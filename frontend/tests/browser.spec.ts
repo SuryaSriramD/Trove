@@ -570,6 +570,7 @@ test("mixed clipboard retains block structure and allocates distinct IDs", async
   await page.keyboard.press("ArrowRight");
   await page.keyboard.press("End");
   await page.keyboard.press("Meta+v");
+  await expect(editor.locator(".block-heading_4")).toHaveCount(2);
   await page.getByRole("button", { name: "Save page", exact: true }).click();
   await expect(page.getByRole("status")).toHaveText("Saved");
   const blocks = await page.evaluate(

@@ -306,9 +306,11 @@ RichText DomainRichText `json:"richText"`
 }
 type DomainBlockToggleV1 struct {
 RichText DomainRichText `json:"richText"`
+Collapsed *bool `json:"collapsed,omitempty"`
 }
 type DomainBlockToggleHeadingV1 struct {
 RichText DomainRichText `json:"richText"`
+Collapsed *bool `json:"collapsed,omitempty"`
 }
 type DomainBlockTodoV1 struct {
 TaskRecordId DomainId `json:"taskRecordId"`

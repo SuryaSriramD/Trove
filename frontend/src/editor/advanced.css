@@ -1,1 +1,13 @@
 .editor-editable{border:0;padding:0;margin:0;min-width:0}.page-lock{display:flex;gap:12px;align-items:center;margin:8px 0}.page-lock small{color:var(--text-muted,#777)}.block-heading_4 .block-text{font-size:1.05rem;font-weight:650;margin-block:8px}.advanced-panel{padding:16px 0;border-top:1px solid #ddd}.advanced-panel section{padding:12px}.advanced-panel button{margin:4px}.advanced-layout{border:1px solid #ccc;padding:10px;border-radius:8px}.advanced-layout [role=tab][aria-selected=true]{border-bottom:3px solid #6d5bd0}.column-panels{display:flex;gap:14px}.column-panels section{min-width:0}.advanced-layout textarea{width:100%;min-height:80px}.advanced-layout label,.table-controls label,.bookmark-card label,.embed-card label{display:block;font-size:12px}.advanced-layout input{max-width:100%}.table-controls{display:flex;gap:8px;align-items:end}.synced-card,.bookmark-card,.embed-card{padding:12px;border:1px solid #ddd;border-radius:8px}.embed-card iframe{width:100%;border:0;min-height:100px;background:white}.atom-block dialog{z-index:10;max-width:80vw;max-height:70vh;overflow:auto}.atom-block dialog pre{white-space:pre-wrap}.editor-editable:disabled .trove-editor{opacity:.8}.editor-editable:disabled .block-actions{display:none}
+
+/* All canonical descendants share one presentation layer; local node effects
+   must not reveal children hidden by a collapsed ancestor. */
+.trove-hidden-block { display: none !important; }
+.table-controls { border: 0; padding: 0; margin: 0 0 8px; }
+.inline-rich-editor { min-width: 120px; max-width: 100%; }
+.inline-rich-toolbar { display: flex; flex-wrap: wrap; gap: 3px; margin-bottom: 3px; }
+.inline-rich-toolbar button { padding: 2px 4px; font-size: 10px; }
+.inline-rich-content { min-height: 40px; padding: 6px; border: 1px solid var(--line, #ddd); border-radius: 4px; overflow-wrap: anywhere; white-space: pre-wrap; }
+.inline-rich-content p { margin: 0; }
+.inline-rich-content:focus { outline: 2px solid var(--purple, #796292); outline-offset: 1px; }
+.inline-rich-content[contenteditable=false] { border-color: transparent; }

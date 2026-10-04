@@ -9,6 +9,7 @@ import {
 import { Plugin } from "@tiptap/pm/state";
 import { fileURL, ids, type WorkspaceSnapshot } from "../api";
 import { plain } from "./codec";
+import { clearTemporaryReveal, temporarilyExpanded } from "./visibility";
 import { AdvancedBlock, AdvancedTable } from "./AdvancedBlocks";
 import katex from "katex";
 import mermaid from "mermaid";
@@ -20,9 +21,10 @@ export const EditorContext = createContext<{
   toggleTask: (id: string) => void;
   openPage: (id: string) => void;
   pageId?: string;
+  readOnly: boolean;
   onError: (e: unknown) => void;
   onCommitted: () => Promise<void>;
-}>({ workspace: null, toggleTask: () => {}, openPage: () => {}, onError: () => {}, onCommitted: async () => {} });
+}>({ workspace: null, toggleTask: () => {}, openPage: () => {}, onError: () => {}, onCommitted: async () => {}, readOnly: false });
 const attrs = {
   blockId: { default: null, renderHTML: () => ({}) },
   clientKey: { default: null, renderHTML: () => ({}) },
@@ -80,7 +82,7 @@ export function BlockActions({ editor, node, getPos }: NodeViewProps) {
       >
         ⠿
       </button>
-      <button aria-label="Copy block link" title="Copy block link" disabled={!node.attrs.blockId} onClick={() => void navigator.clipboard.writeText(`trove://page/${pageId}/block/${node.attrs.blockId}`).catch(onError)}>↗</button>
+      <button aria-label="Copy block link" title="Copy block link" disabled={!node.attrs.blockId} onClick={() => void navigator.clipboard.writeText(`trove://page/${pageId}/block/${node.attrs.blockId}${workspace?.workspaceId ? `?workspace=${encodeURIComponent(workspace.workspaceId)}` : ""}`).catch(onError)}>↗</button>
       <button
         title="Duplicate block"
         aria-label="Duplicate block"
@@ -94,7 +96,14 @@ export function BlockActions({ editor, node, getPos }: NodeViewProps) {
 function TextView(props: NodeViewProps) {
   const { node, updateAttributes } = props;
   const k = node.attrs.kind;
-  const [open, setOpen] = useState(true);
+  const [, refresh] = useState(0);
+  useEffect(() => {
+    if (!["toggle", "toggle_heading"].includes(k)) return;
+    const changed = () => refresh(n => n + 1);
+    props.editor.on("transaction", changed);
+    return () => { props.editor.off("transaction", changed); };
+  }, [props.editor, k]);
+  const open = node.attrs.data.collapsed !== true || temporarilyExpanded(props.editor, node.attrs.blockId);
   return (
     <NodeViewWrapper
       className={`text-block block-${k}`}
@@ -112,13 +121,8 @@ function TextView(props: NodeViewProps) {
           aria-label="Toggle content"
           aria-expanded={open}
           onClick={() => {
-            setOpen(!open);
-            const element = props.editor.view.dom;
-            const key = node.attrs.blockId;
-            for (const child of element.querySelectorAll<HTMLElement>(
-              "[data-parent]",
-            ))
-              if (child.dataset.parent === key) child.hidden = open;
+            updateAttributes({ data: { ...node.attrs.data, collapsed: open } });
+            clearTemporaryReveal(props.editor);
           }}
         >
           ▸
@@ -182,7 +186,7 @@ function Mermaid({ source }: { source: string }) {
 }
 function AtomView(props: NodeViewProps) {
   const { node, updateAttributes } = props;
-  const { workspace: w, toggleTask, openPage, pageId, onError, onCommitted } = useContext(EditorContext);
+  const { workspace: w, toggleTask, openPage, pageId, onError, onCommitted, readOnly } = useContext(EditorContext);
   const d = node.attrs.data;
   const kind = node.attrs.kind;
   const update = (patch: any) => updateAttributes({ data: { ...d, ...patch } });
@@ -293,7 +297,7 @@ function AtomView(props: NodeViewProps) {
         </details>
       </>
     );
-  else if (kind === "table") body = <AdvancedTable data={d} update={update} />;
+  else if (kind === "table") body = <AdvancedTable data={d} update={update} owner={props.editor} readOnly={readOnly} />;
   else if (["image", "audio", "video", "pdf", "file"].includes(kind))
     body = (
       <figure>
@@ -355,7 +359,7 @@ function AtomView(props: NodeViewProps) {
           d.displaySnapshot}
       </button>
     );
-  else if (["tab_container", "columns", "bookmark", "embed", "synced_block", "breadcrumb", "table_of_contents", "date_mention", "button"].includes(kind)) body = <AdvancedBlock props={props} w={w} pageId={pageId} openPage={openPage} onError={onError} onCommitted={onCommitted} />;
+  else if (["tab_container", "columns", "bookmark", "embed", "synced_block", "breadcrumb", "table_of_contents", "date_mention", "button"].includes(kind)) body = <AdvancedBlock props={props} w={w} pageId={pageId} openPage={openPage} onError={onError} onCommitted={onCommitted} readOnly={readOnly} />;
   else
     body = (
       <div className="preserved">

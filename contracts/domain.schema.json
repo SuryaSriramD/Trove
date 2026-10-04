@@ -2794,6 +2794,10 @@
       "properties": {
         "richText": {
           "$ref": "#/$defs/RichText"
+        },
+        "collapsed": {
+          "type": "boolean",
+          "description": "Persisted presentation preference. Omitted means expanded; child ownership is unchanged."
         }
       },
       "required": [
@@ -2806,6 +2810,10 @@
       "properties": {
         "richText": {
           "$ref": "#/$defs/RichText"
+        },
+        "collapsed": {
+          "type": "boolean",
+          "description": "Persisted presentation preference. Omitted means expanded; child ownership is unchanged."
         }
       },
       "required": [

@@ -7,8 +7,10 @@ import { AdvancedPanel } from "../advanced/AdvancedPanel";
 import { getLock, setLock, type PageLock } from "../advanced/service";
 import { replaceDocument, safeWebURL } from "./advanced";
 import "./advanced.css";
+import { BlockVisibility } from "./visibility";
 import { dispatch, envelope } from "../api";
-import { NodeSelection, TextSelection } from "@tiptap/pm/state";
+import { AllSelection, NodeSelection, Selection, TextSelection } from "@tiptap/pm/state";
+import { GapCursor } from "@tiptap/pm/gapcursor";
 import {
   batch,
   ids,
@@ -185,7 +187,21 @@ export function PageEditor({
         e.view.dispatch(e.state.tr.setSelection(TextSelection.create(e.state.doc,extend?selection.anchor:pos,pos)).scrollIntoView());
         return true;
       };
+      const leaveAllSelection = (end: boolean) => {
+        const e = editorRef.current;
+        if (!e || !(e.state.selection instanceof AllSelection)) return false;
+        // Nested cell editors can leave the browser without a usable native
+        // range. Collapse the canonical selection explicitly before typing or
+        // pasting, rather than relying on a delayed selectionchange event.
+        const edge = e.state.doc.resolve(end ? e.state.doc.content.size : 0);
+        const adjacent = end ? e.state.doc.lastChild : e.state.doc.firstChild;
+        const selection = adjacent?.isAtom ? new GapCursor(edge) : end ? Selection.atEnd(e.state.doc) : Selection.atStart(e.state.doc);
+        e.view.dispatch(e.state.tr.setSelection(selection).scrollIntoView());
+        return true;
+      };
       return {
+        ArrowLeft: () => leaveAllSelection(false),
+        ArrowRight: () => leaveAllSelection(true),
         Home: () => lineEdge(false),
         End: () => lineEdge(true),
         "Shift-Home": () => lineEdge(false,true),
@@ -271,6 +287,7 @@ export function PageEditor({
       TroveText,
       TroveAtom,
       CanonicalIdentity,
+      BlockVisibility,
       shortcuts,
     ],
     content: blocks.length
@@ -808,7 +825,7 @@ export function PageEditor({
     }
   }
   return (
-    <EditorContext.Provider value={{ workspace, toggleTask, openPage, pageId:page.id, onError, onCommitted }}>
+    <EditorContext.Provider value={{ workspace, toggleTask, openPage, pageId:page.id, onError, onCommitted, readOnly: lock.locked }}>
       <div className="page-lock"><button disabled={changingLock} aria-label={lock.locked?"Unlock page":"Lock page"} onClick={()=>void togglePageLock()}>{lock.locked?"🔒 Unlock page":"Lock page"}</button><small>{lock.locked?"Page is locked against workspace mutations.":"Alt + ↑ / ↓ navigates blocks"}</small></div>
       <fieldset className="editor-editable" disabled={lock.locked}>
       <div
@@ -831,6 +848,9 @@ export function PageEditor({
               .focus()
               .updateAttributes("troveText", {
                 kind,
+                ...(!["toggle", "toggle_heading"].includes(kind) && editor.getAttributes("troveText").data?.collapsed !== undefined
+                  ? { data: Object.fromEntries(Object.entries(editor.getAttributes("troveText").data).filter(([key]) => key !== "collapsed")) }
+                  : {}),
                 ...(kind === "callout"
                   ? { data: { icon: "💡", backgroundToken: "yellow" } }
                   : {}),
