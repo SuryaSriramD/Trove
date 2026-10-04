@@ -83,7 +83,22 @@ func (a *App) aiDispatch(method string, raw json.RawMessage) string {
 	if ctx == nil {
 		ctx = context.Background()
 	}
-	prepared, err := k.PrepareAI(ctx, e, req.AIRequest)
+	contextTokens, err := a.native.supervisor.GenerationContext(req.ModelPackID)
+	if err != nil {
+		return errorEnvelope("WORKER_FAILED", err.Error())
+	}
+	prepareCtx, prepareCancel := context.WithTimeout(ctx, 30*time.Second)
+	defer prepareCancel()
+	prepared, err := k.PrepareAIWithBudget(prepareCtx, e, req.AIRequest, workspace.AIBudget{
+		ContextTokens: contextTokens, OutputTokens: min(2048, contextTokens/4),
+		CountTokens: func(ctx context.Context, prompts []workspace.AIPrompt) ([]int, error) {
+			texts := make([]string, len(prompts))
+			for i, prompt := range prompts {
+				texts[i] = native.ChatPrompt(prompt.System, prompt.User)
+			}
+			return a.native.supervisor.CountTokens(ctx, req.ModelPackID, texts)
+		},
+	})
 	if err != nil {
 		var failure *workspace.ServiceFailure
 		if errors.As(err, &failure) {
@@ -107,7 +122,9 @@ func (a *App) aiDispatch(method string, raw json.RawMessage) string {
 		}
 		text := ""
 		last := time.Now()
-		answer, err := a.native.supervisor.GenerateText(generation, req.ModelPackID, native.ChatPrompt(prepared.System, prepared.Prompt), 512, func(token string) {
+		completion, err := workspace.GeneratePreparedAI(generation, prepared, func(ctx context.Context, system, prompt string, tokens int, grammar string, stream func(string)) (string, error) {
+			return a.native.supervisor.GenerateTextWithGrammar(ctx, req.ModelPackID, native.ChatPrompt(system, prompt), tokens, grammar, stream)
+		}, func(token string) {
 			text += token
 			emit(map[string]any{"state": "running", "token": token})
 			if time.Since(last) > time.Second {
@@ -115,6 +132,7 @@ func (a *App) aiDispatch(method string, raw json.RawMessage) string {
 				last = time.Now()
 			}
 		})
+		answer := completion.Text
 		state, failure := "completed", ""
 		if err != nil {
 			state = "failed"

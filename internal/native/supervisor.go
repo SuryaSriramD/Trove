@@ -177,7 +177,7 @@ func (s *Supervisor) Run(ctx context.Context, r Request, onEvent func(Event)) (j
 	}
 	defer release()
 	operation := r.Wire.Operation
-	if (operation == "generate" && p.Kind != "chat") || (operation == "embed" && p.Kind != "embedding") || (operation == "transcribe" && p.Kind != "speech") {
+	if ((operation == "generate" || operation == "tokenize") && p.Kind != "chat") || (operation == "embed" && p.Kind != "embedding") || (operation == "transcribe" && p.Kind != "speech") {
 		return nil, errors.New("MODEL_INCOMPATIBLE: operation")
 	}
 	if r.Wire.Limits.MemoryBytes > memoryLimit() || p.EstimatedMemoryBytes > r.Wire.Limits.MemoryBytes {
@@ -435,6 +435,7 @@ func (s *Supervisor) Run(ctx context.Context, r Request, onEvent func(Event)) (j
 	}
 	var body struct {
 		Kind        string            `json:"kind"`
+		Counts      []int             `json:"counts"`
 		Dimension   int               `json:"dimension"`
 		Vectors     [][]float64       `json:"vectors"`
 		Locations   []json.RawMessage `json:"locations"`
@@ -445,6 +446,9 @@ func (s *Supervisor) Run(ctx context.Context, r Request, onEvent func(Event)) (j
 		} `json:"segments"`
 	}
 	_ = json.Unmarshal(raw, &body)
+	if operation == "tokenize" && (body.Kind != "token_counts" || len(body.Counts) != len(metadata.Texts)) {
+		return nil, errors.New("tokenizer result mismatch")
+	}
 	if operation == "embed" {
 		if body.Kind != "embedding" || body.ModelPackID != p.ID || body.Dimension != p.Dimension || len(body.Vectors) != len(body.Locations) {
 			return nil, errors.New("embedding shape mismatch")

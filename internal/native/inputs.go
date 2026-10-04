@@ -47,12 +47,23 @@ func validateInputMetadata(p Pack, operation string, inputs []Input) (InputMetad
 	if m.SchemaVersion != 1 {
 		return m, errors.New("INVALID_INPUT: metadata version")
 	}
-	if operation == "generate" || operation == "embed" {
+	if operation == "generate" || operation == "embed" || operation == "tokenize" {
 		if len(inputs) != 1 || m.ContextTokens < 32 || m.ContextTokens > p.ContextTokens || m.ContextTokens > 32768 || (m.GPULayers != 0 && m.GPULayers != -1) || m.MeetingID != "" || len(m.SegmentIDs) > 0 || m.Language != "" || m.UseGPU {
 			return m, errors.New("INVALID_INPUT: model context or inputs")
 		}
 	}
 	switch operation {
+	case "tokenize":
+		if m.Text != "" || len(m.Texts) == 0 || len(m.Texts) > 16 || len(m.Locations) != 0 || m.Grammar != "" || m.GPULayers != 0 {
+			return m, errors.New("INVALID_INPUT: tokenizer batch")
+		}
+		total := 0
+		for _, text := range m.Texts {
+			total += len(text)
+			if text == "" || len(text) > 128<<10 || total > 1<<20 {
+				return m, errors.New("INVALID_INPUT: tokenizer text budget")
+			}
+		}
 	case "generate":
 		if m.Text == "" || len(m.Text) > 1<<20 || len(m.Texts) > 0 || len(m.Locations) > 0 || len(m.Grammar) > 64<<10 {
 			return m, errors.New("INVALID_INPUT: prompt or grammar")

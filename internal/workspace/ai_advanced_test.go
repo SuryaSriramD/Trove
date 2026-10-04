@@ -156,6 +156,13 @@ func TestAdvancedAICodeRejectsAmbiguousSelectionsAndTruncatedWholeBlock(t *testi
 			if err != nil {
 				t.Fatal(err)
 			}
+			if kind == "missing_evidence" {
+				// Explicitly remove the recorded evidence. Canonical code is now
+				// supplied verbatim, so whitespace no longer creates this condition.
+				if _, err := k.db.Exec("UPDATE ai_runs SET sources_json='[]' WHERE id=?", prepared.Run.ID); err != nil {
+					t.Fatal(err)
+				}
+			}
 			run, err := k.FinishAI(ctx, e, prepared.Run.ID, "return 42", "completed", "")
 			if err != nil {
 				t.Fatal(err)

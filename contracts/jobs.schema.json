@@ -499,7 +499,8 @@
           "enum": [
             "generate",
             "embed",
-            "transcribe"
+            "transcribe",
+            "tokenize"
           ]
         },
         "modelPackId": {
@@ -561,10 +562,11 @@
                 "enum": [
                   "generate",
                   "embed",
-                  "transcribe"
+                  "transcribe",
+                  "tokenize"
                 ]
               },
-              "maxItems": 3
+              "maxItems": 4
             }
           },
           "required": [
@@ -768,6 +770,13 @@
                 "$ref": "domain.schema.json#/$defs/Location"
               },
               "maxItems": 256
+            },
+            "finishReason": {
+              "type": "string",
+              "enum": [
+                "eos",
+                "length"
+              ]
             }
           },
           "required": [
@@ -869,6 +878,28 @@
             "kind",
             "meetingId",
             "segments"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "kind": {
+              "const": "token_counts"
+            },
+            "counts": {
+              "type": "array",
+              "items": {
+                "type": "integer",
+                "minimum": 1,
+                "maximum": 1048576
+              },
+              "maxItems": 16
+            }
+          },
+          "required": [
+            "kind",
+            "counts"
           ],
           "additionalProperties": false
         }

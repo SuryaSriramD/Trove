@@ -392,7 +392,7 @@ export function AIPanel({
           </select>
           <textarea
             aria-label="Selected source text"
-            maxLength={1200}
+            maxLength={16384}
             placeholder="Optional: paste an exact selection from the source block"
             value={selection}
             onChange={(e) => setSelection(e.target.value)}
@@ -404,7 +404,7 @@ export function AIPanel({
         placeholder="Ask a question or describe the draft you want…"
         value={prompt}
         onChange={(e) => setPrompt(e.target.value)}
-        maxLength={2000}
+        maxLength={8192}
       />
       <div className="ai-controls">
         <label>

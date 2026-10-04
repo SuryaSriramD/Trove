@@ -1851,13 +1851,15 @@ type JobsWorkerResult struct { Value JobsWorkerResultValue }
 func (JobsWorkerResultVariant1) isJobsWorkerResult() {}
 func (JobsWorkerResultVariant2) isJobsWorkerResult() {}
 func (JobsWorkerResultVariant3) isJobsWorkerResult() {}
+func (JobsWorkerResultVariant4) isJobsWorkerResult() {}
 func (v JobsWorkerResult) MarshalJSON() ([]byte,error) { return json.Marshal(v.Value) }
 func (v *JobsWorkerResult) UnmarshalJSON(data []byte) error {
 var fields map[string]json.RawMessage
 if err := json.Unmarshal(data, &fields); err != nil {return err}
-if matchesVariant(fields,[]string{"kind","text","citations"},map[string]string{"kind":"\"generation\""},map[string][]string{},[]string{"kind","text","citations"}) { var result JobsWorkerResultVariant1; if err := json.Unmarshal(data,&result); err != nil {return err}; v.Value=result; return nil }
+if matchesVariant(fields,[]string{"kind","text","citations"},map[string]string{"kind":"\"generation\""},map[string][]string{"finishReason":{"\"eos\"","\"length\""}},[]string{"kind","text","citations","finishReason"}) { var result JobsWorkerResultVariant1; if err := json.Unmarshal(data,&result); err != nil {return err}; v.Value=result; return nil }
 if matchesVariant(fields,[]string{"kind","modelPackId","dimension","vectors","locations"},map[string]string{"kind":"\"embedding\""},map[string][]string{},[]string{"kind","modelPackId","dimension","vectors","locations"}) { var result JobsWorkerResultVariant2; if err := json.Unmarshal(data,&result); err != nil {return err}; v.Value=result; return nil }
 if matchesVariant(fields,[]string{"kind","meetingId","segments"},map[string]string{"kind":"\"transcript\""},map[string][]string{},[]string{"kind","meetingId","segments"}) { var result JobsWorkerResultVariant3; if err := json.Unmarshal(data,&result); err != nil {return err}; v.Value=result; return nil }
+if matchesVariant(fields,[]string{"kind","counts"},map[string]string{"kind":"\"token_counts\""},map[string][]string{},[]string{"kind","counts"}) { var result JobsWorkerResultVariant4; if err := json.Unmarshal(data,&result); err != nil {return err}; v.Value=result; return nil }
 return fmt.Errorf("unknown or incomplete JobsWorkerResult variant")
 }
 type JobsEnqueueJobRequest struct {
@@ -2157,6 +2159,7 @@ type JobsWorkerResultVariant1 struct {
 Kind string `json:"kind"`
 Text string `json:"text"`
 Citations []DomainLocation `json:"citations"`
+FinishReason *string `json:"finishReason,omitempty"`
 }
 type JobsWorkerResultVariant2 struct {
 Kind string `json:"kind"`
@@ -2175,6 +2178,10 @@ StartMs int64 `json:"startMs"`
 EndMs int64 `json:"endMs"`
 Text string `json:"text"`
 } `json:"segments"`
+}
+type JobsWorkerResultVariant4 struct {
+Kind string `json:"kind"`
+Counts []int64 `json:"counts"`
 }
 type JobsJobResponseVariant1 struct {
 Ok bool `json:"ok"`

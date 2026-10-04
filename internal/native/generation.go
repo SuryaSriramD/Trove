@@ -56,9 +56,9 @@ func (s *Supervisor) GenerateTextWithGrammar(ctx context.Context, packID, prompt
 		return "", errors.New("INVALID_INPUT: answer token limit must be 1–2048")
 	}
 	contextTokens := min(pack.ContextTokens, 8192)
-	// UTF-8 byte count is a conservative token upper bound. Refuse rather than
-	// silently truncating user requests or evidence. Callers can select less context.
-	if prompt == "" || len(prompt)+maxTokens+16 > contextTokens {
+	// Bound transport allocation here. The pinned worker enforces the exact
+	// tokenizer count including generated tokens before evaluating any prompt.
+	if prompt == "" || len(prompt) > 128<<10 || maxTokens >= contextTokens {
 		return "", errors.New("RESOURCE_EXHAUSTED: prompt exceeds the local context budget; reduce the selection or sources")
 	}
 	f, err := os.CreateTemp("", "trove-generation-")
@@ -89,8 +89,9 @@ func (s *Supervisor) GenerateTextWithGrammar(ctx context.Context, packID, prompt
 		return "", err
 	}
 	var result struct {
-		Kind string `json:"kind"`
-		Text string `json:"text"`
+		Kind         string `json:"kind"`
+		Text         string `json:"text"`
+		FinishReason string `json:"finishReason"`
 	}
 	if err = json.Unmarshal(raw, &result); err != nil {
 		return "", err
@@ -98,5 +99,61 @@ func (s *Supervisor) GenerateTextWithGrammar(ctx context.Context, packID, prompt
 	if result.Kind != "generation" || strings.TrimSpace(result.Text) == "" {
 		return "", errors.New("WORKER_FAILED: model returned no answer")
 	}
+	if result.FinishReason != "eos" {
+		return result.Text, errors.New("OUTPUT_LIMIT: generation did not finish; partial text is retained as a draft and cannot replace source")
+	}
 	return result.Text, nil
+}
+
+// GenerationContext uses only a verified installed instruction pack. Callers
+// cannot increase this budget by passing fields in a model-generated request.
+func (s *Supervisor) GenerationContext(packID string) (int, error) {
+	if s == nil || s.manager == nil {
+		return 0, errors.New("MODEL_NOT_INSTALLED: local runtime is unavailable")
+	}
+	packs, err := s.manager.List()
+	if err != nil {
+		return 0, err
+	}
+	for _, status := range packs {
+		p := status.Pack
+		if p.ID == packID && status.State == "ready" && p.Kind == "chat" && !p.QualificationOnly {
+			return min(p.ContextTokens, 8192), nil
+		}
+	}
+	return 0, errors.New("MODEL_NOT_INSTALLED: install a verified instruction pack in Models")
+}
+
+// CountTokens uses the same vocabulary and special-token handling as generation,
+// but loads no tensor weights and allocates no inference context.
+func (s *Supervisor) CountTokens(ctx context.Context, packID string, prompts []string) ([]int, error) {
+	contextTokens, err := s.GenerationContext(packID)
+	if err != nil {
+		return nil, err
+	}
+	f, err := os.CreateTemp("", "trove-tokenizer-")
+	if err != nil {
+		return nil, err
+	}
+	defer os.Remove(f.Name())
+	defer f.Close()
+	if err = json.NewEncoder(f).Encode(InputMetadata{SchemaVersion: 1, Texts: prompts, ContextTokens: contextTokens}); err != nil {
+		return nil, err
+	}
+	input, err := OpenInput(f, "text", NewID())
+	if err != nil {
+		return nil, err
+	}
+	wire := contracts.JobsWorkerRequest{ProtocolVersion: 1, RequestId: contracts.DomainId(NewID()), JobId: contracts.DomainId(NewID()), LeaseToken: contracts.DomainId(NewID()), CancellationId: contracts.DomainId(NewID()), Operation: "tokenize", ModelPackId: contracts.DomainId(packID), Limits: contracts.JobsResourceLimits{Threads: 1, MemoryBytes: s.MemoryBudget(), TimeoutMs: 30000, MaxOutputBytes: 4096, MaxTokens: 1}}
+	raw, err := s.Run(ctx, Request{Wire: wire, Inputs: []Input{input}, Priority: PriorityChat}, nil)
+	if err != nil {
+		return nil, err
+	}
+	var result struct {
+		Counts []int `json:"counts"`
+	}
+	if err = json.Unmarshal(raw, &result); err != nil {
+		return nil, err
+	}
+	return result.Counts, nil
 }
