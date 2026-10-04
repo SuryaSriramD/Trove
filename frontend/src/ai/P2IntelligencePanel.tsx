@@ -11,6 +11,14 @@ import {
 } from "../api";
 import type { Location } from "../../../contracts/generated/domain";
 
+import {
+  GeneratedReviewCard,
+  ReviewGenerationOptions,
+  newReviewGeneration,
+  type ReviewGeneration,
+  type GeneratedReviewRun,
+} from "./GenerativeReview";
+
 type Graph = {
   nodes: { id: string; title: string; revision: string }[];
   edges: {
@@ -25,6 +33,7 @@ type Graph = {
   warning?: string;
 };
 type Plan = {
+  generative?: ReviewGeneration;
   type: string;
   name: string;
   enabled: boolean;
@@ -52,6 +61,7 @@ type PlanView = {
   error?: string;
 };
 type Run = {
+  generative?: ReviewGeneration;
   id: string;
   pageId: string;
   planBlockId: string;
@@ -105,6 +115,12 @@ export function P2IntelligencePanel({
     [time, setTime] = useState("09:00"),
     [frequency, setFrequency] = useState("daily"),
     [missedPolicy, setMissedPolicy] = useState("skip");
+  const [generative, setGenerative] = useState(false),
+    [generation, setGeneration] = useState(newReviewGeneration),
+    [consent, setConsent] = useState(false),
+    [includeMemory, setIncludeMemory] = useState(false),
+    [weekday, setWeekday] = useState(1),
+    [otherSources, setOtherSources] = useState<string[]>([]);
   const [zone, setZone] = useState(
       Intl.DateTimeFormat().resolvedOptions().timeZone,
     ),
@@ -161,24 +177,47 @@ export function P2IntelligencePanel({
         limit: 60,
       }),
     );
+  useEffect(() => {
+    if (!reviews?.runs.some((r) => ["queued", "generating"].includes(r.status)))
+      return;
+    let active = true;
+    const timer = setInterval(() => {
+      dispatch<Reviews>("review.list", envelope(workspace))
+        .then((r) => {
+          if (active) setReviews(r);
+        })
+        .catch(onError);
+    }, 2000);
+    return () => {
+      active = false;
+      clearInterval(timer);
+    };
+  }, [reviews?.runs, workspace.workspaceId]);
   const createPlan = async () => {
-    if (!page || !source) return;
+    if (
+      !page ||
+      !source ||
+      (generative &&
+        (!consent || !generation.modelPackId || !generation.categories.length))
+    )
+      return;
     const [blockId] = await ids(workspace, 1);
     const [hour, minute] = time.split(":").map(Number);
     const plan: Plan = {
       type: "trove.personal-review/v1",
       name: reviewName,
       enabled: true,
-      sourcePageIds: [source],
+      sourcePageIds: [...new Set([source, ...otherSources])].slice(0, 32),
       query,
-      includeMemory: true,
+      includeMemory,
+      ...(generative ? { generative: generation } : {}),
       schedule: {
         type: "schedule",
         timezone: zone,
         frequency,
         hour,
         minute,
-        weekday: 1,
+        weekday,
         missedPolicy,
         catchUpLimit: 1,
       },
@@ -528,7 +567,13 @@ export function P2IntelligencePanel({
           </label>
           <label>
             Source page{" "}
-            <select value={source} onChange={(e) => setSource(e.target.value)}>
+            <select
+              value={source}
+              onChange={(e) => {
+                setSource(e.target.value);
+                setConsent(false);
+              }}
+            >
               {workspace.pages
                 .filter((p) => !p.deletedAt)
                 .map((p) => (
@@ -538,6 +583,62 @@ export function P2IntelligencePanel({
                 ))}
             </select>
           </label>
+          <label>
+            Additional source pages
+            <select
+              multiple
+              value={otherSources}
+              onChange={(e) => {
+                setConsent(false);
+                setOtherSources(
+                  Array.from(e.target.selectedOptions, (o) => o.value).slice(
+                    0,
+                    31,
+                  ),
+                );
+              }}
+            >
+              {workspace.pages
+                .filter((p) => !p.deletedAt && p.id !== source)
+                .map((p) => (
+                  <option key={p.id} value={p.id}>
+                    {p.title || "Untitled"}
+                  </option>
+                ))}
+            </select>
+          </label>
+          <label>
+            <input
+              type="checkbox"
+              checked={includeMemory}
+              onChange={(e) => {
+                setConsent(false);
+                setIncludeMemory(e.target.checked);
+              }}
+            />
+            Include approved relevant memories
+          </label>
+          <label>
+            <input
+              type="checkbox"
+              checked={generative}
+              onChange={(e) => {
+                setGenerative(e.target.checked);
+                setConsent(false);
+              }}
+            />
+            Enable local model analysis for this plan
+          </label>
+          {generative && (
+            <ReviewGenerationOptions
+              workspace={workspace}
+              value={generation}
+              onChange={setGeneration}
+              consent={consent}
+              onConsent={setConsent}
+              onError={onError}
+            />
+          )}
           <label>
             Evidence query{" "}
             <input
@@ -553,9 +654,32 @@ export function P2IntelligencePanel({
               onChange={(e) => setFrequency(e.target.value)}
             >
               <option value="daily">Daily</option>
-              <option value="weekly">Every Monday</option>
+              <option value="weekly">Weekly</option>
             </select>
           </label>
+          {frequency === "weekly" && (
+            <label>
+              Review weekday
+              <select
+                value={weekday}
+                onChange={(e) => setWeekday(Number(e.target.value))}
+              >
+                {[
+                  "Sunday",
+                  "Monday",
+                  "Tuesday",
+                  "Wednesday",
+                  "Thursday",
+                  "Friday",
+                  "Saturday",
+                ].map((day, i) => (
+                  <option key={day} value={i}>
+                    {day}
+                  </option>
+                ))}
+              </select>
+            </label>
+          )}
           <label>
             Local time{" "}
             <input
@@ -580,7 +704,16 @@ export function P2IntelligencePanel({
           </label>
           <button
             disabled={
-              busy || !page || !source || !reviewName.trim() || !time || !zone
+              busy ||
+              !page ||
+              !source ||
+              !reviewName.trim() ||
+              !time ||
+              !zone ||
+              (generative &&
+                (!consent ||
+                  !generation.modelPackId ||
+                  !generation.categories.length))
             }
             onClick={() => void run(createPlan)}
           >
@@ -606,8 +739,32 @@ export function P2IntelligencePanel({
                       ? new Date(p.nextAt).toLocaleString()
                       : "on the next scheduler tick"}
                   </p>
+                  {p.plan.generative && (
+                    <p>
+                      Local model: {p.plan.generative.modelPackId}. Categories:{" "}
+                      {p.plan.generative.categories.join(", ")}. Enabled
+                      proposed changes:{" "}
+                      {p.plan.generative.allowedActions.join(", ") || "none"}.
+                      Destinations:{" "}
+                      {p.plan.generative.actionPageIds
+                        .map(
+                          (id) =>
+                            workspace.pages.find((page) => page.id === id)
+                              ?.title || "Unavailable page",
+                        )
+                        .join(", ") || "none"}
+                      .{" "}
+                      {p.plan.includeMemory
+                        ? "Approved relevant memories included."
+                        : "Memories excluded."}{" "}
+                      Activation permits scheduled read-only analysis; every
+                      write needs a separate approval.
+                    </p>
+                  )}
                   <button
-                    disabled={busy}
+                    disabled={
+                      busy || Boolean(p.plan.generative && !p.activated)
+                    }
                     onClick={() =>
                       void run(async () => {
                         await dispatch("review.run", {
@@ -624,7 +781,11 @@ export function P2IntelligencePanel({
                     disabled={busy}
                     onClick={() => void run(() => togglePlan(p))}
                   >
-                    {p.activated ? "Pause" : "Activate locally"}
+                    {p.activated
+                      ? "Pause"
+                      : p.plan.generative
+                        ? "Allow and activate local model review"
+                        : "Activate locally"}
                   </button>
                 </>
               )}
@@ -633,39 +794,52 @@ export function P2IntelligencePanel({
           <button disabled={busy} onClick={() => void run(loadReviews)}>
             Refresh review drafts
           </button>
-          {reviews?.runs.map((r) => (
-            <article key={r.id}>
-              <h3>
-                {r.status} · {new Date(r.createdAt).toLocaleString()}
-              </h3>
-              <pre style={{ whiteSpace: "pre-wrap" }}>{r.text}</pre>
-              <ul>
-                {r.sources.map((s, i) => (
-                  <li key={i}>
-                    <button onClick={() => onNavigate(s.pageId)}>
-                      Source · revision {s.sourceRevision}
+          {reviews?.runs.map((r) =>
+            r.generative ? (
+              <GeneratedReviewCard
+                key={r.id}
+                workspace={workspace}
+                review={r as GeneratedReviewRun}
+                onReload={loadReviews}
+                onRefresh={refresh}
+                onNavigate={onNavigate}
+                onDismiss={() => decide(r, false)}
+                onError={onError}
+              />
+            ) : (
+              <article key={r.id}>
+                <h3>
+                  {r.status} · {new Date(r.createdAt).toLocaleString()}
+                </h3>
+                <pre style={{ whiteSpace: "pre-wrap" }}>{r.text}</pre>
+                <ul>
+                  {r.sources.map((s, i) => (
+                    <li key={i}>
+                      <button onClick={() => onNavigate(s.pageId)}>
+                        Source · revision {s.sourceRevision}
+                      </button>
+                    </li>
+                  ))}
+                </ul>
+                {r.status === "pending" && (
+                  <>
+                    <button
+                      disabled={busy}
+                      onClick={() => void run(() => decide(r, true))}
+                    >
+                      Approve and append this digest
                     </button>
-                  </li>
-                ))}
-              </ul>
-              {r.status === "pending" && (
-                <>
-                  <button
-                    disabled={busy}
-                    onClick={() => void run(() => decide(r, true))}
-                  >
-                    Approve and append this digest
-                  </button>
-                  <button
-                    disabled={busy}
-                    onClick={() => void run(() => decide(r, false))}
-                  >
-                    Dismiss
-                  </button>
-                </>
-              )}
-            </article>
-          ))}
+                    <button
+                      disabled={busy}
+                      onClick={() => void run(() => decide(r, false))}
+                    >
+                      Dismiss
+                    </button>
+                  </>
+                )}
+              </article>
+            ),
+          )}
         </>
       )}
     </section>

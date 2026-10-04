@@ -6225,6 +6225,145 @@
         "localCleared"
       ],
       "additionalProperties": false
+    },
+    "PersonalReviewGenerationConfig": {
+      "type": "object",
+      "properties": {
+        "modelPackId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "categories": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": [
+              "summary",
+              "risks",
+              "decisions",
+              "next_steps"
+            ]
+          },
+          "maxItems": 4,
+          "minItems": 1,
+          "uniqueItems": true
+        },
+        "allowedActions": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": [
+              "append_review",
+              "rename_page",
+              "append_page",
+              "create_task",
+              "set_task_status",
+              "set_task_due"
+            ]
+          },
+          "maxItems": 6,
+          "uniqueItems": true
+        },
+        "actionPageIds": {
+          "type": "array",
+          "items": {
+            "$ref": "domain.schema.json#/$defs/Id"
+          },
+          "maxItems": 32,
+          "uniqueItems": true
+        }
+      },
+      "required": [
+        "modelPackId",
+        "categories",
+        "allowedActions",
+        "actionPageIds"
+      ],
+      "additionalProperties": false
+    },
+    "PersonalReviewGeneratedDraft": {
+      "type": "object",
+      "properties": {
+        "claims": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "category": {
+                "type": "string",
+                "enum": [
+                  "summary",
+                  "risks",
+                  "decisions",
+                  "next_steps"
+                ]
+              },
+              "text": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 2000
+              },
+              "quote": {
+                "type": "string",
+                "maxLength": 4000
+              }
+            },
+            "required": [
+              "category",
+              "text",
+              "quote"
+            ],
+            "additionalProperties": false
+          },
+          "maxItems": 12,
+          "minItems": 1
+        },
+        "actions": {
+          "type": "array",
+          "items": {
+            "oneOf": [
+              {
+                "$ref": "#/$defs/PlanUpdatePage"
+              },
+              {
+                "$ref": "#/$defs/PlanCreateTask"
+              },
+              {
+                "$ref": "#/$defs/PlanUpdateTask"
+              }
+            ]
+          },
+          "maxItems": 8
+        }
+      },
+      "required": [
+        "claims",
+        "actions"
+      ],
+      "additionalProperties": false
+    },
+    "PersonalReviewControlRequest": {
+      "type": "object",
+      "properties": {
+        "contractVersion": {
+          "const": 1
+        },
+        "requestId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "workspaceId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "runId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        }
+      },
+      "required": [
+        "contractVersion",
+        "requestId",
+        "workspaceId",
+        "runId"
+      ],
+      "additionalProperties": false
     }
   }
 }

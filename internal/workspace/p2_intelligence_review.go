@@ -15,13 +15,14 @@ import (
 // Plans are canonical code blocks. They round-trip through existing block
 // history, native/portable exports, imports and search without a second schema.
 type PersonalReviewPlan struct {
-	Type          string            `json:"type"`
-	Name          string            `json:"name"`
-	Enabled       bool              `json:"enabled"`
-	SourcePageIDs []string          `json:"sourcePageIds"`
-	Query         string            `json:"query"`
-	IncludeMemory bool              `json:"includeMemory"`
-	Schedule      AutomationTrigger `json:"schedule"`
+	Generative    *PersonalReviewGenerationConfig `json:"generative,omitempty"`
+	Type          string                          `json:"type"`
+	Name          string                          `json:"name"`
+	Enabled       bool                            `json:"enabled"`
+	SourcePageIDs []string                        `json:"sourcePageIds"`
+	Query         string                          `json:"query"`
+	IncludeMemory bool                            `json:"includeMemory"`
+	Schedule      AutomationTrigger               `json:"schedule"`
 }
 type PersonalReviewPlanView struct {
 	BlockID   string             `json:"blockId"`
@@ -33,16 +34,26 @@ type PersonalReviewPlanView struct {
 	Error     string             `json:"error,omitempty"`
 }
 type PersonalReviewRun struct {
-	ID          string                     `json:"id"`
-	PlanBlockID string                     `json:"planBlockId"`
-	PlanHash    string                     `json:"planHash"`
-	PageID      string                     `json:"pageId"`
-	Occurrence  string                     `json:"occurrence"`
-	Status      string                     `json:"status"`
-	Text        string                     `json:"text"`
-	Sources     []contracts.DomainLocation `json:"sources"`
-	Memories    []PersonalReviewMemory     `json:"memories,omitempty"`
-	CreatedAt   string                     `json:"createdAt"`
+	Generative  *PersonalReviewGenerationConfig     `json:"generative,omitempty"`
+	Evidence    []AIEvidence                        `json:"evidence,omitempty"`
+	Guards      []contracts.ServiceExpectedRevision `json:"guards,omitempty"`
+	Actions     []PlannedAction                     `json:"actions,omitempty"`
+	ModelRunID  string                              `json:"modelRunId,omitempty"`
+	ProposalID  string                              `json:"proposalId,omitempty"`
+	Warning     string                              `json:"warning,omitempty"`
+	Error       string                              `json:"error,omitempty"`
+	Attempt     int                                 `json:"attempt,omitempty"`
+	Citations   []AICitation                        `json:"citations,omitempty"`
+	ID          string                              `json:"id"`
+	PlanBlockID string                              `json:"planBlockId"`
+	PlanHash    string                              `json:"planHash"`
+	PageID      string                              `json:"pageId"`
+	Occurrence  string                              `json:"occurrence"`
+	Status      string                              `json:"status"`
+	Text        string                              `json:"text"`
+	Sources     []contracts.DomainLocation          `json:"sources"`
+	Memories    []PersonalReviewMemory              `json:"memories,omitempty"`
+	CreatedAt   string                              `json:"createdAt"`
 }
 type PersonalReviewMemory struct {
 	ID       string `json:"id"`
@@ -155,6 +166,11 @@ func readReviewPlan(ctx context.Context, q querier, id string) (PersonalReviewPl
 	if err = validateAutomationRule(&rule); err != nil {
 		return view, err
 	}
+	if p.Generative != nil {
+		if err := contracts.Validate("service", "PersonalReviewGenerationConfig", marshal(p.Generative)); err != nil {
+			return view, Fail("INVALID_REQUEST", "Invalid generative review configuration: "+err.Error())
+		}
+	}
 	p.Schedule = rule.Trigger
 	_ = q.QueryRowContext(ctx, "SELECT next_at FROM personal_review_schedule WHERE block_id=? AND plan_hash=?", id, view.Hash).Scan(&view.NextAt)
 	var activated int
@@ -226,11 +242,21 @@ func personalReviewList(ctx context.Context, k *Kernel, e contracts.ServiceExecu
 				allowed = false
 			}
 		}
+		if run.Generative != nil {
+			for _, g := range run.Guards {
+				if k.authorizeEntity(ctx, k.db, e, g.Target.EntityType, string(g.Target.EntityId)) != nil {
+					allowed = false
+				}
+			}
+		}
 		if allowed {
+			// Internal captured context and authority guards are not renderer state.
+			run.Evidence = nil
+			run.Guards = nil
 			runs = append(runs, run)
 		}
 	}
-	return map[string]any{"plans": plans, "runs": runs, "engine": "Deterministic local review: cited retrieval and incomplete tasks; no model required", "scheduling": "While this workspace owner is running; daily/weekly IANA wall-clock recurrence; no background effects"}, rows.Err()
+	return map[string]any{"plans": plans, "runs": runs, "engine": "Deterministic cited digests, with optional explicitly activated local-model analysis and reviewed actions", "scheduling": "While this workspace owner is running; daily/weekly IANA wall-clock recurrence; no background effects"}, rows.Err()
 }
 func (k *Kernel) preparePersonalReview(ctx context.Context, e contracts.ServiceExecutionContext, p PersonalReviewPlanView, occurrence string, at time.Time) (PersonalReviewRun, error) {
 	run := PersonalReviewRun{ID: NewID(), PlanBlockID: p.BlockID, PlanHash: p.Hash, PageID: p.PageID, Occurrence: occurrence, Status: "pending", Sources: []contracts.DomainLocation{}, CreatedAt: at.UTC().Format(time.RFC3339Nano)}
@@ -360,7 +386,23 @@ func (k *Kernel) preparePersonalReview(ctx context.Context, e contracts.ServiceE
 		}
 	}
 	run.Text = strings.Join(parts, "\n\n")
+	if p.Plan.Generative != nil {
+		if !p.Activated || !p.Plan.Enabled {
+			return run, Fail("APPROVAL_REQUIRED", "Activate this exact review plan locally before requesting model analysis")
+		}
+		run.Generative = p.Plan.Generative
+		run.Status = "queued"
+		if err := k.capturePersonalReviewGeneration(ctx, e, p, &run); err != nil {
+			return run, err
+		}
+	}
+
 	err := k.write(ctx, func(tx *sql.Tx) error {
+		if run.Generative != nil {
+			if err := k.validateReviewGenerationSnapshot(ctx, tx, e, run); err != nil {
+				return err
+			}
+		}
 		if err := validatePersonalReviewMemories(ctx, tx, run.Memories); err != nil {
 			return err
 		}
@@ -472,6 +514,19 @@ func reviewDecision(m *Mutation, c map[string]any) error {
 		return Fail("SCOPE_DENIED", "Review belongs to another page")
 	}
 	if err := m.AuthorizePage(run.PageID); err != nil {
+		return err
+	}
+	if run.Generative != nil {
+		if str(c["kind"]) == "review.accept" {
+			return Fail("APPROVAL_REQUIRED", "Generated reviews require the shared AI proposal approval")
+		}
+		if status == "accepted" || status == "dismissed" {
+			return Fail("CONFLICT", "Review was already accepted or dismissed")
+		}
+		if err := m.TouchPage(run.PageID); err != nil {
+			return err
+		}
+		_, err := m.Exec("UPDATE personal_review_runs SET status='dismissed' WHERE id=?", run.ID)
 		return err
 	}
 	if status != "pending" {
