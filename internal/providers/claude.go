@@ -23,10 +23,13 @@ type ClaudeConfig struct {
 	Model            string
 	BridgeURL        string
 	ConnectionID     string
-	Token            string
+	Token            string `json:"-"`
 	Tools            []ToolSpec
 	ContextManifest  json.RawMessage
 }
+
+func (ClaudeConfig) String() string   { return "Claude runtime configuration (redacted)" }
+func (ClaudeConfig) GoString() string { return "Claude runtime configuration (redacted)" }
 
 func (c ClaudeConfig) checkpoint(thread string) ManagedCheckpoint {
 	return ManagedCheckpoint{1, c.Identity, c.ScopeHash, ContainmentPolicy, c.Runtime.SHA256, c.Model, thread}
@@ -54,7 +57,7 @@ func (c ClaudeConfig) validate() error {
 	}
 	seen := map[string]bool{}
 	for _, tool := range c.Tools {
-		if !regexp.MustCompile(`^[A-Za-z][A-Za-z0-9_]{0,63}$`).MatchString(tool.Name) || seen[tool.Name] {
+		if !regexp.MustCompile(`^[A-Za-z][A-Za-z0-9_.]{0,63}$`).MatchString(tool.Name) || seen[tool.Name] {
 			return errors.New("invalid repeated Claude tool")
 		}
 		seen[tool.Name] = true

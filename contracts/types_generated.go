@@ -3018,6 +3018,53 @@ type ServiceProviderAuthSignOutResult struct {
 	RemoteRevoked bool `json:"remoteRevoked"`
 	LocalCleared  bool `json:"localCleared"`
 }
+type ServiceProviderClaudeAuth struct {
+	LoggedIn     bool    `json:"loggedIn"`
+	Method       string  `json:"method"`
+	Account      *string `json:"account,omitempty"`
+	AccountLabel *string `json:"accountLabel,omitempty"`
+	BillingMode  *string `json:"billingMode,omitempty"`
+	Reason       *string `json:"reason,omitempty"`
+}
+type ServiceProviderClaudeLoginAttempt struct {
+	Id        DomainId `json:"id"`
+	ProfileId DomainId `json:"profileId"`
+	State     string   `json:"state"`
+	Message   string   `json:"message"`
+	ExpiresAt string   `json:"expiresAt"`
+}
+type ServiceProviderClaudeProfile struct {
+	SignOutIncomplete bool                               `json:"signOutIncomplete"`
+	Id                DomainId                           `json:"id"`
+	Label             string                             `json:"label"`
+	BillingMode       string                             `json:"billingMode"`
+	CreatedAt         string                             `json:"createdAt"`
+	Auth              ServiceProviderClaudeAuth          `json:"auth"`
+	Attempt           *ServiceProviderClaudeLoginAttempt `json:"attempt,omitempty"`
+}
+type ServiceProviderClaudeListRequest struct {
+	ContractVersion int64    `json:"contractVersion"`
+	RequestId       DomainId `json:"requestId"`
+	WorkspaceId     DomainId `json:"workspaceId"`
+}
+type ServiceProviderClaudeCreateRequest struct {
+	ContractVersion int64    `json:"contractVersion"`
+	RequestId       DomainId `json:"requestId"`
+	WorkspaceId     DomainId `json:"workspaceId"`
+	Label           string   `json:"label"`
+	BillingMode     string   `json:"billingMode"`
+}
+type ServiceProviderClaudeProfileRequest struct {
+	ContractVersion int64    `json:"contractVersion"`
+	RequestId       DomainId `json:"requestId"`
+	WorkspaceId     DomainId `json:"workspaceId"`
+	ProfileId       DomainId `json:"profileId"`
+}
+type ServiceProviderClaudeListResult struct {
+	Available bool                           `json:"available"`
+	Reason    string                         `json:"reason"`
+	Profiles  []ServiceProviderClaudeProfile `json:"profiles"`
+}
 type ServicePersonalReviewGenerationConfig struct {
 	ModelPackId    DomainId   `json:"modelPackId"`
 	Categories     []string   `json:"categories"`

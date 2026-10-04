@@ -227,6 +227,16 @@ defs.update({
 'ProviderAuthListResult':obj({'available':B,'reason':S,'registrations':arr(R('ProviderAuthRegistration'),32)}),
 'ProviderAuthSignOutResult':obj({'remoteRevoked':B,'localCleared':B}),
 })
+# Native Claude profiles expose only public vendor status and login receipts.
+defs.update({
+ 'ProviderClaudeAuth':obj({'loggedIn':B,'method':S,'account':S,'accountLabel':S,'billingMode':enum('claude_subscription','anthropic_api'),'reason':S},['loggedIn','method']),
+ 'ProviderClaudeLoginAttempt':obj({'id':D('Id'),'profileId':D('Id'),'state':enum('waiting','running','completed','failed','cancelled','interrupted','cancellation_requested'),'message':{'type':'string','maxLength':512},'expiresAt':{'type':'string','format':'date-time'}}),
+ 'ProviderClaudeProfile':obj({'signOutIncomplete':B,'id':D('Id'),'label':{'type':'string','minLength':1,'maxLength':120},'billingMode':enum('claude_subscription','anthropic_api'),'createdAt':{'type':'string','format':'date-time'},'auth':R('ProviderClaudeAuth'),'attempt':R('ProviderClaudeLoginAttempt')},['id','label','billingMode','createdAt','auth','signOutIncomplete']),
+ 'ProviderClaudeListRequest':obj(header),
+ 'ProviderClaudeCreateRequest':obj({**header,'label':{'type':'string','minLength':1,'maxLength':120},'billingMode':enum('claude_subscription','anthropic_api')}),
+ 'ProviderClaudeProfileRequest':obj({**header,'profileId':D('Id')}),
+ 'ProviderClaudeListResult':obj({'available':B,'reason':S,'profiles':arr(R('ProviderClaudeProfile'),32)}),
+})
 # Optional personal reviews generate read-only drafts; accepted actions use AIProposal.
 defs.update({
  'PersonalReviewGenerationConfig':obj({'modelPackId':D('Id'),'categories':{**arr(enum('summary','risks','decisions','next_steps'),4),'minItems':1,'uniqueItems':True},'allowedActions':{**arr(enum('append_review','rename_page','append_page','create_task','set_task_status','set_task_due'),6),'uniqueItems':True},'actionPageIds':{**arr(D('Id'),32),'uniqueItems':True}}),

@@ -7,6 +7,8 @@ import (
 	"net/http"
 	"os"
 
+	"trove.local/phase0/internal/providers"
+
 	"github.com/wailsapp/wails/v2"
 	"github.com/wailsapp/wails/v2/pkg/options"
 	"github.com/wailsapp/wails/v2/pkg/options/assetserver"
@@ -17,6 +19,12 @@ import (
 var frontendAssets embed.FS
 
 func main() {
+	if len(os.Args) > 1 && os.Args[1] == "--trove-claude-login" {
+		if len(os.Args) != 3 {
+			os.Exit(1)
+		}
+		os.Exit(providers.RunClaudeLoginHelper(os.Args[2]))
+	}
 	app := NewApp()
 	for _, argument := range os.Args[1:] {
 		app.openURL(argument)

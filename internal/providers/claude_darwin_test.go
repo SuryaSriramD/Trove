@@ -67,7 +67,14 @@ func TestInstalledClaudeReadinessGatesLoginAndExecution(t *testing.T) {
 	if !r.Available {
 		t.Fatal(r.Reason)
 	}
-	status, err := ClaudeAuthStatus(ctx, r, t.TempDir())
+	fresh, err := filepath.EvalSymlinks(t.TempDir())
+	if err != nil {
+		t.Fatal(err)
+	}
+	if err := os.Chmod(fresh, 0700); err != nil {
+		t.Fatal(err)
+	}
+	status, err := ClaudeAuthStatus(ctx, r, fresh)
 	if err != nil || status.LoggedIn || status.Method != "none" {
 		t.Fatal("fresh profile reached an existing account", status, err)
 	}

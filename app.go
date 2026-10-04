@@ -148,6 +148,7 @@ func (a *App) shutdown(context.Context) {
 	a.stopRecordings()
 	a.stopAI()
 	a.stopProviders()
+	a.stopProviderClaude()
 	a.stopProviderAuth()
 	if a.native != nil {
 		a.native.mu.Lock()
@@ -182,6 +183,7 @@ func (a *App) openLocked(path string, create bool) error {
 	a.stopRecordings()
 	a.stopAI()
 	a.stopProviders()
+	a.stopProviderClaude()
 	a.stopProviderAuth()
 	var k *workspace.Kernel
 	var err error
@@ -235,7 +237,7 @@ func (a *App) Dispatch(method, raw string) string {
 		return a.nativeDispatch(method, json.RawMessage(raw))
 	}
 	if strings.HasPrefix(method, "providers.") {
-		if method == "providers.auth.signOut" {
+		if method == "providers.auth.signOut" || method == "providers.claude.login" || method == "providers.claude.logout" {
 			a.lifecycle.Lock()
 			defer a.lifecycle.Unlock()
 			return a.providerDispatch(method, json.RawMessage(raw))

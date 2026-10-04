@@ -6226,6 +6226,221 @@
       ],
       "additionalProperties": false
     },
+    "ProviderClaudeAuth": {
+      "type": "object",
+      "properties": {
+        "loggedIn": {
+          "type": "boolean"
+        },
+        "method": {
+          "type": "string"
+        },
+        "account": {
+          "type": "string"
+        },
+        "accountLabel": {
+          "type": "string"
+        },
+        "billingMode": {
+          "type": "string",
+          "enum": [
+            "claude_subscription",
+            "anthropic_api"
+          ]
+        },
+        "reason": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "loggedIn",
+        "method"
+      ],
+      "additionalProperties": false
+    },
+    "ProviderClaudeLoginAttempt": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "profileId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "state": {
+          "type": "string",
+          "enum": [
+            "waiting",
+            "running",
+            "completed",
+            "failed",
+            "cancelled",
+            "interrupted",
+            "cancellation_requested"
+          ]
+        },
+        "message": {
+          "type": "string",
+          "maxLength": 512
+        },
+        "expiresAt": {
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      "required": [
+        "id",
+        "profileId",
+        "state",
+        "message",
+        "expiresAt"
+      ],
+      "additionalProperties": false
+    },
+    "ProviderClaudeProfile": {
+      "type": "object",
+      "properties": {
+        "signOutIncomplete": {
+          "type": "boolean"
+        },
+        "id": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "label": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 120
+        },
+        "billingMode": {
+          "type": "string",
+          "enum": [
+            "claude_subscription",
+            "anthropic_api"
+          ]
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "auth": {
+          "$ref": "#/$defs/ProviderClaudeAuth"
+        },
+        "attempt": {
+          "$ref": "#/$defs/ProviderClaudeLoginAttempt"
+        }
+      },
+      "required": [
+        "id",
+        "label",
+        "billingMode",
+        "createdAt",
+        "auth",
+        "signOutIncomplete"
+      ],
+      "additionalProperties": false
+    },
+    "ProviderClaudeListRequest": {
+      "type": "object",
+      "properties": {
+        "contractVersion": {
+          "const": 1
+        },
+        "requestId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "workspaceId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        }
+      },
+      "required": [
+        "contractVersion",
+        "requestId",
+        "workspaceId"
+      ],
+      "additionalProperties": false
+    },
+    "ProviderClaudeCreateRequest": {
+      "type": "object",
+      "properties": {
+        "contractVersion": {
+          "const": 1
+        },
+        "requestId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "workspaceId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "label": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 120
+        },
+        "billingMode": {
+          "type": "string",
+          "enum": [
+            "claude_subscription",
+            "anthropic_api"
+          ]
+        }
+      },
+      "required": [
+        "contractVersion",
+        "requestId",
+        "workspaceId",
+        "label",
+        "billingMode"
+      ],
+      "additionalProperties": false
+    },
+    "ProviderClaudeProfileRequest": {
+      "type": "object",
+      "properties": {
+        "contractVersion": {
+          "const": 1
+        },
+        "requestId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "workspaceId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "profileId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        }
+      },
+      "required": [
+        "contractVersion",
+        "requestId",
+        "workspaceId",
+        "profileId"
+      ],
+      "additionalProperties": false
+    },
+    "ProviderClaudeListResult": {
+      "type": "object",
+      "properties": {
+        "available": {
+          "type": "boolean"
+        },
+        "reason": {
+          "type": "string"
+        },
+        "profiles": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/ProviderClaudeProfile"
+          },
+          "maxItems": 32
+        }
+      },
+      "required": [
+        "available",
+        "reason",
+        "profiles"
+      ],
+      "additionalProperties": false
+    },
     "PersonalReviewGenerationConfig": {
       "type": "object",
       "properties": {

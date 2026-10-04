@@ -85,13 +85,12 @@ func prepareClaudeState(r Runtime, state string) (string, string, error) {
 	if !claudeVersionSupported(r) || !filepath.IsAbs(state) || strings.ContainsAny(state, "\x00\n\r") {
 		return "", "", errors.New("invalid private Claude runtime profile")
 	}
-	if err := os.MkdirAll(state, 0700); err != nil {
+	// A previous vendor invocation can write inside state. Never turn a symlink
+	// it leaves behind into a larger filesystem grant on the next invocation.
+	if err := privateClaudeDirectory(state); err != nil {
 		return "", "", err
 	}
-	state, err := filepath.EvalSymlinks(state)
-	if err != nil {
-		return "", "", err
-	}
+	var err error
 	if err = os.MkdirAll(filepath.Join(state, "vendor"), 0700); err != nil {
 		return "", "", err
 	}

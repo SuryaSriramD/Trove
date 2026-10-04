@@ -41,6 +41,9 @@ func (a *App) stopProviders() {
 	}
 }
 func (a *App) providerDispatch(method string, raw json.RawMessage) string {
+	if strings.HasPrefix(method, "providers.claude.") {
+		return a.providerClaudeDispatch(method, raw)
+	}
 	if strings.HasPrefix(method, "providers.auth.") {
 		return a.providerAuthDispatch(method, raw)
 	}

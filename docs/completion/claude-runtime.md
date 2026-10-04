@@ -22,8 +22,9 @@ directly through the adapter.
   command hook only after qualification, with an explicit deadline of at most
   ten minutes. The host must attach the vendor's terminal/PTY directly, cancel
   when it closes, and neither inspect nor persist terminal input/output. Login
-  must be a distinct owner action. No embedded native terminal is delivered by
-  this adapter; the login UI remains unqualified. Trove must not ask the user to
+  must be a distinct owner action. The [private profile interface](claude-profiles.md)
+  now supplies an explicit native Terminal handoff. Actual Terminal/account login
+  remains unqualified. Trove must not ask the user to
   paste an OAuth code or token into a Trove field.
 - Login keeps the normal deny-inbound policy. Official documentation describes
   entering a browser-returned code directly into the vendor terminal when the
