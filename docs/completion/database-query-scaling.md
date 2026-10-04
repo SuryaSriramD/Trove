@@ -66,3 +66,7 @@ about 106 ms combined; this is a diagnostic observation, not an acceptance SLA.
 Browser tests exercise lazy page bodies, independent backlinks, virtual
 table/gallery pages and complete-list loading alongside the existing database
 editing/width/calendar/chart regressions.
+
+## Scoped quick search correction
+
+Quick-switcher body matches in shell mode use scoped keyword search; title matches remain available from scoped metadata. Responses are tied to workspace, grant, snapshot cursor and query, so stale searches cannot replace current results. Search failures remain visible. The 10,000-page browser fixture now honors shell snapshots and scoped page reads, and tests body-only matches and refresh without a globally loaded block array. Its renderer readiness retains the two-second assertion; the multi-step 10,000-node accessibility workflow has a separate 60-second test timeout.

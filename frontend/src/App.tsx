@@ -122,6 +122,11 @@ export default function App() {
   const [recents, setRecents] = useState<string[]>(() => stored("recents", []));
   const [switcher, setSwitcher] = useState(false);
   const [query, setQuery] = useState("");
+  const [quickResults, setQuickResults] = useState<{
+    key: string;
+    ids: string[];
+    error?: string;
+  }>({ key: "", ids: [] });
   const [history, setHistory] = useState<string[]>(["Home"]);
   const [position, setPosition] = useState(0);
   const [pageMenu, setPageMenu] = useState(false);
@@ -711,24 +716,79 @@ export default function App() {
   }
   // Read block text only for an actual switcher query, once per snapshot/open.
   const searching = switcher && query.length > 0;
+  const quickKey = `${w?.workspaceId}:${w?.scopeGrantId}:${w?.snapshotCursor}:${query}`;
+  useEffect(() => {
+    let live = true;
+    if (!searching || !w || w.contentMode !== "shell") return;
+    void dispatch<{
+      hits: { location: { pageId: string } }[];
+      partial?: boolean;
+      warning?: string;
+    }>("search.query", {
+      ...envelope(w),
+      query,
+      mode: "keyword",
+      limit: 200,
+      kinds: ["page", "task"],
+    })
+      .then((result) => {
+        if (live)
+          setQuickResults({
+            key: quickKey,
+            ids: [...new Set(result.hits.map((hit) => hit.location.pageId))],
+            error: result.partial
+              ? (result.warning ?? "Search index is incomplete.")
+              : undefined,
+          });
+      })
+      .catch((error) => {
+        if (live)
+          setQuickResults({
+            key: quickKey,
+            ids: [],
+            error: String(error.message ?? error),
+          });
+      });
+    return () => {
+      live = false;
+    };
+  }, [searching, w?.workspaceId, w?.scopeGrantId, w?.snapshotCursor, w?.contentMode, query]);
   const searchDocuments = useMemo(
     () =>
-      searching
+      searching && w?.contentMode !== "shell"
         ? visible.map((p) => ({
             page: p,
             text: `${p.title} ${(blocksByPage.get(p.id) ?? []).map(readable).join(" ")}`.toLocaleLowerCase(),
           }))
         : [],
-    [searching, visible, blocksByPage],
+    [searching, visible, blocksByPage, w?.contentMode],
   );
   const found = useMemo(() => {
     if (!switcher) return [];
     if (!query) return visible;
+    if (w?.contentMode === "shell") {
+      const needle = query.toLocaleLowerCase();
+      const ids = new Set(
+        quickResults.key === quickKey ? quickResults.ids : [],
+      );
+      return visible.filter(
+        (page) =>
+          page.title.toLocaleLowerCase().includes(needle) || ids.has(page.id),
+      );
+    }
     const needle = query.toLocaleLowerCase();
     return searchDocuments
       .filter((entry) => entry.text.includes(needle))
       .map((entry) => entry.page);
-  }, [switcher, query, visible, searchDocuments]);
+  }, [
+    switcher,
+    query,
+    visible,
+    searchDocuments,
+    w?.contentMode,
+    quickResults,
+    quickKey,
+  ]);
   return (
     <div
       className={`app${pageDisplay?.presentation ? " presentation-layout" : ""}`}
@@ -1664,7 +1724,25 @@ export default function App() {
                 <span>↵</span>
               </button>
             ))}
-            {!found.length && <p>No matching pages. Try another phrase.</p>}
+            {searching &&
+              w?.contentMode === "shell" &&
+              quickResults.key !== quickKey && (
+                <p role="status">Searching page contents…</p>
+              )}
+            {searching &&
+              w?.contentMode === "shell" &&
+              quickResults.key === quickKey &&
+              quickResults.error && (
+                <p role="alert">
+                  Content search unavailable: {quickResults.error}
+                </p>
+              )}
+            {!found.length &&
+              !(
+                searching &&
+                w?.contentMode === "shell" &&
+                quickResults.key !== quickKey
+              ) && <p>No matching pages. Try another phrase.</p>}
           </div>
         </div>
       )}

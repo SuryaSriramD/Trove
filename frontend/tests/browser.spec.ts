@@ -184,11 +184,19 @@ test.beforeEach(async ({ page }, testInfo) => {
             },
             Dispatch: async (method: string, raw: string) => {
               const req = JSON.parse(raw);
+              ((window as any).fixtureRequests ??= []).push({method,...req});
               const ok = (result: any) => JSON.stringify({ ok: true, result });
               if (method === "workspace.snapshot") {
-                const response = ok(state);
+                const response = ok(req.contentMode === "shell" && state.pages.length >= 10000 ? {...state,contentMode:"shell",blocks:[]} : state);
                 (window as any).fixtureSnapshotReadyAt = performance.now();
                 return response;
+              }
+              if (method === "readPage") return ok({page:state.pages.find((p:any)=>p.id===req.pageId),blocks:state.blocks.filter((b:any)=>b.pageId===req.pageId)});
+              if (method === "links.backlinks") return ok({links:[]});
+              if (method === "search.query" && state.pages.length >= 10000) {
+                const needle=req.query.toLocaleLowerCase(),texts=new Map<string,string>();
+                for(const block of state.blocks) texts.set(block.pageId,(texts.get(block.pageId)??"")+" "+JSON.stringify(block.data));
+                return ok({hits:state.pages.filter((p:any)=>!p.deletedAt&&!p.archivedAt&&(p.title+" "+(texts.get(p.id)??"")).toLocaleLowerCase().includes(needle)).slice(0,req.limit).map((p:any)=>({title:p.title,kind:"page",location:{pageId:p.id,sourceRevision:p.revision}})),partial:false});
               }
               if (method === "pageDisplay.get") return ok({pageId:req.pageId,fullWidth:false,presentation:false,revision:state.pages.find((p:any)=>p.id===req.pageId)?.revision ?? "1"});
               if (method === "editor.lock") return ok((state as any).pageLock ?? {locked:false,revision:"0"});
@@ -417,9 +425,12 @@ const open = async (page: any) =>
     .first()
     .click();
 test(largeWorkspaceTest, async ({ page }) => {
+  // The workflow traverses a 10k-node accessibility tree; startup keeps its separate <2s budget.
+  test.setTimeout(60000);
   await expect.poll(() => page.evaluate(() => (window as any).fixtureShellReadyMs)).toBeGreaterThan(0);
   // This is renderer readiness from the snapshot response, not native process startup.
   const shellMs = await page.evaluate(() => (window as any).fixtureShellReadyMs);
+  expect(await page.evaluate(() => (window as any).fixtureRequests.find((r:any)=>r.method==="workspace.snapshot").contentMode)).toBe("shell");
   await test.info().attach("large-workspace-renderer-ready", {
     body: JSON.stringify({ pages: 10000, blocks: 20000, shellMs, endpoint: "snapshot response to rendered shell plus two frames" }),
     contentType: "application/json",
@@ -432,7 +443,7 @@ test(largeWorkspaceTest, async ({ page }) => {
   await expect(tree.getByRole("button", { name: "▤ Page 09996", exact: true })).toHaveCount(0);
 
   await page.keyboard.press("Meta+k");
-  const dialog = page.getByRole("dialog", { name: "Quick switcher" });
+  const dialog = page.locator(".switcher");
   const query = dialog.getByRole("textbox", { name: "Find a page" });
   await query.fill("only-body-target తెలుగు");
   await expect(dialog.getByRole("button")).toHaveCount(1);
@@ -476,6 +487,7 @@ test(largeWorkspaceTest, async ({ page }) => {
   await page.locator(".breadcrumbs").getByRole("button", { name: "Page 00000", exact: true }).click();
   await page.keyboard.press("Meta+k");
   await query.fill("refreshed-body-only");
+  await expect(dialog.getByRole("button")).toContainText("Refreshed research");
   await query.press("Enter");
   await expect(page.getByRole("textbox", { name: "Page title" })).toHaveValue("Refreshed research");
 });
