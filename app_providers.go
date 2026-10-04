@@ -87,17 +87,8 @@ func (a *App) providerDispatch(method string, raw json.RawMessage) string {
 		var connection workspace.ProviderConnection
 		connection, err = h.bridge.Connect(ctx, r.Provider, r.PageIDs, r.Tools)
 		if err == nil {
-			h.mu.Lock()
-			if h.listener == nil {
-				h.listener, err = net.Listen("tcp4", "127.0.0.1:0")
-				if err == nil {
-					h.url = "http://" + h.listener.Addr().String() + "/mcp"
-					h.server = &http.Server{Handler: h.bridge.MCPHandler(), ReadHeaderTimeout: 5 * time.Second, ReadTimeout: 15 * time.Second, WriteTimeout: 30 * time.Second, IdleTimeout: 30 * time.Second, MaxHeaderBytes: 8192}
-					go h.server.Serve(h.listener)
-				}
-			}
-			url := h.url
-			h.mu.Unlock()
+			var url string
+			url, err = h.ensureLocalServer()
 			if err != nil {
 				_ = h.bridge.Disconnect(ctx, connection.ID)
 			}
@@ -133,4 +124,21 @@ func (a *App) providerDispatch(method string, raw json.RawMessage) string {
 	}
 	out, _ := json.Marshal(map[string]any{"ok": true, "result": result})
 	return string(out)
+}
+
+func (h *providerHost) ensureLocalServer() (string, error) {
+	h.mu.Lock()
+	defer h.mu.Unlock()
+	if h.listener != nil {
+		return h.url, nil
+	}
+	listener, err := net.Listen("tcp4", "127.0.0.1:0")
+	if err != nil {
+		return "", err
+	}
+	h.listener = listener
+	h.url = "http://" + listener.Addr().String() + "/mcp"
+	h.server = &http.Server{Handler: h.bridge.MCPHandler(), ReadHeaderTimeout: 5 * time.Second, ReadTimeout: 15 * time.Second, WriteTimeout: 30 * time.Second, IdleTimeout: 30 * time.Second, MaxHeaderBytes: 8192}
+	go h.server.Serve(listener)
+	return h.url, nil
 }

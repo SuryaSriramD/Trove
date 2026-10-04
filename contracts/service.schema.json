@@ -5894,8 +5894,8 @@
           "type": "string",
           "enum": [
             "chatgpt_plan",
-            "subscription",
-            "api"
+            "claude_subscription",
+            "anthropic_api"
           ]
         },
         "model": {

@@ -84,7 +84,7 @@ func (b *ProviderBridge) Connect(ctx context.Context, provider string, pages, to
 // The host establishes vendor identity and OS containment before creating this
 // same narrowly scoped, revocable proposal-only capability.
 func (b *ProviderBridge) ConnectManaged(ctx context.Context, provider, account, authMode, billingMode string, pages, tools []string) (ProviderConnection, error) {
-	valid := provider == "codex" && authMode == "siwc" && billingMode == "chatgpt_plan" || provider == "claude_code" && authMode == "vendor_owned" && (billingMode == "subscription" || billingMode == "api")
+	valid := provider == "codex" && authMode == "siwc" && billingMode == "chatgpt_plan" || provider == "claude_code" && authMode == "vendor_owned" && (billingMode == "claude_subscription" || billingMode == "anthropic_api")
 	if !valid || strings.TrimSpace(account) == "" || len(account) > 512 {
 		return ProviderConnection{}, Fail("INVALID_REQUEST", "Invalid managed provider identity")
 	}
