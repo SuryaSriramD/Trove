@@ -1,7 +1,8 @@
 # Managed runtime implementation and qualification
 
-This is development evidence for EXT-001/002/005. Managed runtime transport and
-desktop integration are under construction; no live account is qualified.
+This is development evidence for EXT-001/002/005. The Codex desktop account,
+model/context selection and managed transport are implemented. Claude and remote
+MCP integration continue separately; no live account is qualified.
 
 The host discovers user-installed native executables in standard installation
 locations, resolves the actual path, hashes it, and checks its version inside a
@@ -57,3 +58,39 @@ Dynamic tools include the protocol's `type: function` tag and return typed conte
 items. Native session history stays in the private runtime directory. Model choices
 must come from the selected account's [current catalog](https://developers.openai.com/siwc/token-sharing-open-source/models-and-inference);
 catalog membership alone is not proof that an inference request will succeed.
+
+## Desktop integration
+
+The Codex panel requires runtime discovery, an explicit saved registration, a
+fresh account-specific model list, selected pages/tools, and a context preview
+before starting. Switching accounts clears both model selection and preview.
+There is no automatic API billing fallback. Model catalogs use the selected
+registration's token at the fixed public HTTPS endpoint, reject redirects, and
+have bounded response size/time. Only visible catalog entries can be selected;
+the host checks catalog membership and freshness again at start.
+
+Workspace/owner validation precedes credential access. Account sign-out is
+serialized with provider start, cancels that account's process, and clears its
+catalog before revocation. Disconnect cancels the corresponding active process.
+Workspace changes and shutdown stop processes before closing protected storage.
+Partial output remains visible on cancellation. A failed final database save is
+reported as an unsaved failure, never durable completion. Resume checks account,
+billing, model, runtime digest and page/tool scope before allocating a connection.
+
+`evidence/c5-provider-ui-service.txt` covers host authorization-before-storage,
+uncreated symlink ancestors, invalid sign-out, selected-account model catalogs,
+protocol scope/approval/terminal/cancellation/resume guards. The auth package has
+its own full suite; the narrow host command's auth selector matched no tests.
+`evidence/c5-managed-browser.json` records 7 passing browser scenarios, including
+account isolation, stale previews, cancellation with partial output, and the
+shared local/MCP proposal approval panels. These browser fixtures do not prove
+vendor authentication, model entitlement, or real-client inference.
+
+`evidence/c5-provider-integrated-loopback-race.txt` records the full provider,
+authentication and desktop race suites passing. The earlier
+`c5-provider-integrated-race.txt` is retained: its OAuth/clipper listener checks
+failed because the shell sandbox denied loopback binding, not because a vendor
+account was used. The rerun permits isolated synthetic loopback fixtures.
+The final affected service check also covers current scope metadata and strict
+stream turn binding. `c5-provider-frontend-build.txt` records the production
+frontend build after the seven browser passes.

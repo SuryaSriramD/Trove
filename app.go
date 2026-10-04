@@ -148,6 +148,7 @@ func (a *App) shutdown(context.Context) {
 	a.stopRecordings()
 	a.stopAI()
 	a.stopProviders()
+	a.stopProviderAuth()
 	if a.native != nil {
 		a.native.mu.Lock()
 		for _, cancel := range a.native.cancellations {
@@ -181,6 +182,7 @@ func (a *App) openLocked(path string, create bool) error {
 	a.stopRecordings()
 	a.stopAI()
 	a.stopProviders()
+	a.stopProviderAuth()
 	var k *workspace.Kernel
 	var err error
 	if _, statErr := os.Stat(filepath.Join(path, "workspace.db")); statErr == nil {
@@ -233,6 +235,11 @@ func (a *App) Dispatch(method, raw string) string {
 		return a.nativeDispatch(method, json.RawMessage(raw))
 	}
 	if strings.HasPrefix(method, "providers.") {
+		if method == "providers.auth.signOut" {
+			a.lifecycle.Lock()
+			defer a.lifecycle.Unlock()
+			return a.providerDispatch(method, json.RawMessage(raw))
+		}
 		a.lifecycle.RLock()
 		defer a.lifecycle.RUnlock()
 		return a.providerDispatch(method, json.RawMessage(raw))

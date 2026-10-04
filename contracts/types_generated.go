@@ -2933,6 +2933,12 @@ type ServiceProviderManagedStatusRequest struct {
 	RequestId       DomainId `json:"requestId"`
 	WorkspaceId     DomainId `json:"workspaceId"`
 }
+type ServiceProviderModelsRequest struct {
+	ContractVersion int64    `json:"contractVersion"`
+	RequestId       DomainId `json:"requestId"`
+	WorkspaceId     DomainId `json:"workspaceId"`
+	RegistrationId  DomainId `json:"registrationId"`
+}
 type ServiceProviderDiscoverRequest struct {
 	ContractVersion int64    `json:"contractVersion"`
 	RequestId       DomainId `json:"requestId"`

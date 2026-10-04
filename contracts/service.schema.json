@@ -5814,6 +5814,30 @@
       ],
       "additionalProperties": false
     },
+    "ProviderModelsRequest": {
+      "type": "object",
+      "properties": {
+        "contractVersion": {
+          "const": 1
+        },
+        "requestId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "workspaceId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "registrationId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        }
+      },
+      "required": [
+        "contractVersion",
+        "requestId",
+        "workspaceId",
+        "registrationId"
+      ],
+      "additionalProperties": false
+    },
     "ProviderDiscoverRequest": {
       "type": "object",
       "properties": {

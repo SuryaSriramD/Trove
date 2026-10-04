@@ -6,13 +6,13 @@ import (
 	"errors"
 	"os"
 	"path/filepath"
-	"strings"
 	"sync"
 	"time"
 
 	"github.com/wailsapp/wails/v2/pkg/runtime"
 	"trove.local/phase0/contracts"
 	"trove.local/phase0/internal/providers/auth"
+	"trove.local/phase0/internal/workspace"
 )
 
 type providerAuthState struct {
@@ -36,21 +36,7 @@ func (a *App) getProviderAuth() (*auth.Manager, error) {
 	}
 	// Workspace selection is configurable; never let that selection encompass the
 	// fixed host credential metadata directory (or vice versa).
-	workspacePath, err := filepath.Abs(k.Path())
-	if err != nil {
-		return nil, errors.New("Workspace location is unavailable")
-	}
-	if resolved, e := filepath.EvalSymlinks(workspacePath); e == nil {
-		workspacePath = resolved
-	}
-	if resolved, e := filepath.EvalSymlinks(root); e == nil {
-		root = resolved
-	}
-	contains := func(parent, child string) bool {
-		rel, e := filepath.Rel(parent, child)
-		return e == nil && rel != ".." && !strings.HasPrefix(rel, ".."+string(filepath.Separator))
-	}
-	if contains(workspacePath, root) || contains(root, workspacePath) {
+	if pathsOverlap(root, k.Path()) {
 		return nil, errors.New("Account storage must be outside the workspace")
 	}
 	value, _ := providerAuthStates.LoadOrStore(a, &providerAuthState{})
@@ -129,6 +115,13 @@ func (a *App) providerAuthDispatch(method string, raw json.RawMessage) string {
 	case "providers.auth.retry":
 		result, err = manager.Retry(ctx, request.AttemptID, openURL)
 	case "providers.auth.signOut":
+		if value, ok := providerHosts.Load(a); ok {
+			h := value.(*providerHost)
+			h.stopMatchingManaged(func(run workspace.ManagedRun) bool { return run.Account == request.RegistrationID })
+			h.mu.Lock()
+			delete(h.models, request.RegistrationID)
+			h.mu.Unlock()
+		}
 		signoutCtx, cancel := context.WithTimeout(ctx, 35*time.Second)
 		defer cancel()
 		result, err = manager.SignOut(signoutCtx, request.RegistrationID)

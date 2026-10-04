@@ -1,0 +1,3 @@
+ok  	trove.local/phase0/internal/providers	0.824s
+ok  	trove.local/phase0/internal/providers/auth	0.511s [no tests to run]
+ok  	trove.local/phase0	1.367s

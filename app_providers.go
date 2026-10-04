@@ -8,6 +8,7 @@ import (
 	"net/http"
 	"os"
 	"path/filepath"
+	"strings"
 	"sync"
 	"time"
 	"trove.local/phase0/internal/providers"
@@ -20,6 +21,11 @@ type providerHost struct {
 	server   *http.Server
 	listener net.Listener
 	url      string
+	runtimes map[string]providers.Runtime
+	managed  *managedExecution
+	starting bool
+	models   map[string]accountModels
+	unsaved  map[string]workspace.ManagedRun
 }
 
 var providerHosts sync.Map
@@ -27,6 +33,7 @@ var providerHosts sync.Map
 func (a *App) stopProviders() {
 	if v, ok := providerHosts.LoadAndDelete(a); ok {
 		h := v.(*providerHost)
+		h.stopManaged()
 		h.bridge.Close()
 		if h.server != nil {
 			_ = h.server.Close()
@@ -34,6 +41,12 @@ func (a *App) stopProviders() {
 	}
 }
 func (a *App) providerDispatch(method string, raw json.RawMessage) string {
+	if strings.HasPrefix(method, "providers.auth.") {
+		return a.providerAuthDispatch(method, raw)
+	}
+	if method == "providers.models" || method == "providers.discover" || method == "providers.runs" || method == "providers.start" || method == "providers.cancel" {
+		return a.managedProviderDispatch(method, raw)
+	}
 	a.mu.RLock()
 	defer a.mu.RUnlock()
 	if a.kernel == nil {
@@ -92,6 +105,7 @@ func (a *App) providerDispatch(method string, raw json.RawMessage) string {
 			result = map[string]any{"connection": connection, "url": url, "relayPath": filepath.Join(filepath.Dir(exe), "trove-mcp")}
 		}
 	case "providers.disconnect":
+		h.stopMatchingManaged(func(run workspace.ManagedRun) bool { return run.ConnectionID == r.ConnectionID })
 		err = h.bridge.Disconnect(ctx, r.ConnectionID)
 		result = map[string]any{"state": "disconnected"}
 	case "providers.proposals":

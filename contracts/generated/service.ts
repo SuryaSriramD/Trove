@@ -166,6 +166,7 @@ export type ReadEventsResponse = ({ "ok": true; "result": ReadEventsResult; } | 
 export type CancelResponse = ({ "ok": true; "result": CancelResult; } | { "ok": false; "error": Error; });
 export type PrepareFileResponse = ({ "ok": true; "result": PrepareFileResult; } | { "ok": false; "error": Error; });
 export type ProviderManagedStatusRequest = { "contractVersion": 1; "requestId": domain.Id; "workspaceId": domain.Id; };
+export type ProviderModelsRequest = { "contractVersion": 1; "requestId": domain.Id; "workspaceId": domain.Id; "registrationId": domain.Id; };
 export type ProviderDiscoverRequest = { "contractVersion": 1; "requestId": domain.Id; "workspaceId": domain.Id; "provider": "codex" | "claude_code"; };
 export type ProviderManagedStartRequest = { "contractVersion": 1; "requestId": domain.Id; "workspaceId": domain.Id; "provider": "codex" | "claude_code"; "registrationId": string; "billingMode": "chatgpt_plan" | "subscription" | "api"; "model": string; "prompt": string; "pageIds": Array<domain.Id>; "tools": Array<"readPage" | "search.query" | "queryRecords" | "resolveCitation" | "allocateIds" | "proposeChanges" | "proposeActions">; "previewHash": string; "resumeRunId"?: domain.Id; };
 export type ProviderManagedCancelRequest = { "contractVersion": 1; "requestId": domain.Id; "workspaceId": domain.Id; "runId": domain.Id; };

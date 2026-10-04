@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { dispatch, envelope, type WorkspaceSnapshot } from "../api";
 import "./providers.css";
+import { ManagedProviderPanel } from "./ManagedProviderPanel";
 type ContextPreview = {
   pages: { pageId: string; title: string; revision: string; blocks?: number }[];
   notice: string;
@@ -124,7 +125,12 @@ export function ProviderPanel({
           <option value="codex">Codex</option>
         </select>
       </label>
-      {provider !== "mcp" ? (
+      {provider === "codex" ? (
+        <ManagedProviderPanel
+          key={workspace.workspaceId}
+          workspace={workspace}
+        />
+      ) : provider !== "mcp" ? (
         caps
           .filter((c) => c.provider === provider)
           .map((c) => (

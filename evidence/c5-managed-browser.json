@@ -1,0 +1,345 @@
+{
+  "config": {
+    "argv": [
+      "/opt/homebrew/Cellar/node/25.5.0/bin/node",
+      "/Volumes/HD-B1/HD-Projects/Trove/frontend/node_modules/@playwright/test/cli.js",
+      "test",
+      "tests/managed-providers.browser.spec.ts",
+      "tests/provider-accounts.browser.spec.ts",
+      "tests/proposals.browser.spec.ts"
+    ],
+    "configFile": "/Volumes/HD-B1/HD-Projects/Trove/frontend/playwright.config.ts",
+    "rootDir": "/Volumes/HD-B1/HD-Projects/Trove/frontend/tests",
+    "failOnFlakyTests": false,
+    "forbidOnly": false,
+    "fullyParallel": false,
+    "globalSetup": null,
+    "globalTeardown": null,
+    "globalTimeout": 0,
+    "grep": {},
+    "grepInvert": null,
+    "maxFailures": 0,
+    "metadata": {
+      "actualWorkers": 1
+    },
+    "preserveOutput": "always",
+    "projects": [
+      {
+        "outputDir": "/Volumes/HD-B1/HD-Projects/Trove/frontend/test-results",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 1
+        },
+        "id": "",
+        "name": "",
+        "testDir": "/Volumes/HD-B1/HD-Projects/Trove/frontend/tests",
+        "testIgnore": [
+          "**/._*"
+        ],
+        "testMatch": [
+          "browser.spec.ts",
+          "*.browser.spec.ts"
+        ],
+        "timeout": 30000
+      }
+    ],
+    "quiet": false,
+    "reporter": [
+      [
+        "list",
+        null
+      ],
+      [
+        "json",
+        {
+          "outputFile": "../evidence/c5-managed-browser.json"
+        }
+      ]
+    ],
+    "reportSlowTests": {
+      "max": 5,
+      "threshold": 300000
+    },
+    "shard": null,
+    "tags": [],
+    "updateSnapshots": "missing",
+    "updateSourceMethod": "patch",
+    "version": "1.63.0",
+    "workers": 1,
+    "webServer": null
+  },
+  "suites": [
+    {
+      "title": "managed-providers.browser.spec.ts",
+      "file": "managed-providers.browser.spec.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [
+        {
+          "title": "account/model/context require explicit choices; cancellation retains partial output",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 7955,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-04T18:27:09.425Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "769fd91a5affd5ed9c60-951669e72856265dfc7b",
+          "file": "managed-providers.browser.spec.ts",
+          "line": 22,
+          "column": 1
+        },
+        {
+          "title": "account switching clears models and context; stale preview failure is visible",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 2974,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-04T18:27:21.130Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "769fd91a5affd5ed9c60-b222c727677588814dfb",
+          "file": "managed-providers.browser.spec.ts",
+          "line": 75,
+          "column": 1
+        }
+      ]
+    },
+    {
+      "title": "proposals.browser.spec.ts",
+      "file": "proposals.browser.spec.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [
+        {
+          "title": "named local plan has readable review without internal command entry and requires approval",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 4070,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-04T18:27:24.250Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "c5909b61e3a4eb13ca18-0d337a6dd9e816ef815b",
+          "file": "proposals.browser.spec.ts",
+          "line": 7,
+          "column": 1
+        },
+        {
+          "title": "paired client changes show destinations and remain unapplied until review",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 2909,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-04T18:27:28.374Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "c5909b61e3a4eb13ca18-aaec6d6a9a66916439e6",
+          "file": "proposals.browser.spec.ts",
+          "line": 45,
+          "column": 1
+        }
+      ]
+    },
+    {
+      "title": "provider-accounts.browser.spec.ts",
+      "file": "provider-accounts.browser.spec.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [
+        {
+          "title": "account selection and sign-out stay isolated even with matching email",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 2264,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-04T18:27:31.423Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "c6f9f8f6ffc395c63472-626b093c297aa385ae23",
+          "file": "provider-accounts.browser.spec.ts",
+          "line": 7,
+          "column": 1
+        },
+        {
+          "title": "browser sign-in is cancellable and never silently selects an account",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 3789,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-04T18:27:33.798Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "c6f9f8f6ffc395c63472-e7b7f657a1491614ad10",
+          "file": "provider-accounts.browser.spec.ts",
+          "line": 39,
+          "column": 1
+        },
+        {
+          "title": "failed credential cleanup refreshes disabled state and remains retryable",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 2229,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-04T18:27:37.699Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "c6f9f8f6ffc395c63472-eafce56e9561ac8b2af7",
+          "file": "provider-accounts.browser.spec.ts",
+          "line": 71,
+          "column": 1
+        }
+      ]
+    }
+  ],
+  "errors": [],
+  "stats": {
+    "startTime": "2026-10-04T18:27:05.921Z",
+    "duration": 36464.951,
+    "expected": 7,
+    "skipped": 0,
+    "unexpected": 0,
+    "flaky": 0
+  }
+}

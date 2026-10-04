@@ -1,0 +1,52 @@
+# trove.local/phase0/internal/sqlitevec
+internal/sqlitevec/register.go:11:12: warning: 'sqlite3_auto_extension' is deprecated: first deprecated in macOS 10.10 - Process-global auto extensions are not supported on Apple platforms [-Wdeprecated-declarations]
+/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/sqlite3.h:7627:16: note: 'sqlite3_auto_extension' has been explicitly marked deprecated here
+ok  	trove.local/phase0/internal/providers	1.564s
+--- FAIL: TestSIWCRegistrationPKCEStatePersistenceAndRedaction (0.06s)
+    manager_test.go:283: The local sign-in listener could not start
+--- FAIL: TestSIWCRejectsUnverifiedIDTokens (0.60s)
+    --- FAIL: TestSIWCRejectsUnverifiedIDTokens/issuer (0.09s)
+        manager_test.go:344: The local sign-in listener could not start
+    --- FAIL: TestSIWCRejectsUnverifiedIDTokens/audience (0.09s)
+        manager_test.go:344: The local sign-in listener could not start
+    --- FAIL: TestSIWCRejectsUnverifiedIDTokens/nonce (0.11s)
+        manager_test.go:344: The local sign-in listener could not start
+    --- FAIL: TestSIWCRejectsUnverifiedIDTokens/expired (0.09s)
+        manager_test.go:344: The local sign-in listener could not start
+    --- FAIL: TestSIWCRejectsUnverifiedIDTokens/signature (0.14s)
+        manager_test.go:344: The local sign-in listener could not start
+    --- FAIL: TestSIWCRejectsUnverifiedIDTokens/azp (0.07s)
+        manager_test.go:344: The local sign-in listener could not start
+--- FAIL: TestSIWCAccountsStaySeparateAndReturningIdentityCannotChange (0.11s)
+    manager_test.go:356: The local sign-in listener could not start
+--- FAIL: TestSIWCRefreshSerializesAndRetainsScope (0.13s)
+    manager_test.go:394: The local sign-in listener could not start
+--- FAIL: TestSIWCRefreshFailureRecovery (0.48s)
+    --- FAIL: TestSIWCRefreshFailureRecovery/temporary (0.13s)
+        manager_test.go:422: The local sign-in listener could not start
+    --- FAIL: TestSIWCRefreshFailureRecovery/invalid_grant (0.28s)
+        manager_test.go:422: The local sign-in listener could not start
+    --- FAIL: TestSIWCRefreshFailureRecovery/invalid_client (0.06s)
+        manager_test.go:422: The local sign-in listener could not start
+--- FAIL: TestSIWCPlanPermissionAndSecureStoreFailures (0.13s)
+    manager_test.go:443: The local sign-in listener could not start
+--- FAIL: TestSIWCCancelDuringExchangeCannotSaveTokens (0.45s)
+    manager_test.go:469: The local sign-in listener could not start
+--- FAIL: TestSIWCInvalidGrantRetryReusesIssuedClient (0.27s)
+    manager_test.go:497: The local sign-in listener could not start
+--- FAIL: TestSIWCRevocationRetriesAndReportsUnconfirmed (0.21s)
+    --- FAIL: TestSIWCRevocationRetriesAndReportsUnconfirmed/1 (0.10s)
+        manager_test.go:521: The local sign-in listener could not start
+    --- FAIL: TestSIWCRevocationRetriesAndReportsUnconfirmed/3 (0.11s)
+        manager_test.go:521: The local sign-in listener could not start
+--- FAIL: TestSIWCFailedCredentialCleanupIsRetryableAndCannotAuthorize (0.05s)
+    manager_test.go:555: The local sign-in listener could not start
+--- FAIL: TestSIWCCallbackRejectsDuplicateFieldsAndHandlesDeniedConsent (0.29s)
+    manager_test.go:579: The local sign-in listener could not start
+FAIL
+FAIL	trove.local/phase0/internal/providers/auth	3.330s
+--- FAIL: TestDesktopClipperExplicitSessionRevocationAndShutdown (3.04s)
+    app_clipper_test.go:53: listen tcp4 127.0.0.1:0: bind: operation not permitted
+FAIL
+FAIL	trove.local/phase0	17.209s
+FAIL

@@ -103,6 +103,19 @@ func TestCodexOnlySuccessfulBoundTerminalCompletes(t *testing.T) {
 	}
 }
 
+func TestCodexRejectsUnboundAndCrossTurnOutput(t *testing.T) {
+	for _, method := range []string{"item/agentMessage/delta", "item/completed", "turn/completed", "turn/started"} {
+		var out bufferCloser
+		ctx, cancel := context.WithCancel(context.Background())
+		r := newCodexRPC(ctx, &out, strings.NewReader(""), nil, nil)
+		r.thread, r.turn = "thread", "selected-turn"
+		if err := r.handle(ctx, rpcMessage{Method: method, Params: json.RawMessage(`{"threadId":"thread","turnId":"unrelated-turn","delta":"unrelated output","item":{"type":"agentMessage","text":"unrelated output"},"turn":{"id":"unrelated-turn","status":"completed"}}`)}); err == nil {
+			t.Fatalf("accepted cross-turn event %s", method)
+		}
+		cancel()
+	}
+}
+
 func TestCodexProtocolBoundsAndCancellation(t *testing.T) {
 	for _, input := range []string{"not-json\n", strings.Repeat("x", (1<<20)+1) + "\n", ""} {
 		ctx, cancel := context.WithCancel(context.Background())

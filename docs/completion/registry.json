@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "authority": "Accepted Trove completion roadmap C0\u2013C8; acceptance in docs/remaining-work.md remains binding",
-  "updatedAt": "2026-10-04",
+  "updatedAt": "2026-10-05",
   "baselineCommit": "632d0cd0141dc2dcdc7922274757e10083623616",
   "integrationBranch": "integration",
   "ownerRoles": {
@@ -623,16 +623,19 @@
       "interface_boundary": "Layouts, templates, formula values, migration source identities, capture and automation",
       "acceptance_scenario": "Multiple sources in one container remain distinct; linked views share canonical records; interrupted pagination/downloads resume without duplication; permissions never look like empty content; original formulas/caches/provenance remain separate; captured content works after disconnect.",
       "backlog_anchor": "../remaining-work.md#parity-006-complete-notion-api-database-and-source-reconstruction",
-      "implementation": "in progress",
-      "implementation_commit": null,
+      "implementation": "implemented",
+      "implementation_commit": "fef6ab2",
       "verification": {
-        "service_or_interface": "pending",
+        "service_or_interface": "affected service and browser checks passed; see package evidence",
         "candidate": null,
         "macOS": "unqualified",
         "Windows": "unqualified",
         "Linux": "unqualified"
       },
-      "evidence_target": "evidence/completion/PARITY-006/"
+      "evidence_target": "evidence/completion/PARITY-006/",
+      "evidence_documents": [
+        "docs/completion/notion-api-import.md"
+      ]
     },
     {
       "id": "PARITY-007",
@@ -701,16 +704,19 @@
       "interface_boundary": "Layouts, templates, formula values, migration source identities, capture and automation",
       "acceptance_scenario": "Pairing, source provenance, sanitization, selected destination, explicit resource acquisition, revoked pairing, unavailable app, and offline retained content are tested. No unauthenticated arbitrary-write endpoint is introduced.",
       "backlog_anchor": "../remaining-work.md#parity-009-deliver-the-browser-clipper-workflow",
-      "implementation": "in progress",
-      "implementation_commit": null,
+      "implementation": "implemented",
+      "implementation_commit": "de370c2",
       "verification": {
-        "service_or_interface": "pending",
+        "service_or_interface": "affected service and browser checks passed; see package evidence",
         "candidate": null,
         "macOS": "unqualified",
         "Windows": "unqualified",
         "Linux": "unqualified"
       },
-      "evidence_target": "evidence/completion/PARITY-009/"
+      "evidence_target": "evidence/completion/PARITY-009/",
+      "evidence_documents": [
+        "docs/completion/browser-clipper.md"
+      ]
     },
     {
       "id": "PARITY-010",
@@ -725,16 +731,19 @@
       "interface_boundary": "Layouts, templates, formula values, migration source identities, capture and automation",
       "acceptance_scenario": "Users can configure the documented subset without hand-authoring internal commands; preview/run history/pause/retry work; origin exclusions, DST, deduplication, sleep/restart, and bounded catch-up remain correct. No always-on service or unrestricted vendor automation parity is required.",
       "backlog_anchor": "../remaining-work.md#parity-010-expose-usable-automation-configuration",
-      "implementation": "in progress",
-      "implementation_commit": null,
+      "implementation": "implemented",
+      "implementation_commit": "e46fc8d",
       "verification": {
-        "service_or_interface": "pending",
+        "service_or_interface": "affected service and browser checks passed; see package evidence",
         "candidate": null,
         "macOS": "unqualified",
         "Windows": "unqualified",
         "Linux": "unqualified"
       },
-      "evidence_target": "evidence/completion/PARITY-010/"
+      "evidence_target": "evidence/completion/PARITY-010/",
+      "evidence_documents": [
+        "docs/completion/automation-configuration.md"
+      ]
     },
     {
       "id": "AI-001",
@@ -857,16 +866,23 @@
       "interface_boundary": "Shared proposals, scoped grants, provider lifecycle and owning-kernel bridge",
       "acceptance_scenario": "A real completed request proves account/model eligibility; refresh/resume, account switching, denied tools, expired/revoked authorization, interrupted streams, and cancellation pass. Credentials remain out of logs/workspace/model prompts. API billing is never an automatic fallback.",
       "backlog_anchor": "../remaining-work.md#ext-002-complete-managed-codex-execution",
-      "implementation": "open",
-      "implementation_commit": null,
+      "implementation": "in progress",
+      "implementation_commit": [
+        "8e1e89e",
+        "f363aac"
+      ],
       "verification": {
-        "service_or_interface": "pending",
+        "service_or_interface": "scoped transport/auth and desktop fixtures pass; real account inference remains unqualified",
         "candidate": null,
         "macOS": "unqualified",
         "Windows": "unqualified",
         "Linux": "unqualified"
       },
-      "evidence_target": "evidence/completion/EXT-002/"
+      "evidence_target": "evidence/completion/EXT-002/",
+      "evidence_documents": [
+        "docs/completion/managed-runtimes.md",
+        "docs/completion/codex-siwc-auth.md"
+      ]
     },
     {
       "id": "EXT-003",
@@ -908,7 +924,7 @@
       "interface_boundary": "Shared proposals, scoped grants, provider lifecycle and owning-kernel bridge",
       "acceptance_scenario": "Supported real-client connectivity, authentication/revocation, scope, approvals, disconnect, failure recovery, and credential handling pass. The bridge still forwards to the one owning kernel; local workflows work with the connection disabled.",
       "backlog_anchor": "../remaining-work.md#ext-004-complete-the-supported-remote-mcp-route",
-      "implementation": "open",
+      "implementation": "in progress",
       "implementation_commit": null,
       "verification": {
         "service_or_interface": "pending",
@@ -932,7 +948,7 @@
       "interface_boundary": "Shared proposals, scoped grants, provider lifecycle and owning-kernel bridge",
       "acceptance_scenario": "Handoffs exclude secrets, hidden reasoning, unrelated history, and uncommitted changes. Resume remains provider/account/version compatible. One active mutating provider run is enforced; duplicate retries cannot repeat effects. No unannounced provider/billing/context switch occurs.",
       "backlog_anchor": "../remaining-work.md#ext-005-qualify-provider-handoffs-and-client-interoperability",
-      "implementation": "open",
+      "implementation": "in progress",
       "implementation_commit": null,
       "verification": {
         "service_or_interface": "pending",
@@ -1338,7 +1354,7 @@
       "interface_boundary": "Versioned image/review capabilities, jobs, source manifests and reviewed mutations",
       "acceptance_scenario": "Use representative images and document quality/resource limits. Additional handwriting, scanned-PDF, rotation, or language support is required only when explicitly selected. Images remain local unless the user separately invokes an external integration.",
       "backlog_anchor": "../remaining-work.md#opt-001-qualify-and-optionally-expand-local-image-intelligence",
-      "implementation": "open",
+      "implementation": "in progress",
       "implementation_commit": null,
       "verification": {
         "service_or_interface": "pending",
@@ -1362,7 +1378,7 @@
       "interface_boundary": "Versioned image/review capabilities, jobs, source manifests and reviewed mutations",
       "acceptance_scenario": "Preserve occurrence deduplication, activation consent, current-source/memory checks, reviewed writes, and failure isolation. Do not rename a digest as autonomous task management or introduce unreviewed knowledge rewriting.",
       "backlog_anchor": "../remaining-work.md#opt-002-decide-whether-personal-review-needs-generative-analysis",
-      "implementation": "open",
+      "implementation": "in progress",
       "implementation_commit": null,
       "verification": {
         "service_or_interface": "pending",

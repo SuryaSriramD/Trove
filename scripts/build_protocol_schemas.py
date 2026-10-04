@@ -210,6 +210,7 @@ for method in ['AllocateIds','PreviewImport','GetImportReport','ListMemory','Rea
     defs[method+'Response']={'oneOf':[obj({'ok':{'const':True},'result':R(method+'Result')}),obj({'ok':{'const':False},'error':R('Error')})]}
 defs.update({
  'ProviderManagedStatusRequest':obj(header),
+ 'ProviderModelsRequest':obj({**header,'registrationId':D('Id')}),
  'ProviderDiscoverRequest':obj({**header,'provider':enum('codex','claude_code')}),
  'ProviderManagedStartRequest':obj({**header,'provider':enum('codex','claude_code'),'registrationId':{'type':'string','minLength':1,'maxLength':256},'billingMode':enum('chatgpt_plan','subscription','api'),'model':{'type':'string','minLength':1,'maxLength':128},'prompt':{'type':'string','minLength':1,'maxLength':65536},'pageIds':{**arr(D('Id'),100),'minItems':1,'uniqueItems':True},'tools':{**arr(enum('readPage','search.query','queryRecords','resolveCitation','allocateIds','proposeChanges','proposeActions'),7),'minItems':1,'uniqueItems':True},'previewHash':{'type':'string','pattern':'^[a-f0-9]{64}$'},'resumeRunId':D('Id')},[*header,'provider','registrationId','billingMode','model','prompt','pageIds','tools','previewHash']),
  'ProviderManagedCancelRequest':obj({**header,'runId':D('Id')})
