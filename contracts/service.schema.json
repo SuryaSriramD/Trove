@@ -5957,6 +5957,250 @@
         "runId"
       ],
       "additionalProperties": false
+    },
+    "ProviderAuthIdentity": {
+      "type": "object",
+      "properties": {
+        "registrationId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "subject": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 512
+        },
+        "clientId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 256
+        },
+        "email": {
+          "type": "string",
+          "maxLength": 512
+        },
+        "name": {
+          "type": "string",
+          "maxLength": 512
+        }
+      },
+      "required": [
+        "registrationId",
+        "subject",
+        "clientId",
+        "email",
+        "name"
+      ],
+      "additionalProperties": false
+    },
+    "ProviderAuthRegistration": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "identity": {
+          "$ref": "#/$defs/ProviderAuthIdentity"
+        },
+        "state": {
+          "type": "string",
+          "enum": [
+            "signed_in",
+            "signed_out",
+            "reauthorization_required",
+            "sign_out_incomplete"
+          ]
+        },
+        "planAuthorized": {
+          "type": "boolean"
+        },
+        "expiresAt": {
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      "required": [
+        "id",
+        "identity",
+        "state",
+        "planAuthorized",
+        "expiresAt"
+      ],
+      "additionalProperties": false
+    },
+    "ProviderAuthAttempt": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "registrationId": {
+          "oneOf": [
+            {
+              "$ref": "domain.schema.json#/$defs/Id"
+            },
+            {
+              "const": ""
+            }
+          ]
+        },
+        "state": {
+          "type": "string",
+          "enum": [
+            "waiting",
+            "exchanging",
+            "completed",
+            "failed",
+            "cancelled",
+            "retry_required"
+          ]
+        },
+        "message": {
+          "type": "string"
+        },
+        "expiresAt": {
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      "required": [
+        "id",
+        "registrationId",
+        "state",
+        "message",
+        "expiresAt"
+      ],
+      "additionalProperties": false
+    },
+    "ProviderAuthListRequest": {
+      "type": "object",
+      "properties": {
+        "contractVersion": {
+          "const": 1
+        },
+        "requestId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "workspaceId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        }
+      },
+      "required": [
+        "contractVersion",
+        "requestId",
+        "workspaceId"
+      ],
+      "additionalProperties": false
+    },
+    "ProviderAuthBeginRequest": {
+      "type": "object",
+      "properties": {
+        "contractVersion": {
+          "const": 1
+        },
+        "requestId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "workspaceId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "registrationId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        }
+      },
+      "required": [
+        "contractVersion",
+        "requestId",
+        "workspaceId"
+      ],
+      "additionalProperties": false
+    },
+    "ProviderAuthAttemptRequest": {
+      "type": "object",
+      "properties": {
+        "contractVersion": {
+          "const": 1
+        },
+        "requestId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "workspaceId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "attemptId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        }
+      },
+      "required": [
+        "contractVersion",
+        "requestId",
+        "workspaceId",
+        "attemptId"
+      ],
+      "additionalProperties": false
+    },
+    "ProviderAuthSignOutRequest": {
+      "type": "object",
+      "properties": {
+        "contractVersion": {
+          "const": 1
+        },
+        "requestId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "workspaceId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "registrationId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        }
+      },
+      "required": [
+        "contractVersion",
+        "requestId",
+        "workspaceId",
+        "registrationId"
+      ],
+      "additionalProperties": false
+    },
+    "ProviderAuthListResult": {
+      "type": "object",
+      "properties": {
+        "available": {
+          "type": "boolean"
+        },
+        "reason": {
+          "type": "string"
+        },
+        "registrations": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/ProviderAuthRegistration"
+          },
+          "maxItems": 32
+        }
+      },
+      "required": [
+        "available",
+        "reason",
+        "registrations"
+      ],
+      "additionalProperties": false
+    },
+    "ProviderAuthSignOutResult": {
+      "type": "object",
+      "properties": {
+        "remoteRevoked": {
+          "type": "boolean"
+        },
+        "localCleared": {
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "remoteRevoked",
+        "localCleared"
+      ],
+      "additionalProperties": false
     }
   }
 }

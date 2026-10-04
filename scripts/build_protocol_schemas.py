@@ -214,6 +214,18 @@ defs.update({
  'ProviderManagedStartRequest':obj({**header,'provider':enum('codex','claude_code'),'registrationId':{'type':'string','minLength':1,'maxLength':256},'billingMode':enum('chatgpt_plan','subscription','api'),'model':{'type':'string','minLength':1,'maxLength':128},'prompt':{'type':'string','minLength':1,'maxLength':65536},'pageIds':{**arr(D('Id'),100),'minItems':1,'uniqueItems':True},'tools':{**arr(enum('readPage','search.query','queryRecords','resolveCitation','allocateIds','proposeChanges','proposeActions'),7),'minItems':1,'uniqueItems':True},'previewHash':{'type':'string','pattern':'^[a-f0-9]{64}$'},'resumeRunId':D('Id')},[*header,'provider','registrationId','billingMode','model','prompt','pageIds','tools','previewHash']),
  'ProviderManagedCancelRequest':obj({**header,'runId':D('Id')})
 })
+# Native account operations expose metadata only, never OAuth URLs or tokens.
+defs.update({
+'ProviderAuthIdentity':obj({'registrationId':D('Id'),'subject':{'type':'string','minLength':1,'maxLength':512},'clientId':{'type':'string','minLength':1,'maxLength':256},'email':{'type':'string','maxLength':512},'name':{'type':'string','maxLength':512}}),
+'ProviderAuthRegistration':obj({'id':D('Id'),'identity':R('ProviderAuthIdentity'),'state':enum('signed_in','signed_out','reauthorization_required','sign_out_incomplete'),'planAuthorized':B,'expiresAt':{'type':'string','format':'date-time'}}),
+'ProviderAuthAttempt':obj({'id':D('Id'),'registrationId':{'oneOf':[D('Id'),{'const':''}]},'state':enum('waiting','exchanging','completed','failed','cancelled','retry_required'),'message':S,'expiresAt':{'type':'string','format':'date-time'}}),
+'ProviderAuthListRequest':obj(header),
+'ProviderAuthBeginRequest':obj({**header,'registrationId':D('Id')},list(header)),
+'ProviderAuthAttemptRequest':obj({**header,'attemptId':D('Id')}),
+'ProviderAuthSignOutRequest':obj({**header,'registrationId':D('Id')}),
+'ProviderAuthListResult':obj({'available':B,'reason':S,'registrations':arr(R('ProviderAuthRegistration'),32)}),
+'ProviderAuthSignOutResult':obj({'remoteRevoked':B,'localCleared':B}),
+})
 save('service',schema('service',defs,'BatchRequest'))
 # Jobs and private worker framing. Domain payloads are referenced instead of re-created.
 j={
