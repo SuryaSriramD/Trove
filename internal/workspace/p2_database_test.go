@@ -222,6 +222,13 @@ func TestP2PortableExportRetainsInertConfiguration(t *testing.T) {
 	if !strings.Contains(string(marshal(plan)), "Reviewed only") {
 		t.Fatal("Portable import dropped row action evidence")
 	}
+	for _, item := range plan.Items {
+		if item.Locator == "trove-manifest.json" {
+			if item.Kind != "asset" || item.PageID != "" || !strings.Contains(string(marshal(item.Provenance)), "Reviewed only") {
+				t.Fatal("Portable configuration must remain visible as inert inventory evidence", item)
+			}
+		}
+	}
 	completeImportFixture(t, restored, owner, plan)
 	var active int
 	if err := restored.db.QueryRow("SELECT count(*) FROM p2_database_config").Scan(&active); err != nil || active != 0 {

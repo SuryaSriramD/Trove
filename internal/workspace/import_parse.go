@@ -120,6 +120,7 @@ func (k *Kernel) parseImportPlan(ctx context.Context, p *ImportPlan) error {
 			item.Kind = "asset"
 			item.Outcome = "preserved"
 			item.Reason = "Portable inventory retained as inert source evidence; canonical pages are imported individually"
+			item.Provenance = map[string]any{"format": "trove-portable-inventory", "activationPolicy": "retained evidence only; review before creating rules, actions or filesystem approvals", "phase4Metadata": manifest.Phase4Metadata}
 		}
 		for _, rendition := range manifest.HTMLRenditions {
 			if item.Locator == rendition {
