@@ -410,11 +410,12 @@ func (s *Supervisor) Run(ctx context.Context, r Request, onEvent func(Event)) (j
 			onEvent(event)
 		}
 	}
-	if e = cmd.Wait(); e != nil {
-		return nil, fmt.Errorf("native process failed: %w", e)
-	}
+	e = cmd.Wait()
 	if run.Err() != nil {
 		return nil, context.Cause(run)
+	}
+	if e != nil {
+		return nil, fmt.Errorf("native process failed: %w", e)
 	}
 	if !terminal {
 		return nil, errors.New("native process ended without result")

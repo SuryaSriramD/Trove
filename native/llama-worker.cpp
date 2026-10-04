@@ -5,7 +5,12 @@ static void logger(enum ggml_log_level,const char*text,void*){fputs(text,stderr)
 int main(){try{
  llama_log_set(logger,nullptr);
  frame({{"kind","hello"},{"protocolVersion",1},{"runtime","llama.cpp"},{"runtimeCommit","d2e54583c7452353eb35d40431281f6ee984332f"},{"architecture","arm64"},{"capabilities",{"generate","embed","tokenize"}}});
- request=read_frame(0);init_control();auto input=json::parse(read_input(1,4<<20));std::string op=request.at("operation");std::string grammar=input.value("grammar",std::string());if(grammar.size()>65536||(!grammar.empty()&&op!="generate"))throw std::runtime_error("invalid generation grammar");llama_backend_init();
+ request=read_frame(0);init_control();auto input=json::parse(read_input(1,4<<20));std::string op=request.at("operation");std::string grammar=input.value("grammar",std::string());if(grammar.size()>65536||(!grammar.empty()&&op!="generate"))throw std::runtime_error("invalid generation grammar");
+ // The static registry eagerly creates Metal devices, even for vocabulary-only
+ // and CPU work. Do not compile GPU shaders for operations that cannot use them.
+ // This is the pinned ggml runtime's device-count switch, local to this worker.
+ if(op=="tokenize"||input.value("gpuLayers",0)==0)setenv("GGML_METAL_DEVICES","0",1);
+ if(op!="tokenize")llama_backend_init();
  auto mp=llama_model_default_params();mp.n_gpu_layers=input.value("gpuLayers",0);mp.load_mode=LLAMA_LOAD_MODE_NONE;mp.vocab_only=op=="tokenize";mp.progress_callback=[](float,void*){return !cancelled.load();};
  FILE*mf=fdopen(dup(5),"rb");if(!mf)throw std::runtime_error("model descriptor");std::unique_ptr<llama_model,decltype(&llama_model_free)> model(llama_model_load_from_file_ptr(mf,mp),llama_model_free);fclose(mf);if(!model)throw std::runtime_error("model load failed");check_cancel();progress(1,"Model loaded");
  auto vocab=llama_model_get_vocab(model.get());

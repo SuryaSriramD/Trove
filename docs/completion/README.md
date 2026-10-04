@@ -26,7 +26,7 @@ C1's six defect repairs are implemented with targeted regressions. C2 source imp
 
 Database queries now use scoped, sealed cursors and parameterized typed SQLite predicates. Shell snapshots load active page bodies lazily, the quick switcher uses scoped body search, and table/gallery views page and virtualize their results. Shiki and PDF.js use bundled assets. Exact model token budgeting is implemented, while broader AI and memory quality checks retain failures and remain open.
 
-C4 implementation includes rich layout/reusable content, explicitly fetched bookmark previews and consented provider embeds, timeline scales/grouping/dependencies, unified values-and-body templates, nested import preservation, and shared reviewed local-AI/MCP creation. The integrated Go suite passed 416 tests with 14 optional checks skipped; 46 frontend unit tests and the two new approval-interface browser cases passed. These are development checks, not a frozen release candidate. Formula expansion, Notion database/view migration, rich PDF export, clipper, automation configuration, provider integration, P2 expansion and platform qualification continue.
+C4 implementation includes rich layout/reusable content, explicitly fetched bookmark previews and consented provider embeds, timeline scales/grouping/dependencies, unified values-and-body templates, versioned formula editing, native rich PDF export, nested import preservation, and shared reviewed local-AI/MCP creation. The integrated Go suite before formula/PDF/SDK integration passed 416 tests with 14 optional checks skipped; 46 frontend unit tests and the two new approval-interface browser cases passed. New packages supply affected checks separately; these are development checks, not a frozen release candidate. Notion database/view migration, clipper, automation configuration, managed provider integration, P2 expansion and platform qualification continue. The official MCP SDK and real SDK-client/stdio tests are integrated.
 
 A real local model passed a narrow named-page creation task with explicit approval and retry deduplication. This does not override the separate failed factual/memory quality rubrics. No release gate is marked complete.
 
@@ -60,10 +60,10 @@ The research report has not been supplied. Independent clean machines, authorize
 | PARITY-002 | B, D | C4 | implemented |
 | PARITY-003 | C | C4 | implemented |
 | PARITY-004 | B, C | C4 | implemented |
-| PARITY-005 | C | C4 | in progress |
+| PARITY-005 | C | C4 | implemented |
 | PARITY-006 | C, D | C4 | in progress |
 | PARITY-007 | B, D | C4 | implemented |
-| PARITY-008 | B, D | C4 | in progress |
+| PARITY-008 | B, D | C4 | implemented |
 | PARITY-009 | B, D | C4 | in progress |
 | PARITY-010 | A, B | C4 | in progress |
 | AI-001 | A, E | C4 | implemented |
