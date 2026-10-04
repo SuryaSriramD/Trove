@@ -61,3 +61,39 @@ retains its newer edit and finalized recording. Cancellation and injected
 corrupt assets, interrupted backup startup cleanup, stopped-recording crash
 tails, unsafe manifests and complete staged restoration. Real low-disk device
 qualification and representative large-workspace latency remain release checks.
+
+## Schema-aware historical values (CORE-006)
+
+History preview returns incompatible historical values, their captured property
+definitions, the corresponding current definition when available, and eligible
+current destinations. Service evidence metadata can describe unknown historical
+versions without widening the live property registry. An unresolved preview
+cannot be applied. The recovery
+panel offers two explicit choices for every incompatible value:
+
+- Retain the old value as inert page provenance while keeping the corresponding
+  current typed value, if one exists.
+- Map an explicitly reviewed value to an editable current property in the same
+  collection. Type, option identity, reference permissions and relation target
+  validation use the current schema. Mapping cannot overwrite another historical
+  property or merge multiple source values into one destination implicitly.
+
+The second preview binds decisions to the existing history restore command;
+the mutation does not accept unchecked client-side mapping data. Stored original
+and resolved snapshot hashes, actor/grant binding, expiry, one-use preview state
+and revision guards reject stale reviews. A new edit in the review UI disables
+restore until the decisions are reviewed again.
+
+Applying creates a new revision. The previous current page/values remain in
+history; shared property definitions and unrelated records remain current.
+Retained evidence is bounded to 256 values and 1 MiB, and is never executed as
+commands or activated as typed properties. Subtree recovery asks for individual
+review when a page has incompatible values rather than silently choosing a
+mapping for it.
+
+Go tests cover changed, removed and unknown historical schemas, exact retained values, compatible
+historical restoration, explicit typed mapping, stale and duplicate reviews,
+unknown decisions, target conflicts, option validation, cross-scope files,
+unchanged unrelated records, and the public result schema. Browser tests exercise
+the actual recovery controls with a deterministic service fixture; backend
+semantics are verified separately against real SQLite workspaces.

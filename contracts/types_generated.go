@@ -1368,12 +1368,40 @@ Title string `json:"title"`
 } `json:"revisions"`
 SnapshotCursor string `json:"snapshotCursor"`
 }
+type ServiceHistoryPropertyDecisionValue interface { isServiceHistoryPropertyDecision() }
+type ServiceHistoryPropertyDecision struct { Value ServiceHistoryPropertyDecisionValue }
+func (ServiceHistoryPropertyDecisionVariant1) isServiceHistoryPropertyDecision() {}
+func (ServiceHistoryPropertyDecisionVariant2) isServiceHistoryPropertyDecision() {}
+func (v ServiceHistoryPropertyDecision) MarshalJSON() ([]byte,error) { return json.Marshal(v.Value) }
+func (v *ServiceHistoryPropertyDecision) UnmarshalJSON(data []byte) error {
+var fields map[string]json.RawMessage
+if err := json.Unmarshal(data, &fields); err != nil {return err}
+if matchesVariant(fields,[]string{"sourcePropertyId","action"},map[string]string{"action":"\"retain\""},map[string][]string{},[]string{"sourcePropertyId","action"}) { var result ServiceHistoryPropertyDecisionVariant1; if err := json.Unmarshal(data,&result); err != nil {return err}; v.Value=result; return nil }
+if matchesVariant(fields,[]string{"sourcePropertyId","action","targetPropertyId","value"},map[string]string{"action":"\"map\""},map[string][]string{},[]string{"sourcePropertyId","action","targetPropertyId","value"}) { var result ServiceHistoryPropertyDecisionVariant2; if err := json.Unmarshal(data,&result); err != nil {return err}; v.Value=result; return nil }
+return fmt.Errorf("unknown or incomplete ServiceHistoryPropertyDecision variant")
+}
+type ServiceHistoryPropertyDefinition struct {
+Id DomainId `json:"id"`
+CollectionId DomainId `json:"collectionId"`
+Name string `json:"name"`
+Type string `json:"type"`
+SchemaVersion int64 `json:"schemaVersion"`
+Config json.RawMessage `json:"config"`
+Revision DomainRevision `json:"revision"`
+}
+type ServiceHistoryHistoricalValueIssue struct {
+HistoricalValue DomainPropertyValue `json:"historicalValue"`
+HistoricalProperty *ServiceHistoryPropertyDefinition `json:"historicalProperty,omitempty"`
+CurrentProperty *ServiceHistoryPropertyDefinition `json:"currentProperty,omitempty"`
+Reason string `json:"reason"`
+}
 type ServiceHistoryPreviewRestoreRequest struct {
 ContractVersion int64 `json:"contractVersion"`
 RequestId DomainId `json:"requestId"`
 WorkspaceId DomainId `json:"workspaceId"`
 PageId DomainId `json:"pageId"`
 RestoreRevision DomainRevision `json:"restoreRevision"`
+PropertyDecisions []ServiceHistoryPropertyDecision `json:"propertyDecisions,omitempty"`
 }
 type ServiceHistoryPreviewRestoreResult struct {
 PreviewId DomainId `json:"previewId"`
@@ -1384,6 +1412,9 @@ ExpectedRevisions []ServiceExpectedRevision `json:"expectedRevisions"`
 AffectedFileIds []DomainId `json:"affectedFileIds"`
 Snapshot ServiceReadPageResult `json:"snapshot"`
 Warnings []string `json:"warnings"`
+IncompatibleValues []ServiceHistoryHistoricalValueIssue `json:"incompatibleValues,omitempty"`
+TargetProperties []ServiceHistoryPropertyDefinition `json:"targetProperties,omitempty"`
+CanRestore *bool `json:"canRestore,omitempty"`
 }
 type ServiceHistoryTrashRequest struct {
 ContractVersion int64 `json:"contractVersion"`
@@ -1910,6 +1941,16 @@ Result ServiceBatchResult `json:"result"`
 type ServiceBatchResponseVariant2 struct {
 Ok bool `json:"ok"`
 Error ServiceError `json:"error"`
+}
+type ServiceHistoryPropertyDecisionVariant1 struct {
+SourcePropertyId DomainId `json:"sourcePropertyId"`
+Action string `json:"action"`
+}
+type ServiceHistoryPropertyDecisionVariant2 struct {
+SourcePropertyId DomainId `json:"sourcePropertyId"`
+Action string `json:"action"`
+TargetPropertyId DomainId `json:"targetPropertyId"`
+Value json.RawMessage `json:"value"`
 }
 type ServiceAllocateIdsResponseVariant1 struct {
 Ok bool `json:"ok"`

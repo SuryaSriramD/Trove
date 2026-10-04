@@ -165,8 +165,19 @@ func previewRestore(ctx context.Context, k *Kernel, e contracts.ServiceExecution
 		if err != nil {
 			return err
 		}
+		var decisions []historicalValueDecision
+		if err = json.Unmarshal(marshal(r["propertyDecisions"]), &decisions); err != nil {
+			return Fail("INVALID_REQUEST", "Invalid historical property decisions")
+		}
+		snap, issues, targets, ready, err := resolveHistoricalValues(ctx, tx, snap, decisions)
+		if err != nil {
+			return err
+		}
 		guards, files, err := restoreGuards(ctx, k, tx, e, page, snap)
 		if err != nil {
+			return err
+		}
+		if err = validateRestoreValues(ctx, k, tx, e, snap, guards); err != nil {
 			return err
 		}
 		for _, file := range files {
@@ -182,7 +193,19 @@ func previewRestore(ctx context.Context, k *Kernel, e contracts.ServiceExecution
 		if _, err = tx.ExecContext(ctx, "INSERT INTO restore_previews VALUES(?,?,?,?,?,?,?,?,0)", id, page, revision, e.Actor.ActorId, e.ScopeGrantId, string(marshal(guards)), snapshotDigest(raw), expires); err != nil {
 			return err
 		}
-		result = map[string]any{"previewId": id, "pageId": page, "restoreRevision": revision, "expiresAt": expires, "expectedRevisions": guards, "affectedFileIds": files, "snapshot": snap.ServiceReadPageResult, "warnings": recoveryPreviewWarnings(snap)}
+		if _, err = tx.ExecContext(ctx, "INSERT INTO restore_preview_decisions VALUES(?,?,?,?)", id, string(marshal(decisions)), snapshotDigest(string(marshal(snap))), !ready); err != nil {
+			return err
+		}
+		warnings := recoveryPreviewWarnings(snap)
+		if !ready {
+			warnings = append(warnings, "Review every incompatible historical property: map an explicit current typed value or retain the old value as inert evidence before restoring.")
+		}
+		for _, decision := range decisions {
+			if decision.Action == "retain" {
+				warnings = append(warnings, "Retain historical property "+decision.SourcePropertyID+" as inert evidence; keep its current typed value when present.")
+			}
+		}
+		result = map[string]any{"previewId": id, "pageId": page, "restoreRevision": revision, "expiresAt": expires, "expectedRevisions": guards, "affectedFileIds": files, "snapshot": snap.ServiceReadPageResult, "warnings": warnings, "incompatibleValues": issues, "targetProperties": targets, "canRestore": ready}
 		return nil
 	})
 	return result, err
@@ -286,6 +309,17 @@ func restoreGuards(ctx context.Context, k *Kernel, q querier, e contracts.Servic
 	ids := map[string]bool{}
 	var v any
 	json.Unmarshal(marshal(snap.ServiceReadPageResult), &v)
+	// An arbitrary old payload may contain keys such as fileId. Retained value
+	// evidence is readable provenance, not a new attachment or capability.
+	if result, ok := v.(map[string]any); ok {
+		if page, ok := result["page"].(map[string]any); ok {
+			if provenance, ok := page["provenance"].(map[string]any); ok {
+				if raw, ok := provenance["raw"].(map[string]any); ok {
+					delete(raw, "retainedHistoricalValues")
+				}
+			}
+		}
+	}
 	collectFileIDs(v, ids)
 	for _, id := range snap.Attachments {
 		ids[string(id)] = true
@@ -355,6 +389,29 @@ func restoreHistory(m *Mutation, c map[string]any) error {
 	}
 	if snapshotDigest(raw) != digest {
 		return Fail("CONFLICT", "Historical snapshot changed")
+	}
+	var decisionsRaw, resolvedHash string
+	var requiresDecisions bool
+	err = m.Tx.QueryRowContext(m.Context, "SELECT decisions_json,resolved_hash,requires_decisions FROM restore_preview_decisions WHERE preview_id=?", c["previewId"]).Scan(&decisionsRaw, &resolvedHash, &requiresDecisions)
+	if err != nil && !errors.Is(err, sql.ErrNoRows) {
+		return err
+	}
+	if err == nil {
+		if requiresDecisions {
+			return Fail("CONFLICT", "Review incompatible historical values before restoring")
+		}
+		var decisions []historicalValueDecision
+		if err = json.Unmarshal([]byte(decisionsRaw), &decisions); err != nil {
+			return err
+		}
+		var ready bool
+		snap, _, _, ready, err = resolveHistoricalValues(m.Context, m.Tx, snap, decisions)
+		if err != nil {
+			return err
+		}
+		if !ready || snapshotDigest(string(marshal(snap))) != resolvedHash {
+			return Fail("CONFLICT", "Historical value mapping or current schema changed; preview again")
+		}
 	}
 	_, files, err := restoreGuards(m.Context, m.Kernel, m.Tx, m.Execution, page, snap)
 	if err != nil {

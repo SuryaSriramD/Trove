@@ -83,6 +83,7 @@ CREATE TABLE IF NOT EXISTS file_ingests(handle TEXT PRIMARY KEY,file_id TEXT NOT
 CREATE INDEX IF NOT EXISTS file_ingest_hash ON file_ingests(content_hash);
 CREATE TABLE IF NOT EXISTS file_references(page_id TEXT NOT NULL REFERENCES pages(id),source_kind TEXT NOT NULL,source_id TEXT NOT NULL,file_id TEXT NOT NULL REFERENCES files(id),PRIMARY KEY(page_id,source_kind,source_id,file_id));
 CREATE TABLE IF NOT EXISTS restore_previews(id TEXT PRIMARY KEY,page_id TEXT NOT NULL,restore_revision TEXT NOT NULL,actor_id TEXT NOT NULL,grant_id TEXT NOT NULL,guards_json TEXT NOT NULL,snapshot_hash TEXT NOT NULL,expires_at TEXT NOT NULL,consumed INTEGER NOT NULL DEFAULT 0);
+CREATE TABLE IF NOT EXISTS restore_preview_decisions(preview_id TEXT PRIMARY KEY REFERENCES restore_previews(id),decisions_json TEXT NOT NULL,resolved_hash TEXT NOT NULL,requires_decisions INTEGER NOT NULL);
 CREATE TABLE IF NOT EXISTS recovery_points(id TEXT PRIMARY KEY,label TEXT NOT NULL,created_at TEXT NOT NULL,event_cursor TEXT NOT NULL);
 CREATE TABLE IF NOT EXISTS recovery_point_pages(point_id TEXT NOT NULL REFERENCES recovery_points(id),page_id TEXT NOT NULL,revision TEXT NOT NULL,PRIMARY KEY(point_id,page_id));
 CREATE TABLE IF NOT EXISTS backups(id TEXT PRIMARY KEY,state TEXT NOT NULL CHECK(state IN('active','complete','failed','interrupted')),created_at TEXT NOT NULL,updated_at TEXT NOT NULL);

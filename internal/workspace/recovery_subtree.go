@@ -56,6 +56,9 @@ func previewSubtreeRecovery(ctx context.Context, k *Kernel, e contracts.ServiceE
 			return nil, err
 		}
 		preview := value.(map[string]any)
+		if preview["canRestore"] == false {
+			return nil, Fail("CONFLICT", "A subtree page needs historical property decisions; review and restore that page first")
+		}
 		for _, g := range preview["expectedRevisions"].([]contracts.ServiceExpectedRevision) {
 			key := guardKey(g.Target.EntityType, string(g.Target.EntityId))
 			if old, ok := guards[key]; ok && old.Revision != g.Revision {

@@ -234,11 +234,14 @@ func TestRestoreSubtreeIsAtomicAndPreservesUnrelatedValues(t *testing.T) {
 	if actual != "\""+f.done+"\"" {
 		t.Fatal("unrelated record was rewound", actual)
 	}
-	// A schema revision conflict is explicit; old evidence stays in snapshots.
+	// A schema revision conflict is reviewable; unresolved evidence cannot apply.
 	if _, err := k.db.Exec("UPDATE properties SET schema_version=2 WHERE id=?", f.status); err != nil {
 		t.Fatal(err)
 	}
-	testCode(t, testDispatch(t, k, e, "history.previewRestore", recoveryRequest(k, map[string]any{"pageId": p1, "restoreRevision": "2"})), "CONFLICT")
+	preview := testOK(t, testDispatch(t, k, e, "history.previewRestore", recoveryRequest(k, map[string]any{"pageId": p1, "restoreRevision": "2"})))
+	if preview["canRestore"] != false || len(preview["incompatibleValues"].([]any)) != 1 {
+		t.Fatal("incompatible value was not exposed for review", preview)
+	}
 }
 
 func TestRestoreTranscriptTimingAndForgottenMemory(t *testing.T) {

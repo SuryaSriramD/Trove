@@ -2750,6 +2750,126 @@
       ],
       "additionalProperties": false
     },
+    "HistoryPropertyDecision": {
+      "oneOf": [
+        {
+          "type": "object",
+          "properties": {
+            "sourcePropertyId": {
+              "$ref": "domain.schema.json#/$defs/Id"
+            },
+            "action": {
+              "const": "retain"
+            }
+          },
+          "required": [
+            "sourcePropertyId",
+            "action"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "sourcePropertyId": {
+              "$ref": "domain.schema.json#/$defs/Id"
+            },
+            "action": {
+              "const": "map"
+            },
+            "targetPropertyId": {
+              "$ref": "domain.schema.json#/$defs/Id"
+            },
+            "value": {
+              "type": [
+                "object",
+                "array",
+                "string",
+                "number",
+                "integer",
+                "boolean",
+                "null"
+              ]
+            }
+          },
+          "required": [
+            "sourcePropertyId",
+            "action",
+            "targetPropertyId",
+            "value"
+          ],
+          "additionalProperties": false
+        }
+      ]
+    },
+    "HistoryPropertyDefinition": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "collectionId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "name": {
+          "type": "string"
+        },
+        "type": {
+          "type": "string"
+        },
+        "schemaVersion": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 9007199254740991
+        },
+        "config": {
+          "type": [
+            "object",
+            "array",
+            "string",
+            "number",
+            "integer",
+            "boolean",
+            "null"
+          ]
+        },
+        "revision": {
+          "$ref": "domain.schema.json#/$defs/Revision"
+        }
+      },
+      "required": [
+        "id",
+        "collectionId",
+        "name",
+        "type",
+        "schemaVersion",
+        "config",
+        "revision"
+      ],
+      "additionalProperties": false
+    },
+    "HistoryHistoricalValueIssue": {
+      "type": "object",
+      "properties": {
+        "historicalValue": {
+          "$ref": "domain.schema.json#/$defs/PropertyValue"
+        },
+        "historicalProperty": {
+          "$ref": "#/$defs/HistoryPropertyDefinition"
+        },
+        "currentProperty": {
+          "$ref": "#/$defs/HistoryPropertyDefinition"
+        },
+        "reason": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "historicalValue",
+        "reason"
+      ],
+      "additionalProperties": false
+    },
     "HistoryPreviewRestoreRequest": {
       "type": "object",
       "properties": {
@@ -2767,6 +2887,13 @@
         },
         "restoreRevision": {
           "$ref": "domain.schema.json#/$defs/Revision"
+        },
+        "propertyDecisions": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/HistoryPropertyDecision"
+          },
+          "maxItems": 256
         }
       },
       "required": [
@@ -2816,6 +2943,23 @@
             "type": "string"
           },
           "maxItems": 1000
+        },
+        "incompatibleValues": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/HistoryHistoricalValueIssue"
+          },
+          "maxItems": 256
+        },
+        "targetProperties": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/HistoryPropertyDefinition"
+          },
+          "maxItems": 256
+        },
+        "canRestore": {
+          "type": "boolean"
         }
       },
       "required": [
