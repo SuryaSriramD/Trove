@@ -177,7 +177,7 @@ class DeveloperToolsTests(unittest.TestCase):
                     patch('sys.stdout', new_callable=io.StringIO):
                 runpy.run_path(str(SCRIPTS / 'build-desktop.py'), run_name='__main__')
             children = [argv for argv, _ in commands if argv[0] == sys.executable]
-            self.assertEqual(len(children), 2)
+            self.assertEqual(len(children), 3)
             for argv in children:
                 self.assertEqual(argv[argv.index('--cache') + 1], str(root / 'custom cache'))
                 self.assertEqual(argv[argv.index('--output') + 1], str(native))

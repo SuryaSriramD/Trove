@@ -1,0 +1,94 @@
+{
+  "schemaVersion": 1,
+  "source": "Generated one-second 48 kHz stereo sine tones (330 and 660 Hz), no human audio",
+  "authoringTool": "ffmpeg version 9.0.1 Copyright (c) 2000-2026 the FFmpeg developers",
+  "recipe": "scripts/generate-audio-fixtures.py",
+  "commands": [
+    [
+      "ffmpeg",
+      "-nostdin",
+      "-hide_banner",
+      "-loglevel",
+      "error",
+      "-y",
+      "-i",
+      "tones.wav",
+      "-map_metadata",
+      "-1",
+      "-fflags",
+      "+bitexact",
+      "-flags:a",
+      "+bitexact",
+      "-c:a",
+      "libmp3lame",
+      "-b:a",
+      "96k",
+      "tones.mp3"
+    ],
+    [
+      "ffmpeg",
+      "-nostdin",
+      "-hide_banner",
+      "-loglevel",
+      "error",
+      "-y",
+      "-i",
+      "tones.wav",
+      "-map_metadata",
+      "-1",
+      "-fflags",
+      "+bitexact",
+      "-flags:a",
+      "+bitexact",
+      "-c:a",
+      "aac",
+      "-b:a",
+      "96k",
+      "tones.aac"
+    ],
+    [
+      "ffmpeg",
+      "-nostdin",
+      "-hide_banner",
+      "-loglevel",
+      "error",
+      "-y",
+      "-i",
+      "tones.wav",
+      "-map_metadata",
+      "-1",
+      "-fflags",
+      "+bitexact",
+      "-flags:a",
+      "+bitexact",
+      "-c:a",
+      "aac",
+      "-b:a",
+      "96k",
+      "tones.m4a"
+    ]
+  ],
+  "files": [
+    {
+      "name": "tones.aac",
+      "sha256": "45f5712356a5c51b38ffa5fd21a17db7324ab0487052c44dfb6cd39a9af404d2",
+      "bytes": 12429
+    },
+    {
+      "name": "tones.m4a",
+      "sha256": "e56513758c77e88b358283668909c5427d3601b6944c78e167aa6f8941f23d06",
+      "bytes": 13055
+    },
+    {
+      "name": "tones.mp3",
+      "sha256": "a3302a95ec563dc27c869bb54d91e84f2fc52035e92c68670c4113f615492fce",
+      "bytes": 12692
+    },
+    {
+      "name": "tones.wav",
+      "sha256": "a65d70f01669f0a1d53974ee4e3d1a84b25382b1503bb12238df46af968bdf8f",
+      "bytes": 192044
+    }
+  ],
+  "scope": "Codec and normalization behavior; does not establish speech recognition quality"
+}

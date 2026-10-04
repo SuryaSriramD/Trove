@@ -68,7 +68,8 @@ func transcribeWithRunner(ctx context.Context, k *workspace.Kernel, s speechRunn
 		return err
 	}
 	defer source.Close()
-	audio, cleanup, err := pcmInput(source, meta)
+	decoder, _ := s.(audioDecoder)
+	audio, cleanup, err := normalizedInput(ctx, source, meta, decoder)
 	if err != nil {
 		return err
 	}

@@ -1,6 +1,7 @@
 package workers
 
 import (
+	"context"
 	"encoding/binary"
 	"errors"
 	"io"
@@ -8,21 +9,60 @@ import (
 	"os"
 	"strings"
 	"trove.local/phase0/contracts"
+	"trove.local/phase0/internal/native"
 )
+
+var errAudioNeedsDecoder = errors.New("UNSUPPORTED_FORMAT: this recording needs the local audio decoder")
+
+type audioDecoder interface {
+	DecodeAudio(context.Context, *os.File, *os.File) (native.AudioDecodeResult, error)
+}
+
+// normalizedInput never replaces the canonical source. Even failure/cancellation
+// only removes derived staging data, so the recording can be retried or exported.
+func normalizedInput(ctx context.Context, source *os.File, meta contracts.DomainFile, decoder audioDecoder) (*os.File, func(), error) {
+	audio, cleanup, err := pcmInputContext(ctx, source, meta)
+	if !errors.Is(err, errAudioNeedsDecoder) {
+		return audio, cleanup, err
+	}
+	if decoder == nil {
+		return nil, func() {}, errAudioNeedsDecoder
+	}
+	output, err := os.CreateTemp("", "trove-normalized-audio-")
+	if err != nil {
+		return nil, func() {}, err
+	}
+	cleanup = func() { output.Close(); os.Remove(output.Name()) }
+	if _, err = decoder.DecodeAudio(ctx, source, output); err == nil {
+		err = validatePCMContext(ctx, output)
+	}
+	if err != nil {
+		cleanup()
+		return nil, func() {}, err
+	}
+	return output, cleanup, nil
+}
 
 // pcmInput accepts explicit raw PCM or a bounded RIFF WAV with an unambiguous
 // 16 kHz mono format. Conversion occurs outside SQLite and never changes assets.
 func pcmInput(source *os.File, meta contracts.DomainFile) (*os.File, func(), error) {
+	return pcmInputContext(context.Background(), source, meta)
+}
+
+func pcmInputContext(ctx context.Context, source *os.File, meta contracts.DomainFile) (*os.File, func(), error) {
 	cleanup := func() {}
+	if err := ctx.Err(); err != nil {
+		return nil, cleanup, err
+	}
 	if meta.MediaType == "audio/x-trove-f32le" || strings.HasSuffix(strings.ToLower(meta.OriginalName), ".f32le") {
-		if err := validatePCM(source); err != nil {
+		if err := validatePCMContext(ctx, source); err != nil {
 			return nil, cleanup, err
 		}
 		return source, cleanup, nil
 	}
 	var header [12]byte
 	if _, err := source.ReadAt(header[:], 0); err != nil || string(header[:4]) != "RIFF" || string(header[8:]) != "WAVE" {
-		return nil, cleanup, errors.New("INVALID_INPUT: speech input must be 16 kHz mono PCM WAV or .f32le")
+		return nil, cleanup, errAudioNeedsDecoder
 	}
 	stat, err := source.Stat()
 	if err != nil {
@@ -37,6 +77,9 @@ func pcmInput(source *os.File, meta contracts.DomainFile) (*os.File, func(), err
 	var rate uint32
 	var offset, size int64
 	for pos := int64(12); pos+8 <= riffSize; {
+		if err = ctx.Err(); err != nil {
+			return nil, cleanup, err
+		}
 		var chunk [8]byte
 		if _, err = source.ReadAt(chunk[:], pos); err != nil {
 			return nil, cleanup, err
@@ -72,7 +115,13 @@ func pcmInput(source *os.File, meta contracts.DomainFile) (*os.File, func(), err
 		}
 		pos += 8 + n + (n % 2)
 	}
-	if channels != 1 || rate != 16000 || !((format == 1 && bits == 16) || (format == 3 && bits == 32)) || size < 1 || size%(int64(bits)/8) != 0 || size/(int64(bits)/8) > 16000*7200 {
+	if !seenFormat || !seenData || size < 1 {
+		return nil, cleanup, errors.New("INVALID_INPUT: missing WAV format or audio data")
+	}
+	if channels != 1 || rate != 16000 || !((format == 1 && bits == 16) || (format == 3 && bits == 32)) {
+		return nil, cleanup, errAudioNeedsDecoder
+	}
+	if size%(int64(bits)/8) != 0 || size/(int64(bits)/8) > 16000*7200 {
 		return nil, cleanup, errors.New("INVALID_INPUT: WAV must be 16 kHz mono 16-bit PCM or float32 within two hours")
 	}
 	out, err := os.CreateTemp("", "trove-job-audio-")
@@ -83,6 +132,10 @@ func pcmInput(source *os.File, meta contracts.DomainFile) (*os.File, func(), err
 	reader := io.NewSectionReader(source, offset, size)
 	buf := make([]byte, 32<<10)
 	for {
+		if err = ctx.Err(); err != nil {
+			cleanup()
+			return nil, func() {}, err
+		}
 		n, e := reader.Read(buf)
 		if n > 0 {
 			if bits == 32 {
@@ -110,7 +163,7 @@ func pcmInput(source *os.File, meta contracts.DomainFile) (*os.File, func(), err
 			return nil, func() {}, e
 		}
 	}
-	if err = validatePCM(out); err != nil {
+	if err = validatePCMContext(ctx, out); err != nil {
 		cleanup()
 		return nil, func() {}, err
 	}
@@ -120,6 +173,10 @@ func pcmInput(source *os.File, meta contracts.DomainFile) (*os.File, func(), err
 // validatePCM bounds duration and rejects nonfinite/out-of-range floats before
 // a decoder/model sees bytes. A file suffix is never sufficient validation.
 func validatePCM(source *os.File) error {
+	return validatePCMContext(context.Background(), source)
+}
+
+func validatePCMContext(ctx context.Context, source *os.File) error {
 	st, err := source.Stat()
 	if err != nil {
 		return err
@@ -130,6 +187,9 @@ func validatePCM(source *os.File) error {
 	reader := io.NewSectionReader(source, 0, st.Size())
 	buf := make([]byte, 32<<10)
 	for {
+		if err := ctx.Err(); err != nil {
+			return err
+		}
 		n, err := reader.Read(buf)
 		for i := 0; i < n; i += 4 {
 			value := math.Float32frombits(binary.LittleEndian.Uint32(buf[i : i+4]))

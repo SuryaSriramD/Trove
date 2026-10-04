@@ -53,6 +53,7 @@ native = args.native_bundle.resolve()
 if not (native / 'manifest.json').exists():
     raise SystemExit('Build native helpers first: python scripts/build-native.py')
 run([sys.executable, ROOT / 'scripts/build-document-extractor.py', '--cache', args.cache, '--output', native])
+run([sys.executable, ROOT / 'scripts/build-audio-decoder.py', '--cache', args.cache, '--output', native])
 if args.phase6:
     run([sys.executable, ROOT / 'scripts/build-ocr-worker.py', '--cache', args.cache, '--output', native])
 shutil.copytree(ROOT / 'native/models', native / 'models', dirs_exist_ok=True)

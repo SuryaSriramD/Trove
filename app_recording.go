@@ -135,7 +135,7 @@ func (a *App) MeetingRecordings() ([]workspace.RecordingDraft, error) {
 func (a *App) PickMeetingAudio(title string) (workspace.RecordingDraft, error) {
 	// Wails maps filters through UTType; wildcard/unknown raw PCM extensions
 	// are not portable UTTypes. Validate the selected bytes in the audio service.
-	path, err := runtime.OpenFileDialog(a.ctx, runtime.OpenDialogOptions{Title: "Choose a local recording (16 kHz mono WAV supported)"})
+	path, err := runtime.OpenFileDialog(a.ctx, runtime.OpenDialogOptions{Title: "Choose a local recording (WAV, MP3, AAC or M4A)"})
 	if err != nil {
 		return workspace.RecordingDraft{}, err
 	}
