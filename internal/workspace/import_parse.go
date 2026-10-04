@@ -74,6 +74,7 @@ func inferImportType(values []string) string {
 }
 
 type portableHierarchy struct {
+	Format         string          `json:"format"`
 	HTMLRenditions []string        `json:"htmlRenditions"`
 	Phase4Metadata json.RawMessage `json:"phase4Metadata"`
 	Pages          []struct {
@@ -114,6 +115,12 @@ func (k *Kernel) parseImportPlan(ctx context.Context, p *ImportPlan) error {
 	}
 	for i := range p.Items {
 		item := &p.Items[i]
+		if manifest.Format == "trove-portable" && item.Locator == "trove-manifest.json" {
+			item.PageID = ""
+			item.Kind = "asset"
+			item.Outcome = "preserved"
+			item.Reason = "Portable inventory retained as inert source evidence; canonical pages are imported individually"
+		}
 		for _, rendition := range manifest.HTMLRenditions {
 			if item.Locator == rendition {
 				item.PageID = ""

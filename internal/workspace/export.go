@@ -48,6 +48,7 @@ func (k *Kernel) ExportPortable(ctx context.Context, e contracts.ServiceExecutio
 	}
 	result.Path = destination
 	result.SourceOmissions = []string{"Portable export excludes trash, mutation history, approval grants, and model packs; use a native backup for full workspace restoration."}
+	result.SourceOmissions = append(result.SourceOmissions, portableEvidencePolicy)
 	tx, err := k.db.BeginTx(ctx, &sql.TxOptions{ReadOnly: true})
 	if err != nil {
 		return result, err
@@ -68,13 +69,23 @@ func (k *Kernel) ExportPortable(ctx context.Context, e contracts.ServiceExecutio
 	}
 	rows.Close()
 	pages := map[string]contracts.ServiceReadPageResult{}
+	livePageIDs := []string{}
 	for _, id := range pageIDs {
 		p, er := readPageTx(ctx, tx, id)
 		if er != nil {
 			return result, er
 		}
+		inventory, er := k.portableInventoryPage(ctx, tx, p)
+		if er != nil {
+			return result, er
+		}
+		if inventory {
+			continue
+		}
 		pages[id] = p
+		livePageIDs = append(livePageIDs, id)
 	}
+	pageIDs = livePageIDs
 	paths := map[string]string{}
 	var buildPath func(string, int) string
 	buildPath = func(id string, depth int) string {
@@ -102,28 +113,17 @@ func (k *Kernel) ExportPortable(ctx context.Context, e contracts.ServiceExecutio
 		}
 	}
 	filePaths := map[string]string{}
-	fileMeta := []contracts.DomainFile{}
-	rows, err = tx.QueryContext(ctx, "SELECT id FROM files ORDER BY id")
+	phase4Metadata, err := exportPhase4Metadata(ctx, tx)
 	if err != nil {
 		return result, err
 	}
-	fileIDs := []string{}
-	for rows.Next() {
-		var id string
-		if err = rows.Scan(&id); err != nil {
-			rows.Close()
-			return result, err
-		}
-		fileIDs = append(fileIDs, id)
+	assets, evidence, err := k.portableAssets(ctx, tx, pages, phase4Metadata)
+	if err != nil {
+		return result, err
 	}
-	rows.Close()
-	for _, id := range fileIDs {
-		f, er := readFileMetadata(ctx, tx, id)
-		if er != nil {
-			return result, er
-		}
-		filePaths[id] = "attachments/" + id + "/" + exportName(f.OriginalName, "")
-		fileMeta = append(fileMeta, f)
+	for _, asset := range assets {
+		f := asset.metadata
+		filePaths[string(f.Id)] = "attachments/" + string(f.Id) + "/" + exportName(f.OriginalName, "")
 	}
 	out, err := os.OpenFile(destination, os.O_WRONLY|os.O_CREATE|os.O_EXCL, 0600)
 	if err != nil {
@@ -274,17 +274,29 @@ func (k *Kernel) ExportPortable(ctx context.Context, e contracts.ServiceExecutio
 				views.Close()
 				return result, er
 			}
+			if _, live := pages[viewPage]; !live {
+				continue
+			}
 			vs = append(vs, map[string]any{"id": id, "name": name, "type": kind, "schemaVersion": version, "query": json.RawMessage(query), "config": json.RawMessage(config), "owningPagePath": paths[viewPage]})
 		}
 		views.Close()
 		manifest["collections"] = append(manifest["collections"].([]any), map[string]any{"id": collection.id, "title": collection.title, "path": name, "owningPagePath": paths[collection.page], "properties": properties, "records": canonical, "views": vs})
 		result.Collections++
 	}
-	for _, f := range fileMeta {
+	for _, asset := range assets {
+		f := asset.metadata
 		if err = ctx.Err(); err != nil {
 			return result, err
 		}
 		name := filePaths[string(f.Id)]
+		if asset.content != nil {
+			if err = write(name, asset.content); err != nil {
+				return result, err
+			}
+			manifest["attachments"] = append(manifest["attachments"].([]any), map[string]any{"id": f.Id, "path": name, "sha256": f.ContentHash, "sizeBytes": f.SizeBytes, "mediaType": f.MediaType, "originalName": f.OriginalName})
+			result.Assets++
+			continue
+		}
 		full := k.path + "/" + f.StorageKey
 		size, er := strconv.ParseInt(f.SizeBytes, 10, 64)
 		if er != nil {
@@ -308,27 +320,9 @@ func (k *Kernel) ExportPortable(ctx context.Context, e contracts.ServiceExecutio
 		manifest["attachments"] = append(manifest["attachments"].([]any), map[string]any{"id": f.Id, "path": name, "sha256": f.ContentHash, "sizeBytes": f.SizeBytes, "mediaType": f.MediaType, "originalName": f.OriginalName})
 		result.Assets++
 	}
-	// Include durable import inventories and evidence, in addition to the source
-	// bytes already included above, without interpreting unsupported definitions.
-	evidence := []json.RawMessage{}
-	rows, err = tx.QueryContext(ctx, "SELECT plan_json FROM import_runs ORDER BY created_at")
-	if err != nil {
-		return result, err
-	}
-	for rows.Next() {
-		var raw string
-		if err = rows.Scan(&raw); err != nil {
-			rows.Close()
-			return result, err
-		}
-		evidence = append(evidence, json.RawMessage(raw))
-	}
-	rows.Close()
+	// Evidence is scoped to exported pages; a complete import inventory may
+	// contain trashed pages, rejected members and private historical values.
 	manifest["importEvidence"] = evidence
-	phase4Metadata, metadataErr := exportPhase4Metadata(ctx, tx)
-	if metadataErr != nil {
-		return result, metadataErr
-	}
 	manifest["phase4Metadata"] = phase4Metadata
 	if err = write("trove-manifest.json", marshal(manifest)); err != nil {
 		return result, err
