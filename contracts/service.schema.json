@@ -2172,6 +2172,319 @@
       ],
       "additionalProperties": false
     },
+    "PlanCreatePage": {
+      "type": "object",
+      "properties": {
+        "kind": {
+          "const": "create_page"
+        },
+        "destination": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 512
+        },
+        "title": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 512
+        },
+        "body": {
+          "type": "string",
+          "maxLength": 16000
+        }
+      },
+      "required": [
+        "kind",
+        "destination",
+        "title"
+      ],
+      "additionalProperties": false
+    },
+    "PlanCreateDatabase": {
+      "type": "object",
+      "properties": {
+        "kind": {
+          "const": "create_database"
+        },
+        "destination": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 512
+        },
+        "title": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 512
+        },
+        "body": {
+          "type": "string",
+          "maxLength": 16000
+        },
+        "properties": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "name": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 128
+              },
+              "type": {
+                "type": "string",
+                "enum": [
+                  "text",
+                  "number",
+                  "checkbox",
+                  "date",
+                  "url",
+                  "email",
+                  "phone"
+                ]
+              }
+            },
+            "required": [
+              "name",
+              "type"
+            ],
+            "additionalProperties": false
+          },
+          "maxItems": 32
+        }
+      },
+      "required": [
+        "kind",
+        "destination",
+        "title"
+      ],
+      "additionalProperties": false
+    },
+    "PlanUpdatePage": {
+      "type": "object",
+      "properties": {
+        "kind": {
+          "const": "update_page"
+        },
+        "target": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 512
+        },
+        "title": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 512
+        },
+        "body": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 16000
+        }
+      },
+      "required": [
+        "kind",
+        "target"
+      ],
+      "additionalProperties": false,
+      "anyOf": [
+        {
+          "required": [
+            "title"
+          ]
+        },
+        {
+          "required": [
+            "body"
+          ]
+        }
+      ]
+    },
+    "PlanCreateTask": {
+      "type": "object",
+      "properties": {
+        "kind": {
+          "const": "create_task"
+        },
+        "destination": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 512
+        },
+        "title": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 512
+        },
+        "body": {
+          "type": "string",
+          "maxLength": 16000
+        },
+        "status": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 512
+        },
+        "due": {
+          "type": "string",
+          "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}$"
+        }
+      },
+      "required": [
+        "kind",
+        "destination",
+        "title"
+      ],
+      "additionalProperties": false
+    },
+    "PlanCreateRecord": {
+      "type": "object",
+      "properties": {
+        "kind": {
+          "const": "create_record"
+        },
+        "destination": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 512
+        },
+        "title": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 512
+        },
+        "body": {
+          "type": "string",
+          "maxLength": 16000
+        }
+      },
+      "required": [
+        "kind",
+        "destination",
+        "title"
+      ],
+      "additionalProperties": false
+    },
+    "PlanUpdateRecord": {
+      "type": "object",
+      "properties": {
+        "kind": {
+          "const": "update_record"
+        },
+        "target": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 512
+        },
+        "property": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 512
+        },
+        "value": {
+          "type": [
+            "object",
+            "array",
+            "string",
+            "number",
+            "integer",
+            "boolean",
+            "null"
+          ]
+        }
+      },
+      "required": [
+        "kind",
+        "target",
+        "property",
+        "value"
+      ],
+      "additionalProperties": false
+    },
+    "PlanUpdateTask": {
+      "type": "object",
+      "properties": {
+        "kind": {
+          "const": "update_task"
+        },
+        "target": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 512
+        },
+        "status": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 512
+        },
+        "due": {
+          "type": "string",
+          "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}$"
+        }
+      },
+      "required": [
+        "kind",
+        "target"
+      ],
+      "additionalProperties": false,
+      "anyOf": [
+        {
+          "required": [
+            "status"
+          ]
+        },
+        {
+          "required": [
+            "due"
+          ]
+        }
+      ]
+    },
+    "PlannedAction": {
+      "oneOf": [
+        {
+          "$ref": "#/$defs/PlanCreatePage"
+        },
+        {
+          "$ref": "#/$defs/PlanCreateDatabase"
+        },
+        {
+          "$ref": "#/$defs/PlanUpdatePage"
+        },
+        {
+          "$ref": "#/$defs/PlanCreateTask"
+        },
+        {
+          "$ref": "#/$defs/PlanCreateRecord"
+        },
+        {
+          "$ref": "#/$defs/PlanUpdateRecord"
+        },
+        {
+          "$ref": "#/$defs/PlanUpdateTask"
+        }
+      ]
+    },
+    "ActionPlan": {
+      "type": "object",
+      "properties": {
+        "version": {
+          "const": 1
+        },
+        "actions": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/PlannedAction"
+          },
+          "maxItems": 32,
+          "minItems": 1
+        }
+      },
+      "required": [
+        "version",
+        "actions"
+      ],
+      "additionalProperties": false
+    },
     "ReviewListRequest": {
       "type": "object",
       "properties": {

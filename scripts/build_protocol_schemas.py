@@ -99,6 +99,23 @@ defs['PageDisplayGetRequest']=obj({**header,'pageId':D('Id')})
 defs['GraphQueryRequest']=obj({**header,'pageId':D('Id'),'query':{'type':'string','maxLength':8192},'includeSemantic':B,'limit':{'type':'integer','minimum':1,'maximum':100}},list(header))
 defs['OCRStatusRequest']=obj(header)
 defs['OCRRunRequest']=obj({**header,'fileId':D('Id')})
+# Human references and values become canonical commands only in the trusted planner.
+plan_name={'type':'string','minLength':1,'maxLength':512}
+plan_body={'type':'string','maxLength':16000}
+plan_actions={
+ 'PlanCreatePage':tagged('create_page',{'destination':plan_name,'title':plan_name,'body':plan_body},['destination','title']),
+ 'PlanCreateDatabase':tagged('create_database',{'destination':plan_name,'title':plan_name,'body':plan_body,'properties':arr(obj({'name':{'type':'string','minLength':1,'maxLength':128},'type':enum('text','number','checkbox','date','url','email','phone')}),32)},['destination','title']),
+ 'PlanUpdatePage':tagged('update_page',{'target':plan_name,'title':plan_name,'body':{'type':'string','minLength':1,'maxLength':16000}},['target']),
+ 'PlanCreateTask':tagged('create_task',{'destination':plan_name,'title':plan_name,'body':plan_body,'status':plan_name,'due':{'type':'string','pattern':'^[0-9]{4}-[0-9]{2}-[0-9]{2}$'}},['destination','title']),
+ 'PlanCreateRecord':tagged('create_record',{'destination':plan_name,'title':plan_name,'body':plan_body},['destination','title']),
+ 'PlanUpdateRecord':tagged('update_record',{'target':plan_name,'property':plan_name,'value':json_value}),
+ 'PlanUpdateTask':tagged('update_task',{'target':plan_name,'status':plan_name,'due':{'type':'string','pattern':'^[0-9]{4}-[0-9]{2}-[0-9]{2}$'}},['target']),
+}
+plan_actions['PlanUpdatePage']['anyOf']=[{'required':['title']},{'required':['body']}]
+plan_actions['PlanUpdateTask']['anyOf']=[{'required':['status']},{'required':['due']}]
+defs.update(plan_actions)
+defs['PlannedAction']={'oneOf':[R(n) for n in plan_actions]}
+defs['ActionPlan']=obj({'version':{'const':1},'actions':{**arr(R('PlannedAction'),32),'minItems':1}})
 defs['ReviewListRequest']=obj(header)
 defs['ReviewRunRequest']=obj({**header,'planBlockId':D('Id')})
 defs['BatchRequest']=obj({**header,'mutation':R('MutationMeta'),'commands':{**arr(R('Command'),256),'minItems':1},'cancellationId':D('Id')},[*header,'mutation','commands'])

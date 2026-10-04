@@ -1243,6 +1243,80 @@ RequestId DomainId `json:"requestId"`
 WorkspaceId DomainId `json:"workspaceId"`
 FileId DomainId `json:"fileId"`
 }
+type ServicePlanCreatePage struct {
+Kind string `json:"kind"`
+Destination string `json:"destination"`
+Title string `json:"title"`
+Body *string `json:"body,omitempty"`
+}
+type ServicePlanCreateDatabase struct {
+Kind string `json:"kind"`
+Destination string `json:"destination"`
+Title string `json:"title"`
+Body *string `json:"body,omitempty"`
+Properties []struct {
+Name string `json:"name"`
+Type string `json:"type"`
+} `json:"properties,omitempty"`
+}
+type ServicePlanUpdatePage struct {
+Kind string `json:"kind"`
+Target string `json:"target"`
+Title *string `json:"title,omitempty"`
+Body *string `json:"body,omitempty"`
+}
+type ServicePlanCreateTask struct {
+Kind string `json:"kind"`
+Destination string `json:"destination"`
+Title string `json:"title"`
+Body *string `json:"body,omitempty"`
+Status *string `json:"status,omitempty"`
+Due *string `json:"due,omitempty"`
+}
+type ServicePlanCreateRecord struct {
+Kind string `json:"kind"`
+Destination string `json:"destination"`
+Title string `json:"title"`
+Body *string `json:"body,omitempty"`
+}
+type ServicePlanUpdateRecord struct {
+Kind string `json:"kind"`
+Target string `json:"target"`
+Property string `json:"property"`
+Value json.RawMessage `json:"value"`
+}
+type ServicePlanUpdateTask struct {
+Kind string `json:"kind"`
+Target string `json:"target"`
+Status *string `json:"status,omitempty"`
+Due *string `json:"due,omitempty"`
+}
+type ServicePlannedActionValue interface { isServicePlannedAction() }
+type ServicePlannedAction struct { Value ServicePlannedActionValue }
+func (ServicePlanCreatePage) isServicePlannedAction() {}
+func (ServicePlanCreateDatabase) isServicePlannedAction() {}
+func (ServicePlanUpdatePage) isServicePlannedAction() {}
+func (ServicePlanCreateTask) isServicePlannedAction() {}
+func (ServicePlanCreateRecord) isServicePlannedAction() {}
+func (ServicePlanUpdateRecord) isServicePlannedAction() {}
+func (ServicePlanUpdateTask) isServicePlannedAction() {}
+func (v ServicePlannedAction) MarshalJSON() ([]byte,error) { return json.Marshal(v.Value) }
+func (v *ServicePlannedAction) UnmarshalJSON(data []byte) error {
+var fields map[string]json.RawMessage
+if err := json.Unmarshal(data, &fields); err != nil {return err}
+if matchesVariant(fields,[]string{"kind","destination","title"},map[string]string{"kind":"\"create_page\""},map[string][]string{},[]string{"kind","destination","title","body"}) { var result ServicePlanCreatePage; if err := json.Unmarshal(data,&result); err != nil {return err}; v.Value=result; return nil }
+if matchesVariant(fields,[]string{"kind","destination","title"},map[string]string{"kind":"\"create_database\""},map[string][]string{},[]string{"kind","destination","title","body","properties"}) { var result ServicePlanCreateDatabase; if err := json.Unmarshal(data,&result); err != nil {return err}; v.Value=result; return nil }
+if matchesVariant(fields,[]string{"kind","target"},map[string]string{"kind":"\"update_page\""},map[string][]string{},[]string{"kind","target","title","body"}) { var result ServicePlanUpdatePage; if err := json.Unmarshal(data,&result); err != nil {return err}; v.Value=result; return nil }
+if matchesVariant(fields,[]string{"kind","destination","title"},map[string]string{"kind":"\"create_task\""},map[string][]string{},[]string{"kind","destination","title","body","status","due"}) { var result ServicePlanCreateTask; if err := json.Unmarshal(data,&result); err != nil {return err}; v.Value=result; return nil }
+if matchesVariant(fields,[]string{"kind","destination","title"},map[string]string{"kind":"\"create_record\""},map[string][]string{},[]string{"kind","destination","title","body"}) { var result ServicePlanCreateRecord; if err := json.Unmarshal(data,&result); err != nil {return err}; v.Value=result; return nil }
+if matchesVariant(fields,[]string{"kind","target","property","value"},map[string]string{"kind":"\"update_record\""},map[string][]string{},[]string{"kind","target","property","value"}) { var result ServicePlanUpdateRecord; if err := json.Unmarshal(data,&result); err != nil {return err}; v.Value=result; return nil }
+if matchesVariant(fields,[]string{"kind","target"},map[string]string{"kind":"\"update_task\""},map[string][]string{},[]string{"kind","target","status","due"}) { var result ServicePlanUpdateTask; if err := json.Unmarshal(data,&result); err != nil {return err}; v.Value=result; return nil }
+return fmt.Errorf("unknown or incomplete ServicePlannedAction variant")
+}
+type ServiceActionPlan struct {
+Version int64 `json:"version"`
+Actions []ServicePlannedAction `json:"actions"`
+}
 type ServiceReviewListRequest struct {
 ContractVersion int64 `json:"contractVersion"`
 RequestId DomainId `json:"requestId"`
