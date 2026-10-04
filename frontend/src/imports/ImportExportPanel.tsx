@@ -24,6 +24,7 @@ type Item = {
   columns?: Column[];
 };
 type Plan = {
+  notionGraph?: boolean;
   jobId?: string;
   planId: string;
   planHash: string;
@@ -47,6 +48,12 @@ type Recent = {
   total: number;
   createdAt: string;
 };
+const notionGraphKinds = new Set([
+  "notion_container",
+  "notion_template",
+  "portable_collection",
+  "portable_record",
+]);
 const labels: Record<string, string> = {
   preserved: "Preserved",
   adapted: "Adapted",
@@ -472,12 +479,20 @@ export function ImportExportPanel({
                       disabled={busy || running || plan.initialized}
                       onChange={(e) =>
                         configure({
-                          choices: [
-                            {
-                              sourceLocator: item.sourceLocator,
-                              choice: e.target.value,
-                            },
-                          ],
+                          choices:
+                            plan.notionGraph && notionGraphKinds.has(item.kind)
+                              ? plan.items
+                                  .filter((i) => notionGraphKinds.has(i.kind))
+                                  .map((i) => ({
+                                    sourceLocator: i.sourceLocator,
+                                    choice: e.target.value,
+                                  }))
+                              : [
+                                  {
+                                    sourceLocator: item.sourceLocator,
+                                    choice: e.target.value,
+                                  },
+                                ],
                         })
                       }
                     >
@@ -487,11 +502,14 @@ export function ImportExportPanel({
                       <option value="keep_local">
                         Keep local; retain incoming source
                       </option>
-                      {item.kind !== "csv" && (
-                        <option value="replace">
-                          Replace the page body with incoming content
-                        </option>
-                      )}
+                      {(!plan.notionGraph ||
+                        !notionGraphKinds.has(item.kind)) &&
+                        item.kind !== "csv" &&
+                        item.kind !== "portable_collection" && (
+                          <option value="replace">
+                            Replace the page body with incoming content
+                          </option>
+                        )}
                       <option value="duplicate">Import a separate copy</option>
                     </select>
                   </div>

@@ -172,6 +172,18 @@ defs['CancelRequest']=obj({**header,'cancellationId':D('Id')})
 defs['CancelResult']=obj({'cancellationId':D('Id'),'state':enum('requested','cancelled','already_committed','not_found'),'transactionId':D('Id')},['cancellationId','state'])
 defs['PrepareFileRequest']=obj({**header,'selectionHandle':D('Id')})
 defs['PrepareFileResult']=obj({'ingestHandle':D('Id'),'contentHash':D('Hash'),'sizeBytes':{'type':'string','pattern':'^(0|[1-9][0-9]{0,18})$'},'mediaType':S,'fileId':D('Id'),'expiresAt':D('Timestamp')})
+# Notion capture is an owner-only network workflow. Raw source objects stay in
+# persisted capture state; the public summary exposes only bounded task metadata.
+notion_source_id={'type':'string','pattern':'^[0-9a-fA-F-]{32,36}$'}
+defs['NotionRoot']=obj({'kind':enum('page','database','data_source'),'id':notion_source_id})
+defs['NotionCaptureStartRequest']=obj({**header,'roots':{**arr(R('NotionRoot'),20),'minItems':1},'rootIds':{**arr(notion_source_id,20),'minItems':1},'sourceNamespace':{'type':'string','minLength':1,'maxLength':400}},[*header,'sourceNamespace'])
+defs['NotionCaptureStartRequest']['oneOf']=[{'required':['roots'],'not':{'required':['rootIds']}},{'required':['rootIds'],'not':{'required':['roots']}}]
+defs['NotionCaptureStatusRequest']=obj({**header,'captureId':D('Id')})
+defs['NotionCaptureListRequest']=obj(header)
+defs['NotionCaptureStepRequest']=obj({**header,'captureId':D('Id'),'revision':{'type':'integer','minimum':1},'token':{'type':'string','minLength':8,'maxLength':4096}})
+defs['NotionCaptureFinishRequest']=obj({**header,'captureId':D('Id'),'revision':{'type':'integer','minimum':1},'allowPartial':B},[*header,'captureId','revision'])
+defs['NotionCaptureTask']=obj({'kind':enum('page','children','database','data_source','query','property','views','view','attachment','templates'),'id':S,'pageId':S,'parentId':S,'sourceId':S,'propertyId':S,'fileIndex':N,'template':B,'cursor':{'type':'string','maxLength':4096},'depth':N},['kind','id','pageId','parentId','depth'])
+defs['NotionCaptureResult']=obj({'captureId':D('Id'),'revision':{'type':'integer','minimum':1},'state':enum('capturing','blocked','ready','finished'),'authorizedRoots':arr(S,20),'apiVersion':enum('2025-09-03','2026-03-11'),'planId':D('Id'),'pending':arr(R('NotionCaptureTask'),10000),'completed':N,'bytes':N,'error':S},['captureId','revision','state','authorizedRoots','apiVersion','planId','pending','completed','bytes'])
 defs['ImportItemOutcome']=obj({'sourceLocator':S,'mappingId':D('Id'),'outcome':enum('preserved','adapted','partial','unsupported_but_retained','failed'),'reason':S,'retainedFileId':D('Id'),'location':D('Location')},['sourceLocator','outcome','reason'])
 defs['ImportReport']=obj({'runId':D('Id'),'jobId':D('Id'),'state':enum('preview','running','partial','completed','failed','cancelled'),'sourceCompleteness':enum('complete','partial','unknown'),'discoveredCount':N,'accountedCount':N,'items':arr(R('ImportItemOutcome'),10000),'committedBatchIds':arr(D('Id'),10000),'unresolvedSourceIds':arr(S,10000),'sourceOmissions':arr(S,10000)})
 defs['PreviewImportRequest']=obj({**header,'sourceHandle':D('Id'),'sourceNamespace':S,'channel':enum('zip','html','api'),'destinationScope':D('Scope')})

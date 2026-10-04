@@ -1721,6 +1721,69 @@ MediaType string `json:"mediaType"`
 FileId DomainId `json:"fileId"`
 ExpiresAt DomainTimestamp `json:"expiresAt"`
 }
+type ServiceNotionRoot struct {
+Kind string `json:"kind"`
+Id string `json:"id"`
+}
+type ServiceNotionCaptureStartRequest struct {
+ContractVersion int64 `json:"contractVersion"`
+RequestId DomainId `json:"requestId"`
+WorkspaceId DomainId `json:"workspaceId"`
+Roots []ServiceNotionRoot `json:"roots,omitempty"`
+RootIds []string `json:"rootIds,omitempty"`
+SourceNamespace string `json:"sourceNamespace"`
+}
+type ServiceNotionCaptureStatusRequest struct {
+ContractVersion int64 `json:"contractVersion"`
+RequestId DomainId `json:"requestId"`
+WorkspaceId DomainId `json:"workspaceId"`
+CaptureId DomainId `json:"captureId"`
+}
+type ServiceNotionCaptureListRequest struct {
+ContractVersion int64 `json:"contractVersion"`
+RequestId DomainId `json:"requestId"`
+WorkspaceId DomainId `json:"workspaceId"`
+}
+type ServiceNotionCaptureStepRequest struct {
+ContractVersion int64 `json:"contractVersion"`
+RequestId DomainId `json:"requestId"`
+WorkspaceId DomainId `json:"workspaceId"`
+CaptureId DomainId `json:"captureId"`
+Revision int64 `json:"revision"`
+Token string `json:"token"`
+}
+type ServiceNotionCaptureFinishRequest struct {
+ContractVersion int64 `json:"contractVersion"`
+RequestId DomainId `json:"requestId"`
+WorkspaceId DomainId `json:"workspaceId"`
+CaptureId DomainId `json:"captureId"`
+Revision int64 `json:"revision"`
+AllowPartial *bool `json:"allowPartial,omitempty"`
+}
+type ServiceNotionCaptureTask struct {
+Kind string `json:"kind"`
+Id string `json:"id"`
+PageId string `json:"pageId"`
+ParentId string `json:"parentId"`
+SourceId *string `json:"sourceId,omitempty"`
+PropertyId *string `json:"propertyId,omitempty"`
+FileIndex *int64 `json:"fileIndex,omitempty"`
+Template *bool `json:"template,omitempty"`
+Cursor *string `json:"cursor,omitempty"`
+Depth int64 `json:"depth"`
+}
+type ServiceNotionCaptureResult struct {
+CaptureId DomainId `json:"captureId"`
+Revision int64 `json:"revision"`
+State string `json:"state"`
+AuthorizedRoots []string `json:"authorizedRoots"`
+ApiVersion string `json:"apiVersion"`
+PlanId DomainId `json:"planId"`
+Pending []ServiceNotionCaptureTask `json:"pending"`
+Completed int64 `json:"completed"`
+Bytes int64 `json:"bytes"`
+Error *string `json:"error,omitempty"`
+}
 type ServiceImportItemOutcome struct {
 SourceLocator string `json:"sourceLocator"`
 MappingId *DomainId `json:"mappingId,omitempty"`

@@ -24,6 +24,7 @@ type portableRecordSource struct {
 	Values   map[string]any `json:"values"`
 }
 type portableViewSource struct {
+	ContainerID    string         `json:"containerId,omitempty"`
 	OwningPagePath string         `json:"owningPagePath,omitempty"`
 	OwningPageID   string         `json:"owningPageId,omitempty"`
 	ID             string         `json:"id"`
@@ -412,6 +413,11 @@ func rewritePortableDatabaseValue(v any, ids map[string]string, key string) any 
 	return v
 }
 func remapPortableDatabasePages(p *ImportPlan, ids map[string]string) {
+	for i := range p.NotionContainers {
+		if id := ids[p.NotionContainers[i].PageID]; id != "" {
+			p.NotionContainers[i].PageID = id
+		}
+	}
 	for i := range p.PortableCollections {
 		c := &p.PortableCollections[i]
 		if id := ids[c.PageID]; id != "" {
@@ -433,8 +439,11 @@ func remapPortableDatabasePages(p *ImportPlan, ids map[string]string) {
 // commitPortableDatabase is one atomic final import unit. Canonical commands run
 // through their normal handlers and the frozen import plan's guarded IDs.
 func commitPortableDatabase(m *Mutation, p *ImportPlan) error {
-	if len(p.PortableCollections) == 0 {
+	if p.NotionKeepGraph {
 		return nil
+	}
+	if len(p.PortableCollections) == 0 {
+		return commitNotionContainers(m, p)
 	}
 	for _, item := range p.Items {
 		if item.Kind == "portable_collection" && item.Choice == "keep_local" {
@@ -537,9 +546,12 @@ func commitPortableDatabase(m *Mutation, p *ImportPlan) error {
 			}
 		}
 	}
+	if err := commitNotionContainers(m, p); err != nil {
+		return err
+	}
 	for _, c := range p.PortableCollections {
 		for _, v := range c.Views {
-			if err := saveView(m, map[string]any{"kind": "view.save", "viewId": v.ID, "collectionId": c.CollectionID, "owningPageId": v.OwningPageID, "name": v.Name, "type": v.Type, "schemaVersion": float64(v.SchemaVersion), "config": v.Config, "query": v.Query}); err != nil {
+			if err := saveView(m, map[string]any{"kind": "view.save", "viewId": v.ID, "containerId": v.ContainerID, "collectionId": c.CollectionID, "owningPageId": v.OwningPageID, "name": v.Name, "type": v.Type, "schemaVersion": float64(v.SchemaVersion), "config": v.Config, "query": v.Query}); err != nil {
 				return err
 			}
 		}

@@ -120,6 +120,12 @@ func applyPortableImport(m *Mutation, c map[string]any) error {
 		return nil
 	}
 	if !p.Initialized {
+		if err := prepareNotionGraphChoice(&p); err != nil {
+			return err
+		}
+		if err := validateNotionIdentityPreview(m, &p); err != nil {
+			return err
+		}
 		if resolutions, ok := c["resolutions"].([]any); ok {
 			for _, raw := range resolutions {
 				resolution, _ := raw.(map[string]any)

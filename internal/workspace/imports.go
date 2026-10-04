@@ -75,6 +75,11 @@ type ImportItem struct {
 	Provenance         any                     `json:"provenance,omitempty"`
 }
 type ImportPlan struct {
+	NotionGraph         bool                       `json:"notionGraph,omitempty"`
+	NotionKeepGraph     bool                       `json:"notionKeepGraph,omitempty"`
+	NotionCopyGraph     bool                       `json:"notionCopyGraph,omitempty"`
+	NotionContainers    []NotionContainerImport    `json:"notionContainers,omitempty"`
+	NotionIdentities    []NotionIdentityImport     `json:"notionIdentities,omitempty"`
 	PortableCollections []PortableCollectionImport `json:"portableCollections,omitempty"`
 	ID                  string                     `json:"planId"`
 	Hash                string                     `json:"planHash"`
@@ -519,7 +524,7 @@ func configurePortableImport(ctx context.Context, k *Kernel, e contracts.Service
 				if choice != "keep_local" && choice != "replace" && choice != "duplicate" {
 					return Fail("INVALID_REQUEST", "Choose keep_local, replace, or duplicate")
 				}
-				if (item.Kind == "csv" || item.Kind == "portable_collection") && choice == "replace" {
+				if (item.Kind == "csv" || item.Kind == "portable_collection" || p.NotionGraph && notionGraphPage(*item)) && choice == "replace" {
 					return Fail("INVALID_REQUEST", "Database schema replacement requires a separate reviewed schema migration; keep local or import a copy")
 				}
 				item.Choice = choice

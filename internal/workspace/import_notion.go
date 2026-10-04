@@ -16,27 +16,33 @@ import (
 	"trove.local/phase0/contracts"
 )
 
-const notionCaptureVersion = "2025-09-03"
+const notionCaptureVersion = "2026-03-11"
 
 type notionCaptureTask struct {
-	Kind     string `json:"kind"`
-	ID       string `json:"id"`
-	PageID   string `json:"pageId"`
-	ParentID string `json:"parentId"`
-	Cursor   string `json:"cursor,omitempty"`
-	Depth    int    `json:"depth"`
+	Kind       string `json:"kind"`
+	Template   bool   `json:"template,omitempty"`
+	SourceID   string `json:"sourceId,omitempty"`
+	PropertyID string `json:"propertyId,omitempty"`
+	FileIndex  int    `json:"fileIndex,omitempty"`
+	ID         string `json:"id"`
+	PageID     string `json:"pageId"`
+	ParentID   string `json:"parentId"`
+	Cursor     string `json:"cursor,omitempty"`
+	Depth      int    `json:"depth"`
 }
 type NotionCapture struct {
-	ID        string              `json:"captureId"`
-	Revision  int                 `json:"revision"`
-	State     string              `json:"state"`
-	Roots     []string            `json:"authorizedRoots"`
-	PlanID    string              `json:"planId"`
-	Pending   []notionCaptureTask `json:"pending"`
-	Seen      map[string]bool     `json:"seen"`
-	Completed int                 `json:"completed"`
-	Bytes     int64               `json:"bytes"`
-	Error     string              `json:"error,omitempty"`
+	ID         string                          `json:"captureId"`
+	APIVersion string                          `json:"apiVersion,omitempty"`
+	Objects    map[string]notionCapturedObject `json:"objects,omitempty"`
+	Revision   int                             `json:"revision"`
+	State      string                          `json:"state"`
+	Roots      []string                        `json:"authorizedRoots"`
+	PlanID     string                          `json:"planId"`
+	Pending    []notionCaptureTask             `json:"pending"`
+	Seen       map[string]bool                 `json:"seen"`
+	Completed  int                             `json:"completed"`
+	Bytes      int64                           `json:"bytes"`
+	Error      string                          `json:"error,omitempty"`
 }
 
 var notionID = regexp.MustCompile(`^[0-9a-fA-F]{32}$`)
@@ -48,9 +54,9 @@ func init() {
 			return err
 		})
 	})
-	RegisterQuery("imports.notion.start", startNotionCapture)
-	RegisterQuery("imports.notion.status", getNotionCapture)
-	RegisterQuery("imports.notion.list", func(ctx context.Context, k *Kernel, e contracts.ServiceExecutionContext, r map[string]any) (any, error) {
+	RegisterQuery("imports.notion.start", publicNotionQuery("NotionCaptureStartRequest", startNotionCapture))
+	RegisterQuery("imports.notion.status", publicNotionQuery("NotionCaptureStatusRequest", getNotionCapture))
+	RegisterQuery("imports.notion.list", publicNotionQuery("NotionCaptureListRequest", func(ctx context.Context, k *Kernel, e contracts.ServiceExecutionContext, r map[string]any) (any, error) {
 		if err := requireOwnerScope(k, e); err != nil {
 			return nil, err
 		}
@@ -72,11 +78,11 @@ func init() {
 			out = append(out, s)
 		}
 		return out, rows.Err()
-	})
-	RegisterQuery("imports.notion.step", func(ctx context.Context, k *Kernel, e contracts.ServiceExecutionContext, r map[string]any) (any, error) {
+	}))
+	RegisterQuery("imports.notion.step", publicNotionQuery("NotionCaptureStepRequest", func(ctx context.Context, k *Kernel, e contracts.ServiceExecutionContext, r map[string]any) (any, error) {
 		return k.CaptureNotionStep(ctx, e, str(r["captureId"]), int(number(r["revision"])), str(r["token"]), nil)
-	})
-	RegisterQuery("imports.notion.finish", finishNotionCapture)
+	}))
+	RegisterQuery("imports.notion.finish", publicNotionQuery("NotionCaptureFinishRequest", finishNotionCapture))
 }
 func loadNotionCapture(ctx context.Context, q querier, id string) (NotionCapture, error) {
 	var s NotionCapture
@@ -102,31 +108,27 @@ func startNotionCapture(ctx context.Context, k *Kernel, e contracts.ServiceExecu
 	if err := requireOwnerScope(k, e); err != nil {
 		return nil, err
 	}
-	roots, _ := r["rootIds"].([]any)
-	if len(roots) < 1 || len(roots) > 20 {
-		return nil, Fail("INVALID_REQUEST", "Choose 1–20 explicit Notion page root IDs")
+	roots, err := notionRoots(r)
+	if err != nil {
+		return nil, err
 	}
 	namespace := strings.TrimSpace(str(r["sourceNamespace"]))
 	if namespace == "" || len(namespace) > 400 {
 		return nil, Fail("INVALID_REQUEST", "Choose a stable source namespace up to 400 characters")
 	}
-	s := NotionCapture{ID: NewID(), Revision: 1, State: "capturing", Roots: []string{}, Pending: []notionCaptureTask{}, Seen: map[string]bool{}}
-	p := ImportPlan{ID: NewID(), Namespace: namespace, SourceSystem: "notion_api", SourceName: "Notion API capture", RootID: NewID(), State: "capturing", Items: []ImportItem{}, SourceCompleteness: "partial", SourceOmissions: []string{"Only explicitly selected page roots and their supplied descendants are captured. Comments, permissions, history, and database definitions unavailable from the page/block endpoints are not inferred."}, UnknownCompleteness: []string{"API authorization may omit inaccessible material. Unsupported supplied fields are retained in raw response evidence."}, CommittedBatchIDs: []string{}, CreatedAt: now()}
+	s := NotionCapture{ID: NewID(), Revision: 1, State: "capturing", APIVersion: notionCaptureVersion, Roots: []string{}, Pending: []notionCaptureTask{}, Seen: map[string]bool{}, Objects: map[string]notionCapturedObject{}}
+	p := ImportPlan{ID: NewID(), Namespace: namespace, SourceSystem: "notion_api", SourceName: "Notion API capture", RootID: NewID(), State: "capturing", Items: []ImportItem{}, SourceCompleteness: "partial", SourceOmissions: []string{"Only selected roots and their supplied descendants are authorized. Comments, permissions and history are not captured. Source settings without equivalent local behavior remain inert evidence."}, UnknownCompleteness: []string{"API authorization may omit inaccessible material. Denied or unfinished endpoints are reported, never treated as empty data."}, CommittedBatchIDs: []string{}, CreatedAt: now()}
 	s.PlanID = p.ID
-	for _, raw := range roots {
-		id := strings.ToLower(strings.ReplaceAll(str(raw), "-", ""))
-		if !notionID.MatchString(id) {
-			return nil, Fail("INVALID_REQUEST", "Notion roots must be page UUIDs")
-		}
-		if s.Seen["root:"+id] {
+	for _, root := range roots {
+		key := root.Kind + ":" + root.ID
+		if s.Seen["root:"+key] {
 			continue
 		}
-		s.Seen["root:"+id] = true
-		s.Roots = append(s.Roots, id)
-		s.Pending = append(s.Pending, notionCaptureTask{Kind: "page", ID: id, PageID: NewID(), ParentID: p.RootID})
+		s.Seen["root:"+key] = true
+		s.Roots = append(s.Roots, key)
+		notionEnqueue(&s, notionCaptureTask{Kind: root.Kind, ID: root.ID, PageID: NewID(), ParentID: p.RootID})
 	}
-	var err error
-	p.SourceFileID, err = k.storeImportBytes(ctx, "notion-authorized-roots.json", marshal(map[string]any{"authorizedRoots": s.Roots, "apiVersion": notionCaptureVersion, "capturedAt": now()}))
+	p.SourceFileID, err = k.storeImportBytes(ctx, "notion-authorized-roots.json", marshal(map[string]any{"authorizedRoots": s.Roots, "apiVersion": s.APIVersion, "capturedAt": now()}))
 	if err != nil {
 		return nil, err
 	}
@@ -155,14 +157,24 @@ func notionHTTPClient(client *http.Client) *http.Client {
 	return &copy
 }
 func fetchNotion(ctx context.Context, client *http.Client, endpoint, token string) ([]byte, int, error) {
+	return fetchNotionRequest(ctx, client, endpoint, token, notionCaptureVersion, nil)
+}
+func fetchNotionRequest(ctx context.Context, client *http.Client, endpoint, token, version string, body []byte) ([]byte, int, error) {
 	for attempt := 0; attempt < 3; attempt++ {
-		req, err := http.NewRequestWithContext(ctx, http.MethodGet, endpoint, nil)
+		method := http.MethodGet
+		if body != nil {
+			method = http.MethodPost
+		}
+		req, err := http.NewRequestWithContext(ctx, method, endpoint, strings.NewReader(string(body)))
 		if err != nil {
 			return nil, 0, err
 		}
 		if token != "" {
 			req.Header.Set("Authorization", "Bearer "+token)
-			req.Header.Set("Notion-Version", notionCaptureVersion)
+			req.Header.Set("Notion-Version", version)
+			if body != nil {
+				req.Header.Set("Content-Type", "application/json")
+			}
 		}
 		resp, err := client.Do(req)
 		if err != nil {
@@ -281,17 +293,24 @@ func (k *Kernel) CaptureNotionStep(ctx context.Context, e contracts.ServiceExecu
 		return s, err
 	}
 	task := s.Pending[0]
-	endpoint := "https://api.notion.com/v1/pages/" + task.ID
-	if task.Kind == "children" {
-		endpoint = "https://api.notion.com/v1/blocks/" + task.ID + "/children?page_size=100"
-		if task.Cursor != "" {
-			endpoint += "&start_cursor=" + url.QueryEscape(task.Cursor)
-		}
+	endpoint, requestBody, err := notionEndpoint(task)
+	if err != nil {
+		return s, err
+	}
+	version := s.APIVersion
+	if version == "" {
+		version = "2025-09-03"
+	}
+	if s.Objects == nil {
+		s.Objects = map[string]notionCapturedObject{}
 	}
 	bounded, cancel := context.WithTimeout(ctx, 45*time.Second)
 	defer cancel()
 	client = notionHTTPClient(client)
-	raw, status, fetchErr := fetchNotion(bounded, client, endpoint, token)
+	raw, status, fetchErr := fetchNotionRequest(bounded, client, endpoint, token, version, requestBody)
+	if fetchErr == nil && task.Kind == "attachment" {
+		fetchErr = k.resolveNotionAttachment(bounded, client, &s, &p, task, raw)
+	}
 	s.Revision++
 	s.Error = ""
 	s.State = "capturing"
@@ -304,24 +323,47 @@ func (k *Kernel) CaptureNotionStep(ctx context.Context, e contracts.ServiceExecu
 				return s, er
 			}
 			s.Error += fmt.Sprintf(" (HTTP %d; retained response %s)", status, evidenceID)
+			if len(p.Items) >= 10000 || s.Bytes+int64(len(raw)) > 128<<20 {
+				return s, Fail("RESOURCE_EXHAUSTED", "Failed capture responses exhausted the evidence budget")
+			}
+			p.Items = append(p.Items, ImportItem{Locator: fmt.Sprintf("notion/errors/%s/%d", task.ID, s.Revision), Kind: "asset", Outcome: "failed", Reason: s.Error, RawFileID: evidenceID, Hash: importDigest(raw), Size: int64(len(raw))})
+			s.Bytes += int64(len(raw))
 		}
-		err = k.write(ctx, func(tx *sql.Tx) error { return saveNotionCapture(ctx, tx, s, revision) })
+		p.Hash = importPlanHash(p)
+		err = k.write(ctx, func(tx *sql.Tx) error {
+			if err := saveNotionCapture(ctx, tx, s, revision); err != nil {
+				return err
+			}
+			return saveImportPlan(ctx, tx, p)
+		})
 		return s, err
 	}
 	var response map[string]any
 	if err = json.Unmarshal(raw, &response); err != nil {
 		return s, Fail("INVALID_REQUEST", "Notion returned invalid JSON; cursor retained")
 	}
+	if s.Bytes+int64(len(raw)) > 128<<20 {
+		return s, Fail("RESOURCE_EXHAUSTED", "Capture response exceeds remaining byte budget")
+	}
 	s.Pending = s.Pending[1:]
-	s.Seen["cursor:"+task.Kind+":"+task.ID+":"+task.Cursor] = true
+	s.Seen[notionCursorKey(task, task.Cursor)] = true
 	s.Completed++
 	s.Bytes += int64(len(raw))
 	rawID, err := k.storeImportBytes(ctx, "notion-"+task.ID+".json", raw)
 	if err != nil {
 		return s, err
 	}
-	provenance := map[string]any{"channel": "notion_api", "apiVersion": notionCaptureVersion, "sourceId": task.ID, "cursor": task.Cursor, "capturedAt": now(), "responseFileId": rawID}
-	if task.Kind == "page" {
+	provenance := map[string]any{"channel": "notion_api", "apiVersion": version, "sourceId": task.ID, "cursor": task.Cursor, "capturedAt": now(), "responseFileId": rawID}
+	if task.Kind != "page" && task.Kind != "children" {
+		if err = k.captureNotionObject(ctx, &s, &p, task, response, raw, rawID, provenance); err != nil {
+			return s, err
+		}
+	} else if task.Kind == "page" {
+		if task.SourceID != "" {
+			if err = captureNotionRecord(&s, task, response, raw, rawID); err != nil {
+				return s, err
+			}
+		}
 		title := "Notion page " + task.ID
 		properties, _ := response["properties"].(map[string]any)
 		for _, rawProp := range properties {
@@ -337,11 +379,31 @@ func (k *Kernel) CaptureNotionStep(ctx context.Context, e contracts.ServiceExecu
 			}
 		}
 		item := ImportItem{Locator: "notion/pages/" + task.ID, Kind: "notion_page", Outcome: "partial", Reason: "Page title and descendants captured; every supplied property and metadata field retained in response evidence", RawFileID: rawID, Hash: importDigest(raw), Size: int64(len(raw)), PageID: task.PageID, ParentID: task.ParentID, Title: title, IdentityKind: "external_id", ExternalID: task.ID, Provenance: provenance, Blocks: []ImportBlock{}}
-		if len(properties) > 0 {
+		if len(properties) > 0 && task.SourceID == "" {
 			item.Blocks = append(item.Blocks, fallbackImportBlock(&item, "Captured property values (source snapshots, not freshly calculated results):\n"+string(marshal(properties))))
 		}
-		p.Items = append(p.Items, item)
-		s.Pending = append([]notionCaptureTask{{Kind: "children", ID: task.ID, PageID: task.PageID, ParentID: task.ParentID, Depth: task.Depth}}, s.Pending...)
+		replaced := false
+		for i := range p.Items {
+			if p.Items[i].Kind == "notion_page" && p.Items[i].ExternalID == task.ID {
+				prior := p.Items[i]
+				prior.Kind = "asset"
+				prior.Locator += "#prior-page-response"
+				prior.PageID = ""
+				prior.ParentID = ""
+				prior.Blocks = nil
+				p.Items[i] = item
+				p.Items = append(p.Items, prior)
+				replaced = true
+				break
+			}
+		}
+		if !replaced {
+			p.Items = append(p.Items, item)
+		}
+		childTask := notionCaptureTask{Kind: "children", ID: task.ID, PageID: task.PageID, ParentID: task.ParentID, Depth: task.Depth}
+		if !s.Seen[notionCursorKey(childTask, "")] {
+			s.Pending = append([]notionCaptureTask{childTask}, s.Pending...)
+		}
 	} else {
 		results, ok := response["results"].([]any)
 		if !ok {
@@ -426,7 +488,8 @@ func (k *Kernel) CaptureNotionStep(ctx context.Context, e contracts.ServiceExecu
 						p.Items = append(p.Items, asset)
 					} else {
 						item.Outcome = "partial"
-						item.Reason = "Attachment download failed or exceeded budget; URL and source response retained"
+						item.Reason = "Attachment download pending; resume refreshes its source reference before retry"
+						next = append(next, notionCaptureTask{Kind: "attachment", ID: blockID, PageID: task.PageID})
 					}
 				} else {
 					item.Outcome = "partial"
@@ -435,9 +498,13 @@ func (k *Kernel) CaptureNotionStep(ctx context.Context, e contracts.ServiceExecu
 				if len(item.Blocks) == 0 {
 					item.Blocks = append(item.Blocks, fallbackImportBlock(&item, "Attachment unavailable offline: "+kind))
 				}
+			case "child_database":
+				childPage := notionLocalPage(&s, &p, "database", blockID)
+				notionEnqueue(&s, notionCaptureTask{Kind: "database", ID: blockID, PageID: childPage, ParentID: task.PageID, Depth: task.Depth + 1})
+				item.Blocks = append(item.Blocks, ImportBlock{NewID(), "paragraph", map[string]any{"richText": []any{map[string]any{"text": str(data["title"]), "link": "trove://page/" + childPage}}}})
 			case "child_page":
-				childPage := NewID()
-				next = append(next, notionCaptureTask{Kind: "page", ID: blockID, PageID: childPage, ParentID: task.PageID, Depth: task.Depth + 1})
+				childPage := notionLocalPage(&s, &p, "page", blockID)
+				notionEnqueue(&s, notionCaptureTask{Kind: "page", ID: blockID, PageID: childPage, ParentID: task.PageID, Depth: task.Depth + 1})
 				item.Blocks = append(item.Blocks, ImportBlock{NewID(), "paragraph", map[string]any{"richText": []any{map[string]any{"text": str(data["title"]), "link": "trove://page/" + childPage}}}})
 			default:
 				item.Outcome = "unsupported_but_retained"
@@ -455,7 +522,7 @@ func (k *Kernel) CaptureNotionStep(ctx context.Context, e contracts.ServiceExecu
 					}
 				}
 			}
-			if block["has_children"] == true && kind != "child_page" {
+			if block["has_children"] == true && kind != "child_page" && kind != "child_database" {
 				// A synced reference resolves only to content inside this authorized
 				// capture. It never expands access by fetching a referenced source.
 				if kind != "synced_block" || data["synced_from"] == nil {
@@ -466,7 +533,7 @@ func (k *Kernel) CaptureNotionStep(ctx context.Context, e contracts.ServiceExecu
 		}
 		if response["has_more"] == true {
 			cursor := str(response["next_cursor"])
-			if cursor == "" || cursor == task.Cursor || len(cursor) > 4096 || s.Seen["cursor:"+task.Kind+":"+task.ID+":"+cursor] {
+			if cursor == "" || cursor == task.Cursor || len(cursor) > 4096 || s.Seen[notionCursorKey(task, cursor)] {
 				return s, Fail("INVALID_REQUEST", "Notion pagination cursor is invalid or repeated")
 			}
 			task.Cursor = cursor
@@ -479,7 +546,12 @@ func (k *Kernel) CaptureNotionStep(ctx context.Context, e contracts.ServiceExecu
 		}
 		s.Pending = append(next, s.Pending...)
 	}
-	if len(p.Items) > 10000 {
+	for _, pending := range s.Pending {
+		if pending.Depth > 64 {
+			return s, Fail("RESOURCE_EXHAUSTED", "Notion nesting exceeds 64 levels")
+		}
+	}
+	if len(p.Items) > 10000 || len(s.Pending) > 10000 {
 		return s, Fail("RESOURCE_EXHAUSTED", "Capture exceeds 10,000 supplied items")
 	}
 	if len(s.Pending) == 0 {
@@ -529,6 +601,14 @@ func finishNotionCapture(ctx context.Context, k *Kernel, e contracts.ServiceExec
 			}
 		}
 		reconstructNotionStructure(&p, pageItems)
+		if err = k.reconstructNotionDatabases(ctx, tx, &s, &p); err != nil {
+			return err
+		}
+		for i := range p.Items {
+			if p.Items[i].Kind == "notion_page" || p.Items[i].Kind == "notion_template" || p.Items[i].Kind == "portable_collection" || p.Items[i].Kind == "portable_record" || p.Items[i].Kind == "notion_container" {
+				pageItems[p.Items[i].PageID] = i
+			}
+		}
 		remap := map[string]string{}
 		for _, i := range pageItems {
 			item := &p.Items[i]
@@ -563,6 +643,13 @@ func finishNotionCapture(ctx context.Context, k *Kernel, e contracts.ServiceExec
 				return err
 			}
 		}
+		remapPortableDatabasePages(&p, remap)
+		for i := range p.NotionContainers {
+			if id := remap[p.NotionContainers[i].PageID]; id != "" {
+				p.NotionContainers[i].PageID = id
+			}
+		}
+		setNotionGraphConflicts(&p)
 		for _, task := range s.Pending {
 			item := ImportItem{Locator: "notion/pending/" + task.ID, Kind: "rejected", Outcome: "failed", Reason: "Capture finished before this authorized source could be read: " + s.Error, RawFileID: p.SourceFileID}
 			if task.Kind == "page" {
@@ -576,6 +663,9 @@ func finishNotionCapture(ctx context.Context, k *Kernel, e contracts.ServiceExec
 				item.Blocks = []ImportBlock{fallbackImportBlock(&item, item.Reason)}
 			}
 			p.Items = append(p.Items, item)
+		}
+		if len(p.Items) > 10000 {
+			return Fail("RESOURCE_EXHAUSTED", "Import review exceeds 10,000 items; capture fewer roots")
 		}
 		p.State = "preview"
 		p.Hash = importPlanHash(p)
