@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import "./automation.css";
 import {
   batch,
   dispatch,
@@ -8,24 +9,12 @@ import {
   type WorkspaceSnapshot,
   type S,
 } from "../api";
-type Rule = {
-  id: string;
-  name: string;
-  enabled: boolean;
-  paused: boolean;
-  allowedOrigins: string[];
-  trigger: {
-    type: string;
-    timezone?: string;
-    frequency?: string;
-    hour?: number;
-    minute?: number;
-    missedPolicy?: string;
-    catchUpLimit?: number;
-    collectionId?: string;
-  };
-  actions: Record<string, unknown>[];
-};
+import {
+  RuleBuilder,
+  actionSummary,
+  type Rule,
+  type AutomationOptions,
+} from "./RuleBuilder";
 type Run = {
   id: string;
   ruleId: string;
@@ -58,40 +47,70 @@ export default function AutomationPanel({
 }) {
   const [pageId, setPageId] = useState("");
   const [history, setHistory] = useState<History>({ rules: [], runs: [] });
-  const [name, setName] = useState("Daily note");
-  const [hour, setHour] = useState("09:00");
-  const [zone, setZone] = useState(
-    Intl.DateTimeFormat().resolvedOptions().timeZone || "UTC",
-  );
-  const [policy, setPolicy] = useState("skip");
-  const [limit, setLimit] = useState(3);
+  const [editing, setEditing] = useState<Rule>();
+  const [formVersion, setFormVersion] = useState(0);
+  const [choices, setChoices] = useState<AutomationOptions>({
+    templates: [],
+    templatesTruncated: false,
+    events: [],
+  });
   const [busy, setBusy] = useState(false);
   const [preview, setPreview] = useState<{
     rule: Rule;
     value: Preview;
     eventId?: string;
   }>();
-  const [trigger, setTrigger] = useState("schedule");
-  const [collection, setCollection] = useState("");
-  const [allowAI, setAllowAI] = useState(false);
   const [eventId, setEventId] = useState("");
   const page = w.pages.find(
     (p) => p.id === (pageId || w.pages.find((p) => !p.deletedAt)?.id),
   );
   const refresh = async () => {
-    if (page)
-      setHistory(
-        await dispatch<History>("automationHistory", {
+    if (!page) return;
+    const [next, options] = await Promise.all([
+      dispatch<History>("automationHistory", {
+        ...envelope(w),
+        pageId: page.id,
+      }),
+      dispatch<AutomationOptions>("automationOptions", {
+        ...envelope(w),
+        pageId: page.id,
+      }),
+    ]);
+    setHistory(next);
+    setChoices(options);
+  };
+  useEffect(() => {
+    let live = true;
+    setPreview(undefined);
+    const read = async () => {
+      if (!page) return;
+      const [next, options] = await Promise.all([
+        dispatch<History>("automationHistory", {
           ...envelope(w),
           pageId: page.id,
         }),
-      );
-  };
+        dispatch<AutomationOptions>("automationOptions", {
+          ...envelope(w),
+          pageId: page.id,
+        }),
+      ]);
+      if (live) {
+        setHistory(next);
+        setChoices(options);
+      }
+    };
+    void read().catch(onError);
+    const timer = setInterval(() => void read().catch(onError), 30000);
+    return () => {
+      live = false;
+      clearInterval(timer);
+    };
+  }, [page?.id, w.workspaceId, w.scopeGrantId, w.snapshotCursor]);
   useEffect(() => {
-    void refresh().catch(onError);
-    const timer = setInterval(() => void refresh().catch(onError), 30000);
-    return () => clearInterval(timer);
-  }, [page?.id, w.snapshotCursor]);
+    setEditing(undefined);
+    setEventId("");
+    setHistory({ rules: [], runs: [] });
+  }, [page?.id, w.workspaceId, w.scopeGrantId]);
   const run = async (f: () => Promise<unknown>) => {
     setBusy(true);
     try {
@@ -106,6 +125,7 @@ export default function AutomationPanel({
     }
   };
   const inspect = async (rule: Rule, occurrence?: Run) => {
+    setPreview(undefined);
     const event = occurrence?.occurrenceKey.startsWith("event:")
       ? occurrence.occurrenceKey.slice(6)
       : eventId;
@@ -133,6 +153,7 @@ export default function AutomationPanel({
         Rules on page{" "}
         <select
           aria-label="Automation page"
+          disabled={busy}
           value={page?.id ?? ""}
           onChange={(e) => setPageId(e.target.value)}
         >
@@ -149,148 +170,34 @@ export default function AutomationPanel({
         <p>Create a page to hold automation rules.</p>
       ) : (
         <>
-          <form
-            className="db-panel"
-            onSubmit={(e) => {
-              e.preventDefault();
-              void run(async () => {
-                const [id] = await ids(w, 1);
-                const [h, m] = hour.split(":").map(Number);
-                const rule: Rule = {
-                  id,
-                  name,
-                  enabled: false,
-                  paused: false,
-                  allowedOrigins: allowAI ? ["user", "ai"] : ["user"],
-                  trigger:
-                    trigger === "schedule"
-                      ? {
-                          type: "schedule",
-                          frequency: "daily",
-                          timezone: zone,
-                          hour: h,
-                          minute: m,
-                          missedPolicy: policy,
-                          catchUpLimit: limit,
-                        }
-                      : { type: "event", collectionId: collection },
-                  actions: [
-                    {
-                      kind: "page.create",
-                      pageId: "$id:page",
-                      parentPageId: page.id,
-                      title: `${name} · {{occurrence}}`,
-                    },
-                  ],
-                };
+          <RuleBuilder
+            key={`${w.workspaceId}:${page.id}:${editing?.id ?? "new"}:${formVersion}`}
+            workspace={w}
+            pageId={page.id}
+            initial={editing}
+            choices={choices}
+            busy={busy}
+            onCancel={() => setEditing(undefined)}
+            onSave={async (rule) => {
+              await run(async () => {
+                const id = rule.id || (await ids(w, 1))[0];
                 await batch(
                   w,
                   [
                     {
                       kind: "automation.save",
                       pageId: page.id,
-                      rule: rule as unknown as { [key: string]: unknown },
+                      rule: { ...rule, id } as S.AutomationRule,
                     },
                   ],
                   pageGuards(w, page),
                 );
+                setEditing(undefined);
+                setFormVersion((v) => v + 1);
+                setPreview(undefined);
               });
             }}
-          >
-            <h3>Create a recurring or event note</h3>
-            <label>
-              Name{" "}
-              <input
-                required
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-              />
-            </label>
-            <label>
-              Trigger{" "}
-              <select
-                value={trigger}
-                onChange={(e) => setTrigger(e.target.value)}
-              >
-                <option value="schedule">Every day</option>
-                <option value="event">Collection changes</option>
-              </select>
-            </label>
-            {trigger === "schedule" ? (
-              <>
-                <label>
-                  Local time{" "}
-                  <input
-                    type="time"
-                    required
-                    value={hour}
-                    onChange={(e) => setHour(e.target.value)}
-                  />
-                </label>
-                <label>
-                  Timezone{" "}
-                  <input
-                    required
-                    value={zone}
-                    onChange={(e) => setZone(e.target.value)}
-                  />
-                </label>
-                <label>
-                  Missed runs{" "}
-                  <select
-                    value={policy}
-                    onChange={(e) => setPolicy(e.target.value)}
-                  >
-                    <option value="skip">Skip and log</option>
-                    <option value="catch_up">Bounded catch-up</option>
-                  </select>
-                </label>
-                {policy === "catch_up" && (
-                  <label>
-                    Maximum catch-up{" "}
-                    <input
-                      type="number"
-                      min={1}
-                      max={20}
-                      value={limit}
-                      onChange={(e) => setLimit(Number(e.target.value))}
-                    />
-                  </label>
-                )}
-              </>
-            ) : (
-              <>
-                <label>
-                  Collection{" "}
-                  <select
-                    required
-                    value={collection}
-                    onChange={(e) => setCollection(e.target.value)}
-                  >
-                    <option value="">Choose collection</option>
-                    {w.collections.map((c) => (
-                      <option key={c.id} value={c.id}>
-                        {c.title}
-                      </option>
-                    ))}
-                  </select>
-                </label>
-                <label>
-                  <input
-                    type="checkbox"
-                    checked={allowAI}
-                    onChange={(e) => setAllowAI(e.target.checked)}
-                  />{" "}
-                  Explicitly allow reviewed AI changes
-                </label>
-              </>
-            )}
-            <p>
-              Creates a child page using this name and the intended occurrence
-              time. Save first, inspect the preview, then enable.
-            </p>
-            <button disabled={busy}>Save disabled rule</button>
-          </form>
+          />
           <div className="db-panel">
             <h3>Rules</h3>
             {!history.rules.length && <p>No rules on this page.</p>}
@@ -309,6 +216,15 @@ export default function AutomationPanel({
                     : "On eligible collection changes"}
                   {failures ? ` · ${failures} failure(s)` : ""}
                 </p>
+                <button
+                  disabled={busy}
+                  onClick={() => {
+                    setEditing(rule);
+                    setPreview(undefined);
+                  }}
+                >
+                  Edit rule
+                </button>{" "}
                 <button
                   disabled={busy}
                   onClick={() =>
@@ -362,13 +278,30 @@ export default function AutomationPanel({
               </article>
             ))}
             <label>
-              Event ID for an event preview{" "}
-              <input
+              Event for preview{" "}
+              <select
                 value={eventId}
-                onChange={(e) => setEventId(e.target.value)}
-                placeholder="Choose a committed event"
-              />
+                onChange={(e) => {
+                  setEventId(e.target.value);
+                  setPreview(undefined);
+                }}
+              >
+                <option value="">Choose a recent committed change</option>
+                {choices.events.map((event) => (
+                  <option key={event.id} value={event.id}>
+                    {new Date(event.at).toLocaleString()} · {event.origin} ·{" "}
+                    {Array.from(
+                      new Set(event.revisions.map((r) => r.target.entityType)),
+                    ).join(", ")}
+                  </option>
+                ))}
+              </select>
             </label>
+            <p>
+              Shows eligible origins among the 200 most recent events. Events
+              must match the saved trigger and occur after its version was
+              saved.
+            </p>
           </div>
           {preview && (
             <section className="db-panel" aria-label="Automation preview">
@@ -379,13 +312,24 @@ export default function AutomationPanel({
                   : preview.value.diagnostic}
               </p>
               <ul>
-                {preview.value.commands.map((c, i) => (
+                {preview.value.commands.slice(0, 100).map((c, i) => (
                   <li key={i}>
-                    {c.kind}
-                    {"title" in c ? `: ${c.title}` : ""}
+                    {actionSummary(c as unknown as Record<string, unknown>, w)}
                   </li>
                 ))}
               </ul>
+              {preview.value.commands.length > 100 && (
+                <p>
+                  Showing the first 100 of {preview.value.commands.length}{" "}
+                  canonical effects.
+                </p>
+              )}
+              {!preview.rule.enabled && (
+                <p>
+                  Enable the saved rule, then preview again to run an
+                  occurrence.
+                </p>
+              )}
               <button
                 disabled={
                   busy ||
@@ -436,21 +380,26 @@ export default function AutomationPanel({
                       <td>{r.status}</td>
                       <td>{r.diagnostic || r.occurrenceKey}</td>
                       <td>
-                        {r.status === "failed" && (
-                          <button
-                            disabled={busy}
-                            onClick={() =>
-                              void run(async () => {
-                                const rule = history.rules.find(
-                                  (x) => x.rule.id === r.ruleId,
-                                )?.rule;
-                                if (rule) await inspect(rule, r);
-                              })
-                            }
-                          >
-                            Review retry
-                          </button>
-                        )}
+                        {r.status === "failed" &&
+                          history.rules.some(
+                            (x) =>
+                              x.rule.id === r.ruleId &&
+                              x.version === r.ruleVersion,
+                          ) && (
+                            <button
+                              disabled={busy}
+                              onClick={() =>
+                                void run(async () => {
+                                  const rule = history.rules.find(
+                                    (x) => x.rule.id === r.ruleId,
+                                  )?.rule;
+                                  if (rule) await inspect(rule, r);
+                                })
+                              }
+                            >
+                              Review retry
+                            </button>
+                          )}
                       </td>
                     </tr>
                   ))}

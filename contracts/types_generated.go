@@ -791,6 +791,63 @@ Chart ServiceP2ChartConfig `json:"chart"`
 Form ServiceP2FormConfig `json:"form"`
 Buttons []ServiceP2RowButton `json:"buttons"`
 }
+type ServiceAutomationTemplateAction struct {
+Kind string `json:"kind"`
+TemplateId DomainId `json:"templateId"`
+TemplateHash string `json:"templateHash"`
+Title string `json:"title"`
+CollectionId *DomainId `json:"collectionId,omitempty"`
+}
+type ServiceAutomationActionValue interface { isServiceAutomationAction() }
+type ServiceAutomationAction struct { Value ServiceAutomationActionValue }
+func (ServiceAutomationActionVariant1) isServiceAutomationAction() {}
+func (ServiceAutomationActionVariant2) isServiceAutomationAction() {}
+func (ServiceAutomationActionVariant3) isServiceAutomationAction() {}
+func (ServiceAutomationActionVariant4) isServiceAutomationAction() {}
+func (ServiceAutomationActionVariant5) isServiceAutomationAction() {}
+func (ServiceAutomationActionVariant6) isServiceAutomationAction() {}
+func (ServiceAutomationTemplateAction) isServiceAutomationAction() {}
+func (v ServiceAutomationAction) MarshalJSON() ([]byte,error) { return json.Marshal(v.Value) }
+func (v *ServiceAutomationAction) UnmarshalJSON(data []byte) error {
+var fields map[string]json.RawMessage
+if err := json.Unmarshal(data, &fields); err != nil {return err}
+if matchesVariant(fields,[]string{"kind","pageId","title"},map[string]string{"kind":"\"page.create\""},map[string][]string{},[]string{"kind","pageId","title","parentPageId"}) { var result ServiceAutomationActionVariant1; if err := json.Unmarshal(data,&result); err != nil {return err}; v.Value=result; return nil }
+if matchesVariant(fields,[]string{"kind","pageId"},map[string]string{"kind":"\"page.update\""},map[string][]string{},[]string{"kind","pageId","title","archived","icon","coverFileId"}) { var result ServiceAutomationActionVariant2; if err := json.Unmarshal(data,&result); err != nil {return err}; v.Value=result; return nil }
+if matchesVariant(fields,[]string{"kind","recordId","collectionId","pageId","title"},map[string]string{"kind":"\"record.create\""},map[string][]string{},[]string{"kind","recordId","collectionId","pageId","title"}) { var result ServiceAutomationActionVariant3; if err := json.Unmarshal(data,&result); err != nil {return err}; v.Value=result; return nil }
+if matchesVariant(fields,[]string{"kind","recordId","propertyId","value"},map[string]string{"kind":"\"record.setValue\""},map[string][]string{},[]string{"kind","recordId","propertyId","value"}) { var result ServiceAutomationActionVariant4; if err := json.Unmarshal(data,&result); err != nil {return err}; v.Value=result; return nil }
+if matchesVariant(fields,[]string{"kind","recordId","propertyId"},map[string]string{"kind":"\"record.clearValue\""},map[string][]string{},[]string{"kind","recordId","propertyId"}) { var result ServiceAutomationActionVariant5; if err := json.Unmarshal(data,&result); err != nil {return err}; v.Value=result; return nil }
+if matchesVariant(fields,[]string{"kind","recordId","statusOptionId"},map[string]string{"kind":"\"task.setStatus\""},map[string][]string{},[]string{"kind","recordId","statusOptionId"}) { var result ServiceAutomationActionVariant6; if err := json.Unmarshal(data,&result); err != nil {return err}; v.Value=result; return nil }
+if matchesVariant(fields,[]string{"kind","templateId","templateHash","title"},map[string]string{"kind":"\"template.instantiate\""},map[string][]string{},[]string{"kind","templateId","templateHash","title","collectionId"}) { var result ServiceAutomationTemplateAction; if err := json.Unmarshal(data,&result); err != nil {return err}; v.Value=result; return nil }
+return fmt.Errorf("unknown or incomplete ServiceAutomationAction variant")
+}
+type ServiceAutomationTrigger struct {
+Type string `json:"type"`
+CollectionId *DomainId `json:"collectionId,omitempty"`
+EntityType *string `json:"entityType,omitempty"`
+Timezone *string `json:"timezone,omitempty"`
+Frequency *string `json:"frequency,omitempty"`
+Hour *int64 `json:"hour,omitempty"`
+Minute *int64 `json:"minute,omitempty"`
+Weekday *int64 `json:"weekday,omitempty"`
+MissedPolicy *string `json:"missedPolicy,omitempty"`
+CatchUpLimit *int64 `json:"catchUpLimit,omitempty"`
+}
+type ServiceAutomationCondition struct {
+RecordId DomainId `json:"recordId"`
+PropertyId DomainId `json:"propertyId"`
+Op string `json:"op"`
+Value json.RawMessage `json:"value,omitempty"`
+}
+type ServiceAutomationRule struct {
+Id DomainId `json:"id"`
+Name string `json:"name"`
+Enabled bool `json:"enabled"`
+Paused bool `json:"paused"`
+AllowedOrigins []string `json:"allowedOrigins,omitempty"`
+Trigger ServiceAutomationTrigger `json:"trigger"`
+Condition *ServiceAutomationCondition `json:"condition,omitempty"`
+Actions []ServiceAutomationAction `json:"actions"`
+}
 type ServiceCreatePage struct {
 Kind string `json:"kind"`
 PageId DomainId `json:"pageId"`
@@ -1055,7 +1112,7 @@ DependencyRecordIds []DomainId `json:"dependencyRecordIds"`
 type ServiceSaveAutomation struct {
 Kind string `json:"kind"`
 PageId DomainId `json:"pageId"`
-Rule map[string]json.RawMessage `json:"rule"`
+Rule ServiceAutomationRule `json:"rule"`
 }
 type ServiceRunAutomation struct {
 Kind string `json:"kind"`
@@ -1220,6 +1277,12 @@ if matchesVariant(fields,[]string{"kind","pageId","planBlockId","enabled"},map[s
 if matchesVariant(fields,[]string{"kind","pageId","runId","blockId","approved"},map[string]string{"kind":"\"review.accept\"","approved":"true"},map[string][]string{},[]string{"kind","pageId","runId","blockId","approved"}) { var result ServiceAcceptPersonalReview; if err := json.Unmarshal(data,&result); err != nil {return err}; v.Value=result; return nil }
 if matchesVariant(fields,[]string{"kind","pageId","runId"},map[string]string{"kind":"\"review.dismiss\""},map[string][]string{},[]string{"kind","pageId","runId"}) { var result ServiceDismissPersonalReview; if err := json.Unmarshal(data,&result); err != nil {return err}; v.Value=result; return nil }
 return fmt.Errorf("unknown or incomplete ServiceCommand variant")
+}
+type ServiceAutomationOptionsRequest struct {
+ContractVersion int64 `json:"contractVersion"`
+RequestId DomainId `json:"requestId"`
+WorkspaceId DomainId `json:"workspaceId"`
+PageId DomainId `json:"pageId"`
 }
 type ServiceTemplatePropertyDecisionValue interface { isServiceTemplatePropertyDecision() }
 type ServiceTemplatePropertyDecision struct { Value ServiceTemplatePropertyDecisionValue }
@@ -2196,6 +2259,61 @@ LocalId DomainId `json:"localId"`
 }
 type DomainImportIdentityResolutionVariant2 struct {
 Choice string `json:"choice"`
+}
+type ServiceAutomationActionVariant1 struct {
+Kind string `json:"kind"`
+PageId string `json:"pageId"`
+Title string `json:"title"`
+ParentPageId *string `json:"parentPageId,omitempty"`
+}
+type ServiceAutomationActionVariant2 struct {
+Kind string `json:"kind"`
+PageId string `json:"pageId"`
+Title *string `json:"title,omitempty"`
+Archived *bool `json:"archived,omitempty"`
+Icon *string `json:"icon,omitempty"`
+CoverFileId *string `json:"coverFileId,omitempty"`
+IconPresent bool `json:"-"` // Set true to encode an explicit null when the value is nil.
+CoverFileIdPresent bool `json:"-"` // Set true to encode an explicit null when the value is nil.
+}
+func (v *ServiceAutomationActionVariant2) UnmarshalJSON(data []byte) error {
+type plain ServiceAutomationActionVariant2
+var decoded plain; if err := json.Unmarshal(data,&decoded); err != nil {return err}
+var fields map[string]json.RawMessage; if err := json.Unmarshal(data,&fields); err != nil {return err}
+_, decoded.IconPresent = fields["icon"]
+_, decoded.CoverFileIdPresent = fields["coverFileId"]
+*v = ServiceAutomationActionVariant2(decoded); return nil
+}
+func (v ServiceAutomationActionVariant2) MarshalJSON() ([]byte,error) {
+type plain ServiceAutomationActionVariant2
+raw,err := json.Marshal(plain(v)); if err != nil {return nil,err}
+var fields map[string]json.RawMessage; if err = json.Unmarshal(raw,&fields); err != nil {return nil,err}
+if v.IconPresent && v.Icon == nil {fields["icon"] = json.RawMessage("null")}
+if v.CoverFileIdPresent && v.CoverFileId == nil {fields["coverFileId"] = json.RawMessage("null")}
+return json.Marshal(fields)
+}
+type ServiceAutomationActionVariant3 struct {
+Kind string `json:"kind"`
+RecordId string `json:"recordId"`
+CollectionId string `json:"collectionId"`
+PageId string `json:"pageId"`
+Title string `json:"title"`
+}
+type ServiceAutomationActionVariant4 struct {
+Kind string `json:"kind"`
+RecordId string `json:"recordId"`
+PropertyId string `json:"propertyId"`
+Value ServiceValueInput `json:"value"`
+}
+type ServiceAutomationActionVariant5 struct {
+Kind string `json:"kind"`
+RecordId string `json:"recordId"`
+PropertyId string `json:"propertyId"`
+}
+type ServiceAutomationActionVariant6 struct {
+Kind string `json:"kind"`
+RecordId string `json:"recordId"`
+StatusOptionId string `json:"statusOptionId"`
 }
 type ServiceTemplatePropertyDecisionVariant1 struct {
 SourcePropertyId DomainId `json:"sourcePropertyId"`

@@ -147,6 +147,11 @@ func templateEditable(kind string) bool { return historicalMapType(kind) }
 // consumers. All identity allocation happens here once; apply only uses the
 // stored plan, so a retried batch never allocates a second object graph.
 func buildTemplatePlan(ctx context.Context, k *Kernel, tx *sql.Tx, e contracts.ServiceExecutionContext, r map[string]any) (templatePlan, map[string]any, error) {
+	return buildTemplatePlanWithIDs(ctx, k, tx, e, r, func(string) string { return NewID() })
+}
+
+// Saved owner rules supply occurrence-bound IDs; interactive copies retain random IDs.
+func buildTemplatePlanWithIDs(ctx context.Context, k *Kernel, tx *sql.Tx, e contracts.ServiceExecutionContext, r map[string]any, allocate func(string) string) (templatePlan, map[string]any, error) {
 	if strings.TrimSpace(str(r["title"])) == "" {
 		return templatePlan{}, nil, Fail("INVALID_REQUEST", "Template copy requires a title")
 	}
@@ -219,7 +224,7 @@ func buildTemplatePlan(ctx context.Context, k *Kernel, tx *sql.Tx, e contracts.S
 		if id := remap[old]; id != "" {
 			return id
 		}
-		id := NewID()
+		id := allocate(kind + ":" + old)
 		remap[old] = id
 		fresh[guardKey(kind, id)] = kind
 		return id
@@ -242,7 +247,7 @@ func buildTemplatePlan(ctx context.Context, k *Kernel, tx *sql.Tx, e contracts.S
 		if snap.Record != nil {
 			plan.RecordID = remap[string(snap.Record.Id)]
 		} else {
-			plan.RecordID = NewID()
+			plan.RecordID = allocate("record:destination")
 			fresh[guardKey("record", plan.RecordID)] = "record"
 		}
 	}
@@ -336,7 +341,7 @@ func buildTemplatePlan(ctx context.Context, k *Kernel, tx *sql.Tx, e contracts.S
 						}
 					}
 				}
-				input = remapTemplateValue(input, remap, "", false, false)
+				input = remapTemplateValue(input, remap, "", false, false, allocate)
 				plan.Actions = append(plan.Actions, map[string]any{"kind": "record.setValue", "recordId": record, "propertyId": target, "value": map[string]any{"type": current.Type, "schemaVersion": current.SchemaVersion, "value": input}})
 				valueCount++
 			}
@@ -372,7 +377,7 @@ func buildTemplatePlan(ctx context.Context, k *Kernel, tx *sql.Tx, e contracts.S
 					if kind == "todo" && remap[str(data.(map[string]any)["taskRecordId"])] == "" {
 						return plan, nil, Fail("CONFLICT", "Legacy template does not capture its owned task; recapture the template")
 					}
-					data = remapTemplateValue(data, remap, "", kind == "unsupported_external", kind == "table" || kind == "columns" || kind == "tab_container")
+					data = remapTemplateValue(data, remap, "", kind == "unsupported_external", kind == "table" || kind == "columns" || kind == "tab_container", allocate)
 				}
 				block := map[string]any{"blockId": remap[string(b.Id)], "pageId": page, "type": kind, "schemaVersion": b.SchemaVersion, "data": data}
 				if b.ParentBlockId != nil {
@@ -429,7 +434,7 @@ func buildTemplatePlan(ctx context.Context, k *Kernel, tx *sql.Tx, e contracts.S
 
 // Only canonical references are remapped. Arbitrary imported evidence, code,
 // plain text, URLs and immutable file identities are not interpreted as IDs.
-func remapTemplateValue(value any, ids map[string]string, key string, inert, localIDs bool) any {
+func remapTemplateValue(value any, ids map[string]string, key string, inert, localIDs bool, allocate func(string) string) any {
 	if inert {
 		return value
 	}
@@ -442,17 +447,17 @@ func remapTemplateValue(value any, ids map[string]string, key string, inert, loc
 			if k == "id" && localIDs {
 				if id := str(child); id != "" {
 					if ids[id] == "" {
-						ids[id] = NewID()
+						ids[id] = allocate("local:" + id)
 					}
 					v[k] = ids[id]
 				}
 				continue
 			}
-			v[k] = remapTemplateValue(child, ids, k, false, localIDs)
+			v[k] = remapTemplateValue(child, ids, k, false, localIDs, allocate)
 		}
 	case []any:
 		for i, child := range v {
-			v[i] = remapTemplateValue(child, ids, key, false, localIDs)
+			v[i] = remapTemplateValue(child, ids, key, false, localIDs, allocate)
 		}
 	case string:
 		switch key {

@@ -491,6 +491,466 @@
       ],
       "additionalProperties": false
     },
+    "AutomationTemplateAction": {
+      "type": "object",
+      "properties": {
+        "kind": {
+          "const": "template.instantiate"
+        },
+        "templateId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "templateHash": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "title": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 2000
+        },
+        "collectionId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        }
+      },
+      "required": [
+        "kind",
+        "templateId",
+        "templateHash",
+        "title"
+      ],
+      "additionalProperties": false
+    },
+    "AutomationAction": {
+      "oneOf": [
+        {
+          "type": "object",
+          "properties": {
+            "kind": {
+              "const": "page.create"
+            },
+            "pageId": {
+              "oneOf": [
+                {
+                  "$ref": "domain.schema.json#/$defs/Id"
+                },
+                {
+                  "type": "string",
+                  "pattern": "^\\$id:[A-Za-z0-9_-]{1,80}$"
+                }
+              ]
+            },
+            "title": {
+              "type": "string"
+            },
+            "parentPageId": {
+              "oneOf": [
+                {
+                  "$ref": "domain.schema.json#/$defs/Id"
+                },
+                {
+                  "type": "string",
+                  "pattern": "^\\$id:[A-Za-z0-9_-]{1,80}$"
+                }
+              ]
+            }
+          },
+          "required": [
+            "kind",
+            "pageId",
+            "title"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "kind": {
+              "const": "page.update"
+            },
+            "pageId": {
+              "oneOf": [
+                {
+                  "$ref": "domain.schema.json#/$defs/Id"
+                },
+                {
+                  "type": "string",
+                  "pattern": "^\\$id:[A-Za-z0-9_-]{1,80}$"
+                }
+              ]
+            },
+            "title": {
+              "type": "string"
+            },
+            "archived": {
+              "type": "boolean"
+            },
+            "icon": {
+              "oneOf": [
+                {
+                  "type": "string",
+                  "maxLength": 128
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "coverFileId": {
+              "oneOf": [
+                {
+                  "oneOf": [
+                    {
+                      "$ref": "domain.schema.json#/$defs/Id"
+                    },
+                    {
+                      "type": "string",
+                      "pattern": "^\\$id:[A-Za-z0-9_-]{1,80}$"
+                    }
+                  ]
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            }
+          },
+          "required": [
+            "kind",
+            "pageId"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "kind": {
+              "const": "record.create"
+            },
+            "recordId": {
+              "oneOf": [
+                {
+                  "$ref": "domain.schema.json#/$defs/Id"
+                },
+                {
+                  "type": "string",
+                  "pattern": "^\\$id:[A-Za-z0-9_-]{1,80}$"
+                }
+              ]
+            },
+            "collectionId": {
+              "oneOf": [
+                {
+                  "$ref": "domain.schema.json#/$defs/Id"
+                },
+                {
+                  "type": "string",
+                  "pattern": "^\\$id:[A-Za-z0-9_-]{1,80}$"
+                }
+              ]
+            },
+            "pageId": {
+              "oneOf": [
+                {
+                  "$ref": "domain.schema.json#/$defs/Id"
+                },
+                {
+                  "type": "string",
+                  "pattern": "^\\$id:[A-Za-z0-9_-]{1,80}$"
+                }
+              ]
+            },
+            "title": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "kind",
+            "recordId",
+            "collectionId",
+            "pageId",
+            "title"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "kind": {
+              "const": "record.setValue"
+            },
+            "recordId": {
+              "oneOf": [
+                {
+                  "$ref": "domain.schema.json#/$defs/Id"
+                },
+                {
+                  "type": "string",
+                  "pattern": "^\\$id:[A-Za-z0-9_-]{1,80}$"
+                }
+              ]
+            },
+            "propertyId": {
+              "oneOf": [
+                {
+                  "$ref": "domain.schema.json#/$defs/Id"
+                },
+                {
+                  "type": "string",
+                  "pattern": "^\\$id:[A-Za-z0-9_-]{1,80}$"
+                }
+              ]
+            },
+            "value": {
+              "$ref": "#/$defs/ValueInput"
+            }
+          },
+          "required": [
+            "kind",
+            "recordId",
+            "propertyId",
+            "value"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "kind": {
+              "const": "record.clearValue"
+            },
+            "recordId": {
+              "oneOf": [
+                {
+                  "$ref": "domain.schema.json#/$defs/Id"
+                },
+                {
+                  "type": "string",
+                  "pattern": "^\\$id:[A-Za-z0-9_-]{1,80}$"
+                }
+              ]
+            },
+            "propertyId": {
+              "oneOf": [
+                {
+                  "$ref": "domain.schema.json#/$defs/Id"
+                },
+                {
+                  "type": "string",
+                  "pattern": "^\\$id:[A-Za-z0-9_-]{1,80}$"
+                }
+              ]
+            }
+          },
+          "required": [
+            "kind",
+            "recordId",
+            "propertyId"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "kind": {
+              "const": "task.setStatus"
+            },
+            "recordId": {
+              "oneOf": [
+                {
+                  "$ref": "domain.schema.json#/$defs/Id"
+                },
+                {
+                  "type": "string",
+                  "pattern": "^\\$id:[A-Za-z0-9_-]{1,80}$"
+                }
+              ]
+            },
+            "statusOptionId": {
+              "oneOf": [
+                {
+                  "$ref": "domain.schema.json#/$defs/Id"
+                },
+                {
+                  "type": "string",
+                  "pattern": "^\\$id:[A-Za-z0-9_-]{1,80}$"
+                }
+              ]
+            }
+          },
+          "required": [
+            "kind",
+            "recordId",
+            "statusOptionId"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "$ref": "#/$defs/AutomationTemplateAction"
+        }
+      ]
+    },
+    "AutomationTrigger": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "type": "string",
+          "enum": [
+            "event",
+            "schedule"
+          ]
+        },
+        "collectionId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "entityType": {
+          "type": "string",
+          "enum": [
+            "page",
+            "block",
+            "collection",
+            "property",
+            "record",
+            "view",
+            "container",
+            "file",
+            "meeting",
+            "transcript_segment",
+            "memory"
+          ]
+        },
+        "timezone": {
+          "type": "string"
+        },
+        "frequency": {
+          "type": "string",
+          "enum": [
+            "daily",
+            "weekly"
+          ]
+        },
+        "hour": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 23
+        },
+        "minute": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 59
+        },
+        "weekday": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 6
+        },
+        "missedPolicy": {
+          "type": "string",
+          "enum": [
+            "skip",
+            "catch_up"
+          ]
+        },
+        "catchUpLimit": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 20
+        }
+      },
+      "required": [
+        "type"
+      ],
+      "additionalProperties": false
+    },
+    "AutomationCondition": {
+      "type": "object",
+      "properties": {
+        "recordId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "propertyId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "op": {
+          "type": "string",
+          "enum": [
+            "eq",
+            "ne",
+            "is_empty"
+          ]
+        },
+        "value": {
+          "type": [
+            "object",
+            "array",
+            "string",
+            "number",
+            "integer",
+            "boolean",
+            "null"
+          ]
+        }
+      },
+      "required": [
+        "recordId",
+        "propertyId",
+        "op"
+      ],
+      "additionalProperties": false
+    },
+    "AutomationRule": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "name": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 200
+        },
+        "enabled": {
+          "type": "boolean"
+        },
+        "paused": {
+          "type": "boolean"
+        },
+        "allowedOrigins": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": [
+              "user",
+              "ai"
+            ]
+          },
+          "maxItems": 2
+        },
+        "trigger": {
+          "$ref": "#/$defs/AutomationTrigger"
+        },
+        "condition": {
+          "$ref": "#/$defs/AutomationCondition"
+        },
+        "actions": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/AutomationAction"
+          },
+          "maxItems": 32,
+          "minItems": 1
+        }
+      },
+      "required": [
+        "id",
+        "name",
+        "enabled",
+        "paused",
+        "trigger",
+        "actions"
+      ],
+      "additionalProperties": false
+    },
     "CreatePage": {
       "type": "object",
       "properties": {
@@ -1657,7 +2117,7 @@
           "$ref": "domain.schema.json#/$defs/Id"
         },
         "rule": {
-          "type": "object"
+          "$ref": "#/$defs/AutomationRule"
         }
       },
       "required": [
@@ -2067,6 +2527,30 @@
           "$ref": "#/$defs/DismissPersonalReview"
         }
       ]
+    },
+    "AutomationOptionsRequest": {
+      "type": "object",
+      "properties": {
+        "contractVersion": {
+          "const": 1
+        },
+        "requestId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "workspaceId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "pageId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        }
+      },
+      "required": [
+        "contractVersion",
+        "requestId",
+        "workspaceId",
+        "pageId"
+      ],
+      "additionalProperties": false
     },
     "TemplatePropertyDecision": {
       "oneOf": [

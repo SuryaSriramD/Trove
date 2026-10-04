@@ -92,9 +92,23 @@ commands['CreateTask']['dependentRequired']={'collectionId':['statusPropertyId']
 commands['ProposeMemory']['oneOf']=[{'required':['content'],'not':{'required':['pageRef']}},{'required':['pageRef'],'not':{'required':['content']}}]
 commands['ProposeMemory']['allOf']=[{'if':{'properties':{'memoryKind':{'const':'project_context'}}},'then':{'required':['pageRef']},'else':{'required':['content']}}]
 commands['UpdateMemory']['anyOf']=[{'required':['content']},{'required':['sources']}]
+# Saved automations are a bounded declarative subset, never arbitrary commands.
+# Content IDs may be occurrence-local placeholders; expansion is validated again.
+def automation_ids(value):
+    if value == D('Id'): return {'oneOf':[D('Id'),{'type':'string','pattern':r'^\$id:[A-Za-z0-9_-]{1,80}$'}]}
+    if isinstance(value,dict): return {k:automation_ids(v) for k,v in value.items()}
+    if isinstance(value,list): return [automation_ids(v) for v in value]
+    return value
+defs['AutomationTemplateAction']=tagged('template.instantiate',{'templateId':D('Id'),'templateHash':{'type':'string','pattern':'^[0-9a-f]{64}$'},'title':{'type':'string','minLength':1,'maxLength':2000},'collectionId':D('Id')},['templateId','templateHash','title'])
+defs['AutomationAction']={'oneOf':[automation_ids(commands[n]) for n in ['CreatePage','UpdatePage','CreateRecord','SetValue','ClearValue','SetTaskStatus']]+[R('AutomationTemplateAction')]}
+defs['AutomationTrigger']=obj({'type':enum('event','schedule'),'collectionId':D('Id'),'entityType':enum('page','block','collection','property','record','view','container','file','meeting','transcript_segment','memory'),'timezone':S,'frequency':enum('daily','weekly'),'hour':{'type':'integer','minimum':0,'maximum':23},'minute':{'type':'integer','minimum':0,'maximum':59},'weekday':{'type':'integer','minimum':0,'maximum':6},'missedPolicy':enum('skip','catch_up'),'catchUpLimit':{'type':'integer','minimum':1,'maximum':20}},['type'])
+defs['AutomationCondition']=obj({'recordId':D('Id'),'propertyId':D('Id'),'op':enum('eq','ne','is_empty'),'value':json_value},['recordId','propertyId','op'])
+defs['AutomationRule']=obj({'id':D('Id'),'name':{'type':'string','minLength':1,'maxLength':200},'enabled':B,'paused':B,'allowedOrigins':arr(enum('user','ai'),2),'trigger':R('AutomationTrigger'),'condition':R('AutomationCondition'),'actions':{**arr(R('AutomationAction'),32),'minItems':1}},['id','name','enabled','paused','trigger','actions'])
+commands['SaveAutomation']['properties']['rule']=R('AutomationRule')
 defs.update(commands)
 defs['Command']={'oneOf':[R(n) for n in commands]}
 header={'contractVersion':{'const':1},'requestId':D('Id'),'workspaceId':D('Id')}
+defs['AutomationOptionsRequest']=obj({**header,'pageId':D('Id')})
 defs['TemplatePropertyDecision']={'oneOf':[obj({'sourcePropertyId':D('Id'),'action':{'const':'omit'}}),obj({'sourcePropertyId':D('Id'),'action':{'const':'map'},'targetPropertyId':D('Id'),'value':json_value})]}
 defs['TemplatePreviewRequest']=obj({**header,'templateId':D('Id'),'title':{'type':'string','minLength':1,'maxLength':2000},'collectionId':D('Id'),'propertyDecisions':arr(R('TemplatePropertyDecision'),256)},[*header,'templateId','title'])
 defs['TemplatePropertyIssue']=obj({'sourceProperty':D('PropertyDefinition'),'value':json_value,'reason':S})

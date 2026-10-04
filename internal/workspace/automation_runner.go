@@ -169,10 +169,10 @@ func (k *Kernel) executeAutomationOccurrence(ctx context.Context, e contracts.Se
 		tx.Rollback()
 		return k.logAutomation(ctx, s, key, "skipped", why, nil)
 	}
-	guards, err := automationGuards(ctx, tx, s.Page, actions)
+	guards, err := automationPreparedGuards(ctx, tx, s.Page, actions)
 	tx.Rollback()
 	if err != nil {
-		return k.logAutomation(ctx, s, key, "failed", err.Error(), actions)
+		return k.logAutomation(ctx, s, key, "failed", err.Error(), automationCommands(actions))
 	}
 	command := map[string]any{"kind": "automation.run", "pageId": s.Page, "ruleId": s.Rule.ID, "occurrenceKey": key, "at": at.UTC().Format(time.RFC3339Nano)}
 	if event != "" {
@@ -188,7 +188,7 @@ func (k *Kernel) executeAutomationOccurrence(ctx context.Context, e contracts.Se
 	json.Unmarshal(marshal(response), &result)
 	if result["ok"] != true {
 		diagnostic := string(marshal(result["error"]))
-		return k.logAutomation(ctx, s, key, "failed", diagnostic, actions)
+		return k.logAutomation(ctx, s, key, "failed", diagnostic, automationCommands(actions))
 	}
 	return nil
 }

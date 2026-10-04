@@ -1697,6 +1697,7 @@ test("Phase 4 surfaces expose scoped pairing, gated vendors and reviewed capture
    if(method==='providers.connect')return ok({connection:{id:'paired',provider:'mcp',state:'connected',token:'fixture-only-token'},url:'http://127.0.0.1:4000/mcp',relayPath:'/fixture/trove-mcp'});
    if(method==='index.roots')return ok([]);
    if(method==='automationHistory')return ok({rules:[],runs:[]});
+   if(method==='automationOptions')return ok({templates:[],templatesTruncated:false,events:[]});
    if(method==='capture.preview')return ok({planId:'clip',planHash:'fixture',state:'previewed',items:[{sourceLocator:'selection',outcome:'adapted',reason:'Reviewed text retained'}]});
    return previous(method,raw);
   };

@@ -67,6 +67,7 @@ func init() {
 	RegisterQuery("automationPreview", automationPreview)
 	RegisterQuery("automation.execute", executePreviewedAutomation)
 	RegisterQuery("automationHistory", automationHistory)
+	RegisterQuery("automationOptions", automationOptions)
 }
 func validateAutomationRule(r *AutomationRule) error {
 	if contracts.Validate("domain", "Id", marshal(r.ID)) != nil || strings.TrimSpace(r.Name) == "" || len(r.Name) > 200 {
@@ -110,7 +111,7 @@ func validateAutomationRule(r *AutomationRule) error {
 	if len(marshal(r)) > 256*1024 {
 		return Fail("RESOURCE_EXHAUSTED", "Rule exceeds 256 KiB")
 	}
-	allowed := map[string]bool{"page.create": true, "page.update": true, "record.create": true, "record.setValue": true, "record.clearValue": true, "task.setStatus": true}
+	allowed := map[string]bool{"page.create": true, "page.update": true, "record.create": true, "record.setValue": true, "record.clearValue": true, "task.setStatus": true, "template.instantiate": true}
 	for _, a := range r.Actions {
 		if !allowed[str(a["kind"])] {
 			return Fail("INVALID_REQUEST", "Automation action is not an allowed local command")
@@ -150,6 +151,9 @@ func automationCommand(m *Mutation, c map[string]any) error {
 			return Fail("INVALID_REQUEST", err.Error())
 		}
 		if err := validateAutomationRule(&r); err != nil {
+			return err
+		}
+		if err := validateAutomationBindings(m.Context, m.Kernel, m.Tx, m.Execution, r); err != nil {
 			return err
 		}
 		old, err := loadAutomation(m.Context, m.Tx, r.ID)
@@ -219,16 +223,10 @@ func automationCommand(m *Mutation, c map[string]any) error {
 	if err = m.TouchPage(page); err != nil {
 		return err
 	}
-	for _, action := range commands {
-		handler := commandHandlers[str(action["kind"])]
-		if handler == nil {
-			return Fail("UNSUPPORTED_SCHEMA", "Unknown local action")
-		}
-		if err = handler(m, action); err != nil {
-			return err
-		}
+	if err = executeAutomationPlan(m, commands); err != nil {
+		return err
 	}
-	_, err = m.Exec("INSERT INTO automation_runs(id,rule_id,rule_version,occurrence_key,status,created_at,commands_json) VALUES(?,?,?,?,'succeeded',?,?) ON CONFLICT(rule_id,rule_version,occurrence_key) DO UPDATE SET status='succeeded',diagnostic='',created_at=excluded.created_at,commands_json=excluded.commands_json", NewID(), s.Rule.ID, s.Version, key, now(), string(marshal(commands)))
+	_, err = m.Exec("INSERT INTO automation_runs(id,rule_id,rule_version,occurrence_key,status,created_at,commands_json) VALUES(?,?,?,?,'succeeded',?,?) ON CONFLICT(rule_id,rule_version,occurrence_key) DO UPDATE SET status='succeeded',diagnostic='',created_at=excluded.created_at,commands_json=excluded.commands_json", NewID(), s.Rule.ID, s.Version, key, now(), string(marshal(commands.Commands)))
 	if err != nil {
 		return err
 	}
@@ -303,7 +301,7 @@ func expandAutomationValue(v any, rule, key string, at time.Time) any {
 	}
 	return v
 }
-func prepareAutomation(ctx context.Context, k *Kernel, tx *sql.Tx, e contracts.ServiceExecutionContext, s automationStored, eventID, key string, at time.Time) ([]map[string]any, bool, string, error) {
+func prepareAutomation(ctx context.Context, k *Kernel, tx *sql.Tx, e contracts.ServiceExecutionContext, s automationStored, eventID, key string, at time.Time) (*automationPrepared, bool, string, error) {
 	r := s.Rule
 	if err := k.authorizePage(ctx, tx, e, s.Page); err != nil {
 		return nil, false, "", err
@@ -375,13 +373,34 @@ func prepareAutomation(ctx context.Context, k *Kernel, tx *sql.Tx, e contracts.S
 			return nil, false, "Condition did not match", nil
 		}
 	}
-	out := []map[string]any{}
-	for _, action := range r.Actions {
+	out := &automationPrepared{Commands: []map[string]any{}}
+	for index, action := range r.Actions {
 		a := expandAutomationValue(action, r.ID+fmt.Sprint(s.Version), key, at).(map[string]any)
-		if err := contracts.Validate("service", "Command", marshal(a)); err != nil {
-			return nil, false, "", Fail("INVALID_REQUEST", "Invalid expanded action: "+err.Error())
+		if str(a["kind"]) == "template.instantiate" {
+			plan, summary, err := buildTemplatePlanWithIDs(ctx, k, tx, e, a, func(name string) string {
+				return deterministicAutomationID(r.ID+fmt.Sprint(s.Version), key, fmt.Sprintf("template:%d:%s", index, name))
+			})
+			if err != nil {
+				return nil, false, "", err
+			}
+			if plan.Hash != str(a["templateHash"]) {
+				return nil, false, "", Fail("CONFLICT", "Saved template changed; select and review the template again")
+			}
+			if summary["canApply"] != true {
+				return nil, false, "", Fail("CONFLICT", "Template properties need mapping; capture a compatible template for this database before scheduling")
+			}
+			out.Steps = append(out.Steps, automationStep{Template: &plan})
+			out.Commands = append(out.Commands, plan.Actions...)
+		} else {
+			if err := contracts.Validate("service", "Command", marshal(a)); err != nil {
+				return nil, false, "", Fail("INVALID_REQUEST", "Invalid expanded action: "+err.Error())
+			}
+			out.Steps = append(out.Steps, automationStep{Command: a})
+			out.Commands = append(out.Commands, a)
 		}
-		out = append(out, a)
+		if len(out.Commands) > 1200 || len(marshal(out.Commands)) > 4*1024*1024 {
+			return nil, false, "", Fail("RESOURCE_EXHAUSTED", "Expanded automation exceeds 1200 commands or 4 MiB")
+		}
 	}
 	return out, true, "", nil
 }
@@ -392,7 +411,6 @@ func automationGuards(ctx context.Context, tx *sql.Tx, page string, actions []ma
 			refs[kind+":"+id] = [2]string{kind, id}
 		}
 	}
-	add("page", page)
 	var addPage func(string) error
 	addPage = func(id string) error {
 		add("page", id)
@@ -405,6 +423,11 @@ func automationGuards(ctx context.Context, tx *sql.Tx, page string, actions []ma
 			return err
 		}
 		return nil
+	}
+	if page != "" {
+		if err := addPage(page); err != nil {
+			return nil, err
+		}
 	}
 	newRecords := map[string][2]string{}
 	for _, a := range actions {
@@ -505,50 +528,70 @@ func automationGuards(ctx context.Context, tx *sql.Tx, page string, actions []ma
 	return guards, nil
 }
 func automationPreview(ctx context.Context, k *Kernel, e contracts.ServiceExecutionContext, req map[string]any) (any, error) {
-	tx, err := k.db.BeginTx(ctx, &sql.TxOptions{ReadOnly: true})
-	if err != nil {
+	if err := requireOwnerScope(k, e); err != nil {
 		return nil, err
 	}
-	defer tx.Rollback()
-	s, err := loadAutomation(ctx, tx, str(req["ruleId"]))
-	if err != nil {
-		return nil, err
-	}
-	if s.Page != str(req["pageId"]) {
-		return nil, Fail("SCOPE_DENIED", "Rule page mismatch")
-	}
-	at := time.Now().UTC()
-	if raw := str(req["at"]); raw != "" {
-		at, err = time.Parse(time.RFC3339Nano, raw)
+	var result any
+	err := k.write(ctx, func(tx *sql.Tx) error {
+		s, err := loadAutomation(ctx, tx, str(req["ruleId"]))
 		if err != nil {
-			return nil, err
+			return err
 		}
-	} else if s.Rule.Trigger.Type == "schedule" {
-		at, err = NextAutomationOccurrence(s.Rule.Trigger, at)
-		if err != nil {
-			return nil, err
+		if s.Page != str(req["pageId"]) {
+			return Fail("SCOPE_DENIED", "Rule page mismatch")
 		}
-	}
-	key := "event:" + str(req["eventId"])
-	if s.Rule.Trigger.Type == "schedule" {
-		key = "schedule:" + at.UTC().Format(time.RFC3339Nano)
-	}
-	actions, eligible, why, err := prepareAutomation(ctx, k, tx, e, s, str(req["eventId"]), key, at)
-	if err != nil {
-		return nil, err
-	}
-	guards, err := automationGuards(ctx, tx, s.Page, actions)
-	if err != nil {
-		return nil, err
-	}
-	for _, g := range guards {
-		if g.Revision != "0" {
-			if err = k.authorizeEntity(ctx, tx, e, g.Target.EntityType, string(g.Target.EntityId)); err != nil {
-				return nil, err
+		at := time.Now().UTC()
+		if raw := str(req["at"]); raw != "" {
+			at, err = time.Parse(time.RFC3339Nano, raw)
+			if err != nil {
+				return err
+			}
+		} else if s.Rule.Trigger.Type == "schedule" {
+			at, err = NextAutomationOccurrence(s.Rule.Trigger, at)
+			if err != nil {
+				return err
 			}
 		}
-	}
-	return map[string]any{"rule": s.Rule, "version": s.Version, "eligible": eligible, "diagnostic": why, "commands": actions, "expectedRevisions": guards, "occurrenceKey": key, "at": at.UTC().Format(time.RFC3339Nano)}, nil
+		key := "event:" + str(req["eventId"])
+		if s.Rule.Trigger.Type == "schedule" {
+			key = "schedule:" + at.UTC().Format(time.RFC3339Nano)
+		}
+		var prior string
+		priorErr := tx.QueryRowContext(ctx, "SELECT status FROM automation_runs WHERE rule_id=? AND rule_version=? AND occurrence_key=?", s.Rule.ID, s.Version, key).Scan(&prior)
+		if priorErr != nil && !errors.Is(priorErr, sql.ErrNoRows) {
+			return priorErr
+		}
+		if priorErr == nil && prior != "failed" {
+			if err := k.authorizePage(ctx, tx, e, s.Page); err != nil {
+				return err
+			}
+			result = map[string]any{"rule": s.Rule, "version": s.Version, "eligible": false, "diagnostic": "This occurrence is already " + prior, "commands": []any{}, "expectedRevisions": []any{}, "occurrenceKey": key, "at": at.UTC().Format(time.RFC3339Nano)}
+			return nil
+		}
+		actions, eligible, why, err := prepareAutomation(ctx, k, tx, e, s, str(req["eventId"]), key, at)
+		if err != nil {
+			return err
+		}
+		guards, err := automationPreparedGuards(ctx, tx, s.Page, actions)
+		if err != nil {
+			return err
+		}
+		for _, g := range guards {
+			if g.Revision != "0" {
+				if err = k.authorizeEntity(ctx, tx, e, g.Target.EntityType, string(g.Target.EntityId)); err != nil {
+					return err
+				}
+			}
+		}
+		if eligible {
+			if err = validateAutomationPlan(ctx, k, tx, e, s.Page, actions, guards); err != nil {
+				return err
+			}
+		}
+		result = map[string]any{"rule": s.Rule, "version": s.Version, "eligible": eligible, "diagnostic": why, "commands": automationCommands(actions), "expectedRevisions": guards, "occurrenceKey": key, "at": at.UTC().Format(time.RFC3339Nano)}
+		return nil
+	})
+	return result, err
 }
 func automationHistory(ctx context.Context, k *Kernel, e contracts.ServiceExecutionContext, req map[string]any) (any, error) {
 	tx, err := k.db.BeginTx(ctx, &sql.TxOptions{ReadOnly: true})
