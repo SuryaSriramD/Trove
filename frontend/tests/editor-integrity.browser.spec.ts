@@ -46,6 +46,8 @@ test.beforeEach(async ({page}) => {
     (window as any).go = {main:{App:{ShellReady:async()=>{},SetEditing:async()=>{},PickFile:async()=>"",Dispatch:async(method:string,raw:string)=>{
       const req=JSON.parse(raw),ok=(result:unknown)=>JSON.stringify({ok:true,result});
       if(method==="workspace.snapshot") return ok(state);
+      if(method==="readBlock") {const block=[...state.blocks,...(state.remoteBlocks??[])].find((block:any)=>block.id===req.blockId);return block?ok({block}):JSON.stringify({ok:false,error:{code:"NOT_FOUND",message:"Unavailable source",retryable:false,requestId:req.requestId}});}
+      if(method==="readPage") return ok({page:state.pages.find((page:any)=>page.id===req.pageId)??{...state.pages[0],id:req.pageId,title:"Scoped source page"},blocks:[...state.blocks,...(state.remoteBlocks??[])].filter((block:any)=>block.pageId===req.pageId),snapshotCursor:state.snapshotCursor});
       if(method==="pageDisplay.get") return ok({pageId:req.pageId,fullWidth:false,presentation:false,revision:state.pages[0].revision});
       if(method==="editor.lock") return ok(state.lock??{locked:false,revision:"0"});
       if(method==="editor.setLock") {state.lock={locked:req.locked,revision:String(Number(req.expectedRevision)+1)};persist();return ok(state.lock);}
@@ -268,4 +270,41 @@ test("a damaged PDF reports a bounded preview error and retains the managed orig
  await expect(pdf.getByRole("status")).toHaveCount(0);
  await expect(pdf.getByRole("link",{name:"Open original PDF",exact:true})).toHaveAttribute("href",`/files/${id(92)}`);
  expect(await page.evaluate(()=>(window as any).integrityState().blocks.find((block:any)=>block.id.endsWith("000000000043")).data.fileId)).toBe(id(92));
+});
+
+
+test("rich layout controls move and edit code, tables, images and nested columns without flattening",async({page})=>{
+ const layout=page.locator(`[data-block-id="${id(20)}"]`),group=layout.locator(`[data-layout-group="${id(23)}"]`);
+ await group.getByRole("combobox",{name:"Move existing page block",exact:true}).selectOption(id(41));
+ const code=group.locator(`[data-projected-block-id="${id(41)}"]`);await expect(code.locator('.technical-code')).toBeVisible();await code.getByText("Edit source",{exact:true}).click();await code.getByRole('textbox',{name:'Code source',exact:true}).fill('const inside = "rich🌱";');
+ await group.getByRole("combobox",{name:"Move existing page block",exact:true}).selectOption(id(10));
+ const table=group.locator(`[data-projected-block-id="${id(10)}"]`);const cell=table.getByRole('textbox',{name:'Row 1 column 1',exact:true});await insertCharacter(page,cell);await expect(cell.locator('strong')).toHaveText('Keep! ');
+ await group.getByRole("combobox",{name:"Move existing page block",exact:true}).selectOption(id(42));const image=group.locator(`[data-projected-block-id="${id(42)}"]`);await expect(image.getByRole('img',{name:'A retained image'})).toBeVisible();await image.getByText('Image display',{exact:true}).click();await image.getByRole('combobox',{name:'Image alignment',exact:true}).selectOption('left');
+ await group.getByRole('combobox',{name:'Layout block type',exact:true}).selectOption('columns');await group.getByRole('button',{name:'Add layout block',exact:true}).click();await expect(group.locator('.advanced-layout')).toHaveCount(1);
+ await save(page);const values=await page.evaluate(()=>(window as any).integrityState().blocks);expect(values.find((b:any)=>b.id.endsWith('000000000041')).data.source).toBe('const inside = "rich🌱";');expect(values.find((b:any)=>b.id.endsWith('000000000010')).parentBlockId).toBe(id(20));expect(values.find((b:any)=>b.id.endsWith('000000000010')).data.cells[0].preMergeCells[1].richText[0].text).toBe('Original retained cell');
+ await page.reload();await page.getByRole('button',{name:/Editor integrity/}).first().click();await expect(code.locator('.code-preview')).toContainText('rich🌱');await expect(table.locator('strong').first()).toHaveText('Keep! ');
+});
+
+test("layout group removal keeps content and subtree duplication/removal are undoable",async({page})=>{
+ const layout=page.locator(`[data-block-id="${id(20)}"]`);await layout.getByRole('button',{name:'Add column',exact:true}).click();await expect(layout.locator(':scope > .advanced-layout > .column-panels > section')).toHaveCount(3);
+ const first=layout.locator(`[data-layout-group="${id(23)}"]`);await first.getByRole('button',{name:'Duplicate layout block',exact:true}).click();await expect(first.locator('.layout-child')).toHaveCount(2);await expect(first.locator('strong')).toHaveText(['Keep ','Keep ']);
+ await first.getByRole('button',{name:'Remove column and keep content',exact:true}).click();const remaining=layout.locator(`[data-layout-group="${id(24)}"]`);await expect(remaining.locator('.layout-child')).toHaveCount(3);
+ await remaining.getByRole('button',{name:'Remove layout block',exact:true}).last().click();await layout.getByRole('button',{name:'Remove nested content',exact:true}).click();await expect(remaining.locator('.layout-child')).toHaveCount(2);
+ const field=remaining.getByRole('textbox',{name:'Column content',exact:true}).first();await field.press('ControlOrMeta+z');await expect(remaining.locator('.layout-child')).toHaveCount(3);
+ await save(page);const ids=await page.evaluate(()=>(window as any).integrityState().blocks.map((b:any)=>b.id));expect(new Set(ids).size).toBe(ids.length);
+});
+
+
+test("reusable blocks show rich canonical sources, update live and retain unavailable references",async({page})=>{
+ await page.evaluate(({id44,id45,pageId})=>{const state=(window as any).integrityState();state.blocks.push({id:id44,pageId,parentBlockId:null,sortKey:'000000000044',type:'synced_block',schemaVersion:1,revision:'1',data:{contentSourceId:state.blocks.find((block:any)=>block.type==='code'&&block.id.endsWith('000000000041')).id}},{id:id45,pageId,parentBlockId:null,sortKey:'000000000045',type:'synced_block',schemaVersion:1,revision:'1',data:{contentSourceId:state.blocks.find((block:any)=>block.type==='columns').id}});localStorage.setItem('editor-integrity',JSON.stringify(state));},{id44:id(44),id45:id(45),pageId});
+ await page.reload();await page.getByRole('button',{name:/Editor integrity/}).first().click();const reference=page.locator(`[data-block-id="${id(44)}"]`),source=page.locator(`[data-block-id="${id(41)}"]`);await expect(reference.locator('.code-preview')).toContainText('Multi');
+ const layoutReference=page.locator(`[data-block-id="${id(45)}"]`);await expect(layoutReference.locator('.column-panels')).toBeVisible();await expect(layoutReference.locator('strong').first()).toHaveText('Keep ');await expect(layoutReference.getByRole('textbox',{name:'Column content',exact:true}).first()).toHaveAttribute('contenteditable','false');
+ await source.getByText('Edit source',{exact:true}).click();await source.getByRole('textbox',{name:'Code source',exact:true}).fill('const sourceUpdate = 73;');await expect(reference.locator('.code-preview')).toContainText('sourceUpdate = 73');await save(page);
+ await page.evaluate(()=>{const state=(window as any).integrityState();state.blocks=state.blocks.filter((block:any)=>!block.id.endsWith('000000000041'));localStorage.setItem('editor-integrity',JSON.stringify(state));});await page.reload();await page.getByRole('button',{name:/Editor integrity/}).first().click();await expect(reference).toContainText('Source is unavailable');
+ expect(await page.evaluate(()=>(window as any).integrityState().blocks.find((block:any)=>block.id.endsWith('000000000044')).data.contentSourceId)).toBe(id(41));
+});
+
+test("a reusable layout resolves its scoped remote source subtree without a workspace block preload",async({page})=>{
+ await page.evaluate(({reference,remotePage,source,child,group,pageId})=>{const state=(window as any).integrityState();const base={pageId:remotePage,schemaVersion:1,revision:'1'};state.remoteBlocks=[{...base,id:source,parentBlockId:null,sortKey:'1',type:'tab_container',data:{tabs:[{id:group,title:'Remote tab',childBlockIds:[child]}]}},{...base,id:child,parentBlockId:source,sortKey:'2',type:'code',data:{source:'const remoteRich = true;',language:'typescript'}}];state.blocks.push({id:reference,pageId,parentBlockId:null,sortKey:'000000000044',type:'synced_block',schemaVersion:1,revision:'1',data:{contentSourceId:source}});localStorage.setItem('editor-integrity',JSON.stringify(state));},{reference:id(44),remotePage:id(70),source:id(71),child:id(72),group:id(73),pageId});
+ await page.reload();await page.getByRole('button',{name:/Editor integrity/}).first().click();const reference=page.locator(`[data-block-id="${id(44)}"]`);await expect(reference.getByRole('tab',{name:'Remote tab',exact:true})).toBeVisible();await expect(reference.locator('.code-preview')).toContainText('remoteRich = true');
 });

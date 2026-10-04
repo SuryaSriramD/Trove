@@ -16,6 +16,7 @@ import mermaid from "mermaid";
 import { CodeBlock, ImageBlock } from "./TechnicalBlocks";
 import "katex/dist/katex.min.css";
 import { PDFBlock } from "./PDFBlock";
+import { InlineRichEditor } from "./InlineRichEditor";
 export const EditorContext = createContext<{
   workspace: WorkspaceSnapshot | null;
   toggleTask: (id: string) => void;
@@ -184,7 +185,7 @@ function Mermaid({ source }: { source: string }) {
     <div className="mermaid-output" dangerouslySetInnerHTML={{ __html: svg }} />
   );
 }
-function AtomView(props: NodeViewProps) {
+export function AtomBody(props: NodeViewProps) {
   const { node, updateAttributes } = props;
   const { workspace: w, toggleTask, openPage, pageId, onError, onCommitted, readOnly } = useContext(EditorContext);
   const d = node.attrs.data;
@@ -290,14 +291,7 @@ function AtomView(props: NodeViewProps) {
             <small>{file?.sizeBytes} bytes · immutable file</small>
           </a>
         )}
-        <figcaption>
-          <input
-            aria-label="Attachment caption"
-            placeholder="Add a caption…"
-            value={plain(d.caption ?? [])}
-            onChange={(e) => update({ caption: [{ text: e.target.value }] })}
-          />
-        </figcaption>
+        <figcaption><InlineRichEditor label="Attachment caption" value={d.caption??[]} owner={props.editor} readOnly={readOnly} onChange={caption=>update({caption})}/></figcaption>
         {kind === "image" && (
           <details>
             <summary>Image description</summary>
@@ -335,6 +329,10 @@ function AtomView(props: NodeViewProps) {
         </details>
       </div>
     );
+  return <>{body}</>;
+}
+function AtomView(props: NodeViewProps) {
+  const {node}=props,kind=node.attrs.kind;
   return (
     <NodeViewWrapper
       className={`atom-block block-${kind}`}
@@ -344,7 +342,7 @@ function AtomView(props: NodeViewProps) {
       contentEditable={false}
     >
       <BlockActions {...props} />
-      {body}
+      <AtomBody {...props}/>
     </NodeViewWrapper>
   );
 }

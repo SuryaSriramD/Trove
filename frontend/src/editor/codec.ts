@@ -182,7 +182,7 @@ export function mutations(
     while (depthStack.length > b.depth) depthStack.pop();
     const prev = before.get(b.id!);
     const parent =
-      prev && oldDepths.get(b.id) === b.depth
+      prev && oldDepths.get(b.id) === b.depth && b.parentBlockId === prev.parentBlockId
         ? prev.parentBlockId
         : b.depth > 0
           ? (depthStack[b.depth - 1]?.id ?? null)

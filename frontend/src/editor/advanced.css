@@ -78,3 +78,10 @@
 .pdf-canvas-scroll { overflow: auto; max-height: 640px; background: #eee; padding: 8px; }
 .pdf-canvas-scroll canvas { display: block; margin: auto; background: white; }
 .pdf-page-text { white-space: pre-wrap; max-height: 240px; overflow: auto; }
+
+.layout-child { padding-block: 10px; border-bottom: 1px solid var(--border,#ddd); }
+.layout-child-actions { display:flex; flex-wrap:wrap; align-items:end; gap:6px; margin-block:8px; }
+.layout-add { min-width:0; margin-block:12px; border:1px solid var(--border,#ddd); }
+.layout-add select { max-width:100%; }
+.reusable-rich-content { border:0; padding:0; margin:8px 0; min-width:0; }
+.projected-block > .projected-block { margin-inline-start:16px; }
