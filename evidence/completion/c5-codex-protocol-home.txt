@@ -1,0 +1,6 @@
+=== RUN   TestInstalledCodexContainedInitializationAndResume
+    containment_darwin_test.go:150: compatible resume app-server rejected thread/resume; check account, model, and runtime compatibility {0 {     }     }
+--- FAIL: TestInstalledCodexContainedInitializationAndResume (5.80s)
+FAIL
+FAIL	trove.local/phase0/internal/providers	6.319s
+FAIL

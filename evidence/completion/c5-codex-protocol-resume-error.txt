@@ -1,0 +1,6 @@
+=== RUN   TestInstalledCodexContainedInitializationAndResume
+    containment_darwin_test.go:150: compatible resume offline thread/resume: {"code":-32600,"message":"no rollout found for thread id 01a10813-ab27-76b0-b3d7-08076d97628d"} {0 {     }     }
+--- FAIL: TestInstalledCodexContainedInitializationAndResume (3.31s)
+FAIL
+FAIL	trove.local/phase0/internal/providers	3.762s
+FAIL

@@ -74,13 +74,28 @@ func (b *ProviderBridge) audit(ctx context.Context, id, action, state, detail st
 	})
 }
 func (b *ProviderBridge) Connect(ctx context.Context, provider string, pages, tools []string) (ProviderConnection, error) {
+	if provider != "mcp" {
+		return ProviderConnection{}, Fail("UNSUPPORTED_VERSION", "Managed vendors must use the authenticated native runtime adapter")
+	}
+	return b.connect(ctx, ProviderConnection{Provider: provider, AuthMode: "paired_local", BillingMode: "client_owned", Account: "paired client", AdapterVersion: "1"}, pages, tools)
+}
+
+// ConnectManaged is a trusted-host entry point, never a workspace RPC tool.
+// The host establishes vendor identity and OS containment before creating this
+// same narrowly scoped, revocable proposal-only capability.
+func (b *ProviderBridge) ConnectManaged(ctx context.Context, provider, account, authMode, billingMode string, pages, tools []string) (ProviderConnection, error) {
+	valid := provider == "codex" && authMode == "siwc" && billingMode == "chatgpt_plan" || provider == "claude_code" && authMode == "vendor_owned" && (billingMode == "subscription" || billingMode == "api")
+	if !valid || strings.TrimSpace(account) == "" || len(account) > 512 {
+		return ProviderConnection{}, Fail("INVALID_REQUEST", "Invalid managed provider identity")
+	}
+	return b.connect(ctx, ProviderConnection{Provider: provider, AuthMode: authMode, BillingMode: billingMode, Account: account, AdapterVersion: "2"}, pages, tools)
+}
+
+func (b *ProviderBridge) connect(ctx context.Context, identity ProviderConnection, pages, tools []string) (ProviderConnection, error) {
 	b.mu.Lock()
 	defer b.mu.Unlock()
 	if err := requireOwnerScope(b.kernel, b.owner); err != nil {
 		return ProviderConnection{}, err
-	}
-	if provider != "mcp" {
-		return ProviderConnection{}, Fail("UNSUPPORTED_VERSION", "Managed vendor mode is not enabled: runtime, authentication, distribution and OS containment qualification are required")
 	}
 	if len(pages) == 0 || len(pages) > 100 || len(tools) == 0 {
 		return ProviderConnection{}, Fail("INVALID_REQUEST", "Select 1–100 pages and explicit capabilities")
@@ -112,7 +127,8 @@ func (b *ProviderBridge) Connect(ctx context.Context, provider string, pages, to
 		scopeIDs = append(scopeIDs, contracts.DomainId(p))
 	}
 	e := b.kernel.Grant(contracts.ServiceActor{Kind: "external_client", ActorId: contracts.DomainId(id)}, "external", contracts.DomainScope{Value: contracts.DomainScopeVariant3{Kind: "pages", WorkspaceId: contracts.DomainId(b.kernel.id), PageIds: scopeIDs}})
-	info := ProviderConnection{ID: id, Provider: provider, State: "connected", AuthMode: "paired_local", BillingMode: "client_owned", Account: "paired client", AdapterVersion: "1", PageIDs: pages, Tools: tools}
+	info := identity
+	info.ID, info.State, info.PageIDs, info.Tools = id, "connected", append([]string(nil), pages...), append([]string(nil), tools...)
 	err := b.kernel.write(ctx, func(tx *sql.Tx) error {
 		_, err := tx.ExecContext(ctx, "INSERT INTO provider_connections VALUES(?,?,'connected')", id, string(marshal(info)))
 		return err
@@ -415,7 +431,8 @@ func (b *ProviderBridge) PreviewContext(ctx context.Context, pages []string) (an
 		}
 		manifest = append(manifest, map[string]any{"pageId": id, "revision": p.Page.Revision, "title": p.Page.Title, "blocks": len(p.Blocks)})
 	}
-	return map[string]any{"pages": manifest, "notice": "Only these pages are shared. Changes require review. Pairing does not choose a paid billing mode."}, nil
+	hash := sha256.Sum256(marshal(manifest))
+	return map[string]any{"pages": manifest, "hash": hex.EncodeToString(hash[:]), "notice": "Only these pages are shared. Changes require review. Pairing does not choose a paid billing mode."}, nil
 }
 func (b *ProviderBridge) Handoff(ctx context.Context, id, objective, result, pending string) (any, error) {
 	b.mu.Lock()

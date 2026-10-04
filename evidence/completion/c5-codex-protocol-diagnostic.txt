@@ -1,0 +1,7 @@
+=== RUN   TestInstalledCodexContainedInitializationAndResume
+    containment_darwin_test.go:143: offline initialization: EOF; WARNING: proceeding, even though we could not create PATH aliases: CODEX_HOME points to "/private/var/folders/xc/s78np0812b12p6338l0ndvsm0000gn/T/TestInstalledCodexContainedInitializationAndResume2273925409/001/session/.codex", but that path does not exist
+        Error: CODEX_HOME points to "/private/var/folders/xc/s78np0812b12p6338l0ndvsm0000gn/T/TestInstalledCodexContainedInitializationAndResume2273925409/001/session/.codex", but that path does not exist
+--- FAIL: TestInstalledCodexContainedInitializationAndResume (5.42s)
+FAIL
+FAIL	trove.local/phase0/internal/providers	5.821s
+FAIL

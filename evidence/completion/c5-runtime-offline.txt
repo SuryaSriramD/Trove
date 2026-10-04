@@ -1,0 +1,12 @@
+=== RUN   TestMacOSContainmentDeniesWorkspaceShellAndUnapprovedNetwork
+    containment_darwin_test.go:87: actual Seatbelt denied external content, symlink escape, writes, shell, network; private state retained
+--- PASS: TestMacOSContainmentDeniesWorkspaceShellAndUnapprovedNetwork (0.02s)
+=== RUN   TestInstalledRuntimeDiscovery
+    containment_darwin_test.go:99: codex version=0.153.4 sha256=b973d440acac501fd2594a43e7ca9ce41e0a65b9dfb28d0d7a7837c99e1261e3
+    containment_darwin_test.go:99: claude_code version=2.1.283 sha256=d8cb1e5c79684cc12a8bfc813e3a2073406921b6245744b3009be3ab5651d21e
+--- PASS: TestInstalledRuntimeDiscovery (0.43s)
+=== RUN   TestInstalledCodexContainedInitializationAndEmptyResumeRefusal
+    containment_darwin_test.go:156: real Codex 0.153.4 initialized and created a scoped dynamic-tool thread offline; empty-session resume and changed scope rejected; live inference and completed-turn resume remain unqualified
+--- PASS: TestInstalledCodexContainedInitializationAndEmptyResumeRefusal (3.31s)
+PASS
+ok  	trove.local/phase0/internal/providers	4.156s

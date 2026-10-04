@@ -1,0 +1,6 @@
+=== RUN   TestInstalledCodexContainedInitializationAndResume
+    containment_darwin_test.go:143: EOF
+--- FAIL: TestInstalledCodexContainedInitializationAndResume (3.75s)
+FAIL
+FAIL	trove.local/phase0/internal/providers	4.224s
+FAIL

@@ -1,0 +1,9 @@
+=== RUN   TestMacOSContainmentDeniesWorkspaceShellAndUnapprovedNetwork
+    containment_darwin_test.go:72: contained process: signal: abort trap 
+--- FAIL: TestMacOSContainmentDeniesWorkspaceShellAndUnapprovedNetwork (0.64s)
+=== RUN   TestInstalledRuntimeDiscovery
+    containment_darwin_test.go:97: codex discovery: {Provider:codex Version: SHA256:b973d440acac501fd2594a43e7ca9ce41e0a65b9dfb28d0d7a7837c99e1261e3 Path:/opt/homebrew/Caskroom/codex/0.153.4/bin/codex Available:false Reason:Runtime could not start inside Trove's containment}
+--- FAIL: TestInstalledRuntimeDiscovery (0.58s)
+FAIL
+FAIL	trove.local/phase0/internal/providers	1.712s
+FAIL
