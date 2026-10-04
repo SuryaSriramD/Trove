@@ -1,0 +1,13 @@
+# Retrieval implementation and qualification
+
+Completion scope: CORE-004 and CORE-009; AI-002/003 and release evidence remain separate.
+
+Workspace questions now use hybrid search when the workspace owner enabled a compatible embedding index. Disabled or unavailable semantic retrieval uses keyword evidence and persists an explicit warning on the AI run. Search scope, current source revisions, deletion, memory validity and citation validation remain enforced. Keyword fallback does not invoke one embedding request per question word.
+
+Production vector storage uses statically linked sqlite-vec `vec0` tables, compact float32 values and cosine KNN. Canonical source metadata stays in SQLite. Allowed pages, explicit project membership/exclusions, source kinds and current revisions filter candidates before the neighbour limit. Fresh authorization and source checks run after query inference. Model bytes, dimension, runtime and the embedding preprocessing version identify a generation; incompatible generations rebuild derived vectors without rewriting notes. Legacy JSON vectors are discarded and regenerated after consent.
+
+The vendored runtime advances from v0.1.6 to v0.1.9, immutable upstream commit `e9f598abfa0c06b328d8fe5da9c3760cce74be10`. [Upstream release](https://github.com/asg017/sqlite-vec/releases/tag/v0.1.9) documents the long-metadata DELETE fix. Source hashes and the unchanged MIT license are in `internal/sqlitevec/upstream.json`. Historical Phase 0 binding pins and their evidence remain historical; this application uses its original CGO registration adapter with the newer C runtime.
+
+Regression coverage includes conceptual retrieval inside a page grant, truthful fallback, disabled models, stale evidence at answer completion, model replacement during inference, derived-only generation replacement, inaccessible closer neighbours, trashed evidence, and native manifest identity changes. Runtime stress crosses multiple chunks with 2,305 vectors and long text metadata, repeated deletion, rollback, reopen and compaction. The long-metadata scenario also passes the old v0.1.6 runtime; it is qualification coverage, not a claimed reproduction of an old-version failure.
+
+`BenchmarkHybridVec10K`, Apple M4 / macOS arm64, 10,000 synthetic 384-dimensional vectors, 5 iterations: 12,298,908 ns/op (about 12.3 ms), 180,091 Go-allocated bytes/op, 2,723 allocations/op. It exercises SQLite/vec0 and current-source checks with deterministic query vectors. This is not real-model relevance, native bridge/paint, peak process memory, concurrent recording, or broad realistic-workload qualification. Those release checks remain open.

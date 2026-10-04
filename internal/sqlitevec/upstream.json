@@ -1,26 +1,26 @@
 {
   "repository": "https://github.com/asg017/sqlite-vec",
-  "commit": "639fca5739fe056fdc98f3d539c4cd79328d7dc7",
-  "version": "v0.1.6",
+  "commit": "e9f598abfa0c06b328d8fe5da9c3760cce74be10",
+  "version": "v0.1.9",
   "license": "MIT",
   "sourceSha256": {
-    "sqlite-vec.c": "aea2ff1524ab80ccd1d51c698b09a74403c2d6ef00949d2a083661b4660881fe",
+    "sqlite-vec.c": "ba081a47fa02eadc3cf6b16c314b695b84081269349aac722b4efa338fe8fd85",
     "sqlite-vec.h.tmpl": "259d7a7f7f4b2ada97def925c4d249856a62f073514dbe4aef838ecb284a2a25",
-    "sqlite-vec.h": "401a8ff1857cbbc512110338f0d97c4a0c636289425fc97f25db1dc0c8b1d7d0",
+    "sqlite-vec.h": "ae76982413f1f215ec4d9c30a9252aabc7b2826d57a08c6ac25a604e4833f9ca",
     "LICENSE-MIT": "6ce72bbe12d975bd5286e5ab0a064c069693300c47bccbc57bec18485f1621ea"
   },
   "headerTemplateValues": {
-    "VERSION": "0.1.6",
-    "DATE": "2024-11-20T16:38:29Z+0000",
-    "SOURCE": "639fca5739fe056fdc98f3d539c4cd79328d7dc7",
+    "VERSION": "0.1.9",
+    "DATE": "2026-03-31T07:59:06Z+0000",
+    "SOURCE": "e9f598abfa0c06b328d8fe5da9c3760cce74be10",
     "VERSION_MAJOR": "0",
     "VERSION_MINOR": "1",
-    "VERSION_PATCH": "6"
+    "VERSION_PATCH": "9"
   },
   "sourceURLs": {
-    "sqlite-vec.c": "https://raw.githubusercontent.com/asg017/sqlite-vec/639fca5739fe056fdc98f3d539c4cd79328d7dc7/sqlite-vec.c",
-    "sqlite-vec.h.tmpl": "https://raw.githubusercontent.com/asg017/sqlite-vec/639fca5739fe056fdc98f3d539c4cd79328d7dc7/sqlite-vec.h.tmpl",
-    "LICENSE-MIT": "https://raw.githubusercontent.com/asg017/sqlite-vec/639fca5739fe056fdc98f3d539c4cd79328d7dc7/LICENSE-MIT"
+    "sqlite-vec.c": "https://raw.githubusercontent.com/asg017/sqlite-vec/e9f598abfa0c06b328d8fe5da9c3760cce74be10/sqlite-vec.c",
+    "sqlite-vec.h.tmpl": "https://raw.githubusercontent.com/asg017/sqlite-vec/e9f598abfa0c06b328d8fe5da9c3760cce74be10/sqlite-vec.h.tmpl",
+    "LICENSE-MIT": "https://raw.githubusercontent.com/asg017/sqlite-vec/e9f598abfa0c06b328d8fe5da9c3760cce74be10/LICENSE-MIT"
   },
   "adapter": "register.go is original Trove code; no Go wrapper source is copied."
 }

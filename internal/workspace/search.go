@@ -80,6 +80,10 @@ func (k *Kernel) InitSearch(ctx context.Context) error {
  CREATE TABLE IF NOT EXISTS document_extractions(file_id TEXT PRIMARY KEY,file_revision TEXT NOT NULL,extractor_version TEXT NOT NULL,state TEXT NOT NULL,warning TEXT NOT NULL DEFAULT '',updated_at TEXT NOT NULL);
  CREATE TABLE IF NOT EXISTS document_sections(file_id TEXT NOT NULL,ordinal INTEGER NOT NULL,document_page INTEGER NOT NULL,heading TEXT NOT NULL,body TEXT NOT NULL,PRIMARY KEY(file_id,ordinal));
  CREATE TABLE IF NOT EXISTS search_embeddings(chunk_id TEXT NOT NULL,content_hash TEXT NOT NULL,model_pack_id TEXT NOT NULL,dimension INTEGER NOT NULL,vector_json TEXT NOT NULL,PRIMARY KEY(chunk_id,model_pack_id));
+ CREATE TABLE IF NOT EXISTS search_vector_models(model_pack_id TEXT PRIMARY KEY,dimension INTEGER NOT NULL,identity TEXT NOT NULL,table_name TEXT NOT NULL UNIQUE);
+ DELETE FROM search_embeddings WHERE NOT EXISTS(SELECT 1 FROM search_meta WHERE key='vector_store' AND value='vec0-v1');
+ DELETE FROM semantic_auto_attempts WHERE NOT EXISTS(SELECT 1 FROM search_meta WHERE key='vector_store' AND value='vec0-v1');
+ INSERT INTO search_meta VALUES('vector_store','vec0-v1') ON CONFLICT(key) DO UPDATE SET value=excluded.value;
  INSERT OR IGNORE INTO search_dirty SELECT id FROM pages WHERE id NOT IN(SELECT page_id FROM search_chunks);
  `)
 		if err != nil {

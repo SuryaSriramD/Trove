@@ -34,6 +34,9 @@ func aiSemanticFixture(t *testing.T) (*Kernel, contracts.ServiceExecutionContext
 	if err = registeredJobs["GENERATE_EMBEDDINGS"](context.Background(), k, j); err != nil {
 		t.Fatal(err)
 	}
+	if err = k.FinishJob(context.Background(), string(j.JobId), string(*j.LeaseToken), nil, false); err != nil {
+		t.Fatal(err)
+	}
 	return k, e, page, private, model
 }
 

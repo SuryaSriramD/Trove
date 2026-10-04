@@ -4,8 +4,8 @@ import (
 	"context"
 	"database/sql"
 	"encoding/json"
-	"math"
 	"sort"
+	"strings"
 	"sync"
 	"trove.local/phase0/contracts"
 )
@@ -19,6 +19,7 @@ func (k *Kernel) SetEmbeddingProvider(provider EmbeddingProvider) {
 	defer k.mu.Unlock()
 	if provider == nil || k.closed {
 		embeddingProviders.Delete(k)
+		embeddingIdentities.Delete(k)
 	} else {
 		embeddingProviders.Store(k, provider)
 	}
@@ -42,6 +43,10 @@ func init() {
 		}
 		defer k.RevokeGrant(string(e.ScopeGrantId))
 		if err = k.FlushSearch(ctx); err != nil {
+			return err
+		}
+		identity, err := k.embeddingIdentity(ctx, string(p.ModelPackId))
+		if err != nil {
 			return err
 		}
 		seen := map[string]bool{}
@@ -101,7 +106,23 @@ func init() {
 					return Fail("WORKER_FAILED", "Embedding dimension or values are invalid")
 				}
 			}
+			currentIdentity, identityErr := k.embeddingIdentity(ctx, string(p.ModelPackId))
+			if identityErr != nil || identity != currentIdentity {
+				return Fail("CONFLICT", "Embedding model generation changed; rebuild the index")
+			}
 			err = k.write(ctx, func(tx *sql.Tx) error {
+				var configured string
+				var dimension int
+				if err := tx.QueryRowContext(ctx, `SELECT COALESCE((SELECT value FROM search_meta WHERE key='semantic_model'),''),CAST(COALESCE((SELECT value FROM search_meta WHERE key='semantic_dimension'),'0') AS INTEGER)`).Scan(&configured, &dimension); err != nil {
+					return err
+				}
+				if configured == string(p.ModelPackId) && dimension != int(p.Dimension) {
+					return Fail("CONFLICT", "Configured embedding dimension changed")
+				}
+				table, err := ensureVectorGeneration(ctx, tx, string(p.ModelPackId), identity, int(p.Dimension))
+				if err != nil {
+					return err
+				}
 				if _, err := k.checkLease(ctx, tx, string(j.JobId), string(*j.LeaseToken), false); err != nil {
 					return err
 				}
@@ -116,7 +137,7 @@ func init() {
 					if live != 1 {
 						return Fail("CONFLICT", "Embedding source changed; retry against the current revision")
 					}
-					if _, err := tx.ExecContext(ctx, "INSERT OR REPLACE INTO search_embeddings VALUES(?,?,?,?,?)", h.ChunkID, h.ContentHash, p.ModelPackId, p.Dimension, string(marshal(vectors[i]))); err != nil {
+					if err := storeSearchVector(ctx, tx, table, h, string(p.ModelPackId), vectors[i]); err != nil {
 						return err
 					}
 				}
@@ -146,6 +167,10 @@ func (k *Kernel) semanticSearch(ctx context.Context, tx *sql.Tx, e contracts.Ser
 	if model == "" {
 		return nil, "No semantic index is ready. Showing keyword results."
 	}
+	expectedIdentity, err := k.embeddingIdentity(ctx, model)
+	if err != nil {
+		return nil, "Embedding model unavailable. Showing keyword results."
+	}
 	// Query metadata uses a real scoped source location; it is not persisted as evidence.
 	var queryLoc contracts.DomainLocation
 	if len(keyword) > 0 {
@@ -174,49 +199,68 @@ func (k *Kernel) semanticSearch(ctx context.Context, tx *sql.Tx, e contracts.Ser
 	if err != nil || len(vectors) != 1 || cosine(vectors[0], vectors[0]) < 0 {
 		return nil, "Embedding worker unavailable. Showing keyword results."
 	}
-	rows, err := tx.QueryContext(ctx, `SELECT c.id,c.title,c.kind,c.body,c.location_json,c.content_hash,COALESCE(c.file_id,''),c.document_page,v.vector_json FROM search_embeddings v JOIN search_chunks c ON c.id=v.chunk_id AND c.content_hash=v.content_hash JOIN pages p ON p.id=c.page_id AND p.revision=c.source_revision AND p.deleted_at IS NULL WHERE v.model_pack_id=? AND NOT EXISTS(SELECT 1 FROM memory_entries m WHERE m.page_id=p.id AND m.status<>'active')`, model)
+	identity, err := k.embeddingIdentity(ctx, model)
+	if err != nil || identity != expectedIdentity {
+		return nil, "Embedding model changed during retrieval. Showing keyword results."
+	}
+	var table, storedIdentity string
+	var dimension int
+	if err := tx.QueryRowContext(ctx, "SELECT table_name,identity,dimension FROM search_vector_models WHERE model_pack_id=?", model).Scan(&table, &storedIdentity, &dimension); err != nil || !vectorTableName.MatchString(table) || identity != storedIdentity || dimension != len(vectors[0]) {
+		return nil, "Embedding model generation changed or its index is unavailable. Rebuild the semantic index. Showing keyword results."
+	}
+	if k.authorize(e) != nil || (requested != nil && k.authorize(*requested) != nil) {
+		return nil, "Search scope is no longer available."
+	}
+	allowed := `SELECT x.rowid FROM search_embeddings x JOIN search_chunks c ON c.id=x.chunk_id AND c.content_hash=x.content_hash JOIN pages p ON p.id=c.page_id AND p.revision=c.source_revision AND p.deleted_at IS NULL WHERE x.model_pack_id=? AND x.dimension=? AND NOT EXISTS(SELECT 1 FROM memory_entries m WHERE m.page_id=p.id AND m.status<>'active')`
+	args := []any{floatVector(vectors[0]), limit, model, dimension}
+	predicate, scopeArgs := vectorScopeSQL(e.Scope)
+	allowed += " AND (" + predicate + ")"
+	args = append(args, scopeArgs...)
+	if requested != nil {
+		predicate, scopeArgs = vectorScopeSQL(requested.Scope)
+		allowed += " AND (" + predicate + ")"
+		args = append(args, scopeArgs...)
+	}
+	if page := str(r["pageId"]); page != "" {
+		allowed += " AND c.page_id=?"
+		args = append(args, page)
+	}
+	if len(kinds) > 0 {
+		marks := []string{}
+		for _, kind := range []string{"page", "task", "file", "transcript"} {
+			if kinds[kind] {
+				marks = append(marks, "?")
+				args = append(args, kind)
+			}
+		}
+		allowed += " AND c.kind IN (" + strings.Join(marks, ",") + ")"
+	}
+	rows, err := tx.QueryContext(ctx, `SELECT c.id,c.title,c.kind,c.body,c.location_json,c.content_hash,COALESCE(c.file_id,''),c.document_page,v.distance FROM `+table+` v JOIN search_embeddings x ON x.rowid=v.rowid JOIN search_chunks c ON c.id=x.chunk_id WHERE v.embedding MATCH ? AND v.k=? AND v.rowid IN (`+allowed+`) ORDER BY v.distance,c.id`, args...)
 	if err != nil {
 		return nil, "Semantic index unavailable. Showing keyword results."
 	}
-	candidates := []SearchHit{}
+	visible := []SearchHit{}
 	for rows.Next() {
 		var h SearchHit
-		var loc, raw string
-		if rows.Scan(&h.ChunkID, &h.Title, &h.Kind, &h.Excerpt, &loc, &h.ContentHash, &h.FileID, &h.DocumentPage, &raw) != nil {
-			continue
+		var loc string
+		var distance float64
+		if err = rows.Scan(&h.ChunkID, &h.Title, &h.Kind, &h.Excerpt, &loc, &h.ContentHash, &h.FileID, &h.DocumentPage, &distance); err != nil {
+			rows.Close()
+			return nil, "Semantic index read failed. Showing keyword results."
 		}
 		if json.Unmarshal([]byte(loc), &h.Location) != nil {
 			continue
 		}
-		var v []float32
-		if json.Unmarshal([]byte(raw), &v) != nil {
-			continue
+		h.Score, h.SourceState = 1-distance, "current"
+		if h.Score >= 0 {
+			visible = append(visible, h)
 		}
-		h.Score = cosine(vectors[0], v)
-		h.SourceState = "current"
-		if h.Score < 0 || math.IsNaN(h.Score) {
-			continue
-		}
-		candidates = append(candidates, h)
 	}
 	err = rows.Err()
 	rows.Close()
 	if err != nil {
 		return nil, "Semantic index read failed. Showing keyword results."
 	}
-	visible := []SearchHit{}
-	for _, h := range candidates {
-		page := string(h.Location.PageId)
-		if (len(kinds) == 0 || kinds[h.Kind]) && (str(r["pageId"]) == "" || str(r["pageId"]) == page) && k.authorizePage(ctx, tx, e, page) == nil && (requested == nil || k.authorizePage(ctx, tx, *requested, page) == nil) {
-			visible = append(visible, h)
-		}
-	}
-	sort.Slice(visible, func(i, j int) bool {
-		if visible[i].Score == visible[j].Score {
-			return visible[i].ChunkID < visible[j].ChunkID
-		}
-		return visible[i].Score > visible[j].Score
-	})
 	if str(r["mode"]) == "hybrid" {
 		byID := map[string]SearchHit{}
 		for i, h := range keyword {

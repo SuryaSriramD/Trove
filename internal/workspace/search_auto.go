@@ -81,6 +81,16 @@ func (k *Kernel) QueueSemanticUpdates(ctx context.Context, e contracts.ServiceEx
 	if err != nil {
 		return err
 	}
+	identity, err := k.embeddingIdentity(ctx, model)
+	if err != nil {
+		return err
+	}
+	if err = k.write(ctx, func(tx *sql.Tx) error {
+		_, err := ensureVectorGeneration(ctx, tx, model, identity, dim)
+		return err
+	}); err != nil {
+		return err
+	}
 	if err = k.db.QueryRowContext(ctx, "SELECT value FROM search_meta WHERE key='generation'").Scan(&generation); err != nil {
 		return err
 	}

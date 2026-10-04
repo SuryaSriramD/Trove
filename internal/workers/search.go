@@ -104,4 +104,5 @@ func ConfigureSearch(k *workspace.Kernel, s *native.Supervisor) {
 		}
 		return sums, nil
 	})
+	k.SetEmbeddingIdentityProvider(s.EmbeddingIdentity)
 }
