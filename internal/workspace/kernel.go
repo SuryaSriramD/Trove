@@ -26,6 +26,7 @@ import (
 type Kernel struct {
 	db                    *sql.DB
 	writeDB               *sql.DB
+	recordQueryDB         *sql.DB
 	path                  string
 	id                    string
 	ownerID               string
@@ -39,6 +40,7 @@ type Kernel struct {
 	cancellations         map[string]*cancellation
 	listeners             map[uint64]chan json.RawMessage
 	listenerSeq           uint64
+	recordQueries         recordQueryCache
 }
 type cancellation struct {
 	cancel      context.CancelFunc
@@ -228,6 +230,14 @@ func open(path string, create bool) (k *Kernel, err error) {
 	}
 	k.writeDB.SetMaxOpenConns(1)
 	k.writeDB.SetMaxIdleConns(1)
+	// Query-local typed functions are registered only on this pool, never on
+	// the canonical writer, online-backup pool, or another workspace's handles.
+	k.recordQueryDB, err = sql.Open("sqlite3", dsn)
+	if err != nil {
+		return nil, err
+	}
+	k.recordQueryDB.SetMaxOpenConns(2)
+	k.recordQueryDB.SetMaxIdleConns(2)
 	if err = k.initServiceRuntime(context.Background()); err != nil {
 		return nil, err
 	}
@@ -266,9 +276,13 @@ func (k *Kernel) Close() error {
 	k.mu.Unlock()
 	k.SetEmbeddingProvider(nil)
 	k.closeRecovery()
+	k.recordQueries.close()
 	var err error
 	if k.writeDB != nil {
 		k.writeDB.Close()
+	}
+	if k.recordQueryDB != nil {
+		k.recordQueryDB.Close()
 	}
 	if k.db != nil {
 		err = k.db.Close()

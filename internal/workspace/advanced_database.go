@@ -314,17 +314,34 @@ type derivedEvaluator struct {
 	active    map[string]bool
 	cache     map[string]DerivedValue
 	work      int
+	// Query paging can reuse an immutable memo without sharing mutable maps.
+	baseCache map[string]DerivedValue
+	workLimit int
+	byteLimit int
+	memoBytes int
+	exhausted bool
 }
 
 func (d *derivedEvaluator) value(record, property string) (DerivedValue, error) {
+	if err := d.ctx.Err(); err != nil {
+		return DerivedValue{}, err
+	}
 	key := record + ":" + property
 	if v, ok := d.cache[key]; ok {
 		return v, nil
 	}
+	if v, ok := d.baseCache[key]; ok {
+		return v, nil
+	}
 	v := DerivedValue{PropertyID: property, Status: "computed", Timezone: d.clock.Timezone}
 	d.work++
-	if d.work > 10000 {
-		return v, fmt.Errorf("derived query work limit exceeded")
+	limit := d.workLimit
+	if limit == 0 {
+		limit = 10000
+	}
+	if d.work > limit || d.exhausted {
+		d.exhausted = true
+		return v, Fail("RESOURCE_EXHAUSTED", "Derived query work budget exceeded; narrow the view")
 	}
 	if d.active[key] {
 		return v, fmt.Errorf("dependency cycle")
@@ -457,6 +474,16 @@ func (d *derivedEvaluator) value(record, property string) (DerivedValue, error) 
 		}
 	} else {
 		v.ComputedAt = d.clock.At.UTC().Format(time.RFC3339Nano)
+	}
+	if err := d.ctx.Err(); err != nil {
+		return v, err
+	}
+	d.memoBytes += len(key) + len(marshal(v))
+	if d.byteLimit > 0 && d.memoBytes > d.byteLimit {
+		d.exhausted = true
+	}
+	if d.exhausted {
+		return v, Fail("RESOURCE_EXHAUSTED", "Derived query memo budget exceeded; narrow the view")
 	}
 	d.cache[key] = v
 	return v, nil
