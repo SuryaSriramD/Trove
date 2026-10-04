@@ -3198,6 +3198,67 @@
       ],
       "additionalProperties": false
     },
+    "BookmarkPreviewRequest": {
+      "type": "object",
+      "properties": {
+        "contractVersion": {
+          "const": 1
+        },
+        "requestId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "workspaceId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "pageId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "url": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 8192
+        },
+        "consent": {
+          "const": "fetch_once"
+        }
+      },
+      "required": [
+        "contractVersion",
+        "requestId",
+        "workspaceId",
+        "pageId",
+        "url",
+        "consent"
+      ],
+      "additionalProperties": false
+    },
+    "BookmarkPreviewResult": {
+      "type": "object",
+      "properties": {
+        "sourceUrl": {
+          "type": "string",
+          "maxLength": 8192
+        },
+        "title": {
+          "type": "string",
+          "maxLength": 512
+        },
+        "description": {
+          "type": "string",
+          "maxLength": 2048
+        },
+        "fetchedAt": {
+          "$ref": "domain.schema.json#/$defs/Timestamp"
+        }
+      },
+      "required": [
+        "sourceUrl",
+        "title",
+        "description",
+        "fetchedAt"
+      ],
+      "additionalProperties": false
+    },
     "BacklinksRequest": {
       "type": "object",
       "properties": {

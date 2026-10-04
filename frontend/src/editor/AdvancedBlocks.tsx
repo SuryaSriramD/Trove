@@ -5,9 +5,10 @@ import { closeHistory } from "@tiptap/pm/history";
 import type { D, WorkspaceSnapshot } from "../api";
 import { LayoutBlock } from "./LayoutBlock";
 import { ReusableBlock } from "./ReusableBlock";
+import { BookmarkBlock, EmbedBlock } from "./OnlineBlocks";
 import { InlineRichEditor } from "./InlineRichEditor";
 import { insertTableLine, removeTableLine, tableLineRemoval, tableWidths } from "./tableStructure";
-import { inertEmbedDocument, mergeCells, safeWebURL, splitCell } from "./advanced";
+import { mergeCells, splitCell } from "./advanced";
 import { previewButton, runButton } from "../advanced/service";
 
 export function AdvancedTable({ data: d, update, owner, allocateIds, readOnly = false }: {
@@ -76,8 +77,8 @@ export function AdvancedBlock({props,w,pageId,openPage,onError,onCommitted,readO
  const update=(patch:any)=>updateAttributes({data:{...d,...patch}});
  const [proposal,setProposal]=useState<{label:string;commands:any[]}|null>(null),[busy,setBusy]=useState(false);
  if(kind==='columns'||kind==='tab_container')return <LayoutBlock {...props} readOnly={readOnly}/>;
- if(kind==='bookmark')return <div className="bookmark-card"><a href={safeWebURL(d.url)??undefined} target="_blank" rel="noopener noreferrer">{d.title||d.url}</a><p>{d.description}</p><details><summary>Edit bookmark</summary><label>Title<input value={d.title} onChange={e=>update({title:e.target.value})}/></label><label>URL<input value={d.url} onChange={e=>update({url:e.target.value})}/></label><label>Description<textarea value={d.description??''} onChange={e=>update({description:e.target.value})}/></label></details></div>;
- if(kind==='embed')return <div className="embed-card"><iframe title={`${d.provider} offline embed`} sandbox="" referrerPolicy="no-referrer" srcDoc={inertEmbedDocument(d.offlineText)}/><p>Offline snapshot · network and scripts disabled</p><a href={safeWebURL(d.url)??undefined} target="_blank" rel="noopener noreferrer">Open source externally</a><label>Offline content<textarea value={d.offlineText} onChange={e=>update({offlineText:e.target.value})}/></label></div>;
+ if(kind==='bookmark')return <BookmarkBlock data={d} update={update} workspace={w} pageId={pageId} readOnly={readOnly}/>;
+ if(kind==='embed')return <EmbedBlock data={d} update={update} readOnly={readOnly}/>;
  if(kind==='date_mention')return <label>Date <input type={d.hasTime?'datetime-local':'date'} value={d.start} onChange={e=>update({start:e.target.value})}/><span>{d.timezone}</span></label>;
  if(kind==='breadcrumb'){const path:D.Page[]=[];let p=w?.pages.find(p=>p.id===pageId);const seen=new Set<string>();while(p&&!seen.has(p.id)){path.unshift(p);seen.add(p.id);p=w?.pages.find(x=>x.id===p!.parentPageId)}return <nav aria-label="Breadcrumb">{path.map((p,i)=><span key={p.id}>{i?' / ':''}<button onClick={()=>openPage(p.id)}>{p.title}</button></span>)}</nav>}
  if(kind==='table_of_contents'){const headings:any[]=[];props.editor.state.doc.descendants(n=>{if(/^heading_[1-4]$/.test(n.attrs.kind)&&Number(n.attrs.kind.slice(-1))<=d.maxLevel)headings.push(n)});return <nav aria-label="Table of contents">{headings.map(n=><button key={n.attrs.blockId??n.attrs.clientKey} style={{display:'block',marginInlineStart:(Number(n.attrs.kind.slice(-1))-1)*12}} onClick={()=>props.editor.view.dom.querySelector(`[data-block-id="${n.attrs.blockId}"]`)?.scrollIntoView({behavior:'smooth'})}>{n.textContent||'Untitled heading'}</button>)}{!headings.length&&<p>Add headings to build a table of contents.</p>}</nav>}

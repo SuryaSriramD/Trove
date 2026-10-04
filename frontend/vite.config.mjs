@@ -22,7 +22,9 @@ export default defineConfig({
     });},
     generateBundle(){for(const [path,source] of pdfAssets)this.emitFile({type:"asset",fileName:path.slice(1),source});},
   }],
+  preview: {headers:{"Content-Security-Policy":"frame-ancestors 'none'","X-Frame-Options":"DENY"}},
   server: {
+    headers:{"Content-Security-Policy":"frame-ancestors 'none'","X-Frame-Options":"DENY"},
     hmr: process.env.TROVE_TEST_URL ? false : undefined,
     fs: {
       allow: [

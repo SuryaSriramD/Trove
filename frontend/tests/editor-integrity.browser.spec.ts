@@ -36,6 +36,7 @@ const initial = {
 };
 test.beforeEach(async ({page}) => {
   await page.addInitScript(({initial}) => {
+    if(window!==window.top)return;
     const state = JSON.parse(localStorage.getItem("editor-integrity") ?? "null") ?? initial;
     let sequence = 500;
     const makeID = () => `019a1234-5678-7000-8000-${String(++sequence).padStart(12,"0")}`;
@@ -46,6 +47,7 @@ test.beforeEach(async ({page}) => {
     (window as any).go = {main:{App:{ShellReady:async()=>{},SetEditing:async()=>{},PickFile:async()=>"",Dispatch:async(method:string,raw:string)=>{
       const req=JSON.parse(raw),ok=(result:unknown)=>JSON.stringify({ok:true,result});
       if(method==="workspace.snapshot") return ok(state);
+      if(method==="editor.bookmarkPreview") {state.bookmarkRequests=(state.bookmarkRequests??0)+1;if(req.consent!=="fetch_once")throw Error("Explicit consent missing");if(state.failBookmark)throw Error("Source unavailable");return ok({sourceUrl:req.url,title:"Cached <script>text</script>",description:"Safe cached description 🌱",fetchedAt:"2026-10-04T12:00:00Z"});}
       if(method==="readBlock") {const block=[...state.blocks,...(state.remoteBlocks??[])].find((block:any)=>block.id===req.blockId);return block?ok({block}):JSON.stringify({ok:false,error:{code:"NOT_FOUND",message:"Unavailable source",retryable:false,requestId:req.requestId}});}
       if(method==="readPage") return ok({page:state.pages.find((page:any)=>page.id===req.pageId)??{...state.pages[0],id:req.pageId,title:"Scoped source page"},blocks:[...state.blocks,...(state.remoteBlocks??[])].filter((block:any)=>block.pageId===req.pageId),snapshotCursor:state.snapshotCursor});
       if(method==="pageDisplay.get") return ok({pageId:req.pageId,fullWidth:false,presentation:false,revision:state.pages[0].revision});
@@ -307,4 +309,56 @@ test("reusable blocks show rich canonical sources, update live and retain unavai
 test("a reusable layout resolves its scoped remote source subtree without a workspace block preload",async({page})=>{
  await page.evaluate(({reference,remotePage,source,child,group,pageId})=>{const state=(window as any).integrityState();const base={pageId:remotePage,schemaVersion:1,revision:'1'};state.remoteBlocks=[{...base,id:source,parentBlockId:null,sortKey:'1',type:'tab_container',data:{tabs:[{id:group,title:'Remote tab',childBlockIds:[child]}]}},{...base,id:child,parentBlockId:source,sortKey:'2',type:'code',data:{source:'const remoteRich = true;',language:'typescript'}}];state.blocks.push({id:reference,pageId,parentBlockId:null,sortKey:'000000000044',type:'synced_block',schemaVersion:1,revision:'1',data:{contentSourceId:source}});localStorage.setItem('editor-integrity',JSON.stringify(state));},{reference:id(44),remotePage:id(70),source:id(71),child:id(72),group:id(73),pageId});
  await page.reload();await page.getByRole('button',{name:/Editor integrity/}).first().click();const reference=page.locator(`[data-block-id="${id(44)}"]`);await expect(reference.getByRole('tab',{name:'Remote tab',exact:true})).toBeVisible();await expect(reference.locator('.code-preview')).toContainText('remoteRich = true');
+});
+
+
+async function addOnlineFixtures(page:Page) {
+ await page.evaluate(({pageId,bookmark,embed})=>{const state=(window as any).integrityState();const base={pageId,parentBlockId:null,schemaVersion:1,revision:'1'};state.blocks.push({...base,id:bookmark,sortKey:'000000000050',type:'bookmark',data:{url:'https://source.example/article',title:'Saved offline title',description:'Saved offline description'}},{...base,id:embed,sortKey:'000000000051',type:'embed',data:{url:'https://www.youtube.com/watch?v=M7lc1UVf-VE',provider:'youtube.com',sandboxPolicy:'no_scripts_no_network',offlineText:'<script>window.importedRan=true</script> Saved offline evidence'}});localStorage.setItem('editor-integrity',JSON.stringify(state));},{pageId,bookmark:id(50),embed:id(51)});
+ await page.reload();await page.getByRole('button',{name:/Editor integrity/}).first().click();
+}
+test("bookmarks fetch only on explicit action and keep source-matched offline metadata",async({page})=>{
+ await addOnlineFixtures(page);const bookmark=page.locator(`[data-block-id="${id(50)}"]`);await expect(bookmark).toContainText('Saved offline title');expect(await page.evaluate(()=>(window as any).integrityState().bookmarkRequests??0)).toBe(0);
+ await bookmark.getByRole('button',{name:'Fetch metadata once',exact:true}).click();await expect(bookmark).toContainText('Cached <script>text</script>');await expect(bookmark.locator('script')).toHaveCount(0);await save(page);
+ await page.reload();await page.getByRole('button',{name:/Editor integrity/}).first().click();await expect(bookmark).toContainText('available offline');expect(await page.evaluate(()=>(window as any).integrityState().bookmarkRequests)).toBe(1);
+ await page.evaluate(()=>(window as any).integrityState().failBookmark=true);await bookmark.getByRole('button',{name:'Fetch metadata once',exact:true}).click();await expect(bookmark.getByRole('alert')).toContainText('saved content is unchanged');await expect(bookmark).toContainText('Safe cached description');
+ await bookmark.getByText('Edit bookmark',{exact:true}).click();await bookmark.getByRole('textbox',{name:'Bookmark URL',exact:true}).fill('https://different.example/article');await expect(bookmark.getByRole('link').first()).toHaveText('https://different.example/article');await expect(bookmark).toContainText('Saved metadata belongs to a previous URL');
+});
+test("online embeds require per-view consent, isolate provider scripts and keep inert offline fallback",async({page,context})=>{
+ const requests:string[]=[];await context.route('https://www.youtube-nocookie.com/**',route=>{requests.push(route.request().url());return route.fulfill({contentType:'text/html',body:'<div id="player">Provider fixture</div><script>try{top.go.main.App.Dispatch("batch","{}");document.body.dataset.parentAccess="allowed"}catch{document.body.dataset.parentAccess="blocked"};document.body.dataset.ownBridge=typeof window.go</script>'});});
+ await addOnlineFixtures(page);const embed=page.locator(`[data-block-id="${id(51)}"]`);await expect(embed.getByRole('button',{name:'Enable YouTube for this view',exact:true})).toBeVisible();expect(requests).toEqual([]);await expect(embed.locator('iframe[title="youtube.com offline embed"]').contentFrame().locator('body')).toContainText('Saved offline evidence');expect(await page.evaluate(()=>(window as any).importedRan)).toBeUndefined();
+ await embed.getByRole('button',{name:'Enable YouTube for this view',exact:true}).click();const outer=embed.locator('iframe[title="YouTube enabled online embed"]');await expect(outer).toHaveAttribute('sandbox','allow-scripts allow-same-origin allow-presentation');const provider=outer.contentFrame();await expect(provider.locator('body')).toHaveAttribute('data-parent-access','blocked');expect(requests).toHaveLength(1);await expect(provider.locator('body')).toHaveAttribute('data-own-bridge','undefined');await expect(embed).toContainText('Saved offline evidence');
+ await embed.getByRole('button',{name:'Stop online embed',exact:true}).click();await expect(outer).toHaveCount(0);expect(requests).toHaveLength(1);
+ await embed.getByRole('button',{name:'Enable YouTube for this view',exact:true}).click();await expect.poll(()=>requests.length).toBe(2);await context.setOffline(true);await expect(outer).toHaveCount(0);await expect(embed).toContainText('Offline · saved text is available');await context.setOffline(false);
+ await page.reload();await page.getByRole('button',{name:/Editor integrity/}).first().click();await expect(embed.getByRole('button',{name:'Enable YouTube for this view',exact:true})).toBeVisible();expect(requests).toHaveLength(2);
+ await embed.getByText('Edit embed',{exact:true}).click();await embed.getByRole('textbox',{name:'Embed source URL',exact:true}).fill('https://youtube.com.attacker.example/watch?v=M7lc1UVf-VE');await expect(embed).toContainText('no supported live player');await expect(embed.getByRole('button',{name:/Enable .* for this view/})).toHaveCount(0);expect(requests).toHaveLength(2);
+});
+
+for(const providerName of ["YouTube","Vimeo"] as const) test(`optional real ${providerName} provider smoke for the consented sandbox`,async({page})=>{
+ test.skip(process.env.TROVE_LIVE_EMBED_SMOKE!=="1","Requires an explicit network qualification run");
+ const diagnostics:string[]=[];page.on('pageerror',error=>diagnostics.push(error.message));page.on('requestfailed',request=>{if(request.url().includes('youtube'))diagnostics.push(`${request.url()} ${request.failure()?.errorText}`);});page.on('console',message=>{if(/sandbox|youtube|Refused|blocked/i.test(message.text()))diagnostics.push(message.text());});
+ await addOnlineFixtures(page);const embed=page.locator(`[data-block-id="${id(51)}"]`);
+ if(providerName==='Vimeo'){await embed.getByText('Edit embed',{exact:true}).click();await embed.getByRole('textbox',{name:'Embed source URL',exact:true}).fill('https://player.vimeo.com/video/76979871?h=8272103f6e');}
+ await embed.getByRole('button',{name:`Enable ${providerName} for this view`,exact:true}).click();
+ const player=embed.locator(`iframe[title="${providerName} enabled online embed"]`).contentFrame();
+ try {if(providerName==='YouTube'){await expect(player.locator('.html5-video-player')).toBeVisible({timeout:20000});await expect(player.locator('.ytp-error-content-wrap')).not.toBeVisible();}else{await expect(player.locator('video')).toBeAttached({timeout:20000});}}
+ finally {for(const frame of page.frames())if(frame.url().includes('youtube')||frame.url().includes('vimeo')||frame.url().includes('chrome-error'))diagnostics.push(frame.url()+' '+await frame.locator('body').innerText().catch(()=>''));await test.info().attach('live-provider-diagnostics',{body:JSON.stringify(diagnostics),contentType:'application/json'});console.log(JSON.stringify(diagnostics));}
+});
+
+
+test("provider frames cannot navigate into the Trove app origin",async({page,context})=>{
+ const response=await page.request.get(process.env.TROVE_TEST_URL??'http://127.0.0.1:4173');expect(response.headers()['content-security-policy']).toContain("frame-ancestors 'none'");expect(response.headers()['x-frame-options']).toBe('DENY');
+ await context.route('https://www.youtube-nocookie.com/**',route=>route.fulfill({contentType:'text/html',body:'<p id="remote">Provider fixture</p>'}));await addOnlineFixtures(page);
+ await page.evaluate(()=>{(window as any).frameViolations=[];document.addEventListener('securitypolicyviolation',event=>{(window as any).frameViolations.push(event.blockedURI);});});
+ const embed=page.locator(`[data-block-id="${id(51)}"]`);await embed.getByRole('button',{name:'Enable YouTube for this view',exact:true}).click();const provider=embed.locator('iframe[title="YouTube enabled online embed"]').contentFrame();await expect(provider.locator('#remote')).toBeVisible();
+ await provider.locator('body').evaluate((element,url)=>{window.location.href=url;},process.env.TROVE_TEST_URL??'http://127.0.0.1:4173');
+ await expect.poll(()=>page.evaluate(()=>(window as any).frameViolations.some((uri:string)=>uri.startsWith(location.origin)))).toBe(true);
+ await expect(page.getByRole('textbox',{name:'Page title',exact:true})).toHaveValue('Editor integrity');
+});
+
+
+test("changing an enabled embed URL or provider revokes consent before another request",async({page,context})=>{
+ const calls:string[]=[];for(const origin of ['https://www.youtube-nocookie.com/**','https://player.vimeo.com/**'])await context.route(origin,route=>{calls.push(route.request().url());return route.fulfill({contentType:'text/html',body:'<p>Player fixture</p>'});});
+ await addOnlineFixtures(page);const embed=page.locator(`[data-block-id="${id(51)}"]`);await embed.getByRole('button',{name:'Enable YouTube for this view',exact:true}).click();await expect.poll(()=>calls.length).toBe(1);
+ await embed.getByText('Edit embed',{exact:true}).click();await embed.getByRole('textbox',{name:'Embed source URL',exact:true}).fill('https://vimeo.com/76979871');await expect(embed.locator('iframe[title$="enabled online embed"]')).toHaveCount(0);await expect(embed.getByRole('button',{name:'Enable Vimeo for this view',exact:true})).toBeVisible();expect(calls).toHaveLength(1);
+ await embed.getByRole('button',{name:'Enable Vimeo for this view',exact:true}).click();await expect.poll(()=>calls.length).toBe(2);expect(calls[1]).toBe('https://player.vimeo.com/video/76979871?autoplay=0&dnt=1');
 });

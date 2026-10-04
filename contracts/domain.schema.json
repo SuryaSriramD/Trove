@@ -3255,6 +3255,13 @@
         },
         "description": {
           "type": "string"
+        },
+        "cachedSourceUrl": {
+          "type": "string",
+          "maxLength": 8192
+        },
+        "fetchedAt": {
+          "$ref": "#/$defs/Timestamp"
         }
       },
       "required": [

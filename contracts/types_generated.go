@@ -410,6 +410,8 @@ type DomainBlockBookmarkV1 struct {
 Url string `json:"url"`
 Title string `json:"title"`
 Description *string `json:"description,omitempty"`
+CachedSourceUrl *string `json:"cachedSourceUrl,omitempty"`
+FetchedAt *DomainTimestamp `json:"fetchedAt,omitempty"`
 }
 type DomainBlockEmbedV1 struct {
 Url string `json:"url"`
@@ -1479,6 +1481,20 @@ ContractVersion int64 `json:"contractVersion"`
 RequestId DomainId `json:"requestId"`
 WorkspaceId DomainId `json:"workspaceId"`
 CollectionId DomainId `json:"collectionId"`
+}
+type ServiceBookmarkPreviewRequest struct {
+ContractVersion int64 `json:"contractVersion"`
+RequestId DomainId `json:"requestId"`
+WorkspaceId DomainId `json:"workspaceId"`
+PageId DomainId `json:"pageId"`
+Url string `json:"url"`
+Consent string `json:"consent"`
+}
+type ServiceBookmarkPreviewResult struct {
+SourceUrl string `json:"sourceUrl"`
+Title string `json:"title"`
+Description string `json:"description"`
+FetchedAt DomainTimestamp `json:"fetchedAt"`
 }
 type ServiceBacklinksRequest struct {
 ContractVersion int64 `json:"contractVersion"`
