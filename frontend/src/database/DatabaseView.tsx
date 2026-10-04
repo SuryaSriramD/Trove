@@ -32,13 +32,13 @@ import {
 } from "./model";
 import "./database.css";
 import { VirtualRows } from "./VirtualRows";
+import { Timeline } from "./Timeline";
 import { calendarDay, resizeDateRange } from "./dateRange";
 import { P2DatabasePanel, P2RowButtons } from "./P2Database";
 import type { P2Button, P2Config } from "./P2Model";
 import {
   AdvancedDatabasePanel,
   Gallery,
-  Timeline,
   DerivedCellView,
 } from "./AdvancedDatabase";
 type Props = {
@@ -746,8 +746,12 @@ export default function DatabaseView({
             <Timeline
               records={records}
               view={view}
-              pages={w.pages}
+              workspace={w}
+              properties={properties}
+              busy={busy}
               openPage={openPage}
+              onChange={change}
+              onError={onError}
             />
           ) : view?.type === "calendar" ? (
             <Calendar
@@ -1844,6 +1848,17 @@ function ViewSettings({
         )}
         {draft.type === "timeline" && (
           <>
+            <label>
+              <input
+                type="checkbox"
+                aria-label="Show timeline dependencies"
+                checked={cfg.showDependencies !== false}
+                onChange={(event) =>
+                  setConfig({ showDependencies: event.target.checked })
+                }
+              />
+              Show dependencies
+            </label>
             <label>
               Timeline date
               <select

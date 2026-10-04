@@ -522,6 +522,7 @@ CardSize string `json:"cardSize"`
 type DomainViewTimelineV1 struct {
 DatePropertyId DomainId `json:"datePropertyId"`
 Scale string `json:"scale"`
+ShowDependencies *bool `json:"showDependencies,omitempty"`
 }
 type DomainViewChartV1 DomainFallback
 type DomainViewFormV1 DomainFallback
@@ -1343,6 +1344,12 @@ RecordId DomainId `json:"recordId"`
 }
 type ServiceReadRecordResult struct {
 Record DomainRecord `json:"record"`
+}
+type ServiceDatabaseStructureRequest struct {
+ContractVersion int64 `json:"contractVersion"`
+RequestId DomainId `json:"requestId"`
+WorkspaceId DomainId `json:"workspaceId"`
+CollectionId DomainId `json:"collectionId"`
 }
 type ServiceBacklinksRequest struct {
 ContractVersion int64 `json:"contractVersion"`

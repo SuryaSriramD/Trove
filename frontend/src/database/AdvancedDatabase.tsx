@@ -179,64 +179,6 @@ export function Gallery({
   );
 }
 
-export function Timeline({
-  records,
-  view,
-  pages,
-  openPage,
-}: {
-  records: D.Record[];
-  view: D.View;
-  pages: D.Page[];
-  openPage: (id: string) => void;
-}) {
-  const cfg = view.config as { datePropertyId: string; scale: string };
-  const items = records
-    .map((r) => ({
-      r,
-      date: valueOf(r, cfg.datePropertyId) as {
-        start?: string;
-        end?: string;
-      } | null,
-    }))
-    .sort((a, b) =>
-      (a.date?.start ?? "9999").localeCompare(b.date?.start ?? "9999"),
-    );
-  const dated = items.filter((i) => i.date?.start);
-  const starts = dated.map((i) => Date.parse(i.date!.start!));
-  const ends = dated.map((i) => Date.parse(i.date!.end ?? i.date!.start!));
-  const min = Math.min(...starts),
-    max = Math.max(...ends, min + 86400000),
-    span = max - min;
-  return (
-    <div className="db-timeline" aria-label="Database timeline">
-      <p>{cfg.scale} scale · dates follow each record's stored timezone</p>
-      {items.map(({ r, date }) => (
-        <div key={r.id} className="db-timeline-row">
-          <button onClick={() => openPage(r.pageId)}>
-            {pages.find((p) => p.id === r.pageId)?.title}
-          </button>
-          <div className="db-timeline-track">
-            {date?.start ? (
-              <span
-                className="db-timeline-bar"
-                style={{
-                  marginLeft: `${((Date.parse(date.start) - min) / span) * 80}%`,
-                  width: `${Math.max(5, ((Date.parse(date.end ?? date.start) - Date.parse(date.start)) / span) * 80)}%`,
-                }}
-              >
-                {date.start}
-                {date.end ? ` → ${date.end}` : ""}
-              </span>
-            ) : (
-              <span>Unscheduled</span>
-            )}
-          </div>
-        </div>
-      ))}
-    </div>
-  );
-}
 export function AdvancedDatabasePanel({
   workspace: w,
   collection,

@@ -2607,6 +2607,30 @@
       ],
       "additionalProperties": false
     },
+    "DatabaseStructureRequest": {
+      "type": "object",
+      "properties": {
+        "contractVersion": {
+          "const": 1
+        },
+        "requestId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "workspaceId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "collectionId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        }
+      },
+      "required": [
+        "contractVersion",
+        "requestId",
+        "workspaceId",
+        "collectionId"
+      ],
+      "additionalProperties": false
+    },
     "BacklinksRequest": {
       "type": "object",
       "properties": {

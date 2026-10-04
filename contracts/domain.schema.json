@@ -3769,6 +3769,9 @@
             "quarter",
             "year"
           ]
+        },
+        "showDependencies": {
+          "type": "boolean"
         }
       },
       "required": [

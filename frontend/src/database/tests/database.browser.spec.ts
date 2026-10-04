@@ -194,6 +194,7 @@ test.beforeEach(async ({ page }) => {
                     },
                   ],
                 });
+              if (method === "databaseStructure") return ok({structure: Object.fromEntries(state.records.map((r: any, i: number) => [r.id, {parentRecordId:null, dependencyRecordIds:i === 0 ? [state.records[1].id] : []}]))});
               if (method === "databaseDerived")
                 return ok({ locked: false, values: {}, structure: {} });
               if (method === "allocateIds")
@@ -302,7 +303,8 @@ test.beforeEach(async ({ page }) => {
                   changes.add(state.collections[0]);
                 }
                 if (c.kind === "view.save") {
-                  const v = state.views.find((v: any) => v.id === c.viewId);
+                  let v = state.views.find((v: any) => v.id === c.viewId);
+                  if (!v) { v = { revision: "0" }; state.views.push(v); }
                   Object.assign(v, { ...c, id: c.viewId });
                   delete v.kind;
                   changes.add(v);
@@ -674,4 +676,83 @@ test("P2 row buttons cancel without mutation then confirm the selected row only"
   expect(
     call.mutation.expectedRevisions.map((g: any) => g.target.entityType).sort(),
   ).toEqual(["collection", "page", "property", "record"]);
+});
+
+test("timeline persists meaningful scales, grouping, dependency visibility and guarded ranges", async ({
+  page,
+}) => {
+  await page.evaluate(() => {
+    const state = (window as any).dbState();
+    state.records[1].values.push({
+      propertyId: state.properties[2].id,
+      schemaVersion: 1,
+      value: {
+        start: "2026-09-30",
+        end: null,
+        hasTime: false,
+        timezone: "UTC",
+      },
+    });
+  });
+  await page.getByLabel("Add saved view").selectOption("timeline");
+  const timeline = page.getByRole("region", { name: "Database timeline" });
+  await expect(timeline).toBeVisible();
+  await expect(timeline.locator(".db-timeline-edges > path")).toHaveCount(1);
+  const originalWidth = await timeline
+    .locator(".db-timeline-range")
+    .first()
+    .evaluate((el) => el.getBoundingClientRect().width);
+  await page
+    .getByRole("button", { name: "View settings", exact: true })
+    .click();
+  await page.getByRole("combobox", { name: "Scale", exact: true }).selectOption("day");
+  await page.getByLabel("Group records", { exact: true }).selectOption(id(12));
+  await page.getByRole("button", { name: "Save view", exact: true }).click();
+  await expect(timeline.locator(".db-timeline-group")).toContainText([
+    "To do",
+    "No Status",
+  ]);
+  const dayWidth = await timeline
+    .locator(".db-timeline-range")
+    .first()
+    .evaluate((el) => el.getBoundingClientRect().width);
+  expect(dayWidth).toBeGreaterThan(originalWidth);
+  await timeline
+    .getByText("Edit date ranges and inspect dependencies", { exact: true })
+    .click();
+  await timeline
+    .getByLabel("Timeline end Prepare prototype")
+    .fill("2026-10-03");
+  await timeline.getByLabel("Timeline end Prepare prototype").blur();
+  await expect
+    .poll(() =>
+      page.evaluate(
+        () =>
+          (window as any).dbCommands
+            .filter((c: any) => c.kind === "record.setValue")
+            .at(-1)?.value.value.end,
+      ),
+    )
+    .toBe("2026-10-03");
+  const request = await page.evaluate(() =>
+    (window as any).dbRequests
+      .filter(
+        (r: any) =>
+          r.method === "batch" &&
+          r.commands.some((c: any) => c.kind === "record.setValue"),
+      )
+      .at(-1),
+  );
+  expect(request.mutation.expectedRevisions.length).toBeGreaterThanOrEqual(4);
+  await page.reload();
+  await page
+    .getByRole("navigation", { name: "Workspace", exact: true })
+    .getByRole("button", { name: /Pages$/ })
+    .click();
+  await page.getByRole("tab", { name: /Timeline view$/ }).click();
+  await expect(page.locator(".db-timeline-toolbar")).toContainText("day scale");
+  await expect(page.locator(".db-timeline-group")).toContainText([
+    "To do",
+    "No Status",
+  ]);
 });

@@ -82,6 +82,7 @@ export type ReadBlockRequest = { "contractVersion": 1; "requestId": domain.Id; "
 export type ReadBlockResult = { "block": domain.Block; };
 export type ReadRecordRequest = { "contractVersion": 1; "requestId": domain.Id; "workspaceId": domain.Id; "recordId": domain.Id; };
 export type ReadRecordResult = { "record": domain.Record; };
+export type DatabaseStructureRequest = { "contractVersion": 1; "requestId": domain.Id; "workspaceId": domain.Id; "collectionId": domain.Id; };
 export type BacklinksRequest = { "contractVersion": 1; "requestId": domain.Id; "workspaceId": domain.Id; "pageId": domain.Id; };
 export type BacklinksResult = { "links": Array<{ "pageId": domain.Id; "blockId": domain.Id; }>; };
 export type JobsListRequest = { "contractVersion": 1; "requestId": domain.Id; "workspaceId": domain.Id; "limit": number; "state"?: "queued" | "running" | "retry_wait" | "cancel_requested" | "cancelled" | "succeeded" | "failed" | "interrupted"; };
