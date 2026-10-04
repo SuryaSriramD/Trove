@@ -72,6 +72,9 @@ func TestHostAuthenticationAndSameOrigin(t *testing.T) {
 		t.Fatal(e)
 	}
 	defer res.Body.Close()
+	if res.Header.Get("Content-Security-Policy") != "frame-ancestors 'none'" || res.Header.Get("X-Frame-Options") != "DENY" {
+		t.Fatal("hosted app can be framed", res.Header)
+	}
 	b, _ := io.ReadAll(res.Body)
 	if !strings.Contains(string(b), "host-bridge.js") {
 		t.Fatal("authenticated frontend has no bridge")

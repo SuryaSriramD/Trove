@@ -28,7 +28,7 @@ func main() {
 	}
 	err = wails.Run(&options.App{Title: "Trove", Width: 1380, Height: 900, MinWidth: 960, MinHeight: 640,
 		BackgroundColour: options.NewRGB(246, 245, 241),
-		AssetServer:      &assetserver.Options{Assets: assets, Handler: http.HandlerFunc(app.serveFile)},
+		AssetServer:      &assetserver.Options{Assets: assets, Handler: http.HandlerFunc(app.serveFile), Middleware: preventAppFraming},
 		OnStartup:        app.startup, OnDomReady: app.domReady, OnShutdown: app.shutdown, Bind: []interface{}{app},
 		DragAndDrop: &options.DragAndDrop{EnableFileDrop: true},
 		Mac:         &mac.Options{TitleBar: mac.TitleBarDefault(), OnUrlOpen: app.openURL},
