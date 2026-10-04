@@ -1,0 +1,62 @@
+{
+  "scope": "OPT-002 / C6 local personal review implementation",
+  "baseCommit": "e46fc8d",
+  "releaseQualified": false,
+  "model": {
+    "id": "01990000-0000-7000-8000-000000000105",
+    "name": "Qwen2.5 1.5B Instruct Q5",
+    "sha256": "b46661073c18e5b56a41fa320975f866a00def1ff08feef4718e013258896f8c",
+    "runtimeCommit": "d2e54583c7452353eb35d40431281f6ee984332f",
+    "helperSHA256": "e2a14be8524c76491e0b4779604fd33f151905594c1eec96621c79596ca131c3"
+  },
+  "realModelFixture": {
+    "name": "TestRealLocalPersonalReviewCitedProposal",
+    "firstAttempt": "Rejected unselected category summary when risks was selected; no effects",
+    "change": "Grammar now admits selected categories and enabled action kinds only; prompt example matches selected category",
+    "result": "pass",
+    "latencySeconds": 15.10780925,
+    "totalTestSeconds": 17.45,
+    "claim": "The launch is blocked by the pending security review.",
+    "quote": "The launch is blocked by the pending security review.",
+    "explicitApprovalRequired": true,
+    "limitations": [
+      "One fixed synthetic blocker fixture",
+      "No broad factual quality conclusion",
+      "Prior unrelated factual evaluation failures remain open"
+    ]
+  },
+  "browser": {
+    "tests": 4,
+    "passed": 4,
+    "seconds": 17.7,
+    "firstRunInterruption": "Server dependency restart interrupted final navigation; all four passed after stable restart"
+  },
+  "frontend": {
+    "typecheck": "pass",
+    "build": "pass",
+    "buildSeconds": 8.44,
+    "warnings": [
+      "Existing large bundle chunks",
+      "Existing third-party use-client module directive"
+    ]
+  },
+  "kernel": {
+    "focusedRaceSuite": "pass",
+    "seconds": 11.919,
+    "selection": "TestPersonalReview|TestP2Review|TestActionPlan|TestAI",
+    "coverage": [
+      "explicit approval and atomic repeated apply",
+      "unlinked generic AI proposal rejection",
+      "stale source and tokenizer preparation",
+      "forgotten memory during generation",
+      "activation, cancellation, retry and restart",
+      "canonical task status and due fields",
+      "inactive portable reimport"
+    ]
+  },
+  "contracts": {
+    "tests": 8,
+    "passed": 8,
+    "seconds": 4.283
+  }
+}

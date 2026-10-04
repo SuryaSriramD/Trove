@@ -2033,6 +2033,26 @@ if matchesVariant(fields,[]string{"ok","result"},map[string]string{"ok":"true"},
 if matchesVariant(fields,[]string{"ok","error"},map[string]string{"ok":"false"},map[string][]string{},[]string{"ok","error"}) { var result ServicePrepareFileResponseVariant2; if err := json.Unmarshal(data,&result); err != nil {return err}; v.Value=result; return nil }
 return fmt.Errorf("unknown or incomplete ServicePrepareFileResponse variant")
 }
+type ServicePersonalReviewGenerationConfig struct {
+ModelPackId DomainId `json:"modelPackId"`
+Categories []string `json:"categories"`
+AllowedActions []string `json:"allowedActions"`
+ActionPageIds []DomainId `json:"actionPageIds"`
+}
+type ServicePersonalReviewGeneratedDraft struct {
+Claims []struct {
+Category string `json:"category"`
+Text string `json:"text"`
+Quote string `json:"quote"`
+} `json:"claims"`
+Actions []ServicePersonalReviewGeneratedDraftActionsItem `json:"actions"`
+}
+type ServicePersonalReviewControlRequest struct {
+ContractVersion int64 `json:"contractVersion"`
+RequestId DomainId `json:"requestId"`
+WorkspaceId DomainId `json:"workspaceId"`
+RunId DomainId `json:"runId"`
+}
 type JobsJobKind string
 type JobsJobState string
 type JobsProgress struct {
@@ -2430,6 +2450,20 @@ Result ServicePrepareFileResult `json:"result"`
 type ServicePrepareFileResponseVariant2 struct {
 Ok bool `json:"ok"`
 Error ServiceError `json:"error"`
+}
+type ServicePersonalReviewGeneratedDraftActionsItemValue interface { isServicePersonalReviewGeneratedDraftActionsItem() }
+type ServicePersonalReviewGeneratedDraftActionsItem struct { Value ServicePersonalReviewGeneratedDraftActionsItemValue }
+func (ServicePlanUpdatePage) isServicePersonalReviewGeneratedDraftActionsItem() {}
+func (ServicePlanCreateTask) isServicePersonalReviewGeneratedDraftActionsItem() {}
+func (ServicePlanUpdateTask) isServicePersonalReviewGeneratedDraftActionsItem() {}
+func (v ServicePersonalReviewGeneratedDraftActionsItem) MarshalJSON() ([]byte,error) { return json.Marshal(v.Value) }
+func (v *ServicePersonalReviewGeneratedDraftActionsItem) UnmarshalJSON(data []byte) error {
+var fields map[string]json.RawMessage
+if err := json.Unmarshal(data, &fields); err != nil {return err}
+if matchesVariant(fields,[]string{"kind","target"},map[string]string{"kind":"\"update_page\""},map[string][]string{},[]string{"kind","target","title","body"}) { var result ServicePlanUpdatePage; if err := json.Unmarshal(data,&result); err != nil {return err}; v.Value=result; return nil }
+if matchesVariant(fields,[]string{"kind","destination","title"},map[string]string{"kind":"\"create_task\""},map[string][]string{},[]string{"kind","destination","title","body","status","due"}) { var result ServicePlanCreateTask; if err := json.Unmarshal(data,&result); err != nil {return err}; v.Value=result; return nil }
+if matchesVariant(fields,[]string{"kind","target"},map[string]string{"kind":"\"update_task\""},map[string][]string{},[]string{"kind","target","status","due"}) { var result ServicePlanUpdateTask; if err := json.Unmarshal(data,&result); err != nil {return err}; v.Value=result; return nil }
+return fmt.Errorf("unknown or incomplete ServicePersonalReviewGeneratedDraftActionsItem variant")
 }
 type JobsJobPayloadVariant1 struct {
 Kind string `json:"kind"`

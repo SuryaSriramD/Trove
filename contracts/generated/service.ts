@@ -165,3 +165,6 @@ export type ResolveCitationResponse = ({ "ok": true; "result": ResolveCitationRe
 export type ReadEventsResponse = ({ "ok": true; "result": ReadEventsResult; } | { "ok": false; "error": Error; });
 export type CancelResponse = ({ "ok": true; "result": CancelResult; } | { "ok": false; "error": Error; });
 export type PrepareFileResponse = ({ "ok": true; "result": PrepareFileResult; } | { "ok": false; "error": Error; });
+export type PersonalReviewGenerationConfig = { "modelPackId": domain.Id; "categories": Array<"summary" | "risks" | "decisions" | "next_steps">; "allowedActions": Array<"append_review" | "rename_page" | "append_page" | "create_task" | "set_task_status" | "set_task_due">; "actionPageIds": Array<domain.Id>; };
+export type PersonalReviewGeneratedDraft = { "claims": Array<{ "category": "summary" | "risks" | "decisions" | "next_steps"; "text": string; "quote": string; }>; "actions": Array<(PlanUpdatePage | PlanCreateTask | PlanUpdateTask)>; };
+export type PersonalReviewControlRequest = { "contractVersion": 1; "requestId": domain.Id; "workspaceId": domain.Id; "runId": domain.Id; };

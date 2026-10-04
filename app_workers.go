@@ -38,6 +38,8 @@ func (a *App) startJobs(k *workspace.Kernel) {
 		defer close(done)
 		indexDone := make(chan struct{})
 		go func() { defer close(indexDone); k.WatchExternalRoots(ctx) }()
+		reviewDone := make(chan struct{})
+		go func() { defer close(reviewDone); a.runPersonalReviewGenerations(ctx, k) }()
 		maintenanceDone := make(chan struct{})
 		go func() {
 			defer close(maintenanceDone)
@@ -71,7 +73,7 @@ func (a *App) startJobs(k *workspace.Kernel) {
 				}
 			}
 		}()
-		defer func() { cancel(); <-maintenanceDone; <-indexDone }()
+		defer func() { cancel(); <-maintenanceDone; <-reviewDone; <-indexDone }()
 		err := workers.Run(ctx, k, k.OwnerContext(), supervisor)
 		if err != nil && !errors.Is(err, context.Canceled) {
 			runtime.EventsEmit(a.ctx, "jobs:error", map[string]any{"message": err.Error()})

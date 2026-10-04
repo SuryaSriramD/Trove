@@ -208,6 +208,12 @@ defs['ListMemoryRequest']=obj({**header,'scope':D('Scope'),'includeInactive':B})
 defs['ListMemoryResult']=obj({'entries':arr(D('Memory'),1000),'snapshotCursor':{'oneOf':[D('Revision'),{'const':'0'}]}})
 for method in ['AllocateIds','PreviewImport','GetImportReport','ListMemory','ReadPage','QueryRecords','Search','ResolveCitation','ReadEvents','Cancel','PrepareFile']:
     defs[method+'Response']={'oneOf':[obj({'ok':{'const':True},'result':R(method+'Result')}),obj({'ok':{'const':False},'error':R('Error')})]}
+# Optional personal reviews generate read-only drafts; accepted actions use AIProposal.
+defs.update({
+ 'PersonalReviewGenerationConfig':obj({'modelPackId':D('Id'),'categories':{**arr(enum('summary','risks','decisions','next_steps'),4),'minItems':1,'uniqueItems':True},'allowedActions':{**arr(enum('append_review','rename_page','append_page','create_task','set_task_status','set_task_due'),6),'uniqueItems':True},'actionPageIds':{**arr(D('Id'),32),'uniqueItems':True}}),
+ 'PersonalReviewGeneratedDraft':obj({'claims':{**arr(obj({'category':enum('summary','risks','decisions','next_steps'),'text':{'type':'string','minLength':1,'maxLength':2000},'quote':{'type':'string','maxLength':4000}}),12),'minItems':1},'actions':arr({'oneOf':[R('PlanUpdatePage'),R('PlanCreateTask'),R('PlanUpdateTask')]},8)}),
+ 'PersonalReviewControlRequest':obj({**header,'runId':D('Id')}),
+})
 save('service',schema('service',defs,'BatchRequest'))
 # Jobs and private worker framing. Domain payloads are referenced instead of re-created.
 j={

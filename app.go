@@ -235,6 +235,11 @@ func (a *App) Dispatch(method, raw string) string {
 		defer a.lifecycle.RUnlock()
 		return a.providerDispatch(method, json.RawMessage(raw))
 	}
+	if method == "review.cancel" {
+		a.lifecycle.RLock()
+		defer a.lifecycle.RUnlock()
+		return a.reviewCancel(json.RawMessage(raw))
+	}
 	if method == "ai.start" || method == "ai.cancel" {
 		a.lifecycle.Lock()
 		defer a.lifecycle.Unlock()
