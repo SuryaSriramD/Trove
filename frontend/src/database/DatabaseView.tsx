@@ -30,6 +30,7 @@ import {
   type RecordGroup,
 } from "./model";
 import "./database.css";
+import { calendarDay, resizeDateRange } from "./dateRange";
 import { P2DatabasePanel, P2RowButtons } from "./P2Database";
 import type { P2Button, P2Config } from "./P2Model";
 import {
@@ -156,9 +157,13 @@ export default function DatabaseView({
       setActive("");
     });
   };
-  const visible = properties.filter(
-    (p) => !view || view.query.visiblePropertyIds.includes(p.id),
-  );
+  const visible = view ? view.query.visiblePropertyIds.flatMap(id => {
+    const property = properties.find(p => p.id === id);
+    return property ? [property] : [];
+  }) : properties;
+  const columnWidth = (id: string) => view?.type === "table"
+    ? (view.config as D.view_table_v1).columnWidths.find(c => c.propertyId === id)?.pixels ?? 220
+    : 220;
   useEffect(() => {
     let active = true;
     setP2Buttons([]);
@@ -291,7 +296,11 @@ export default function DatabaseView({
     if (type === "table")
       return (
         <div className="db-table-scroll">
-          <table className="db-table">
+          <table className="db-table" style={{tableLayout: "fixed", width: visible.reduce((width,p) => width+columnWidth(p.id),160)}}>
+            <colgroup>
+              {visible.map(p => <col key={p.id} style={{width: columnWidth(p.id)}} />)}
+              <col style={{width:160}} />
+            </colgroup>
             <thead>
               <tr>
                 {visible.map((p) => (
@@ -609,6 +618,7 @@ export default function DatabaseView({
               busy={busy}
               openPage={openPage}
               onChange={change}
+              onError={onError}
             />
           ) : (
             grouped(
@@ -1091,6 +1101,7 @@ function Calendar({
   busy,
   openPage,
   onChange,
+  onError,
 }: {
   records: D.Record[];
   view: D.View;
@@ -1098,6 +1109,7 @@ function Calendar({
   pages: D.Page[];
   busy: boolean;
   openPage: (id: string) => void;
+  onError: (error: unknown) => void;
   onChange: (
     r: D.Record,
     p: D.PropertyDefinition,
@@ -1124,7 +1136,11 @@ function Calendar({
   );
   const dateOf = (r: D.Record) =>
     valueOf(r, property.id) as { start?: string; end?: string } | null;
-  const event = (r: D.Record) => (
+  const resize = (r: D.Record, edge: "start" | "end", day: string) => {
+    try { void onChange(r, property, resizeDateRange(valueOf(r,property.id),edge,day)); }
+    catch (error) { onError(error); }
+  };
+  const event = (r: D.Record, day?: string) => (
     <article
       key={r.id}
       data-record-id={r.id}
@@ -1141,7 +1157,7 @@ function Calendar({
         type="date"
         aria-label={`Reschedule ${pages.find((p) => p.id === r.pageId)?.title ?? "record"}`}
         disabled={busy}
-        value={dateOf(r)?.start?.slice(0, 10) ?? ""}
+        value={calendarDay(valueOf(r,property.id))}
         onChange={(e) => {
           if (e.target.value)
             void onChange(
@@ -1151,6 +1167,19 @@ function Calendar({
             );
         }}
       />
+      {dateOf(r)?.start && <>
+        <input type="date" aria-label={`Range end for ${pages.find(p => p.id===r.pageId)?.title ?? "record"}`}
+          disabled={busy} min={calendarDay(valueOf(r,property.id))}
+          value={calendarDay(valueOf(r,property.id),"end")}
+          onChange={e => { if (e.target.value) resize(r,"end",e.target.value); }} />
+        {(["start","end"] as const).filter(edge => day===(calendarDay(valueOf(r,property.id),edge) || calendarDay(valueOf(r,property.id)))).map(edge =>
+          <button key={edge} type="button" className="db-range-handle" draggable={!busy} disabled={busy}
+            aria-label={`Resize ${edge} of ${pages.find(p => p.id===r.pageId)?.title ?? "record"}`}
+            title={`Drag to change the range ${edge}`}
+            onDragStart={e => { e.stopPropagation(); e.dataTransfer.setData("application/x-trove-calendar-resize",JSON.stringify({recordId:r.id,edge})); }}>
+            {edge==="start" ? "↤" : "↦"}
+          </button>)}
+      </>}
     </article>
   );
   return (
@@ -1167,7 +1196,7 @@ function Calendar({
             }}
           />
         </label>
-        <span>Drag a record to a date, or use its date field.</span>
+        <span>Drag a record to move it. Drag an end handle or edit its end date to resize the range.</span>
       </div>
       <div
         className="db-calendar-grid"
@@ -1194,6 +1223,15 @@ function Calendar({
             }}
             onDrop={(e) => {
               e.preventDefault();
+              const resizing = e.dataTransfer.getData("application/x-trove-calendar-resize");
+              if (resizing) {
+                try {
+                  const {recordId,edge} = JSON.parse(resizing);
+                  const r = records.find(r => r.id===recordId);
+                  if (r && !busy && (edge==="start" || edge==="end")) resize(r,edge,day);
+                } catch { onError(new Error("The dragged calendar range is unavailable.")); }
+                return;
+              }
               const r = records.find(
                 (r) =>
                   r.id === e.dataTransfer.getData("application/x-trove-record"),
@@ -1212,18 +1250,18 @@ function Calendar({
                 const date = dateOf(r);
                 return (
                   date?.start &&
-                  date.start.slice(0, 10) <= day &&
-                  (date.end?.slice(0, 10) ?? date.start.slice(0, 10)) >= day
+                  calendarDay(valueOf(r,property.id)) <= day &&
+                  (calendarDay(valueOf(r,property.id),"end") || calendarDay(valueOf(r,property.id))) >= day
                 );
               })
-              .map(event)}
+              .map(r => event(r,day))}
           </div>
         ))}
       </div>
       {records.some((r) => !dateOf(r)?.start) && (
         <section className="db-undated">
           <h3>No date</h3>
-          {records.filter((r) => !dateOf(r)?.start).map(event)}
+          {records.filter((r) => !dateOf(r)?.start).map(r => event(r))}
         </section>
       )}
     </div>
@@ -1503,11 +1541,18 @@ function ViewSettings({
   onSave: (v: D.View) => void;
 }) {
   const [draft, setDraft] = useState(view);
+  const [widthDrafts, setWidthDrafts] = useState<Record<string, string>>({});
   const setQuery = (q: Partial<D.ViewQuery>) =>
     setDraft({ ...draft, query: { ...draft.query, ...q } });
   const cfg = draft.config as any;
   const setConfig = (c: object) =>
     setDraft({ ...draft, config: { ...cfg, ...c } });
+  const moveProperty = (index: number, direction: number) => {
+    const next = [...draft.query.visiblePropertyIds], destination = index+direction;
+    if (destination<0 || destination>=next.length) return;
+    [next[index],next[destination]] = [next[destination],next[index]];
+    setQuery({visiblePropertyIds:next});
+  };
   return (
     <form
       className="db-panel db-view-settings"
@@ -1716,6 +1761,22 @@ function ViewSettings({
             </label>
           ))}
         </div>
+        <ol className="db-property-order" aria-label="Property display order">
+          {draft.query.visiblePropertyIds.map((id,index) => {
+            const property = properties.find(p => p.id===id);
+            if (!property) return null;
+            const width = (cfg.columnWidths ?? []).find((c: {propertyId: string}) => c.propertyId===id)?.pixels ?? 220;
+            return <li key={id}>
+              <span>{property.name}</span>
+              <button type="button" aria-label={`Move ${property.name} earlier`} disabled={busy || index===0} onClick={() => moveProperty(index,-1)}>↑</button>
+              <button type="button" aria-label={`Move ${property.name} later`} disabled={busy || index===draft.query.visiblePropertyIds.length-1} onClick={() => moveProperty(index,1)}>↓</button>
+              {draft.type==="table" && <label>Width
+                <input type="number" aria-label={`${property.name} column width`} min={40} max={2000} step={1} required value={widthDrafts[id] ?? String(width)} disabled={busy}
+                  onChange={e => { const raw=e.target.value, pixels=Number(raw); setWidthDrafts({...widthDrafts,[id]:raw}); if (Number.isInteger(pixels) && pixels>=40 && pixels<=2000) setConfig({columnWidths:[...(cfg.columnWidths ?? []).filter((c: {propertyId: string}) => c.propertyId!==id),{propertyId:id,pixels}]}); }} />
+              </label>}
+            </li>;
+          })}
+        </ol>
       </fieldset>
       <div className="db-settings-row">
         {(["groupByPropertyId", "subgroupByPropertyId"] as const).map(

@@ -520,6 +520,37 @@ test("table creates record and edits its body title through the canonical page s
   ).toBe("page.update");
 });
 
+test("table property order and widths persist through view save and restart", async ({page}) => {
+  await page.getByRole("button", {name:"View settings",exact:true}).click();
+  await page.getByRole("button", {name:"Move When earlier",exact:true}).click();
+  await page.getByRole("button", {name:"Move When earlier",exact:true}).click();
+  await page.getByLabel("When column width",{exact:true}).fill("");
+  await page.getByLabel("When column width",{exact:true}).pressSequentially("310");
+  await page.getByRole("button", {name:"Save view",exact:true}).click();
+  await expect(page.locator(".db-table thead th").first()).toHaveText("When");
+  await expect.poll(async()=>Math.round((await page.locator(".db-table thead th").first().boundingBox())!.width)).toBe(310);
+  const state=await page.evaluate(()=>(window as any).dbState());
+  expect(state.views[0].query.visiblePropertyIds).toEqual([id(13),id(11),id(12)]);
+  expect(state.views[0].config.columnWidths).toContainEqual({propertyId:id(13),pixels:310});
+  await page.reload();
+  await page.getByRole("navigation",{name:"Workspace",exact:true}).getByRole("button",{name:/Pages$/}).click();
+  await expect(page.locator(".db-table thead th").first()).toHaveText("When");
+  await expect.poll(async()=>Math.round((await page.locator(".db-table thead th").first().boundingBox())!.width)).toBe(310);
+});
+
+test("calendar resizes a range using its end field and drag handle with guarded writes", async ({page}) => {
+  await page.getByRole("tab",{name:/Calendar$/}).click();
+  await page.getByLabel("Calendar month").fill("2026-10");
+  await page.getByLabel("Range end for Prepare prototype",{exact:true}).first().fill("2026-10-06");
+  const read=()=>page.evaluate(()=>(window as any).dbState().records[0].values.find((v:any)=>v.propertyId.endsWith("000000000013")).value);
+  await expect.poll(read).toEqual({start:"2026-09-30",end:"2026-10-06",timezone:"Asia/Kolkata",hasTime:false});
+  await page.getByRole("button",{name:"Resize end of Prepare prototype",exact:true}).dragTo(page.getByRole("gridcell",{name:"2026-10-09",exact:true}));
+  await expect.poll(read).toEqual({start:"2026-09-30",end:"2026-10-09",timezone:"Asia/Kolkata",hasTime:false});
+  const call=await page.evaluate(()=>(window as any).dbRequests.filter((r:any)=>r.method==="batch").at(-1));
+  expect(call.commands[0].kind).toBe("record.setValue");
+  expect(call.mutation.expectedRevisions.map((g:any)=>g.target.entityType).sort()).toEqual(["collection","page","property","record"]);
+});
+
 test("P2 chart traces rows and persists display configuration", async ({
   page,
 }) => {

@@ -112,11 +112,17 @@
   white-space: nowrap;
 }
 .db-table td {
-  min-width: 170px;
+  overflow-wrap: anywhere;
+  overflow: hidden;
   vertical-align: top;
   padding: 7px;
   border-top: 1px solid var(--line, #e4e3df);
 }
+.db-property-order { display: grid; gap: 8px; padding-left: 24px; }
+.db-property-order li { display: flex; gap: 8px; align-items: center; }
+.db-property-order li > span { min-width: 100px; }
+.db-property-order input { width: 90px; margin-left: 8px; }
+.db-range-handle { cursor: ew-resize; padding: 0 5px; }
 .db-table td input,
 .db-table td textarea,
 .db-table td select {
