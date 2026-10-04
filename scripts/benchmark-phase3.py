@@ -10,6 +10,8 @@ import shutil
 import subprocess
 import tempfile
 
+from devtools import build_env, cache_dir, go_binary, models_dir
+
 ROOT = Path(__file__).resolve().parents[1]
 
 
@@ -23,7 +25,7 @@ def sha(path):
 
 def inputs():
     paths = [ROOT / s for s in ['go.mod', 'go.sum', 'native/models/catalog.json',
-                               'scripts/benchmark-phase3.py', 'scripts/phase3-benchmark/main.go']]
+                               'scripts/benchmark-phase3.py', 'scripts/devtools.py', 'scripts/phase3-benchmark/main.go']]
     for directory in ['internal', 'contracts', 'schemas', 'native']:
         paths += [p for p in (ROOT / directory).rglob('*') if p.is_file() and not p.name.startswith('._')
                   and p.suffix in ('.go', '.json', '.sql', '.c', '.h', '.tmpl', '.cpp', '.hpp', '.swift') and not p.name.endswith('_test.go')]
@@ -34,11 +36,14 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--pages', default='100,1000,10000')
     parser.add_argument('--iterations', type=int, default=100)
-    parser.add_argument('--models', type=Path, default=Path('/private/tmp/trove-phase1-models'))
+    parser.add_argument('--cache', type=Path, default=cache_dir())
+    parser.add_argument('--models', type=Path, default=None)
     parser.add_argument('--native-bundle', type=Path, default=ROOT / 'build/native')
     parser.add_argument('--skip-hybrid', action='store_true')
     parser.add_argument('--output', type=Path, default=ROOT / 'evidence/phase3')
     args = parser.parse_args()
+    args.cache = cache_dir(args.cache)
+    args.models = models_dir(args.models, args.cache)
     args.output.mkdir(parents=True, exist_ok=True)
     failures = []
 
@@ -66,9 +71,8 @@ def main():
     shutil.copytree(args.native_bundle, snapshot, ignore=shutil.ignore_patterns('._*', '.DS_Store'))
     resource_hashes = {str(p.relative_to(snapshot)): sha(p) for p in sorted(snapshot.rglob('*')) if p.is_file()}
     result_path = args.output / 'benchmark-service.json'
-    go = shutil.which('go') or '/private/tmp/trove-phase0-tools/go/bin/go'
-    env = dict(os.environ, GOPROXY='off', GOTOOLCHAIN='local', GOCACHE='/private/tmp/trove-phase0-tools/go-cache',
-               GOMODCACHE='/private/tmp/trove-phase0-tools/go-mod')
+    go = go_binary(args.cache)
+    env = build_env(args.cache)
     command = [go, 'run', '-mod=readonly', '-tags', 'fts5 sqlite_omit_load_extension', './scripts/phase3-benchmark',
                '-pages', args.pages, '-iterations', str(args.iterations), '-models', str(args.models), '-bundle', str(snapshot), '-output', str(result_path)]
     if not args.skip_hybrid:

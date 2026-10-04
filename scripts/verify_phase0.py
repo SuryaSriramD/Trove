@@ -11,6 +11,8 @@ import subprocess
 import sys
 import unittest
 
+from devtools import build_env, cache_dir, go_binary
+
 ROOT=Path(__file__).resolve().parents[1]
 sys.path.insert(0,str(ROOT))
 class EvidenceResult(unittest.TextTestResult):
@@ -21,7 +23,7 @@ class EvidenceResult(unittest.TextTestResult):
  def addSkip(self,test,reason):super().addSkip(test,reason);self.details.append({'test':test.id(),'result':'skipped','reason':reason})
 def hashfile(p):return hashlib.sha256(p.read_bytes()).hexdigest()
 def main():
- parser=argparse.ArgumentParser(description=__doc__);parser.add_argument('--cache-dir',type=Path,default=Path('/private/tmp/trove-phase0-tools'));parser.add_argument('--fresh-baseline',action='store_true');args=parser.parse_args()
+ parser=argparse.ArgumentParser(description=__doc__);parser.add_argument('--cache-dir',type=Path,default=cache_dir());parser.add_argument('--fresh-baseline',action='store_true');args=parser.parse_args()
  os.chdir(ROOT)
  checks=[]
  def run(name,cmd,env=None):
@@ -35,12 +37,12 @@ def main():
   result=unittest.TextTestRunner(stream=output,verbosity=2,resultclass=EvidenceResult).run(suite)
  print(f'python contracts: {result.testsRun} tests, '+('passed' if result.wasSuccessful() else 'FAILED'))
  if not result.wasSuccessful():print((ROOT/'evidence/contract-tests.log').read_text()[-12000:])
- go=shutil.which('go') or args.cache_dir/'go/bin/go'
- env=dict(os.environ);env.update({'GOCACHE':str(args.cache_dir/'go-cache'),'GOMODCACHE':str(args.cache_dir/'go-mod'),'GOTOOLCHAIN':'local','GOPROXY':'off'})
+ go=go_binary(args.cache_dir)
+ env=build_env(args.cache_dir)
  run('go-contracts',[go,'test','-count=1','-v','./contracts'],env)
- tsc=shutil.which('tsc') or args.cache_dir/'frontend/node_modules/.bin/tsc'
+ tsc=ROOT/'frontend/node_modules/.bin/tsc'
  run('typescript-contracts',[tsc,'-p','contracts/tsconfig.json'])
- run('baseline-evidence',[sys.executable,'scripts/validate-baseline.py',* ([] if args.fresh_baseline else ['--check-evidence'])])
+ run('baseline-evidence',[sys.executable,'scripts/validate-baseline.py','--cache-dir',args.cache_dir,* ([] if args.fresh_baseline else ['--check-evidence'])])
  tracked=[ROOT/name for name in ('README.md','requirements-dev.txt','go.mod','go.sum')]
  for directory in ['contracts','schemas','scripts','tests','docs/phase-0']:
   tracked += [p for p in (ROOT/directory).rglob('*') if p.is_file() and not p.name.startswith('._') and '__pycache__' not in p.parts and p.suffix!='.pyc']

@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 """Build and run the locked Phase 0 probes; never imply release qualification.
 
-Use --fetch once to download verified tools/sources. Caches live in a temporary
-directory, never in a global toolchain installation. Default runs are offline.
+Use --fetch once to download verified tools/sources. Caches use the persistent developer cache, never a global toolchain install.
+Setup without qualification is scripts/bootstrap.py. Default runs are offline.
 """
 import argparse
 import datetime
@@ -17,6 +17,8 @@ import subprocess
 import sys
 import tarfile
 import urllib.request
+
+from devtools import build_env, cache_dir, workspace_cache
 
 ROOT = Path(__file__).resolve().parents[1]
 LOCK = json.loads((ROOT / "baseline/baseline.lock.json").read_text())
@@ -40,7 +42,7 @@ def digest(path):
 
 
 def inputs():
-    paths = [ROOT / "scripts/validate-baseline.py"]
+    paths = [ROOT / "scripts/validate-baseline.py", ROOT / "scripts/devtools.py"]
     paths += [p for p in (ROOT / "baseline").rglob("*") if p.is_file()
               and not p.name.startswith("._") and not any(x in p.parts for x in ("node_modules", "dist", "build"))]
     return {str(p.relative_to(ROOT)): digest(p) for p in sorted(paths)}
@@ -49,7 +51,7 @@ def inputs():
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--fetch", action="store_true", help="allow verified downloads and package installation")
-    parser.add_argument("--cache-dir", type=Path, default=Path("/private/tmp/trove-phase0-tools"))
+    parser.add_argument("--cache-dir", type=Path, default=cache_dir())
     parser.add_argument("--check-evidence", action="store_true", help="check recorded Phase 0 pass and input hashes; do not claim a fresh host run")
     parser.add_argument("--release", action="store_true", help="also enforce product release gates (currently unverified)")
     args = parser.parse_args()
@@ -66,9 +68,8 @@ def main():
     logdir = ROOT / "evidence/baseline-logs"
     logdir.mkdir(parents=True, exist_ok=True)
     checks = []
-    env = dict(os.environ)
-    env.update({"GOCACHE": str(cache / "go-cache"), "GOMODCACHE": str(cache / "go-mod"),
-                "GOTOOLCHAIN": "local", "CGO_ENABLED": "1", "GOFLAGS": ""})
+    env = build_env(cache, offline=not args.fetch)
+    env.update({"CGO_ENABLED": "1", "GOFLAGS": ""})
     if not args.fetch:
         env["GOPROXY"] = "off"
 
@@ -193,7 +194,7 @@ def main():
             if not source.exists():
                 extract(tar)
             verify_native_source(tar, source, name)
-            build = cache / (name + "-build")
+            build = workspace_cache(cache) / (name + "-baseline-build")
             options = ["-DCMAKE_BUILD_TYPE=Release", "-DCMAKE_OSX_ARCHITECTURES=arm64", "-DBUILD_SHARED_LIBS=OFF",
                        "-DGGML_METAL=ON", "-DGGML_METAL_EMBED_LIBRARY=ON"]
             if name == "llama":

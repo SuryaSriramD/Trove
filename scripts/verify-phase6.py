@@ -15,11 +15,15 @@ import time
 import uuid
 from urllib.request import urlopen
 
+from devtools import build_env, cache_dir, go_binary
+
 ROOT=Path(__file__).resolve().parents[1]
 parser=argparse.ArgumentParser(description=__doc__)
+parser.add_argument('--cache',type=Path,default=cache_dir())
 parser.add_argument('--app',type=Path,help='Build a P2 preview at a new unused path')
 parser.add_argument('--skip-browser',action='store_true')
 args=parser.parse_args()
+args.cache=cache_dir(args.cache)
 run_dir=ROOT/'evidence/phase6/runs'/(datetime.now(timezone.utc).strftime('%Y%m%dT%H%M%SZ')+'-'+uuid.uuid4().hex[:8])
 run_dir.mkdir(parents=True)
 checks=[]
@@ -33,8 +37,9 @@ inputs=fingerprint()
 env=dict(os.environ)
 for key in list(env):
  if key.startswith(('TROVE_','DYLD_')):env.pop(key)
-env.update(GOCACHE='/private/tmp/trove-phase0-tools/go-cache',GOMODCACHE='/private/tmp/trove-phase0-tools/go-mod',CGO_LDFLAGS='-framework UniformTypeIdentifiers',GOPROXY='off',GOSUMDB='off',GOTOOLCHAIN='local')
-go='/private/tmp/trove-phase0-tools/go/bin/go'
+env=build_env(args.cache,source=env)
+env.update(CGO_LDFLAGS='-framework UniformTypeIdentifiers',GOPROXY='off',GOSUMDB='off',GOTOOLCHAIN='local')
+go=go_binary(args.cache)
 node=shutil.which('node')
 def run(name,command,cwd=ROOT,extra=None):
  log=run_dir/(name+'.log');start=time.monotonic()
@@ -72,7 +77,7 @@ if not args.skip_browser:
 if args.app:
  app=args.app.resolve()
  if app.exists():checks.append({'name':'unused-package-destination','result':'failed','reason':'Existing candidates are never overwritten'})
- else:run('package',[sys.executable,ROOT/'scripts/build-desktop.py','--phase6','--output',app])
+ else:run('package',[sys.executable,ROOT/'scripts/build-desktop.py','--cache',args.cache,'--phase6','--output',app])
 else:run('frontend-build',[node,ROOT/'frontend/node_modules/vite/bin/vite.js','build'],ROOT/'frontend')
 run('host-build',[go,'build','-tags','fts5 sqlite_omit_load_extension','-o',run_dir/'trove-host','./cmd/trove-host'])
 run('host-journey',[sys.executable,ROOT/'scripts/verify-host.py','--host',run_dir/'trove-host','--output',run_dir/'host-journey.json'])

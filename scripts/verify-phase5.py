@@ -11,6 +11,8 @@ from pathlib import Path
 import sys
 import traceback
 
+from devtools import cache_dir, models_dir
+
 from phase5_policy import evaluate_families, PACKAGES, MODULE, INTEGRATION, WORKSPACE, OFFLINE_TESTS
 
 spec = importlib.util.spec_from_file_location('phase3_qualification', Path(__file__).with_name('verify-phase3.py'))
@@ -96,12 +98,13 @@ class Qualification(p0.Qualification):
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument('--models', type=Path, default=Path('/private/tmp/trove-phase1-models'))
-    parser.add_argument('--cache', type=Path, default=Path('/private/tmp/trove-phase0-tools'))
+    parser.add_argument('--models', type=Path, default=None)
+    parser.add_argument('--cache', type=Path, default=cache_dir())
     parser.add_argument('--app', type=Path, default=p0.ROOT / 'build/phase5-candidate/Trove.app')
     parser.add_argument('--port', type=int, default=0)
     args = parser.parse_args()
-    args.models, args.cache, args.app = args.models.resolve(), args.cache.resolve(), args.app.resolve()
+    args.cache = cache_dir(args.cache)
+    args.models, args.app = models_dir(args.models, args.cache), args.app.resolve()
     run = Qualification(args)
     try:
         run.execute()

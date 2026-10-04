@@ -13,12 +13,17 @@ import time
 import uuid
 from urllib.request import urlopen
 
+from devtools import build_env, cache_dir, go_binary, models_dir
+
 ROOT = Path(__file__).resolve().parents[1]
 p = argparse.ArgumentParser()
-p.add_argument('--models', type=Path, default=Path('/private/tmp/trove-phase1-models'))
+p.add_argument('--cache', type=Path, default=cache_dir())
+p.add_argument('--models', type=Path, default=None)
 p.add_argument('--skip-package', action='store_true')
 p.add_argument('--port', type=int, default=4173)
 args = p.parse_args()
+args.cache = cache_dir(args.cache)
+args.models = models_dir(args.models, args.cache)
 base_url = f'http://127.0.0.1:{args.port}'
 evidence = ROOT / 'evidence/phase2'
 evidence.mkdir(parents=True, exist_ok=True)
@@ -34,13 +39,11 @@ def fingerprint_inputs():
     return {str(p.relative_to(ROOT)): hashlib.sha256(p.read_bytes()).hexdigest() for p in sorted(set(paths)) if not p.name.startswith('._')}
 
 inputs = fingerprint_inputs()
-env = dict(os.environ)
-env.update(GOCACHE='/private/tmp/trove-phase0-tools/go-cache',
-           GOMODCACHE='/private/tmp/trove-phase0-tools/go-mod',
-           CGO_LDFLAGS='-framework UniformTypeIdentifiers',
+env = build_env(args.cache)
+env.update(CGO_LDFLAGS='-framework UniformTypeIdentifiers',
            TROVE_NATIVE_INTEGRATION='1', TROVE_LONG_AUDIO_INTEGRATION='1', TROVE_MODEL_ROOT=str(args.models),
            TROVE_BROWSER_REPORT=str(run_evidence / 'browser-results.json'), TROVE_TEST_URL=base_url)
-go = shutil.which('go') or '/private/tmp/trove-phase0-tools/go/bin/go'
+go = go_binary(args.cache)
 node = shutil.which('node') or 'node'
 checks = []
 tests = []
@@ -89,7 +92,7 @@ finally:
         server.terminate(); server.wait(timeout=10)
         server_log.close()
 if not args.skip_package:
-    if run('desktop-build', [sys.executable, 'scripts/build-desktop.py']):
+    if run('desktop-build', [sys.executable, 'scripts/build-desktop.py', '--cache', args.cache]):
         run('packaged-restart-native', [sys.executable, 'scripts/verify-packaged.py', '--models', args.models, '--native', '--evidence', run_evidence])
 final_inputs = fingerprint_inputs()
 changed = sorted(name for name in inputs.keys() | final_inputs.keys() if inputs.get(name) != final_inputs.get(name))

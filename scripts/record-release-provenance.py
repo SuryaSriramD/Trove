@@ -14,6 +14,8 @@ import re
 import shutil
 import subprocess
 
+from devtools import build_env, cache_dir, go_binary, models_dir
+
 ROOT = Path(__file__).resolve().parents[1]
 
 
@@ -41,16 +43,17 @@ def license_family(text):
 
 def main():
     p = argparse.ArgumentParser(description=__doc__)
-    p.add_argument('--cache', type=Path, default=Path('/private/tmp/trove-phase0-tools'))
-    p.add_argument('--models', type=Path, default=Path('/private/tmp/trove-phase1-models'))
+    p.add_argument('--cache', type=Path, default=cache_dir())
+    p.add_argument('--models', type=Path, default=None)
     p.add_argument('--output', type=Path, default=ROOT / 'evidence/phase3')
     args = p.parse_args()
+    args.cache = cache_dir(args.cache)
+    args.models = models_dir(args.models, args.cache)
     args.output.mkdir(parents=True, exist_ok=True)
     notices = args.output / 'notices'
     notices.mkdir(exist_ok=True)
-    env = dict(os.environ, GOPROXY='off', GOTOOLCHAIN='local',
-               GOCACHE=str(args.cache / 'go-cache'), GOMODCACHE=str(args.cache / 'go-mod'))
-    go = str(args.cache / 'go/bin/go') if (args.cache / 'go/bin/go').exists() else shutil.which('go')
+    env = build_env(args.cache)
+    go = go_binary(args.cache)
     warnings = []
 
     def retain(name, directory, recursive=False):

@@ -6,13 +6,16 @@ import json
 from pathlib import Path
 import subprocess
 
+from devtools import cache_dir
+
 ROOT = Path(__file__).resolve().parents[1]
 p = argparse.ArgumentParser()
 p.add_argument('--output', type=Path, default=ROOT / 'build/native')
+p.add_argument('--cache', type=Path, default=cache_dir())
 args = p.parse_args()
 args.output.mkdir(parents=True, exist_ok=True)
 out = args.output / 'document-extractor'
-subprocess.run(['swiftc', '-module-cache-path', '/private/tmp/trove-phase0-tools/swift-module-cache',
+subprocess.run(['swiftc', '-module-cache-path', str(cache_dir(args.cache) / 'swift-module-cache'),
                 '-swift-version', '5', '-O', '-target', 'arm64-apple-macos27.0',
                 '-framework', 'PDFKit', str(ROOT / 'native/document-extractor.swift'), '-o', str(out)], check=True)
 subprocess.run(['codesign', '--force', '--sign', '-', str(out)], check=True)

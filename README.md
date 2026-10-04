@@ -1,8 +1,8 @@
 # Trove
 
-[Phase 6 optional P2 packages](docs/phase-6/implementation.md) add charts, local forms, scoped row buttons, a traceable knowledge graph, bounded local OCR, scheduled reviewed digests, conversation-export import, persistent page display settings and an authenticated headless host. The implementation backlog, stable agent ownership and Phase 0 contract extensions are documented there. Run `/private/tmp/trove-phase0-venv/bin/python scripts/verify-phase6.py --app build/phase6-preview-next/Trove.app` to verify and package a fresh development preview. [Hosting and verified owner transfer](docs/phase-6/hosting.md) remain single-owner operations, without offline multi-device synchronization. The [Phase 6 qualification record](docs/phase-6/qualification.md) records the actual checks and limits.
+[Phase 6 optional P2 packages](docs/phase-6/implementation.md) add charts, local forms, scoped row buttons, a traceable knowledge graph, bounded local OCR, scheduled reviewed digests, conversation-export import, persistent page display settings and an authenticated headless host. The implementation backlog, stable agent ownership and Phase 0 contract extensions are documented there. Run `python scripts/verify-phase6.py --app build/phase6-preview-next/Trove.app` to verify and package a fresh development preview. [Hosting and verified owner transfer](docs/phase-6/hosting.md) remain single-owner operations, without offline multi-device synchronization. The [Phase 6 qualification record](docs/phase-6/qualification.md) records the actual checks and limits.
 
-The [Phase 5 P1 personal-use qualification](docs/phase-5/release.md) packages advanced editing/databases, migration/capture, local automation, expanded reviewed AI and paired local MCP as Trove 0.5.0. Build and qualify a new candidate with `/private/tmp/trove-phase0-venv/bin/python scripts/verify-phase5.py --app build/phase5-candidate-4/Trove.app`. This reruns affected P0 workflows, native models and packaged P1 restart/restore under OS network denial, with evidence organized by V01–V10. Use a new path for every run. Managed Claude Code/Codex and remote MCP remain disabled; live-account and native UI gaps remain explicit. See the [release assessment](docs/phase-5/qualification.md) for the recorded result and remaining approval gates. The [Phase 4 preview](docs/phase-4/implementation.md) and P0 evidence below remain historical checkpoints.
+The [Phase 5 P1 personal-use qualification](docs/phase-5/release.md) packages advanced editing/databases, migration/capture, local automation, expanded reviewed AI and paired local MCP as Trove 0.5.0. Build and qualify a new candidate with `python scripts/verify-phase5.py --app build/phase5-candidate-4/Trove.app`. This reruns affected P0 workflows, native models and packaged P1 restart/restore under OS network denial, with evidence organized by V01–V10. Use a new path for every run. Managed Claude Code/Codex and remote MCP remain disabled; live-account and native UI gaps remain explicit. See the [release assessment](docs/phase-5/qualification.md) for the recorded result and remaining approval gates. The [Phase 4 preview](docs/phase-4/implementation.md) and P0 evidence below remain historical checkpoints.
 
 Trove 0.3.0 is a P0 desktop release candidate for macOS 27 on Apple Silicon. It includes Notion/Markdown/CSV import, page and database editing, keyword and optional semantic search, local AI with reviewed changes and approved memory, recordings and transcription, and native backup/restore. It is built with Go, Wails 2, React/TypeScript, Tiptap and SQLite.
 
@@ -14,7 +14,7 @@ This candidate uses an ad-hoc signature. Developer ID signing/notarization and i
 
 ## Build and qualify the P0 candidate
 
-The following tools are needed only to build or test from source. Provision the pinned toolchain/cache described below, install `frontend/pnpm-lock.yaml` with `pnpm install --frozen-lockfile` in `frontend/`, and acquire the explicit qualification model packs. Then run:
+The following tools are needed only to build or test from source. Complete the developer setup below, then build the native helpers and acquire the explicit qualification model packs. Then run:
 
 ```sh
 python3 scripts/build-native.py
@@ -47,23 +47,41 @@ The source of truth is `contracts/*.schema.json`, `contracts/registries.json` an
 
 ## Verify
 
-Use Python 3.12+, the pinned toolchain from the baseline and a local virtual environment. The virtual environment/cache can live outside this checkout; this is faster on removable volumes.
+Use Python 3.12+ and the Node, pnpm, CMake and Xcode versions in [the baseline lock](baseline/baseline.lock.json). The first target is macOS 27 on Apple Silicon. Windows and Linux require their own toolchain and release qualification.
 
 ```sh
-python3 -m venv /tmp/trove-phase0-venv
-/tmp/trove-phase0-venv/bin/python -m pip install -r requirements-dev.txt
-/tmp/trove-phase0-venv/bin/python scripts/extract_requirements.py
-/tmp/trove-phase0-venv/bin/python scripts/validate-baseline.py --fetch
-/tmp/trove-phase0-venv/bin/python scripts/verify_phase0.py
+# Read-only inventory; reports missing prerequisites without modifying evidence.
+python3.12 scripts/doctor.py
+
+# Explicitly allow pinned dependency downloads. Chromium is optional unless
+# running browser tests. Model weights are never downloaded by bootstrap.
+python3.12 scripts/bootstrap.py --fetch --browser
+source "$(python3.12 scripts/bootstrap.py --print-venv)/bin/activate"
+python scripts/doctor.py
 ```
 
-The baseline bootstrap downloads pinned dependencies into `/private/tmp/trove-phase0-tools`; it needs Node/pnpm/CMake/Xcode as documented. The root Go validator dependency is pinned by `go.mod` and `go.sum`; bootstrap it with `go mod download` using the same Go cache if absent. The complete command using that toolchain is:
+The cache defaults to `~/Library/Caches/Trove` on macOS, `$XDG_CACHE_HOME/trove` (or `~/.cache/trove`) on Linux, and `%LOCALAPPDATA%/Trove/Cache` on Windows. Set `TROVE_CACHE_DIR` before setup to select another persistent local disk; this avoids slow metadata operations on removable volumes. `--cache` (or `--cache-dir` on the Phase 0 commands) overrides the environment. Paths containing spaces are supported. Existing `.venv` directories and historical qualification evidence are preserved.
+
+Bootstrap installs exact Python requirements into a dedicated cache environment, verifies downloaded Go/native archives against the baseline lock, downloads the pinned Go modules, and installs both frontend lockfiles. It repairs a dangling `node_modules` link by removing only the link; it refuses to modify dependencies through a live link to another checkout. Use `--seed-cache /path/to/old/cache` to reuse verified archives, or `--components python go frontend native` to select portions of setup. Omitting `--fetch` requires already cached archives, packages and Python wheels and does not permit network downloads. Go and native archive setup currently enforce the committed macOS arm64 target.
+
+`GOCACHE`, `GOMODCACHE` and `PLAYWRIGHT_BROWSERS_PATH` can point at existing persistent caches. Native CMake build directories are isolated per checkout/worktree; source archives and package stores may be shared. Avoid running bootstrap simultaneously against the same cache. Every worktree should install its own frontend dependencies with the shared pnpm store. Setup prepares dependencies only; it does not compile native helpers, install models, generate contracts or record release qualification.
+
+If `go mod verify` reports modified directories in an external-volume cache, select a fresh local `GOMODCACHE` and rerun setup. Filesystem metadata sidecars can cause this failure; do not bypass checksum verification or treat an unverified extracted toolchain as reusable. The `--seed-cache` option reuses archives only after checking their pinned hash.
 
 ```sh
-PATH=/private/tmp/trove-phase0-tools/go/bin:$PATH \
-GOCACHE=/private/tmp/trove-phase0-tools/go-cache \
-GOMODCACHE=/private/tmp/trove-phase0-tools/go-mod go mod download
+# With the generated Python environment activated:
+python scripts/build-native.py
+python scripts/build-desktop.py
+
+# Explicit, separate qualification-model download:
+python scripts/acquire-test-models.py
+# TROVE_MODELS_DIR or each command's --models/--root overrides <cache>/models.
+
+# Run gates only when intentionally refreshing qualification evidence:
+python scripts/verify_phase0.py
 ```
+
+`validate-baseline.py --fetch` remains a native qualification command that writes evidence; it is not the setup command. New tooling/source changes invalidate older source-bound baseline records. Refresh baseline qualification explicitly with `verify_phase0.py --fresh-baseline` when ready, and review the resulting evidence separately from setup. Model and browser checks in `doctor.py` are optional inventory checks; their presence alone does not establish hash verification, inference quality or release approval.
 
 `verify_phase0.py` runs contract/domain/persistence/ledger tests, compiles Go and TypeScript consumers and verifies that recorded native evidence still matches source and log hashes. Add `--fresh-baseline` to rerun native probes. It writes [verification evidence](evidence/phase0-verification.json). Native evidence distinguishes compilation/capability probes from future installer and model-inference tests.
 

@@ -23,6 +23,8 @@ import traceback
 import uuid
 from urllib.request import urlopen
 
+from devtools import build_env, cache_dir, go_binary, models_dir
+
 ROOT = Path(__file__).resolve().parents[1]
 TAGS = 'desktop production fts5 sqlite_omit_load_extension'
 OFFLINE = ['/usr/bin/sandbox-exec', '-p', '(version 1)(allow default)(deny network*)']
@@ -105,15 +107,15 @@ class Qualification:
         self.bundle_before = {}
         self.bundle_after = {}
         self.interrupted = False
-        self.go = str(args.cache / 'go/bin/go') if (args.cache / 'go/bin/go').is_file() else shutil.which('go')
+        self.go = go_binary(args.cache)
         self.node = shutil.which('node')
         self.env = dict(os.environ)
         # Ambient integration flags must not change the non-native test phase.
         for key in list(self.env):
             if key.startswith(('TROVE_', 'DYLD_')):
                 self.env.pop(key)
-        self.env.update(GOCACHE=str(args.cache / 'go-cache'), GOMODCACHE=str(args.cache / 'go-mod'),
-                        GOPROXY='off', GOSUMDB='off', GOTOOLCHAIN='local', CGO_ENABLED='1',
+        self.env = build_env(args.cache, source=self.env)
+        self.env.update(GOPROXY='off', GOSUMDB='off', GOTOOLCHAIN='local', CGO_ENABLED='1',
                         CGO_LDFLAGS='-framework UniformTypeIdentifiers')
 
     def path(self, path):
@@ -290,7 +292,7 @@ class Qualification:
         if self.args.app.exists():
             self.record('candidate-path-still-unused', False, reason='Candidate appeared during qualification; refusing to overwrite it.')
             return
-        if not self.command('desktop-build', [sys.executable, ROOT / 'scripts/build-desktop.py', *self.BUILD_OPTIONS, '--output', self.args.app,
+        if not self.command('desktop-build', [sys.executable, ROOT / 'scripts/build-desktop.py', '--cache', self.args.cache, *self.BUILD_OPTIONS, '--output', self.args.app,
                                              '--release-notices', notices], timeout=1200):
             return
         self.bundle_before = tree_fingerprint(self.args.app)
@@ -406,13 +408,14 @@ class Qualification:
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument('--models', type=Path, default=Path('/private/tmp/trove-phase1-models'))
-    parser.add_argument('--cache', type=Path, default=Path('/private/tmp/trove-phase0-tools'))
+    parser.add_argument('--models', type=Path, default=None)
+    parser.add_argument('--cache', type=Path, default=cache_dir())
     parser.add_argument('--app', type=Path, default=ROOT / 'build/phase3-candidate/Trove.app',
                         help='Unused immutable candidate path; existing apps are never overwritten')
     parser.add_argument('--port', type=int, default=0, help='Unique Vite port; 0 selects an unused ephemeral port')
     args = parser.parse_args()
-    args.models, args.cache, args.app = args.models.resolve(), args.cache.resolve(), args.app.resolve()
+    args.cache = cache_dir(args.cache)
+    args.models, args.app = models_dir(args.models, args.cache), args.app.resolve()
     qualification = Qualification(args)
     try:
         qualification.execute()

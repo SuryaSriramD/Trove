@@ -1,8 +1,10 @@
 #!/usr/bin/env python3
 """Explicit, SHA-pinned qualification download. Models are never application-bundled."""
 import argparse,hashlib,json,pathlib,urllib.request,shutil,concurrent.futures
+from devtools import cache_dir, models_dir
+
 ROOT=pathlib.Path(__file__).resolve().parents[1]
-p=argparse.ArgumentParser();p.add_argument('--root',type=pathlib.Path,default=pathlib.Path('/private/tmp/trove-phase1-models'));a=p.parse_args();a.root.mkdir(parents=True,exist_ok=True)
+p=argparse.ArgumentParser();p.add_argument('--cache',type=pathlib.Path,default=cache_dir());p.add_argument('--root',type=pathlib.Path,default=None);a=p.parse_args();a.root=models_dir(a.root,a.cache);a.root.mkdir(parents=True,exist_ok=True)
 def acquire(pack):
  final=a.root/(pack['id']+'.model');part=final.with_suffix('.download')
  if final.exists() and hashlib.sha256(final.read_bytes()).hexdigest()==pack['sha256']:

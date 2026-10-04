@@ -12,9 +12,14 @@ from pathlib import Path
 import plistlib
 import shutil
 import subprocess
+import sys
+
+from devtools import build_env, cache_dir, go_binary
 
 ROOT = Path(__file__).resolve().parents[1]
 parser = argparse.ArgumentParser()
+parser.add_argument('--cache', type=Path, default=cache_dir())
+parser.add_argument('--native-bundle', type=Path, default=ROOT / 'build/native')
 parser.add_argument('--skip-frontend', action='store_true')
 parser.add_argument('--phase4', action='store_true', help='Build the P1 development preview and paired MCP relay')
 parser.add_argument('--phase6', action='store_true', help='Build optional P2 packages, host and OCR helper')
@@ -28,10 +33,9 @@ if (args.phase5 or args.phase6) and args.output.exists():
     parser.error('P1 candidates are immutable; choose an unused output path')
 if args.phase5 and not args.release_notices:
     parser.error('P1 candidates require --release-notices from the provenance inventory')
-env = os.environ.copy()
-go = shutil.which('go') or '/private/tmp/trove-phase0-tools/go/bin/go'
-env.setdefault('GOCACHE', '/private/tmp/trove-phase0-tools/go-cache')
-env.setdefault('GOMODCACHE', '/private/tmp/trove-phase0-tools/go-mod')
+args.cache = cache_dir(args.cache)
+env = build_env(args.cache)
+go = go_binary(args.cache)
 env['CGO_ENABLED'] = '1'
 env['GOOS'], env['GOARCH'] = 'darwin', 'arm64'
 env['CGO_LDFLAGS'] = '-framework UniformTypeIdentifiers'
@@ -45,12 +49,12 @@ if not args.skip_frontend:
     # Install frontend/pnpm-lock.yaml first if these executables are absent.
     run([ROOT / 'frontend/node_modules/.bin/tsc', '--noEmit'], ROOT / 'frontend')
     run([ROOT / 'frontend/node_modules/.bin/vite', 'build'], ROOT / 'frontend')
-native = ROOT / 'build' / 'native'
+native = args.native_bundle.resolve()
 if not (native / 'manifest.json').exists():
     raise SystemExit('Build native helpers first: python scripts/build-native.py')
-run([shutil.which('python3') or 'python3', ROOT / 'scripts/build-document-extractor.py'])
+run([sys.executable, ROOT / 'scripts/build-document-extractor.py', '--cache', args.cache, '--output', native])
 if args.phase6:
-    run([shutil.which('python3') or 'python3', ROOT / 'scripts/build-ocr-worker.py'])
+    run([sys.executable, ROOT / 'scripts/build-ocr-worker.py', '--cache', args.cache, '--output', native])
 shutil.copytree(ROOT / 'native/models', native / 'models', dirs_exist_ok=True)
 contents = args.output / 'Contents'
 (contents / 'MacOS').mkdir(parents=True, exist_ok=True)
