@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import {
   batch,
   fileURL,
@@ -6,11 +6,13 @@ import {
   envelope,
   ids,
   pageGuards,
+  readRecord,
   type D,
   type WorkspaceSnapshot,
 } from "../api";
 import { guard, saveView, uniqueGuards } from "./service";
 import { displayValue, valueOf } from "./model";
+import { VirtualRows } from "./VirtualRows";
 
 export type DerivedCell = {
   propertyId: string;
@@ -75,6 +77,7 @@ export function Gallery({
   pages,
   files,
   openPage,
+  virtualIdentity,
 }: {
   records: D.Record[];
   view: D.View;
@@ -82,56 +85,100 @@ export function Gallery({
   pages: D.Page[];
   files: D.File[];
   openPage: (id: string) => void;
+  virtualIdentity?: string;
 }) {
   const cfg = view.config as {
     cardSize: string;
     coverPropertyId: string | null;
   };
+  const gallery = useRef<HTMLDivElement>(null);
+  const [galleryWidth, setGalleryWidth] = useState(600);
+  useEffect(() => {
+    const element = gallery.current;
+    if (!element) return;
+    const observer = new ResizeObserver(() =>
+      setGalleryWidth(element.clientWidth),
+    );
+    observer.observe(element);
+    return () => observer.disconnect();
+  }, [virtualIdentity]);
+  const columns = Math.max(
+    1,
+    Math.floor(
+      (galleryWidth + 16) /
+        ((cfg.cardSize === "small"
+          ? 180
+          : cfg.cardSize === "large"
+            ? 320
+            : 240) +
+          16),
+    ),
+  );
+  const card = (r: D.Record) => (
+    <article key={r.id} className="db-gallery-card">
+      {cfg.coverPropertyId &&
+        (() => {
+          const cover = (
+            valueOf(r, cfg.coverPropertyId) as { fileId: string }[] | null
+          )?.find((value) =>
+            files
+              .find((file) => file.id === value.fileId)
+              ?.mediaType.startsWith("image/"),
+          );
+          return cover ? (
+            <img
+              className="db-gallery-cover"
+              src={fileURL(cover.fileId)}
+              alt=""
+              loading="lazy"
+            />
+          ) : null;
+        })()}
+      <button className="db-gallery-title" onClick={() => openPage(r.pageId)}>
+        {pages.find((p) => p.id === r.pageId)?.title ?? "Untitled"}
+      </button>
+      {properties
+        .filter(
+          (p) =>
+            p.type !== "title" && view.query.visiblePropertyIds.includes(p.id),
+        )
+        .map((p) => (
+          <div key={p.id}>
+            <small>{p.name}</small>
+            <p>{displayValue(valueOf(r, p.id), p, pages) || "—"}</p>
+          </div>
+        ))}
+    </article>
+  );
+  if (virtualIdentity)
+    return (
+      <div ref={gallery}>
+        <VirtualRows
+          count={Math.ceil(records.length / columns)}
+          identity={`${virtualIdentity}:${columns}`}
+          estimate={280}
+          renderRow={(index) => (
+            <div
+              className="db-gallery-window-row"
+              style={{
+                gridTemplateColumns: `repeat(${columns},minmax(0,1fr))`,
+              }}
+            >
+              {records
+                .slice(index * columns, index * columns + columns)
+                .map(card)}
+            </div>
+          )}
+        />
+      </div>
+    );
   return (
     <div className={`db-gallery db-gallery-${cfg.cardSize}`}>
-      {records.map((r) => (
-        <article key={r.id} className="db-gallery-card">
-          {cfg.coverPropertyId &&
-            (() => {
-              const values = valueOf(r, cfg.coverPropertyId) as
-                { fileId: string }[] | null;
-              const cover = values?.find((v) =>
-                files
-                  .find((f) => f.id === v.fileId)
-                  ?.mediaType.startsWith("image/"),
-              );
-              return cover ? (
-                <img
-                  className="db-gallery-cover"
-                  src={fileURL(cover.fileId)}
-                  alt=""
-                  loading="lazy"
-                />
-              ) : null;
-            })()}
-          <button
-            className="db-gallery-title"
-            onClick={() => openPage(r.pageId)}
-          >
-            {pages.find((p) => p.id === r.pageId)?.title ?? "Untitled"}
-          </button>
-          {properties
-            .filter(
-              (p) =>
-                p.type !== "title" &&
-                view.query.visiblePropertyIds.includes(p.id),
-            )
-            .map((p) => (
-              <div key={p.id}>
-                <small>{p.name}</small>
-                <p>{displayValue(valueOf(r, p.id), p, pages) || "—"}</p>
-              </div>
-            ))}
-        </article>
-      ))}
+      {records.map(card)}
     </div>
   );
 }
+
 export function Timeline({
   records,
   view,
@@ -206,6 +253,7 @@ export function AdvancedDatabasePanel({
   onError: (e: unknown) => void;
 }) {
   const [state, setState] = useState<DatabaseState>();
+  const [expanded, setExpanded] = useState(false);
   const [busy, setBusy] = useState(false);
   const [recordId, setRecordId] = useState("");
   const [parent, setParent] = useState("");
@@ -214,6 +262,7 @@ export function AdvancedDatabasePanel({
   const [template, setTemplate] = useState("");
   useEffect(() => {
     let live = true;
+    if (!expanded) return;
     dispatch<DatabaseState>("databaseDerived", {
       ...envelope(w),
       collectionId: collection.id,
@@ -225,7 +274,7 @@ export function AdvancedDatabasePanel({
     return () => {
       live = false;
     };
-  }, [w.snapshotCursor, collection.id]);
+  }, [w.snapshotCursor, collection.id, expanded]);
   const run = async (action: () => Promise<unknown>) => {
     setBusy(true);
     try {
@@ -237,261 +286,281 @@ export function AdvancedDatabasePanel({
       setBusy(false);
     }
   };
-  const title = (r: D.Record) =>
-    w.pages.find((p) => p.id === r.pageId)?.title ?? "Untitled";
+  const pageTitles = useMemo(
+    () => new Map(w.pages.map((page) => [page.id, page.title])),
+    [w.pages],
+  );
+  const title = (r: D.Record) => pageTitles.get(r.pageId) ?? "Untitled";
   const choose = (id: string) => {
     setRecordId(id);
     setParent(state?.structure[id]?.parentRecordId ?? "");
     setDeps(state?.structure[id]?.dependencyRecordIds ?? []);
   };
   return (
-    <details className="db-panel db-advanced">
+    <details
+      className="db-panel db-advanced"
+      onToggle={(event) => setExpanded(event.currentTarget.open)}
+    >
       <summary>
         Database structure, linked views and templates{" "}
         {state?.locked ? "· Locked" : ""}
       </summary>
-      <p>
-        <button
-          disabled={busy}
-          onClick={() =>
-            void run(() =>
-              batch(
-                w,
-                [
-                  {
-                    kind: "collection.configure",
-                    collectionId: collection.id,
-                    locked: !state?.locked,
-                  },
-                ],
-                [guard("collection", collection.id, collection.revision)],
-              ),
-            )
-          }
-        >
-          {state?.locked ? "Unlock database" : "Lock database"}
-        </button>{" "}
-        <small>A locked database rejects record and schema changes.</small>
-      </p>
-      <fieldset disabled={busy || state?.locked}>
-        <legend>Sub-items and dependencies</legend>
-        <label>
-          Record{" "}
-          <select value={recordId} onChange={(e) => choose(e.target.value)}>
-            <option value="">Choose a record</option>
-            {records.map((r) => (
-              <option value={r.id} key={r.id}>
-                {title(r)}
-              </option>
-            ))}
-          </select>
-        </label>
-        <label>
-          Parent{" "}
-          <select value={parent} onChange={(e) => setParent(e.target.value)}>
-            <option value="">No parent</option>
-            {records
-              .filter((r) => r.id !== recordId)
-              .map((r) => (
-                <option value={r.id} key={r.id}>
-                  {title(r)}
-                </option>
-              ))}
-          </select>
-        </label>
-        <label>
-          Depends on{" "}
-          <select
-            multiple
-            value={deps}
-            onChange={(e) =>
-              setDeps([...e.target.selectedOptions].map((o) => o.value))
-            }
-          >
-            {records
-              .filter((r) => r.id !== recordId)
-              .map((r) => (
-                <option value={r.id} key={r.id}>
-                  {title(r)}
-                </option>
-              ))}
-          </select>
-        </label>
-        <button
-          disabled={!recordId}
-          onClick={() =>
-            void run(async () => {
-              const r = records.find((r) => r.id === recordId)!;
-              const p = w.pages.find((p) => p.id === r.pageId)!;
-              return batch(
-                w,
-                [
-                  {
-                    kind: "record.configure",
-                    recordId,
-                    parentRecordId: parent || null,
-                    dependencyRecordIds: deps,
-                  },
-                ],
-                uniqueGuards([
-                  ...pageGuards(w, p),
-                  ...[parent, ...deps]
-                    .filter(Boolean)
-                    .map((id) =>
-                      guard(
-                        "record",
-                        id,
-                        w.records.find((r) => r.id === id)!.revision,
-                      ),
-                    ),
-                ]),
-              );
-            })
-          }
-        >
-          Save structure
-        </button>
-      </fieldset>
-      {view && (
-        <fieldset disabled={busy}>
-          <legend>Linked view</legend>
-          <label>
-            Show this collection on page{" "}
-            <select
-              value={destination}
-              onChange={(e) => setDestination(e.target.value)}
+      {expanded && (
+        <>
+          <p>
+            <button
+              disabled={busy}
+              onClick={() =>
+                void run(() =>
+                  batch(
+                    w,
+                    [
+                      {
+                        kind: "collection.configure",
+                        collectionId: collection.id,
+                        locked: !state?.locked,
+                      },
+                    ],
+                    [guard("collection", collection.id, collection.revision)],
+                  ),
+                )
+              }
             >
-              <option value="">Choose a page</option>
-              {w.pages
-                .filter((p) => !p.deletedAt)
-                .map((p) => (
-                  <option key={p.id} value={p.id}>
-                    {p.title}
+              {state?.locked ? "Unlock database" : "Lock database"}
+            </button>{" "}
+            <small>A locked database rejects record and schema changes.</small>
+          </p>
+          <fieldset disabled={busy || state?.locked}>
+            <legend>Sub-items and dependencies</legend>
+            <label>
+              Record{" "}
+              <select value={recordId} onChange={(e) => choose(e.target.value)}>
+                <option value="">Choose a record</option>
+                {records.map((r) => (
+                  <option value={r.id} key={r.id}>
+                    {title(r)}
                   </option>
                 ))}
-            </select>
-          </label>
-          <button
-            disabled={!destination}
-            onClick={() =>
-              void run(async () => {
-                const [id] = await ids(w, 1);
-                await saveView(w, {
-                  ...view,
-                  id,
-                  owningPageId: destination,
-                  name: `${view.name} · linked`,
-                  revision: undefined,
-                });
-              })
-            }
-          >
-            Create linked view
-          </button>
-          <small>All linked views read and edit the same records.</small>
-        </fieldset>
-      )}
-      <fieldset disabled={busy || state?.locked}>
-        <legend>Record templates</legend>
-        <label>
-          Use record as a template{" "}
-          <select
-            value={template}
-            onChange={(e) => setTemplate(e.target.value)}
-          >
-            <option value="">Choose a record</option>
-            {records.map((r) => (
-              <option key={r.id} value={r.id}>
-                {title(r)}
-              </option>
-            ))}
-          </select>
-        </label>
-        <button
-          disabled={!template}
-          onClick={() =>
-            void run(async () => {
-              const source = records.find((r) => r.id === template)!;
-              const name = prompt("New record title", `${title(source)} copy`);
-              if (!name) return;
-              const [recordId, pageId] = await ids(w, 2);
-              const editable = new Set(
-                w.properties
-                  .filter(
-                    (p) =>
-                      p.collectionId === collection.id &&
-                      ![
-                        "title",
-                        "formula",
-                        "rollup",
-                        "created_time",
-                        "last_edited_time",
-                        "unique_id",
-                      ].includes(p.type),
-                  )
-                  .map((p) => p.id),
-              );
-              const vals = source.values.filter((v) =>
-                editable.has(v.propertyId),
-              );
-              const guards = uniqueGuards([
-                guard("collection", collection.id, collection.revision),
-                guard("record", recordId, "0"),
-                guard("page", pageId, "0"),
-                ...vals.map((v) =>
-                  guard(
-                    "property",
-                    v.propertyId,
-                    w.properties.find((p) => p.id === v.propertyId)!.revision,
-                  ),
-                ),
-                ...vals.flatMap((v) =>
-                  w.properties.find((p) => p.id === v.propertyId)?.type ===
-                  "relation"
-                    ? (v.value as string[]).map((id) =>
-                        guard(
-                          "record",
-                          id,
-                          w.records.find((r) => r.id === id)!.revision,
+              </select>
+            </label>
+            <label>
+              Parent{" "}
+              <select
+                value={parent}
+                onChange={(e) => setParent(e.target.value)}
+              >
+                <option value="">No parent</option>
+                {records
+                  .filter((r) => r.id !== recordId)
+                  .map((r) => (
+                    <option value={r.id} key={r.id}>
+                      {title(r)}
+                    </option>
+                  ))}
+              </select>
+            </label>
+            <label>
+              Depends on{" "}
+              <select
+                multiple
+                value={deps}
+                onChange={(e) =>
+                  setDeps([...e.target.selectedOptions].map((o) => o.value))
+                }
+              >
+                {records
+                  .filter((r) => r.id !== recordId)
+                  .map((r) => (
+                    <option value={r.id} key={r.id}>
+                      {title(r)}
+                    </option>
+                  ))}
+              </select>
+            </label>
+            <button
+              disabled={!recordId}
+              onClick={() =>
+                void run(async () => {
+                  const r = records.find((r) => r.id === recordId)!;
+                  const p = w.pages.find((p) => p.id === r.pageId)!;
+                  return batch(
+                    w,
+                    [
+                      {
+                        kind: "record.configure",
+                        recordId,
+                        parentRecordId: parent || null,
+                        dependencyRecordIds: deps,
+                      },
+                    ],
+                    uniqueGuards([
+                      ...pageGuards(w, p),
+                      ...[parent, ...deps]
+                        .filter(Boolean)
+                        .map((id) =>
+                          guard(
+                            "record",
+                            id,
+                            w.records.find((r) => r.id === id)!.revision,
+                          ),
                         ),
+                    ]),
+                  );
+                })
+              }
+            >
+              Save structure
+            </button>
+          </fieldset>
+          {view && (
+            <fieldset disabled={busy}>
+              <legend>Linked view</legend>
+              <label>
+                Show this collection on page{" "}
+                <select
+                  value={destination}
+                  onChange={(e) => setDestination(e.target.value)}
+                >
+                  <option value="">Choose a page</option>
+                  {w.pages
+                    .filter((p) => !p.deletedAt)
+                    .map((p) => (
+                      <option key={p.id} value={p.id}>
+                        {p.title}
+                      </option>
+                    ))}
+                </select>
+              </label>
+              <button
+                disabled={!destination}
+                onClick={() =>
+                  void run(async () => {
+                    const [id] = await ids(w, 1);
+                    await saveView(w, {
+                      ...view,
+                      id,
+                      owningPageId: destination,
+                      name: `${view.name} · linked`,
+                      revision: undefined,
+                    });
+                  })
+                }
+              >
+                Create linked view
+              </button>
+              <small>All linked views read and edit the same records.</small>
+            </fieldset>
+          )}
+          <fieldset disabled={busy || state?.locked}>
+            <legend>Record templates</legend>
+            <label>
+              Use record as a template{" "}
+              <select
+                value={template}
+                onChange={(e) => setTemplate(e.target.value)}
+              >
+                <option value="">Choose a record</option>
+                {records.map((r) => (
+                  <option key={r.id} value={r.id}>
+                    {title(r)}
+                  </option>
+                ))}
+              </select>
+            </label>
+            <button
+              disabled={!template}
+              onClick={() =>
+                void run(async () => {
+                  const source =
+                    w.contentMode === "shell"
+                      ? await readRecord(w, template)
+                      : records.find((r) => r.id === template)!;
+                  const name = prompt(
+                    "New record title",
+                    `${title(source)} copy`,
+                  );
+                  if (!name) return;
+                  const [recordId, pageId] = await ids(w, 2);
+                  const editable = new Set(
+                    w.properties
+                      .filter(
+                        (p) =>
+                          p.collectionId === collection.id &&
+                          ![
+                            "title",
+                            "formula",
+                            "rollup",
+                            "created_time",
+                            "last_edited_time",
+                            "unique_id",
+                          ].includes(p.type),
                       )
-                    : [],
-                ),
-              ]);
-              await batch(
-                w,
-                [
-                  {
-                    kind: "record.create",
-                    recordId,
-                    pageId,
-                    collectionId: collection.id,
-                    title: name,
-                  },
-                  ...vals.map((v) => ({
-                    kind: "record.setValue" as const,
-                    recordId,
-                    propertyId: v.propertyId,
-                    value: {
-                      type: w.properties.find((p) => p.id === v.propertyId)!
-                        .type,
-                      schemaVersion: v.schemaVersion,
-                      value: v.value,
-                    },
-                  })),
-                ],
-                guards,
-              );
-            })
-          }
-        >
-          Create from template
-        </button>
-        <small>
-          Copies editable property values; the new record has its own identity
-          and page.
-        </small>
-      </fieldset>
+                      .map((p) => p.id),
+                  );
+                  const vals = source.values.filter((v) =>
+                    editable.has(v.propertyId),
+                  );
+                  const guards = uniqueGuards([
+                    guard("collection", collection.id, collection.revision),
+                    guard("record", recordId, "0"),
+                    guard("page", pageId, "0"),
+                    ...vals.map((v) =>
+                      guard(
+                        "property",
+                        v.propertyId,
+                        w.properties.find((p) => p.id === v.propertyId)!
+                          .revision,
+                      ),
+                    ),
+                    ...vals.flatMap((v) =>
+                      w.properties.find((p) => p.id === v.propertyId)?.type ===
+                      "relation"
+                        ? (v.value as string[]).map((id) =>
+                            guard(
+                              "record",
+                              id,
+                              w.records.find((r) => r.id === id)!.revision,
+                            ),
+                          )
+                        : [],
+                    ),
+                  ]);
+                  await batch(
+                    w,
+                    [
+                      {
+                        kind: "record.create",
+                        recordId,
+                        pageId,
+                        collectionId: collection.id,
+                        title: name,
+                      },
+                      ...vals.map((v) => ({
+                        kind: "record.setValue" as const,
+                        recordId,
+                        propertyId: v.propertyId,
+                        value: {
+                          type: w.properties.find((p) => p.id === v.propertyId)!
+                            .type,
+                          schemaVersion: v.schemaVersion,
+                          value: v.value,
+                        },
+                      })),
+                    ],
+                    guards,
+                  );
+                })
+              }
+            >
+              Create from template
+            </button>
+            <small>
+              Copies editable property values; the new record has its own
+              identity and page.
+            </small>
+          </fieldset>
+        </>
+      )}
     </details>
   );
 }

@@ -16,6 +16,7 @@ import {
   defaultQuery,
   guard,
   loadRecords,
+  loadRecordPage,
   saveView,
   setProperty,
   uniqueGuards,
@@ -30,6 +31,7 @@ import {
   type RecordGroup,
 } from "./model";
 import "./database.css";
+import { VirtualRows } from "./VirtualRows";
 import { calendarDay, resizeDateRange } from "./dateRange";
 import { P2DatabasePanel, P2RowButtons } from "./P2Database";
 import type { P2Button, P2Config } from "./P2Model";
@@ -74,6 +76,13 @@ export default function DatabaseView({
   const [selected, setSelected] = useState(collectionId ?? "");
   const [active, setActive] = useState("");
   const [records, setRecords] = useState<D.Record[]>([]);
+  const [pager, setPager] = useState<{
+    key: string;
+    index: number;
+    history: string[];
+  }>({ key: "", index: 0, history: [""] });
+  const [nextCursor, setNextCursor] = useState<string>();
+  const [loadError, setLoadError] = useState("");
   const [clockTick, setClockTick] = useState(0);
   useEffect(() => {
     const timer = setInterval(() => setClockTick((x) => x + 1), 60000);
@@ -100,6 +109,13 @@ export default function DatabaseView({
       (!owningPageId || v.owningPageId === owningPageId),
   );
   const view = views.find((v) => v.id === active) ?? views[0];
+  const windowed =
+    (!view || view.type === "table" || view.type === "gallery") &&
+    !view?.query.groupByPropertyId &&
+    !view?.query.subgroupByPropertyId;
+  const queryKey = `${w.workspaceId}:${w.snapshotCursor}:${clockTick}:${collection?.id}:${collection?.revision}:${view?.id}:${view?.revision}`;
+  const pageIndex = pager.key === queryKey ? pager.index : 0;
+  const pageHistory = pager.key === queryKey ? pager.history : [""];
   useEffect(() => {
     if (collectionId) setSelected(collectionId);
   }, [collectionId]);
@@ -110,25 +126,39 @@ export default function DatabaseView({
       return;
     }
     setLoading(true);
-    loadRecords(w, collection.id, view?.id)
+    setRecords([]);
+    setNextCursor(undefined);
+    setLoadError("");
+    const load = windowed
+      ? loadRecordPage(w, collection.id, view?.id, pageHistory[pageIndex]).then(
+          (result) => ({
+            records: result.records,
+            nextCursor: result.nextCursor,
+          }),
+        )
+      : loadRecords(w, collection.id, view?.id, () => !live).then(
+          (records) => ({ records, nextCursor: undefined }),
+        );
+    load
       .then((r) => {
-        if (live) setRecords(r);
+        if (live) {
+          setRecords(r.records);
+          setNextCursor(r.nextCursor);
+        }
       })
-      .catch(onError)
+      .catch((error) => {
+        if (live) {
+          setLoadError(error instanceof Error ? error.message : String(error));
+          onError(error);
+        }
+      })
       .finally(() => {
         if (live) setLoading(false);
       });
     return () => {
       live = false;
     };
-  }, [
-    w.snapshotCursor,
-    clockTick,
-    collection?.id,
-    collection?.revision,
-    view?.id,
-    view?.revision,
-  ]);
+  }, [queryKey, pageIndex, windowed]);
   const run = async (action: () => Promise<unknown>) => {
     if (busy) return;
     setBusy(true);
@@ -157,13 +187,18 @@ export default function DatabaseView({
       setActive("");
     });
   };
-  const visible = view ? view.query.visiblePropertyIds.flatMap(id => {
-    const property = properties.find(p => p.id === id);
-    return property ? [property] : [];
-  }) : properties;
-  const columnWidth = (id: string) => view?.type === "table"
-    ? (view.config as D.view_table_v1).columnWidths.find(c => c.propertyId === id)?.pixels ?? 220
-    : 220;
+  const visible = view
+    ? view.query.visiblePropertyIds.flatMap((id) => {
+        const property = properties.find((p) => p.id === id);
+        return property ? [property] : [];
+      })
+    : properties;
+  const columnWidth = (id: string) =>
+    view?.type === "table"
+      ? ((view.config as D.view_table_v1).columnWidths.find(
+          (c) => c.propertyId === id,
+        )?.pixels ?? 220)
+      : 220;
   useEffect(() => {
     let active = true;
     setP2Buttons([]);
@@ -293,13 +328,68 @@ export default function DatabaseView({
     );
   }
   function flatRows(items: D.Record[], type: string) {
+    if (type === "table" && windowed)
+      return (
+        <VirtualRows
+          count={items.length}
+          identity={`${queryKey}:${pageIndex}`}
+          table
+          colSpan={visible.length + 1}
+          recordId={(index) => items[index].id}
+          width={visible.reduce((width, p) => width + columnWidth(p.id), 160)}
+          header={
+            <>
+              <colgroup>
+                {visible.map((p) => (
+                  <col key={p.id} style={{ width: columnWidth(p.id) }} />
+                ))}
+                <col style={{ width: 160 }} />
+              </colgroup>
+              <thead>
+                <tr>
+                  {visible.map((p) => (
+                    <th key={p.id} scope="col">
+                      {p.name}
+                    </th>
+                  ))}
+                  <th scope="col">
+                    <span className="sr-only">Record actions</span>
+                  </th>
+                </tr>
+              </thead>
+            </>
+          }
+          renderRow={(index) => {
+            const r = items[index];
+            return (
+              <>
+                {visible.map((p) => (
+                  <td key={p.id}>{cell(r, p)}</td>
+                ))}
+                <td>{rowActions(r)}</td>
+              </>
+            );
+          }}
+        />
+      );
     if (type === "table")
       return (
         <div className="db-table-scroll">
-          <table className="db-table" style={{tableLayout: "fixed", width: visible.reduce((width,p) => width+columnWidth(p.id),160)}}>
+          <table
+            className="db-table"
+            style={{
+              tableLayout: "fixed",
+              width: visible.reduce(
+                (width, p) => width + columnWidth(p.id),
+                160,
+              ),
+            }}
+          >
             <colgroup>
-              {visible.map(p => <col key={p.id} style={{width: columnWidth(p.id)}} />)}
-              <col style={{width:160}} />
+              {visible.map((p) => (
+                <col key={p.id} style={{ width: columnWidth(p.id) }} />
+              ))}
+              <col style={{ width: 160 }} />
             </colgroup>
             <thead>
               <tr>
@@ -504,7 +594,7 @@ export default function DatabaseView({
             workspace={w}
             collection={collection}
             view={view}
-            records={records}
+            records={w.records.filter((r) => r.collectionId === collection.id)}
             onCommitted={onCommitted}
             onError={onError}
           />
@@ -569,9 +659,56 @@ export default function DatabaseView({
           <div role="status" className="db-count">
             {loading
               ? "Loading records…"
-              : `${records.length} record${records.length === 1 ? "" : "s"}`}
+              : windowed && (pageIndex > 0 || nextCursor)
+                ? `${records.length ? pageIndex * 200 + 1 : 0}–${pageIndex * 200 + records.length} records${nextCursor ? " · more available" : ""}`
+                : `${records.length} record${records.length === 1 ? "" : "s"}`}
             {busy ? " · Saving…" : ""}
           </div>
+          {loadError && (
+            <div role="alert">
+              {loadError}{" "}
+              <button
+                onClick={() => {
+                  setPager({ key: queryKey, index: 0, history: [""] });
+                  setClockTick((n) => n + 1);
+                }}
+              >
+                Restart view
+              </button>
+            </div>
+          )}
+          {windowed && (
+            <nav className="db-pager" aria-label="Record pages">
+              <button
+                disabled={loading || pageIndex === 0}
+                onClick={() =>
+                  setPager({
+                    key: queryKey,
+                    index: pageIndex - 1,
+                    history: pageHistory,
+                  })
+                }
+              >
+                Previous records
+              </button>
+              <span>Page {pageIndex + 1}</span>
+              <button
+                disabled={loading || !nextCursor}
+                onClick={() =>
+                  setPager({
+                    key: queryKey,
+                    index: pageIndex + 1,
+                    history: [
+                      ...pageHistory.slice(0, pageIndex + 1),
+                      nextCursor!,
+                    ],
+                  })
+                }
+              >
+                Next records
+              </button>
+            </nav>
+          )}
           {view?.type === "board" ? (
             <Board
               records={records}
@@ -601,6 +738,9 @@ export default function DatabaseView({
               pages={w.pages}
               files={w.files}
               openPage={openPage}
+              virtualIdentity={
+                windowed ? `${queryKey}:${pageIndex}` : undefined
+              }
             />
           ) : view?.type === "timeline" ? (
             <Timeline
@@ -633,7 +773,7 @@ export default function DatabaseView({
               view?.type === "list" ? "list" : "table",
             )
           )}
-          {!loading && !records.length && (
+          {!loading && !loadError && !records.length && (
             <p className="db-empty">
               No records match this view. Add one above or adjust its filters.
             </p>
@@ -1137,8 +1277,15 @@ function Calendar({
   const dateOf = (r: D.Record) =>
     valueOf(r, property.id) as { start?: string; end?: string } | null;
   const resize = (r: D.Record, edge: "start" | "end", day: string) => {
-    try { void onChange(r, property, resizeDateRange(valueOf(r,property.id),edge,day)); }
-    catch (error) { onError(error); }
+    try {
+      void onChange(
+        r,
+        property,
+        resizeDateRange(valueOf(r, property.id), edge, day),
+      );
+    } catch (error) {
+      onError(error);
+    }
   };
   const event = (r: D.Record, day?: string) => (
     <article
@@ -1157,7 +1304,7 @@ function Calendar({
         type="date"
         aria-label={`Reschedule ${pages.find((p) => p.id === r.pageId)?.title ?? "record"}`}
         disabled={busy}
-        value={calendarDay(valueOf(r,property.id))}
+        value={calendarDay(valueOf(r, property.id))}
         onChange={(e) => {
           if (e.target.value)
             void onChange(
@@ -1167,19 +1314,47 @@ function Calendar({
             );
         }}
       />
-      {dateOf(r)?.start && <>
-        <input type="date" aria-label={`Range end for ${pages.find(p => p.id===r.pageId)?.title ?? "record"}`}
-          disabled={busy} min={calendarDay(valueOf(r,property.id))}
-          value={calendarDay(valueOf(r,property.id),"end")}
-          onChange={e => { if (e.target.value) resize(r,"end",e.target.value); }} />
-        {(["start","end"] as const).filter(edge => day===(calendarDay(valueOf(r,property.id),edge) || calendarDay(valueOf(r,property.id)))).map(edge =>
-          <button key={edge} type="button" className="db-range-handle" draggable={!busy} disabled={busy}
-            aria-label={`Resize ${edge} of ${pages.find(p => p.id===r.pageId)?.title ?? "record"}`}
-            title={`Drag to change the range ${edge}`}
-            onDragStart={e => { e.stopPropagation(); e.dataTransfer.setData("application/x-trove-calendar-resize",JSON.stringify({recordId:r.id,edge})); }}>
-            {edge==="start" ? "↤" : "↦"}
-          </button>)}
-      </>}
+      {dateOf(r)?.start && (
+        <>
+          <input
+            type="date"
+            aria-label={`Range end for ${pages.find((p) => p.id === r.pageId)?.title ?? "record"}`}
+            disabled={busy}
+            min={calendarDay(valueOf(r, property.id))}
+            value={calendarDay(valueOf(r, property.id), "end")}
+            onChange={(e) => {
+              if (e.target.value) resize(r, "end", e.target.value);
+            }}
+          />
+          {(["start", "end"] as const)
+            .filter(
+              (edge) =>
+                day ===
+                (calendarDay(valueOf(r, property.id), edge) ||
+                  calendarDay(valueOf(r, property.id))),
+            )
+            .map((edge) => (
+              <button
+                key={edge}
+                type="button"
+                className="db-range-handle"
+                draggable={!busy}
+                disabled={busy}
+                aria-label={`Resize ${edge} of ${pages.find((p) => p.id === r.pageId)?.title ?? "record"}`}
+                title={`Drag to change the range ${edge}`}
+                onDragStart={(e) => {
+                  e.stopPropagation();
+                  e.dataTransfer.setData(
+                    "application/x-trove-calendar-resize",
+                    JSON.stringify({ recordId: r.id, edge }),
+                  );
+                }}
+              >
+                {edge === "start" ? "↤" : "↦"}
+              </button>
+            ))}
+        </>
+      )}
     </article>
   );
   return (
@@ -1196,7 +1371,10 @@ function Calendar({
             }}
           />
         </label>
-        <span>Drag a record to move it. Drag an end handle or edit its end date to resize the range.</span>
+        <span>
+          Drag a record to move it. Drag an end handle or edit its end date to
+          resize the range.
+        </span>
       </div>
       <div
         className="db-calendar-grid"
@@ -1223,13 +1401,20 @@ function Calendar({
             }}
             onDrop={(e) => {
               e.preventDefault();
-              const resizing = e.dataTransfer.getData("application/x-trove-calendar-resize");
+              const resizing = e.dataTransfer.getData(
+                "application/x-trove-calendar-resize",
+              );
               if (resizing) {
                 try {
-                  const {recordId,edge} = JSON.parse(resizing);
-                  const r = records.find(r => r.id===recordId);
-                  if (r && !busy && (edge==="start" || edge==="end")) resize(r,edge,day);
-                } catch { onError(new Error("The dragged calendar range is unavailable.")); }
+                  const { recordId, edge } = JSON.parse(resizing);
+                  const r = records.find((r) => r.id === recordId);
+                  if (r && !busy && (edge === "start" || edge === "end"))
+                    resize(r, edge, day);
+                } catch {
+                  onError(
+                    new Error("The dragged calendar range is unavailable."),
+                  );
+                }
                 return;
               }
               const r = records.find(
@@ -1250,18 +1435,19 @@ function Calendar({
                 const date = dateOf(r);
                 return (
                   date?.start &&
-                  calendarDay(valueOf(r,property.id)) <= day &&
-                  (calendarDay(valueOf(r,property.id),"end") || calendarDay(valueOf(r,property.id))) >= day
+                  calendarDay(valueOf(r, property.id)) <= day &&
+                  (calendarDay(valueOf(r, property.id), "end") ||
+                    calendarDay(valueOf(r, property.id))) >= day
                 );
               })
-              .map(r => event(r,day))}
+              .map((r) => event(r, day))}
           </div>
         ))}
       </div>
       {records.some((r) => !dateOf(r)?.start) && (
         <section className="db-undated">
           <h3>No date</h3>
-          {records.filter((r) => !dateOf(r)?.start).map(r => event(r))}
+          {records.filter((r) => !dateOf(r)?.start).map((r) => event(r))}
         </section>
       )}
     </div>
@@ -1548,10 +1734,11 @@ function ViewSettings({
   const setConfig = (c: object) =>
     setDraft({ ...draft, config: { ...cfg, ...c } });
   const moveProperty = (index: number, direction: number) => {
-    const next = [...draft.query.visiblePropertyIds], destination = index+direction;
-    if (destination<0 || destination>=next.length) return;
-    [next[index],next[destination]] = [next[destination],next[index]];
-    setQuery({visiblePropertyIds:next});
+    const next = [...draft.query.visiblePropertyIds],
+      destination = index + direction;
+    if (destination < 0 || destination >= next.length) return;
+    [next[index], next[destination]] = [next[destination], next[index]];
+    setQuery({ visiblePropertyIds: next });
   };
   return (
     <form
@@ -1762,19 +1949,70 @@ function ViewSettings({
           ))}
         </div>
         <ol className="db-property-order" aria-label="Property display order">
-          {draft.query.visiblePropertyIds.map((id,index) => {
-            const property = properties.find(p => p.id===id);
+          {draft.query.visiblePropertyIds.map((id, index) => {
+            const property = properties.find((p) => p.id === id);
             if (!property) return null;
-            const width = (cfg.columnWidths ?? []).find((c: {propertyId: string}) => c.propertyId===id)?.pixels ?? 220;
-            return <li key={id}>
-              <span>{property.name}</span>
-              <button type="button" aria-label={`Move ${property.name} earlier`} disabled={busy || index===0} onClick={() => moveProperty(index,-1)}>↑</button>
-              <button type="button" aria-label={`Move ${property.name} later`} disabled={busy || index===draft.query.visiblePropertyIds.length-1} onClick={() => moveProperty(index,1)}>↓</button>
-              {draft.type==="table" && <label>Width
-                <input type="number" aria-label={`${property.name} column width`} min={40} max={2000} step={1} required value={widthDrafts[id] ?? String(width)} disabled={busy}
-                  onChange={e => { const raw=e.target.value, pixels=Number(raw); setWidthDrafts({...widthDrafts,[id]:raw}); if (Number.isInteger(pixels) && pixels>=40 && pixels<=2000) setConfig({columnWidths:[...(cfg.columnWidths ?? []).filter((c: {propertyId: string}) => c.propertyId!==id),{propertyId:id,pixels}]}); }} />
-              </label>}
-            </li>;
+            const width =
+              (cfg.columnWidths ?? []).find(
+                (c: { propertyId: string }) => c.propertyId === id,
+              )?.pixels ?? 220;
+            return (
+              <li key={id}>
+                <span>{property.name}</span>
+                <button
+                  type="button"
+                  aria-label={`Move ${property.name} earlier`}
+                  disabled={busy || index === 0}
+                  onClick={() => moveProperty(index, -1)}
+                >
+                  ↑
+                </button>
+                <button
+                  type="button"
+                  aria-label={`Move ${property.name} later`}
+                  disabled={
+                    busy || index === draft.query.visiblePropertyIds.length - 1
+                  }
+                  onClick={() => moveProperty(index, 1)}
+                >
+                  ↓
+                </button>
+                {draft.type === "table" && (
+                  <label>
+                    Width
+                    <input
+                      type="number"
+                      aria-label={`${property.name} column width`}
+                      min={40}
+                      max={2000}
+                      step={1}
+                      required
+                      value={widthDrafts[id] ?? String(width)}
+                      disabled={busy}
+                      onChange={(e) => {
+                        const raw = e.target.value,
+                          pixels = Number(raw);
+                        setWidthDrafts({ ...widthDrafts, [id]: raw });
+                        if (
+                          Number.isInteger(pixels) &&
+                          pixels >= 40 &&
+                          pixels <= 2000
+                        )
+                          setConfig({
+                            columnWidths: [
+                              ...(cfg.columnWidths ?? []).filter(
+                                (c: { propertyId: string }) =>
+                                  c.propertyId !== id,
+                              ),
+                              { propertyId: id, pixels },
+                            ],
+                          });
+                      }}
+                    />
+                  </label>
+                )}
+              </li>
+            );
           })}
         </ol>
       </fieldset>

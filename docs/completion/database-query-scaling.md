@@ -33,7 +33,36 @@ global/per-query budget failures, cancellation, and connection isolation under
 the race detector. This is local developer validation, not a final signed-build
 performance qualification.
 
-The shell's full workspace snapshot and frontend all-page preload are separate
-implementation work. Query paging alone does not remove their memory cost or
-justify a workspace-size/RSS claim. Charts and grouped views must retain complete
-aggregation semantics when the frontend adopts incremental loading.
+The renderer now requests `workspace.snapshot` with `contentMode: "shell"`.
+The default full snapshot remains compatible. Shell mode returns scoped page
+metadata, collection/view/property definitions, record identities/revisions,
+title projections and task status/due values; it omits every page's block body
+and ordinary record-cell payloads. The active page is fetched with `readPage`;
+reusable blocks and review edits use scoped `readBlock`; backlinks use their
+existing scoped query. The editor waits for matching page content/revision before
+mounting, and failed reads expose a retry rather than an editable empty page.
+
+Ungrouped tables and galleries retain only one 200-record page, with explicit
+previous/next navigation. Variable-height virtual rendering keeps the visible
+rows plus a focused editor in the DOM. The cursor history stores cursor strings,
+not old records. Record changes, view changes and minute-clock changes restart
+the query. Complete list/board/calendar/timeline/grouped views load their complete
+result up to 10,000 records; larger results display an explicit error, never a
+partial count or aggregate. Chart and advanced-derived queries run only when
+their panels are opened; chart aggregation still uses the complete authorized
+backend result and its existing explicit bounds.
+
+Shell metadata is still O(pages + records), needed by current navigation, relation
+pickers and canonical revision guards. Auxiliary collections (including meeting
+segments, file metadata, memories and import mappings) retain their existing
+snapshot behavior. This removes the general page-body/cell preload but does not
+establish a constant-memory shell or a qualified maximum workspace size. Those
+claims require immutable-build memory/startup measurements on target hardware.
+
+Additional checks cover shell payload omission, task guard/status retention,
+legacy full snapshots, scope denial for block reads, and a 10,000-record fixture.
+On this developer machine, race-enabled first and second 200-record reads took
+about 106 ms combined; this is a diagnostic observation, not an acceptance SLA.
+Browser tests exercise lazy page bodies, independent backlinks, virtual
+table/gallery pages and complete-list loading alongside the existing database
+editing/width/calendar/chart regressions.

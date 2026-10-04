@@ -1,4 +1,4 @@
-import {batch,dispatch,envelope,ids,pageGuards,requestID,type D,type S,type WorkspaceSnapshot} from '../api';
+import {batch,dispatch,envelope,ids,pageGuards,requestID,readBlock,type D,type S,type WorkspaceSnapshot} from '../api';
 import {orderedBlocks} from '../editor/codec';
 export type PageLock={locked:boolean;revision:string};
 export const getLock=(w:WorkspaceSnapshot,pageId:string)=>dispatch<PageLock>('editor.lock',{...envelope(w),pageId});
@@ -32,6 +32,16 @@ export async function runButton(w:WorkspaceSnapshot,commands:S.Command[]){
  const guards:S.ExpectedRevision[]=[];
  for(const [key,entityType] of Object.entries({pages:'page',blocks:'block',collections:'collection',properties:'property',records:'record',views:'view',containers:'container',files:'file',meetings:'meeting',memories:'memory'})){
   for(const value of (w as any)[key]??[])guards.push({target:{entityType:entityType as S.EntityRef['entityType'],entityId:value.id},revision:value.revision});
+ }
+ // Shell snapshots omit block bodies. Fetch only pages actually referenced by
+ // the reviewed action, preserving existing block guards without global preload.
+ if(w.contentMode==='shell'){
+  const inserted=new Set(commands.flatMap(c=>c.kind==='block.insert'?[c.block.blockId]:[]));
+  const referenced=new Set<string>();
+  for(const command of commands){const c=command as any;for(const id of [c.blockId,c.parentBlockId,c.block?.parentBlockId,c.block?.afterBlockId,...(c.orderedBlockIds??[])])if(id&&!inserted.has(id))referenced.add(id);}
+  const pages=new Set<string>();
+  for(const id of referenced)pages.add((await readBlock(w,id)).pageId);
+  for(const pageId of pages){const content=await dispatch<S.ReadPageResult>('readPage',{...envelope(w),pageId});for(const block of content.blocks)if(!guards.some(g=>g.target.entityType==='block'&&g.target.entityId===block.id))guards.push({target:{entityType:'block',entityId:block.id},revision:block.revision});}
  }
  const created=new Set<string>();
  for(const c of commands){const v=c as any;const add=(kind:S.EntityRef['entityType'],id:string|undefined)=>{if(id&&!guards.some(g=>g.target.entityId===id)){created.add(id);guards.push({target:{entityType:kind,entityId:id},revision:'0'});}};

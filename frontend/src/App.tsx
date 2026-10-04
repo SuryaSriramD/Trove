@@ -81,9 +81,38 @@ const fmt = (date: string) =>
     new Date(date),
   );
 export default function App() {
-  const [w, setW] = useState<WorkspaceSnapshot | null>(null);
+  const [shell, setW] = useState<WorkspaceSnapshot | null>(null);
+  const [pageContent, setPageContent] = useState<{
+    workspaceId: string;
+    pageId: string;
+    revision: string;
+    blocks: D.Block[];
+  } | null>(null);
+  const [pageReadError, setPageReadError] = useState("");
+  const [pageReadRetry, setPageReadRetry] = useState(0);
   const [surface, setSurface] = useState<Surface>("Home");
   const [active, setActive] = useState<string | null>(null);
+  const w = useMemo(
+    () =>
+      shell
+        ? {
+            ...shell,
+            blocks:
+              shell.contentMode === "shell"
+                ? pageContent?.workspaceId === shell.workspaceId &&
+                  pageContent.pageId === active &&
+                  pageContent.revision ===
+                    shell.pages.find((p) => p.id === active)?.revision
+                  ? pageContent.blocks
+                  : []
+                : shell.blocks,
+          }
+        : null,
+    [shell, pageContent, active],
+  );
+  const [remoteBacklinks, setRemoteBacklinks] = useState<
+    { pageId: string; blockId: string }[]
+  >([]);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(true);
   const [tabs, setTabs] = useState<string[]>(() => stored("tabs", []));
@@ -239,6 +268,67 @@ export default function App() {
     };
   }, [w]);
   const page = active ? pagesById.get(active) : undefined;
+  const pageReady =
+    !w ||
+    w.contentMode !== "shell" ||
+    (pageContent?.workspaceId === w.workspaceId &&
+      pageContent.pageId === page?.id &&
+      pageContent.revision === page?.revision);
+  useEffect(() => {
+    let live = true;
+    setPageReadError("");
+    if (!w || !page || w.contentMode !== "shell") return;
+    const currentWorkspace = w.workspaceId;
+    void dispatch<S.ReadPageResult>("readPage", {
+      ...envelope(w),
+      pageId: page.id,
+    })
+      .then((result) => {
+        if (!live) return;
+        if (result.page.revision !== page.revision) {
+          void refresh();
+          return;
+        }
+        setPageContent({
+          workspaceId: currentWorkspace,
+          pageId: page.id,
+          revision: result.page.revision,
+          blocks: result.blocks,
+        });
+      })
+      .catch((error) => {
+        if (live)
+          setPageReadError(
+            error instanceof Error ? error.message : String(error),
+          );
+      });
+    return () => {
+      live = false;
+    };
+  }, [
+    w?.workspaceId,
+    w?.snapshotCursor,
+    page?.id,
+    page?.revision,
+    pageReadRetry,
+    refresh,
+  ]);
+  useEffect(() => {
+    let live = true;
+    setRemoteBacklinks([]);
+    if (!w || !page || w.contentMode !== "shell") return;
+    void dispatch<{ links: { pageId: string; blockId: string }[] }>(
+      "links.backlinks",
+      { ...envelope(w), pageId: page.id },
+    )
+      .then((result) => {
+        if (live) setRemoteBacklinks(result.links);
+      })
+      .catch(errorHandler);
+    return () => {
+      live = false;
+    };
+  }, [w?.workspaceId, w?.snapshotCursor, page?.id, errorHandler]);
   const pageDisplay = display?.pageId === page?.id ? display : null;
   useEffect(() => {
     let current = true;
@@ -298,7 +388,13 @@ export default function App() {
     }
   }
   const body = (active && blocksByPage.get(active)) || [];
-  const backlinks = (active && backlinksByPage.get(active)) || [];
+  const backlinks =
+    w?.contentMode === "shell"
+      ? remoteBacklinks.map((link) => ({
+          id: link.blockId,
+          pageId: link.pageId,
+        }))
+      : (active && backlinksByPage.get(active)) || [];
   const navigate = useCallback(
     async (target: string, record = true) => {
       if (flushEditor.current && !(await flushEditor.current())) return false;
@@ -401,7 +497,7 @@ export default function App() {
   useEffect(() => {
     if (sourceLocation && active === sourceLocation.pageId)
       return focusSourceLocation(sourceLocation);
-  }, [active, sourceLocation]);
+  }, [active, sourceLocation, pageReady]);
   useEffect(() => {
     const key = (e: KeyboardEvent) => {
       if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === "k") {
@@ -644,7 +740,9 @@ export default function App() {
         <div className="brand">
           <span className="brand-logo">✳</span>
           <strong>Trove</strong>
-          <span className="local-pill">{(window as any).troveHost ? "HOST" : "LOCAL"}</span>
+          <span className="local-pill">
+            {(window as any).troveHost ? "HOST" : "LOCAL"}
+          </span>
         </div>
         <button className="workspace-button" onClick={() => navigate("Home")}>
           <span className="workspace-avatar">S</span>
@@ -711,7 +809,11 @@ export default function App() {
           {pageTree}
         </div>
         <div className="sidebar-footer">
-          <span className="status-dot" /> {(window as any).troveHost ? "Connected to your host" : "On your device"}<span>↙</span>
+          <span className="status-dot" />{" "}
+          {(window as any).troveHost
+            ? "Connected to your host"
+            : "On your device"}
+          <span>↙</span>
         </div>
       </aside>
       <div className="main-shell">
@@ -970,21 +1072,32 @@ export default function App() {
                     <p>Review approval and evidence in Local AI below.</p>
                   </aside>
                 ))}
-              <PageEditor
-                key={`${page.id}-${editorKey}`}
-                page={page}
-                blocks={body}
-                workspace={w}
-                onAttach={() => pickAttachment(page.id)}
-                registerFlush={(flush) => {
-                  flushEditor.current = flush;
-                }}
+              {pageReady ? (
+                <PageEditor
+                  key={`${page.id}-${editorKey}`}
+                  page={page}
+                  blocks={body}
+                  workspace={w}
+                  onAttach={() => pickAttachment(page.id)}
+                  registerFlush={(flush) => {
+                    flushEditor.current = flush;
+                  }}
 
-                onCommitted={refresh}
-                onError={errorHandler}
-                openPage={navigate}
-                toggleTask={toggleTask}
-              />
+                  onCommitted={refresh}
+                  onError={errorHandler}
+                  openPage={navigate}
+                  toggleTask={toggleTask}
+                />
+              ) : (
+                <div role={pageReadError ? "alert" : "status"}>
+                  {pageReadError || "Loading page content…"}
+                  {pageReadError && (
+                    <button onClick={() => setPageReadRetry((n) => n + 1)}>
+                      Retry loading page
+                    </button>
+                  )}
+                </div>
+              )}
               {w.meetings.some((m) => m.pageId === page.id) && (
                 <MeetingPanel
                   workspace={w}
@@ -1222,7 +1335,12 @@ export default function App() {
                   onCommitted={refresh}
                 />
               ) : surface === "Intelligence" ? (
-                <P2IntelligencePanel workspace={w} refresh={refresh} onNavigate={navigate} onError={errorHandler} />
+                <P2IntelligencePanel
+                  workspace={w}
+                  refresh={refresh}
+                  onNavigate={navigate}
+                  onError={errorHandler}
+                />
               ) : surface === "Automations" ? (
                 <AutomationPanel
                   workspace={w}

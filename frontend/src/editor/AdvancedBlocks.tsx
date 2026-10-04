@@ -3,6 +3,7 @@ import type { NodeViewProps } from "@tiptap/react";
 import type { Editor } from "@tiptap/core";
 import { closeHistory } from "@tiptap/pm/history";
 import type { D, WorkspaceSnapshot } from "../api";
+import { readBlock } from "../api";
 import { richNodes, richText } from "./codec";
 import { InlineRichEditor } from "./InlineRichEditor";
 import { insertTableLine, removeTableLine, tableLineRemoval, tableWidths } from "./tableStructure";
@@ -130,7 +131,19 @@ export function AdvancedBlock({props,w,pageId,openPage,onError,onCommitted,readO
  if(kind==='date_mention')return <label>Date <input type={d.hasTime?'datetime-local':'date'} value={d.start} onChange={e=>update({start:e.target.value})}/><span>{d.timezone}</span></label>;
  if(kind==='breadcrumb'){const path:D.Page[]=[];let p=w?.pages.find(p=>p.id===pageId);const seen=new Set<string>();while(p&&!seen.has(p.id)){path.unshift(p);seen.add(p.id);p=w?.pages.find(x=>x.id===p!.parentPageId)}return <nav aria-label="Breadcrumb">{path.map((p,i)=><span key={p.id}>{i?' / ':''}<button onClick={()=>openPage(p.id)}>{p.title}</button></span>)}</nav>}
  if(kind==='table_of_contents'){const headings:any[]=[];props.editor.state.doc.descendants(n=>{if(/^heading_[1-4]$/.test(n.attrs.kind)&&Number(n.attrs.kind.slice(-1))<=d.maxLevel)headings.push(n)});return <nav aria-label="Table of contents">{headings.map(n=><button key={n.attrs.blockId??n.attrs.clientKey} style={{display:'block',marginInlineStart:(Number(n.attrs.kind.slice(-1))-1)*12}} onClick={()=>props.editor.view.dom.querySelector(`[data-block-id="${n.attrs.blockId}"]`)?.scrollIntoView({behavior:'smooth'})}>{n.textContent||'Untitled heading'}</button>)}{!headings.length&&<p>Add headings to build a table of contents.</p>}</nav>}
- if(kind==='synced_block'){const source=w?.blocks.find(b=>b.id===d.contentSourceId);return <div className="synced-card"><small>Reusable block · live canonical source</small><p>{source?blockReadable(source):'Source is unavailable. The reference is preserved.'}</p>{source&&<button onClick={()=>openPage(source.pageId)}>Edit source</button>}</div>}
+ if(kind==='synced_block') return <SyncedBlock workspace={w} sourceId={d.contentSourceId} openPage={openPage}/>;
  if(kind==='button')return <div><button disabled={busy||!w} onClick={()=>w&&void previewButton(w,d.actionDefinitionId).then(setProposal).catch(onError)}>{d.label}</button>{proposal&&<dialog open><h3>Review {proposal.label}</h3><pre>{JSON.stringify(proposal.commands,null,2)}</pre><button onClick={()=>setProposal(null)}>Cancel</button><button disabled={busy} onClick={()=>{if(!w)return;setBusy(true);void runButton(w,proposal.commands).then(onCommitted).then(()=>setProposal(null)).catch(onError).finally(()=>setBusy(false))}}>Apply through workspace permissions</button></dialog>}</div>;
  return null;
+}
+
+function SyncedBlock({workspace,sourceId,openPage}:{workspace:WorkspaceSnapshot|null;sourceId:string;openPage:(id:string)=>void}) {
+ const [source,setSource]=useState<D.Block>();
+ const [loading,setLoading]=useState(true);
+ useEffect(()=>{
+  let live=true;setSource(undefined);setLoading(true);
+  if(!workspace){setLoading(false);return;}
+  void readBlock(workspace,sourceId).then(block=>{if(live)setSource(block);}).catch(()=>{}).finally(()=>{if(live)setLoading(false);});
+  return()=>{live=false;};
+ },[workspace?.workspaceId,workspace?.snapshotCursor,sourceId]);
+ return <div className="synced-card"><small>Reusable block · live canonical source</small><p>{source?blockReadable(source):loading?'Loading source…':'Source is unavailable. The reference is preserved.'}</p>{source&&<button onClick={()=>openPage(source.pageId)}>Edit source</button>}</div>;
 }

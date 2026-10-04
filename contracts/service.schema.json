@@ -2519,12 +2519,91 @@
         },
         "workspaceId": {
           "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "contentMode": {
+          "type": "string",
+          "enum": [
+            "full",
+            "shell"
+          ]
         }
       },
       "required": [
         "contractVersion",
         "requestId",
         "workspaceId"
+      ],
+      "additionalProperties": false
+    },
+    "ReadBlockRequest": {
+      "type": "object",
+      "properties": {
+        "contractVersion": {
+          "const": 1
+        },
+        "requestId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "workspaceId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "blockId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        }
+      },
+      "required": [
+        "contractVersion",
+        "requestId",
+        "workspaceId",
+        "blockId"
+      ],
+      "additionalProperties": false
+    },
+    "ReadBlockResult": {
+      "type": "object",
+      "properties": {
+        "block": {
+          "$ref": "domain.schema.json#/$defs/Block"
+        }
+      },
+      "required": [
+        "block"
+      ],
+      "additionalProperties": false
+    },
+    "ReadRecordRequest": {
+      "type": "object",
+      "properties": {
+        "contractVersion": {
+          "const": 1
+        },
+        "requestId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "workspaceId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "recordId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        }
+      },
+      "required": [
+        "contractVersion",
+        "requestId",
+        "workspaceId",
+        "recordId"
+      ],
+      "additionalProperties": false
+    },
+    "ReadRecordResult": {
+      "type": "object",
+      "properties": {
+        "record": {
+          "$ref": "domain.schema.json#/$defs/Record"
+        }
+      },
+      "required": [
+        "record"
       ],
       "additionalProperties": false
     },

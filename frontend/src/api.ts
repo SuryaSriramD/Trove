@@ -4,6 +4,7 @@ export type { D, S };
 export type WorkspaceSnapshot = D.DomainSnapshot & {
   scopeGrantId: string;
   snapshotCursor: string;
+  contentMode?: "shell" | "full";
 };
 declare global {
   interface Window {
@@ -66,7 +67,18 @@ export async function dispatch<T>(
   if (response.ok === false) throw new ServiceError(response.error);
   return response.result ?? response;
 }
-export const snapshot = () => dispatch<WorkspaceSnapshot>("workspace.snapshot");
+export const snapshot = () =>
+  dispatch<WorkspaceSnapshot>("workspace.snapshot", { contentMode: "shell" });
+export const readBlock = async (w: WorkspaceSnapshot, blockId: string) =>
+  (await dispatch<{ block: D.Block }>("readBlock", { ...envelope(w), blockId }))
+    .block;
+export const readRecord = async (w: WorkspaceSnapshot, recordId: string) =>
+  (
+    await dispatch<{ record: D.Record }>("readRecord", {
+      ...envelope(w),
+      recordId,
+    })
+  ).record;
 export function envelope(w: WorkspaceSnapshot) {
   return {
     contractVersion: 1 as const,

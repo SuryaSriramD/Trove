@@ -247,9 +247,17 @@ func (a *App) Dispatch(method, raw string) string {
 	}
 	// Bootstrap is a trusted adapter operation: the renderer does not know the
 	// workspace ID until the first snapshot. All later requests carry headers.
-	if method == "workspace.snapshot" && (strings.TrimSpace(raw) == "{}" || strings.TrimSpace(raw) == "") {
-		payload, _ := json.Marshal(map[string]any{"contractVersion": 1, "requestId": workspace.NewID(), "workspaceId": a.kernel.ID()})
-		raw = string(payload)
+	if method == "workspace.snapshot" {
+		var bootstrap map[string]any
+		if strings.TrimSpace(raw) == "" {
+			raw = "{}"
+		}
+		if json.Unmarshal([]byte(raw), &bootstrap) == nil && bootstrap != nil && bootstrap["workspaceId"] == nil {
+			// Preserve caller options and unknown fields for contract validation.
+			bootstrap["contractVersion"], bootstrap["requestId"], bootstrap["workspaceId"] = 1, workspace.NewID(), a.kernel.ID()
+			payload, _ := json.Marshal(bootstrap)
+			raw = string(payload)
+		}
 	}
 	return string(a.kernel.Dispatch(a.ctx, a.execution, method, json.RawMessage(raw)))
 }

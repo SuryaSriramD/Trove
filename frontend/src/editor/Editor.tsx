@@ -9,7 +9,7 @@ import { replaceDocument, safeWebURL } from "./advanced";
 import "./advanced.css";
 import { TextColor, TextHighlight, ColorControls, preserveStyledPaste } from "./ColorMarks";
 import { BlockVisibility } from "./visibility";
-import { dispatch, envelope } from "../api";
+import { dispatch, envelope, readBlock } from "../api";
 import { AllSelection, NodeSelection, Selection, TextSelection } from "@tiptap/pm/state";
 import { GapCursor } from "@tiptap/pm/gapcursor";
 import {
@@ -755,7 +755,8 @@ export function PageEditor({
       }
       if (kind === "synced_block") {
         const source = prompt("Canonical source block ID (use Copy block link)"); if (!source) return;
-        const id = source.split("/").at(-1); if (!workspace.blocks.some(b=>b.id===id)) throw new Error("Choose a block visible in this workspace.");
+        const id = source.split("/").at(-1); if (!id) throw new Error("Choose a block visible in this workspace.");
+        await readBlock(workspace,id);
         data = {contentSourceId:id};
       }
       if (kind === "table_of_contents") data = {maxLevel:4};

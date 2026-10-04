@@ -1324,6 +1324,25 @@ type ServiceWorkspaceSnapshotRequest struct {
 ContractVersion int64 `json:"contractVersion"`
 RequestId DomainId `json:"requestId"`
 WorkspaceId DomainId `json:"workspaceId"`
+ContentMode *string `json:"contentMode,omitempty"`
+}
+type ServiceReadBlockRequest struct {
+ContractVersion int64 `json:"contractVersion"`
+RequestId DomainId `json:"requestId"`
+WorkspaceId DomainId `json:"workspaceId"`
+BlockId DomainId `json:"blockId"`
+}
+type ServiceReadBlockResult struct {
+Block DomainBlock `json:"block"`
+}
+type ServiceReadRecordRequest struct {
+ContractVersion int64 `json:"contractVersion"`
+RequestId DomainId `json:"requestId"`
+WorkspaceId DomainId `json:"workspaceId"`
+RecordId DomainId `json:"recordId"`
+}
+type ServiceReadRecordResult struct {
+Record DomainRecord `json:"record"`
 }
 type ServiceBacklinksRequest struct {
 ContractVersion int64 `json:"contractVersion"`

@@ -40,6 +40,7 @@ export function P2DatabasePanel({
   const [chart, setChart] = useState<P2Chart>();
   const [busy, setBusy] = useState(false);
   const [chartError, setChartError] = useState("");
+  const [expanded, setExpanded] = useState(false);
   const [title, setTitle] = useState("");
   const [values, setValues] = useState<Record<string, D.RawValue>>({});
   const [buttonProperty, setButtonProperty] = useState("");
@@ -68,20 +69,21 @@ export function P2DatabasePanel({
         if (active) setConfig(settings.config);
       })
       .catch(onError);
-    dispatch<P2Chart>("databaseChart", {
-      ...envelope(w),
-      collectionId: collection.id,
-    })
-      .then((aggregate) => {
-        if (active) setChart(aggregate);
+    if (expanded)
+      dispatch<P2Chart>("databaseChart", {
+        ...envelope(w),
+        collectionId: collection.id,
       })
-      .catch((error) => {
-        if (active) setChartError(String(error.message ?? error));
-      });
+        .then((aggregate) => {
+          if (active) setChart(aggregate);
+        })
+        .catch((error) => {
+          if (active) setChartError(String(error.message ?? error));
+        });
     return () => {
       active = false;
     };
-  }, [collection.id, collection.revision, w.snapshotCursor]);
+  }, [collection.id, collection.revision, w.snapshotCursor, expanded]);
   const run = async (action: () => Promise<unknown>) => {
     if (busy) return;
     setBusy(true);
@@ -111,7 +113,7 @@ export function P2DatabasePanel({
   const buttonField = fields.find((p) => p.id === buttonProperty);
   return (
     <section className="p2-database" aria-label="Local database enhancements">
-      <details>
+      <details onToggle={(event) => setExpanded(event.currentTarget.open)}>
         <summary>Charts, local forms and row buttons</summary>
         <div className="p2-grid">
           <section aria-label="Chart configuration">

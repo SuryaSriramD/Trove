@@ -347,21 +347,35 @@ export async function loadRecords(
   w: WorkspaceSnapshot,
   collectionId: string,
   viewId?: string,
+  cancelled: () => boolean = () => false,
 ): Promise<D.Record[]> {
   const records: D.Record[] = [];
   let cursor: string | undefined;
   do {
-    const result = await dispatch<S.QueryRecordsResult>("queryRecords", {
-      ...envelope(w),
-      collectionId,
-      ...(viewId ? { viewId } : {}),
-      limit: 200,
-      ...(cursor ? { cursor } : {}),
-    });
+    if (cancelled()) throw new Error("Record loading cancelled");
+    const result = await loadRecordPage(w, collectionId, viewId, cursor);
     records.push(...result.records);
     cursor = result.nextCursor;
+    if (records.length >= 10000 && cursor)
+      throw new Error(
+        "This complete view exceeds 10,000 records. Narrow its filters or use an ungrouped table or gallery to browse pages.",
+      );
   } while (cursor);
   return records;
+}
+export async function loadRecordPage(
+  w: WorkspaceSnapshot,
+  collectionId: string,
+  viewId?: string,
+  cursor?: string,
+): Promise<S.QueryRecordsResult> {
+  return dispatch<S.QueryRecordsResult>("queryRecords", {
+    ...envelope(w),
+    collectionId,
+    ...(viewId ? { viewId } : {}),
+    limit: 200,
+    ...(cursor ? { cursor } : {}),
+  });
 }
 
 export async function clearProperty(

@@ -99,6 +99,10 @@
 .db-table-scroll {
   overflow: auto;
 }
+.db-virtual-viewport { max-height: 560px; height: min(560px, 65vh); overflow: auto; overflow-anchor: none; }
+.db-virtual-viewport thead { position: sticky; top: 0; z-index: 1; background: var(--panel, #fff); }
+.db-pager { display: flex; align-items: center; gap: 12px; margin: 12px 0; }
+.db-gallery-window-row { display: grid; gap: 16px; padding: 8px 0; }
 .db-table {
   border-collapse: collapse;
   width: 100%;

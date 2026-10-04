@@ -5,6 +5,7 @@ import {
   envelope,
   ids,
   pageGuards,
+  readBlock,
   type S,
   type WorkspaceSnapshot,
 } from "../api";
@@ -214,7 +215,7 @@ export function P2IntelligencePanel({
     await loadReviews();
   };
   const togglePlan = async (view: PlanView) => {
-    const block = workspace.blocks.find((b) => b.id === view.blockId),
+    const block = await readBlock(workspace, view.blockId),
       owner = workspace.pages.find((p) => p.id === view.pageId);
     if (!block || !owner) return;
     await batch(

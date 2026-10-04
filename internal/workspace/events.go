@@ -102,7 +102,11 @@ func (k *Kernel) Dispatch(ctx context.Context, e contracts.ServiceExecutionConte
 	case "cancel":
 		result, err = k.cancelMutation(ctx, e, str(r["cancellationId"]))
 	case "workspace.snapshot":
-		result, err = k.snapshot(ctx, e)
+		if str(r["contentMode"]) == "shell" {
+			result, err = k.shellSnapshot(ctx, e)
+		} else {
+			result, err = k.snapshot(ctx, e)
+		}
 	case "jobs.list":
 		result, err = k.listJobs(ctx, e, r)
 	case "enqueueJob":

@@ -38,6 +38,16 @@ func TestDesktopBootstrapUsesTrustedWorkspaceIdentity(t *testing.T) {
 	if !response.OK || response.Result.WorkspaceID != k.ID() || response.Result.ScopeGrantID != string(a.execution.ScopeGrantId) {
 		t.Fatalf("invalid desktop bootstrap: %+v", response)
 	}
+	var shell map[string]any
+	if err = json.Unmarshal([]byte(a.Dispatch("workspace.snapshot", `{"contentMode":"shell"}`)), &shell); err != nil || shell["ok"] != true || shell["result"].(map[string]any)["contentMode"] != "shell" {
+		t.Fatal("shell bootstrap option was not preserved", shell, err)
+	}
+	for _, raw := range []string{`null`, `{"contentMode":"shell","unknown":true}`} {
+		var invalid map[string]any
+		if err = json.Unmarshal([]byte(a.Dispatch("workspace.snapshot", raw)), &invalid); err != nil || invalid["ok"] != false {
+			t.Fatal("invalid bootstrap accepted", raw, invalid, err)
+		}
+	}
 }
 
 func TestDesktopUploadDescriptorSurvivesTemporaryPathCleanup(t *testing.T) {
