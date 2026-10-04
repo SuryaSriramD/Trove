@@ -24,6 +24,7 @@ type ProviderBridge struct {
 	connections map[string]*providerConnection
 }
 type providerConnection struct {
+	mcp       *providerMCP
 	execution contracts.ServiceExecutionContext
 	token     string
 	tools     map[string]bool
@@ -146,7 +147,11 @@ func (b *ProviderBridge) Disconnect(ctx context.Context, id string) error {
 	c.info.State = "disconnected"
 	c.token = ""
 	c.cancel()
+	transport := c.mcp
 	b.mu.Unlock()
+	if transport != nil {
+		transport.close()
+	}
 	b.kernel.RevokeGrant(string(c.execution.ScopeGrantId))
 	err := b.kernel.write(ctx, func(tx *sql.Tx) error {
 		_, err := tx.ExecContext(ctx, "UPDATE provider_connections SET state='disconnected' WHERE id=?", id)
@@ -203,6 +208,20 @@ func (b *ProviderBridge) Call(ctx context.Context, id, token, tool string, args 
 	clean := map[string]any{}
 	for key, v := range args {
 		clean[key] = v
+	}
+	if tool == "queryRecords" {
+		if _, ok := clean["limit"]; !ok {
+			clean["limit"] = 50
+		}
+	}
+	if tool == "search.query" {
+		clean["scope"] = c.execution.Scope
+		if _, ok := clean["limit"]; !ok {
+			clean["limit"] = 20
+		}
+		if _, ok := clean["mode"]; !ok {
+			clean["mode"] = "keyword"
+		}
 	}
 	clean["contractVersion"] = 1
 	clean["requestId"] = NewID()

@@ -1,0 +1,2 @@
+ok  	trove.local/phase0/internal/workspace	7.330s
+ok  	trove.local/phase0/cmd/trove-mcp	0.218s

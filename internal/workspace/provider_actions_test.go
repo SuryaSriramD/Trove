@@ -3,7 +3,6 @@ package workspace
 import (
 	"context"
 	"encoding/json"
-	"net/http"
 	"net/http/httptest"
 	"strings"
 	"testing"
@@ -182,13 +181,9 @@ func TestMCPNamedPlanDiscoveryCallAndDisconnect(t *testing.T) {
 		t.Fatal(err)
 	}
 	h := b.MCPHandler()
+	transport := pairedMCPTestTransport(t, h, c)
 	call := func(method string, params any) *httptest.ResponseRecorder {
-		request := httptest.NewRequest(http.MethodPost, "http://127.0.0.1/mcp", strings.NewReader(string(marshal(map[string]any{"jsonrpc": "2.0", "id": 1, "method": method, "params": params}))))
-		request.Header.Set("Authorization", "Bearer "+c.Token)
-		request.Header.Set("Trove-Connection-Id", c.ID)
-		response := httptest.NewRecorder()
-		h.ServeHTTP(response, request)
-		return response
+		return transport(marshal(map[string]any{"jsonrpc": "2.0", "id": 1, "method": method, "params": params}))
 	}
 	discovered := call("tools/list", map[string]any{}).Body.String()
 	if !strings.Contains(discovered, `"create_task"`) || strings.Contains(discovered, `"$ref"`) || !strings.Contains(discovered, `"additionalProperties":false`) {
@@ -196,7 +191,7 @@ func TestMCPNamedPlanDiscoveryCallAndDisconnect(t *testing.T) {
 	}
 	args := map[string]any{"idempotencyKey": "disconnect-plan", "plan": map[string]any{"version": 1, "actions": []any{map[string]any{"kind": "create_page", "destination": "Destination", "title": "Cancelled child"}}}}
 	response := call("tools/call", map[string]any{"name": "proposeActions", "arguments": args})
-	if response.Code != 200 || !strings.Contains(response.Body.String(), `"isError":false`) {
+	if response.Code != 200 || strings.Contains(response.Body.String(), `"isError":true`) || !strings.Contains(response.Body.String(), `"structuredContent"`) {
 		t.Fatal(response.Body.String())
 	}
 	proposals, err := b.Proposals(ctx)

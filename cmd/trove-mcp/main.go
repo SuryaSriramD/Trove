@@ -6,6 +6,7 @@ import (
 	"bufio"
 	"bytes"
 	"context"
+	"encoding/base64"
 	"encoding/json"
 	"fmt"
 	"io"
@@ -13,6 +14,7 @@ import (
 	"net/url"
 	"os"
 	"strings"
+	"sync"
 	"time"
 )
 
@@ -77,6 +79,7 @@ func relayStreams(input io.Reader, output io.Writer, endpoint, token, id string)
 	}
 	done := make(chan completion, 40)
 	requests, cancellations := 0, 0
+	transport := &relayTransport{}
 	for lines != nil || requests+cancellations > 0 {
 		select {
 		case next, ok := <-lines:
@@ -106,7 +109,7 @@ func relayStreams(input io.Reader, output io.Writer, endpoint, token, id string)
 				requests++
 			}
 			go func(body []byte, cancellation bool) {
-				response, err := relayRequest(ctx, client, endpoint, token, id, body)
+				response, err := transport.request(ctx, client, endpoint, token, id, body)
 				done <- completion{body: response, err: err, cancellation: cancellation}
 			}(next.body, isCancellation)
 		case result := <-done:
@@ -128,8 +131,20 @@ func relayStreams(input io.Reader, output io.Writer, endpoint, token, id string)
 	return nil
 }
 
-func relayRequest(ctx context.Context, client *http.Client, endpoint, token, id string, body []byte) ([]byte, error) {
-	req, err := http.NewRequestWithContext(ctx, http.MethodPost, endpoint, bytes.NewReader(body))
+type relayTransport struct {
+	mu               sync.Mutex
+	session, version string
+}
+
+func (t *relayTransport) request(ctx context.Context, client *http.Client, endpoint, token, id string, body []byte) ([]byte, error) {
+	// The pinned SDK decodes numeric JSON-RPC IDs through float64. Encode only
+	// transport identities as strings so adjacent large integers and cancellation
+	// IDs remain distinct; content arguments are never rewritten.
+	encoded, original, err := relayIDs(body)
+	if err != nil {
+		return nil, err
+	}
+	req, err := http.NewRequestWithContext(ctx, http.MethodPost, endpoint, bytes.NewReader(encoded))
 	if err != nil {
 		return nil, err
 	}
@@ -137,6 +152,33 @@ func relayRequest(ctx context.Context, client *http.Client, endpoint, token, id 
 	req.Header.Set("Accept", "application/json, text/event-stream")
 	req.Header.Set("Authorization", "Bearer "+token)
 	req.Header.Set("Trove-Connection-Id", id)
+	t.mu.Lock()
+	session, version := t.session, t.version
+	t.mu.Unlock()
+	var rpc struct {
+		Method string `json:"method"`
+		Params struct {
+			Meta map[string]any `json:"_meta"`
+			Name string         `json:"name"`
+		} `json:"params"`
+	}
+	if json.Unmarshal(body, &rpc) != nil {
+		return nil, fmt.Errorf("invalid JSON-RPC input")
+	}
+	if explicit, ok := rpc.Params.Meta["io.modelcontextprotocol/protocolVersion"].(string); ok {
+		version = explicit
+	}
+	if version != "" {
+		req.Header.Set("MCP-Protocol-Version", version)
+	}
+	if version >= "2026-07-28" {
+		req.Header.Set("Mcp-Method", rpc.Method)
+		if rpc.Params.Name != "" {
+			req.Header.Set("Mcp-Name", rpc.Params.Name)
+		}
+	} else if session != "" {
+		req.Header.Set("Mcp-Session-Id", session)
+	}
 	res, err := client.Do(req)
 	if err != nil {
 		return nil, fmt.Errorf("connection interrupted")
@@ -155,5 +197,71 @@ func relayRequest(ctx context.Context, client *http.Client, endpoint, token, id 
 	if !json.Valid(response) {
 		return nil, fmt.Errorf("invalid JSON-RPC response")
 	}
+	if len(original) > 0 {
+		var message map[string]json.RawMessage
+		if json.Unmarshal(response, &message) == nil && message["id"] != nil {
+			message["id"] = original
+			response, _ = json.Marshal(message)
+		}
+	}
+	if rpc.Method == "initialize" {
+		var initialized struct {
+			Result struct {
+				ProtocolVersion string `json:"protocolVersion"`
+			} `json:"result"`
+		}
+		if json.Unmarshal(response, &initialized) == nil && initialized.Result.ProtocolVersion != "" {
+			t.mu.Lock()
+			t.session = res.Header.Get("Mcp-Session-Id")
+			t.version = initialized.Result.ProtocolVersion
+			t.mu.Unlock()
+		}
+	}
 	return response, nil
+}
+
+func relayIDs(body []byte) ([]byte, json.RawMessage, error) {
+	var message map[string]json.RawMessage
+	if err := json.Unmarshal(body, &message); err != nil {
+		return nil, nil, fmt.Errorf("invalid JSON-RPC input")
+	}
+	identity := func(raw json.RawMessage) (json.RawMessage, error) {
+		var value any
+		decoder := json.NewDecoder(bytes.NewReader(raw))
+		decoder.UseNumber()
+		if err := decoder.Decode(&value); err != nil {
+			return nil, err
+		}
+		switch value.(type) {
+		case string, json.Number:
+		default:
+			return nil, fmt.Errorf("invalid JSON-RPC request identity")
+		}
+		canonical, _ := json.Marshal(value)
+		return json.Marshal("trove-relay:" + base64.RawURLEncoding.EncodeToString(canonical))
+	}
+	original := message["id"]
+	if len(original) > 0 {
+		encoded, err := identity(original)
+		if err != nil {
+			return nil, nil, err
+		}
+		message["id"] = encoded
+	}
+	var method string
+	_ = json.Unmarshal(message["method"], &method)
+	if method == "notifications/cancelled" {
+		var params map[string]json.RawMessage
+		if err := json.Unmarshal(message["params"], &params); err != nil {
+			return nil, nil, err
+		}
+		encoded, err := identity(params["requestId"])
+		if err != nil {
+			return nil, nil, err
+		}
+		params["requestId"] = encoded
+		message["params"], _ = json.Marshal(params)
+	}
+	encoded, err := json.Marshal(message)
+	return encoded, original, err
 }

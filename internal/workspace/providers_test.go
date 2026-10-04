@@ -87,9 +87,11 @@ func TestProviderMCPAuthenticationAndOrigin(t *testing.T) {
 	}
 	h := b.MCPHandler()
 	call := func(token, origin string) *httptest.ResponseRecorder {
-		r := httptest.NewRequest(http.MethodPost, "http://127.0.0.1/mcp", strings.NewReader(`{"jsonrpc":"2.0","id":1,"method":"initialize","params":{}}`))
+		r := httptest.NewRequest(http.MethodPost, "http://127.0.0.1/mcp", strings.NewReader(`{"jsonrpc":"2.0","id":1,"method":"initialize","params":{"protocolVersion":"2025-03-26","capabilities":{},"clientInfo":{"name":"fixture","version":"1"}}}`))
 		r.Header.Set("Authorization", "Bearer "+token)
 		r.Header.Set("Trove-Connection-Id", c.ID)
+		r.Header.Set("Content-Type", "application/json")
+		r.Header.Set("Accept", "application/json, text/event-stream")
 		if origin != "" {
 			r.Header.Set("Origin", origin)
 		}
@@ -255,14 +257,7 @@ func TestMCPCancellationInterruptsQueuedProposal(t *testing.T) {
 			<-k.writer
 		}
 	}()
-	call := func(body []byte) *httptest.ResponseRecorder {
-		r := httptest.NewRequest(http.MethodPost, "http://127.0.0.1/mcp", strings.NewReader(string(body)))
-		r.Header.Set("Authorization", "Bearer "+c.Token)
-		r.Header.Set("Trove-Connection-Id", c.ID)
-		w := httptest.NewRecorder()
-		handler.ServeHTTP(w, r)
-		return w
-	}
+	call := pairedMCPTestTransport(t, handler, c)
 	done := make(chan *httptest.ResponseRecorder, 1)
 	go func() {
 		done <- call(marshal(map[string]any{"jsonrpc": "2.0", "id": 7, "method": "tools/call", "params": map[string]any{"name": "proposeChanges", "arguments": map[string]any{"idempotencyKey": "cancelled", "commands": []any{map[string]any{"kind": "page.update", "pageId": page, "title": "never"}}, "expectedRevisions": []contracts.ServiceExpectedRevision{required("page", page, "1")}}}}))
@@ -325,4 +320,36 @@ func TestProviderRestartRecoversCommittedReceipt(t *testing.T) {
 	if readPage(t, reopened, reopened.OwnerContext(), page)["page"].(map[string]any)["revision"] != "2" {
 		t.Fatal("restart replayed committed effects")
 	}
+}
+
+// Actual legacy lifecycle; tool requests must carry the negotiated session.
+func pairedMCPTestTransport(t *testing.T, h http.Handler, c ProviderConnection) func([]byte) *httptest.ResponseRecorder {
+	t.Helper()
+	session := ""
+	call := func(body []byte) *httptest.ResponseRecorder {
+		r := httptest.NewRequest(http.MethodPost, "http://127.0.0.1/mcp", strings.NewReader(string(body)))
+		r.Header.Set("Authorization", "Bearer "+c.Token)
+		r.Header.Set("Trove-Connection-Id", c.ID)
+		r.Header.Set("Content-Type", "application/json")
+		r.Header.Set("Accept", "application/json, text/event-stream")
+		r.Header.Set("MCP-Protocol-Version", "2025-03-26")
+		if session != "" {
+			r.Header.Set("Mcp-Session-Id", session)
+		}
+		w := httptest.NewRecorder()
+		h.ServeHTTP(w, r)
+		return w
+	}
+	w := call([]byte(`{"jsonrpc":"2.0","id":"init","method":"initialize","params":{"protocolVersion":"2025-03-26","capabilities":{},"clientInfo":{"name":"fixture","version":"1"}}}`))
+	if w.Code != 200 {
+		t.Fatal(w.Code, w.Body.String())
+	}
+	session = w.Header().Get("Mcp-Session-Id")
+	if session == "" {
+		t.Fatal("SDK session missing")
+	}
+	if w = call([]byte(`{"jsonrpc":"2.0","method":"notifications/initialized"}`)); w.Code != 202 {
+		t.Fatal(w.Code, w.Body.String())
+	}
+	return call
 }

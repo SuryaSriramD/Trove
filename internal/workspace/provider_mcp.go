@@ -1,45 +1,97 @@
 package workspace
 
 import (
-	"bytes"
 	"context"
 	"encoding/json"
-	"io"
+	"github.com/modelcontextprotocol/go-sdk/mcp"
 	"net/http"
 	"strings"
-	"sync"
+	"time"
 	"trove.local/phase0/contracts"
 )
 
-// MCPHandler is a bounded JSON-response Streamable HTTP endpoint. The shell
-// binds it only to loopback; remote deployment needs a separately qualified
-// OAuth transport. Browser origins are denied and no CORS headers are emitted.
-func (b *ProviderBridge) MCPHandler() http.Handler {
-	var mu sync.Mutex
-	active := map[string]context.CancelFunc{}
-	requestKey := func(connection string, raw json.RawMessage) string {
-		var value any
-		decoder := json.NewDecoder(bytes.NewReader(raw))
-		decoder.UseNumber()
-		if decoder.Decode(&value) != nil {
-			return ""
-		}
-		switch value.(type) {
-		case string, json.Number:
-			return connection + ":" + string(marshal(value))
-		default:
-			return ""
-		}
+// A paired connection owns its SDK server and transports. Sessions from one
+// connection can never select another connection's tool handlers.
+type providerMCP struct {
+	server          *mcp.Server
+	legacy, current *mcp.StreamableHTTPHandler
+	calls           chan struct{}
+}
+
+func (p *providerMCP) close() {
+	for session := range p.server.Sessions() {
+		_ = session.Close()
 	}
+}
+func (b *ProviderBridge) pairedMCP(c *providerConnection) *providerMCP {
+	b.mu.Lock()
+	defer b.mu.Unlock()
+	live := b.connections[c.info.ID]
+	if live == nil || live.info.State != "connected" {
+		return nil
+	}
+	if live.mcp != nil {
+		return live.mcp
+	}
+	p := &providerMCP{calls: make(chan struct{}, 32)}
+	p.server = mcp.NewServer(&mcp.Implementation{Name: "Trove", Version: "0.5.0"}, &mcp.ServerOptions{Instructions: "Only explicitly selected Trove context is accessible. Submit named create/update actions with proposeActions or existing scoped edits with proposeChanges. A person approves them in Trove. Creating a child does not share that new page with this connection."})
+	for _, name := range c.info.Tools {
+		p.server.AddTool(&mcp.Tool{Name: name, Description: "Scoped Trove workspace service: " + name, InputSchema: mcpInputSchema(name), Annotations: &mcp.ToolAnnotations{ReadOnlyHint: name != "proposeActions" && name != "proposeChanges", DestructiveHint: new(false), OpenWorldHint: new(false)}}, func(ctx context.Context, req *mcp.CallToolRequest) (*mcp.CallToolResult, error) {
+			select {
+			case p.calls <- struct{}{}:
+				defer func() { <-p.calls }()
+			default:
+				return mcpToolError("RESOURCE_EXHAUSTED: at most 32 concurrent calls"), nil
+			}
+			var args map[string]any
+			if json.Unmarshal(req.Params.Arguments, &args) != nil || args == nil {
+				return mcpToolError("INVALID_REQUEST: tool arguments must be an object"), nil
+			}
+			result, err := b.Call(ctx, c.info.ID, c.token, name, args)
+			if err != nil {
+				return mcpToolError(err.Error()), nil
+			}
+			var envelope map[string]any
+			if err = json.Unmarshal(result, &envelope); err != nil {
+				return mcpToolError("INTERNAL: invalid service result"), nil
+			}
+			return &mcp.CallToolResult{IsError: envelope["ok"] == false, Content: []mcp.Content{&mcp.TextContent{Text: string(result)}}, StructuredContent: envelope}, nil
+		})
+	}
+	get := func(*http.Request) *mcp.Server {
+		count := 0
+		for range p.server.Sessions() {
+			count++
+		}
+		if count >= 32 {
+			return nil
+		}
+		return p.server
+	}
+	p.legacy = mcp.NewStreamableHTTPHandler(get, &mcp.StreamableHTTPOptions{JSONResponse: true, SessionTimeout: 5 * time.Minute, MaxRequestBodyBytes: 1 << 20})
+	p.current = mcp.NewStreamableHTTPHandler(get, &mcp.StreamableHTTPOptions{Stateless: true, JSONResponse: true, MaxRequestBodyBytes: 1 << 20, PropagateRequestCancellation: true})
+	live.mcp = p
+	return p
+}
+func mcpToolError(message string) *mcp.CallToolResult {
+	return &mcp.CallToolResult{IsError: true, Content: []mcp.Content{&mcp.TextContent{Text: message}}}
+}
+
+// MCPHandler delegates protocol negotiation, validation, sessions and cancellation
+// to the pinned official SDK. The shell alone chooses loopback/TLS listeners.
+func (b *ProviderBridge) MCPHandler() http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		w.Header().Set("Content-Type", "application/json")
+		w.Header().Set("Cache-Control", "no-store")
 		if r.Header.Get("Origin") != "" {
 			http.Error(w, "Browser origins are not permitted", http.StatusForbidden)
 			return
 		}
-		id := r.Header.Get("Trove-Connection-Id")
-		token := strings.TrimPrefix(r.Header.Get("Authorization"), "Bearer ")
-		c, err := b.authenticate(id, token)
+		authorization := r.Header.Get("Authorization")
+		if !strings.HasPrefix(authorization, "Bearer ") {
+			http.Error(w, "Unauthorized", http.StatusUnauthorized)
+			return
+		}
+		c, err := b.authenticate(r.Header.Get("Trove-Connection-Id"), strings.TrimPrefix(authorization, "Bearer "))
 		if err == nil {
 			err = b.kernel.authorize(c.execution)
 		}
@@ -47,114 +99,18 @@ func (b *ProviderBridge) MCPHandler() http.Handler {
 			http.Error(w, "Unauthorized", http.StatusUnauthorized)
 			return
 		}
-		if r.Method == http.MethodDelete {
-			if err = b.Disconnect(r.Context(), id); err != nil {
-				http.Error(w, "Disconnect failed", 500)
-				return
-			}
-			w.WriteHeader(204)
+		if !validateMCPHTTPIDs(w, r) {
 			return
 		}
-		if r.Method != http.MethodPost {
-			w.WriteHeader(http.StatusMethodNotAllowed)
+		p := b.pairedMCP(c)
+		if p == nil {
+			http.Error(w, "Unauthorized", http.StatusUnauthorized)
 			return
 		}
-		var req struct {
-			JSONRPC string          `json:"jsonrpc"`
-			ID      json.RawMessage `json:"id"`
-			Method  string          `json:"method"`
-			Params  json.RawMessage `json:"params"`
-		}
-		raw, err := io.ReadAll(io.LimitReader(r.Body, 1024*1024+1))
-		if err != nil || len(raw) > 1024*1024 {
-			http.Error(w, "Request too large", 413)
-			return
-		}
-		if json.Unmarshal(raw, &req) != nil || req.JSONRPC != "2.0" {
-			http.Error(w, "Invalid JSON-RPC request", 400)
-			return
-		}
-		reply := func(value any) {
-			_ = json.NewEncoder(w).Encode(map[string]any{"jsonrpc": "2.0", "id": req.ID, "result": value})
-		}
-		fail := func(code int, msg string) {
-			_ = json.NewEncoder(w).Encode(map[string]any{"jsonrpc": "2.0", "id": req.ID, "error": map[string]any{"code": code, "message": msg}})
-		}
-		if len(req.ID) == 0 {
-			if req.Method == "notifications/cancelled" {
-				var params struct {
-					RequestID json.RawMessage `json:"requestId"`
-				}
-				if json.Unmarshal(req.Params, &params) != nil {
-					w.WriteHeader(400)
-					return
-				}
-				key := requestKey(id, params.RequestID)
-				mu.Lock()
-				cancel := active[key]
-				mu.Unlock()
-				if cancel != nil {
-					cancel()
-				}
-				w.WriteHeader(202)
-				return
-			}
-			if req.Method == "notifications/initialized" {
-				w.WriteHeader(202)
-				return
-			}
-			w.WriteHeader(400)
-			return
-		}
-		if requestKey(id, req.ID) == "" {
-			fail(-32600, "Request ID must be a string or number")
-			return
-		}
-		switch req.Method {
-		case "initialize":
-			w.Header().Set("Mcp-Session-Id", id)
-			reply(map[string]any{"protocolVersion": "2025-03-26", "capabilities": map[string]any{"tools": map[string]any{"listChanged": false}}, "serverInfo": map[string]any{"name": "Trove", "version": "0.5.0"}, "instructions": "Only explicitly selected Trove context is accessible. Submit named create/update actions with proposeActions or existing scoped edits with proposeChanges; a person approves them in Trove. Creating a child does not share that new page with this connection."})
-		case "ping":
-			reply(map[string]any{})
-		case "tools/list":
-			tools := []map[string]any{}
-			for _, name := range c.info.Tools {
-				tools = append(tools, map[string]any{"name": name, "description": "Scoped Trove workspace service: " + name, "inputSchema": mcpInputSchema(name), "annotations": map[string]any{"readOnlyHint": name != "proposeChanges" && name != "proposeActions", "destructiveHint": false, "openWorldHint": false}})
-			}
-			reply(map[string]any{"tools": tools})
-		case "tools/call":
-			var p struct {
-				Name      string         `json:"name"`
-				Arguments map[string]any `json:"arguments"`
-			}
-			if json.Unmarshal(req.Params, &p) != nil || p.Arguments == nil {
-				fail(-32602, "Invalid tool arguments")
-				return
-			}
-			callContext, cancel := context.WithCancel(r.Context())
-			key := requestKey(id, req.ID)
-			mu.Lock()
-			_, duplicate := active[key]
-			if !duplicate {
-				active[key] = cancel
-			}
-			mu.Unlock()
-			if duplicate {
-				cancel()
-				fail(-32600, "Request ID is already active")
-				return
-			}
-			defer func() { cancel(); mu.Lock(); delete(active, key); mu.Unlock() }()
-			result, callErr := b.Call(callContext, id, token, p.Name, p.Arguments)
-			if callErr != nil {
-				reply(map[string]any{"isError": true, "content": []any{map[string]any{"type": "text", "text": callErr.Error()}}})
-				return
-			}
-			var envelope map[string]any
-			json.Unmarshal(result, &envelope)
-			reply(map[string]any{"isError": envelope["ok"] == false, "content": []any{map[string]any{"type": "text", "text": string(result)}}})
-		default:
-			fail(-32601, "Method not supported")
+		if r.Header.Get("MCP-Protocol-Version") >= "2026-07-28" {
+			p.current.ServeHTTP(w, r)
+		} else {
+			p.legacy.ServeHTTP(w, r)
 		}
 	})
 }
@@ -169,9 +125,13 @@ func mcpInputSchema(name string) any {
 	case "queryRecords":
 		props["collectionId"] = text
 		props["viewId"] = text
+		props["cursor"] = text
+		props["limit"] = map[string]any{"type": "integer", "minimum": 1, "maximum": 200}
+		required = []string{"collectionId"}
 	case "search.query":
 		props["query"] = text
-		props["mode"] = map[string]any{"type": "string", "enum": []string{"keyword", "semantic", "hybrid"}}
+		props["mode"] = map[string]any{"type": "string", "enum": []string{"keyword", "hybrid"}}
+		props["limit"] = map[string]any{"type": "integer", "minimum": 1, "maximum": 100}
 		required = []string{"query"}
 	case "resolveCitation":
 		props["location"] = map[string]any{"type": "object"}

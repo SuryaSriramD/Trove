@@ -596,16 +596,19 @@
       "interface_boundary": "Layouts, templates, formula values, migration source identities, capture and automation",
       "acceptance_scenario": "Independent expected-output fixtures cover every claimed feature; original expressions and captured values remain distinct from live results; unsupported expressions preserve evidence and report useful errors. Full proprietary Notion-function parity is not required.",
       "backlog_anchor": "../remaining-work.md#parity-005-close-the-formula-compatibility-contract",
-      "implementation": "in progress",
-      "implementation_commit": null,
+      "implementation": "implemented",
+      "implementation_commit": "68546c4",
       "verification": {
-        "service_or_interface": "pending",
+        "service_or_interface": "targeted development tests passed; native helper evidence for PDF, no packaged release qualification",
         "candidate": null,
         "macOS": "unqualified",
         "Windows": "unqualified",
         "Linux": "unqualified"
       },
-      "evidence_target": "evidence/completion/PARITY-005/"
+      "evidence_target": "evidence/completion/PARITY-005/",
+      "implementation_evidence": [
+        "docs/completion/formula-compatibility.md"
+      ]
     },
     {
       "id": "PARITY-006",
@@ -671,16 +674,19 @@
       "interface_boundary": "Layouts, templates, formula values, migration source identities, capture and automation",
       "acceptance_scenario": "Export representative rich pages offline; inspect pagination, clipping, missing glyphs, and attachment handling; retain Unicode and readable fallbacks. Pixel-perfect Notion PDF reproduction is not required. State platform support explicitly.",
       "backlog_anchor": "../remaining-work.md#parity-008-render-usable-rich-page-pdfs",
-      "implementation": "in progress",
-      "implementation_commit": null,
+      "implementation": "implemented",
+      "implementation_commit": "8c2367f",
       "verification": {
-        "service_or_interface": "pending",
+        "service_or_interface": "targeted development tests passed; native helper evidence for PDF, no packaged release qualification",
         "candidate": null,
         "macOS": "unqualified",
         "Windows": "unqualified",
         "Linux": "unqualified"
       },
-      "evidence_target": "evidence/completion/PARITY-008/"
+      "evidence_target": "evidence/completion/PARITY-008/",
+      "implementation_evidence": [
+        "docs/completion/rich-pdf.md"
+      ]
     },
     {
       "id": "PARITY-009",
@@ -1311,7 +1317,13 @@
         "Windows": "unqualified",
         "Linux": "unqualified"
       },
-      "evidence_target": "evidence/completion/GOV-005/"
+      "evidence_target": "evidence/completion/GOV-005/",
+      "implementation_evidence": [
+        "docs/completion/retrieval.md",
+        "docs/completion/recovery.md",
+        "docs/completion/audio-decoding.md",
+        "docs/completion/mcp-sdk.md"
+      ]
     },
     {
       "id": "OPT-001",

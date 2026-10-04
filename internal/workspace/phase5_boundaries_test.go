@@ -141,8 +141,9 @@ func TestPhase5V10PairedRelayProtocolConsentAndCancellation(t *testing.T) {
 	if tool(2, "readPage", map[string]any{"pageId": secret})["isError"] != true {
 		t.Fatal("private page escaped scope")
 	}
-	if tool(3, "batch", map[string]any{})["isError"] != true {
-		t.Fatal("direct mutation tool was accessible")
+	denied := call(3, "tools/call", map[string]any{"name": "batch", "arguments": map[string]any{}})
+	if failure, ok := denied["error"].(map[string]any); !ok || failure["code"] != json.Number("-32602") {
+		t.Fatal("unregistered direct mutation tool was not rejected by SDK", denied)
 	}
 	propose := func(id any, key, revision, title string) string {
 		t.Helper()

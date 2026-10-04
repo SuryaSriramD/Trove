@@ -1,0 +1,11 @@
+--- FAIL: TestMCPNamedPlanDiscoveryCallAndDisconnect (0.06s)
+    provider_actions_test.go:195: authoritative closed named-plan schema missing Content-Type must be 'application/json'
+        
+--- FAIL: TestProviderMCPAuthenticationAndOrigin (0.02s)
+    providers_test.go:107: Content-Type must be 'application/json'
+        
+--- FAIL: TestMCPCancellationInterruptsQueuedProposal (1.02s)
+    providers_test.go:276: 415
+FAIL
+FAIL	trove.local/phase0/internal/workspace	1.648s
+FAIL
