@@ -1,0 +1,28 @@
+{
+  "step": "p1-verify",
+  "passed": true,
+  "recordedAt": "2026-09-30T19:23:06.427285Z",
+  "state": {
+    "workspaceId": "01a0f3c5-4093-7acb-b327-30abe2cdd47b",
+    "pageId": "01a0f3c5-4111-731c-8b1a-b09cb5bebecb",
+    "blockId": "01a0f3c5-4111-7843-9530-ead63b34adc2",
+    "collectionId": "01a0f3c5-4111-7d4a-a974-b050e771359e",
+    "propertyId": "01a0f3c5-4111-77a6-93d7-b2bd53ff927b",
+    "recordId": "01a0f3c5-4111-738b-996d-a11451c12c7a",
+    "recordPageId": "01a0f3c5-4111-7245-936b-1bec6e012c8e",
+    "fileId": "01a0f3c5-4123-7d1d-bf1c-4853e70ee6d9",
+    "fileBlockId": "01a0f3c5-4111-7da1-83d4-9ddbeb4f55c1",
+    "contentHash": "61cb495898eb4901d8a4ea859ee4cee692bb981cc2474a55f2809e47519fd273"
+  },
+  "checks": [
+    "canonical linked gallery shares edited record identity",
+    "formula computes exact 0.3 separately from captured source 999",
+    "advanced reusable content and inert card survive offline",
+    "keyword search includes retained offline card",
+    "automation receipt prevents duplicate effects across repeated ticks",
+    "managed attachment hash preserved",
+    "separate process restart and native backup restore preserve P1 objects and effects"
+  ],
+  "processExitCode": 0,
+  "installedWeightsAvailable": false
+}

@@ -1,0 +1,96 @@
+-- llama.cpp version: 0.5.0
+CMAKE_BUILD_TYPE=Release
+fatal: not a git repository (or any of the parent directories): .git
+fatal: not a git repository (or any of the parent directories): .git
+-- Warning: ccache not found - consider installing it for faster compilation or disable this warning with GGML_CCACHE=OFF
+-- CMAKE_SYSTEM_PROCESSOR: arm64
+-- GGML_SYSTEM_ARCH: ARM
+-- Could NOT find OpenMP_C (missing: OpenMP_C_FLAGS OpenMP_C_LIB_NAMES) 
+-- Could NOT find OpenMP_CXX (missing: OpenMP_CXX_FLAGS OpenMP_CXX_LIB_NAMES) 
+-- Could NOT find OpenMP (missing: OpenMP_C_FOUND OpenMP_CXX_FOUND) 
+CMake Warning at ggml/src/CMakeLists.txt:347 (message):
+  OpenMP not found
+
+
+-- Including CPU backend
+-- Accelerate framework found
+-- ARM detected
+-- Checking for ARM features using flags:
+--   -march=armv8.2-a+dotprod
+-- Adding CPU backend variant ggml-cpu: -march=armv8.2-a+dotprod 
+-- BLAS found, Libraries: /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/System/Library/Frameworks/Accelerate.framework
+-- BLAS found, Includes: 
+-- Including BLAS backend
+-- Metal framework found
+-- Including METAL backend
+-- ggml version: 0.25.1
+-- ggml commit:  unknown
+-- Configuring done (0.3s)
+-- Generating done (0.1s)
+-- Build files have been written to: /private/tmp/trove-phase0-tools/llama-phase1-build
+[  4%] Built target vendor-hash
+[ 12%] Built target ggml-base
+[ 13%] Built target ggml-blas
+[ 51%] Built target ggml-metal
+[ 64%] Built target ggml-cpu
+[ 66%] Built target ggml
+[100%] Built target llama
+/Volumes/HD-B1/HD-Projects/Trove/build/native/llama-worker: replacing existing signature
+CMake Deprecation Warning at CMakeLists.txt:1 (cmake_minimum_required):
+  Compatibility with CMake < 3.10 will be removed from a future version of
+  CMake.
+
+  Update the VERSION argument <min> value.  Or, use the <min>...<max> syntax
+  to tell CMake that the project requires at least <min> but has been updated
+  to work with policies introduced by <max> or earlier.
+
+
+-- whisper.cpp version: 1.9.4
+fatal: not a git repository (or any of the parent directories): .git
+fatal: not a git repository (or any of the parent directories): .git
+-- Warning: ccache not found - consider installing it for faster compilation or disable this warning with GGML_CCACHE=OFF
+-- CMAKE_SYSTEM_PROCESSOR: arm64
+-- GGML_SYSTEM_ARCH: ARM
+-- Could NOT find OpenMP_C (missing: OpenMP_C_FLAGS OpenMP_C_LIB_NAMES) 
+-- Could NOT find OpenMP_CXX (missing: OpenMP_CXX_FLAGS OpenMP_CXX_LIB_NAMES) 
+-- Could NOT find OpenMP (missing: OpenMP_C_FOUND OpenMP_CXX_FOUND) 
+CMake Warning at ggml/src/CMakeLists.txt:347 (message):
+  OpenMP not found
+
+
+-- Including CPU backend
+-- Accelerate framework found
+-- ARM detected
+-- Checking for ARM features using flags:
+--   -march=armv8.2-a+dotprod
+-- Adding CPU backend variant ggml-cpu: -march=armv8.2-a+dotprod 
+-- BLAS found, Libraries: /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/System/Library/Frameworks/Accelerate.framework
+-- BLAS found, Includes: 
+-- Including BLAS backend
+-- Metal framework found
+-- Including METAL backend
+-- ggml version: 0.23.0
+-- ggml commit:  unknown
+-- Configuring done (0.3s)
+-- Generating done (0.0s)
+-- Build files have been written to: /private/tmp/trove-phase0-tools/whisper-phase1-build
+[ 12%] Built target ggml-base
+[ 14%] Built target ggml-blas
+[ 72%] Built target ggml-metal
+[ 91%] Built target ggml-cpu
+[ 95%] Built target ggml
+[100%] Built target parakeet
+[100%] Built target whisper
+/Volumes/HD-B1/HD-Projects/Trove/build/native/whisper-worker: replacing existing signature
+/Volumes/HD-B1/HD-Projects/Trove/native/microphone-worker.swift:38:7: warning: 'installTap(onBus:bufferSize:format:block:)' was deprecated in macOS 27.0 [#DeprecatedDeclaration]
+36 |  let engine=AVAudioEngine();let node=engine.inputNode;let inputFormat=node.outputFormat(forBus:0)
+37 |  guard let target=AVAudioFormat(commonFormat:.pcmFormatFloat32,sampleRate:16000,channels:1,interleaved:false),let converter=AVAudioConverter(from:inputFormat,to:target) else {throw NSError(domain:"AUDIO_FORMAT",code:1)}
+38 |  node.installTap(onBus:0,bufferSize:4096,format:inputFormat){buffer,_ in
+   |       `- warning: 'installTap(onBus:bufferSize:format:block:)' was deprecated in macOS 27.0 [#DeprecatedDeclaration]
+39 |   if isStopped(){return};let capacity=AVAudioFrameCount(Double(buffer.frameLength)*16000/inputFormat.sampleRate+32)
+40 |   guard let converted=AVAudioPCMBuffer(pcmFormat:target,frameCapacity:capacity) else{return};var provided=false;var error:NSError?
+
+[#DeprecatedDeclaration]: <https://docs.swift.org/compiler/documentation/diagnostics/deprecated-declaration>
+/Volumes/HD-B1/HD-Projects/Trove/build/native/microphone-worker: replacing existing signature
+/Volumes/HD-B1/HD-Projects/Trove/build/native/document-extractor: replacing existing signature
+/Volumes/HD-B1/HD-Projects/Trove/build/native/manifest.json

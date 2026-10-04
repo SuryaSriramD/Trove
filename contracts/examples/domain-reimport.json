@@ -1,0 +1,135 @@
+[
+  {
+    "name": "unchanged",
+    "base": {
+      "title": "A"
+    },
+    "local": {
+      "title": "A"
+    },
+    "incoming": {
+      "title": "A"
+    },
+    "expected": {
+      "title": "unchanged"
+    }
+  },
+  {
+    "name": "source-only-edit",
+    "base": {
+      "title": "A"
+    },
+    "local": {
+      "title": "A"
+    },
+    "incoming": {
+      "title": "B"
+    },
+    "expected": {
+      "title": "apply_incoming"
+    }
+  },
+  {
+    "name": "local-only-edit",
+    "base": {
+      "title": "A"
+    },
+    "local": {
+      "title": "Local"
+    },
+    "incoming": {
+      "title": "A"
+    },
+    "expected": {
+      "title": "keep_local"
+    }
+  },
+  {
+    "name": "equal-edits",
+    "base": {
+      "title": "A"
+    },
+    "local": {
+      "title": "B"
+    },
+    "incoming": {
+      "title": "B"
+    },
+    "expected": {
+      "title": "converged"
+    }
+  },
+  {
+    "name": "conflicting-title",
+    "base": {
+      "title": "A"
+    },
+    "local": {
+      "title": "Local"
+    },
+    "incoming": {
+      "title": "Source"
+    },
+    "expected": {
+      "title": "conflict"
+    }
+  },
+  {
+    "name": "independent-fields",
+    "base": {
+      "title": "A",
+      "body": "Old"
+    },
+    "local": {
+      "title": "Local",
+      "body": "Old"
+    },
+    "incoming": {
+      "title": "A",
+      "body": "Source"
+    },
+    "expected": {
+      "title": "keep_local",
+      "body": "apply_incoming"
+    }
+  },
+  {
+    "name": "missing-is-not-null",
+    "base": {
+      "x": null
+    },
+    "local": {
+      "x": null
+    },
+    "incoming": {},
+    "expected": {
+      "x": "apply_incoming"
+    }
+  },
+  {
+    "name": "source-deletes-locally-edited-block",
+    "base": {
+      "block": "Old"
+    },
+    "local": {
+      "block": "Local"
+    },
+    "incoming": {},
+    "expected": {
+      "block": "conflict"
+    }
+  },
+  {
+    "name": "local-deletes-source-edited-block",
+    "base": {
+      "block": "Old"
+    },
+    "local": {},
+    "incoming": {
+      "block": "New"
+    },
+    "expected": {
+      "block": "conflict"
+    }
+  }
+]

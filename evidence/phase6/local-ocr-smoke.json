@@ -1,0 +1,29 @@
+{
+  "exitCode": 0,
+  "seconds": 29.6710305,
+  "network": "denied by sandbox-exec",
+  "expected": [
+    "TROVE LOCAL OCR 2026",
+    "Review sources before approval"
+  ],
+  "fixtureSHA256": "9f726ff8d1b78f429cfd7813b131e0b978f44f790605471d232e4b5478d5db0b",
+  "helperSHA256": "dcb2bccae9ee1de6d3502d60b8017ee345edafd882edcff98b4a9ac7057650bd",
+  "result": {
+    "lines": [
+      {
+        "confidence": 1,
+        "text": "TROVE LOCAL OCR 2026"
+      },
+      {
+        "confidence": 1,
+        "text": "Review sources before approval"
+      }
+    ],
+    "warning": "OCR may misread handwriting, columns, low contrast, or rotated text. Verify against the image."
+  },
+  "coldStartNote": "The first network-denied probe exceeded 30 seconds. A direct local cold-start run subsequently completed in 29.82 seconds; this is the repeated network-denied probe.",
+  "workerSource": "native/ocr-worker.swift",
+  "workerSourceSHA256": "ab327ac179584f27c909d295f3c4f46ea10bdab4a4b0fb4c5d3394985604b3f6",
+  "finalProductTimeoutSeconds": 60,
+  "fixturePath": "evidence/phase6/local-ocr-fixture.png"
+}

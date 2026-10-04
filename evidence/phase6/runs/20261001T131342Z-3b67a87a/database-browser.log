@@ -1,0 +1,14 @@
+
+Running 6 tests using 1 worker
+
+(node:65067) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+
+[1/6] database.browser.spec.ts:362:1 › all four views retain canonical record identities; board and calendar call guarded record mutations
+[2/6] database.browser.spec.ts:438:1 › saved view filter groups, sorting, visibility, rename and move serialize without record duplication
+[3/6] database.browser.spec.ts:468:1 › table creates record and edits its body title through the canonical page service
+[4/6] database.browser.spec.ts:485:1 › P2 chart traces rows and persists display configuration
+[5/6] database.browser.spec.ts:518:1 › P2 local form requires configured field then sends one guarded submission
+[6/6] database.browser.spec.ts:551:1 › P2 row buttons cancel without mutation then confirm the selected row only
+  6 passed (5.3s)

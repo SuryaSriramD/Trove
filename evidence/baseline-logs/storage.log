@@ -1,0 +1,4 @@
+=== RUN   TestPinnedStorageBinary
+    storage_test.go:29: sqlite=3.53.4 sqlite-vec=v0.1.6
+--- PASS: TestPinnedStorageBinary (0.01s)
+PASS

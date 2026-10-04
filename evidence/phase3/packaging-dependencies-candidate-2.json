@@ -1,0 +1,1005 @@
+{
+  "schemaVersion": 1,
+  "recordedAt": "2026-09-30T17:14:22.574038+00:00",
+  "scope": "Read-only Mach-O linkage, architecture, signatures, helper manifest and bundled provenance audit of this exact candidate; no app launch",
+  "app": "/Volumes/HD-B1/HD-Projects/Trove/build/phase3-candidate-2/Trove.app",
+  "appBinarySha256": "5b3ac5c6a5f764bf39b8c28a56e9093c1fb7dd8d5a29f9faf0599fa5829b6e3e",
+  "bundleFingerprintSha256": "cd0ae875be19f19267a4c864f37f7e7036cf523ba6abac969ae9e51801591d03",
+  "bundleChangedPaths": [],
+  "bundleFileSha256": {
+    "Contents/Info.plist": "6b5cd8d43799d49b7b858fce448da693a08f50f8470f72cb8f5645ed008fd0af",
+    "Contents/MacOS/Trove": "5b3ac5c6a5f764bf39b8c28a56e9093c1fb7dd8d5a29f9faf0599fa5829b6e3e",
+    "Contents/PkgInfo": "82502191c9484b04d685374f9879a0066069c49b8acae7a04b01d38d07e8eca0",
+    "Contents/Resources/native/document-extractor": "ef7f2543226846f39283ba325f4699c10b92b22fcf19828b11c1fbcf2b80f75d",
+    "Contents/Resources/native/document-extractor.json": "fae8680d007214f5e6769aa6205a2f88941f4287474d34b00adcd205695e2425",
+    "Contents/Resources/native/fixtures/jfk.wav": "59dfb9a4acb36fe2a2affc14bacbee2920ff435cb13cc314a08c13f66ba7860e",
+    "Contents/Resources/native/llama-worker": "94fa1694c96f7c39fa44226b7801cb8227f4528cad143392a2ceec2d6eb98982",
+    "Contents/Resources/native/manifest.json": "eb58cdd9aa22f2911a3a84d73f9ca311f60f8bb78123d17d32c3b681f54c4714",
+    "Contents/Resources/native/microphone-worker": "9940c517026dfad18329843e1bc33ee47d0c67512d5c6f10a819a7753619e448",
+    "Contents/Resources/native/models/catalog.json": "64f86eddccfd2c84372f52fd42702a7d05c6c9f8813e290123a01cb5a2857478",
+    "Contents/Resources/native/models/provenance.json": "70fba6c9d33726f3cb90093a4f65c9db4ee097ca4634108a31de7ef935eb4294",
+    "Contents/Resources/native/notices/llama-LICENSE.txt": "94f29bbed6a22c35b992c5c6ebf0e7c92f13b836b90f36f461c9cf2f0f1d010d",
+    "Contents/Resources/native/notices/whisper-LICENSE.txt": "94f29bbed6a22c35b992c5c6ebf0e7c92f13b836b90f36f461c9cf2f0f1d010d",
+    "Contents/Resources/native/whisper-worker": "6da645519bda5262de0f6ab5709d52894f2dba8380bda26660113cd316e22eca",
+    "Contents/Resources/release/THIRD-PARTY-NOTICES.txt": "6edf45ef2f3665fe518e26b26a25726a867326b9139ae07ad1a9e165bf56aa0a",
+    "Contents/Resources/release/notices/_antfu_install-pkg_2.1.0/LICENSE": "67cd5e903c1f908edfa27c25606fa806ce629d9a8ddb7d83019d9fd1f83f7fde",
+    "Contents/Resources/release/notices/_braintree_sanitize-url_7.1.2/LICENSE": "0984740e0c3d725c8044dec7edcefe1dbce180ef5a7bc710c251e19607000158",
+    "Contents/Resources/release/notices/_chevrotain_cst-dts-gen_11.1.2/LICENSE.txt": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30",
+    "Contents/Resources/release/notices/_chevrotain_gast_11.1.2/LICENSE.txt": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30",
+    "Contents/Resources/release/notices/_chevrotain_regexp-to-ast_11.1.2/LICENSE.txt": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30",
+    "Contents/Resources/release/notices/_chevrotain_types_11.1.2/LICENSE.txt": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30",
+    "Contents/Resources/release/notices/_chevrotain_utils_11.1.2/LICENSE.txt": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30",
+    "Contents/Resources/release/notices/_floating-ui_core_1.8.0/LICENSE": "0e4c9a9b6c71019cbbea3bdc20b01223110a9035700f9c960c8fcbf78c2325ce",
+    "Contents/Resources/release/notices/_floating-ui_dom_1.8.0/LICENSE": "0e4c9a9b6c71019cbbea3bdc20b01223110a9035700f9c960c8fcbf78c2325ce",
+    "Contents/Resources/release/notices/_floating-ui_utils_0.2.12/LICENSE": "0e4c9a9b6c71019cbbea3bdc20b01223110a9035700f9c960c8fcbf78c2325ce",
+    "Contents/Resources/release/notices/_iconify_types_2.0.0/license.txt": "045ce74712fc613fdd74d1c55f5140a08d623836ff2aca44132b38d68fbc67ad",
+    "Contents/Resources/release/notices/_iconify_utils_3.1.7/license.txt": "a86793ac023162ce98b91899601c15f6712f44943163c4f92a0a4bf89152b3bf",
+    "Contents/Resources/release/notices/_mermaid-js_parser_2.0.0/LICENSE": "d374061c40bfb6f99c5033290caefda97a9b3e7e477e5ee02f487143ef2177e8",
+    "Contents/Resources/release/notices/_oxc-project_types_0.151.0/LICENSE": "95ced5ecf1133fbf41d409b5555c86c344f83f3b019926057ddbc07cfdcc27b3",
+    "Contents/Resources/release/notices/_playwright_test_1.63.0/LICENSE": "45873d00a0dd243596deb4aa23b2493b3d1f0671921bf2538ea431d7380220eb",
+    "Contents/Resources/release/notices/_playwright_test_1.63.0/NOTICE": "6d602191187b35b9b01d2cffa01c8469c2c8d9de8a96f1bf868e0f264f51c81d",
+    "Contents/Resources/release/notices/_rolldown_binding-darwin-arm64_1.2.11/README.md": "d0ed9ea9f9b8215381c7db10404bb507d7e54146c4a6a2fa80ca1e8dccd3dad1",
+    "Contents/Resources/release/notices/_rolldown_binding-darwin-arm64_1.2.11/package.json": "db45900bbc3b2b9f07aa4e218c43ae04d716fea98fca10cd7b927f9dcd1d571f",
+    "Contents/Resources/release/notices/_rolldown_pluginutils_1.0.1/LICENSE": "e1919b3b98b8bf6c1b99fcc60a0ed46027c97ac947432e1278446c9606f50161",
+    "Contents/Resources/release/notices/_tiptap_core_3.31.3/LICENSE.md": "c96e5ecb55ac593157ad1d21d1f44a611187f494a0f04c235a1ae692c88d6ba9",
+    "Contents/Resources/release/notices/_tiptap_extension-blockquote_3.31.3/LICENSE.md": "c96e5ecb55ac593157ad1d21d1f44a611187f494a0f04c235a1ae692c88d6ba9",
+    "Contents/Resources/release/notices/_tiptap_extension-bold_3.31.3/LICENSE.md": "c96e5ecb55ac593157ad1d21d1f44a611187f494a0f04c235a1ae692c88d6ba9",
+    "Contents/Resources/release/notices/_tiptap_extension-bubble-menu_3.31.3/LICENSE.md": "c96e5ecb55ac593157ad1d21d1f44a611187f494a0f04c235a1ae692c88d6ba9",
+    "Contents/Resources/release/notices/_tiptap_extension-bullet-list_3.31.3/LICENSE.md": "c96e5ecb55ac593157ad1d21d1f44a611187f494a0f04c235a1ae692c88d6ba9",
+    "Contents/Resources/release/notices/_tiptap_extension-code-block_3.31.3/LICENSE.md": "c96e5ecb55ac593157ad1d21d1f44a611187f494a0f04c235a1ae692c88d6ba9",
+    "Contents/Resources/release/notices/_tiptap_extension-code_3.31.3/LICENSE.md": "c96e5ecb55ac593157ad1d21d1f44a611187f494a0f04c235a1ae692c88d6ba9",
+    "Contents/Resources/release/notices/_tiptap_extension-document_3.31.3/LICENSE.md": "c96e5ecb55ac593157ad1d21d1f44a611187f494a0f04c235a1ae692c88d6ba9",
+    "Contents/Resources/release/notices/_tiptap_extension-dropcursor_3.31.3/LICENSE.md": "c96e5ecb55ac593157ad1d21d1f44a611187f494a0f04c235a1ae692c88d6ba9",
+    "Contents/Resources/release/notices/_tiptap_extension-floating-menu_3.31.3/LICENSE.md": "c96e5ecb55ac593157ad1d21d1f44a611187f494a0f04c235a1ae692c88d6ba9",
+    "Contents/Resources/release/notices/_tiptap_extension-gapcursor_3.31.3/LICENSE.md": "c96e5ecb55ac593157ad1d21d1f44a611187f494a0f04c235a1ae692c88d6ba9",
+    "Contents/Resources/release/notices/_tiptap_extension-hard-break_3.31.3/LICENSE.md": "c96e5ecb55ac593157ad1d21d1f44a611187f494a0f04c235a1ae692c88d6ba9",
+    "Contents/Resources/release/notices/_tiptap_extension-heading_3.31.3/LICENSE.md": "c96e5ecb55ac593157ad1d21d1f44a611187f494a0f04c235a1ae692c88d6ba9",
+    "Contents/Resources/release/notices/_tiptap_extension-horizontal-rule_3.31.3/LICENSE.md": "c96e5ecb55ac593157ad1d21d1f44a611187f494a0f04c235a1ae692c88d6ba9",
+    "Contents/Resources/release/notices/_tiptap_extension-italic_3.31.3/LICENSE.md": "c96e5ecb55ac593157ad1d21d1f44a611187f494a0f04c235a1ae692c88d6ba9",
+    "Contents/Resources/release/notices/_tiptap_extension-link_3.31.3/LICENSE.md": "c96e5ecb55ac593157ad1d21d1f44a611187f494a0f04c235a1ae692c88d6ba9",
+    "Contents/Resources/release/notices/_tiptap_extension-list-item_3.31.3/LICENSE.md": "c96e5ecb55ac593157ad1d21d1f44a611187f494a0f04c235a1ae692c88d6ba9",
+    "Contents/Resources/release/notices/_tiptap_extension-list-keymap_3.31.3/LICENSE.md": "c96e5ecb55ac593157ad1d21d1f44a611187f494a0f04c235a1ae692c88d6ba9",
+    "Contents/Resources/release/notices/_tiptap_extension-list_3.31.3/LICENSE.md": "c96e5ecb55ac593157ad1d21d1f44a611187f494a0f04c235a1ae692c88d6ba9",
+    "Contents/Resources/release/notices/_tiptap_extension-ordered-list_3.31.3/LICENSE.md": "c96e5ecb55ac593157ad1d21d1f44a611187f494a0f04c235a1ae692c88d6ba9",
+    "Contents/Resources/release/notices/_tiptap_extension-paragraph_3.31.3/LICENSE.md": "c96e5ecb55ac593157ad1d21d1f44a611187f494a0f04c235a1ae692c88d6ba9",
+    "Contents/Resources/release/notices/_tiptap_extension-strike_3.31.3/LICENSE.md": "c96e5ecb55ac593157ad1d21d1f44a611187f494a0f04c235a1ae692c88d6ba9",
+    "Contents/Resources/release/notices/_tiptap_extension-text_3.31.3/LICENSE.md": "c96e5ecb55ac593157ad1d21d1f44a611187f494a0f04c235a1ae692c88d6ba9",
+    "Contents/Resources/release/notices/_tiptap_extension-underline_3.31.3/LICENSE.md": "c96e5ecb55ac593157ad1d21d1f44a611187f494a0f04c235a1ae692c88d6ba9",
+    "Contents/Resources/release/notices/_tiptap_extensions_3.31.3/LICENSE.md": "c96e5ecb55ac593157ad1d21d1f44a611187f494a0f04c235a1ae692c88d6ba9",
+    "Contents/Resources/release/notices/_tiptap_pm_3.31.3/LICENSE": "c96e5ecb55ac593157ad1d21d1f44a611187f494a0f04c235a1ae692c88d6ba9",
+    "Contents/Resources/release/notices/_tiptap_react_3.31.3/LICENSE.md": "c96e5ecb55ac593157ad1d21d1f44a611187f494a0f04c235a1ae692c88d6ba9",
+    "Contents/Resources/release/notices/_tiptap_starter-kit_3.31.3/LICENSE.md": "c96e5ecb55ac593157ad1d21d1f44a611187f494a0f04c235a1ae692c88d6ba9",
+    "Contents/Resources/release/notices/_types_d3-array_3.2.2/LICENSE": "c2cfccb812fe482101a8f04597dfc5a9991a6b2748266c47ac91b6a5aae15383",
+    "Contents/Resources/release/notices/_types_d3-axis_3.0.6/LICENSE": "c2cfccb812fe482101a8f04597dfc5a9991a6b2748266c47ac91b6a5aae15383",
+    "Contents/Resources/release/notices/_types_d3-brush_3.0.6/LICENSE": "c2cfccb812fe482101a8f04597dfc5a9991a6b2748266c47ac91b6a5aae15383",
+    "Contents/Resources/release/notices/_types_d3-chord_3.0.6/LICENSE": "c2cfccb812fe482101a8f04597dfc5a9991a6b2748266c47ac91b6a5aae15383",
+    "Contents/Resources/release/notices/_types_d3-color_3.1.3/LICENSE": "c2cfccb812fe482101a8f04597dfc5a9991a6b2748266c47ac91b6a5aae15383",
+    "Contents/Resources/release/notices/_types_d3-contour_3.0.6/LICENSE": "c2cfccb812fe482101a8f04597dfc5a9991a6b2748266c47ac91b6a5aae15383",
+    "Contents/Resources/release/notices/_types_d3-delaunay_6.0.4/LICENSE": "c2cfccb812fe482101a8f04597dfc5a9991a6b2748266c47ac91b6a5aae15383",
+    "Contents/Resources/release/notices/_types_d3-dispatch_3.0.7/LICENSE": "c2cfccb812fe482101a8f04597dfc5a9991a6b2748266c47ac91b6a5aae15383",
+    "Contents/Resources/release/notices/_types_d3-drag_3.0.7/LICENSE": "c2cfccb812fe482101a8f04597dfc5a9991a6b2748266c47ac91b6a5aae15383",
+    "Contents/Resources/release/notices/_types_d3-dsv_3.0.7/LICENSE": "c2cfccb812fe482101a8f04597dfc5a9991a6b2748266c47ac91b6a5aae15383",
+    "Contents/Resources/release/notices/_types_d3-ease_3.0.2/LICENSE": "c2cfccb812fe482101a8f04597dfc5a9991a6b2748266c47ac91b6a5aae15383",
+    "Contents/Resources/release/notices/_types_d3-fetch_3.0.7/LICENSE": "c2cfccb812fe482101a8f04597dfc5a9991a6b2748266c47ac91b6a5aae15383",
+    "Contents/Resources/release/notices/_types_d3-force_3.0.10/LICENSE": "c2cfccb812fe482101a8f04597dfc5a9991a6b2748266c47ac91b6a5aae15383",
+    "Contents/Resources/release/notices/_types_d3-format_3.0.4/LICENSE": "c2cfccb812fe482101a8f04597dfc5a9991a6b2748266c47ac91b6a5aae15383",
+    "Contents/Resources/release/notices/_types_d3-geo_3.1.1/LICENSE": "c2cfccb812fe482101a8f04597dfc5a9991a6b2748266c47ac91b6a5aae15383",
+    "Contents/Resources/release/notices/_types_d3-hierarchy_3.1.7/LICENSE": "c2cfccb812fe482101a8f04597dfc5a9991a6b2748266c47ac91b6a5aae15383",
+    "Contents/Resources/release/notices/_types_d3-interpolate_3.0.4/LICENSE": "c2cfccb812fe482101a8f04597dfc5a9991a6b2748266c47ac91b6a5aae15383",
+    "Contents/Resources/release/notices/_types_d3-path_3.1.1/LICENSE": "c2cfccb812fe482101a8f04597dfc5a9991a6b2748266c47ac91b6a5aae15383",
+    "Contents/Resources/release/notices/_types_d3-polygon_3.0.2/LICENSE": "c2cfccb812fe482101a8f04597dfc5a9991a6b2748266c47ac91b6a5aae15383",
+    "Contents/Resources/release/notices/_types_d3-quadtree_3.0.6/LICENSE": "c2cfccb812fe482101a8f04597dfc5a9991a6b2748266c47ac91b6a5aae15383",
+    "Contents/Resources/release/notices/_types_d3-random_3.0.4/LICENSE": "c2cfccb812fe482101a8f04597dfc5a9991a6b2748266c47ac91b6a5aae15383",
+    "Contents/Resources/release/notices/_types_d3-scale-chromatic_3.1.0/LICENSE": "c2cfccb812fe482101a8f04597dfc5a9991a6b2748266c47ac91b6a5aae15383",
+    "Contents/Resources/release/notices/_types_d3-scale_4.0.9/LICENSE": "c2cfccb812fe482101a8f04597dfc5a9991a6b2748266c47ac91b6a5aae15383",
+    "Contents/Resources/release/notices/_types_d3-selection_3.0.12/LICENSE": "c2cfccb812fe482101a8f04597dfc5a9991a6b2748266c47ac91b6a5aae15383",
+    "Contents/Resources/release/notices/_types_d3-shape_3.2.0/LICENSE": "c2cfccb812fe482101a8f04597dfc5a9991a6b2748266c47ac91b6a5aae15383",
+    "Contents/Resources/release/notices/_types_d3-time-format_4.0.3/LICENSE": "c2cfccb812fe482101a8f04597dfc5a9991a6b2748266c47ac91b6a5aae15383",
+    "Contents/Resources/release/notices/_types_d3-time_3.0.4/LICENSE": "c2cfccb812fe482101a8f04597dfc5a9991a6b2748266c47ac91b6a5aae15383",
+    "Contents/Resources/release/notices/_types_d3-timer_3.0.2/LICENSE": "c2cfccb812fe482101a8f04597dfc5a9991a6b2748266c47ac91b6a5aae15383",
+    "Contents/Resources/release/notices/_types_d3-transition_3.0.9/LICENSE": "c2cfccb812fe482101a8f04597dfc5a9991a6b2748266c47ac91b6a5aae15383",
+    "Contents/Resources/release/notices/_types_d3-zoom_3.0.9/LICENSE": "c2cfccb812fe482101a8f04597dfc5a9991a6b2748266c47ac91b6a5aae15383",
+    "Contents/Resources/release/notices/_types_d3_7.4.3/LICENSE": "c2cfccb812fe482101a8f04597dfc5a9991a6b2748266c47ac91b6a5aae15383",
+    "Contents/Resources/release/notices/_types_geojson_7946.0.16/LICENSE": "c2cfccb812fe482101a8f04597dfc5a9991a6b2748266c47ac91b6a5aae15383",
+    "Contents/Resources/release/notices/_types_katex_0.16.8/LICENSE": "c2cfccb812fe482101a8f04597dfc5a9991a6b2748266c47ac91b6a5aae15383",
+    "Contents/Resources/release/notices/_types_react-dom_19.3.0/LICENSE": "c2cfccb812fe482101a8f04597dfc5a9991a6b2748266c47ac91b6a5aae15383",
+    "Contents/Resources/release/notices/_types_react_19.3.0/LICENSE": "c2cfccb812fe482101a8f04597dfc5a9991a6b2748266c47ac91b6a5aae15383",
+    "Contents/Resources/release/notices/_types_trusted-types_2.0.7/LICENSE": "c2cfccb812fe482101a8f04597dfc5a9991a6b2748266c47ac91b6a5aae15383",
+    "Contents/Resources/release/notices/_types_use-sync-external-store_0.0.6/LICENSE": "c2cfccb812fe482101a8f04597dfc5a9991a6b2748266c47ac91b6a5aae15383",
+    "Contents/Resources/release/notices/_typescript_typescript-darwin-arm64_7.0.2/LICENSE": "a7d00bfd54525bc694b6e32f64c7ebcf5e6b7ae3657be5cc12767bce74654a47",
+    "Contents/Resources/release/notices/_typescript_typescript-darwin-arm64_7.0.2/NOTICE.txt": "f5c708b59114507b8b27b48181b6883d106bbca0c1634bbee45b5e344237b66b",
+    "Contents/Resources/release/notices/_upsetjs_venn.js_2.0.0/LICENSE": "6a3508febf2cfccfee96597394543a6154a4bb0b1f91f28404be42c09e9fcb54",
+    "Contents/Resources/release/notices/chevrotain_11.1.2/LICENSE.txt": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30",
+    "Contents/Resources/release/notices/commander_15.0.0/LICENSE": "04512a63dce4d2d506ad612dc0bd7681ccf6e3655f7b6eaef7dfac8323d1ec0b",
+    "Contents/Resources/release/notices/commander_7.2.0/LICENSE": "04512a63dce4d2d506ad612dc0bd7681ccf6e3655f7b6eaef7dfac8323d1ec0b",
+    "Contents/Resources/release/notices/commander_8.3.0/LICENSE": "04512a63dce4d2d506ad612dc0bd7681ccf6e3655f7b6eaef7dfac8323d1ec0b",
+    "Contents/Resources/release/notices/cose-base_1.0.3/LICENSE": "5fb3cf4a14c3c5af6e473a192df8bca10c77754e3a0c6492c79fb92a76a5478a",
+    "Contents/Resources/release/notices/cose-base_2.2.0/LICENSE": "5fb3cf4a14c3c5af6e473a192df8bca10c77754e3a0c6492c79fb92a76a5478a",
+    "Contents/Resources/release/notices/csstype_3.2.3/LICENSE": "11d55bd4541c75ee7879547ac49089c489163dae49551389713c3d026cab383e",
+    "Contents/Resources/release/notices/cytoscape-cose-bilkent_4.1.0/LICENSE": "440fc58a56a12814e417d2b341da89b050da052dc75bdb235607d37ec5fe74ef",
+    "Contents/Resources/release/notices/cytoscape-fcose_2.2.0/LICENSE": "2837634f403949215760fcdd2fa1ed0c64875d02099ecc8318c704b852f1421d",
+    "Contents/Resources/release/notices/cytoscape_3.34.3/LICENSE": "eb319c6e6f233607f71e8e2f450391751883cfc0eeb3ca7ef574c13d1d9c2203",
+    "Contents/Resources/release/notices/cytoscape_3.34.3/license-update.mjs": "4a5a644717fc90d678e8fbbc537a08452d0566726710eef47b196abd6363e635",
+    "Contents/Resources/release/notices/d3-array_2.12.1/LICENSE": "0747bebeb06b10954913149be9b9a8bdf6fad3e6fdcbd9f9524e7a94c13d2cea",
+    "Contents/Resources/release/notices/d3-array_3.2.4/LICENSE": "3e6849627f74ff73c257a3ae1efb574015d94fc1035c05ec3c15805165efcbc4",
+    "Contents/Resources/release/notices/d3-axis_3.0.0/LICENSE": "e008c5e25a6be382593089c29bfabbc553c6378eee02895aec46ce396cc404ee",
+    "Contents/Resources/release/notices/d3-brush_3.0.0/LICENSE": "e008c5e25a6be382593089c29bfabbc553c6378eee02895aec46ce396cc404ee",
+    "Contents/Resources/release/notices/d3-chord_3.0.1/LICENSE": "e008c5e25a6be382593089c29bfabbc553c6378eee02895aec46ce396cc404ee",
+    "Contents/Resources/release/notices/d3-color_3.1.0/LICENSE": "faa682e3e430941f958d26180458f5934a62f58dac4d70ccdd15608c15d0f884",
+    "Contents/Resources/release/notices/d3-contour_4.0.2/LICENSE": "e51cba0e4fa1d8c078e15319868f2b90188f413f9ce9dac1043b62db32901e93",
+    "Contents/Resources/release/notices/d3-delaunay_6.0.4/LICENSE": "582c3022bd01942336095f92b58a90b1be624dc547d987555c6c956512dd24c1",
+    "Contents/Resources/release/notices/d3-dispatch_3.0.1/LICENSE": "e008c5e25a6be382593089c29bfabbc553c6378eee02895aec46ce396cc404ee",
+    "Contents/Resources/release/notices/d3-drag_3.0.0/LICENSE": "e008c5e25a6be382593089c29bfabbc553c6378eee02895aec46ce396cc404ee",
+    "Contents/Resources/release/notices/d3-dsv_3.0.1/LICENSE": "7842a82012622e5a37bfe4f6c1b67cd3bae6350716b5bf87f36cea0bdc1319dc",
+    "Contents/Resources/release/notices/d3-ease_3.0.1/LICENSE": "b989d9085148d21ff64a75e14462aefa06b2589a55553b07b1460c70081c7d08",
+    "Contents/Resources/release/notices/d3-fetch_3.0.1/LICENSE": "ffdc17dc9040006bddeb891c95bfbb492e86d6bc64a4a4233666febab1be35e0",
+    "Contents/Resources/release/notices/d3-force_3.0.0/LICENSE": "e008c5e25a6be382593089c29bfabbc553c6378eee02895aec46ce396cc404ee",
+    "Contents/Resources/release/notices/d3-format_3.1.2/LICENSE": "2a6d2d5f32ba0b755ddbc1c833f766e30cdbe6ebe9a6d4e3e24427721f0b63d3",
+    "Contents/Resources/release/notices/d3-geo_3.1.1/LICENSE": "3e3edc1224eec9c39cd26491a21304a62883c1e5b6a65c5283ccc7a6cc94baee",
+    "Contents/Resources/release/notices/d3-hierarchy_3.1.2/LICENSE": "e008c5e25a6be382593089c29bfabbc553c6378eee02895aec46ce396cc404ee",
+    "Contents/Resources/release/notices/d3-interpolate_3.0.1/LICENSE": "e008c5e25a6be382593089c29bfabbc553c6378eee02895aec46ce396cc404ee",
+    "Contents/Resources/release/notices/d3-path_1.0.9/LICENSE": "b8265327ab678f554800e71188b1cc6b1ff57522e292d2b1c0be66f27cf328b6",
+    "Contents/Resources/release/notices/d3-path_3.1.0/LICENSE": "a09b0d6d76e768fca2085fad05743ee81ddd11946bcda160a3cf5e1081a479aa",
+    "Contents/Resources/release/notices/d3-polygon_3.0.1/LICENSE": "e008c5e25a6be382593089c29bfabbc553c6378eee02895aec46ce396cc404ee",
+    "Contents/Resources/release/notices/d3-quadtree_3.0.1/LICENSE": "e008c5e25a6be382593089c29bfabbc553c6378eee02895aec46ce396cc404ee",
+    "Contents/Resources/release/notices/d3-random_3.0.1/LICENSE": "e008c5e25a6be382593089c29bfabbc553c6378eee02895aec46ce396cc404ee",
+    "Contents/Resources/release/notices/d3-sankey_0.12.3/LICENSE": "2bf785e778d67a4f5266cffcd4f2cc5bb98cde73791666e7efeb8002ba32dfa5",
+    "Contents/Resources/release/notices/d3-scale-chromatic_3.1.0/LICENSE": "0986d93944902cca9af86824b6a641b4b7c2d10602fc510c433a8bcd443919fe",
+    "Contents/Resources/release/notices/d3-scale_4.0.2/LICENSE": "e008c5e25a6be382593089c29bfabbc553c6378eee02895aec46ce396cc404ee",
+    "Contents/Resources/release/notices/d3-selection_3.0.0/LICENSE": "e008c5e25a6be382593089c29bfabbc553c6378eee02895aec46ce396cc404ee",
+    "Contents/Resources/release/notices/d3-shape_1.3.7/LICENSE": "7eea8533ea92bd8c32a901e89ecb0305890905bb12711449565ddff96891146d",
+    "Contents/Resources/release/notices/d3-shape_3.2.0/LICENSE": "faa682e3e430941f958d26180458f5934a62f58dac4d70ccdd15608c15d0f884",
+    "Contents/Resources/release/notices/d3-time-format_4.1.0/LICENSE": "e008c5e25a6be382593089c29bfabbc553c6378eee02895aec46ce396cc404ee",
+    "Contents/Resources/release/notices/d3-time_3.1.0/LICENSE": "faa682e3e430941f958d26180458f5934a62f58dac4d70ccdd15608c15d0f884",
+    "Contents/Resources/release/notices/d3-timer_3.0.1/LICENSE": "e008c5e25a6be382593089c29bfabbc553c6378eee02895aec46ce396cc404ee",
+    "Contents/Resources/release/notices/d3-transition_3.0.1/LICENSE": "e008c5e25a6be382593089c29bfabbc553c6378eee02895aec46ce396cc404ee",
+    "Contents/Resources/release/notices/d3-zoom_3.0.0/LICENSE": "e008c5e25a6be382593089c29bfabbc553c6378eee02895aec46ce396cc404ee",
+    "Contents/Resources/release/notices/d3_7.9.0/LICENSE": "3e6849627f74ff73c257a3ae1efb574015d94fc1035c05ec3c15805165efcbc4",
+    "Contents/Resources/release/notices/dagre-d3-es_7.0.14/LICENSE.md": "d01eb84ccce437dbf5fd40853bceea0f287930920acea066597a4a25ead63858",
+    "Contents/Resources/release/notices/dayjs_1.11.23/LICENSE": "5faab7526d055651be3aab769d58897be6bd91f3d39d137f25f12dba1b31d5dc",
+    "Contents/Resources/release/notices/delaunator_5.1.0/LICENSE": "0b348fff56384b43dbb37593906904e56d0f9deb51eae590d4dc6d427fbf1808",
+    "Contents/Resources/release/notices/detect-libc_2.1.2/LICENSE": "b40930bbcf80744c86c46a12bc9da056641d722716c378f5659b9e555ef833e1",
+    "Contents/Resources/release/notices/dompurify_3.4.16/LICENSE": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30",
+    "Contents/Resources/release/notices/dompurify_3.4.16/LICENSE-MPL": "fab3dd6bdab226f1c08630b1dd917e11fcb4ec5e1e020e2c16f83a0a13863e85",
+    "Contents/Resources/release/notices/elkjs_0.9.3/LICENSE.md": "89591d4578fb1ebd91501312a3d25f021bd865a2e436641c1cf7b1bc7e3c1617",
+    "Contents/Resources/release/notices/es-toolkit_1.52.0/LICENSE": "51f3674294d988d89dbebd31273baaeb3c697a15482d9699b14d1fded2e132a7",
+    "Contents/Resources/release/notices/es-toolkit_1.52.0/NOTICE": "11ee5e3bce9b0a4dde7f73811caf98978e710228d891c3111ad8ef8d7d2a916f",
+    "Contents/Resources/release/notices/fast-equals_5.4.3/LICENSE": "c0af1c3e74a891b408dc4365897482cc8c284365808e3837c56ea3c337ed7a2c",
+    "Contents/Resources/release/notices/fdir_6.5.0/LICENSE": "9a39f2aadab11a3697edd668ff2d8ad885b649737b7ab4d3bf12b34e5ada0c86",
+    "Contents/Resources/release/notices/fsevents_2.3.3/LICENSE": "2a8a5d6197bb97a018b8a190dd3ed853d750ca87c8e80c17aad41d6c6ff448e1",
+    "Contents/Resources/release/notices/github.com_leaanthony_go-ansi-parser_v1.6.1/LICENSE": "d0817a3112cb46c57b987f58db0d8c71ca99f26d448a351073e3d69b6702e541",
+    "Contents/Resources/release/notices/github.com_leaanthony_slicer_v1.6.0/LICENSE": "6ec71bfac83b3a260158e53408a81392f84982fe19c43b4c2b6e2b6f0b44457b",
+    "Contents/Resources/release/notices/github.com_leaanthony_u_v1.1.1/LICENSE": "ff3448b5ffd013b261466bb5d7898094a845756f8a69773331ebbf66518f4109",
+    "Contents/Resources/release/notices/github.com_mattn_go-sqlite3_v1.14.52/LICENSE": "afa48e5e64dc610298d80b010ae7a3450f61a79500a9f1d1697ff6dcbbfa1f72",
+    "Contents/Resources/release/notices/github.com_pkg_browser_v0.0.0-20240102092130-5ac0b6a4141c/LICENSE": "4801bb0c5d70b980b3e1f63d1d2df8d84fec22548e3d73f03a68df1fb808791f",
+    "Contents/Resources/release/notices/github.com_pkg_errors_v0.9.1/LICENSE": "8d427fd87bc9579ea368fde3d49f9ca22eac857f91a9dec7e3004bdfab7dee86",
+    "Contents/Resources/release/notices/github.com_rivo_uniseg_v0.4.7/LICENSE.txt": "a59885f5f0f3b3c07cf9444db5fe399b6f0791eac82055f7b85cc65500551039",
+    "Contents/Resources/release/notices/github.com_samber_lo_v1.49.1/LICENSE": "adb3ac2e3e382989de6befdd489f4714785af8aca47c01193a9892e8b26b3860",
+    "Contents/Resources/release/notices/github.com_santhosh-tekuri_jsonschema_v6_v6.0.2/LICENSE": "c8858a5a76440bbca484e134cf7df46385d090dd18b2c58e650f939258802e5b",
+    "Contents/Resources/release/notices/github.com_tkrajina_go-reflector_v0.5.8/LICENSE.txt": "3f1fc64a3fded0d8c44382af796cc434fb4026a5d3d56da296dd272277dc336f",
+    "Contents/Resources/release/notices/github.com_wailsapp_mimetype_v1.4.1/LICENSE": "4335e2ceb33d8d7e75125192466ae8604617b0a67492b919604fe52dc56018d9",
+    "Contents/Resources/release/notices/github.com_wailsapp_wails_v2_v2.16.0/LICENSE": "cede95c28e6e9d67d1c1e49e8ba3c20250c7d4080c3faca1579b6732327ae40d",
+    "Contents/Resources/release/notices/github.com_wailsapp_wails_v2_v2.16.0/cmd/wails/internal/template/base/frontend/dist/assets/fonts/OFL.txt": "8656c2a27357b3140047a39b27e3cd928256544ad8a004ef77087f761358208c",
+    "Contents/Resources/release/notices/github.com_wailsapp_wails_v2_v2.16.0/internal/frontend/desktop/windows/winc/AUTHORS": "3e6babb0262dbc81071b4d7296e6038bd3a48e6990b4d54159e11eb1dbcb3220",
+    "Contents/Resources/release/notices/github.com_wailsapp_wails_v2_v2.16.0/internal/frontend/desktop/windows/winc/LICENSE": "bccedbce38390429aa2fbb6cdff1e5622be8cd14c2b5b6b1f522db1813cdbb46",
+    "Contents/Resources/release/notices/github.com_wailsapp_wails_v2_v2.16.0/internal/go-common-file-dialog/LICENSE": "2c09e92358414ef4da9739026acadfbd0663118e590238b306d70ccf60db3159",
+    "Contents/Resources/release/notices/github.com_wailsapp_wails_v2_v2.16.0/internal/typescriptify/LICENSE.txt": "e4794d2db458f14f6bcbd2958b58729c91f274a27c08068e65d9e521d2bd941d",
+    "Contents/Resources/release/notices/github.com_wailsapp_wails_v2_v2.16.0/pkg/templates/generate/assets/common/frontend/src/assets/fonts/OFL.txt": "8656c2a27357b3140047a39b27e3cd928256544ad8a004ef77087f761358208c",
+    "Contents/Resources/release/notices/github.com_wailsapp_wails_v2_v2.16.0/pkg/templates/generate/assets/lit/frontend/src/assets/fonts/OFL.txt": "8656c2a27357b3140047a39b27e3cd928256544ad8a004ef77087f761358208c",
+    "Contents/Resources/release/notices/github.com_wailsapp_wails_v2_v2.16.0/pkg/templates/generate/assets/preact/frontend/src/assets/fonts/OFL.txt": "8656c2a27357b3140047a39b27e3cd928256544ad8a004ef77087f761358208c",
+    "Contents/Resources/release/notices/github.com_wailsapp_wails_v2_v2.16.0/pkg/templates/generate/assets/react/frontend/src/assets/fonts/OFL.txt": "8656c2a27357b3140047a39b27e3cd928256544ad8a004ef77087f761358208c",
+    "Contents/Resources/release/notices/github.com_wailsapp_wails_v2_v2.16.0/pkg/templates/generate/assets/vue/frontend/src/assets/fonts/OFL.txt": "8656c2a27357b3140047a39b27e3cd928256544ad8a004ef77087f761358208c",
+    "Contents/Resources/release/notices/github.com_wailsapp_wails_v2_v2.16.0/pkg/templates/generate/plain/frontend/src/assets/fonts/OFL.txt": "8656c2a27357b3140047a39b27e3cd928256544ad8a004ef77087f761358208c",
+    "Contents/Resources/release/notices/github.com_wailsapp_wails_v2_v2.16.0/pkg/templates/templates/lit/frontend/src/assets/fonts/OFL.txt": "8656c2a27357b3140047a39b27e3cd928256544ad8a004ef77087f761358208c",
+    "Contents/Resources/release/notices/github.com_wailsapp_wails_v2_v2.16.0/pkg/templates/templates/lit-ts/frontend/src/assets/fonts/OFL.txt": "8656c2a27357b3140047a39b27e3cd928256544ad8a004ef77087f761358208c",
+    "Contents/Resources/release/notices/github.com_wailsapp_wails_v2_v2.16.0/pkg/templates/templates/plain/frontend/src/assets/fonts/OFL.txt": "8656c2a27357b3140047a39b27e3cd928256544ad8a004ef77087f761358208c",
+    "Contents/Resources/release/notices/github.com_wailsapp_wails_v2_v2.16.0/pkg/templates/templates/preact/frontend/src/assets/fonts/OFL.txt": "8656c2a27357b3140047a39b27e3cd928256544ad8a004ef77087f761358208c",
+    "Contents/Resources/release/notices/github.com_wailsapp_wails_v2_v2.16.0/pkg/templates/templates/preact-ts/frontend/src/assets/fonts/OFL.txt": "8656c2a27357b3140047a39b27e3cd928256544ad8a004ef77087f761358208c",
+    "Contents/Resources/release/notices/github.com_wailsapp_wails_v2_v2.16.0/pkg/templates/templates/react/frontend/src/assets/fonts/OFL.txt": "8656c2a27357b3140047a39b27e3cd928256544ad8a004ef77087f761358208c",
+    "Contents/Resources/release/notices/github.com_wailsapp_wails_v2_v2.16.0/pkg/templates/templates/react-ts/frontend/src/assets/fonts/OFL.txt": "8656c2a27357b3140047a39b27e3cd928256544ad8a004ef77087f761358208c",
+    "Contents/Resources/release/notices/github.com_wailsapp_wails_v2_v2.16.0/pkg/templates/templates/svelte/frontend/src/assets/fonts/OFL.txt": "8656c2a27357b3140047a39b27e3cd928256544ad8a004ef77087f761358208c",
+    "Contents/Resources/release/notices/github.com_wailsapp_wails_v2_v2.16.0/pkg/templates/templates/svelte-ts/frontend/src/assets/fonts/OFL.txt": "8656c2a27357b3140047a39b27e3cd928256544ad8a004ef77087f761358208c",
+    "Contents/Resources/release/notices/github.com_wailsapp_wails_v2_v2.16.0/pkg/templates/templates/vanilla/frontend/src/assets/fonts/OFL.txt": "8656c2a27357b3140047a39b27e3cd928256544ad8a004ef77087f761358208c",
+    "Contents/Resources/release/notices/github.com_wailsapp_wails_v2_v2.16.0/pkg/templates/templates/vanilla-ts/frontend/src/assets/fonts/OFL.txt": "8656c2a27357b3140047a39b27e3cd928256544ad8a004ef77087f761358208c",
+    "Contents/Resources/release/notices/github.com_wailsapp_wails_v2_v2.16.0/pkg/templates/templates/vue/frontend/src/assets/fonts/OFL.txt": "8656c2a27357b3140047a39b27e3cd928256544ad8a004ef77087f761358208c",
+    "Contents/Resources/release/notices/github.com_wailsapp_wails_v2_v2.16.0/pkg/templates/templates/vue-ts/frontend/src/assets/fonts/OFL.txt": "8656c2a27357b3140047a39b27e3cd928256544ad8a004ef77087f761358208c",
+    "Contents/Resources/release/notices/go-toolchain/LICENSE": "911f8f5782931320f5b8d1160a76365b83aea6447ee6c04fa6d5591467db9dad",
+    "Contents/Resources/release/notices/golang.org_x_net_v0.56.0/LICENSE": "911f8f5782931320f5b8d1160a76365b83aea6447ee6c04fa6d5591467db9dad",
+    "Contents/Resources/release/notices/golang.org_x_text_v0.39.0/LICENSE": "911f8f5782931320f5b8d1160a76365b83aea6447ee6c04fa6d5591467db9dad",
+    "Contents/Resources/release/notices/hachure-fill_0.5.2/LICENSE": "5e807b516a9be9229ed459880bf353a336e2d947867247290680d437017be391",
+    "Contents/Resources/release/notices/highlight.js_11.12.0/LICENSE": "6c081431591d9df696c82dc598fe1423765b8a299b200ed00b281afd0f64c490",
+    "Contents/Resources/release/notices/iconv-lite_0.6.3/LICENSE": "ac779f7314c74f232ef847ea86e714abe25cf6eeb5cc97b69451b74e2af6492d",
+    "Contents/Resources/release/notices/import-meta-resolve_4.2.0/license": "8770a1a4b69ee722636643e81340ce4a8f0b8415b1c568487edc9062338bfcc7",
+    "Contents/Resources/release/notices/internmap_1.0.1/LICENSE": "9ea8903938dab5f12c4572d60725069bec2d1b0dc3bcc210b09bae946a5ebb1f",
+    "Contents/Resources/release/notices/internmap_2.0.3/LICENSE": "9ea8903938dab5f12c4572d60725069bec2d1b0dc3bcc210b09bae946a5ebb1f",
+    "Contents/Resources/release/notices/katex_0.16.47/LICENSE": "766ccc1f306c885aa45542a9846bbd0a505b27a0374f146778171c2254ce18e3",
+    "Contents/Resources/release/notices/katex_0.18.9/LICENSE": "766ccc1f306c885aa45542a9846bbd0a505b27a0374f146778171c2254ce18e3",
+    "Contents/Resources/release/notices/khroma_2.1.0/license": "66b333b0f66759a0b710459e03f7029abe17f4358114a128d2c972e642961b49",
+    "Contents/Resources/release/notices/layout-base_1.0.2/LICENSE": "eabb762d8a95109a39c9be3247325529a5239a7aca327d909c3ccdc41f3a06bf",
+    "Contents/Resources/release/notices/layout-base_2.0.1/LICENSE": "eabb762d8a95109a39c9be3247325529a5239a7aca327d909c3ccdc41f3a06bf",
+    "Contents/Resources/release/notices/lightningcss-darwin-arm64_1.33.0/LICENSE": "5eba353fe5076ac3432177f8ab1cf75e3afcd0584251e37c3bfead5f447d040e",
+    "Contents/Resources/release/notices/lightningcss_1.33.0/LICENSE": "5eba353fe5076ac3432177f8ab1cf75e3afcd0584251e37c3bfead5f447d040e",
+    "Contents/Resources/release/notices/linkifyjs_4.3.3/LICENSE": "58e6f3677452cca096ce5328ebf7de37a1406bbeeb2f263c1b2ededc8c7d0228",
+    "Contents/Resources/release/notices/llama.cpp/AUTHORS": "71cc2a5e46e4d1da0d1f78f186d3252a2c01f7829a8eda36e8aef5dcfebcf17f",
+    "Contents/Resources/release/notices/llama.cpp/LICENSE": "94f29bbed6a22c35b992c5c6ebf0e7c92f13b836b90f36f461c9cf2f0f1d010d",
+    "Contents/Resources/release/notices/llama.cpp/cmake/license.cmake": "083515dff8a9b8696e348c7c616934e53941a7db30e1b3f092576632e9a2d1d4",
+    "Contents/Resources/release/notices/llama.cpp/gguf-py/LICENSE": "ef78c7e6659e34c798194f0d344e807c722de70cbca1359ef54772661e11ca38",
+    "Contents/Resources/release/notices/llama.cpp/licenses/LICENSE-jsonhpp": "c0d068392ea65358b798b8c165103560f06e9e3b38c4ab4e2d8810a7b931af86",
+    "Contents/Resources/release/notices/llama.cpp/tools/ui/src/lib/vendors/big-integer/LICENSE": "e9b0e94f628e00b5ed98046cfa041696ff89eebbbdd54108ee350625bc6d0363",
+    "Contents/Resources/release/notices/llama.cpp/tools/ui/src/lib/vendors/decimal.js/LICENCE.md": "3108b546bcff5d346923a82f48b2d252ca722f9088076db6d145f6b67757ad6c",
+    "Contents/Resources/release/notices/llama.cpp/tools/ui/src/lib/vendors/nerdamer-prime/LICENSE": "c9f52548869a0a2e63a7100055c54cebf36b9327c8fc2da7cf9ca8dddc2f1cca",
+    "Contents/Resources/release/notices/llama.cpp/vendor/cpp-httplib/LICENSE": "4b45cbe16d7b71b89ae6127e26e0d90a029198ca5e958ad8e3d0b8bbed364d8b",
+    "Contents/Resources/release/notices/llama.cpp/vendor/hash/rotate-bits/LICENSE.md": "ca0b44aec101afb6b46f4c39b23369fa06a64fb9c0add37c2689d702156fee55",
+    "Contents/Resources/release/notices/llama.cpp/vendor/hash/sha256/LICENSE": "b81d0022ca6367918c67b57e9647d3513ee58809fd4b0ef0b3492f1356bced25",
+    "Contents/Resources/release/notices/llama.cpp/vendor/hash/xxhash/LICENSE": "6ffedbc0f7878612d2b23589f1ff2ab15633e1df7963a5d9fc750ec5500c7e7a",
+    "Contents/Resources/release/notices/lodash-es_4.17.23/LICENSE": "f71e8ed126b46346494aad5486874cd8f0aafe95092ed67d2e3cb6110f939abc",
+    "Contents/Resources/release/notices/lodash-es_4.18.1/LICENSE": "f71e8ed126b46346494aad5486874cd8f0aafe95092ed67d2e3cb6110f939abc",
+    "Contents/Resources/release/notices/marked_16.4.2/LICENSE.md": "8e3a3f82f59a60958f56ca08f445647c32a4733dc7ca6c2c46f6eb898471ab9c",
+    "Contents/Resources/release/notices/mermaid_12.0.0/LICENSE": "ec9fb67dcb25eccc416ed56e1aab819222c805a2a4bfe4cb19e7556bf2ffde80",
+    "Contents/Resources/release/notices/model-and-runtime-licenses/bge-small-en-model-card.md": "496b991097837fd0a32a4c4a474c4090e2a9b119dbe5354ba73079b0df30803a",
+    "Contents/Resources/release/notices/model-and-runtime-licenses/qwen-0.5b-LICENSE": "832dd9e00a68dd83b3c3fb9f5588dad7dcf337a0db50f7d9483f310cd292e92e",
+    "Contents/Resources/release/notices/model-and-runtime-licenses/qwen-1.5b-LICENSE": "832dd9e00a68dd83b3c3fb9f5588dad7dcf337a0db50f7d9483f310cd292e92e",
+    "Contents/Resources/release/notices/model-and-runtime-licenses/sqlite-vec-LICENSE-MIT": "6ce72bbe12d975bd5286e5ab0a064c069693300c47bccbc57bec18485f1621ea",
+    "Contents/Resources/release/notices/model-and-runtime-licenses/tinyllamas-model-card.md": "f5d36081d79fc18b2b8ee80fbf05f307c30ea8d6f3ce605c3f393be29f7d8863",
+    "Contents/Resources/release/notices/model-and-runtime-licenses/whisper-tiny-en-model-card.md": "13627ce3d7dce389223eab7b6ed06738f0f1c786e5245e650b029e4e314c8ff1",
+    "Contents/Resources/release/notices/nanoid_3.3.19/LICENSE": "da4db1480d9beea3483a2eda5c53b22238d0827d57da162b48f122e04d2d9987",
+    "Contents/Resources/release/notices/orderedmap_2.1.1/LICENSE": "869c30f368eb08735e779027b9f4bc9fea2f39624351856aebe42741f0bc0884",
+    "Contents/Resources/release/notices/package-manager-detector_1.8.0/LICENSE": "05c365176db3cc00e951c44b921c809c75b8e99d2d724f7daf00381e26fb0850",
+    "Contents/Resources/release/notices/path-data-parser_0.1.0/LICENSE": "e9754a00aebde654e80f40bcf41dab667d6a41dfbbd2912bcf14fb07d468bf71",
+    "Contents/Resources/release/notices/picocolors_1.1.1/LICENSE": "6582629e2979466878f6014313dcc2f3756c9616148682227ce3063dde310750",
+    "Contents/Resources/release/notices/picomatch_4.0.7/LICENSE": "d0cd141b0c322fded5dfad1d4645bb2fedfc05b7321fe1009469638190d59ef9",
+    "Contents/Resources/release/notices/playwright-core_1.63.0/LICENSE": "45873d00a0dd243596deb4aa23b2493b3d1f0671921bf2538ea431d7380220eb",
+    "Contents/Resources/release/notices/playwright-core_1.63.0/NOTICE": "6d602191187b35b9b01d2cffa01c8469c2c8d9de8a96f1bf868e0f264f51c81d",
+    "Contents/Resources/release/notices/playwright_1.63.0/LICENSE": "45873d00a0dd243596deb4aa23b2493b3d1f0671921bf2538ea431d7380220eb",
+    "Contents/Resources/release/notices/playwright_1.63.0/NOTICE": "6d602191187b35b9b01d2cffa01c8469c2c8d9de8a96f1bf868e0f264f51c81d",
+    "Contents/Resources/release/notices/points-on-curve_0.2.0/LICENSE": "e9754a00aebde654e80f40bcf41dab667d6a41dfbbd2912bcf14fb07d468bf71",
+    "Contents/Resources/release/notices/points-on-path_0.2.1/LICENSE": "b6fc1f7f1d96a48bc97176f3dcef959e364c5c17ba44167511de421500a86c6c",
+    "Contents/Resources/release/notices/postcss_8.5.28/LICENSE": "5be1f3465bba68a626777f984878814aaf35e7ef8e9fd314d469bcf887050fb8",
+    "Contents/Resources/release/notices/prettier_3.9.9/LICENSE": "b0f2417199889f1c0d28ec4e0244eacf1a15de5819d61f641dd7d8f45153ac9c",
+    "Contents/Resources/release/notices/prosemirror-changeset_2.4.4/LICENSE": "7543dfe82fa61d5bb2478c78cbd9dfb2cbd500b6ac2893b24ed925773b67fb70",
+    "Contents/Resources/release/notices/prosemirror-commands_1.7.2/LICENSE": "ef0b452ced6304db2ce78ca66de1fc7b97bab05bc1750c95df359ed3fe1d65c8",
+    "Contents/Resources/release/notices/prosemirror-dropcursor_1.8.4/LICENSE": "ef0b452ced6304db2ce78ca66de1fc7b97bab05bc1750c95df359ed3fe1d65c8",
+    "Contents/Resources/release/notices/prosemirror-gapcursor_1.4.1/LICENSE": "ef0b452ced6304db2ce78ca66de1fc7b97bab05bc1750c95df359ed3fe1d65c8",
+    "Contents/Resources/release/notices/prosemirror-history_1.5.1/LICENSE": "ef0b452ced6304db2ce78ca66de1fc7b97bab05bc1750c95df359ed3fe1d65c8",
+    "Contents/Resources/release/notices/prosemirror-inputrules_1.5.1/LICENSE": "ef0b452ced6304db2ce78ca66de1fc7b97bab05bc1750c95df359ed3fe1d65c8",
+    "Contents/Resources/release/notices/prosemirror-keymap_1.2.3/LICENSE": "ef0b452ced6304db2ce78ca66de1fc7b97bab05bc1750c95df359ed3fe1d65c8",
+    "Contents/Resources/release/notices/prosemirror-model_1.25.12/LICENSE": "ef0b452ced6304db2ce78ca66de1fc7b97bab05bc1750c95df359ed3fe1d65c8",
+    "Contents/Resources/release/notices/prosemirror-schema-list_1.5.1/LICENSE": "ef0b452ced6304db2ce78ca66de1fc7b97bab05bc1750c95df359ed3fe1d65c8",
+    "Contents/Resources/release/notices/prosemirror-state_1.4.4/LICENSE": "ef0b452ced6304db2ce78ca66de1fc7b97bab05bc1750c95df359ed3fe1d65c8",
+    "Contents/Resources/release/notices/prosemirror-tables_1.8.5/LICENSE": "d1d2046ebbe6362f9ad8fd4d62e9074f2553f289c0e1de895a650f10ba5f4239",
+    "Contents/Resources/release/notices/prosemirror-transform_1.12.2/LICENSE": "ef0b452ced6304db2ce78ca66de1fc7b97bab05bc1750c95df359ed3fe1d65c8",
+    "Contents/Resources/release/notices/prosemirror-view_1.42.6/LICENSE": "ef0b452ced6304db2ce78ca66de1fc7b97bab05bc1750c95df359ed3fe1d65c8",
+    "Contents/Resources/release/notices/react-dom_19.3.0/LICENSE": "da6d3703ed11cbe42bd212c725957c98da23cbff1998c05fa4b3d976d1a58e93",
+    "Contents/Resources/release/notices/react_19.3.0/LICENSE": "da6d3703ed11cbe42bd212c725957c98da23cbff1998c05fa4b3d976d1a58e93",
+    "Contents/Resources/release/notices/robust-predicates_3.0.3/LICENSE": "88d9b4eb60579c191ec391ca04c16130572d7eedc4a86daa58bf28c6e14c9bcd",
+    "Contents/Resources/release/notices/rolldown_1.2.11/LICENSE": "23ecfff35a5a2e80d92142f75228912c3b1abc4b5a8337a821ff4397e2f9f734",
+    "Contents/Resources/release/notices/rolldown_1.2.11/THIRD-PARTY-LICENSE": "a877291d800ed43692f3f9ae09d8e01cc6f7293ad39d43896059c188ffbb8b7c",
+    "Contents/Resources/release/notices/rope-sequence_1.3.4/LICENSE": "530424aebdd0e73f53238d1f89df250057bc8d8ce090cf5954197fadce5bf226",
+    "Contents/Resources/release/notices/roughjs_4.6.6/LICENSE": "dca9a392272606ac748ac0976a2a1133f14eef841c27beaa51a844d53c56a09d",
+    "Contents/Resources/release/notices/rw_1.3.3/LICENSE": "e273680c43c2ab5bb3b50af28de6a08000b333396834db7bf6129cd6f130c9cd",
+    "Contents/Resources/release/notices/safer-buffer_2.1.2/LICENSE": "4bc935e71be198c67ddf3c2b5fddb195f6edc182bfc155a96a6db61b44b494b9",
+    "Contents/Resources/release/notices/scheduler_0.28.0/LICENSE": "da6d3703ed11cbe42bd212c725957c98da23cbff1998c05fa4b3d976d1a58e93",
+    "Contents/Resources/release/notices/source-map-js_1.2.1/LICENSE": "6cb0631f71c7749763fd3dd1d5bee52dd1070ec17f2edc1710079ad070bd2fbd",
+    "Contents/Resources/release/notices/sqlite-vec/LICENSE-MIT": "6ce72bbe12d975bd5286e5ab0a064c069693300c47bccbc57bec18485f1621ea",
+    "Contents/Resources/release/notices/stylis_4.4.0/LICENSE": "88c579c6ee44b41137a21321190d177982e5b17d4fa1b83a4a2e3ea325a8fc9a",
+    "Contents/Resources/release/notices/tinyexec_1.3.1/LICENSE": "f95f668fe64081ddb4153b322e34fdd719b991285ed08177d5ad7133b7988d92",
+    "Contents/Resources/release/notices/tinyglobby_0.2.17/LICENSE": "22c68811e174cbbfb3813d4135918df4f540959c14d872e601d9abe83d3cde8f",
+    "Contents/Resources/release/notices/ts-dedent_2.3.0/LICENSE": "eff13095d9d762c3bd9dda74370c81e2130c28f2691bc455603abf973bac25b9",
+    "Contents/Resources/release/notices/typescript_7.0.2/LICENSE": "a7d00bfd54525bc694b6e32f64c7ebcf5e6b7ae3657be5cc12767bce74654a47",
+    "Contents/Resources/release/notices/typescript_7.0.2/NOTICE.txt": "f5c708b59114507b8b27b48181b6883d106bbca0c1634bbee45b5e344237b66b",
+    "Contents/Resources/release/notices/use-sync-external-store_1.7.0/LICENSE": "da6d3703ed11cbe42bd212c725957c98da23cbff1998c05fa4b3d976d1a58e93",
+    "Contents/Resources/release/notices/uuid_14.0.2/LICENSE.md": "beaa6b04fb82e41dd2ad679e19e27953afb5999b1abbb455b6564e78ebfeb332",
+    "Contents/Resources/release/notices/vite_8.3.1/LICENSE.md": "387dd7baa307083401a27c58c362c30832f5ba1dba84f10cc22c33401523f45c",
+    "Contents/Resources/release/notices/w3c-keyname_2.2.8/LICENSE": "869c30f368eb08735e779027b9f4bc9fea2f39624351856aebe42741f0bc0884",
+    "Contents/Resources/release/notices/whisper.cpp/AUTHORS": "09800c8c5bdf54bcfd65d869c85ea1b1756016f15798bef9e706ca390ab04f12",
+    "Contents/Resources/release/notices/whisper.cpp/LICENSE": "94f29bbed6a22c35b992c5c6ebf0e7c92f13b836b90f36f461c9cf2f0f1d010d",
+    "Contents/Resources/release/notices/whisper.cpp/bindings/go/LICENSE": "3fa8d70be1f0deb5fb971a9c36cfbdcdc904fa46646560f9ac859494b40248b6",
+    "Contents/Resources/release/notices/whisper.cpp/examples/wchess/wchess.wasm/chessboardjs-1.0.0/js/chessboard-1.0.0/LICENSE.md": "d33e835c372360941e425214c06c2063f7058d850b9a0153d5a624c1cab9bf31",
+    "Contents/Resources/release/notices/whisper.cpp/tests/earnings21/normalizers/LICENSE": "fff3c2ad5a861a1dedc227f08afca28a12bd6fd80a11e0095901262c4fe61d16",
+    "Contents/Resources/release/notices/whisper.cpp/tests/librispeech/normalizers/LICENSE": "fff3c2ad5a861a1dedc227f08afca28a12bd6fd80a11e0095901262c4fe61d16",
+    "Contents/Resources/release/notices/whisper.cpp/tests/librispeech-parakeet/normalizers/LICENSE": "fff3c2ad5a861a1dedc227f08afca28a12bd6fd80a11e0095901262c4fe61d16",
+    "Contents/Resources/release/provenance.json": "5a05ad0665b27f37db11d39c95e78b6e0a2d8f1e9c554c5054242c08c22a4d37",
+    "Contents/_CodeSignature/CodeResources": "50ebb68dd1d9bb223a4b726ccf13dbf4d1e537d6a407299d5d3a046ace33589b"
+  },
+  "bundleInfo": {
+    "CFBundleDisplayName": "Trove",
+    "CFBundleExecutable": "Trove",
+    "CFBundleIdentifier": "local.trove.desktop",
+    "CFBundleName": "Trove",
+    "CFBundlePackageType": "APPL",
+    "CFBundleShortVersionString": "0.3.0",
+    "CFBundleVersion": "3",
+    "LSMinimumSystemVersion": "27.0",
+    "NSHighResolutionCapable": true,
+    "NSHumanReadableCopyright": "Trove contributors",
+    "NSMicrophoneUsageDescription": "Trove records meetings locally when you start a recording.",
+    "TroveReleaseChannel": "P0 release candidate"
+  },
+  "machOFiles": [
+    {
+      "path": "Contents/MacOS/Trove",
+      "sha256": "5b3ac5c6a5f764bf39b8c28a56e9093c1fb7dd8d5a29f9faf0599fa5829b6e3e",
+      "sizeBytes": 31151168,
+      "architecture": "arm64",
+      "dependencies": [
+        {
+          "installName": "/usr/lib/libresolv.9.dylib",
+          "resolution": "operating-system"
+        },
+        {
+          "installName": "/System/Library/Frameworks/UniformTypeIdentifiers.framework/Versions/A/UniformTypeIdentifiers",
+          "resolution": "operating-system"
+        },
+        {
+          "installName": "/usr/lib/libSystem.B.dylib",
+          "resolution": "operating-system"
+        },
+        {
+          "installName": "/System/Library/Frameworks/CoreFoundation.framework/Versions/A/CoreFoundation",
+          "resolution": "operating-system"
+        },
+        {
+          "installName": "/System/Library/Frameworks/Security.framework/Versions/A/Security",
+          "resolution": "operating-system"
+        },
+        {
+          "installName": "/System/Library/Frameworks/Foundation.framework/Versions/C/Foundation",
+          "resolution": "operating-system"
+        },
+        {
+          "installName": "/System/Library/Frameworks/Cocoa.framework/Versions/A/Cocoa",
+          "resolution": "operating-system"
+        },
+        {
+          "installName": "/System/Library/Frameworks/WebKit.framework/Versions/A/WebKit",
+          "resolution": "operating-system"
+        },
+        {
+          "installName": "/System/Library/Frameworks/UserNotifications.framework/Versions/A/UserNotifications",
+          "resolution": "operating-system"
+        },
+        {
+          "installName": "/System/Library/Frameworks/AppKit.framework/Versions/C/AppKit",
+          "resolution": "operating-system"
+        },
+        {
+          "installName": "/usr/lib/libobjc.A.dylib",
+          "resolution": "operating-system"
+        },
+        {
+          "installName": "/System/Library/Frameworks/CoreGraphics.framework/Versions/A/CoreGraphics",
+          "resolution": "operating-system"
+        }
+      ],
+      "rpaths": [],
+      "buildVersions": [
+        {
+          "platform": "1",
+          "minos": "27.0",
+          "sdk": "27.0"
+        }
+      ],
+      "codesignVerification": {
+        "command": [
+          "/usr/bin/codesign",
+          "--verify",
+          "--strict",
+          "--verbose=2",
+          "/Volumes/HD-B1/HD-Projects/Trove/build/phase3-candidate-2/Trove.app/Contents/MacOS/Trove"
+        ],
+        "exitCode": 0,
+        "stdout": "",
+        "stderr": "/Volumes/HD-B1/HD-Projects/Trove/build/phase3-candidate-2/Trove.app/Contents/MacOS/Trove: valid on disk\n/Volumes/HD-B1/HD-Projects/Trove/build/phase3-candidate-2/Trove.app/Contents/MacOS/Trove: satisfies its Designated Requirement\n"
+      },
+      "signature": {
+        "command": [
+          "/usr/bin/codesign",
+          "-dv",
+          "--verbose=4",
+          "/Volumes/HD-B1/HD-Projects/Trove/build/phase3-candidate-2/Trove.app/Contents/MacOS/Trove"
+        ],
+        "exitCode": 0,
+        "stdout": "",
+        "stderr": "Executable=/Volumes/HD-B1/HD-Projects/Trove/build/phase3-candidate-2/Trove.app/Contents/MacOS/Trove\nIdentifier=local.trove.desktop\nFormat=app bundle with Mach-O thin (arm64)\nCodeDirectory v=20400 size=61068 flags=0x2(adhoc) hashes=1898+7 location=embedded\nVersionPlatform=1\nVersionMin=1769472\nVersionSDK=1769472\nHash type=sha256 size=32\nCandidateCDHash sha256=9633e059159c14d10601b2c3c1045889e8422161\nCandidateCDHashFull sha256=9633e059159c14d10601b2c3c1045889e842216137748a3a7bc05655b0fcb0e0\nHash choices=sha256\nCMSDigest=9633e059159c14d10601b2c3c1045889e842216137748a3a7bc05655b0fcb0e0\nCMSDigestType=2\nExecutable Segment base=0\nExecutable Segment limit=20332544\nExecutable Segment flags=0x1\nPage size=16384\nCDHash=9633e059159c14d10601b2c3c1045889e8422161\nSignature=adhoc\nInfo.plist entries=12\nTeamIdentifier=not set\nSealed Resources version=2 rules=13 files=289\nInternal requirements count=0 size=12\nTotal signatures=1\nChosen signature=1\n"
+      },
+      "entitlements": {
+        "command": [
+          "/usr/bin/codesign",
+          "-d",
+          "--entitlements",
+          ":-",
+          "/Volumes/HD-B1/HD-Projects/Trove/build/phase3-candidate-2/Trove.app/Contents/MacOS/Trove"
+        ],
+        "exitCode": 0,
+        "stdout": "<?xml version=\"1.0\" encoding=\"UTF-8\"?><!DOCTYPE plist PUBLIC \"-//Apple//DTD PLIST 1.0//EN\" \"https://www.apple.com/DTDs/PropertyList-1.0.dtd\"><plist version=\"1.0\"><dict><key>com.apple.security.device.audio-input</key><true/></dict></plist>\n",
+        "stderr": "Executable=/Volumes/HD-B1/HD-Projects/Trove/build/phase3-candidate-2/Trove.app/Contents/MacOS/Trove\nwarning: Specifying ':' in the path is deprecated and will not work in a future release\n"
+      },
+      "otoolLinkedLibraries": {
+        "command": [
+          "/usr/bin/otool",
+          "-L",
+          "/Volumes/HD-B1/HD-Projects/Trove/build/phase3-candidate-2/Trove.app/Contents/MacOS/Trove"
+        ],
+        "exitCode": 0,
+        "stdout": "/Volumes/HD-B1/HD-Projects/Trove/build/phase3-candidate-2/Trove.app/Contents/MacOS/Trove:\n\t/usr/lib/libresolv.9.dylib (compatibility version 1.0.0, current version 1.0.0)\n\t/System/Library/Frameworks/UniformTypeIdentifiers.framework/Versions/A/UniformTypeIdentifiers (compatibility version 1.0.0, current version 709.0.0)\n\t/usr/lib/libSystem.B.dylib (compatibility version 1.0.0, current version 1359.0.0)\n\t/System/Library/Frameworks/CoreFoundation.framework/Versions/A/CoreFoundation (compatibility version 150.0.0, current version 5027.0.69)\n\t/System/Library/Frameworks/Security.framework/Versions/A/Security (compatibility version 1.0.0, current version 62460.1.2)\n\t/System/Library/Frameworks/Foundation.framework/Versions/C/Foundation (compatibility version 300.0.0, current version 5027.0.69)\n\t/System/Library/Frameworks/Cocoa.framework/Versions/A/Cocoa (compatibility version 1.0.0, current version 24.0.0)\n\t/System/Library/Frameworks/WebKit.framework/Versions/A/WebKit (compatibility version 1.0.0, current version 625.1.29)\n\t/System/Library/Frameworks/UserNotifications.framework/Versions/A/UserNotifications (compatibility version 1.0.0, current version 1.0.0)\n\t/System/Library/Frameworks/AppKit.framework/Versions/C/AppKit (compatibility version 45.0.0, current version 2775.10.103)\n\t/usr/lib/libobjc.A.dylib (compatibility version 1.0.0, current version 228.0.0)\n\t/System/Library/Frameworks/CoreGraphics.framework/Versions/A/CoreGraphics (compatibility version 64.0.0, current version 2050.0.0)\n",
+        "stderr": ""
+      },
+      "otoolLoadCommands": {
+        "command": [
+          "/usr/bin/otool",
+          "-l",
+          "/Volumes/HD-B1/HD-Projects/Trove/build/phase3-candidate-2/Trove.app/Contents/MacOS/Trove"
+        ],
+        "exitCode": 0,
+        "stdout": "/Volumes/HD-B1/HD-Projects/Trove/build/phase3-candidate-2/Trove.app/Contents/MacOS/Trove:\nLoad command 0\n      cmd LC_SEGMENT_64\n  cmdsize 72\n  segname __PAGEZERO\n   vmaddr 0x0000000000000000\n   vmsize 0x0000000100000000\n  fileoff 0\n filesize 0\n  maxprot 0x00000000\n initprot 0x00000000\n   nsects 0\n    flags 0x0\nLoad command 1\n      cmd LC_SEGMENT_64\n  cmdsize 1192\n  segname __TEXT\n   vmaddr 0x0000000100000000\n   vmsize 0x0000000001364000\n  fileoff 0\n filesize 20332544\n  maxprot 0x00000005\n initprot 0x00000005\n   nsects 14\n    flags 0x0\nSection\n  sectname __text\n   segname __TEXT\n      addr 0x00000001000023a0\n      size 0x000000000067dc30\n    offset 9120\n     align 2^4 (16)\n    reloff 0\n    nreloc 0\n     flags 0x80000400\n reserved1 0\n reserved2 0\nSection\n  sectname __stubs\n   segname __TEXT\n      addr 0x000000010067ffd0\n      size 0x0000000000000ac8\n    offset 6815696\n     align 2^2 (4)\n    reloff 0\n    nreloc 0\n     flags 0x80000408\n reserved1 0 (index into indirect symbol table)\n reserved2 12 (size of stubs)\nSection\n  sectname __objc_stubs\n   segname __TEXT\n      addr 0x0000000100680aa0\n      size 0x0000000000002bc0\n    offset 6818464\n     align 2^5 (32)\n    reloff 0\n    nreloc 0\n     flags 0x80000400\n reserved1 0\n reserved2 0\nSection\n  sectname __objc_methlist\n   segname __TEXT\n      addr 0x0000000100683660\n      size 0x0000000000000f18\n    offset 6829664\n     align 2^3 (8)\n    reloff 0\n    nreloc 0\n     flags 0x00000000\n reserved1 0\n reserved2 0\nSection\n  sectname __rodata\n   segname __TEXT\n      addr 0x0000000100684580\n      size 0x0000000000869139\n    offset 6833536\n     align 2^5 (32)\n    reloff 0\n    nreloc 0\n     flags 0x00000000\n reserved1 0\n reserved2 0\nSection\n  sectname __gopclntab\n   segname __TEXT\n      addr 0x0000000100eed6c0\n      size 0x00000000004492bc\n    offset 15652544\n     align 2^3 (8)\n    reloff 0\n    nreloc 0\n     flags 0x00000000\n reserved1 0\n reserved2 0\nSection\n  sectname __const\n   segname __TEXT\n      addr 0x0000000101336980\n      size 0x0000000000009548\n    offset 20146560\n     align 2^4 (16)\n    reloff 0\n    nreloc 0\n     flags 0x00000000\n reserved1 0\n reserved2 0\nSection\n  sectname __cstring\n   segname __TEXT\n      addr 0x000000010133fec8\n      size 0x000000000000dfe1\n    offset 20184776\n     align 2^0 (1)\n    reloff 0\n    nreloc 0\n     flags 0x00000002\n reserved1 0\n reserved2 0\nSection\n  sectname __objc_methname\n   segname __TEXT\n      addr 0x000000010134dea9\n      size 0x0000000000003551\n    offset 20242089\n     align 2^0 (1)\n    reloff 0\n    nreloc 0\n     flags 0x00000002\n reserved1 0\n reserved2 0\nSection\n  sectname __objc_classname\n   segname __TEXT\n      addr 0x00000001013513fa\n      size 0x000000000000010f\n    offset 20255738\n     align 2^0 (1)\n    reloff 0\n    nreloc 0\n     flags 0x00000002\n reserved1 0\n reserved2 0\nSection\n  sectname __objc_methtype\n   segname __TEXT\n      addr 0x0000000101351509\n      size 0x000000000000115d\n    offset 20256009\n     align 2^0 (1)\n    reloff 0\n    nreloc 0\n     flags 0x00000002\n reserved1 0\n reserved2 0\nSection\n  sectname __gcc_except_tab\n   segname __TEXT\n      addr 0x0000000101352668\n      size 0x0000000000000030\n    offset 20260456\n     align 2^2 (4)\n    reloff 0\n    nreloc 0\n     flags 0x00000000\n reserved1 0\n reserved2 0\nSection\n  sectname __unwind_info\n   segname __TEXT\n      addr 0x0000000101352698\n      size 0x000000000000f160\n    offset 20260504\n     align 2^2 (4)\n    reloff 0\n    nreloc 0\n     flags 0x00000000\n reserved1 0\n reserved2 0\nSection\n  sectname __eh_frame\n   segname __TEXT\n      addr 0x00000001013617f8\n      size 0x00000000000000e8\n    offset 20322296\n     align 2^3 (8)\n    reloff 0\n    nreloc 0\n     flags 0x6800000b\n reserved1 0\n reserved2 0\nLoad command 2\n      cmd LC_SEGMENT_64\n  cmdsize 872\n  segname __DATA_CONST\n   vmaddr 0x0000000101364000\n   vmsize 0x0000000000150000\n  fileoff 20332544\n filesize 1376256\n  maxprot 0x00000003\n initprot 0x00000003\n   nsects 10\n    flags 0x10\nSection\n  sectname __const\n   segname __DATA_CONST\n      addr 0x0000000101364000\n      size 0x0000000000002ec8\n    offset 20332544\n     align 2^3 (8)\n    reloff 0\n    nreloc 0\n     flags 0x00000000\n reserved1 0\n reserved2 0\nSection\n  sectname __cfstring\n   segname __DATA_CONST\n      addr 0x0000000101366ec8\n      size 0x0000000000000f00\n    offset 20344520\n     align 2^3 (8)\n    reloff 0\n    nreloc 0\n     flags 0x00000000\n reserved1 0\n reserved2 0\nSection\n  sectname __objc_classlist\n   segname __DATA_CONST\n      addr 0x0000000101367dc8\n      size 0x0000000000000048\n    offset 20348360\n     align 2^3 (8)\n    reloff 0\n    nreloc 0\n     flags 0x10000000\n reserved1 0\n reserved2 0\nSection\n  sectname __objc_protolist\n   segname __DATA_CONST\n      addr 0x0000000101367e10\n      size 0x0000000000000040\n    offset 20348432\n     align 2^3 (8)\n    reloff 0\n    nreloc 0\n     flags 0x00000000\n reserved1 0\n reserved2 0\nSection\n  sectname __objc_imageinfo\n   segname __DATA_CONST\n      addr 0x0000000101367e50\n      size 0x0000000000000008\n    offset 20348496\n     align 2^2 (4)\n    reloff 0\n    nreloc 0\n     flags 0x00000000\n reserved1 0\n reserved2 0\nSection\n  sectname __objc_superrefs\n   segname __DATA_CONST\n      addr 0x0000000101367e58\n      size 0x0000000000000028\n    offset 20348504\n     align 2^3 (8)\n    reloff 0\n    nreloc 0\n     flags 0x00000000\n reserved1 0\n reserved2 0\nSection\n  sectname __rodata\n   segname __DATA_CONST\n      addr 0x0000000101367e80\n      size 0x00000000000212b8\n    offset 20348544\n     align 2^5 (32)\n    reloff 0\n    nreloc 0\n     flags 0x00000000\n reserved1 0\n reserved2 0\nSection\n  sectname __go_type\n   segname __DATA_CONST\n      addr 0x0000000101389140\n      size 0x0000000000127450\n    offset 20484416\n     align 2^4 (16)\n    reloff 0\n    nreloc 0\n     flags 0x00000000\n reserved1 0\n reserved2 0\nSection\n  sectname __go_func\n   segname __DATA_CONST\n      addr 0x00000001014b0590\n      size 0x0000000000001970\n    offset 21693840\n     align 2^3 (8)\n    reloff 0\n    nreloc 0\n     flags 0x00000000\n reserved1 0\n reserved2 0\nSection\n  sectname __got\n   segname __DATA_CONST\n      addr 0x00000001014b1f00\n      size 0x0000000000000900\n    offset 21700352\n     align 2^3 (8)\n    reloff 0\n    nreloc 0\n     flags 0x00000006\n reserved1 230 (index into indirect symbol table)\n reserved2 0\nLoad command 3\n      cmd LC_SEGMENT_64\n  cmdsize 1032\n  segname __DATA\n   vmaddr 0x00000001014b4000\n   vmsize 0x00000000020fc000\n  fileoff 21708800\n filesize 802816\n  maxprot 0x00000003\n initprot 0x00000003\n   nsects 12\n    flags 0x0\nSection\n  sectname __objc_const\n   segname __DATA\n      addr 0x00000001014b4000\n      size 0x0000000000001818\n    offset 21708800\n     align 2^3 (8)\n    reloff 0\n    nreloc 0\n     flags 0x00000000\n reserved1 0\n reserved2 0\nSection\n  sectname __objc_selrefs\n   segname __DATA\n      addr 0x00000001014b5818\n      size 0x00000000000010a0\n    offset 21714968\n     align 2^3 (8)\n    reloff 0\n    nreloc 0\n     flags 0x10000005\n reserved1 0\n reserved2 0\nSection\n  sectname __objc_ivar\n   segname __DATA\n      addr 0x00000001014b68b8\n      size 0x0000000000000084\n    offset 21719224\n     align 2^2 (4)\n    reloff 0\n    nreloc 0\n     flags 0x00000000\n reserved1 0\n reserved2 0\nSection\n  sectname __objc_data\n   segname __DATA\n      addr 0x00000001014b6940\n      size 0x00000000000002d0\n    offset 21719360\n     align 2^3 (8)\n    reloff 0\n    nreloc 0\n     flags 0x00000000\n reserved1 0\n reserved2 0\nSection\n  sectname __go_buildinfo\n   segname __DATA\n      addr 0x00000001014b6c10\n      size 0x0000000000000620\n    offset 21720080\n     align 2^4 (16)\n    reloff 0\n    nreloc 0\n     flags 0x00000000\n reserved1 0\n reserved2 0\nSection\n  sectname __go_fipsinfo\n   segname __DATA\n      addr 0x00000001014b7240\n      size 0x0000000000000078\n    offset 21721664\n     align 2^5 (32)\n    reloff 0\n    nreloc 0\n     flags 0x00000000\n reserved1 0\n reserved2 0\nSection\n  sectname __go_module\n   segname __DATA\n      addr 0x00000001014b72c0\n      size 0x0000000000000238\n    offset 21721792\n     align 2^5 (32)\n    reloff 0\n    nreloc 0\n     flags 0x00000000\n reserved1 0\n reserved2 0\nSection\n  sectname __noptrdata\n   segname __DATA\n      addr 0x00000001014b7500\n      size 0x000000000009a3e1\n    offset 21722368\n     align 2^5 (32)\n    reloff 0\n    nreloc 0\n     flags 0x00000000\n reserved1 0\n reserved2 0\nSection\n  sectname __data\n   segname __DATA\n      addr 0x0000000101551900\n      size 0x0000000000023c30\n    offset 22354176\n     align 2^5 (32)\n    reloff 0\n    nreloc 0\n     flags 0x00000000\n reserved1 0\n reserved2 0\nSection\n  sectname __bss\n   segname __DATA\n      addr 0x0000000101575540\n      size 0x000000000002b898\n    offset 0\n     align 2^5 (32)\n    reloff 0\n    nreloc 0\n     flags 0x00000001\n reserved1 0\n reserved2 0\nSection\n  sectname __noptrbss\n   segname __DATA\n      addr 0x00000001015a0de0\n      size 0x000000000200ede0\n    offset 0\n     align 2^5 (32)\n    reloff 0\n    nreloc 0\n     flags 0x00000001\n reserved1 0\n reserved2 0\nSection\n  sectname __common\n   segname __DATA\n      addr 0x00000001035afbc0\n      size 0x0000000000000020\n    offset 0\n     align 2^3 (8)\n    reloff 0\n    nreloc 0\n     flags 0x00000001\n reserved1 0\n reserved2 0\nLoad command 4\n      cmd LC_SEGMENT_64\n  cmdsize 72\n  segname __LINKEDIT\n   vmaddr 0x00000001035b0000\n   vmsize 0x0000000000150000\n  fileoff 29786112\n filesize 1365056\n  maxprot 0x00000001\n initprot 0x00000001\n   nsects 0\n    flags 0x0\nLoad command 5\n      cmd LC_DYLD_CHAINED_FIXUPS\n  cmdsize 16\n  dataoff 29786112\n datasize 6688\nLoad command 6\n      cmd LC_DYLD_EXPORTS_TRIE\n  cmdsize 16\n  dataoff 29792800\n datasize 14192\nLoad command 7\n     cmd LC_SYMTAB\n cmdsize 24\n  symoff 29833232\n   nsyms 23753\n  stroff 30215352\n strsize 874360\nLoad command 8\n            cmd LC_DYSYMTAB\n        cmdsize 80\n      ilocalsym 0\n      nlocalsym 22795\n     iextdefsym 22795\n     nextdefsym 656\n      iundefsym 23451\n      nundefsym 302\n         tocoff 0\n           ntoc 0\n      modtaboff 0\n        nmodtab 0\n   extrefsymoff 0\n    nextrefsyms 0\n indirectsymoff 30213280\n  nindirectsyms 518\n      extreloff 0\n        nextrel 0\n      locreloff 0\n        nlocrel 0\nLoad command 9\n          cmd LC_LOAD_DYLINKER\n      cmdsize 32\n         name /usr/lib/dyld (offset 12)\nLoad command 10\n     cmd LC_UUID\n cmdsize 24\n    uuid D4C3323E-065F-31B4-87AE-C668CCCB961F\nLoad command 11\n      cmd LC_BUILD_VERSION\n  cmdsize 32\n platform 1\n    minos 27.0\n      sdk 27.0\n   ntools 1\n     tool 3\n  version 27037.1\nLoad command 12\n      cmd LC_SOURCE_VERSION\n  cmdsize 16\n  version 0.0\nLoad command 13\n       cmd LC_MAIN\n   cmdsize 24\n  entryoff 560256\n stacksize 0\nLoad command 14\n          cmd LC_LOAD_DYLIB\n      cmdsize 56\n         name /usr/lib/libresolv.9.dylib (offset 24)\n   time stamp 2 Thu Jan  1 05:30:02 1970\n      current version 1.0.0\ncompatibility version 1.0.0\nLoad command 15\n          cmd LC_LOAD_DYLIB\n      cmdsize 120\n         name /System/Library/Frameworks/UniformTypeIdentifiers.framework/Versions/A/UniformTypeIdentifiers (offset 24)\n   time stamp 2 Thu Jan  1 05:30:02 1970\n      current version 709.0.0\ncompatibility version 1.0.0\nLoad command 16\n          cmd LC_LOAD_DYLIB\n      cmdsize 56\n         name /usr/lib/libSystem.B.dylib (offset 24)\n   time stamp 2 Thu Jan  1 05:30:02 1970\n      current version 1359.0.0\ncompatibility version 1.0.0\nLoad command 17\n          cmd LC_LOAD_DYLIB\n      cmdsize 104\n         name /System/Library/Frameworks/CoreFoundation.framework/Versions/A/CoreFoundation (offset 24)\n   time stamp 2 Thu Jan  1 05:30:02 1970\n      current version 5027.0.69\ncompatibility version 150.0.0\nLoad command 18\n          cmd LC_LOAD_DYLIB\n      cmdsize 96\n         name /System/Library/Frameworks/Security.framework/Versions/A/Security (offset 24)\n   time stamp 2 Thu Jan  1 05:30:02 1970\n      current version 62460.1.2\ncompatibility version 1.0.0\nLoad command 19\n          cmd LC_LOAD_DYLIB\n      cmdsize 96\n         name /System/Library/Frameworks/Foundation.framework/Versions/C/Foundation (offset 24)\n   time stamp 2 Thu Jan  1 05:30:02 1970\n      current version 5027.0.69\ncompatibility version 300.0.0\nLoad command 20\n          cmd LC_LOAD_DYLIB\n      cmdsize 88\n         name /System/Library/Frameworks/Cocoa.framework/Versions/A/Cocoa (offset 24)\n   time stamp 2 Thu Jan  1 05:30:02 1970\n      current version 24.0.0\ncompatibility version 1.0.0\nLoad command 21\n          cmd LC_LOAD_DYLIB\n      cmdsize 88\n         name /System/Library/Frameworks/WebKit.framework/Versions/A/WebKit (offset 24)\n   time stamp 2 Thu Jan  1 05:30:02 1970\n      current version 625.1.29\ncompatibility version 1.0.0\nLoad command 22\n          cmd LC_LOAD_DYLIB\n      cmdsize 112\n         name /System/Library/Frameworks/UserNotifications.framework/Versions/A/UserNotifications (offset 24)\n   time stamp 2 Thu Jan  1 05:30:02 1970\n      current version 1.0.0\ncompatibility version 1.0.0\nLoad command 23\n          cmd LC_LOAD_DYLIB\n      cmdsize 88\n         name /System/Library/Frameworks/AppKit.framework/Versions/C/AppKit (offset 24)\n   time stamp 2 Thu Jan  1 05:30:02 1970\n      current version 2775.10.103\ncompatibility version 45.0.0\nLoad command 24\n          cmd LC_LOAD_DYLIB\n      cmdsize 56\n         name /usr/lib/libobjc.A.dylib (offset 24)\n   time stamp 2 Thu Jan  1 05:30:02 1970\n      current version 228.0.0\ncompatibility version 1.0.0\nLoad command 25\n          cmd LC_LOAD_DYLIB\n      cmdsize 104\n         name /System/Library/Frameworks/CoreGraphics.framework/Versions/A/CoreGraphics (offset 24)\n   time stamp 2 Thu Jan  1 05:30:02 1970\n      current version 2050.0.0\ncompatibility version 64.0.0\nLoad command 26\n      cmd LC_FUNCTION_STARTS\n  cmdsize 16\n  dataoff 29806992\n datasize 26240\nLoad command 27\n      cmd LC_DATA_IN_CODE\n  cmdsize 16\n  dataoff 29833232\n datasize 0\nLoad command 28\n      cmd LC_CODE_SIGNATURE\n  cmdsize 16\n  dataoff 31089712\n datasize 61456\nLoad command 29\n      cmd LC_SEGMENT_64\n  cmdsize 1192\n  segname __DWARF\n   vmaddr 0x0000000000000000\n   vmsize 0x0000000000000000\n  fileoff 22511616\n filesize 7269688\n  maxprot 0x00000007\n initprot 0x00000000\n   nsects 14\n    flags 0x0\nSection\n  sectname __zdebug_line\n   segname __DWARF\n      addr 0x00000001036e0000\n      size 0x000000000011e313\n    offset 22511616\n     align 2^0 (1)\n    reloff 0\n    nreloc 0\n     flags 0x00000000\n reserved1 0\n reserved2 0\nSection\n  sectname __zdebug_aranges\n   segname __DWARF\n      addr 0x00000001037fe313\n      size 0x0000000000001152\n    offset 23683859\n     align 2^0 (1)\n    reloff 0\n    nreloc 0\n     flags 0x00000000\n reserved1 0\n reserved2 0\nSection\n  sectname __zdebug_ranges\n   segname __DWARF\n      addr 0x00000001037ff465\n      size 0x000000000004baf0\n    offset 23688293\n     align 2^0 (1)\n    reloff 0\n    nreloc 0\n     flags 0x00000000\n reserved1 0\n reserved2 0\nSection\n  sectname __zdebug_loc\n   segname __DWARF\n      addr 0x000000010384af55\n      size 0x0000000000113614\n    offset 23998293\n     align 2^0 (1)\n    reloff 0\n    nreloc 0\n     flags 0x00000000\n reserved1 0\n reserved2 0\nSection\n  sectname __zdebug_info\n   segname __DWARF\n      addr 0x000000010395e569\n      size 0x00000000002509c4\n    offset 25126249\n     align 2^0 (1)\n    reloff 0\n    nreloc 0\n     flags 0x00000000\n reserved1 0\n reserved2 0\nSection\n  sectname __zdebug_frame\n   segname __DWARF\n      addr 0x0000000103baef2d\n      size 0x0000000000029113\n    offset 27553581\n     align 2^0 (1)\n    reloff 0\n    nreloc 0\n     flags 0x00000000\n reserved1 0\n reserved2 0\nSection\n  sectname __zdebug_loclist\n   segname __DWARF\n      addr 0x0000000103bd8040\n      size 0x0000000000074bda\n    offset 27721792\n     align 2^0 (1)\n    reloff 0\n    nreloc 0\n     flags 0x00000000\n reserved1 0\n reserved2 0\nSection\n  sectname __zdebug_addr\n   segname __DWARF\n      addr 0x0000000103c4cc1a\n      size 0x0000000000018d3f\n    offset 28199962\n     align 2^0 (1)\n    reloff 0\n    nreloc 0\n     flags 0x00000000\n reserved1 0\n reserved2 0\nSection\n  sectname __zdebug_rnglist\n   segname __DWARF\n      addr 0x0000000103c65959\n      size 0x000000000000f0fa\n    offset 28301657\n     align 2^0 (1)\n    reloff 0\n    nreloc 0\n     flags 0x00000000\n reserved1 0\n reserved2 0\nSection\n  sectname __zdebug_abbrev\n   segname __DWARF\n      addr 0x0000000103c74a53\n      size 0x00000000000007c2\n    offset 28363347\n     align 2^0 (1)\n    reloff 0\n    nreloc 0\n     flags 0x00000000\n reserved1 0\n reserved2 0\nSection\n  sectname __zdebug_str\n   segname __DWARF\n      addr 0x0000000103c75215\n      size 0x0000000000051baa\n    offset 28365333\n     align 2^0 (1)\n    reloff 0\n    nreloc 0\n     flags 0x00000000\n reserved1 0\n reserved2 0\nSection\n  sectname __zdebug_str_off\n   segname __DWARF\n      addr 0x0000000103cc6dbf\n      size 0x000000000000a301\n    offset 28700095\n     align 2^0 (1)\n    reloff 0\n    nreloc 0\n     flags 0x00000000\n reserved1 0\n reserved2 0\nSection\n  sectname __zdebug_line_st\n   segname __DWARF\n      addr 0x0000000103cd10c0\n      size 0x0000000000000804\n    offset 28741824\n     align 2^0 (1)\n    reloff 0\n    nreloc 0\n     flags 0x00000000\n reserved1 0\n reserved2 0\nSection\n  sectname __zdebug_names\n   segname __DWARF\n      addr 0x0000000103cd18c4\n      size 0x00000000000fd474\n    offset 28743876\n     align 2^2 (4)\n    reloff 0\n    nreloc 0\n     flags 0x00000000\n reserved1 0\n reserved2 0\n",
+        "stderr": ""
+      }
+    },
+    {
+      "path": "Contents/Resources/native/document-extractor",
+      "sha256": "ef7f2543226846f39283ba325f4699c10b92b22fcf19828b11c1fbcf2b80f75d",
+      "sizeBytes": 59728,
+      "architecture": "arm64",
+      "dependencies": [
+        {
+          "installName": "/System/Library/Frameworks/PDFKit.framework/Versions/A/PDFKit",
+          "resolution": "operating-system"
+        },
+        {
+          "installName": "/usr/lib/libSystem.B.dylib",
+          "resolution": "operating-system"
+        },
+        {
+          "installName": "/System/Library/Frameworks/Foundation.framework/Versions/C/Foundation",
+          "resolution": "operating-system"
+        },
+        {
+          "installName": "/usr/lib/libobjc.A.dylib",
+          "resolution": "operating-system"
+        },
+        {
+          "installName": "/usr/lib/swift/libswiftCore.dylib",
+          "resolution": "operating-system"
+        },
+        {
+          "installName": "/usr/lib/swift/libswiftCoreFoundation.dylib",
+          "resolution": "operating-system"
+        },
+        {
+          "installName": "/usr/lib/swift/libswiftCoreImage.dylib",
+          "resolution": "operating-system"
+        },
+        {
+          "installName": "/usr/lib/swift/libswiftDispatch.dylib",
+          "resolution": "operating-system"
+        },
+        {
+          "installName": "/usr/lib/swift/libswiftIOKit.dylib",
+          "resolution": "operating-system"
+        },
+        {
+          "installName": "/usr/lib/swift/libswiftMetal.dylib",
+          "resolution": "operating-system"
+        },
+        {
+          "installName": "/usr/lib/swift/libswiftOSLog.dylib",
+          "resolution": "operating-system"
+        },
+        {
+          "installName": "/usr/lib/swift/libswiftObjectiveC.dylib",
+          "resolution": "operating-system"
+        },
+        {
+          "installName": "/usr/lib/swift/libswiftQuartzCore.dylib",
+          "resolution": "operating-system"
+        },
+        {
+          "installName": "/usr/lib/swift/libswiftSpatial.dylib",
+          "resolution": "operating-system"
+        },
+        {
+          "installName": "/usr/lib/swift/libswiftUniformTypeIdentifiers.dylib",
+          "resolution": "operating-system"
+        },
+        {
+          "installName": "/usr/lib/swift/libswiftXPC.dylib",
+          "resolution": "operating-system"
+        },
+        {
+          "installName": "/usr/lib/swift/libswift_Builtin_float.dylib",
+          "resolution": "operating-system"
+        },
+        {
+          "installName": "/usr/lib/swift/libswiftos.dylib",
+          "resolution": "operating-system"
+        },
+        {
+          "installName": "/usr/lib/swift/libswiftsimd.dylib",
+          "resolution": "operating-system"
+        }
+      ],
+      "rpaths": [],
+      "buildVersions": [
+        {
+          "platform": "1",
+          "minos": "27.0",
+          "sdk": "27.0"
+        }
+      ],
+      "codesignVerification": {
+        "command": [
+          "/usr/bin/codesign",
+          "--verify",
+          "--strict",
+          "--verbose=2",
+          "/Volumes/HD-B1/HD-Projects/Trove/build/phase3-candidate-2/Trove.app/Contents/Resources/native/document-extractor"
+        ],
+        "exitCode": 0,
+        "stdout": "",
+        "stderr": "/Volumes/HD-B1/HD-Projects/Trove/build/phase3-candidate-2/Trove.app/Contents/Resources/native/document-extractor: valid on disk\n/Volumes/HD-B1/HD-Projects/Trove/build/phase3-candidate-2/Trove.app/Contents/Resources/native/document-extractor: satisfies its Designated Requirement\n"
+      },
+      "signature": {
+        "command": [
+          "/usr/bin/codesign",
+          "-dv",
+          "--verbose=4",
+          "/Volumes/HD-B1/HD-Projects/Trove/build/phase3-candidate-2/Trove.app/Contents/Resources/native/document-extractor"
+        ],
+        "exitCode": 0,
+        "stdout": "",
+        "stderr": "Executable=/Volumes/HD-B1/HD-Projects/Trove/build/phase3-candidate-2/Trove.app/Contents/Resources/native/document-extractor\nIdentifier=document-extractor-555549440d7317c5b1d7362dbcf529450c58e56e\nFormat=Mach-O thin (arm64)\nCodeDirectory v=20400 size=340 flags=0x2(adhoc) hashes=4+2 location=embedded\nVersionPlatform=1\nVersionMin=1769472\nVersionSDK=1769472\nHash type=sha256 size=32\nCandidateCDHash sha256=48207022ad2ab75e1a92dc1fe987859ba3a1ee8e\nCandidateCDHashFull sha256=48207022ad2ab75e1a92dc1fe987859ba3a1ee8eb01d35439a4db7fa3bc8b9ee\nHash choices=sha256\nCMSDigest=48207022ad2ab75e1a92dc1fe987859ba3a1ee8eb01d35439a4db7fa3bc8b9ee\nCMSDigestType=2\nExecutable Segment base=0\nExecutable Segment limit=16384\nExecutable Segment flags=0x1\nPage size=16384\nCDHash=48207022ad2ab75e1a92dc1fe987859ba3a1ee8e\nSignature=adhoc\nInfo.plist=not bound\nTeamIdentifier=not set\nSealed Resources=none\nInternal requirements count=0 size=12\nTotal signatures=1\nChosen signature=1\n"
+      },
+      "entitlements": {
+        "command": [
+          "/usr/bin/codesign",
+          "-d",
+          "--entitlements",
+          ":-",
+          "/Volumes/HD-B1/HD-Projects/Trove/build/phase3-candidate-2/Trove.app/Contents/Resources/native/document-extractor"
+        ],
+        "exitCode": 0,
+        "stdout": "",
+        "stderr": "Executable=/Volumes/HD-B1/HD-Projects/Trove/build/phase3-candidate-2/Trove.app/Contents/Resources/native/document-extractor\nwarning: Specifying ':' in the path is deprecated and will not work in a future release\n"
+      },
+      "otoolLinkedLibraries": {
+        "command": [
+          "/usr/bin/otool",
+          "-L",
+          "/Volumes/HD-B1/HD-Projects/Trove/build/phase3-candidate-2/Trove.app/Contents/Resources/native/document-extractor"
+        ],
+        "exitCode": 0,
+        "stdout": "/Volumes/HD-B1/HD-Projects/Trove/build/phase3-candidate-2/Trove.app/Contents/Resources/native/document-extractor:\n\t/System/Library/Frameworks/PDFKit.framework/Versions/A/PDFKit (compatibility version 1.0.0, current version 1537.0.0)\n\t/usr/lib/libSystem.B.dylib (compatibility version 1.0.0, current version 1359.0.0)\n\t/System/Library/Frameworks/Foundation.framework/Versions/C/Foundation (compatibility version 300.0.0, current version 5027.0.69)\n\t/usr/lib/libobjc.A.dylib (compatibility version 1.0.0, current version 228.0.0)\n\t/usr/lib/swift/libswiftCore.dylib (compatibility version 0.0.0, current version 0.0.0)\n\t/usr/lib/swift/libswiftCoreFoundation.dylib (compatibility version 1.0.0, current version 120.100.0, weak)\n\t/usr/lib/swift/libswiftCoreImage.dylib (compatibility version 1.0.0, current version 3.0.0, weak)\n\t/usr/lib/swift/libswiftDispatch.dylib (compatibility version 1.0.0, current version 1605.0.2, weak)\n\t/usr/lib/swift/libswiftIOKit.dylib (compatibility version 1.0.0, current version 1.0.0, weak)\n\t/usr/lib/swift/libswiftMetal.dylib (compatibility version 1.0.0, current version 382.5.3, weak)\n\t/usr/lib/swift/libswiftOSLog.dylib (compatibility version 1.0.0, current version 10.0.0, weak)\n\t/usr/lib/swift/libswiftObjectiveC.dylib (compatibility version 1.0.0, current version 973.1.0, weak)\n\t/usr/lib/swift/libswiftQuartzCore.dylib (compatibility version 1.0.0, current version 5.0.0, weak)\n\t/usr/lib/swift/libswiftSpatial.dylib (compatibility version 1.0.0, current version 1.0.0, weak)\n\t/usr/lib/swift/libswiftUniformTypeIdentifiers.dylib (compatibility version 1.0.0, current version 917.0.1, weak)\n\t/usr/lib/swift/libswiftXPC.dylib (compatibility version 1.0.0, current version 167.0.2, weak)\n\t/usr/lib/swift/libswift_Builtin_float.dylib (compatibility version 0.0.0, current version 0.0.0, weak)\n\t/usr/lib/swift/libswiftos.dylib (compatibility version 1.0.0, current version 1090.0.0, weak)\n\t/usr/lib/swift/libswiftsimd.dylib (compatibility version 1.0.0, current version 25.0.0, weak)\n",
+        "stderr": ""
+      },
+      "otoolLoadCommands": {
+        "command": [
+          "/usr/bin/otool",
+          "-l",
+          "/Volumes/HD-B1/HD-Projects/Trove/build/phase3-candidate-2/Trove.app/Contents/Resources/native/document-extractor"
+        ],
+        "exitCode": 0,
+        "stdout": "/Volumes/HD-B1/HD-Projects/Trove/build/phase3-candidate-2/Trove.app/Contents/Resources/native/document-extractor:\nLoad command 0\n      cmd LC_SEGMENT_64\n  cmdsize 72\n  segname __PAGEZERO\n   vmaddr 0x0000000000000000\n   vmsize 0x0000000100000000\n  fileoff 0\n filesize 0\n  maxprot 0x00000000\n initprot 0x00000000\n   nsects 0\n    flags 0x0\nLoad command 1\n      cmd LC_SEGMENT_64\n  cmdsize 872\n  segname __TEXT\n   vmaddr 0x0000000100000000\n   vmsize 0x0000000000004000\n  fileoff 0\n filesize 16384\n  maxprot 0x00000005\n initprot 0x00000005\n   nsects 10\n    flags 0x0\nSection\n  sectname __text\n   segname __TEXT\n      addr 0x0000000100000d20\n      size 0x0000000000001eb8\n    offset 3360\n     align 2^2 (4)\n    reloff 0\n    nreloc 0\n     flags 0x80000400\n reserved1 0\n reserved2 0\nSection\n  sectname __stubs\n   segname __TEXT\n      addr 0x0000000100002bd8\n      size 0x0000000000000258\n    offset 11224\n     align 2^2 (4)\n    reloff 0\n    nreloc 0\n     flags 0x80000408\n reserved1 0 (index into indirect symbol table)\n reserved2 12 (size of stubs)\nSection\n  sectname __objc_stubs\n   segname __TEXT\n      addr 0x0000000100002e40\n      size 0x0000000000000140\n    offset 11840\n     align 2^5 (32)\n    reloff 0\n    nreloc 0\n     flags 0x80000400\n reserved1 0\n reserved2 0\nSection\n  sectname __const\n   segname __TEXT\n      addr 0x0000000100002f80\n      size 0x000000000000002a\n    offset 12160\n     align 2^4 (16)\n    reloff 0\n    nreloc 0\n     flags 0x00000000\n reserved1 0\n reserved2 0\nSection\n  sectname __cstring\n   segname __TEXT\n      addr 0x0000000100002fb0\n      size 0x000000000000016f\n    offset 12208\n     align 2^4 (16)\n    reloff 0\n    nreloc 0\n     flags 0x00000002\n reserved1 0\n reserved2 0\nSection\n  sectname __swift5_entry\n   segname __TEXT\n      addr 0x0000000100003120\n      size 0x0000000000000008\n    offset 12576\n     align 2^2 (4)\n    reloff 0\n    nreloc 0\n     flags 0x00000000\n reserved1 0\n reserved2 0\nSection\n  sectname __swift5_typeref\n   segname __TEXT\n      addr 0x0000000100003128\n      size 0x0000000000000008\n    offset 12584\n     align 2^1 (2)\n    reloff 0\n    nreloc 0\n     flags 0x00000000\n reserved1 0\n reserved2 0\nSection\n  sectname __objc_methname\n   segname __TEXT\n      addr 0x0000000100003130\n      size 0x00000000000000a7\n    offset 12592\n     align 2^0 (1)\n    reloff 0\n    nreloc 0\n     flags 0x00000002\n reserved1 0\n reserved2 0\nSection\n  sectname __unwind_info\n   segname __TEXT\n      addr 0x00000001000031d8\n      size 0x00000000000000a8\n    offset 12760\n     align 2^2 (4)\n    reloff 0\n    nreloc 0\n     flags 0x00000000\n reserved1 0\n reserved2 0\nSection\n  sectname __eh_frame\n   segname __TEXT\n      addr 0x0000000100003280\n      size 0x0000000000000048\n    offset 12928\n     align 2^3 (8)\n    reloff 0\n    nreloc 0\n     flags 0x6800000b\n reserved1 0\n reserved2 0\nLoad command 2\n      cmd LC_SEGMENT_64\n  cmdsize 312\n  segname __DATA_CONST\n   vmaddr 0x0000000100004000\n   vmsize 0x0000000000004000\n  fileoff 16384\n filesize 16384\n  maxprot 0x00000003\n initprot 0x00000003\n   nsects 3\n    flags 0x10\nSection\n  sectname __const\n   segname __DATA_CONST\n      addr 0x0000000100004000\n      size 0x0000000000000078\n    offset 16384\n     align 2^3 (8)\n    reloff 0\n    nreloc 0\n     flags 0x00000000\n reserved1 0\n reserved2 0\nSection\n  sectname __objc_imageinfo\n   segname __DATA_CONST\n      addr 0x0000000100004078\n      size 0x0000000000000008\n    offset 16504\n     align 2^2 (4)\n    reloff 0\n    nreloc 0\n     flags 0x00000000\n reserved1 0\n reserved2 0\nSection\n  sectname __got\n   segname __DATA_CONST\n      addr 0x0000000100004080\n      size 0x00000000000001e0\n    offset 16512\n     align 2^3 (8)\n    reloff 0\n    nreloc 0\n     flags 0x00000006\n reserved1 50 (index into indirect symbol table)\n reserved2 0\nLoad command 3\n      cmd LC_SEGMENT_64\n  cmdsize 312\n  segname __DATA\n   vmaddr 0x0000000100008000\n   vmsize 0x0000000000004000\n  fileoff 32768\n filesize 16384\n  maxprot 0x00000003\n initprot 0x00000003\n   nsects 3\n    flags 0x0\nSection\n  sectname __objc_selrefs\n   segname __DATA\n      addr 0x0000000100008000\n      size 0x0000000000000050\n    offset 32768\n     align 2^3 (8)\n    reloff 0\n    nreloc 0\n     flags 0x10000005\n reserved1 0\n reserved2 0\nSection\n  sectname __data\n   segname __DATA\n      addr 0x0000000100008050\n      size 0x0000000000000010\n    offset 32848\n     align 2^3 (8)\n    reloff 0\n    nreloc 0\n     flags 0x00000000\n reserved1 0\n reserved2 0\nSection\n  sectname __common\n   segname __DATA\n      addr 0x0000000100008060\n      size 0x0000000000000029\n    offset 0\n     align 2^4 (16)\n    reloff 0\n    nreloc 0\n     flags 0x00000001\n reserved1 0\n reserved2 0\nLoad command 4\n      cmd LC_SEGMENT_64\n  cmdsize 72\n  segname __LINKEDIT\n   vmaddr 0x000000010000c000\n   vmsize 0x0000000000004000\n  fileoff 49152\n filesize 10576\n  maxprot 0x00000001\n initprot 0x00000001\n   nsects 0\n    flags 0x0\nLoad command 5\n      cmd LC_DYLD_CHAINED_FIXUPS\n  cmdsize 16\n  dataoff 49152\n datasize 2544\nLoad command 6\n      cmd LC_DYLD_EXPORTS_TRIE\n  cmdsize 16\n  dataoff 51696\n datasize 48\nLoad command 7\n     cmd LC_SYMTAB\n cmdsize 24\n  symoff 51776\n   nsyms 130\n  stroff 54296\n strsize 5016\nLoad command 8\n            cmd LC_DYSYMTAB\n        cmdsize 80\n      ilocalsym 0\n      nlocalsym 53\n     iextdefsym 53\n     nextdefsym 2\n      iundefsym 55\n      nundefsym 75\n         tocoff 0\n           ntoc 0\n      modtaboff 0\n        nmodtab 0\n   extrefsymoff 0\n    nextrefsyms 0\n indirectsymoff 53856\n  nindirectsyms 110\n      extreloff 0\n        nextrel 0\n      locreloff 0\n        nlocrel 0\nLoad command 9\n          cmd LC_LOAD_DYLINKER\n      cmdsize 32\n         name /usr/lib/dyld (offset 12)\nLoad command 10\n     cmd LC_UUID\n cmdsize 24\n    uuid 0D7317C5-B1D7-362D-BCF5-29450C58E56E\nLoad command 11\n      cmd LC_BUILD_VERSION\n  cmdsize 32\n platform 1\n    minos 27.0\n      sdk 27.0\n   ntools 1\n     tool 3\n  version 27037.1\nLoad command 12\n      cmd LC_SOURCE_VERSION\n  cmdsize 16\n  version 0.0\nLoad command 13\n       cmd LC_MAIN\n   cmdsize 24\n  entryoff 3360\n stacksize 0\nLoad command 14\n          cmd LC_LOAD_DYLIB\n      cmdsize 88\n         name /System/Library/Frameworks/PDFKit.framework/Versions/A/PDFKit (offset 24)\n   time stamp 2 Thu Jan  1 05:30:02 1970\n      current version 1537.0.0\ncompatibility version 1.0.0\nLoad command 15\n          cmd LC_LOAD_DYLIB\n      cmdsize 56\n         name /usr/lib/libSystem.B.dylib (offset 24)\n   time stamp 2 Thu Jan  1 05:30:02 1970\n      current version 1359.0.0\ncompatibility version 1.0.0\nLoad command 16\n          cmd LC_LOAD_DYLIB\n      cmdsize 96\n         name /System/Library/Frameworks/Foundation.framework/Versions/C/Foundation (offset 24)\n   time stamp 2 Thu Jan  1 05:30:02 1970\n      current version 5027.0.69\ncompatibility version 300.0.0\nLoad command 17\n          cmd LC_LOAD_DYLIB\n      cmdsize 56\n         name /usr/lib/libobjc.A.dylib (offset 24)\n   time stamp 2 Thu Jan  1 05:30:02 1970\n      current version 228.0.0\ncompatibility version 1.0.0\nLoad command 18\n          cmd LC_LOAD_DYLIB\n      cmdsize 64\n         name /usr/lib/swift/libswiftCore.dylib (offset 24)\n   time stamp 2 Thu Jan  1 05:30:02 1970\n      current version 0.0.0\ncompatibility version 0.0.0\nLoad command 19\n          cmd LC_LOAD_WEAK_DYLIB\n      cmdsize 72\n         name /usr/lib/swift/libswiftCoreFoundation.dylib (offset 24)\n   time stamp 2 Thu Jan  1 05:30:02 1970\n      current version 120.100.0\ncompatibility version 1.0.0\nLoad command 20\n          cmd LC_LOAD_WEAK_DYLIB\n      cmdsize 64\n         name /usr/lib/swift/libswiftCoreImage.dylib (offset 24)\n   time stamp 2 Thu Jan  1 05:30:02 1970\n      current version 3.0.0\ncompatibility version 1.0.0\nLoad command 21\n          cmd LC_LOAD_WEAK_DYLIB\n      cmdsize 64\n         name /usr/lib/swift/libswiftDispatch.dylib (offset 24)\n   time stamp 2 Thu Jan  1 05:30:02 1970\n      current version 1605.0.2\ncompatibility version 1.0.0\nLoad command 22\n          cmd LC_LOAD_WEAK_DYLIB\n      cmdsize 64\n         name /usr/lib/swift/libswiftIOKit.dylib (offset 24)\n   time stamp 2 Thu Jan  1 05:30:02 1970\n      current version 1.0.0\ncompatibility version 1.0.0\nLoad command 23\n          cmd LC_LOAD_WEAK_DYLIB\n      cmdsize 64\n         name /usr/lib/swift/libswiftMetal.dylib (offset 24)\n   time stamp 2 Thu Jan  1 05:30:02 1970\n      current version 382.5.3\ncompatibility version 1.0.0\nLoad command 24\n          cmd LC_LOAD_WEAK_DYLIB\n      cmdsize 64\n         name /usr/lib/swift/libswiftOSLog.dylib (offset 24)\n   time stamp 2 Thu Jan  1 05:30:02 1970\n      current version 10.0.0\ncompatibility version 1.0.0\nLoad command 25\n          cmd LC_LOAD_WEAK_DYLIB\n      cmdsize 64\n         name /usr/lib/swift/libswiftObjectiveC.dylib (offset 24)\n   time stamp 2 Thu Jan  1 05:30:02 1970\n      current version 973.1.0\ncompatibility version 1.0.0\nLoad command 26\n          cmd LC_LOAD_WEAK_DYLIB\n      cmdsize 64\n         name /usr/lib/swift/libswiftQuartzCore.dylib (offset 24)\n   time stamp 2 Thu Jan  1 05:30:02 1970\n      current version 5.0.0\ncompatibility version 1.0.0\nLoad command 27\n          cmd LC_LOAD_WEAK_DYLIB\n      cmdsize 64\n         name /usr/lib/swift/libswiftSpatial.dylib (offset 24)\n   time stamp 2 Thu Jan  1 05:30:02 1970\n      current version 1.0.0\ncompatibility version 1.0.0\nLoad command 28\n          cmd LC_LOAD_WEAK_DYLIB\n      cmdsize 80\n         name /usr/lib/swift/libswiftUniformTypeIdentifiers.dylib (offset 24)\n   time stamp 2 Thu Jan  1 05:30:02 1970\n      current version 917.0.1\ncompatibility version 1.0.0\nLoad command 29\n          cmd LC_LOAD_WEAK_DYLIB\n      cmdsize 64\n         name /usr/lib/swift/libswiftXPC.dylib (offset 24)\n   time stamp 2 Thu Jan  1 05:30:02 1970\n      current version 167.0.2\ncompatibility version 1.0.0\nLoad command 30\n          cmd LC_LOAD_WEAK_DYLIB\n      cmdsize 72\n         name /usr/lib/swift/libswift_Builtin_float.dylib (offset 24)\n   time stamp 2 Thu Jan  1 05:30:02 1970\n      current version 0.0.0\ncompatibility version 0.0.0\nLoad command 31\n          cmd LC_LOAD_WEAK_DYLIB\n      cmdsize 56\n         name /usr/lib/swift/libswiftos.dylib (offset 24)\n   time stamp 2 Thu Jan  1 05:30:02 1970\n      current version 1090.0.0\ncompatibility version 1.0.0\nLoad command 32\n          cmd LC_LOAD_WEAK_DYLIB\n      cmdsize 64\n         name /usr/lib/swift/libswiftsimd.dylib (offset 24)\n   time stamp 2 Thu Jan  1 05:30:02 1970\n      current version 25.0.0\ncompatibility version 1.0.0\nLoad command 33\n      cmd LC_FUNCTION_STARTS\n  cmdsize 16\n  dataoff 51744\n datasize 32\nLoad command 34\n      cmd LC_DATA_IN_CODE\n  cmdsize 16\n  dataoff 51776\n datasize 0\nLoad command 35\n      cmd LC_CODE_SIGNATURE\n  cmdsize 16\n  dataoff 59312\n datasize 416\n",
+        "stderr": ""
+      }
+    },
+    {
+      "path": "Contents/Resources/native/llama-worker",
+      "sha256": "94fa1694c96f7c39fa44226b7801cb8227f4528cad143392a2ceec2d6eb98982",
+      "sizeBytes": 7109744,
+      "architecture": "arm64",
+      "dependencies": [
+        {
+          "installName": "/System/Library/Frameworks/Accelerate.framework/Versions/A/Accelerate",
+          "resolution": "operating-system"
+        },
+        {
+          "installName": "/System/Library/Frameworks/Metal.framework/Versions/A/Metal",
+          "resolution": "operating-system"
+        },
+        {
+          "installName": "/System/Library/Frameworks/Foundation.framework/Versions/C/Foundation",
+          "resolution": "operating-system"
+        },
+        {
+          "installName": "/usr/lib/libc++.1.dylib",
+          "resolution": "operating-system"
+        },
+        {
+          "installName": "/usr/lib/libSystem.B.dylib",
+          "resolution": "operating-system"
+        },
+        {
+          "installName": "/System/Library/Frameworks/CoreFoundation.framework/Versions/A/CoreFoundation",
+          "resolution": "operating-system"
+        },
+        {
+          "installName": "/usr/lib/libobjc.A.dylib",
+          "resolution": "operating-system"
+        }
+      ],
+      "rpaths": [],
+      "buildVersions": [
+        {
+          "platform": "1",
+          "minos": "27.0",
+          "sdk": "27.0"
+        }
+      ],
+      "codesignVerification": {
+        "command": [
+          "/usr/bin/codesign",
+          "--verify",
+          "--strict",
+          "--verbose=2",
+          "/Volumes/HD-B1/HD-Projects/Trove/build/phase3-candidate-2/Trove.app/Contents/Resources/native/llama-worker"
+        ],
+        "exitCode": 0,
+        "stdout": "",
+        "stderr": "/Volumes/HD-B1/HD-Projects/Trove/build/phase3-candidate-2/Trove.app/Contents/Resources/native/llama-worker: valid on disk\n/Volumes/HD-B1/HD-Projects/Trove/build/phase3-candidate-2/Trove.app/Contents/Resources/native/llama-worker: satisfies its Designated Requirement\n"
+      },
+      "signature": {
+        "command": [
+          "/usr/bin/codesign",
+          "-dv",
+          "--verbose=4",
+          "/Volumes/HD-B1/HD-Projects/Trove/build/phase3-candidate-2/Trove.app/Contents/Resources/native/llama-worker"
+        ],
+        "exitCode": 0,
+        "stdout": "",
+        "stderr": "Executable=/Volumes/HD-B1/HD-Projects/Trove/build/phase3-candidate-2/Trove.app/Contents/Resources/native/llama-worker\nIdentifier=llama-worker-55554944da141a59f6ab39c9a47c41d4f04bb76a\nFormat=Mach-O thin (arm64)\nCodeDirectory v=20400 size=14094 flags=0x2(adhoc) hashes=434+2 location=embedded\nVersionPlatform=1\nVersionMin=1769472\nVersionSDK=1769472\nHash type=sha256 size=32\nCandidateCDHash sha256=83c94c6c4c27c5f5d3c1eb3e298010a1521b5915\nCandidateCDHashFull sha256=83c94c6c4c27c5f5d3c1eb3e298010a1521b59154784489c858585e516abbc1f\nHash choices=sha256\nCMSDigest=83c94c6c4c27c5f5d3c1eb3e298010a1521b59154784489c858585e516abbc1f\nCMSDigestType=2\nExecutable Segment base=0\nExecutable Segment limit=3997696\nExecutable Segment flags=0x1\nPage size=16384\nCDHash=83c94c6c4c27c5f5d3c1eb3e298010a1521b5915\nSignature=adhoc\nInfo.plist=not bound\nTeamIdentifier=not set\nSealed Resources=none\nInternal requirements count=0 size=12\nTotal signatures=1\nChosen signature=1\n"
+      },
+      "entitlements": {
+        "command": [
+          "/usr/bin/codesign",
+          "-d",
+          "--entitlements",
+          ":-",
+          "/Volumes/HD-B1/HD-Projects/Trove/build/phase3-candidate-2/Trove.app/Contents/Resources/native/llama-worker"
+        ],
+        "exitCode": 0,
+        "stdout": "",
+        "stderr": "Executable=/Volumes/HD-B1/HD-Projects/Trove/build/phase3-candidate-2/Trove.app/Contents/Resources/native/llama-worker\nwarning: Specifying ':' in the path is deprecated and will not work in a future release\n"
+      },
+      "otoolLinkedLibraries": {
+        "command": [
+          "/usr/bin/otool",
+          "-L",
+          "/Volumes/HD-B1/HD-Projects/Trove/build/phase3-candidate-2/Trove.app/Contents/Resources/native/llama-worker"
+        ],
+        "exitCode": 0,
+        "stdout": "/Volumes/HD-B1/HD-Projects/Trove/build/phase3-candidate-2/Trove.app/Contents/Resources/native/llama-worker:\n\t/System/Library/Frameworks/Accelerate.framework/Versions/A/Accelerate (compatibility version 1.0.0, current version 4.0.0)\n\t/System/Library/Frameworks/Metal.framework/Versions/A/Metal (compatibility version 1.0.0, current version 382.5.3)\n\t/System/Library/Frameworks/Foundation.framework/Versions/C/Foundation (compatibility version 300.0.0, current version 5027.0.69)\n\t/usr/lib/libc++.1.dylib (compatibility version 1.0.0, current version 2200.27.0)\n\t/usr/lib/libSystem.B.dylib (compatibility version 1.0.0, current version 1359.0.0)\n\t/System/Library/Frameworks/CoreFoundation.framework/Versions/A/CoreFoundation (compatibility version 150.0.0, current version 5027.0.69)\n\t/usr/lib/libobjc.A.dylib (compatibility version 1.0.0, current version 228.0.0)\n",
+        "stderr": ""
+      },
+      "otoolLoadCommands": {
+        "command": [
+          "/usr/bin/otool",
+          "-l",
+          "/Volumes/HD-B1/HD-Projects/Trove/build/phase3-candidate-2/Trove.app/Contents/Resources/native/llama-worker"
+        ],
+        "exitCode": 0,
+        "stdout": "/Volumes/HD-B1/HD-Projects/Trove/build/phase3-candidate-2/Trove.app/Contents/Resources/native/llama-worker:\nLoad command 0\n      cmd LC_SEGMENT_64\n  cmdsize 72\n  segname __PAGEZERO\n   vmaddr 0x0000000000000000\n   vmsize 0x0000000100000000\n  fileoff 0\n filesize 0\n  maxprot 0x00000000\n initprot 0x00000000\n   nsects 0\n    flags 0x0\nLoad command 1\n      cmd LC_SEGMENT_64\n  cmdsize 872\n  segname __TEXT\n   vmaddr 0x0000000100000000\n   vmsize 0x00000000003d0000\n  fileoff 0\n filesize 3997696\n  maxprot 0x00000005\n initprot 0x00000005\n   nsects 10\n    flags 0x0\nSection\n  sectname __text\n   segname __TEXT\n      addr 0x0000000100000b10\n      size 0x00000000003383c4\n    offset 2832\n     align 2^2 (4)\n    reloff 0\n    nreloc 0\n     flags 0x80000400\n reserved1 0\n reserved2 0\nSection\n  sectname __stubs\n   segname __TEXT\n      addr 0x0000000100338ed4\n      size 0x0000000000000e7c\n    offset 3378900\n     align 2^2 (4)\n    reloff 0\n    nreloc 0\n     flags 0x80000408\n reserved1 0 (index into indirect symbol table)\n reserved2 12 (size of stubs)\nSection\n  sectname __objc_stubs\n   segname __TEXT\n      addr 0x0000000100339d60\n      size 0x0000000000000ae0\n    offset 3382624\n     align 2^5 (32)\n    reloff 0\n    nreloc 0\n     flags 0x80000400\n reserved1 0\n reserved2 0\nSection\n  sectname __init_offsets\n   segname __TEXT\n      addr 0x000000010033a840\n      size 0x0000000000000024\n    offset 3385408\n     align 2^2 (4)\n    reloff 0\n    nreloc 0\n     flags 0x00000016\n reserved1 0\n reserved2 0\nSection\n  sectname __gcc_except_tab\n   segname __TEXT\n      addr 0x000000010033a864\n      size 0x000000000001b058\n    offset 3385444\n     align 2^2 (4)\n    reloff 0\n    nreloc 0\n     flags 0x00000000\n reserved1 0\n reserved2 0\nSection\n  sectname __const\n   segname __TEXT\n      addr 0x00000001003558c0\n      size 0x0000000000041dd8\n    offset 3496128\n     align 2^4 (16)\n    reloff 0\n    nreloc 0\n     flags 0x00000000\n reserved1 0\n reserved2 0\nSection\n  sectname __cstring\n   segname __TEXT\n      addr 0x0000000100397698\n      size 0x000000000002b6f7\n    offset 3765912\n     align 2^0 (1)\n    reloff 0\n    nreloc 0\n     flags 0x00000002\n reserved1 0\n reserved2 0\nSection\n  sectname __objc_methname\n   segname __TEXT\n      addr 0x00000001003c2d8f\n      size 0x0000000000000753\n    offset 3943823\n     align 2^0 (1)\n    reloff 0\n    nreloc 0\n     flags 0x00000002\n reserved1 0\n reserved2 0\nSection\n  sectname __unwind_info\n   segname __TEXT\n      addr 0x00000001003c34e4\n      size 0x00000000000087f0\n    offset 3945700\n     align 2^2 (4)\n    reloff 0\n    nreloc 0\n     flags 0x00000000\n reserved1 0\n reserved2 0\nSection\n  sectname __eh_frame\n   segname __TEXT\n      addr 0x00000001003cbcd8\n      size 0x00000000000003f8\n    offset 3980504\n     align 2^3 (8)\n    reloff 0\n    nreloc 0\n     flags 0x6800000b\n reserved1 0\n reserved2 0\nLoad command 2\n      cmd LC_SEGMENT_64\n  cmdsize 392\n  segname __DATA_CONST\n   vmaddr 0x00000001003d0000\n   vmsize 0x0000000000014000\n  fileoff 3997696\n filesize 81920\n  maxprot 0x00000003\n initprot 0x00000003\n   nsects 4\n    flags 0x10\nSection\n  sectname __const\n   segname __DATA_CONST\n      addr 0x00000001003d0000\n      size 0x0000000000010520\n    offset 3997696\n     align 2^3 (8)\n    reloff 0\n    nreloc 0\n     flags 0x00000000\n reserved1 0\n reserved2 0\nSection\n  sectname __cfstring\n   segname __DATA_CONST\n      addr 0x00000001003e0520\n      size 0x0000000000000140\n    offset 4064544\n     align 2^3 (8)\n    reloff 0\n    nreloc 0\n     flags 0x00000000\n reserved1 0\n reserved2 0\nSection\n  sectname __objc_imageinfo\n   segname __DATA_CONST\n      addr 0x00000001003e0660\n      size 0x0000000000000008\n    offset 4064864\n     align 2^2 (4)\n    reloff 0\n    nreloc 0\n     flags 0x00000000\n reserved1 0\n reserved2 0\nSection\n  sectname __got\n   segname __DATA_CONST\n      addr 0x00000001003e0668\n      size 0x0000000000000c70\n    offset 4064872\n     align 2^3 (8)\n    reloff 0\n    nreloc 0\n     flags 0x00000006\n reserved1 309 (index into indirect symbol table)\n reserved2 0\nLoad command 3\n      cmd LC_SEGMENT_64\n  cmdsize 472\n  segname __DATA\n   vmaddr 0x00000001003e4000\n   vmsize 0x000000000024c000\n  fileoff 4079616\n filesize 1884160\n  maxprot 0x00000003\n initprot 0x00000003\n   nsects 5\n    flags 0x0\nSection\n  sectname __objc_selrefs\n   segname __DATA\n      addr 0x00000001003e4000\n      size 0x00000000000002b8\n    offset 4079616\n     align 2^3 (8)\n    reloff 0\n    nreloc 0\n     flags 0x10000005\n reserved1 0\n reserved2 0\nSection\n  sectname __data\n   segname __DATA\n      addr 0x00000001003e42b8\n      size 0x0000000000000b20\n    offset 4080312\n     align 2^3 (8)\n    reloff 0\n    nreloc 0\n     flags 0x00000000\n reserved1 0\n reserved2 0\nSection\n  sectname __ggml_metallib\n   segname __DATA\n      addr 0x00000001003e4dd8\n      size 0x00000000001c8c85\n    offset 4083160\n     align 2^0 (1)\n    reloff 0\n    nreloc 0\n     flags 0x00000000\n reserved1 0\n reserved2 0\nSection\n  sectname __bss\n   segname __DATA\n      addr 0x00000001005ada60\n      size 0x0000000000001a08\n    offset 0\n     align 2^3 (8)\n    reloff 0\n    nreloc 0\n     flags 0x00000001\n reserved1 0\n reserved2 0\nSection\n  sectname __common\n   segname __DATA\n      addr 0x00000001005af468\n      size 0x000000000008082c\n    offset 0\n     align 2^3 (8)\n    reloff 0\n    nreloc 0\n     flags 0x00000001\n reserved1 0\n reserved2 0\nLoad command 4\n      cmd LC_SEGMENT_64\n  cmdsize 72\n  segname __LINKEDIT\n   vmaddr 0x0000000100630000\n   vmsize 0x0000000000118000\n  fileoff 5963776\n filesize 1145968\n  maxprot 0x00000001\n initprot 0x00000001\n   nsects 0\n    flags 0x0\nLoad command 5\n      cmd LC_DYLD_CHAINED_FIXUPS\n  cmdsize 16\n  dataoff 5963776\n datasize 23056\nLoad command 6\n      cmd LC_DYLD_EXPORTS_TRIE\n  cmdsize 16\n  dataoff 5986832\n datasize 146504\nLoad command 7\n     cmd LC_SYMTAB\n cmdsize 24\n  symoff 6143776\n   nsyms 12906\n  stroff 6353104\n strsize 742480\nLoad command 8\n            cmd LC_DYSYMTAB\n        cmdsize 80\n      ilocalsym 0\n      nlocalsym 8281\n     iextdefsym 8281\n     nextdefsym 4281\n      iundefsym 12562\n      nundefsym 344\n         tocoff 0\n           ntoc 0\n      modtaboff 0\n        nmodtab 0\n   extrefsymoff 0\n    nextrefsyms 0\n indirectsymoff 6350272\n  nindirectsyms 707\n      extreloff 0\n        nextrel 0\n      locreloff 0\n        nlocrel 0\nLoad command 9\n          cmd LC_LOAD_DYLINKER\n      cmdsize 32\n         name /usr/lib/dyld (offset 12)\nLoad command 10\n     cmd LC_UUID\n cmdsize 24\n    uuid DA141A59-F6AB-39C9-A47C-41D4F04BB76A\nLoad command 11\n      cmd LC_BUILD_VERSION\n  cmdsize 32\n platform 1\n    minos 27.0\n      sdk 27.0\n   ntools 1\n     tool 3\n  version 27037.1\nLoad command 12\n      cmd LC_SOURCE_VERSION\n  cmdsize 16\n  version 0.0\nLoad command 13\n       cmd LC_MAIN\n   cmdsize 24\n  entryoff 3040\n stacksize 0\nLoad command 14\n          cmd LC_LOAD_DYLIB\n      cmdsize 96\n         name /System/Library/Frameworks/Accelerate.framework/Versions/A/Accelerate (offset 24)\n   time stamp 2 Thu Jan  1 05:30:02 1970\n      current version 4.0.0\ncompatibility version 1.0.0\nLoad command 15\n          cmd LC_LOAD_DYLIB\n      cmdsize 88\n         name /System/Library/Frameworks/Metal.framework/Versions/A/Metal (offset 24)\n   time stamp 2 Thu Jan  1 05:30:02 1970\n      current version 382.5.3\ncompatibility version 1.0.0\nLoad command 16\n          cmd LC_LOAD_DYLIB\n      cmdsize 96\n         name /System/Library/Frameworks/Foundation.framework/Versions/C/Foundation (offset 24)\n   time stamp 2 Thu Jan  1 05:30:02 1970\n      current version 5027.0.69\ncompatibility version 300.0.0\nLoad command 17\n          cmd LC_LOAD_DYLIB\n      cmdsize 48\n         name /usr/lib/libc++.1.dylib (offset 24)\n   time stamp 2 Thu Jan  1 05:30:02 1970\n      current version 2200.27.0\ncompatibility version 1.0.0\nLoad command 18\n          cmd LC_LOAD_DYLIB\n      cmdsize 56\n         name /usr/lib/libSystem.B.dylib (offset 24)\n   time stamp 2 Thu Jan  1 05:30:02 1970\n      current version 1359.0.0\ncompatibility version 1.0.0\nLoad command 19\n          cmd LC_LOAD_DYLIB\n      cmdsize 104\n         name /System/Library/Frameworks/CoreFoundation.framework/Versions/A/CoreFoundation (offset 24)\n   time stamp 2 Thu Jan  1 05:30:02 1970\n      current version 5027.0.69\ncompatibility version 150.0.0\nLoad command 20\n          cmd LC_LOAD_DYLIB\n      cmdsize 56\n         name /usr/lib/libobjc.A.dylib (offset 24)\n   time stamp 2 Thu Jan  1 05:30:02 1970\n      current version 228.0.0\ncompatibility version 1.0.0\nLoad command 21\n      cmd LC_FUNCTION_STARTS\n  cmdsize 16\n  dataoff 6133336\n datasize 10440\nLoad command 22\n      cmd LC_DATA_IN_CODE\n  cmdsize 16\n  dataoff 6143776\n datasize 0\nLoad command 23\n      cmd LC_CODE_SIGNATURE\n  cmdsize 16\n  dataoff 7095584\n datasize 14160\n",
+        "stderr": ""
+      }
+    },
+    {
+      "path": "Contents/Resources/native/microphone-worker",
+      "sha256": "9940c517026dfad18329843e1bc33ee47d0c67512d5c6f10a819a7753619e448",
+      "sizeBytes": 86608,
+      "architecture": "arm64",
+      "dependencies": [
+        {
+          "installName": "/System/Library/Frameworks/AVFoundation.framework/Versions/A/AVFoundation",
+          "resolution": "operating-system"
+        },
+        {
+          "installName": "/usr/lib/libSystem.B.dylib",
+          "resolution": "operating-system"
+        },
+        {
+          "installName": "/System/Library/Frameworks/AVFAudio.framework/Versions/A/AVFAudio",
+          "resolution": "operating-system"
+        },
+        {
+          "installName": "/System/Library/Frameworks/CoreFoundation.framework/Versions/A/CoreFoundation",
+          "resolution": "operating-system"
+        },
+        {
+          "installName": "/System/Library/Frameworks/Foundation.framework/Versions/C/Foundation",
+          "resolution": "operating-system"
+        },
+        {
+          "installName": "/usr/lib/libobjc.A.dylib",
+          "resolution": "operating-system"
+        },
+        {
+          "installName": "/usr/lib/swift/libswiftAVFoundation.dylib",
+          "resolution": "operating-system"
+        },
+        {
+          "installName": "/usr/lib/swift/libswiftCore.dylib",
+          "resolution": "operating-system"
+        },
+        {
+          "installName": "/usr/lib/swift/libswiftCoreAudio.dylib",
+          "resolution": "operating-system"
+        },
+        {
+          "installName": "/usr/lib/swift/libswiftCoreFoundation.dylib",
+          "resolution": "operating-system"
+        },
+        {
+          "installName": "/usr/lib/swift/libswiftCoreImage.dylib",
+          "resolution": "operating-system"
+        },
+        {
+          "installName": "/usr/lib/swift/libswiftCoreMIDI.dylib",
+          "resolution": "operating-system"
+        },
+        {
+          "installName": "/usr/lib/swift/libswiftDispatch.dylib",
+          "resolution": "operating-system"
+        },
+        {
+          "installName": "/usr/lib/swift/libswiftIOKit.dylib",
+          "resolution": "operating-system"
+        },
+        {
+          "installName": "/usr/lib/swift/libswiftMetal.dylib",
+          "resolution": "operating-system"
+        },
+        {
+          "installName": "/usr/lib/swift/libswiftObjectiveC.dylib",
+          "resolution": "operating-system"
+        },
+        {
+          "installName": "/usr/lib/swift/libswiftQuartzCore.dylib",
+          "resolution": "operating-system"
+        },
+        {
+          "installName": "/usr/lib/swift/libswiftUniformTypeIdentifiers.dylib",
+          "resolution": "operating-system"
+        },
+        {
+          "installName": "/usr/lib/swift/libswiftXPC.dylib",
+          "resolution": "operating-system"
+        },
+        {
+          "installName": "/usr/lib/swift/libswift_Builtin_float.dylib",
+          "resolution": "operating-system"
+        },
+        {
+          "installName": "/usr/lib/swift/libswiftsimd.dylib",
+          "resolution": "operating-system"
+        }
+      ],
+      "rpaths": [],
+      "buildVersions": [
+        {
+          "platform": "1",
+          "minos": "27.0",
+          "sdk": "27.0"
+        }
+      ],
+      "codesignVerification": {
+        "command": [
+          "/usr/bin/codesign",
+          "--verify",
+          "--strict",
+          "--verbose=2",
+          "/Volumes/HD-B1/HD-Projects/Trove/build/phase3-candidate-2/Trove.app/Contents/Resources/native/microphone-worker"
+        ],
+        "exitCode": 0,
+        "stdout": "",
+        "stderr": "/Volumes/HD-B1/HD-Projects/Trove/build/phase3-candidate-2/Trove.app/Contents/Resources/native/microphone-worker: valid on disk\n/Volumes/HD-B1/HD-Projects/Trove/build/phase3-candidate-2/Trove.app/Contents/Resources/native/microphone-worker: satisfies its Designated Requirement\n"
+      },
+      "signature": {
+        "command": [
+          "/usr/bin/codesign",
+          "-dv",
+          "--verbose=4",
+          "/Volumes/HD-B1/HD-Projects/Trove/build/phase3-candidate-2/Trove.app/Contents/Resources/native/microphone-worker"
+        ],
+        "exitCode": 0,
+        "stdout": "",
+        "stderr": "Executable=/Volumes/HD-B1/HD-Projects/Trove/build/phase3-candidate-2/Trove.app/Contents/Resources/native/microphone-worker\nIdentifier=microphone-worker-55554944d5a2ac5484af31e1beac36ab8a810cc8\nFormat=Mach-O thin (arm64)\nCodeDirectory v=20400 size=563 flags=0x2(adhoc) hashes=6+7 location=embedded\nVersionPlatform=1\nVersionMin=1769472\nVersionSDK=1769472\nHash type=sha256 size=32\nCandidateCDHash sha256=78e36037be38d425e3190d2b61866a0e524aec8b\nCandidateCDHashFull sha256=78e36037be38d425e3190d2b61866a0e524aec8bdea5599687951552dbdeb424\nHash choices=sha256\nCMSDigest=78e36037be38d425e3190d2b61866a0e524aec8bdea5599687951552dbdeb424\nCMSDigestType=2\nExecutable Segment base=0\nExecutable Segment limit=32768\nExecutable Segment flags=0x1\nPage size=16384\nCDHash=78e36037be38d425e3190d2b61866a0e524aec8b\nSignature=adhoc\nInfo.plist=not bound\nTeamIdentifier=not set\nSealed Resources=none\nInternal requirements count=0 size=12\nTotal signatures=1\nChosen signature=1\n"
+      },
+      "entitlements": {
+        "command": [
+          "/usr/bin/codesign",
+          "-d",
+          "--entitlements",
+          ":-",
+          "/Volumes/HD-B1/HD-Projects/Trove/build/phase3-candidate-2/Trove.app/Contents/Resources/native/microphone-worker"
+        ],
+        "exitCode": 0,
+        "stdout": "<?xml version=\"1.0\" encoding=\"UTF-8\"?><!DOCTYPE plist PUBLIC \"-//Apple//DTD PLIST 1.0//EN\" \"https://www.apple.com/DTDs/PropertyList-1.0.dtd\"><plist version=\"1.0\"><dict><key>com.apple.security.device.audio-input</key><true/></dict></plist>\n",
+        "stderr": "Executable=/Volumes/HD-B1/HD-Projects/Trove/build/phase3-candidate-2/Trove.app/Contents/Resources/native/microphone-worker\nwarning: Specifying ':' in the path is deprecated and will not work in a future release\n"
+      },
+      "otoolLinkedLibraries": {
+        "command": [
+          "/usr/bin/otool",
+          "-L",
+          "/Volumes/HD-B1/HD-Projects/Trove/build/phase3-candidate-2/Trove.app/Contents/Resources/native/microphone-worker"
+        ],
+        "exitCode": 0,
+        "stdout": "/Volumes/HD-B1/HD-Projects/Trove/build/phase3-candidate-2/Trove.app/Contents/Resources/native/microphone-worker:\n\t/System/Library/Frameworks/AVFoundation.framework/Versions/A/AVFoundation (compatibility version 1.0.0, current version 2.0.0)\n\t/usr/lib/libSystem.B.dylib (compatibility version 1.0.0, current version 1359.0.0)\n\t/System/Library/Frameworks/AVFAudio.framework/Versions/A/AVFAudio (compatibility version 1.0.0, current version 1.0.0)\n\t/System/Library/Frameworks/CoreFoundation.framework/Versions/A/CoreFoundation (compatibility version 150.0.0, current version 5027.0.69)\n\t/System/Library/Frameworks/Foundation.framework/Versions/C/Foundation (compatibility version 300.0.0, current version 5027.0.69)\n\t/usr/lib/libobjc.A.dylib (compatibility version 1.0.0, current version 228.0.0)\n\t/usr/lib/swift/libswiftAVFoundation.dylib (compatibility version 1.0.0, current version 2450.77.5, weak)\n\t/usr/lib/swift/libswiftCore.dylib (compatibility version 0.0.0, current version 0.0.0)\n\t/usr/lib/swift/libswiftCoreAudio.dylib (compatibility version 1.0.0, current version 482.102.10, weak)\n\t/usr/lib/swift/libswiftCoreFoundation.dylib (compatibility version 1.0.0, current version 120.100.0, weak)\n\t/usr/lib/swift/libswiftCoreImage.dylib (compatibility version 1.0.0, current version 3.0.0, weak)\n\t/usr/lib/swift/libswiftCoreMIDI.dylib (compatibility version 1.0.0, current version 6.0.0, weak)\n\t/usr/lib/swift/libswiftDispatch.dylib (compatibility version 1.0.0, current version 1605.0.2)\n\t/usr/lib/swift/libswiftIOKit.dylib (compatibility version 1.0.0, current version 1.0.0, weak)\n\t/usr/lib/swift/libswiftMetal.dylib (compatibility version 1.0.0, current version 382.5.3, weak)\n\t/usr/lib/swift/libswiftObjectiveC.dylib (compatibility version 1.0.0, current version 973.1.0, weak)\n\t/usr/lib/swift/libswiftQuartzCore.dylib (compatibility version 1.0.0, current version 5.0.0, weak)\n\t/usr/lib/swift/libswiftUniformTypeIdentifiers.dylib (compatibility version 1.0.0, current version 917.0.1, weak)\n\t/usr/lib/swift/libswiftXPC.dylib (compatibility version 1.0.0, current version 167.0.2, weak)\n\t/usr/lib/swift/libswift_Builtin_float.dylib (compatibility version 0.0.0, current version 0.0.0, weak)\n\t/usr/lib/swift/libswiftsimd.dylib (compatibility version 1.0.0, current version 25.0.0, weak)\n",
+        "stderr": ""
+      },
+      "otoolLoadCommands": {
+        "command": [
+          "/usr/bin/otool",
+          "-l",
+          "/Volumes/HD-B1/HD-Projects/Trove/build/phase3-candidate-2/Trove.app/Contents/Resources/native/microphone-worker"
+        ],
+        "exitCode": 0,
+        "stdout": "/Volumes/HD-B1/HD-Projects/Trove/build/phase3-candidate-2/Trove.app/Contents/Resources/native/microphone-worker:\nLoad command 0\n      cmd LC_SEGMENT_64\n  cmdsize 72\n  segname __PAGEZERO\n   vmaddr 0x0000000000000000\n   vmsize 0x0000000100000000\n  fileoff 0\n filesize 0\n  maxprot 0x00000000\n initprot 0x00000000\n   nsects 0\n    flags 0x0\nLoad command 1\n      cmd LC_SEGMENT_64\n  cmdsize 1272\n  segname __TEXT\n   vmaddr 0x0000000100000000\n   vmsize 0x0000000000008000\n  fileoff 0\n filesize 32768\n  maxprot 0x00000005\n initprot 0x00000005\n   nsects 15\n    flags 0x0\nSection\n  sectname __text\n   segname __TEXT\n      addr 0x0000000100000f98\n      size 0x0000000000003dec\n    offset 3992\n     align 2^2 (4)\n    reloff 0\n    nreloc 0\n     flags 0x80000400\n reserved1 0\n reserved2 0\nSection\n  sectname __stubs\n   segname __TEXT\n      addr 0x0000000100004d84\n      size 0x0000000000000414\n    offset 19844\n     align 2^2 (4)\n    reloff 0\n    nreloc 0\n     flags 0x80000408\n reserved1 0 (index into indirect symbol table)\n reserved2 12 (size of stubs)\nSection\n  sectname __objc_stubs\n   segname __TEXT\n      addr 0x00000001000051a0\n      size 0x0000000000000380\n    offset 20896\n     align 2^5 (32)\n    reloff 0\n    nreloc 0\n     flags 0x80000400\n reserved1 0\n reserved2 0\nSection\n  sectname __const\n   segname __TEXT\n      addr 0x0000000100005520\n      size 0x000000000000009e\n    offset 21792\n     align 2^4 (16)\n    reloff 0\n    nreloc 0\n     flags 0x00000000\n reserved1 0\n reserved2 0\nSection\n  sectname __swift5_typeref\n   segname __TEXT\n      addr 0x00000001000055be\n      size 0x00000000000000ee\n    offset 21950\n     align 2^1 (2)\n    reloff 0\n    nreloc 0\n     flags 0x00000000\n reserved1 0\n reserved2 0\nSection\n  sectname __cstring\n   segname __TEXT\n      addr 0x00000001000056b0\n      size 0x00000000000000a2\n    offset 22192\n     align 2^4 (16)\n    reloff 0\n    nreloc 0\n     flags 0x00000002\n reserved1 0\n reserved2 0\nSection\n  sectname __objc_methtype\n   segname __TEXT\n      addr 0x0000000100005760\n      size 0x000000000000006c\n    offset 22368\n     align 2^4 (16)\n    reloff 0\n    nreloc 0\n     flags 0x00000002\n reserved1 0\n reserved2 0\nSection\n  sectname __swift5_capture\n   segname __TEXT\n      addr 0x00000001000057cc\n      size 0x0000000000000068\n    offset 22476\n     align 2^2 (4)\n    reloff 0\n    nreloc 0\n     flags 0x00000000\n reserved1 0\n reserved2 0\nSection\n  sectname __swift5_entry\n   segname __TEXT\n      addr 0x0000000100005834\n      size 0x0000000000000008\n    offset 22580\n     align 2^2 (4)\n    reloff 0\n    nreloc 0\n     flags 0x00000000\n reserved1 0\n reserved2 0\nSection\n  sectname __constg_swiftt\n   segname __TEXT\n      addr 0x000000010000583c\n      size 0x000000000000002c\n    offset 22588\n     align 2^2 (4)\n    reloff 0\n    nreloc 0\n     flags 0x00000000\n reserved1 0\n reserved2 0\nSection\n  sectname __swift5_builtin\n   segname __TEXT\n      addr 0x0000000100005868\n      size 0x0000000000000014\n    offset 22632\n     align 2^2 (4)\n    reloff 0\n    nreloc 0\n     flags 0x00000000\n reserved1 0\n reserved2 0\nSection\n  sectname __swift5_types\n   segname __TEXT\n      addr 0x000000010000587c\n      size 0x0000000000000004\n    offset 22652\n     align 2^2 (4)\n    reloff 0\n    nreloc 0\n     flags 0x00000000\n reserved1 0\n reserved2 0\nSection\n  sectname __objc_methname\n   segname __TEXT\n      addr 0x0000000100005880\n      size 0x0000000000000282\n    offset 22656\n     align 2^0 (1)\n    reloff 0\n    nreloc 0\n     flags 0x00000002\n reserved1 0\n reserved2 0\nSection\n  sectname __unwind_info\n   segname __TEXT\n      addr 0x0000000100005b04\n      size 0x0000000000000128\n    offset 23300\n     align 2^2 (4)\n    reloff 0\n    nreloc 0\n     flags 0x00000000\n reserved1 0\n reserved2 0\nSection\n  sectname __eh_frame\n   segname __TEXT\n      addr 0x0000000100005c30\n      size 0x0000000000000080\n    offset 23600\n     align 2^3 (8)\n    reloff 0\n    nreloc 0\n     flags 0x6800000b\n reserved1 0\n reserved2 0\nLoad command 2\n      cmd LC_SEGMENT_64\n  cmdsize 312\n  segname __DATA_CONST\n   vmaddr 0x0000000100008000\n   vmsize 0x0000000000004000\n  fileoff 32768\n filesize 16384\n  maxprot 0x00000003\n initprot 0x00000003\n   nsects 3\n    flags 0x10\nSection\n  sectname __const\n   segname __DATA_CONST\n      addr 0x0000000100008000\n      size 0x0000000000000230\n    offset 32768\n     align 2^3 (8)\n    reloff 0\n    nreloc 0\n     flags 0x00000000\n reserved1 0\n reserved2 0\nSection\n  sectname __objc_imageinfo\n   segname __DATA_CONST\n      addr 0x0000000100008230\n      size 0x0000000000000008\n    offset 33328\n     align 2^2 (4)\n    reloff 0\n    nreloc 0\n     flags 0x00000000\n reserved1 0\n reserved2 0\nSection\n  sectname __got\n   segname __DATA_CONST\n      addr 0x0000000100008238\n      size 0x00000000000003c8\n    offset 33336\n     align 2^3 (8)\n    reloff 0\n    nreloc 0\n     flags 0x00000006\n reserved1 87 (index into indirect symbol table)\n reserved2 0\nLoad command 3\n      cmd LC_SEGMENT_64\n  cmdsize 312\n  segname __DATA\n   vmaddr 0x000000010000c000\n   vmsize 0x0000000000004000\n  fileoff 49152\n filesize 16384\n  maxprot 0x00000003\n initprot 0x00000003\n   nsects 3\n    flags 0x0\nSection\n  sectname __objc_selrefs\n   segname __DATA\n      addr 0x000000010000c000\n      size 0x00000000000000e0\n    offset 49152\n     align 2^3 (8)\n    reloff 0\n    nreloc 0\n     flags 0x10000005\n reserved1 0\n reserved2 0\nSection\n  sectname __data\n   segname __DATA\n      addr 0x000000010000c0e0\n      size 0x0000000000000058\n    offset 49376\n     align 2^3 (8)\n    reloff 0\n    nreloc 0\n     flags 0x00000000\n reserved1 0\n reserved2 0\nSection\n  sectname __common\n   segname __DATA\n      addr 0x000000010000c138\n      size 0x0000000000000038\n    offset 0\n     align 2^3 (8)\n    reloff 0\n    nreloc 0\n     flags 0x00000001\n reserved1 0\n reserved2 0\nLoad command 4\n      cmd LC_SEGMENT_64\n  cmdsize 72\n  segname __LINKEDIT\n   vmaddr 0x0000000100010000\n   vmsize 0x0000000000008000\n  fileoff 65536\n filesize 21072\n  maxprot 0x00000001\n initprot 0x00000001\n   nsects 0\n    flags 0x0\nLoad command 5\n      cmd LC_DYLD_CHAINED_FIXUPS\n  cmdsize 16\n  dataoff 65536\n datasize 4760\nLoad command 6\n      cmd LC_DYLD_EXPORTS_TRIE\n  cmdsize 16\n  dataoff 70296\n datasize 48\nLoad command 7\n     cmd LC_SYMTAB\n cmdsize 24\n  symoff 70416\n   nsyms 281\n  stroff 75744\n strsize 9904\nLoad command 8\n            cmd LC_DYSYMTAB\n        cmdsize 80\n      ilocalsym 0\n      nlocalsym 140\n     iextdefsym 140\n     nextdefsym 2\n      iundefsym 142\n      nundefsym 139\n         tocoff 0\n           ntoc 0\n      modtaboff 0\n        nmodtab 0\n   extrefsymoff 0\n    nextrefsyms 0\n indirectsymoff 74912\n  nindirectsyms 208\n      extreloff 0\n        nextrel 0\n      locreloff 0\n        nlocrel 0\nLoad command 9\n          cmd LC_LOAD_DYLINKER\n      cmdsize 32\n         name /usr/lib/dyld (offset 12)\nLoad command 10\n     cmd LC_UUID\n cmdsize 24\n    uuid D5A2AC54-84AF-31E1-BEAC-36AB8A810CC8\nLoad command 11\n      cmd LC_BUILD_VERSION\n  cmdsize 32\n platform 1\n    minos 27.0\n      sdk 27.0\n   ntools 1\n     tool 3\n  version 27037.1\nLoad command 12\n      cmd LC_SOURCE_VERSION\n  cmdsize 16\n  version 0.0\nLoad command 13\n       cmd LC_MAIN\n   cmdsize 24\n  entryoff 3992\n stacksize 0\nLoad command 14\n          cmd LC_LOAD_DYLIB\n      cmdsize 104\n         name /System/Library/Frameworks/AVFoundation.framework/Versions/A/AVFoundation (offset 24)\n   time stamp 2 Thu Jan  1 05:30:02 1970\n      current version 2.0.0\ncompatibility version 1.0.0\nLoad command 15\n          cmd LC_LOAD_DYLIB\n      cmdsize 56\n         name /usr/lib/libSystem.B.dylib (offset 24)\n   time stamp 2 Thu Jan  1 05:30:02 1970\n      current version 1359.0.0\ncompatibility version 1.0.0\nLoad command 16\n          cmd LC_LOAD_DYLIB\n      cmdsize 96\n         name /System/Library/Frameworks/AVFAudio.framework/Versions/A/AVFAudio (offset 24)\n   time stamp 2 Thu Jan  1 05:30:02 1970\n      current version 1.0.0\ncompatibility version 1.0.0\nLoad command 17\n          cmd LC_LOAD_DYLIB\n      cmdsize 104\n         name /System/Library/Frameworks/CoreFoundation.framework/Versions/A/CoreFoundation (offset 24)\n   time stamp 2 Thu Jan  1 05:30:02 1970\n      current version 5027.0.69\ncompatibility version 150.0.0\nLoad command 18\n          cmd LC_LOAD_DYLIB\n      cmdsize 96\n         name /System/Library/Frameworks/Foundation.framework/Versions/C/Foundation (offset 24)\n   time stamp 2 Thu Jan  1 05:30:02 1970\n      current version 5027.0.69\ncompatibility version 300.0.0\nLoad command 19\n          cmd LC_LOAD_DYLIB\n      cmdsize 56\n         name /usr/lib/libobjc.A.dylib (offset 24)\n   time stamp 2 Thu Jan  1 05:30:02 1970\n      current version 228.0.0\ncompatibility version 1.0.0\nLoad command 20\n          cmd LC_LOAD_WEAK_DYLIB\n      cmdsize 72\n         name /usr/lib/swift/libswiftAVFoundation.dylib (offset 24)\n   time stamp 2 Thu Jan  1 05:30:02 1970\n      current version 2450.77.5\ncompatibility version 1.0.0\nLoad command 21\n          cmd LC_LOAD_DYLIB\n      cmdsize 64\n         name /usr/lib/swift/libswiftCore.dylib (offset 24)\n   time stamp 2 Thu Jan  1 05:30:02 1970\n      current version 0.0.0\ncompatibility version 0.0.0\nLoad command 22\n          cmd LC_LOAD_WEAK_DYLIB\n      cmdsize 64\n         name /usr/lib/swift/libswiftCoreAudio.dylib (offset 24)\n   time stamp 2 Thu Jan  1 05:30:02 1970\n      current version 482.102.10\ncompatibility version 1.0.0\nLoad command 23\n          cmd LC_LOAD_WEAK_DYLIB\n      cmdsize 72\n         name /usr/lib/swift/libswiftCoreFoundation.dylib (offset 24)\n   time stamp 2 Thu Jan  1 05:30:02 1970\n      current version 120.100.0\ncompatibility version 1.0.0\nLoad command 24\n          cmd LC_LOAD_WEAK_DYLIB\n      cmdsize 64\n         name /usr/lib/swift/libswiftCoreImage.dylib (offset 24)\n   time stamp 2 Thu Jan  1 05:30:02 1970\n      current version 3.0.0\ncompatibility version 1.0.0\nLoad command 25\n          cmd LC_LOAD_WEAK_DYLIB\n      cmdsize 64\n         name /usr/lib/swift/libswiftCoreMIDI.dylib (offset 24)\n   time stamp 2 Thu Jan  1 05:30:02 1970\n      current version 6.0.0\ncompatibility version 1.0.0\nLoad command 26\n          cmd LC_LOAD_DYLIB\n      cmdsize 64\n         name /usr/lib/swift/libswiftDispatch.dylib (offset 24)\n   time stamp 2 Thu Jan  1 05:30:02 1970\n      current version 1605.0.2\ncompatibility version 1.0.0\nLoad command 27\n          cmd LC_LOAD_WEAK_DYLIB\n      cmdsize 64\n         name /usr/lib/swift/libswiftIOKit.dylib (offset 24)\n   time stamp 2 Thu Jan  1 05:30:02 1970\n      current version 1.0.0\ncompatibility version 1.0.0\nLoad command 28\n          cmd LC_LOAD_WEAK_DYLIB\n      cmdsize 64\n         name /usr/lib/swift/libswiftMetal.dylib (offset 24)\n   time stamp 2 Thu Jan  1 05:30:02 1970\n      current version 382.5.3\ncompatibility version 1.0.0\nLoad command 29\n          cmd LC_LOAD_WEAK_DYLIB\n      cmdsize 64\n         name /usr/lib/swift/libswiftObjectiveC.dylib (offset 24)\n   time stamp 2 Thu Jan  1 05:30:02 1970\n      current version 973.1.0\ncompatibility version 1.0.0\nLoad command 30\n          cmd LC_LOAD_WEAK_DYLIB\n      cmdsize 64\n         name /usr/lib/swift/libswiftQuartzCore.dylib (offset 24)\n   time stamp 2 Thu Jan  1 05:30:02 1970\n      current version 5.0.0\ncompatibility version 1.0.0\nLoad command 31\n          cmd LC_LOAD_WEAK_DYLIB\n      cmdsize 80\n         name /usr/lib/swift/libswiftUniformTypeIdentifiers.dylib (offset 24)\n   time stamp 2 Thu Jan  1 05:30:02 1970\n      current version 917.0.1\ncompatibility version 1.0.0\nLoad command 32\n          cmd LC_LOAD_WEAK_DYLIB\n      cmdsize 64\n         name /usr/lib/swift/libswiftXPC.dylib (offset 24)\n   time stamp 2 Thu Jan  1 05:30:02 1970\n      current version 167.0.2\ncompatibility version 1.0.0\nLoad command 33\n          cmd LC_LOAD_WEAK_DYLIB\n      cmdsize 72\n         name /usr/lib/swift/libswift_Builtin_float.dylib (offset 24)\n   time stamp 2 Thu Jan  1 05:30:02 1970\n      current version 0.0.0\ncompatibility version 0.0.0\nLoad command 34\n          cmd LC_LOAD_WEAK_DYLIB\n      cmdsize 64\n         name /usr/lib/swift/libswiftsimd.dylib (offset 24)\n   time stamp 2 Thu Jan  1 05:30:02 1970\n      current version 25.0.0\ncompatibility version 1.0.0\nLoad command 35\n      cmd LC_FUNCTION_STARTS\n  cmdsize 16\n  dataoff 70344\n datasize 72\nLoad command 36\n      cmd LC_DATA_IN_CODE\n  cmdsize 16\n  dataoff 70416\n datasize 0\nLoad command 37\n      cmd LC_CODE_SIGNATURE\n  cmdsize 16\n  dataoff 85648\n datasize 960\n",
+        "stderr": ""
+      }
+    },
+    {
+      "path": "Contents/Resources/native/whisper-worker",
+      "sha256": "6da645519bda5262de0f6ab5709d52894f2dba8380bda26660113cd316e22eca",
+      "sizeBytes": 4088016,
+      "architecture": "arm64",
+      "dependencies": [
+        {
+          "installName": "/System/Library/Frameworks/Accelerate.framework/Versions/A/Accelerate",
+          "resolution": "operating-system"
+        },
+        {
+          "installName": "/System/Library/Frameworks/Metal.framework/Versions/A/Metal",
+          "resolution": "operating-system"
+        },
+        {
+          "installName": "/System/Library/Frameworks/Foundation.framework/Versions/C/Foundation",
+          "resolution": "operating-system"
+        },
+        {
+          "installName": "/usr/lib/libc++.1.dylib",
+          "resolution": "operating-system"
+        },
+        {
+          "installName": "/usr/lib/libSystem.B.dylib",
+          "resolution": "operating-system"
+        },
+        {
+          "installName": "/System/Library/Frameworks/CoreFoundation.framework/Versions/A/CoreFoundation",
+          "resolution": "operating-system"
+        },
+        {
+          "installName": "/usr/lib/libobjc.A.dylib",
+          "resolution": "operating-system"
+        }
+      ],
+      "rpaths": [],
+      "buildVersions": [
+        {
+          "platform": "1",
+          "minos": "27.0",
+          "sdk": "27.0"
+        }
+      ],
+      "codesignVerification": {
+        "command": [
+          "/usr/bin/codesign",
+          "--verify",
+          "--strict",
+          "--verbose=2",
+          "/Volumes/HD-B1/HD-Projects/Trove/build/phase3-candidate-2/Trove.app/Contents/Resources/native/whisper-worker"
+        ],
+        "exitCode": 0,
+        "stdout": "",
+        "stderr": "/Volumes/HD-B1/HD-Projects/Trove/build/phase3-candidate-2/Trove.app/Contents/Resources/native/whisper-worker: valid on disk\n/Volumes/HD-B1/HD-Projects/Trove/build/phase3-candidate-2/Trove.app/Contents/Resources/native/whisper-worker: satisfies its Designated Requirement\n"
+      },
+      "signature": {
+        "command": [
+          "/usr/bin/codesign",
+          "-dv",
+          "--verbose=4",
+          "/Volumes/HD-B1/HD-Projects/Trove/build/phase3-candidate-2/Trove.app/Contents/Resources/native/whisper-worker"
+        ],
+        "exitCode": 0,
+        "stdout": "",
+        "stderr": "Executable=/Volumes/HD-B1/HD-Projects/Trove/build/phase3-candidate-2/Trove.app/Contents/Resources/native/whisper-worker\nIdentifier=whisper-worker-55554944709d7640d99f34af96edbd850a21c562\nFormat=Mach-O thin (arm64)\nCodeDirectory v=20400 size=8208 flags=0x2(adhoc) hashes=250+2 location=embedded\nVersionPlatform=1\nVersionMin=1769472\nVersionSDK=1769472\nHash type=sha256 size=32\nCandidateCDHash sha256=c1c4883208de72bbf295cd8384e6cce32c0129a8\nCandidateCDHashFull sha256=c1c4883208de72bbf295cd8384e6cce32c0129a8a1700f6ec963155350f74045\nHash choices=sha256\nCMSDigest=c1c4883208de72bbf295cd8384e6cce32c0129a8a1700f6ec963155350f74045\nCMSDigestType=2\nExecutable Segment base=0\nExecutable Segment limit=1835008\nExecutable Segment flags=0x1\nPage size=16384\nCDHash=c1c4883208de72bbf295cd8384e6cce32c0129a8\nSignature=adhoc\nInfo.plist=not bound\nTeamIdentifier=not set\nSealed Resources=none\nInternal requirements count=0 size=12\nTotal signatures=1\nChosen signature=1\n"
+      },
+      "entitlements": {
+        "command": [
+          "/usr/bin/codesign",
+          "-d",
+          "--entitlements",
+          ":-",
+          "/Volumes/HD-B1/HD-Projects/Trove/build/phase3-candidate-2/Trove.app/Contents/Resources/native/whisper-worker"
+        ],
+        "exitCode": 0,
+        "stdout": "",
+        "stderr": "Executable=/Volumes/HD-B1/HD-Projects/Trove/build/phase3-candidate-2/Trove.app/Contents/Resources/native/whisper-worker\nwarning: Specifying ':' in the path is deprecated and will not work in a future release\n"
+      },
+      "otoolLinkedLibraries": {
+        "command": [
+          "/usr/bin/otool",
+          "-L",
+          "/Volumes/HD-B1/HD-Projects/Trove/build/phase3-candidate-2/Trove.app/Contents/Resources/native/whisper-worker"
+        ],
+        "exitCode": 0,
+        "stdout": "/Volumes/HD-B1/HD-Projects/Trove/build/phase3-candidate-2/Trove.app/Contents/Resources/native/whisper-worker:\n\t/System/Library/Frameworks/Accelerate.framework/Versions/A/Accelerate (compatibility version 1.0.0, current version 4.0.0)\n\t/System/Library/Frameworks/Metal.framework/Versions/A/Metal (compatibility version 1.0.0, current version 382.5.3)\n\t/System/Library/Frameworks/Foundation.framework/Versions/C/Foundation (compatibility version 300.0.0, current version 5027.0.69)\n\t/usr/lib/libc++.1.dylib (compatibility version 1.0.0, current version 2200.27.0)\n\t/usr/lib/libSystem.B.dylib (compatibility version 1.0.0, current version 1359.0.0)\n\t/System/Library/Frameworks/CoreFoundation.framework/Versions/A/CoreFoundation (compatibility version 150.0.0, current version 5027.0.69)\n\t/usr/lib/libobjc.A.dylib (compatibility version 1.0.0, current version 228.0.0)\n",
+        "stderr": ""
+      },
+      "otoolLoadCommands": {
+        "command": [
+          "/usr/bin/otool",
+          "-l",
+          "/Volumes/HD-B1/HD-Projects/Trove/build/phase3-candidate-2/Trove.app/Contents/Resources/native/whisper-worker"
+        ],
+        "exitCode": 0,
+        "stdout": "/Volumes/HD-B1/HD-Projects/Trove/build/phase3-candidate-2/Trove.app/Contents/Resources/native/whisper-worker:\nLoad command 0\n      cmd LC_SEGMENT_64\n  cmdsize 72\n  segname __PAGEZERO\n   vmaddr 0x0000000000000000\n   vmsize 0x0000000100000000\n  fileoff 0\n filesize 0\n  maxprot 0x00000000\n initprot 0x00000000\n   nsects 0\n    flags 0x0\nLoad command 1\n      cmd LC_SEGMENT_64\n  cmdsize 872\n  segname __TEXT\n   vmaddr 0x0000000100000000\n   vmsize 0x00000000001c0000\n  fileoff 0\n filesize 1835008\n  maxprot 0x00000005\n initprot 0x00000005\n   nsects 10\n    flags 0x0\nSection\n  sectname __text\n   segname __TEXT\n      addr 0x0000000100000b10\n      size 0x00000000001739b0\n    offset 2832\n     align 2^2 (4)\n    reloff 0\n    nreloc 0\n     flags 0x80000400\n reserved1 0\n reserved2 0\nSection\n  sectname __stubs\n   segname __TEXT\n      addr 0x00000001001744c0\n      size 0x0000000000000a74\n    offset 1524928\n     align 2^2 (4)\n    reloff 0\n    nreloc 0\n     flags 0x80000408\n reserved1 0 (index into indirect symbol table)\n reserved2 12 (size of stubs)\nSection\n  sectname __objc_stubs\n   segname __TEXT\n      addr 0x0000000100174f40\n      size 0x0000000000000b00\n    offset 1527616\n     align 2^5 (32)\n    reloff 0\n    nreloc 0\n     flags 0x80000400\n reserved1 0\n reserved2 0\nSection\n  sectname __init_offsets\n   segname __TEXT\n      addr 0x0000000100175a40\n      size 0x000000000000000c\n    offset 1530432\n     align 2^2 (4)\n    reloff 0\n    nreloc 0\n     flags 0x00000016\n reserved1 0\n reserved2 0\nSection\n  sectname __gcc_except_tab\n   segname __TEXT\n      addr 0x0000000100175a4c\n      size 0x0000000000004fd8\n    offset 1530444\n     align 2^2 (4)\n    reloff 0\n    nreloc 0\n     flags 0x00000000\n reserved1 0\n reserved2 0\nSection\n  sectname __const\n   segname __TEXT\n      addr 0x000000010017aa30\n      size 0x0000000000030e08\n    offset 1550896\n     align 2^4 (16)\n    reloff 0\n    nreloc 0\n     flags 0x00000000\n reserved1 0\n reserved2 0\nSection\n  sectname __cstring\n   segname __TEXT\n      addr 0x00000001001ab838\n      size 0x0000000000010e58\n    offset 1751096\n     align 2^0 (1)\n    reloff 0\n    nreloc 0\n     flags 0x00000002\n reserved1 0\n reserved2 0\nSection\n  sectname __objc_methname\n   segname __TEXT\n      addr 0x00000001001bc690\n      size 0x000000000000075c\n    offset 1820304\n     align 2^0 (1)\n    reloff 0\n    nreloc 0\n     flags 0x00000002\n reserved1 0\n reserved2 0\nSection\n  sectname __unwind_info\n   segname __TEXT\n      addr 0x00000001001bcdec\n      size 0x0000000000002780\n    offset 1822188\n     align 2^2 (4)\n    reloff 0\n    nreloc 0\n     flags 0x00000000\n reserved1 0\n reserved2 0\nSection\n  sectname __eh_frame\n   segname __TEXT\n      addr 0x00000001001bf570\n      size 0x0000000000000368\n    offset 1832304\n     align 2^3 (8)\n    reloff 0\n    nreloc 0\n     flags 0x6800000b\n reserved1 0\n reserved2 0\nLoad command 2\n      cmd LC_SEGMENT_64\n  cmdsize 392\n  segname __DATA_CONST\n   vmaddr 0x00000001001c0000\n   vmsize 0x0000000000008000\n  fileoff 1835008\n filesize 32768\n  maxprot 0x00000003\n initprot 0x00000003\n   nsects 4\n    flags 0x10\nSection\n  sectname __const\n   segname __DATA_CONST\n      addr 0x00000001001c0000\n      size 0x0000000000003a90\n    offset 1835008\n     align 2^3 (8)\n    reloff 0\n    nreloc 0\n     flags 0x00000000\n reserved1 0\n reserved2 0\nSection\n  sectname __cfstring\n   segname __DATA_CONST\n      addr 0x00000001001c3a90\n      size 0x0000000000000140\n    offset 1850000\n     align 2^3 (8)\n    reloff 0\n    nreloc 0\n     flags 0x00000000\n reserved1 0\n reserved2 0\nSection\n  sectname __objc_imageinfo\n   segname __DATA_CONST\n      addr 0x00000001001c3bd0\n      size 0x0000000000000008\n    offset 1850320\n     align 2^2 (4)\n    reloff 0\n    nreloc 0\n     flags 0x00000000\n reserved1 0\n reserved2 0\nSection\n  sectname __got\n   segname __DATA_CONST\n      addr 0x00000001001c3bd8\n      size 0x0000000000000878\n    offset 1850328\n     align 2^3 (8)\n    reloff 0\n    nreloc 0\n     flags 0x00000006\n reserved1 223 (index into indirect symbol table)\n reserved2 0\nLoad command 3\n      cmd LC_SEGMENT_64\n  cmdsize 472\n  segname __DATA\n   vmaddr 0x00000001001c8000\n   vmsize 0x0000000000244000\n  fileoff 1867776\n filesize 1835008\n  maxprot 0x00000003\n initprot 0x00000003\n   nsects 5\n    flags 0x0\nSection\n  sectname __objc_selrefs\n   segname __DATA\n      addr 0x00000001001c8000\n      size 0x00000000000002c0\n    offset 1867776\n     align 2^3 (8)\n    reloff 0\n    nreloc 0\n     flags 0x10000005\n reserved1 0\n reserved2 0\nSection\n  sectname __data\n   segname __DATA\n      addr 0x00000001001c82c0\n      size 0x0000000000000328\n    offset 1868480\n     align 2^3 (8)\n    reloff 0\n    nreloc 0\n     flags 0x00000000\n reserved1 0\n reserved2 0\nSection\n  sectname __ggml_metallib\n   segname __DATA\n      addr 0x00000001001c85e8\n      size 0x00000000001bdc86\n    offset 1869288\n     align 2^0 (1)\n    reloff 0\n    nreloc 0\n     flags 0x00000000\n reserved1 0\n reserved2 0\nSection\n  sectname __bss\n   segname __DATA\n      addr 0x0000000100386270\n      size 0x00000000000019f8\n    offset 0\n     align 2^3 (8)\n    reloff 0\n    nreloc 0\n     flags 0x00000001\n reserved1 0\n reserved2 0\nSection\n  sectname __common\n   segname __DATA\n      addr 0x0000000100387c68\n      size 0x0000000000080804\n    offset 0\n     align 2^2 (4)\n    reloff 0\n    nreloc 0\n     flags 0x00000001\n reserved1 0\n reserved2 0\nLoad command 4\n      cmd LC_SEGMENT_64\n  cmdsize 72\n  segname __LINKEDIT\n   vmaddr 0x000000010040c000\n   vmsize 0x0000000000060000\n  fileoff 3702784\n filesize 385232\n  maxprot 0x00000001\n initprot 0x00000001\n   nsects 0\n    flags 0x0\nLoad command 5\n      cmd LC_DYLD_CHAINED_FIXUPS\n  cmdsize 16\n  dataoff 3702784\n datasize 8424\nLoad command 6\n      cmd LC_DYLD_EXPORTS_TRIE\n  cmdsize 16\n  dataoff 3711208\n datasize 28216\nLoad command 7\n     cmd LC_SYMTAB\n cmdsize 24\n  symoff 3743944\n   nsyms 4556\n  stroff 3818816\n strsize 260920\nLoad command 8\n            cmd LC_DYSYMTAB\n        cmdsize 80\n      ilocalsym 0\n      nlocalsym 2842\n     iextdefsym 2842\n     nextdefsym 1435\n      iundefsym 4277\n      nundefsym 279\n         tocoff 0\n           ntoc 0\n      modtaboff 0\n        nmodtab 0\n   extrefsymoff 0\n    nextrefsyms 0\n indirectsymoff 3816840\n  nindirectsyms 494\n      extreloff 0\n        nextrel 0\n      locreloff 0\n        nlocrel 0\nLoad command 9\n          cmd LC_LOAD_DYLINKER\n      cmdsize 32\n         name /usr/lib/dyld (offset 12)\nLoad command 10\n     cmd LC_UUID\n cmdsize 24\n    uuid 709D7640-D99F-34AF-96ED-BD850A21C562\nLoad command 11\n      cmd LC_BUILD_VERSION\n  cmdsize 32\n platform 1\n    minos 27.0\n      sdk 27.0\n   ntools 1\n     tool 3\n  version 27037.1\nLoad command 12\n      cmd LC_SOURCE_VERSION\n  cmdsize 16\n  version 0.0\nLoad command 13\n       cmd LC_MAIN\n   cmdsize 24\n  entryoff 3040\n stacksize 0\nLoad command 14\n          cmd LC_LOAD_DYLIB\n      cmdsize 96\n         name /System/Library/Frameworks/Accelerate.framework/Versions/A/Accelerate (offset 24)\n   time stamp 2 Thu Jan  1 05:30:02 1970\n      current version 4.0.0\ncompatibility version 1.0.0\nLoad command 15\n          cmd LC_LOAD_DYLIB\n      cmdsize 88\n         name /System/Library/Frameworks/Metal.framework/Versions/A/Metal (offset 24)\n   time stamp 2 Thu Jan  1 05:30:02 1970\n      current version 382.5.3\ncompatibility version 1.0.0\nLoad command 16\n          cmd LC_LOAD_DYLIB\n      cmdsize 96\n         name /System/Library/Frameworks/Foundation.framework/Versions/C/Foundation (offset 24)\n   time stamp 2 Thu Jan  1 05:30:02 1970\n      current version 5027.0.69\ncompatibility version 300.0.0\nLoad command 17\n          cmd LC_LOAD_DYLIB\n      cmdsize 48\n         name /usr/lib/libc++.1.dylib (offset 24)\n   time stamp 2 Thu Jan  1 05:30:02 1970\n      current version 2200.27.0\ncompatibility version 1.0.0\nLoad command 18\n          cmd LC_LOAD_DYLIB\n      cmdsize 56\n         name /usr/lib/libSystem.B.dylib (offset 24)\n   time stamp 2 Thu Jan  1 05:30:02 1970\n      current version 1359.0.0\ncompatibility version 1.0.0\nLoad command 19\n          cmd LC_LOAD_DYLIB\n      cmdsize 104\n         name /System/Library/Frameworks/CoreFoundation.framework/Versions/A/CoreFoundation (offset 24)\n   time stamp 2 Thu Jan  1 05:30:02 1970\n      current version 5027.0.69\ncompatibility version 150.0.0\nLoad command 20\n          cmd LC_LOAD_DYLIB\n      cmdsize 56\n         name /usr/lib/libobjc.A.dylib (offset 24)\n   time stamp 2 Thu Jan  1 05:30:02 1970\n      current version 228.0.0\ncompatibility version 1.0.0\nLoad command 21\n      cmd LC_FUNCTION_STARTS\n  cmdsize 16\n  dataoff 3739424\n datasize 4520\nLoad command 22\n      cmd LC_DATA_IN_CODE\n  cmdsize 16\n  dataoff 3743944\n datasize 0\nLoad command 23\n      cmd LC_CODE_SIGNATURE\n  cmdsize 16\n  dataoff 4079744\n datasize 8272\n",
+        "stderr": ""
+      }
+    }
+  ],
+  "machOCount": 5,
+  "helperManifestVerification": [
+    {
+      "name": "llama-worker",
+      "expectedSha256": "94fa1694c96f7c39fa44226b7801cb8227f4528cad143392a2ceec2d6eb98982",
+      "actualSha256": "94fa1694c96f7c39fa44226b7801cb8227f4528cad143392a2ceec2d6eb98982",
+      "verified": true
+    },
+    {
+      "name": "whisper-worker",
+      "expectedSha256": "6da645519bda5262de0f6ab5709d52894f2dba8380bda26660113cd316e22eca",
+      "actualSha256": "6da645519bda5262de0f6ab5709d52894f2dba8380bda26660113cd316e22eca",
+      "verified": true
+    },
+    {
+      "name": "microphone-worker",
+      "expectedSha256": "9940c517026dfad18329843e1bc33ee47d0c67512d5c6f10a819a7753619e448",
+      "actualSha256": "9940c517026dfad18329843e1bc33ee47d0c67512d5c6f10a819a7753619e448",
+      "verified": true
+    },
+    {
+      "name": "document-extractor",
+      "expectedSha256": "ef7f2543226846f39283ba325f4699c10b92b22fcf19828b11c1fbcf2b80f75d",
+      "actualSha256": "ef7f2543226846f39283ba325f4699c10b92b22fcf19828b11c1fbcf2b80f75d",
+      "verified": true
+    }
+  ],
+  "deepSignatureVerification": {
+    "command": [
+      "/usr/bin/codesign",
+      "--verify",
+      "--deep",
+      "--strict",
+      "--verbose=2",
+      "/Volumes/HD-B1/HD-Projects/Trove/build/phase3-candidate-2/Trove.app"
+    ],
+    "exitCode": 0,
+    "stdout": "",
+    "stderr": "/Volumes/HD-B1/HD-Projects/Trove/build/phase3-candidate-2/Trove.app: valid on disk\n/Volumes/HD-B1/HD-Projects/Trove/build/phase3-candidate-2/Trove.app: satisfies its Designated Requirement\n"
+  },
+  "symlinks": [],
+  "goBuildInfo": {
+    "command": [
+      "/private/tmp/trove-phase0-tools/go/bin/go",
+      "version",
+      "-m",
+      "/Volumes/HD-B1/HD-Projects/Trove/build/phase3-candidate-2/Trove.app/Contents/MacOS/Trove"
+    ],
+    "exitCode": 0,
+    "stdout": "/Volumes/HD-B1/HD-Projects/Trove/build/phase3-candidate-2/Trove.app/Contents/MacOS/Trove: go1.27.1\n\tpath\ttrove.local/phase0\n\tmod\ttrove.local/phase0\t(devel)\t\n\tdep\tgithub.com/leaanthony/go-ansi-parser\tv1.6.1\th1:xd8bzARK3dErqkPFtoF9F3/HgN8UQk0ed1YDKpEz01A=\n\tdep\tgithub.com/leaanthony/slicer\tv1.6.0\th1:1RFP5uiPJvT93TAHi+ipd3NACobkW53yUiBqZheE/Js=\n\tdep\tgithub.com/leaanthony/u\tv1.1.1\th1:TUFjwDGlNX+WuwVEzDqQwC2lOv0P4uhTQw7CMFdiK7M=\n\tdep\tgithub.com/mattn/go-sqlite3\tv1.14.52\th1:wVbm2Qnf4OXkqhBTSPuCRZDRnxfbVrrmiCEroVdog8U=\n\tdep\tgithub.com/pkg/browser\tv0.0.0-20240102092130-5ac0b6a4141c\th1:+mdjkGKdHQG3305AYmdv1U2eRNDiU2ErMBj1gwrq8eQ=\n\tdep\tgithub.com/pkg/errors\tv0.9.1\th1:FEBLx1zS214owpjy7qsBeixbURkuhQAwrK5UwLGTwt4=\n\tdep\tgithub.com/rivo/uniseg\tv0.4.7\th1:WUdvkW8uEhrYfLC4ZzdpI2ztxP1I582+49Oc5Mq64VQ=\n\tdep\tgithub.com/samber/lo\tv1.49.1\th1:4BIFyVfuQSEpluc7Fua+j1NolZHiEHEpaSEKdsH0tew=\n\tdep\tgithub.com/santhosh-tekuri/jsonschema/v6\tv6.0.2\th1:KRzFb2m7YtdldCEkzs6KqmJw4nqEVZGK7IN2kJkjTuQ=\n\tdep\tgithub.com/tkrajina/go-reflector\tv0.5.8\th1:yPADHrwmUbMq4RGEyaOUpz2H90sRsETNVpjzo3DLVQQ=\n\tdep\tgithub.com/wailsapp/mimetype\tv1.4.1\th1:pQN9ycO7uo4vsUUuPeHEYoUkLVkaRntMnHJxVwYhwHs=\n\tdep\tgithub.com/wailsapp/wails/v2\tv2.16.0\th1:hLYrSHUUq6hRXl3rWT9ZXiyFIgM94nVN9Ns6iEJzxyw=\n\tdep\tgolang.org/x/net\tv0.56.0\th1:Rw8j/hFzGvJUZwNBXnAtf5sVDVt+65SK2C7IxCxZt5o=\n\tdep\tgolang.org/x/text\tv0.39.0\th1:UbZz4pLOvn600D6Oh6GGEI6VAmndrEBLv8/6BEXzyus=\n\tbuild\t-buildmode=exe\n\tbuild\t-compiler=gc\n\tbuild\t-tags=desktop,production,fts5,sqlite_omit_load_extension\n\tbuild\t-trimpath=true\n\tbuild\tCGO_ENABLED=1\n\tbuild\tGOARCH=arm64\n\tbuild\tGOOS=darwin\n\tbuild\tGOARM64=v8.0\n",
+    "stderr": ""
+  },
+  "goModulesMatchBundledProvenance": true,
+  "bundledProvenanceSha256": "5a05ad0665b27f37db11d39c95e78b6e0a2d8f1e9c554c5054242c08c22a4d37",
+  "failures": [],
+  "passed": true,
+  "conclusions": {
+    "externalDynamicLibraryDependencies": false,
+    "signatureKind": "ad-hoc; no Developer ID/notarization claim",
+    "requiredSeparatelyInstalledNodePythonOllamaDocker": "No such dynamic dependency or runtime executable is present in this bundle; production subprocess review and packaged minimal-PATH evidence supply the separate launch-path evidence."
+  },
+  "limitations": [
+    "This is not a clean-Mac installation or native device/UI test.",
+    "OS Swift libraries and frameworks may reside in the dyld shared cache rather than individual filesystem files.",
+    "The candidate executable hash must be rebound by rerunning this audit after any rebuild; previous helper hashes can only be reused if unchanged."
+  ]
+}

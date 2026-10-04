@@ -1,0 +1,38 @@
+[
+  {
+    "url": "https://raw.githubusercontent.com/asg017/sqlite-vec/639fca5739fe056fdc98f3d539c4cd79328d7dc7/LICENSE-MIT",
+    "path": "sqlite-vec-LICENSE-MIT",
+    "retrievedAt": "2026-09-30",
+    "scope": "sqlite-vec C runtime only; the separate Go binding has no license file at its pinned revision"
+  },
+  {
+    "url": "https://huggingface.co/karpathy/tinyllamas/resolve/0bd21da7698eaf29a0d7de3992de8a46ef624add/README.md",
+    "path": "tinyllamas-model-card.md",
+    "retrievedAt": "2026-09-30",
+    "scope": "Publisher license/model-card declaration at the pinned revision"
+  },
+  {
+    "url": "https://huggingface.co/BAAI/bge-small-en/resolve/2275a7bdee235e9b4f01fa73aa60d3311983cfea/README.md",
+    "path": "bge-small-en-model-card.md",
+    "retrievedAt": "2026-09-30",
+    "scope": "Publisher license/model-card declaration at the pinned revision"
+  },
+  {
+    "url": "https://huggingface.co/openai/whisper-tiny.en/resolve/87c7102498dcde7456f24cfd30239ca606ed9063/README.md",
+    "path": "whisper-tiny-en-model-card.md",
+    "retrievedAt": "2026-09-30",
+    "scope": "Publisher license/model-card declaration at the pinned revision"
+  },
+  {
+    "url": "https://huggingface.co/Qwen/Qwen2.5-0.5B-Instruct-GGUF/resolve/9217f5db79a29953eb74d5343926648285ec7e67/LICENSE",
+    "path": "qwen-0.5b-LICENSE",
+    "retrievedAt": "2026-09-30",
+    "scope": "Publisher license/model-card declaration at the pinned revision"
+  },
+  {
+    "url": "https://huggingface.co/Qwen/Qwen2.5-1.5B-Instruct-GGUF/resolve/91cad51170dc346986eccefdc2dd33a9da36ead9/LICENSE",
+    "path": "qwen-1.5b-LICENSE",
+    "retrievedAt": "2026-09-30",
+    "scope": "Publisher license/model-card declaration at the pinned revision"
+  }
+]

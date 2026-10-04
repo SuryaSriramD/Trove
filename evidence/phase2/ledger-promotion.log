@@ -1,0 +1,12 @@
+test_all_release_labelled_matrix_rows_are_mapped (tests.test_ledger.LedgerTests.test_all_release_labelled_matrix_rows_are_mapped) ... ok
+test_cited_audit_ids_are_expanded_without_claiming_missing_report (tests.test_ledger.LedgerTests.test_cited_audit_ids_are_expanded_without_claiming_missing_report) ... ok
+test_phase0_and_product_completion_are_independent (tests.test_ledger.LedgerTests.test_phase0_and_product_completion_are_independent) ... ok
+test_source_anchors_and_numbered_requirements_are_preserved (tests.test_ledger.LedgerTests.test_source_anchors_and_numbered_requirements_are_preserved) ... ok
+test_source_text_is_complete_and_matches_supplied_docx (tests.test_ledger.LedgerTests.test_source_text_is_complete_and_matches_supplied_docx) ... ok
+test_unique_ids_and_complete_ownership_chain (tests.test_ledger.LedgerTests.test_unique_ids_and_complete_ownership_chain) ... ok
+test_verified_requires_implementation_and_covering_passing_evidence (tests.test_ledger.LedgerTests.test_verified_requires_implementation_and_covering_passing_evidence) ... ok
+
+----------------------------------------------------------------------
+Ran 7 tests in 0.181s
+
+OK

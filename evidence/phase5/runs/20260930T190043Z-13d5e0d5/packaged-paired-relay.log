@@ -1,0 +1,8 @@
+{"Time":"2026-10-01T00:36:58.690724+05:30","Action":"start","Package":"trove.local/phase0/internal/workspace"}
+{"Time":"2026-10-01T00:36:58.967437+05:30","Action":"run","Package":"trove.local/phase0/internal/workspace","Test":"TestPhase5V10PairedRelayProtocolConsentAndCancellation"}
+{"Time":"2026-10-01T00:36:58.967537+05:30","Action":"output","Package":"trove.local/phase0/internal/workspace","Test":"TestPhase5V10PairedRelayProtocolConsentAndCancellation","Output":"=== RUN   TestPhase5V10PairedRelayProtocolConsentAndCancellation\n","OutputType":"frame"}
+{"Time":"2026-10-01T00:36:59.793889+05:30","Action":"output","Package":"trove.local/phase0/internal/workspace","Test":"TestPhase5V10PairedRelayProtocolConsentAndCancellation","Output":"--- PASS: TestPhase5V10PairedRelayProtocolConsentAndCancellation (0.83s)\n","OutputType":"frame"}
+{"Time":"2026-10-01T00:36:59.793954+05:30","Action":"pass","Package":"trove.local/phase0/internal/workspace","Test":"TestPhase5V10PairedRelayProtocolConsentAndCancellation","Elapsed":0.83}
+{"Time":"2026-10-01T00:36:59.794025+05:30","Action":"output","Package":"trove.local/phase0/internal/workspace","Output":"PASS\n","OutputType":"frame"}
+{"Time":"2026-10-01T00:37:00.802615+05:30","Action":"output","Package":"trove.local/phase0/internal/workspace","Output":"ok  \ttrove.local/phase0/internal/workspace\t2.112s\n"}
+{"Time":"2026-10-01T00:37:00.802692+05:30","Action":"pass","Package":"trove.local/phase0/internal/workspace","Elapsed":2.112}

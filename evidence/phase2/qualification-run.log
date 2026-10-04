@@ -1,0 +1,37 @@
+contracts: passed
+go-race: failed
+ptionKeepsEditorResponsive","Output":"    transcription_test.go:479: durable audio progress 76800000 / 230400000 bytes\n"}
+{"Time":"2026-09-30T21:42:14.369396+05:30","Action":"output","Package":"trove.local/phase0/internal/workers","Test":"TestRealOneHourTranscriptionKeepsEditorResponsive","Output":"    transcription_test.go:479: durable audio progress 80640000 / 230400000 bytes\n"}
+{"Time":"2026-09-30T21:42:15.293049+05:30","Action":"output","Package":"trove.local/phase0/internal/workers","Test":"TestRealOneHourTranscriptionKeepsEditorResponsive","Output":"    transcription_test.go:479: durable audio progress 84480000 / 230400000 bytes\n"}
+{"Time":"2026-09-30T21:42:16.256585+05:30","Action":"output","Package":"trove.local/phase0/internal/workers","Test":"TestRealOneHourTranscriptionKeepsEditorResponsive","Output":"    transcription_test.go:479: durable audio progress 88320000 / 230400000 bytes\n"}
+{"Time":"2026-09-30T21:42:17.28127+05:30","Action":"output","Package":"trove.local/phase0/internal/workers","Test":"TestRealOneHourTranscriptionKeepsEditorResponsive","Output":"    transcription_test.go:479: durable audio progress 92160000 / 230400000 bytes\n"}
+{"Time":"2026-09-30T21:42:18.207432+05:30","Action":"output","Package":"trove.local/phase0/internal/workers","Test":"TestRealOneHourTranscriptionKeepsEditorResponsive","Output":"    transcription_test.go:479: durable audio progress 96000000 / 230400000 bytes\n"}
+{"Time":"2026-09-30T21:42:19.282939+05:30","Action":"output","Package":"trove.local/phase0/internal/workers","Test":"TestRealOneHourTranscriptionKeepsEditorResponsive","Output":"    transcription_test.go:479: durable audio progress 99840000 / 230400000 bytes\n"}
+{"Time":"2026-09-30T21:42:20.257341+05:30","Action":"output","Package":"trove.local/phase0/internal/workers","Test":"TestRealOneHourTranscriptionKeepsEditorResponsive","Output":"    transcription_test.go:479: durable audio progress 103680000 / 230400000 bytes\n"}
+{"Time":"2026-09-30T21:42:21.229292+05:30","Action":"output","Package":"trove.local/phase0/internal/workers","Test":"TestRealOneHourTranscriptionKeepsEditorResponsive","Output":"    transcription_test.go:479: durable audio progress 107520000 / 230400000 bytes\n"}
+{"Time":"2026-09-30T21:42:22.264728+05:30","Action":"output","Package":"trove.local/phase0/internal/workers","Test":"TestRealOneHourTranscriptionKeepsEditorResponsive","Output":"    transcription_test.go:479: durable audio progress 111360000 / 230400000 bytes\n"}
+{"Time":"2026-09-30T21:42:23.188516+05:30","Action":"output","Package":"trove.local/phase0/internal/workers","Test":"TestRealOneHourTranscriptionKeepsEditorResponsive","Output":"    transcription_test.go:479: durable audio progress 115200000 / 230400000 bytes\n"}
+{"Time":"2026-09-30T21:42:24.174835+05:30","Action":"output","Package":"trove.local/phase0/internal/workers","Test":"TestRealOneHourTranscriptionKeepsEditorResponsive","Output":"    transcription_test.go:479: durable audio progress 119040000 / 230400000 bytes\n"}
+{"Time":"2026-09-30T21:42:25.151614+05:30","Action":"output","Package":"trove.local/phase0/internal/workers","Test":"TestRealOneHourTranscriptionKeepsEditorResponsive","Output":"    transcription_test.go:479: durable audio progress 122880000 / 230400000 bytes\n"}
+{"Time":"2026-09-30T21:42:26.197454+05:30","Action":"output","Package":"trove.local/phase0/internal/workers","Test":"TestRealOneHourTranscriptionKeepsEditorResponsive","Output":"    transcription_test.go:479: durable audio progress 126720000 / 230400000 bytes\n"}
+{"Time":"2026-09-30T21:42:27.172073+05:30","Action":"output","Package":"trove.local/phase0/internal/workers","Test":"TestRealOneHourTranscriptionKeepsEditorResponsive","Output":"    transcription_test.go:479: durable audio progress 130560000 / 230400000 bytes\n"}
+{"Time":"2026-09-30T21:42:28.29471+05:30","Action":"output","Package":"trove.local/phase0/internal/workers","Test":"TestRealOneHourTranscriptionKeepsEditorResponsive","Output":"    transcription_test.go:479: durable audio progress 134400000 / 230400000 bytes\n"}
+{"Time":"2026-09-30T21:42:29.267213+05:30","Action":"output","Package":"trove.local/phase0/internal/workers","Test":"TestRealOneHourTranscriptionKeepsEditorResponsive","Output":"    transcription_test.go:479: durable audio progress 138240000 / 230400000 bytes\n"}
+{"Time":"2026-09-30T21:42:30.32696+05:30","Action":"output","Package":"trove.local/phase0/internal/workers","Test":"TestRealOneHourTranscriptionKeepsEditorResponsive","Output":"    transcription_test.go:479: durable audio progress 142080000 / 230400000 bytes\n"}
+{"Time":"2026-09-30T21:42:32.0317+05:30","Action":"output","Package":"trove.local/phase0/internal/workers","Test":"TestRealOneHourTranscriptionKeepsEditorResponsive","Output":"    transcription_test.go:479: durable audio progress 145920000 / 230400000 bytes\n"}
+{"Time":"2026-09-30T21:42:32.954836+05:30","Action":"output","Package":"trove.local/phase0/internal/workers","Test":"TestRealOneHourTranscriptionKeepsEditorResponsive","Output":"    transcription_test.go:479: durable audio progress 149760000 / 230400000 bytes\n"}
+{"Time":"2026-09-30T21:42:33.980607+05:30","Action":"output","Package":"trove.local/phase0/internal/workers","Test":"TestRealOneHourTranscriptionKeepsEditorResponsive","Output":"    transcription_test.go:479: durable audio progress 153600000 / 230400000 bytes\n"}
+{"Time":"2026-09-30T21:42:35.103176+05:30","Action":"output","Package":"trove.local/phase0/internal/workers","Test":"TestRealOneHourTranscriptionKeepsEditorResponsive","Output":"    transcription_test.go:479: durable audio progress 157440000 / 230400000 bytes\n"}
+{"Time":"2026-09-30T21:42:36.225033+05:30","Action":"output","Package":"trove.local/phase0/internal/workers","Test":"TestRealOneHourTranscriptionKeepsEditorResponsive","Output":"    transcription_test.go:471: native one-hour job stopped: \u0026{Code:INTERNAL Message:CONFLICT: Job input changed after enqueue Retryable:false RequestId:01a0f316-d9d6-7c6b-8000-3c1218967569 Details:\u003cnil\u003e}\n","OutputType":"error"}
+{"Time":"2026-09-30T21:42:36.255916+05:30","Action":"output","Package":"trove.local/phase0/internal/workers","Test":"TestRealOneHourTranscriptionKeepsEditorResponsive","Output":"--- FAIL: TestRealOneHourTranscriptionKeepsEditorResponsive (47.08s)\n","OutputType":"frame"}
+{"Time":"2026-09-30T21:42:36.255955+05:30","Action":"fail","Package":"trove.local/phase0/internal/workers","Test":"TestRealOneHourTranscriptionKeepsEditorResponsive","Elapsed":47.08}
+{"Time":"2026-09-30T21:42:36.256414+05:30","Action":"output","Package":"trove.local/phase0/internal/workers","Output":"FAIL\n","OutputType":"frame"}
+{"Time":"2026-09-30T21:42:36.25979+05:30","Action":"output","Package":"trove.local/phase0/internal/workers","Output":"FAIL\ttrove.local/phase0/internal/workers\t80.310s\n","OutputType":"frame"}
+{"Time":"2026-09-30T21:42:36.259808+05:30","Action":"fail","Package":"trove.local/phase0/internal/workers","Elapsed":80.31}
+
+frontend-types: passed
+frontend-codec: passed
+frontend-browser: passed
+database-browser: passed
+desktop-build: passed
+packaged-restart-native: passed

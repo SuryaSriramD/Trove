@@ -1,0 +1,121 @@
+{
+  "recordedAt": "2026-09-30T16:31:14.516444+00:00",
+  "app": "/Volumes/HD-B1/HD-Projects/Trove/build/Trove.app",
+  "appBinarySha256": "cf6a25b86660e6f899cb321771531848753ea069c698fbb736902089ad05e330",
+  "fixture": "/var/folders/xc/s78np0812b12p6338l0ndvsm0000gn/T/trove-packaged-6_26eajl",
+  "checks": [
+    {
+      "step": "create",
+      "passed": true,
+      "recordedAt": "2026-09-30T16:31:11.894762Z",
+      "state": {
+        "workspaceId": "01a0f327-dedb-71d6-8495-acee03e05c01",
+        "pageId": "01a0f327-e016-7a92-b6a1-0dac0d705ec8",
+        "blockId": "01a0f327-e016-75fd-8ce2-05f78418044e",
+        "collectionId": "01a0f327-e016-726b-b8bf-4d5db64e91bf",
+        "propertyId": "01a0f327-e016-786f-b1ad-971cbca06a3e",
+        "recordId": "01a0f327-e016-7ac9-b69b-c8efe8650315",
+        "recordPageId": "01a0f327-e016-70a7-978c-e79667f09aa5",
+        "fileId": "01a0f327-e03b-7e56-852f-1d38ce5916c7",
+        "fileBlockId": "01a0f327-e016-755a-875c-3561d0bc7436",
+        "contentHash": "61cb495898eb4901d8a4ea859ee4cee692bb981cc2474a55f2809e47519fd273"
+      },
+      "checks": [
+        "pages persisted",
+        "blocks persisted",
+        "collections persisted",
+        "records persisted",
+        "files persisted",
+        "page titles, Unicode rich text and attachment references unchanged",
+        "record has canonical page body",
+        "attachment hash and scoped file read verified"
+      ],
+      "processExitCode": 0
+    },
+    {
+      "step": "verify",
+      "passed": true,
+      "recordedAt": "2026-09-30T16:31:12.517088Z",
+      "state": {
+        "workspaceId": "01a0f327-dedb-71d6-8495-acee03e05c01",
+        "pageId": "01a0f327-e016-7a92-b6a1-0dac0d705ec8",
+        "blockId": "01a0f327-e016-75fd-8ce2-05f78418044e",
+        "collectionId": "01a0f327-e016-726b-b8bf-4d5db64e91bf",
+        "propertyId": "01a0f327-e016-786f-b1ad-971cbca06a3e",
+        "recordId": "01a0f327-e016-7ac9-b69b-c8efe8650315",
+        "recordPageId": "01a0f327-e016-70a7-978c-e79667f09aa5",
+        "fileId": "01a0f327-e03b-7e56-852f-1d38ce5916c7",
+        "fileBlockId": "01a0f327-e016-755a-875c-3561d0bc7436",
+        "contentHash": "61cb495898eb4901d8a4ea859ee4cee692bb981cc2474a55f2809e47519fd273"
+      },
+      "checks": [
+        "pages persisted",
+        "blocks persisted",
+        "collections persisted",
+        "records persisted",
+        "files persisted",
+        "page titles, Unicode rich text and attachment references unchanged",
+        "record has canonical page body",
+        "attachment hash and scoped file read verified"
+      ],
+      "processExitCode": 0
+    },
+    {
+      "checks": {
+        "chat": {
+          "citations": [],
+          "kind": "generation",
+          "text": ", there was a little girl named Lily. She loved to play outside and"
+        },
+        "embedding": {
+          "dimension": 384,
+          "vectors": 1
+        },
+        "microphoneSynthetic": {
+          "bytes": 6400,
+          "sampleRate": 16000,
+          "channels": 1,
+          "format": "f32le",
+          "synthetic": true,
+          "cancelled": false
+        },
+        "speech": {
+          "kind": "transcript",
+          "meetingId": "01a0f327-e751-7405-bb5b-05375e290146",
+          "segments": [
+            {
+              "blockId": "01a0f327-e750-78e6-af25-1108af0c91d9",
+              "endMs": 8000,
+              "segmentId": "01a0f327-e750-78e3-a9fe-a01cf6ed319e",
+              "startMs": 0,
+              "text": " And so my fellow Americans ask not what your country can do for you"
+            },
+            {
+              "blockId": "01a0f327-e750-7e6a-a277-87f40dc1b0eb",
+              "endMs": 11000,
+              "segmentId": "01a0f327-e750-7d49-9799-0a76f21490bf",
+              "startMs": 8000,
+              "text": " ask what you can do for your country."
+            }
+          ]
+        }
+      },
+      "passed": true,
+      "recordedAt": "2026-09-30T16:31:13.112126Z",
+      "step": "native",
+      "processExitCode": 0,
+      "shell": {
+        "definition": "Go process initialization to canonical snapshot rendered plus two animation frames",
+        "recordedAt": "2026-09-30T16:31:13.597928Z",
+        "usableShellMs": 973.943
+      }
+    }
+  ],
+  "networkDeniedByOS": false,
+  "passed": true,
+  "limitations": [
+    "Ad-hoc developer signature; not Developer ID or notarized.",
+    "Executed on this Mac with minimal PATH; a separate clean-machine installation is unverified.",
+    "Service integration fixture; interactive editing and accessibility use separate tests."
+  ]
+}

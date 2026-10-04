@@ -1,0 +1,11 @@
+{
+ "$schema":"https://wails.io/schemas/config.v2.json",
+ "name":"Trove",
+ "outputfilename":"Trove",
+ "frontend:install":"pnpm install --frozen-lockfile",
+ "frontend:build":"pnpm build",
+ "frontend:dev:watcher":"pnpm dev",
+ "frontend:dev:serverUrl":"auto",
+ "author":{"name":"Trove"},
+ "info":{"companyName":"Trove","productName":"Trove","productVersion":"0.3.0","comments":"P0 desktop release candidate"}
+}

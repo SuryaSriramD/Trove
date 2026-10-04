@@ -1,0 +1,50 @@
+{
+  "workPackage": "1A",
+  "implemented": true,
+  "verified": true,
+  "verifiedAt": "2026-09-30T15:16:19.396225+00:00",
+  "platform": "darwin/arm64",
+  "command": "TROVE_NATIVE_INTEGRATION=1 go test -race -tags 'fts5 sqlite_omit_load_extension' ./internal/workspace ./internal/workers ./contracts -json",
+  "topLevelPassedByPackage": {
+    "trove.local/phase0/contracts": 5,
+    "trove.local/phase0/internal/workers": 2,
+    "trove.local/phase0/internal/workspace": 47
+  },
+  "failed": [],
+  "skipped": [],
+  "testOutput": {
+    "path": "evidence/phase1-kernel-tests.jsonl",
+    "sha256": "8dbb686aceb4838fa21de8f2088177fc36f6104a524f93fe577891d55e23b9fa"
+  },
+  "nativeJobEvidence": "evidence/phase1-job-native.json",
+  "sourceHashes": {
+    "contracts/service.schema.json": "ed6e73e914493143f12c43073623430fa98b4e8d1ec5de4a1eb215f7388674b1",
+    "contracts/types_generated.go": "3eaf24672bb7f6fdf61f4ddb8c748311168eeb0e1d0eab6387d9d04ce1265a80",
+    "internal/native/supervisor.go": "d3790305f2aef2ac5e2c4d28825c7414921097520569dc4c5b4e3c66616ad009",
+    "internal/workers/audio.go": "6b4fa534124d5af47ad2a80fe30d23933b63dadd1d1bec4e4bc807ea0a426f45",
+    "internal/workers/runner.go": "aadeb307faa7f9668051dd5e6bc3d7bdca4aa8219dc09cdd732759c27b6efaf8",
+    "internal/workers/runner_test.go": "11213dee2b90e0eae2ec38c40169808f930cf511e3b651a65557dafaacbf353f",
+    "internal/workspace/backup.go": "c49256a60a09e245215d6609cc100b09db0621fa09d9b6231e497f15d169ec37",
+    "internal/workspace/canonical.go": "727ba27437dd1c20917bcae5dad5c509e5d46b1ec1ac76a58aa8b34057353459",
+    "internal/workspace/database.go": "920385780bfca2c0b98989775d5ee999c4d4964b5941d3350c13824c53aa75b8",
+    "internal/workspace/database_test.go": "72b37ecc204f98b7a26bb3c05f2ac0f477f10699f516ace512e9bc2b1d77fa1a",
+    "internal/workspace/events.go": "6f1c450153797aac372d0f698da03ad0c4e85ba6bdba2a1fe9e4542a429daa5d",
+    "internal/workspace/files.go": "8c10258407408c7a29f64ead27da334a45d9e4e4887ff9df3a00d8e049f2bc5a",
+    "internal/workspace/history.go": "d5efcfa0c1d32943960c354001d39cb210029facb485c06779ea47bc1e4f6560",
+    "internal/workspace/job_backup.go": "38c711be69f95b8163464cd97c36b037de5f57e4af782989258bd15a8c131e70",
+    "internal/workspace/job_commits.go": "9339ead97420f696b7790d56be30b564b12763d5805b00d34127e62e51113943",
+    "internal/workspace/jobs.go": "f29ccdbce838fbd4396221365b93013a92df6d720ccd676b9acabd0b2762eaf7",
+    "internal/workspace/jobs_test.go": "455005fc866f4edeba6e69553fbb05b4a369117915b835cbfd017e834c645a58",
+    "internal/workspace/kernel.go": "6340fec7f688a892be9ddb20f555f88654a657743dacf0c0a609af1222522f51",
+    "internal/workspace/kernel_test.go": "3e26d59af88821a48dc590eeb065646a4d2f12853f27a4f7500ce8e36c75403b",
+    "internal/workspace/meetings.go": "94ed712dd5df86233a75030db6a4af277d04874494eef0b80960597668a37c47",
+    "internal/workspace/mutations.go": "19119b438734b6892e3103dc0371352cba4671b3547f42fdb227fc1396d7dafb",
+    "internal/workspace/pages.go": "679fca5acf41f6e4e400021b5c257104ccadb4080ce08d383189fb1507083a40",
+    "internal/workspace/permissions.go": "6194d6bfade86bfe3e7efb18b325dee392fe8584b09bac715a53d95bb35d3163",
+    "internal/workspace/projects.go": "8f174e5ee8b0948cdbd0421566d3d64303314e82a19474fc1d04de90068dd424",
+    "internal/workspace/recovery_test.go": "9d66cc56d6b22e0d9c31d10414636f84f64758fb77819e550bda245c060d10b5",
+    "internal/workspace/services.go": "684bbb35ec06646f85aee2997c2e07c5b85e3c7e40af433434753183f512c297",
+    "internal/workspace/tasks.go": "6ed5c5fdfaf273a0254a75c1effa47f7e831246d178c70105d51f3efb7f71c7b",
+    "internal/workspace/tasks_test.go": "ef92e0609fdc470f8d9ab07e705578a255bf0ddaed086a35c30a1878aeac73c5"
+  }
+}

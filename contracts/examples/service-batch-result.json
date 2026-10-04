@@ -1,0 +1,20 @@
+{
+  "ok": true,
+  "result": {
+    "requestId": "0199a000-0000-7000-8000-000000000003",
+    "transactionId": "0199a000-0000-7000-8000-000000000011",
+    "eventCursor": "1",
+    "revisions": [
+      {
+        "target": {
+          "entityType": "page",
+          "entityId": "0199a000-0000-7000-8000-000000000002"
+        },
+        "before": "0",
+        "after": "1",
+        "deleted": false
+      }
+    ],
+    "replayed": false
+  }
+}

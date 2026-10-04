@@ -1,0 +1,14 @@
+# trove.local/phase0/internal/sqlitevec
+internal/sqlitevec/register.go:11:12: warning: 'sqlite3_auto_extension' is deprecated: first deprecated in macOS 10.10 - Process-global auto extensions are not supported on Apple platforms [-Wdeprecated-declarations]
+/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/sqlite3.h:7627:16: note: 'sqlite3_auto_extension' has been explicitly marked deprecated here
+Benchmarking 100 pages
+panic: CONFLICT: Worker lease expired
+
+goroutine 1 [running]:
+main.must(...)
+	/Volumes/HD-B1/HD-Projects/Trove/scripts/phase3-benchmark/main.go:28
+main.profile({0x1c7adfb87500, 0x52}, 0x64, 0x64, {0x16b5eaf43, 0x20}, {0x16b5eaf6c, 0x57}, 0x1)
+	/Volumes/HD-B1/HD-Projects/Trove/scripts/phase3-benchmark/main.go:227 +0x21a8
+main.main()
+	/Volumes/HD-B1/HD-Projects/Trove/scripts/phase3-benchmark/main.go:272 +0x3e8
+exit status 2

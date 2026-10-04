@@ -1,0 +1,42 @@
+
+Running 34 tests using 1 worker
+
+(node:64269) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+
+[1/34] tests/browser.spec.ts:419:1 › 10,000-page shell keeps the full hierarchy and body search usable across refresh
+[2/34] tests/browser.spec.ts:482:1 › shell navigation, focus, quick switcher, page metadata
+[3/34] tests/browser.spec.ts:513:1 › Unicode composition, RTL, emoji, undo/redo, reopen, raw preservation
+[4/34] tests/browser.spec.ts:560:1 › mixed clipboard retains block structure and allocates distinct IDs
+[5/34] tests/browser.spec.ts:587:1 › repeated splits and formatted paste preserve imported neighbors with complete revision guards
+[6/34] tests/browser.spec.ts:661:1 › insert real code, Mermaid and KaTeX rendering
+[7/34] tests/browser.spec.ts:679:1 › Markdown shortcuts, duplication, keyboard focus and screen-reader structure
+[8/34] tests/browser.spec.ts:749:1 › page lifecycle preserves identity through nesting, icon, archive and navigation
+[9/34] tests/browser.spec.ts:863:1 › all named surfaces open and created page links generate navigable backlinks
+[10/34] tests/browser.spec.ts:909:1 › block transforms, rich marks, find and nested toggle survive save/reopen
+[11/34] tests/browser.spec.ts:981:1 › multi-file clipboard and file drop serialize uploads and preserve media captions and cover
+[12/34] tests/browser.spec.ts:1088:1 › Phase 2 search opens the exact cited block without model packs
+[13/34] tests/browser.spec.ts:1098:1 › Phase 2 import displays complete accounting and editable property preview
+[14/34] tests/browser.spec.ts:1140:1 › Phase 2 AI works without packs and shows reviewed memory controls
+[15/34] tests/browser.spec.ts:1153:1 › Phase 2 failed job retry preserves revision and resumed progress
+[16/34] tests/browser.spec.ts:1171:1 › Phase 2 native restore is reviewed before mutation and retention keeps all
+[17/34] tests/browser.spec.ts:1188:1 › Phase 2 AI review shows exact before and after and applies only on approval
+[18/34] tests/browser.spec.ts:1262:1 › background append synchronizes a clean editor without writes and survives the next edit
+[19/34] tests/browser.spec.ts:1283:1 › background append merges into a dirty editor and remains through save and local undo
+[20/34] tests/browser.spec.ts:1306:1 › background append received during an in-flight save reconciles after completion without dropping ongoing typing
+[21/34] tests/browser.spec.ts:1343:1 › overlapping background block edits preserve the local draft and require conflict review
+[22/34] tests/browser.spec.ts:1367:1 › an append racing the initial save safely rebases and retries after a revision conflict
+[23/34] tests/browser.spec.ts:1396:1 › P0 saved audio loads Blob metadata, plays, seeks, and releases old recordings
+[24/34] tests/browser.spec.ts:1422:1 › P0 audio loading aborts on selection change and reports failed authorized fetches
+[25/34] tests/browser.spec.ts:1450:1 › advanced editor H4, replacement, page lock and native column content
+[26/34] tests/browser.spec.ts:1517:1 › Phase 5 page lock keeps saved advanced content clean and unlock permits editing
+[27/34] tests/browser.spec.ts:1552:1 › Phase 5 remote page lock preserves a pending draft and unlock retries it safely
+[28/34] tests/browser.spec.ts:1579:1 › Phase 5 locking a dirty page commits its draft before changing the lock
+[29/34] tests/browser.spec.ts:1599:1 › Phase 5 unlock preserves an overlapping draft and its original content revision fence
+[30/34] tests/browser.spec.ts:1621:1 › Phase 4 surfaces expose scoped pairing, gated vendors and reviewed capture
+[31/34] tests/browser.spec.ts:1658:1 › AI review rejects malformed Mermaid before approval
+[32/34] tests/browser.spec.ts:1690:1 › provider disconnect stays available while approval is pending
+[33/34] tests/p2-display.browser.spec.ts:3:1 › page display settings persist per page and presentation layout exits after restart
+[34/34] tests/p2-intelligence.browser.spec.ts:3:1 › knowledge graph exposes evidence, OCR availability, and explicitly reviewed digests
+  34 passed (36.1s)

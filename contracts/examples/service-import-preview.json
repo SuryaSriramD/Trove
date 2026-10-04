@@ -1,0 +1,72 @@
+{
+  "planId": "0199a000-0000-7000-8000-000000000028",
+  "planHash": "dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd",
+  "report": {
+    "runId": "0199a000-0000-7000-8000-000000000024",
+    "jobId": "0199a000-0000-7000-8000-000000000025",
+    "state": "partial",
+    "sourceCompleteness": "unknown",
+    "discoveredCount": 2,
+    "accountedCount": 2,
+    "items": [
+      {
+        "sourceLocator": "Notes.md",
+        "outcome": "preserved",
+        "reason": "Matched stable source identity"
+      },
+      {
+        "sourceLocator": "Tabs.html",
+        "outcome": "unsupported_but_retained",
+        "reason": "P1 tabs retained as readable fallback",
+        "retainedFileId": "0199a000-0000-7000-8000-000000000026"
+      }
+    ],
+    "committedBatchIds": [
+      "0199a000-0000-7000-8000-000000000027"
+    ],
+    "unresolvedSourceIds": [],
+    "sourceOmissions": [
+      "Export does not supply complete comment history"
+    ]
+  },
+  "reimportPlans": [
+    {
+      "id": "0199a000-0000-7000-8000-00000000008c",
+      "mappingId": "0199a000-0000-7000-8000-000000000082",
+      "expectedLocalRevision": "1",
+      "incomingSourceRevision": "source-revision-5",
+      "identityStatus": "matched",
+      "sourceCompleteness": "complete",
+      "fields": [
+        {
+          "path": "/title",
+          "outcome": "conflict",
+          "base": {
+            "present": true,
+            "value": "A"
+          },
+          "local": {
+            "present": true,
+            "value": "Local"
+          },
+          "incoming": {
+            "present": true,
+            "value": "Source"
+          }
+        }
+      ],
+      "sourceDeleted": false,
+      "localDeleted": false,
+      "resolution": "needs_review"
+    }
+  ],
+  "requiredRevisions": [
+    {
+      "target": {
+        "entityType": "page",
+        "entityId": "0199a000-0000-7000-8000-00000000000e"
+      },
+      "revision": "1"
+    }
+  ]
+}

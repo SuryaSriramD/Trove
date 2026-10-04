@@ -1,0 +1,32 @@
+{
+  "contractVersion": 1,
+  "requestId": "0199a000-0000-7000-8000-000000000003",
+  "workspaceId": "0199a000-0000-7000-8000-000000000001",
+  "mutation": {
+    "idempotencyKey": "toggle-task-1",
+    "scopeGrantId": "0199a000-0000-7000-8000-000000000009",
+    "expectedRevisions": [
+      {
+        "target": {
+          "entityType": "record",
+          "entityId": "0199a000-0000-7000-8000-00000000003c"
+        },
+        "revision": "1"
+      },
+      {
+        "target": {
+          "entityType": "page",
+          "entityId": "0199a000-0000-7000-8000-00000000000c"
+        },
+        "revision": "1"
+      }
+    ]
+  },
+  "commands": [
+    {
+      "kind": "task.setStatus",
+      "recordId": "0199a000-0000-7000-8000-00000000003c",
+      "statusOptionId": "0199a000-0000-7000-8000-000000000033"
+    }
+  ]
+}

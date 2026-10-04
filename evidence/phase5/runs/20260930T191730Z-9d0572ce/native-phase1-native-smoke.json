@@ -1,0 +1,44 @@
+{
+  "checks": {
+    "chat": {
+      "citations": [],
+      "kind": "generation",
+      "text": ", there was a little girl named Lily. She loved to play outside and"
+    },
+    "embedding": {
+      "dimension": 384,
+      "vectors": 1
+    },
+    "microphoneSynthetic": {
+      "bytes": 6400,
+      "sampleRate": 16000,
+      "channels": 1,
+      "format": "f32le",
+      "synthetic": true,
+      "cancelled": false
+    },
+    "speech": {
+      "kind": "transcript",
+      "meetingId": "01a0f3c2-f6f3-79ea-a03c-2fe4e7edb95a",
+      "segments": [
+        {
+          "blockId": "01a0f3c2-f6f2-75de-a2ff-909ab9701182",
+          "endMs": 8000,
+          "segmentId": "01a0f3c2-f6f2-7e1d-9e4d-6eb326d1c6ef",
+          "startMs": 0,
+          "text": " And so my fellow Americans ask not what your country can do for you"
+        },
+        {
+          "blockId": "01a0f3c2-f6f2-7230-89fe-70ae6b4b0adb",
+          "endMs": 11000,
+          "segmentId": "01a0f3c2-f6f2-7f66-a1df-e6c5dcd99da6",
+          "startMs": 8000,
+          "text": " ask what you can do for your country."
+        }
+      ]
+    }
+  },
+  "host": "darwin/arm64",
+  "recordedAt": "2026-09-30T19:20:36.334512Z",
+  "status": "verified"
+}

@@ -1,0 +1,29 @@
+=== RUN   TestAdvancedEditorLockCASAndMutationBoundary
+--- PASS: TestAdvancedEditorLockCASAndMutationBoundary (0.13s)
+=== RUN   TestAdvancedEditorCycleAndLayoutOwnershipAreAtomic
+--- PASS: TestAdvancedEditorCycleAndLayoutOwnershipAreAtomic (0.04s)
+=== RUN   TestAdvancedEditorTemplateEvidenceReferencesAndSearch
+--- PASS: TestAdvancedEditorTemplateEvidenceReferencesAndSearch (0.03s)
+=== RUN   TestAdvancedEditorTableGeometryRejectsOverlaps
+--- PASS: TestAdvancedEditorTableGeometryRejectsOverlaps (0.03s)
+=== RUN   TestAdvancedEditorRecoveryPreservesContentAndButtonProposalsDoNotExecute
+--- PASS: TestAdvancedEditorRecoveryPreservesContentAndButtonProposalsDoNotExecute (0.05s)
+=== RUN   TestPhase5EditorMergedTablesTabsRestoreCanonicalContent
+--- PASS: TestPhase5EditorMergedTablesTabsRestoreCanonicalContent (0.06s)
+=== RUN   TestPhase5EditorOrdinaryEditsDoNotScaleWithUnrelatedBlocks
+    phase5_editor_performance_test.go:62: create_page_with_paragraphs allocations: small=5181 unrelated2500=5148
+    phase5_editor_performance_test.go:62: title_edit allocations: small=3281 unrelated2500=3320
+    phase5_editor_performance_test.go:62: paragraph_edit allocations: small=4206 unrelated2500=4225
+--- PASS: TestPhase5EditorOrdinaryEditsDoNotScaleWithUnrelatedBlocks (0.19s)
+=== RUN   TestPhase5EditorOrdinaryBatchStillEnforcesLocksAndMixedGraphInvariants
+--- PASS: TestPhase5EditorOrdinaryBatchStillEnforcesLocksAndMixedGraphInvariants (0.09s)
+=== RUN   TestPhase5RecoveryP1ObjectGraphAndOfflineResume
+--- PASS: TestPhase5RecoveryP1ObjectGraphAndOfflineResume (0.41s)
+=== RUN   TestPhase5RecoveryLinkedViewsMoveReplayAndRestartIdentity
+--- PASS: TestPhase5RecoveryLinkedViewsMoveReplayAndRestartIdentity (0.09s)
+=== RUN   TestPhase5RecoveryExternalAuthorityRequiresFreshConsent
+--- PASS: TestPhase5RecoveryExternalAuthorityRequiresFreshConsent (0.09s)
+=== RUN   TestPhase5ProvenanceSuppliedMetadataAndOpaqueEvidenceSurviveRestore
+--- PASS: TestPhase5ProvenanceSuppliedMetadataAndOpaqueEvidenceSurviveRestore (0.26s)
+PASS
+ok  	trove.local/phase0/internal/workspace	3.011s

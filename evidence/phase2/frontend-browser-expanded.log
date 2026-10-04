@@ -1,0 +1,21 @@
+
+Running 14 tests using 1 worker
+
+(node:72723) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓   1 tests/browser.spec.ts:313:1 › shell navigation, focus, quick switcher, page metadata (987ms)
+  ✓   2 tests/browser.spec.ts:344:1 › Unicode composition, RTL, emoji, undo/redo, reopen, raw preservation (1.0s)
+  ✓   3 tests/browser.spec.ts:391:1 › mixed clipboard retains block structure and allocates distinct IDs (746ms)
+  ✓   4 tests/browser.spec.ts:417:1 › insert real code, Mermaid and KaTeX rendering (910ms)
+  ✓   5 tests/browser.spec.ts:435:1 › Markdown shortcuts, duplication, keyboard focus and screen-reader structure (730ms)
+  ✓   6 tests/browser.spec.ts:505:1 › page lifecycle preserves identity through nesting, icon, archive and navigation (2.4s)
+  ✓   7 tests/browser.spec.ts:619:1 › all named surfaces open and created page links generate navigable backlinks (1.5s)
+  ✓   8 tests/browser.spec.ts:665:1 › block transforms, rich marks, find and nested toggle survive save/reopen (963ms)
+  ✓   9 tests/browser.spec.ts:737:1 › multi-file clipboard and file drop serialize uploads and preserve media captions and cover (1.0s)
+  ✓  10 tests/browser.spec.ts:844:1 › Phase 2 search opens the exact cited block without model packs (674ms)
+  ✓  11 tests/browser.spec.ts:854:1 › Phase 2 import displays complete accounting and editable property preview (448ms)
+  ✓  12 tests/browser.spec.ts:896:1 › Phase 2 AI works without packs and shows reviewed memory controls (566ms)
+  ✓  13 tests/browser.spec.ts:909:1 › Phase 2 failed job retry preserves revision and resumed progress (516ms)
+  ✓  14 tests/browser.spec.ts:927:1 › Phase 2 native restore is reviewed before mutation and retention keeps all (561ms)
+
+  14 passed (14.5s)

@@ -1,0 +1,123 @@
+{
+  "schemaVersion": 1,
+  "recordedAt": "2026-09-30T17:23:39.816335+00:00",
+  "status": "candidate_packaged_native_ui_pending",
+  "releaseApproved": false,
+  "qualificationRun": "20260930T171124Z-c451f895",
+  "automatedQualification": "passed",
+  "shellMeasurement": "all 20 samples passed the declared <=2.5-second approximation",
+  "nativeUIQualification": "pending; Mac locked at this checkpoint and final interactive journey incomplete",
+  "app": {
+    "recordedAt": "2026-09-30T17:22:37.845812+00:00",
+    "sourceApp": "/Users/suryasriramduvvuri/Applications/Trove.app",
+    "appBinarySha256": "5b3ac5c6a5f764bf39b8c28a56e9093c1fb7dd8d5a29f9faf0599fa5829b6e3e",
+    "archive": {
+      "path": "build/releases/Trove-0.3.0-p0-candidate-2-macos27-arm64.zip",
+      "sha256": "389ac82e85ebe9b9d31f8d4d76f95cbfeccfedeacfe43ee2f9be59aacf2cd732",
+      "bytes": 20593516,
+      "format": "ZIP with Unix permissions; metadata sidecars omitted"
+    },
+    "verification": {
+      "expectedManifest": "evidence/phase3/runs/20260930T171124Z-c451f895/bundle-after.json",
+      "expectedManifestSha256": "f3535ae42d23766be1d94bb01dcf8cf3b1b1510ef48737e13d8d691476b1b0ce",
+      "bundleFingerprintSha256": "cd0ae875be19f19267a4c864f37f7e7036cf523ba6abac969ae9e51801591d03",
+      "payloadFiles": 293,
+      "changedPayloadPaths": [],
+      "changedPermissionPaths": [],
+      "unexpectedMetadataFiles": [],
+      "zipCRCVerified": true,
+      "sourceAppUnchanged": true,
+      "sourceSignature": {
+        "command": [
+          "/usr/bin/codesign",
+          "--verify",
+          "--deep",
+          "--strict",
+          "--verbose=2",
+          "/Users/suryasriramduvvuri/Applications/Trove.app"
+        ],
+        "exitCode": 0,
+        "stdout": "",
+        "stderr": "/Users/suryasriramduvvuri/Applications/Trove.app: valid on disk\n/Users/suryasriramduvvuri/Applications/Trove.app: satisfies its Designated Requirement\n"
+      },
+      "extraction": {
+        "command": [
+          "/usr/bin/unzip",
+          "-q",
+          "/Volumes/HD-B1/HD-Projects/Trove/build/releases/Trove-0.3.0-p0-candidate-2-macos27-arm64.zip",
+          "-d",
+          "/private/tmp/trove-release-extract-mblpn83p"
+        ],
+        "exitCode": 0,
+        "stdout": "",
+        "stderr": ""
+      },
+      "extractedApp": "/private/tmp/trove-release-extract-mblpn83p/Trove.app",
+      "extractedSignature": {
+        "command": [
+          "/usr/bin/codesign",
+          "--verify",
+          "--deep",
+          "--strict",
+          "--verbose=2",
+          "/private/tmp/trove-release-extract-mblpn83p/Trove.app"
+        ],
+        "exitCode": 0,
+        "stdout": "",
+        "stderr": "/private/tmp/trove-release-extract-mblpn83p/Trove.app: valid on disk\n/private/tmp/trove-release-extract-mblpn83p/Trove.app: satisfies its Designated Requirement\n"
+      }
+    },
+    "includesModelWeights": false,
+    "includesPrivateWorkspace": false,
+    "passed": true
+  },
+  "source": {
+    "path": "build/releases/Trove-0.3.0-p0-candidate-2-source.tar.gz",
+    "sha256": "6516123eac902e81f56c8fd2f165f821359e36ae16e0417f3335d315d8a783dc",
+    "bytes": 683274,
+    "sourceManifest": "build/releases/Trove-0.3.0-p0-candidate-2-source-manifest.json",
+    "sourceManifestSha256": "17b01e6c2e134c3a85ddaa8ed28aabf30400205e893c9fca3fe185fd42fa1b60",
+    "qualifiedInputFiles": 224,
+    "totalSourceAndDocumentationFiles": 251,
+    "qualifiedSourceFingerprintSha256": "18ae95a6b632869eddb073cea36629a21220efb00f0e9505c1954e3b7632f97c",
+    "allQualifiedInputsVerified": true,
+    "allArchivedFileHashesVerified": true,
+    "sourceAndDocsUnchangedDuringPackaging": true,
+    "includesModelWeights": false,
+    "includesPrivateWorkspace": false
+  },
+  "documentation": [
+    {
+      "path": "build/releases/Trove-0.3.0-p0-candidate-2-user-guide.md",
+      "source": "docs/phase-3/release.md",
+      "sha256": "7ba9e816b0f68f5c1517b3b134d2dcf805d82496892ec96c5736d80cdc06a16f",
+      "bytes": 5272
+    },
+    {
+      "path": "build/releases/performance.md",
+      "source": "docs/phase-3/performance.md",
+      "sha256": "0675a142ce2bf996226ecddad5477ddcaadc2b78ce682567cb13a3b008017ef2",
+      "bytes": 12244
+    },
+    {
+      "path": "build/releases/release-provenance.md",
+      "source": "docs/phase-3/release-provenance.md",
+      "sha256": "efb3b999119641887461a547d832fe416d8cc5ec1c2e8e1338743aacba7460d2",
+      "bytes": 9517
+    }
+  ],
+  "checksums": {
+    "path": "build/releases/Trove-0.3.0-p0-candidate-2-SHA256SUMS.txt",
+    "sha256": "7b50961a669a15aa9d951b7965cef4200cfadd2ae8fdb517d19d5639694f9cb0"
+  },
+  "artifactVerificationPassed": true,
+  "distributionLimits": [
+    "Ad-hoc signed candidate; no Developer ID or notarization claim.",
+    "Packaging and extraction verified on the development Mac; no separate clean-Mac/Gatekeeper download qualification."
+  ],
+  "notes": [
+    "The app ZIP contains only Trove.app, including bundled helpers and notices; no model weights or private workspace.",
+    "The source manifest distinguishes the 224 source inputs qualified by the frozen aggregate from documentation captured at packaging time.",
+    "Native UI completion is independent of archive integrity. Packaging does not approve the open P0 release gate."
+  ]
+}

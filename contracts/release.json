@@ -1,0 +1,19 @@
+{
+  "contractVersion": "1.3.0",
+  "transportVersion": 1,
+  "workspaceMigration": 2,
+  "changes": [
+    "Optional page icon, coverFileId and archivedAt metadata; page.update accepts icon/coverFileId.",
+    "Workspace snapshot and native file-handle facade are Phase1 implementation adapters over canonical schemas.",
+    "block.move provides guarded existing-block reparenting and cross-page moves, retaining identity.",
+    "tasks.ensure atomically establishes the one system Tasks collection; record.clearValue explicitly removes optional values.",
+    "Snapshot, backlinks, job listing, history preview, restoration and recovery-point requests have bounded typed contracts.",
+    "Go optional-nullable fields preserve absent versus explicit-null intent through typed command hashing and round trips.",
+    "memory.update and memory.setStatus support reviewed edits and disabling/superseding approved memory without copying current task/database state.",
+    "transcript_segment entity references support guarded history restore and consistent canonical revision reporting.",
+    "Phase 2 adapters implement import previews/commits/portable export, derived FTS/semantic indexing, local AI review, recording and complete staged native restore.",
+    "Additive runtime tables retain import evidence, search projections, AI conversations/proposals, capture journals, recovery previews and explicit retention settings. Historical memory source IDs survive block deletion.",
+    "Phase 6 optional P2 contracts add guarded database configuration/forms/row buttons, page display preferences, bounded graph/OCR/review queries, and reviewed personal actions. Hosting reuses service transport 1 and verified snapshots with a durable source-owner fence."
+  ],
+  "compatibility": "Numeric service transport remains version 1 and the canonical domain snapshot remains 1.0.0. The packaged UI and kernel upgrade together. Old property values without sufficient schema evidence produce explicit restore conflicts; unsupported import/export semantics remain readable and raw. Immutable base SQL migrations 1 and 2 remain unchanged; runtime migrations and CREATE IF NOT EXISTS tables are additive."
+}

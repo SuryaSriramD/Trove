@@ -1,0 +1,10 @@
+{
+  "scope": "Core service benchmark source and helper identity binding; desktop startup is measured separately",
+  "candidate": "/Volumes/HD-B1/HD-Projects/Trove/build/phase5-candidate-4/Trove.app",
+  "candidateBinarySha256": "20ddd24cea0c42a9b4b7934eece1a461a8314cd7160a05c75a0983859e7be7d4",
+  "benchmarkSourceMatches": true,
+  "nativeResourceFilesMatch": true,
+  "nativeFilesCompared": 11,
+  "benchmarkReportSha256": "137de21aae685d7580d3a8b93eada053285cfb5a4c38ee7130c316e1fb251907",
+  "serviceReportSha256": "05e9318df896e4b6ff4ededbb221289c6a8f5d3d6a85d73bff0947f7cc33b045"
+}

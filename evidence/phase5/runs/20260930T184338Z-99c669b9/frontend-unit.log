@@ -1,0 +1,26 @@
+✔ rectangular nested merges reversibly preserve rich text and original cell identity (7.281584ms)
+✔ post-merge edits survive splitting without removing other original content (0.1415ms)
+✔ incomplete and overlapping ranges do not erase source data (0.224125ms)
+✔ search replace crosses formatting spans and leaves canonical IDs and raw evidence intact (0.229625ms)
+✔ embed HTML escapes executable input and has no network policy (0.118291ms)
+✔ advanced canonical structures round trip through editor without spurious writes (0.561166ms)
+✔ lossless mixed canonical document including unsupported imported structures (8.527709ms)
+✔ split and clipboard duplicates get fresh allocated identities; task references stay canonical (0.174416ms)
+✔ indent keeps block identity and emits canonical block.move (0.129375ms)
+✔ marks, links, Unicode and explicit line breaks survive rich text projection (0.081959ms)
+✔ deleting a nested tree emits child-first deletes (0.072791ms)
+✔ split and formatted paste guard unchanged reordered siblings and new blocks (0.321416ms)
+✔ structural guards include an unchanged parent, moved descendants and destination siblings (0.304084ms)
+✔ calendar range rescheduling preserves duration and explicit timezone (2.855958ms)
+✔ grouping and subgrouping partition references without copying record identities (0.222209ms)
+✔ imported identities, places and author labels remain readable without interpreting raw payload (0.063208ms)
+✔ Phase 5 editor replacement crosses table formatting spans without changing merged evidence (1.440042ms)
+✔ Phase 5 editor merged tables and nested tabs keep canonical identities across unrelated edits (6.43925ms)
+ℹ tests 18
+ℹ suites 0
+ℹ pass 18
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 198.62175

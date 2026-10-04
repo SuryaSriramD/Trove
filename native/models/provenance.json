@@ -1,0 +1,36 @@
+[
+  {
+    "repository": "karpathy/tinyllamas",
+    "revision": "0bd21da7698eaf29a0d7de3992de8a46ef624add",
+    "license": "mit",
+    "qualification": "Runtime protocol fixture only; not an instruction assistant."
+  },
+  {
+    "repository": "BAAI/bge-small-en",
+    "revision": "2275a7bdee235e9b4f01fa73aa60d3311983cfea",
+    "license": "mit",
+    "qualification": "P0 English embedding pack; pinned hash and native embedding/retrieval fixtures. No multilingual or large-corpus relevance claim."
+  },
+  {
+    "repository": "openai/whisper-tiny.en",
+    "revision": "87c7102498dcde7456f24cfd30239ca606ed9063",
+    "license": "apache-2.0",
+    "qualification": "P0 compact English speech pack; native public-speech and one-hour duration fixtures. No noisy-meeting, multilingual, diarization, or general accuracy claim."
+  },
+  {
+    "repository": "Qwen/Qwen2.5-0.5B-Instruct-GGUF",
+    "revision": "9217f5db79a29953eb74d5343926648285ec7e67",
+    "license": "apache-2.0",
+    "metadataSource": "https://huggingface.co/api/models/Qwen/Qwen2.5-0.5B-Instruct-GGUF?blobs=true",
+    "verifiedAt": "2026-09-30",
+    "qualification": "Pinned public model and digest; application quality evaluated separately."
+  },
+  {
+    "repository": "Qwen/Qwen2.5-1.5B-Instruct-GGUF",
+    "revision": "91cad51170dc346986eccefdc2dd33a9da36ead9",
+    "license": "apache-2.0",
+    "metadataSource": "https://huggingface.co/api/models/Qwen/Qwen2.5-1.5B-Instruct-GGUF?blobs=true",
+    "verifiedAt": "2026-09-30",
+    "qualification": "Pinned public model and digest; application quality evaluated separately."
+  }
+]

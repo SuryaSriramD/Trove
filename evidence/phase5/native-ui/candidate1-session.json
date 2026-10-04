@@ -1,0 +1,64 @@
+{
+  "startedAt": "2026-09-30T18:51:22.414392+00:00",
+  "candidate": "/Volumes/HD-B1/HD-Projects/Trove/build/phase5-candidate-1/Trove.app",
+  "candidateBinarySha256": "5d7fdef855c8c3798a5b809b2dccc4363c4edaa262aab0458176febd383b0ec9",
+  "fixture": "/private/tmp/trove-phase5-native-src6q17p",
+  "workspace": "/private/tmp/trove-phase5-native-src6q17p/workspace",
+  "pid": 52772,
+  "observations": [
+    {
+      "stage": "launch",
+      "result": "sandboxed launch aborted in Wails NewWindow; native launch retried with GUI permission",
+      "log": "/private/tmp/trove-phase5-native-src6q17p/app.log"
+    },
+    {
+      "at": "2026-09-30T18:53:30.861450+00:00",
+      "case": "fixture and native clipboard",
+      "result": "passed",
+      "observed": [
+        "Synthetic fixture report passed; workspace 01a0f3a9-2423-782d-a1ef-4717e3fcea60",
+        "UI Phase 1 integration: linked gallery 1 record, Exact decimal 0.3; offline card P1OfflineEvidence retained card",
+        "Native triple-click paragraph, super+c, new page, super+v preserved Persistent notes — తెలుగు 中文 العربية 🌱",
+        "Page Native acceptance saved with Restore-marker-original; status Saved"
+      ],
+      "setup": "Sandboxed launch aborted before fixture; escalated launch PID53312 succeeded. Stopped only no-env test candidate PID53081."
+    },
+    {
+      "at": "2026-09-30T18:56:01.263033+00:00",
+      "case": "table merge/split, Heading 4, tabs",
+      "result": "passed-before-lock",
+      "observed": [
+        "Table first row entered alpha and beta; merged 1:1 through 1:2 displayed alpha\\nbeta in spanning cell and Restore cells button",
+        "Restore cells recovered Row 1 column 1=alpha and Row 1 column 2=beta; Save status Saved",
+        "Block type Heading 4 yielded AX heading Restore-marker-original Value 4",
+        "Content tabs created Tab 1/Tab 2. First tab ultimately renamed Evidence with setValue and contained Native tab content; second tab retained Content 2; switched back and observed first tab content"
+      ],
+      "inputQualificationNotes": [
+        "Per-keystroke tab-title input initially yielded vidence instead of Evidence; not isolated as app versus input-tool timing. CUA paste(Evidence) pasted prior clipboard source paragraph, so corrected using documented accessible setValue and verified exact Evidence. Native Cmd+C/Cmd+V earlier succeeded."
+      ]
+    },
+    {
+      "at": "2026-09-30T18:56:01.263033+00:00",
+      "case": "page-lock-unlock",
+      "result": "failed",
+      "severity": "release-blocker",
+      "steps": [
+        "Saved native acceptance page with Unicode paragraph, Heading 4, table, content tabs",
+        "Clicked Lock page; editor controls became disabled; status became Unsaved changes",
+        "Clicked Unlock page and attempted to navigate P1 linked gallery"
+      ],
+      "observed": [
+        "Page remains locked with Unlock page button",
+        "Error: Page is locked; unlock it before making changes",
+        "Save status: Could not save",
+        "Conflict: This page changed elsewhere. Your draft is still here. Copy it before reloading to reconcile the newer revision.",
+        "Save and Copy draft JSON buttons disabled",
+        "Navigation remained Native acceptance"
+      ],
+      "evidence": "Live AX tree plus screenshot captured inline by CUA call titled Capture the native page-lock failure state. No screenshot file fabricated.",
+      "suspectedCause": "Read-only hypothesis: editor.setEditable emits onUpdate and marks lock transition dirty; unlocking calls save before releasing lock."
+    }
+  ],
+  "nativePid": 53312,
+  "stoppedAtBlocker": true
+}

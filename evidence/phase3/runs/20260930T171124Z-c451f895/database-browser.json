@@ -1,0 +1,188 @@
+{
+  "config": {
+    "argv": [
+      "/opt/homebrew/Cellar/node/25.5.0/bin/node",
+      "/Volumes/HD-B1/HD-Projects/Trove/frontend/node_modules/@playwright/test/cli.js",
+      "test",
+      "--config",
+      "playwright.config.ts",
+      "--reporter=line,json",
+      "--output",
+      "/Volumes/HD-B1/HD-Projects/Trove/evidence/phase3/runs/20260930T171124Z-c451f895/database-browser-results"
+    ],
+    "configFile": "/Volumes/HD-B1/HD-Projects/Trove/frontend/src/database/tests/playwright.config.ts",
+    "rootDir": "/Volumes/HD-B1/HD-Projects/Trove/frontend/src/database/tests",
+    "failOnFlakyTests": false,
+    "forbidOnly": false,
+    "fullyParallel": false,
+    "globalSetup": null,
+    "globalTeardown": null,
+    "globalTimeout": 0,
+    "grep": {},
+    "grepInvert": null,
+    "maxFailures": 0,
+    "metadata": {
+      "actualWorkers": 1
+    },
+    "preserveOutput": "always",
+    "projects": [
+      {
+        "outputDir": "/Volumes/HD-B1/HD-Projects/Trove/evidence/phase3/runs/20260930T171124Z-c451f895/database-browser-results",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 1
+        },
+        "id": "",
+        "name": "",
+        "testDir": "/Volumes/HD-B1/HD-Projects/Trove/frontend/src/database/tests",
+        "testIgnore": [],
+        "testMatch": [
+          "database.browser.spec.ts"
+        ],
+        "timeout": 30000
+      }
+    ],
+    "quiet": false,
+    "reporter": [
+      [
+        "line"
+      ],
+      [
+        "json"
+      ]
+    ],
+    "reportSlowTests": {
+      "max": 5,
+      "threshold": 300000
+    },
+    "shard": null,
+    "tags": [],
+    "updateSnapshots": "missing",
+    "updateSourceMethod": "patch",
+    "version": "1.63.0",
+    "workers": 1,
+    "webServer": null
+  },
+  "suites": [
+    {
+      "title": "database.browser.spec.ts",
+      "file": "database.browser.spec.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [
+        {
+          "title": "all four views retain canonical record identities; board and calendar call guarded record mutations",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 3159,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-09-30T17:13:05.610Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "a5a10b8aa35116872fcd-69f30ae84c0acd19d0f4",
+          "file": "database.browser.spec.ts",
+          "line": 296,
+          "column": 1
+        },
+        {
+          "title": "saved view filter groups, sorting, visibility, rename and move serialize without record duplication",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 2082,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-09-30T17:13:09.413Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "a5a10b8aa35116872fcd-6db391bca7e8553f10c2",
+          "file": "database.browser.spec.ts",
+          "line": 372,
+          "column": 1
+        },
+        {
+          "title": "table creates record and edits its body title through the canonical page service",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 1050,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-09-30T17:13:11.533Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "a5a10b8aa35116872fcd-ddea5c0f1a1758e06b41",
+          "file": "database.browser.spec.ts",
+          "line": 402,
+          "column": 1
+        }
+      ]
+    }
+  ],
+  "errors": [],
+  "stats": {
+    "startTime": "2026-09-30T17:13:05.093Z",
+    "duration": 7654.883,
+    "expected": 3,
+    "skipped": 0,
+    "unexpected": 0,
+    "flaky": 0
+  }
+}

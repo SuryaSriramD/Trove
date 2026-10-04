@@ -1,0 +1,29 @@
+{
+  "id": "0199a000-0000-7000-8000-00000000008c",
+  "mappingId": "0199a000-0000-7000-8000-000000000082",
+  "expectedLocalRevision": "1",
+  "incomingSourceRevision": "source-revision-5",
+  "identityStatus": "matched",
+  "sourceCompleteness": "complete",
+  "fields": [
+    {
+      "path": "/title",
+      "outcome": "conflict",
+      "base": {
+        "present": true,
+        "value": "A"
+      },
+      "local": {
+        "present": true,
+        "value": "Local"
+      },
+      "incoming": {
+        "present": true,
+        "value": "Source"
+      }
+    }
+  ],
+  "sourceDeleted": false,
+  "localDeleted": false,
+  "resolution": "needs_review"
+}

@@ -1,0 +1,62 @@
+{
+  "schemaVersion": 1,
+  "recordedAt": "2026-10-01T01:35:01.205676+00:00",
+  "releaseVersion": "0.5.0",
+  "status": "automated_supported_contracts_qualified_native_partial",
+  "releaseApproved": false,
+  "candidate": "/Volumes/HD-B1/HD-Projects/Trove/build/phase5-candidate-4/Trove.app",
+  "archive": "build/releases/Trove-0.5.0-p1-candidate.zip",
+  "archiveSha256": "1b4c641ba9e66fa54f4a396aec9f08f0c7ce9c2454bc9f049957ab54b507036c",
+  "verificationFamilies": {
+    "V01": "passed",
+    "V02": "passed",
+    "V03": "passed",
+    "V04": "passed",
+    "V05": "passed",
+    "V06": "passed",
+    "V07": "passed",
+    "V08": "passed",
+    "V09": "passed",
+    "V10": "passed"
+  },
+  "automatedCheckCount": 42,
+  "nativeCases": {
+    "final-restart-lock-edit-clipboard": "passed",
+    "final-local-ai-source-review": "passed",
+    "final-linked-view-formula": "passed",
+    "final-native-automation-retry": "passed",
+    "final-public-audio-playback": "passed",
+    "final-screenshot-cancel-error-recovery": "error-recovery-passed-native-escape-unverified"
+  },
+  "nativeBlocker": {
+    "at": "2026-09-30T19:28:35.720758+00:00",
+    "reason": "Mac locked; CUA automatic unlock could not unlock. Final native backup/review/restore and restart pending."
+  },
+  "remaining": [
+    "Final candidate interactive backup/review/restore, provider controls and subsequent restart need an unlocked Mac.",
+    "Ordinary OS screenshot-picker cancellation/capture and physical microphone permissions/capture remain unqualified.",
+    "Phase4 package breadth and general P1 AI output quality are incomplete; referenced R00 audit was not supplied.",
+    "Notion live account/database API parity unqualified; managed Claude Code/Codex and remote MCP disabled."
+  ],
+  "distributionLimits": [
+    "Ad-hoc signed macOS27 arm64 candidate; separate clean-Mac installation and notarization unverified."
+  ],
+  "documentationValidation": {
+    "command": "python -m unittest discover -s tests -p test_ledger.py -v",
+    "passedTests": 7,
+    "result": "passed after ledger qualification update"
+  },
+  "evidenceSha256": {
+    "evidence/phase5/runs/20260930T191730Z-9d0572ce/verification.json": "b6f8be3ef18a6cc15ec1182c60aa7681e67b5e2e3a070f99a7389d60474d6cca",
+    "build/releases/Trove-0.5.0-p1-candidate.zip.manifest.json": "8353c78d7a6014128b62a2d3e0dfdc3b9c7e037822fce30f42782deaa1a0b258",
+    "evidence/phase5/performance-final/benchmark-environment.json": "137de21aae685d7580d3a8b93eada053285cfb5a4c38ee7130c316e1fb251907",
+    "evidence/phase5/performance-final/benchmark-service.json": "05e9318df896e4b6ff4ededbb221289c6a8f5d3d6a85d73bff0947f7cc33b045",
+    "evidence/phase5/performance-final/candidate-binding.json": "e3bc52b4ec98f9a6675833e7c5b4f7aa24e722c365cd858708f8b011b7db9578",
+    "evidence/phase5/performance-final/shell-benchmark.json": "ffa9f08e67137fcc26fdb923c622fb8ab22e7d9e77bfc13421b24d10eb4e63cd",
+    "evidence/phase5/native-ui/candidate4-session.json": "ed700614d9513a6d621405bacfa20c0a29926e1e6900e300b9a97dceaa9c9d0d",
+    "evidence/phase5/native-ui/candidate4-before-backup-canonical.json": "6c76f174ee7c9994290bf76744ff1294937b39387927f9fbfd5d073a36fc9cb4",
+    "docs/phase-5/qualification.md": "0927a8148072a0e52c2b4b4593c4eefa412ae42a177edf817b5563d0f40ccc46",
+    "docs/phase-5/release.md": "6618456bdc4fd46bcd244625a72d14d63839f58844eee65adf8341b11e32ae6d",
+    "docs/phase-0/requirements-ledger.json": "ae4b2d9173aa37863340b6b2ac48de617c3ca40482e4038cd03233eee22a68db"
+  }
+}

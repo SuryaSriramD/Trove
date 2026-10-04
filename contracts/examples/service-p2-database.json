@@ -1,0 +1,17 @@
+{
+  "kind": "database.p2Configure",
+  "collectionId": "0199a000-0000-7000-8000-000000000030",
+  "config": {
+    "chart": {
+      "groupPropertyId": null,
+      "valuePropertyId": null,
+      "aggregation": "count",
+      "visualization": "bar"
+    },
+    "form": {
+      "enabled": true,
+      "requiredPropertyIds": []
+    },
+    "buttons": []
+  }
+}

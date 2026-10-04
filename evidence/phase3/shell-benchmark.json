@@ -1,0 +1,170 @@
+{
+  "recordedAt": "2026-09-30T17:05:48.995830+00:00",
+  "app": "build/phase3-candidate/Trove.app",
+  "appBinarySha256": "0b7f3a3e5de1f2a0b9dedc790ee258c3a729de9af9a8a229ee9a3a90bc525705",
+  "appUnchanged": true,
+  "networkDeniedByOS": true,
+  "modelPacks": [],
+  "fixture": "/var/folders/xc/s78np0812b12p6338l0ndvsm0000gn/T/trove-shell-benchmark-0u8k3koc",
+  "profiles": [
+    {
+      "pages": 0,
+      "paragraphBlocks": 0,
+      "samples": [
+        {
+          "definition": "Go process initialization to canonical snapshot rendered plus two animation frames",
+          "recordedAt": "2026-09-30T17:04:26.890267Z",
+          "usableShellMs": 540.77,
+          "launchThroughShutdownMs": 604.1860410005029
+        },
+        {
+          "definition": "Go process initialization to canonical snapshot rendered plus two animation frames",
+          "recordedAt": "2026-09-30T17:04:27.861982Z",
+          "usableShellMs": 875.135,
+          "launchThroughShutdownMs": 951.586541999859
+        },
+        {
+          "definition": "Go process initialization to canonical snapshot rendered plus two animation frames",
+          "recordedAt": "2026-09-30T17:04:28.835782Z",
+          "usableShellMs": 910.994,
+          "launchThroughShutdownMs": 983.2024999996065
+        },
+        {
+          "definition": "Go process initialization to canonical snapshot rendered plus two animation frames",
+          "recordedAt": "2026-09-30T17:04:29.652267Z",
+          "usableShellMs": 736.883,
+          "launchThroughShutdownMs": 830.407749999722
+        },
+        {
+          "definition": "Go process initialization to canonical snapshot rendered plus two animation frames",
+          "recordedAt": "2026-09-30T17:04:30.419007Z",
+          "usableShellMs": 680.051,
+          "launchThroughShutdownMs": 727.6731670026493
+        }
+      ],
+      "medianMs": 736.883,
+      "maximumMs": 910.994,
+      "approximatelyTwoSeconds": true
+    },
+    {
+      "pages": 100,
+      "paragraphBlocks": 200,
+      "samples": [
+        {
+          "definition": "Go process initialization to canonical snapshot rendered plus two animation frames",
+          "recordedAt": "2026-09-30T17:04:31.235589Z",
+          "usableShellMs": 753.399,
+          "launchThroughShutdownMs": 830.5824160015618
+        },
+        {
+          "definition": "Go process initialization to canonical snapshot rendered plus two animation frames",
+          "recordedAt": "2026-09-30T17:04:32.102346Z",
+          "usableShellMs": 795.511,
+          "launchThroughShutdownMs": 884.0144169989799
+        },
+        {
+          "definition": "Go process initialization to canonical snapshot rendered plus two animation frames",
+          "recordedAt": "2026-09-30T17:04:32.902212Z",
+          "usableShellMs": 705.719,
+          "launchThroughShutdownMs": 774.8309170019638
+        },
+        {
+          "definition": "Go process initialization to canonical snapshot rendered plus two animation frames",
+          "recordedAt": "2026-09-30T17:04:33.66891Z",
+          "usableShellMs": 713.002,
+          "launchThroughShutdownMs": 765.6464159990719
+        },
+        {
+          "definition": "Go process initialization to canonical snapshot rendered plus two animation frames",
+          "recordedAt": "2026-09-30T17:04:34.435684Z",
+          "usableShellMs": 718.537,
+          "launchThroughShutdownMs": 769.9583749999874
+        }
+      ],
+      "medianMs": 718.537,
+      "maximumMs": 795.511,
+      "approximatelyTwoSeconds": true
+    },
+    {
+      "pages": 1000,
+      "paragraphBlocks": 2000,
+      "samples": [
+        {
+          "definition": "Go process initialization to canonical snapshot rendered plus two animation frames",
+          "recordedAt": "2026-09-30T17:04:35.369008Z",
+          "usableShellMs": 855.084,
+          "launchThroughShutdownMs": 926.0828750011569
+        },
+        {
+          "definition": "Go process initialization to canonical snapshot rendered plus two animation frames",
+          "recordedAt": "2026-09-30T17:04:36.252331Z",
+          "usableShellMs": 809.013,
+          "launchThroughShutdownMs": 878.6115420007263
+        },
+        {
+          "definition": "Go process initialization to canonical snapshot rendered plus two animation frames",
+          "recordedAt": "2026-09-30T17:04:37.16915Z",
+          "usableShellMs": 847.503,
+          "launchThroughShutdownMs": 937.1524999987741
+        },
+        {
+          "definition": "Go process initialization to canonical snapshot rendered plus two animation frames",
+          "recordedAt": "2026-09-30T17:04:38.085129Z",
+          "usableShellMs": 831.413,
+          "launchThroughShutdownMs": 873.16679200012
+        },
+        {
+          "definition": "Go process initialization to canonical snapshot rendered plus two animation frames",
+          "recordedAt": "2026-09-30T17:04:38.952424Z",
+          "usableShellMs": 831.306,
+          "launchThroughShutdownMs": 887.7502499999537
+        }
+      ],
+      "medianMs": 831.413,
+      "maximumMs": 855.084,
+      "approximatelyTwoSeconds": true
+    },
+    {
+      "pages": 10000,
+      "paragraphBlocks": 20000,
+      "samples": [
+        {
+          "definition": "Go process initialization to canonical snapshot rendered plus two animation frames",
+          "recordedAt": "2026-09-30T17:04:42.50227Z",
+          "usableShellMs": 3370.179,
+          "launchThroughShutdownMs": 3448.28737500211
+        },
+        {
+          "definition": "Go process initialization to canonical snapshot rendered plus two animation frames",
+          "recordedAt": "2026-09-30T17:04:45.668879Z",
+          "usableShellMs": 3089.606,
+          "launchThroughShutdownMs": 3135.3348340016964
+        },
+        {
+          "definition": "Go process initialization to canonical snapshot rendered plus two animation frames",
+          "recordedAt": "2026-09-30T17:04:48.835557Z",
+          "usableShellMs": 3108.162,
+          "launchThroughShutdownMs": 3194.7533749989816
+        }
+      ],
+      "medianMs": 3108.162,
+      "maximumMs": 3370.179,
+      "approximatelyTwoSeconds": false
+    }
+  ],
+  "failures": [
+    {
+      "pages": 10000,
+      "iteration": 3,
+      "exitCode": 0,
+      "reason": "Renderer did not report a usable shell",
+      "log": "/var/folders/xc/s78np0812b12p6338l0ndvsm0000gn/T/trove-shell-benchmark-0u8k3koc/10000-3.log"
+    }
+  ],
+  "measurementPassed": false,
+  "definition": "Go process initialization to canonical workspace snapshot rendered and two animation frames. Startup includes native validation and Wails initialization. Each sample uses a new app process; OS disk caches are not flushed. The approximate two-second threshold is explicitly interpreted as at most 2.5 seconds, and exact values are retained.",
+  "limitations": [
+    "Developer Mac only; hardware and synthetic workspace definitions are in benchmark-environment.json.",
+    "Does not measure installer/Gatekeeper time or guarantee editor responsiveness during background work."
+  ]
+}

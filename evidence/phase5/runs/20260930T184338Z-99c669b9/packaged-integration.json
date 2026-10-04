@@ -1,0 +1,122 @@
+{
+  "recordedAt": "2026-09-30T18:50:12.044018+00:00",
+  "app": "/Volumes/HD-B1/HD-Projects/Trove/build/phase5-candidate-1/Trove.app",
+  "appBinarySha256": "5d7fdef855c8c3798a5b809b2dccc4363c4edaa262aab0458176febd383b0ec9",
+  "fixture": "/var/folders/xc/s78np0812b12p6338l0ndvsm0000gn/T/trove-packaged-5z0wg0ye",
+  "checks": [
+    {
+      "step": "p0-create",
+      "passed": true,
+      "recordedAt": "2026-09-30T18:50:09.439744Z",
+      "state": {
+        "workspaceId": "01a0f3a7-17a7-7a7d-a946-e3afdadc81b2",
+        "pageId": "01a0f3a7-18b4-7bd1-9b20-370c613217ca",
+        "blockId": "01a0f3a7-1903-7ccf-9241-e0c947e3a943",
+        "collectionId": "",
+        "propertyId": "",
+        "recordId": "01a0f3a7-18de-7657-8e31-06721c6e78f9",
+        "recordPageId": "01a0f3a7-18de-7d46-9ee5-46ecfa16531e",
+        "fileId": "",
+        "fileBlockId": "",
+        "contentHash": ""
+      },
+      "checks": [
+        "Notion ZIP inventory and five-outcome reconciliation retained",
+        "imported page body and database record edits persisted",
+        "keyword search works without inference",
+        "forgotten and stale memory excluded from retrieval",
+        "durable interrupted recording remains recoverable"
+      ],
+      "processExitCode": 0,
+      "installedWeightsAvailable": false
+    },
+    {
+      "step": "p0-verify",
+      "passed": true,
+      "recordedAt": "2026-09-30T18:50:10.015367Z",
+      "state": {
+        "workspaceId": "01a0f3a7-17a7-7a7d-a946-e3afdadc81b2",
+        "pageId": "01a0f3a7-18b4-7bd1-9b20-370c613217ca",
+        "blockId": "01a0f3a7-1903-7ccf-9241-e0c947e3a943",
+        "collectionId": "",
+        "propertyId": "",
+        "recordId": "01a0f3a7-18de-7657-8e31-06721c6e78f9",
+        "recordPageId": "01a0f3a7-18de-7d46-9ee5-46ecfa16531e",
+        "fileId": "",
+        "fileBlockId": "",
+        "contentHash": ""
+      },
+      "checks": [
+        "Notion ZIP inventory and five-outcome reconciliation retained",
+        "imported page body and database record edits persisted",
+        "keyword search works without inference",
+        "forgotten and stale memory excluded from retrieval",
+        "durable interrupted recording remains recoverable",
+        "separate desktop restart preserved the complete data fixture",
+        "verified native backup restored to an unused workspace",
+        "restored canonical snapshot equals the source",
+        "restored interrupted recording finalized with its complete audio tail"
+      ],
+      "processExitCode": 0,
+      "installedWeightsAvailable": false
+    },
+    {
+      "checks": {
+        "chat": {
+          "citations": [],
+          "kind": "generation",
+          "text": ", there was a little girl named Lily. She loved to play outside and"
+        },
+        "embedding": {
+          "dimension": 384,
+          "vectors": 1
+        },
+        "microphoneSynthetic": {
+          "bytes": 6400,
+          "sampleRate": 16000,
+          "channels": 1,
+          "format": "f32le",
+          "synthetic": true,
+          "cancelled": false
+        },
+        "speech": {
+          "kind": "transcript",
+          "meetingId": "01a0f3a7-1f8e-7375-acba-697e2363ce54",
+          "segments": [
+            {
+              "blockId": "01a0f3a7-1f8d-7764-a324-00ad2c6c8f78",
+              "endMs": 8000,
+              "segmentId": "01a0f3a7-1f8d-7784-94d0-e4eb1ad6a678",
+              "startMs": 0,
+              "text": " And so my fellow Americans ask not what your country can do for you"
+            },
+            {
+              "blockId": "01a0f3a7-1f8d-7b05-b641-2af2dc94eff0",
+              "endMs": 11000,
+              "segmentId": "01a0f3a7-1f8d-7bf6-803f-cb3245df061d",
+              "startMs": 8000,
+              "text": " ask what you can do for your country."
+            }
+          ]
+        }
+      },
+      "passed": true,
+      "recordedAt": "2026-09-30T18:50:10.694933Z",
+      "step": "native",
+      "processExitCode": 0,
+      "installedWeightsAvailable": true,
+      "shell": {
+        "definition": "Go process initialization to canonical snapshot rendered plus two animation frames",
+        "recordedAt": "2026-09-30T18:50:11.091194Z",
+        "usableShellMs": 808.469
+      }
+    }
+  ],
+  "networkDeniedByOS": true,
+  "passed": true,
+  "limitations": [
+    "Ad-hoc developer signature; not Developer ID or notarized.",
+    "Executed on this Mac with minimal PATH; a separate clean-machine installation is unverified.",
+    "Service integration fixture; interactive editing and accessibility use separate tests."
+  ]
+}

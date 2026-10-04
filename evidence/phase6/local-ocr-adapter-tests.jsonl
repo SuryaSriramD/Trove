@@ -1,0 +1,8 @@
+{"Time":"2026-10-01T18:43:31.845965+05:30","Action":"start","Package":"trove.local/phase0/internal/native"}
+{"Time":"2026-10-01T18:43:31.98731+05:30","Action":"run","Package":"trove.local/phase0/internal/native","Test":"TestP2OCRNativeFixture"}
+{"Time":"2026-10-01T18:43:31.987596+05:30","Action":"output","Package":"trove.local/phase0/internal/native","Test":"TestP2OCRNativeFixture","Output":"=== RUN   TestP2OCRNativeFixture\n","OutputType":"frame"}
+{"Time":"2026-10-01T18:44:03.959742+05:30","Action":"output","Package":"trove.local/phase0/internal/native","Test":"TestP2OCRNativeFixture","Output":"--- PASS: TestP2OCRNativeFixture (31.97s)\n","OutputType":"frame"}
+{"Time":"2026-10-01T18:44:03.959846+05:30","Action":"pass","Package":"trove.local/phase0/internal/native","Test":"TestP2OCRNativeFixture","Elapsed":31.97}
+{"Time":"2026-10-01T18:44:03.960713+05:30","Action":"output","Package":"trove.local/phase0/internal/native","Output":"PASS\n","OutputType":"frame"}
+{"Time":"2026-10-01T18:44:03.960741+05:30","Action":"output","Package":"trove.local/phase0/internal/native","Output":"ok  \ttrove.local/phase0/internal/native\t32.114s\n"}
+{"Time":"2026-10-01T18:44:03.960754+05:30","Action":"pass","Package":"trove.local/phase0/internal/native","Elapsed":32.115}

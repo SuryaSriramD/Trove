@@ -1,0 +1,30 @@
+{
+  "scope": "Focused post-fix service scaling probe; five keyword queries per size, no native hybrid; not full performance qualification or packaged UI timing",
+  "command": "GOCACHE=/private/tmp/trove-phase0-tools/go-cache GOMODCACHE=/private/tmp/trove-phase0-tools/go-mod GOPROXY=off GOSUMDB=off GOTOOLCHAIN=local /private/tmp/trove-phase0-tools/go/bin/go run -mod=readonly -tags \"fts5 sqlite_omit_load_extension\" ./scripts/phase3-benchmark -pages 100,1000,10000 -iterations 5 -output evidence/phase5/performance-diagnosis/fixed-service-probe.json",
+  "resultSha256": "74f6247f1880416fc47b66d3a282dc271d8c0dad9460ecafa2db317397db8300",
+  "sourceSha256": {
+    "internal/workspace/advanced_editor.go": "345069ea6a4e144547f761a9d5eaa4ce599ecba7ed170c8c845883c75085c49c",
+    "internal/workspace/phase5_editor_performance_test.go": "5e19bb8516333677d03f28ccb74c500f773b020f3fd1a10e2e510f2131c24e3a"
+  },
+  "profiles": [
+    {
+      "pages": 100,
+      "setupSeconds": 0.117268708,
+      "idleEditCommitP95Ms": 1.0865,
+      "keywordP95Ms": 1.116666
+    },
+    {
+      "pages": 1000,
+      "setupSeconds": 0.824774792,
+      "idleEditCommitP95Ms": 0.814292,
+      "keywordP95Ms": 2.70975
+    },
+    {
+      "pages": 10000,
+      "setupSeconds": 9.709869334,
+      "idleEditCommitP95Ms": 1.024584,
+      "keywordP95Ms": 27.625833
+    }
+  ],
+  "qualification": "Full pinned host/native/100-iteration benchmark is rerun separately by release qualification."
+}

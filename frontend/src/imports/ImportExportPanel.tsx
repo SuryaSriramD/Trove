@@ -1,0 +1,600 @@
+import { useEffect, useRef, useState } from "react";
+import { dispatch, envelope, fileURL, type WorkspaceSnapshot } from "../api";
+import "./imports.css";
+import { NotionCapturePanel } from "./NotionCapturePanel";
+
+type Column = {
+  name: string;
+  type: string;
+  propertyId: string;
+  samples: string[];
+  warning?: string;
+};
+type Item = {
+  sourceLocator: string;
+  kind: string;
+  outcome: string;
+  reason: string;
+  retainedFileId?: string;
+  pageId?: string;
+  title?: string;
+  conflict?: string;
+  choice?: string;
+  committed: boolean;
+  columns?: Column[];
+};
+type Plan = {
+  jobId?: string;
+  planId: string;
+  planHash: string;
+  sourceNamespace: string;
+  sourceName: string;
+  rootPageId: string;
+  sourceFileId: string;
+  state: string;
+  cursor: number;
+  initialized: boolean;
+  items: Item[];
+  sourceCompleteness: string;
+  sourceOmissions: string[];
+  unknownCompleteness: string[];
+};
+type Recent = {
+  planId: string;
+  sourceName: string;
+  state: string;
+  cursor: number;
+  total: number;
+  createdAt: string;
+};
+const labels: Record<string, string> = {
+  preserved: "Preserved",
+  adapted: "Adapted",
+  partial: "Partial",
+  unsupported_but_retained: "Unsupported but retained",
+  failed: "Failed",
+};
+
+export function ImportExportPanel({
+  workspace,
+  onChanged,
+  onOpenPage,
+}: {
+  workspace: WorkspaceSnapshot;
+  onChanged: () => Promise<void> | void;
+  onOpenPage?: (id: string) => void;
+}) {
+  const [plan, setPlan] = useState<Plan>();
+  const [recent, setRecent] = useState<Recent[]>([]);
+  const [namespace, setNamespace] = useState("my-notion-workspace");
+  const [busy, setBusy] = useState(false);
+  const [running, setRunning] = useState(false);
+  const [error, setError] = useState("");
+  const [notice, setNotice] = useState("");
+  const stop = useRef(false);
+  const previewRequest = useRef("");
+  const [inventoryProgress, setInventoryProgress] = useState<{
+    stage: string;
+    completed: number;
+    total: number;
+  } | null>(null);
+  const request = <T,>(method: string, data: object = {}) =>
+    dispatch<T>(method, { ...envelope(workspace), ...data });
+  const refresh = () => request<Recent[]>("imports.list").then(setRecent);
+  useEffect(() => {
+    void refresh().catch((e) => setError(String(e)));
+    return () => {
+      stop.current = true;
+    };
+  }, [workspace.workspaceId]);
+  useEffect(
+    () =>
+      window.runtime?.EventsOn(
+        "imports:previewProgress",
+        (...args: unknown[]) => {
+          const progress = args[0] as any;
+          if (
+            progress?.workspaceId === workspace.workspaceId &&
+            progress.requestId === previewRequest.current
+          )
+            setInventoryProgress(progress);
+        },
+      ),
+    [workspace.workspaceId],
+  );
+  const act = async (fn: () => Promise<void>) => {
+    setBusy(true);
+    setError("");
+    setNotice("");
+    try {
+      await fn();
+    } catch (e) {
+      setError(e instanceof Error ? e.message : String(e));
+    } finally {
+      setBusy(false);
+    }
+  };
+  const preview = (folder = false) =>
+    act(async () => {
+      const bridge = window.go!.main.App as unknown as {
+        PickImportFolder: () => Promise<string>;
+      };
+      const sourceHandle = folder
+        ? await bridge.PickImportFolder()
+        : await window.go!.main.App.PickFile();
+      if (!sourceHandle) return;
+      const base = envelope(workspace);
+      previewRequest.current = base.requestId;
+      setInventoryProgress({ stage: "reading", completed: 0, total: 0 });
+      try {
+        setPlan(
+          await dispatch<Plan>("imports.preview", {
+            ...base,
+            sourceHandle,
+            sourceNamespace: namespace,
+          }),
+        );
+        await refresh();
+      } finally {
+        setInventoryProgress(null);
+        previewRequest.current = "";
+      }
+    });
+  const configure = (data: object) =>
+    act(async () => {
+      if (!plan) return;
+      setPlan(
+        await request<Plan>("imports.configure", {
+          planId: plan.planId,
+          planHash: plan.planHash,
+          ...data,
+        }),
+      );
+    });
+  const run = async () => {
+    if (!plan) return;
+    stop.current = false;
+    setRunning(true);
+    setError("");
+    let current = plan;
+    try {
+      while (!stop.current && current.state !== "complete") {
+        current = await request<Plan>("imports.commit", {
+          planId: current.planId,
+          planHash: current.planHash,
+        });
+        setPlan(current);
+      }
+      await onChanged();
+      await refresh();
+      if (current.state === "complete")
+        setNotice("Import processing finished. Review all outcomes below.");
+      else
+        setNotice(
+          "Paused after a durable commit. Resume here, including after restarting Trove.",
+        );
+    } catch (e) {
+      setError(e instanceof Error ? e.message : String(e));
+    } finally {
+      setRunning(false);
+    }
+  };
+  const exportWorkspace = () =>
+    act(async () => {
+      const bridge = window.go!.main.App as unknown as {
+        ExportPortable?: () => Promise<string>;
+      };
+      if (!bridge.ExportPortable)
+        throw new Error("Portable export is available in the desktop app.");
+      const raw = await bridge.ExportPortable();
+      if (raw) {
+        const result = JSON.parse(raw) as {
+          path: string;
+          pages: number;
+          collections: number;
+          assets: number;
+        };
+        setNotice(
+          `Exported ${result.pages} pages, ${result.collections} databases and ${result.assets} assets to ${result.path}`,
+        );
+      }
+    });
+  const exportAdditional = (kind: "HTML" | "PDF") =>
+    act(async () => {
+      const bridge = window.go!.main.App as unknown as {
+        ExportHTML: () => Promise<string>;
+        ExportPDF: () => Promise<string>;
+      };
+      const raw = await (kind === "HTML"
+        ? bridge.ExportHTML()
+        : bridge.ExportPDF());
+      if (raw) {
+        const result = JSON.parse(raw);
+        setNotice(
+          `Exported ${result.pages} pages to ${result.path}. ${(result.sourceOmissions ?? []).join(" ")}`,
+        );
+      }
+    });
+  const unresolved =
+    plan?.items.filter((i) => i.conflict && !i.choice).length ?? 0;
+  return (
+    <section
+      className="import-export-panel"
+      aria-label="Import and portable export"
+    >
+      <div className="import-heading">
+        <div>
+          <h2>Import &amp; export</h2>
+          <p>
+            Bring ChatGPT or Claude conversation JSON, HTML or Markdown ZIPs,
+            CSV, DOCX, text, or a selected folder into Trove. Original source
+            files remain available.
+          </p>
+        </div>
+        <button disabled={busy || running} onClick={exportWorkspace}>
+          Export Markdown &amp; CSV
+        </button>
+        <button
+          disabled={busy || running}
+          onClick={() => exportAdditional("HTML")}
+        >
+          Export HTML
+        </button>
+        <button
+          disabled={busy || running}
+          onClick={() => exportAdditional("PDF")}
+        >
+          Export readable PDF
+        </button>
+      </div>
+      <div className="import-controls">
+        <label>
+          Source namespace
+          <input
+            value={namespace}
+            onChange={(e) => setNamespace(e.target.value)}
+            disabled={busy || running}
+            placeholder="Stable name for this source workspace"
+          />
+        </label>
+        <button
+          disabled={!namespace.trim() || busy || running}
+          onClick={() => preview()}
+        >
+          {busy ? "Working…" : "Choose import file"}
+        </button>
+        <button
+          disabled={!namespace.trim() || busy || running}
+          onClick={() => preview(true)}
+        >
+          Import selected folder
+        </button>
+      </div>
+      <p className="import-help">
+        Reuse the same namespace to identify re-imports. Export creates a ZIP
+        with readable pages, CSV databases, hierarchy, attachments, and a
+        provenance manifest. Conversation JSON preserves message roles, IDs,
+        timestamps, all supplied branches and parent/reply navigation. Non-text
+        payloads remain in the source attachment. Up to 256 conversations and
+        2,000 nodes per conversation are accepted. Use native backup for
+        complete history and trash.
+      </p>
+      <NotionCapturePanel
+        workspace={workspace}
+        namespace={namespace}
+        onPlan={(value) => {
+          setPlan(value as Plan);
+          void refresh();
+        }}
+      />
+      {inventoryProgress && (
+        <div role="status">
+          <p>
+            {inventoryProgress.stage === "reading"
+              ? "Reading source bytes"
+              : inventoryProgress.stage === "inventory"
+                ? "Inventorying archive members"
+                : "Parsing content and rebuilding hierarchy"}{" "}
+            · {inventoryProgress.completed.toLocaleString()}
+            {inventoryProgress.total
+              ? ` / ${inventoryProgress.total.toLocaleString()}`
+              : ""}
+          </p>
+          <progress
+            value={
+              inventoryProgress.total ? inventoryProgress.completed : undefined
+            }
+            max={inventoryProgress.total || 1}
+            aria-label="Import compatibility preview progress"
+          />
+        </div>
+      )}
+      {error && (
+        <p role="alert" className="import-error">
+          {error}
+        </p>
+      )}
+      {notice && <p role="status">{notice}</p>}
+      {recent.length > 0 && (
+        <details>
+          <summary>Recent imports and resumable plans</summary>
+          <ul>
+            {recent.map((r) => (
+              <li key={r.planId}>
+                <button
+                  disabled={busy || running}
+                  onClick={() =>
+                    act(async () =>
+                      setPlan(
+                        await request<Plan>("imports.plan", {
+                          planId: r.planId,
+                        }),
+                      ),
+                    )
+                  }
+                >
+                  {r.sourceName} · {r.state} · {r.cursor}/{r.total}
+                </button>
+              </li>
+            ))}
+          </ul>
+        </details>
+      )}
+      {plan && (
+        <>
+          <div className="import-heading">
+            <h3>{plan.sourceName}</h3>
+            <a href={fileURL(plan.sourceFileId)} download>
+              Original source
+            </a>
+          </div>
+          <div className="import-outcomes">
+            {Object.entries(labels).map(([key, label]) => (
+              <span key={key} className={`import-outcome ${key}`}>
+                {label}:{" "}
+                <strong>
+                  {plan.items.filter((i) => i.outcome === key).length}
+                </strong>
+              </span>
+            ))}
+          </div>
+          <p>
+            {plan.items.length} discovered items · {plan.items.length} accounted
+            for · {plan.cursor} committed
+          </p>
+          <progress
+            value={plan.cursor}
+            max={Math.max(plan.items.length, 1)}
+            aria-label="Import progress"
+          />
+          <details open>
+            <summary>Source completeness: {plan.sourceCompleteness}</summary>
+            <h4>Known source omissions</h4>
+            {plan.sourceOmissions.length ? (
+              <ul>
+                {plan.sourceOmissions.map((s, i) => (
+                  <li key={i}>{s}</li>
+                ))}
+              </ul>
+            ) : (
+              <p>
+                No omission statement was supplied. This does not establish
+                completeness.
+              </p>
+            )}
+            <h4>Unknown completeness</h4>
+            <ul>
+              {plan.unknownCompleteness.map((s, i) => (
+                <li key={i}>{s}</li>
+              ))}
+            </ul>
+          </details>
+          {!plan.initialized &&
+            plan.items
+              .filter((i) => i.columns)
+              .map((item) => (
+                <details key={item.sourceLocator} open>
+                  <summary>CSV properties · {item.sourceLocator}</summary>
+                  <p>
+                    The first column is the page title. Empty cells remain
+                    unset. Formula and view definitions are never inferred from
+                    display values.
+                  </p>
+                  <table>
+                    <thead>
+                      <tr>
+                        <th>Property</th>
+                        <th>Import as</th>
+                        <th>Sample source values</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {item.columns!.map((column, index) => (
+                        <tr key={column.propertyId}>
+                          <td>
+                            {column.name}
+                            {column.warning && <small>{column.warning}</small>}
+                          </td>
+                          <td>
+                            {index === 0 ? (
+                              "Page title"
+                            ) : (
+                              <select
+                                aria-label={`Type for ${column.name}`}
+                                value={column.type}
+                                disabled={busy || running}
+                                onChange={(e) =>
+                                  configure({
+                                    columns: [
+                                      {
+                                        sourceLocator: item.sourceLocator,
+                                        index,
+                                        type: e.target.value,
+                                      },
+                                    ],
+                                  })
+                                }
+                              >
+                                {[
+                                  "text",
+                                  "number",
+                                  "checkbox",
+                                  "date",
+                                  "url",
+                                  "email",
+                                ].map((type) => (
+                                  <option key={type}>{type}</option>
+                                ))}
+                              </select>
+                            )}
+                          </td>
+                          <td>{column.samples.join(" · ") || "(blank)"}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </details>
+              ))}
+          {plan.items.some((i) => i.conflict) && (
+            <details open>
+              <summary>
+                Review re-import conflicts ({unresolved} unresolved)
+              </summary>
+              {plan.items
+                .filter((i) => i.conflict)
+                .map((item) => (
+                  <div className="import-conflict" key={item.sourceLocator}>
+                    <strong>{item.sourceLocator}</strong>
+                    <p>{item.conflict}</p>
+                    <select
+                      aria-label={`Conflict choice for ${item.sourceLocator}`}
+                      value={item.choice ?? ""}
+                      disabled={busy || running || plan.initialized}
+                      onChange={(e) =>
+                        configure({
+                          choices: [
+                            {
+                              sourceLocator: item.sourceLocator,
+                              choice: e.target.value,
+                            },
+                          ],
+                        })
+                      }
+                    >
+                      <option value="" disabled>
+                        Choose explicitly…
+                      </option>
+                      <option value="keep_local">
+                        Keep local; retain incoming source
+                      </option>
+                      {item.kind !== "csv" && (
+                        <option value="replace">
+                          Replace the page body with incoming content
+                        </option>
+                      )}
+                      <option value="duplicate">Import a separate copy</option>
+                    </select>
+                  </div>
+                ))}
+            </details>
+          )}
+          <div className="import-controls">
+            {plan.jobId && plan.state !== "complete" && (
+              <p>
+                Queued in Jobs. Use Jobs to cancel or retry this import; reopen
+                this plan to refresh its report.
+              </p>
+            )}
+            {plan.state !== "complete" && !running && !plan.jobId && (
+              <button
+                disabled={busy || unresolved > 0}
+                onClick={() =>
+                  act(async () => {
+                    await request("imports.enqueue", {
+                      planId: plan.planId,
+                      planHash: plan.planHash,
+                    });
+                    setPlan(
+                      await request<Plan>("imports.plan", {
+                        planId: plan.planId,
+                      }),
+                    );
+                    setNotice(
+                      "Reviewed import queued. Open Jobs for progress, cancellation, and retry.",
+                    );
+                  })
+                }
+              >
+                Commit in background
+              </button>
+            )}
+            {plan.state !== "complete" &&
+              !plan.jobId &&
+              (running ? (
+                <button
+                  onClick={() => {
+                    stop.current = true;
+                  }}
+                >
+                  Pause after current item
+                </button>
+              ) : (
+                <button disabled={busy || unresolved > 0} onClick={run}>
+                  {plan.initialized
+                    ? "Resume import"
+                    : "Commit reviewed import"}
+                </button>
+              ))}
+            {plan.initialized && (
+              <button onClick={() => onOpenPage?.(plan.rootPageId)}>
+                Open imported pages
+              </button>
+            )}
+          </div>
+          <details open>
+            <summary>Complete item inventory and report</summary>
+            <div className="import-inventory">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Discovered item</th>
+                    <th>Outcome</th>
+                    <th>Details</th>
+                    <th>Evidence</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {plan.items.map((item, index) => (
+                    <tr key={`${item.sourceLocator}-${index}`}>
+                      <td>
+                        {item.pageId && item.committed ? (
+                          <button onClick={() => onOpenPage?.(item.pageId!)}>
+                            {item.sourceLocator}
+                          </button>
+                        ) : (
+                          item.sourceLocator
+                        )}
+                      </td>
+                      <td>{labels[item.outcome]}</td>
+                      <td>
+                        {item.reason}
+                        {item.committed ? " · Committed" : " · Planned"}
+                      </td>
+                      <td>
+                        {item.retainedFileId && (
+                          <a href={fileURL(item.retainedFileId)} download>
+                            Original
+                          </a>
+                        )}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </details>
+        </>
+      )}
+    </section>
+  );
+}

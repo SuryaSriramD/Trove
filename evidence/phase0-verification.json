@@ -1,0 +1,303 @@
+{
+  "contractVersion": "1.0.0",
+  "recordedAt": "2026-09-30T11:30:10.491615+00:00",
+  "scope": "Phase0 executable contracts, not product implementation",
+  "result": "passed",
+  "pythonLog": {
+    "path": "evidence/contract-tests.log",
+    "sha256": "09615ba4e36f3bbb89ff5d42815373bc1c2aeb730661fd14791453d30676354c"
+  },
+  "baselineEvidenceSha256": "b19db6fcc71792657783cc13eea40e7c0478f50f830d4a75a072b3a64d53ecc1",
+  "tests": [
+    {
+      "test": "test_contracts.ContractTests.test_all_schema_definitions_are_valid",
+      "result": "passed"
+    },
+    {
+      "test": "test_contracts.ContractTests.test_generator_has_no_drift",
+      "result": "passed"
+    },
+    {
+      "test": "test_contracts.ContractTests.test_protocol_authoring_has_no_drift",
+      "result": "passed"
+    },
+    {
+      "test": "test_contracts.ContractTests.test_protocol_examples_validate",
+      "result": "passed"
+    },
+    {
+      "test": "test_contracts.ContractTests.test_tasks_and_memory_commands_share_domain_vocabulary",
+      "result": "passed"
+    },
+    {
+      "test": "test_contracts.ContractTests.test_title_value_is_projection_and_edits_use_page_update",
+      "result": "passed"
+    },
+    {
+      "test": "test_contracts.ContractTests.test_wire_rejects_actor_injection_unsafe_revision_unknown_command_and_empty_batch",
+      "result": "passed"
+    },
+    {
+      "test": "test_contracts.ContractTests.test_worker_limits_and_citation_identity_are_structural",
+      "result": "passed"
+    },
+    {
+      "test": "test_domain.DomainContractTests.test_citations_use_stable_identity_revision_and_timestamp",
+      "result": "passed"
+    },
+    {
+      "test": "test_domain.DomainContractTests.test_complete_identity_fixture",
+      "result": "passed"
+    },
+    {
+      "test": "test_domain.DomainContractTests.test_import_resolution_binds_exact_plan_and_all_conflicts",
+      "result": "passed"
+    },
+    {
+      "test": "test_domain.DomainContractTests.test_memory_content_or_context_reference_is_unambiguous",
+      "result": "passed"
+    },
+    {
+      "test": "test_domain.DomainContractTests.test_memory_inheritance_is_opt_in_and_preferences_only",
+      "result": "passed"
+    },
+    {
+      "test": "test_domain.DomainContractTests.test_memory_scope_approval_forgetting_and_source_invalidation",
+      "result": "passed"
+    },
+    {
+      "test": "test_domain.DomainContractTests.test_registry_schemas_and_all_examples",
+      "result": "passed"
+    },
+    {
+      "test": "test_domain.DomainContractTests.test_reimport_deletion_ambiguity_and_omissions",
+      "result": "passed"
+    },
+    {
+      "test": "test_domain.DomainContractTests.test_reimport_three_way_field_matrix",
+      "result": "passed"
+    },
+    {
+      "test": "test_domain.DomainContractTests.test_reject_dangling_and_duplicate_identity",
+      "result": "passed"
+    },
+    {
+      "test": "test_domain.DomainContractTests.test_revision_precision_and_identity",
+      "result": "passed"
+    },
+    {
+      "test": "test_domain.DomainContractTests.test_table_spans_coverage",
+      "result": "passed"
+    },
+    {
+      "test": "test_domain.DomainContractTests.test_tasks_share_record_and_completion",
+      "result": "passed"
+    },
+    {
+      "test": "test_domain.DomainContractTests.test_unknown_and_future_content_preserved_inert",
+      "result": "passed"
+    },
+    {
+      "test": "test_domain.DomainContractTests.test_views_reference_single_record_collection",
+      "result": "passed"
+    },
+    {
+      "test": "test_domain.PersistenceContractTests.test_record_body_required_unique_and_foreign_keyed",
+      "result": "passed"
+    },
+    {
+      "test": "test_domain.PersistenceContractTests.test_sql_asset_hash_and_mapping_namespace",
+      "result": "passed"
+    },
+    {
+      "test": "test_domain.PersistenceContractTests.test_sql_rejects_wrong_collection_and_duplicate_title",
+      "result": "passed"
+    },
+    {
+      "test": "test_domain.PersistenceContractTests.test_sql_revision_limit_and_cycles",
+      "result": "passed"
+    },
+    {
+      "test": "test_domain.PersistenceContractTests.test_sql_task_completion_has_one_value",
+      "result": "passed"
+    },
+    {
+      "test": "test_domain.PersistenceContractTests.test_sql_view_membership_preserves_multiple_sources",
+      "result": "passed"
+    },
+    {
+      "test": "test_jobs.JobTests.test_cancel_crash_does_not_restart_and_terminal_is_final",
+      "result": "passed"
+    },
+    {
+      "test": "test_jobs.JobTests.test_claim_is_exclusive_and_old_worker_is_fenced",
+      "result": "passed"
+    },
+    {
+      "test": "test_jobs.JobTests.test_frames_fragment_coalesce_and_reject_oversized_truncated_or_nonfinite",
+      "result": "passed"
+    },
+    {
+      "test": "test_jobs.JobTests.test_job_kind_and_payload_cannot_drift",
+      "result": "passed"
+    },
+    {
+      "test": "test_jobs.JobTests.test_jobs_survive_connection_restart",
+      "result": "passed"
+    },
+    {
+      "test": "test_jobs.JobTests.test_retry_budget_is_bounded",
+      "result": "passed"
+    },
+    {
+      "test": "test_jobs.JobTests.test_retry_wait_respects_due_time_and_revision_overflow",
+      "result": "passed"
+    },
+    {
+      "test": "test_ledger.LedgerTests.test_all_release_labelled_matrix_rows_are_mapped",
+      "result": "passed"
+    },
+    {
+      "test": "test_ledger.LedgerTests.test_cited_audit_ids_are_expanded_without_claiming_missing_report",
+      "result": "passed"
+    },
+    {
+      "test": "test_ledger.LedgerTests.test_phase0_and_product_completion_are_independent",
+      "result": "passed"
+    },
+    {
+      "test": "test_ledger.LedgerTests.test_source_anchors_and_numbered_requirements_are_preserved",
+      "result": "passed"
+    },
+    {
+      "test": "test_ledger.LedgerTests.test_source_text_is_complete_and_matches_supplied_docx",
+      "result": "passed"
+    },
+    {
+      "test": "test_ledger.LedgerTests.test_unique_ids_and_complete_ownership_chain",
+      "result": "passed"
+    },
+    {
+      "test": "test_ledger.LedgerTests.test_verified_requires_implementation_and_covering_passing_evidence",
+      "result": "passed"
+    },
+    {
+      "test": "test_services.ServiceTests.test_ai_approval_binds_exact_proposal_actor_policy_and_expiry",
+      "result": "passed"
+    },
+    {
+      "test": "test_services.ServiceTests.test_atomic_batch_rolls_back_content_history_and_events",
+      "result": "passed"
+    },
+    {
+      "test": "test_services.ServiceTests.test_cancellation_before_commit_and_revision_once_per_batch",
+      "result": "passed"
+    },
+    {
+      "test": "test_services.ServiceTests.test_retry_after_lost_ack_replays_one_commit",
+      "result": "passed"
+    },
+    {
+      "test": "test_services.ServiceTests.test_scope_revoked_and_origin_spoof_rejected",
+      "result": "passed"
+    },
+    {
+      "test": "test_services.ServiceTests.test_stale_revision_and_missing_guard_never_overwrite",
+      "result": "passed"
+    }
+  ],
+  "checks": [
+    {
+      "name": "go-contracts",
+      "command": "/private/tmp/trove-phase0-tools/go/bin/go test -count=1 -v ./contracts",
+      "result": "passed",
+      "log": "evidence/go-contracts.log",
+      "logSha256": "d62f8ecdf4bc7a3d939f7dc38a9ed1f6153aeb1b86c67cc76a7d718068c49c09"
+    },
+    {
+      "name": "typescript-contracts",
+      "command": "/private/tmp/trove-phase0-tools/frontend/node_modules/.bin/tsc -p contracts/tsconfig.json",
+      "result": "passed",
+      "log": "evidence/typescript-contracts.log",
+      "logSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "baseline-evidence",
+      "command": "/private/tmp/trove-phase0-venv/bin/python scripts/validate-baseline.py --check-evidence",
+      "result": "passed",
+      "log": "evidence/baseline-evidence.log",
+      "logSha256": "5bca243dc9aa77f0cfa526c0aee4e0525be7267248127886edd9d75f08b65282"
+    }
+  ],
+  "inputSha256": {
+    "README.md": "3bc1a5b55b6cd9ba6a3ffdec405ca797f2bec7d539f3d4ea545f9727a2fe275d",
+    "contracts/contracts_test.go": "9a8bf5715ebebf7c778bb315de2147135cbae0c533ac2c5bb2996a28921c9c55",
+    "contracts/domain.schema.json": "b3c620d50734307254bac1e2d614f62284760078c4a724a4c231cf568be6f21e",
+    "contracts/examples/domain-import-resolution.json": "24e570629c388271955a0df7957a14326fd09e8140b51c10092b4c1766534268",
+    "contracts/examples/domain-memory-context.json": "304d952fd5a0198584996c113d4e3605b50859fc23aa98c87fc811e191167813",
+    "contracts/examples/domain-registry-values.json": "4374c5ac9ca890f2274f0e4edc6c84a769200566579b797bcc3472555330d821",
+    "contracts/examples/domain-reimport-plan.json": "12275a7607ae7b03875010c6c29d0ab410259dc3537d64237d3144cdd7402e22",
+    "contracts/examples/domain-reimport.json": "123ed6c03161f75b960388f59bd7ed245c144476f305dc9af5662b957893bb8b",
+    "contracts/examples/domain-workspace.json": "fd304c695adce18a1165c2b8dadca74988b3a324da05cee3604c4a19c092631f",
+    "contracts/examples/job-progress.json": "4d972599862dcf5ccb2f749e30e9a9c121e336520d1531b18b8fe0856d6052da",
+    "contracts/examples/job-transcribe.json": "e4bdb4ef3f9708cb6f74ac6b84a2a1c5c357963f1d32bb58e642e8365eaff01f",
+    "contracts/examples/protocol-manifest.json": "fbad7a4b5134b73d326debd748e1086a50883172b051039ddca8174bde5b6924",
+    "contracts/examples/service-batch-result.json": "a46422b3945744e2e09171434cfa29f200baebc4f4527114ae00bc472c3e483d",
+    "contracts/examples/service-batch.json": "9113e047d27e115778179665ba9a9eccfa7d567469f5867c82ff9a77a9b7ab34",
+    "contracts/examples/service-conflict.json": "32f7d3724c52e4e808a85ff96d250eb0edc2e9be84a6adc331b05ec6363cb5cd",
+    "contracts/examples/service-event.json": "a0f076f05f83bb70310dae434b5047b1144bd8fdc61bf8bcb4cfcb88432759fa",
+    "contracts/examples/service-import-apply.json": "d04eadd5cd5d60ec2f00797729892e501204127700290a9a15847e8595afe737",
+    "contracts/examples/service-import-preview.json": "49ad2226b3d35d6ea62b0696cdf3f3acfdb2621bf9fa820d212250918eeb0b7d",
+    "contracts/examples/service-import-report.json": "ba110be26bfa04dd20f2de43076bd35bb7389f2c39b49137c5be85b7c5846c65",
+    "contracts/examples/service-memory-proposal.json": "b6de5ec4cc877c0c7779f27ed576c02b39d6811b56050a9aee507f21857d48ae",
+    "contracts/examples/service-search.json": "2cfa668163fcf6c476ea2f3007fb1c74293a8188a14e619eede0ba8ed8c2f35a",
+    "contracts/examples/service-stale-citation.json": "8b9a9e1cdfc3ee36242258ac210c027f7c82638c86ec57c207b59394645c346e",
+    "contracts/examples/service-task-toggle.json": "9922dfab0c5154140ab82c6c1bd4327464b236f73d322f03687e5425b117f759",
+    "contracts/examples/worker-cancel.json": "47027af03e9dce88b8a828cbd6978b0f3b9a8f739996a7d50c7f7599b80323e0",
+    "contracts/examples/worker-result.json": "7b54d00795827582f4557645dabdd5b1d2dcaccc3a713acdc4a099d5b23efedf",
+    "contracts/examples/worker-transcribe.json": "d7a1b9ef39acb5e9f7619e185b3a882fb2634c35c92491786d330c5f4a7700c8",
+    "contracts/examples/worker-transcript.json": "e5d7b87a323c1ca03848e46a12f7a8569181d451c612178f3883ad54b3409e0d",
+    "contracts/generated/consumer.ts": "ff72fe6fc408648c330f59563dabfe7ca23be56f53124f7ad595c48b035d1da5",
+    "contracts/generated/domain.ts": "af616d3b7b2d49c8bcb5c067e6298e282eeee2e216c5e3580d4fc7fa118f638b",
+    "contracts/generated/jobs.ts": "2c40914f7dd30e988eacd7414975b888d1f7e301cf87c571872340539abf6959",
+    "contracts/generated/service.ts": "9aa50ef6c39790c0e2c7b700b262397d3e7bd469b310a64b12c3f98798435a6d",
+    "contracts/jobs.schema.json": "11740ffe777b9811ba1f39e7c075b9a8ad87482d62bd60b8bf78f45873176bd3",
+    "contracts/reference_domain.py": "84ab9674b310c873721c771e7bb1e8b840f8aabdcc203e1acdb16d8b63d74fd3",
+    "contracts/reference_jobs.py": "4efa27220d9884c15d8bbe2b116747652e5ba9b1a15c56dd380a50f83438cfe8",
+    "contracts/reference_service.py": "cd8d3c46ccb5ec95a7a88afde894c661ec90dcd1feb1bde0c0cf582db9c0ffc4",
+    "contracts/registries.json": "193b61ff678e38ed00a95cb489bc40cddadcdd213575c0b3d5aee19504b6cd6d",
+    "contracts/service.go": "a35475be7afa7d13c8a4b2ea5d9f904f4a07b4af0739eed858367fa7d5ef899f",
+    "contracts/service.schema.json": "d6ed64e9b1c0f25be60ac7c9ee9e651bc95eb99e1070ba9217b4ec9f566d998f",
+    "contracts/tsconfig.json": "e52212240fc1476540c750c17631a201c5a261612444d4e479209603e041ff07",
+    "contracts/types_generated.go": "9c64cb4701e3217c671b19173c3b1e774f368f1097ddf681114595bbdf3c49cb",
+    "docs/phase-0/baseline.md": "54ca23421736d00f7a30c9872b6fea3a25da0e6d1dec4e1661638d47c25c15da",
+    "docs/phase-0/decisions.md": "7a8f2c8861091dee3cc40b0a9e4faface28a7357b699dceb34306cd3d9f8f247",
+    "docs/phase-0/domain.md": "7291bb6742c1f912d613bedcc80b0f2a93de20330aa3ccea66ebe90c0e298b8d",
+    "docs/phase-0/jobs.md": "01dca145e475a482628135ee38430871e41a31dfbae15e3836e19defbe8a4099",
+    "docs/phase-0/registries.md": "8fb810432183c2e7d713b65c6bd51cbbd0d54ccbd512a5d31e76cf5dd7a90b79",
+    "docs/phase-0/requirements-ledger.json": "2ab3f5b1c4a10e13a9c42b06d204236d5d64a82b2bde170e4f8daa6e12f3fd2c",
+    "docs/phase-0/services.md": "46232310598dd2bd495b3576e8dd12456236451fc1223e9efd27773c07f11a9d",
+    "docs/phase-0/workstreams.md": "1fdacb094c4f672ac4f1c654f4df362d4e20ad11bc733189646f27cb95d952f9",
+    "go.mod": "7dbf6b8a1bfed06c6a3803dff096d0ecb03642ceb5c89bf5dc34fdd4f90fdd47",
+    "go.sum": "63c93a009db9ad922511c645e7216a59837b8c33aec5f77a8fab84ba01d0a13d",
+    "requirements-dev.txt": "e99394c278eed0e2ee36f7a1289c0327af0a355b1726472a8296563d5fb0fde6",
+    "schemas/services.sql": "a9ed90022d9fadf28468a8625b0716ba47e6dba5b45bcf3b5ce3d9fc3d8523c5",
+    "schemas/workspace.sql": "227c533aef7dea1d5fb358f41245861fd589995783172972c7edef1f9c2d82ed",
+    "scripts/build_examples.py": "20dde85d22cdae79283b9209ec23e9be99f30f960de9d6dfaabe91e2f04f733a",
+    "scripts/build_protocol_schemas.py": "ff49f4d4606a08be3caf6db5526890ad2797c5fdf23ee3c2c28b13511ebd878d",
+    "scripts/extract_requirements.py": "6c6f997a3f9e86e173aca4a228f9e43026a5c17d85b8c35bbe1febbad1fdf183",
+    "scripts/generate_types.py": "9c6e3af971033ec3b4ab27308fdd57cb3a984d271554cefd48576b176d824fc9",
+    "scripts/validate-baseline.py": "fe74450d3eb825b44ee8213ab728a5354ed5ea495c311fa7095fb2307114a0c0",
+    "scripts/verify_phase0.py": "640829451ef743a35700e35e4e1d05ae39ecbf3562b7398ffe36ff4c06b696fc",
+    "tests/test_contracts.py": "9efeef8336df79d90bd5269bad6553348d6e78c57fab12e1325df7cecb106167",
+    "tests/test_domain.py": "d6ea001eb60eeaba62beaa4fa0341c402246c94a568c44d4c917f108885ae5ce",
+    "tests/test_jobs.py": "2b1866de10c0cae98969e94a4fc0ce6c07d0a7b34f6aa93629eaac1f10f82edd",
+    "tests/test_ledger.py": "ab6a8b813ee0dc45f1d7ac06ec95f4148e07039709cdec695b2027a32a17cb9a",
+    "tests/test_services.py": "9eb1d943753c15ed3a7cee5c13b05f6b0492f922be7dde64a8866a3476c6ce1f"
+  },
+  "limitations": [
+    "Reference Python transaction/job/domain implementations are conformance oracles; production Go services remain product work.",
+    "Baseline record distinguishes native compile/capability probes from signed installation and model inference.",
+    "PRD/TRD cited R00 audit source was not supplied; original 307 audit rows are not claimed verified."
+  ]
+}

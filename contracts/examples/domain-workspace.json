@@ -1,0 +1,513 @@
+{
+  "contractVersion": "1.0.0",
+  "workspaceId": "0199a000-0000-7000-8000-000000000001",
+  "pages": [
+    {
+      "id": "0199a000-0000-7000-8000-00000000000a",
+      "workspaceId": "0199a000-0000-7000-8000-000000000001",
+      "parentPageId": null,
+      "title": "Project Atlas",
+      "revision": "1",
+      "createdAt": "2026-09-30T00:00:00Z",
+      "updatedAt": "2026-09-30T00:00:00Z",
+      "deletedAt": null
+    },
+    {
+      "id": "0199a000-0000-7000-8000-00000000000b",
+      "workspaceId": "0199a000-0000-7000-8000-000000000001",
+      "parentPageId": null,
+      "title": "Tasks",
+      "revision": "1",
+      "createdAt": "2026-09-30T00:00:00Z",
+      "updatedAt": "2026-09-30T00:00:00Z",
+      "deletedAt": null
+    },
+    {
+      "id": "0199a000-0000-7000-8000-00000000000c",
+      "workspaceId": "0199a000-0000-7000-8000-000000000001",
+      "parentPageId": null,
+      "title": "Ship phase zero",
+      "revision": "1",
+      "createdAt": "2026-09-30T00:00:00Z",
+      "updatedAt": "2026-09-30T00:00:00Z",
+      "deletedAt": null
+    },
+    {
+      "id": "0199a000-0000-7000-8000-00000000000d",
+      "workspaceId": "0199a000-0000-7000-8000-000000000001",
+      "parentPageId": null,
+      "title": "Design review",
+      "revision": "1",
+      "createdAt": "2026-09-30T00:00:00Z",
+      "updatedAt": "2026-09-30T00:00:00Z",
+      "deletedAt": null
+    },
+    {
+      "id": "0199a000-0000-7000-8000-00000000000e",
+      "workspaceId": "0199a000-0000-7000-8000-000000000001",
+      "parentPageId": null,
+      "title": "Notes",
+      "revision": "1",
+      "createdAt": "2026-09-30T00:00:00Z",
+      "updatedAt": "2026-09-30T00:00:00Z",
+      "deletedAt": null
+    },
+    {
+      "id": "0199a000-0000-7000-8000-00000000000f",
+      "workspaceId": "0199a000-0000-7000-8000-000000000001",
+      "parentPageId": null,
+      "title": "Approve canonical schema",
+      "revision": "1",
+      "createdAt": "2026-09-30T00:00:00Z",
+      "updatedAt": "2026-09-30T00:00:00Z",
+      "deletedAt": null
+    },
+    {
+      "id": "0199a000-0000-7000-8000-000000000010",
+      "workspaceId": "0199a000-0000-7000-8000-000000000001",
+      "parentPageId": null,
+      "title": "Atlas meeting",
+      "revision": "1",
+      "createdAt": "2026-09-30T00:00:00Z",
+      "updatedAt": "2026-09-30T00:00:00Z",
+      "deletedAt": null
+    },
+    {
+      "id": "0199a000-0000-7000-8000-000000000011",
+      "workspaceId": "0199a000-0000-7000-8000-000000000001",
+      "parentPageId": null,
+      "title": "Prefer concise updates",
+      "revision": "1",
+      "createdAt": "2026-09-30T00:00:00Z",
+      "updatedAt": "2026-09-30T00:00:00Z",
+      "deletedAt": null
+    },
+    {
+      "id": "0199a000-0000-7000-8000-000000000012",
+      "workspaceId": "0199a000-0000-7000-8000-000000000001",
+      "parentPageId": null,
+      "title": "Imported sources",
+      "revision": "1",
+      "createdAt": "2026-09-30T00:00:00Z",
+      "updatedAt": "2026-09-30T00:00:00Z",
+      "deletedAt": null
+    }
+  ],
+  "blocks": [
+    {
+      "id": "0199a000-0000-7000-8000-000000000046",
+      "pageId": "0199a000-0000-7000-8000-00000000000d",
+      "parentBlockId": null,
+      "sortKey": "000000000001",
+      "type": "todo",
+      "schemaVersion": 1,
+      "data": {
+        "taskRecordId": "0199a000-0000-7000-8000-00000000003c"
+      },
+      "revision": "1"
+    },
+    {
+      "id": "0199a000-0000-7000-8000-000000000047",
+      "pageId": "0199a000-0000-7000-8000-00000000000e",
+      "parentBlockId": null,
+      "sortKey": "000000000001",
+      "type": "todo",
+      "schemaVersion": 1,
+      "data": {
+        "taskRecordId": "0199a000-0000-7000-8000-00000000003c"
+      },
+      "revision": "1"
+    },
+    {
+      "id": "0199a000-0000-7000-8000-000000000048",
+      "pageId": "0199a000-0000-7000-8000-00000000000d",
+      "parentBlockId": null,
+      "sortKey": "000000000002",
+      "type": "todo",
+      "schemaVersion": 1,
+      "data": {
+        "taskRecordId": "0199a000-0000-7000-8000-00000000003d"
+      },
+      "revision": "1"
+    },
+    {
+      "id": "0199a000-0000-7000-8000-000000000049",
+      "pageId": "0199a000-0000-7000-8000-000000000010",
+      "parentBlockId": null,
+      "sortKey": "000000000001",
+      "type": "paragraph",
+      "schemaVersion": 1,
+      "data": {
+        "richText": [
+          {
+            "text": "Use one canonical record and page body."
+          }
+        ]
+      },
+      "revision": "1"
+    },
+    {
+      "id": "0199a000-0000-7000-8000-00000000004a",
+      "pageId": "0199a000-0000-7000-8000-00000000000e",
+      "parentBlockId": null,
+      "sortKey": "000000000002",
+      "type": "unsupported_external",
+      "schemaVersion": 1,
+      "data": {
+        "sourceType": "tab_container",
+        "sourceVersion": 1,
+        "raw": {
+          "tabs": [
+            {
+              "sourceId": "source-tab",
+              "title": "Context",
+              "children": [
+                "unknown-source-child"
+              ]
+            }
+          ]
+        },
+        "readableText": "Context tab: retained original source structure.",
+        "reason": "unsupported_behavior"
+      },
+      "revision": "1"
+    }
+  ],
+  "collections": [
+    {
+      "id": "0199a000-0000-7000-8000-00000000001e",
+      "workspaceId": "0199a000-0000-7000-8000-000000000001",
+      "owningPageId": "0199a000-0000-7000-8000-00000000000b",
+      "title": "Tasks",
+      "titlePropertyId": "0199a000-0000-7000-8000-000000000028",
+      "systemRole": "tasks",
+      "revision": "1"
+    },
+    {
+      "id": "0199a000-0000-7000-8000-00000000001f",
+      "workspaceId": "0199a000-0000-7000-8000-000000000001",
+      "owningPageId": "0199a000-0000-7000-8000-00000000000e",
+      "title": "Design decisions",
+      "titlePropertyId": "0199a000-0000-7000-8000-00000000002b",
+      "systemRole": "none",
+      "revision": "1"
+    }
+  ],
+  "properties": [
+    {
+      "id": "0199a000-0000-7000-8000-000000000028",
+      "collectionId": "0199a000-0000-7000-8000-00000000001e",
+      "name": "Title",
+      "type": "title",
+      "schemaVersion": 1,
+      "config": {},
+      "revision": "1"
+    },
+    {
+      "id": "0199a000-0000-7000-8000-000000000029",
+      "collectionId": "0199a000-0000-7000-8000-00000000001e",
+      "name": "Status",
+      "type": "status",
+      "schemaVersion": 1,
+      "config": {
+        "options": [
+          {
+            "id": "0199a000-0000-7000-8000-000000000032",
+            "label": "Open",
+            "group": "not_started"
+          },
+          {
+            "id": "0199a000-0000-7000-8000-000000000033",
+            "label": "Done",
+            "group": "done"
+          }
+        ],
+        "defaultOptionId": "0199a000-0000-7000-8000-000000000032",
+        "doneOptionId": "0199a000-0000-7000-8000-000000000033",
+        "reopenOptionId": "0199a000-0000-7000-8000-000000000032"
+      },
+      "revision": "1"
+    },
+    {
+      "id": "0199a000-0000-7000-8000-00000000002a",
+      "collectionId": "0199a000-0000-7000-8000-00000000001e",
+      "name": "Due",
+      "type": "date",
+      "schemaVersion": 1,
+      "config": {},
+      "revision": "1"
+    },
+    {
+      "id": "0199a000-0000-7000-8000-00000000002b",
+      "collectionId": "0199a000-0000-7000-8000-00000000001f",
+      "name": "Title",
+      "type": "title",
+      "schemaVersion": 1,
+      "config": {},
+      "revision": "1"
+    },
+    {
+      "id": "0199a000-0000-7000-8000-00000000002c",
+      "collectionId": "0199a000-0000-7000-8000-00000000001f",
+      "name": "Status",
+      "type": "status",
+      "schemaVersion": 1,
+      "config": {
+        "options": [
+          {
+            "id": "0199a000-0000-7000-8000-000000000034",
+            "label": "In review",
+            "group": "in_progress"
+          },
+          {
+            "id": "0199a000-0000-7000-8000-000000000035",
+            "label": "Accepted",
+            "group": "done"
+          }
+        ],
+        "defaultOptionId": "0199a000-0000-7000-8000-000000000034",
+        "doneOptionId": "0199a000-0000-7000-8000-000000000035",
+        "reopenOptionId": "0199a000-0000-7000-8000-000000000034"
+      },
+      "revision": "1"
+    }
+  ],
+  "records": [
+    {
+      "id": "0199a000-0000-7000-8000-00000000003c",
+      "collectionId": "0199a000-0000-7000-8000-00000000001e",
+      "pageId": "0199a000-0000-7000-8000-00000000000c",
+      "revision": "1",
+      "sortKey": "000000000001",
+      "values": [
+        {
+          "propertyId": "0199a000-0000-7000-8000-000000000029",
+          "schemaVersion": 1,
+          "value": "0199a000-0000-7000-8000-000000000032"
+        }
+      ]
+    },
+    {
+      "id": "0199a000-0000-7000-8000-00000000003d",
+      "collectionId": "0199a000-0000-7000-8000-00000000001f",
+      "pageId": "0199a000-0000-7000-8000-00000000000f",
+      "revision": "1",
+      "sortKey": "000000000001",
+      "values": [
+        {
+          "propertyId": "0199a000-0000-7000-8000-00000000002c",
+          "schemaVersion": 1,
+          "value": "0199a000-0000-7000-8000-000000000035"
+        }
+      ]
+    }
+  ],
+  "containers": [
+    {
+      "id": "0199a000-0000-7000-8000-000000000050",
+      "workspaceId": "0199a000-0000-7000-8000-000000000001",
+      "owningPageId": "0199a000-0000-7000-8000-00000000000a",
+      "kind": "project",
+      "label": "Atlas",
+      "parentProjectId": null,
+      "revision": "1"
+    },
+    {
+      "id": "0199a000-0000-7000-8000-000000000051",
+      "workspaceId": "0199a000-0000-7000-8000-000000000001",
+      "owningPageId": "0199a000-0000-7000-8000-000000000012",
+      "kind": "database",
+      "label": "Imported multi-source database",
+      "parentProjectId": null,
+      "revision": "1"
+    }
+  ],
+  "containerCollections": [
+    {
+      "containerId": "0199a000-0000-7000-8000-000000000051",
+      "collectionId": "0199a000-0000-7000-8000-00000000001e"
+    },
+    {
+      "containerId": "0199a000-0000-7000-8000-000000000051",
+      "collectionId": "0199a000-0000-7000-8000-00000000001f"
+    }
+  ],
+  "views": [
+    {
+      "id": "0199a000-0000-7000-8000-00000000005a",
+      "collectionId": "0199a000-0000-7000-8000-00000000001e",
+      "containerId": "0199a000-0000-7000-8000-000000000051",
+      "owningPageId": "0199a000-0000-7000-8000-00000000000b",
+      "name": "All tasks",
+      "type": "table",
+      "schemaVersion": 1,
+      "query": {
+        "filter": null,
+        "sorts": [],
+        "visiblePropertyIds": [
+          "0199a000-0000-7000-8000-000000000028",
+          "0199a000-0000-7000-8000-000000000029"
+        ],
+        "groupByPropertyId": null,
+        "subgroupByPropertyId": null
+      },
+      "config": {
+        "columnWidths": [
+          {
+            "propertyId": "0199a000-0000-7000-8000-000000000028",
+            "pixels": 300
+          }
+        ]
+      },
+      "revision": "1"
+    },
+    {
+      "id": "0199a000-0000-7000-8000-00000000005b",
+      "collectionId": "0199a000-0000-7000-8000-00000000001e",
+      "containerId": null,
+      "owningPageId": "0199a000-0000-7000-8000-00000000000d",
+      "name": "Review tasks",
+      "type": "list",
+      "schemaVersion": 1,
+      "query": {
+        "filter": null,
+        "sorts": [],
+        "visiblePropertyIds": [
+          "0199a000-0000-7000-8000-000000000028",
+          "0199a000-0000-7000-8000-000000000029"
+        ],
+        "groupByPropertyId": null,
+        "subgroupByPropertyId": null
+      },
+      "config": {
+        "showPageIcon": true
+      },
+      "revision": "1"
+    }
+  ],
+  "files": [
+    {
+      "id": "0199a000-0000-7000-8000-000000000064",
+      "workspaceId": "0199a000-0000-7000-8000-000000000001",
+      "contentHash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "originalName": "meeting.wav",
+      "mediaType": "audio/wav",
+      "sizeBytes": "16000",
+      "storageKey": "files/aa/aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "revision": "1"
+    },
+    {
+      "id": "0199a000-0000-7000-8000-000000000065",
+      "workspaceId": "0199a000-0000-7000-8000-000000000001",
+      "contentHash": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+      "originalName": "source.md",
+      "mediaType": "text/markdown",
+      "sizeBytes": "120",
+      "storageKey": "files/bb/bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+      "revision": "1"
+    }
+  ],
+  "meetings": [
+    {
+      "id": "0199a000-0000-7000-8000-00000000006e",
+      "pageId": "0199a000-0000-7000-8000-000000000010",
+      "recordingFileId": "0199a000-0000-7000-8000-000000000064",
+      "startedAt": "2026-09-30T00:00:00Z",
+      "durationMs": 10000,
+      "state": "ready",
+      "revision": "1"
+    }
+  ],
+  "transcriptSegments": [
+    {
+      "id": "0199a000-0000-7000-8000-00000000006f",
+      "meetingId": "0199a000-0000-7000-8000-00000000006e",
+      "blockId": "0199a000-0000-7000-8000-000000000049",
+      "startMs": 1000,
+      "endMs": 4100,
+      "text": "Use one canonical record and page body.",
+      "speakerLabel": null,
+      "revision": "1"
+    }
+  ],
+  "taskFacets": [
+    {
+      "recordId": "0199a000-0000-7000-8000-00000000003c",
+      "statusPropertyId": "0199a000-0000-7000-8000-000000000029",
+      "duePropertyId": "0199a000-0000-7000-8000-00000000002a"
+    },
+    {
+      "recordId": "0199a000-0000-7000-8000-00000000003d",
+      "statusPropertyId": "0199a000-0000-7000-8000-00000000002c",
+      "duePropertyId": null
+    }
+  ],
+  "projectScopes": [
+    {
+      "projectId": "0199a000-0000-7000-8000-000000000050",
+      "revision": "1",
+      "memberPageIds": [
+        "0199a000-0000-7000-8000-00000000000c",
+        "0199a000-0000-7000-8000-00000000000d",
+        "0199a000-0000-7000-8000-00000000000f",
+        "0199a000-0000-7000-8000-000000000010"
+      ],
+      "pinnedPageIds": [
+        "0199a000-0000-7000-8000-00000000000e"
+      ],
+      "excludedPageIds": [],
+      "inheritAncestorPreferences": false,
+      "inheritWorkspacePreferences": false
+    }
+  ],
+  "memories": [
+    {
+      "id": "0199a000-0000-7000-8000-000000000078",
+      "pageId": "0199a000-0000-7000-8000-000000000011",
+      "scope": {
+        "kind": "project",
+        "workspaceId": "0199a000-0000-7000-8000-000000000001",
+        "projectId": "0199a000-0000-7000-8000-000000000050"
+      },
+      "kind": "decision",
+      "status": "active",
+      "content": "Use canonical records for tasks.",
+      "sources": [
+        {
+          "pageId": "0199a000-0000-7000-8000-000000000010",
+          "sourceRevision": "1",
+          "blockId": "0199a000-0000-7000-8000-000000000049",
+          "transcript": {
+            "meetingId": "0199a000-0000-7000-8000-00000000006e",
+            "segmentId": "0199a000-0000-7000-8000-00000000006f",
+            "startMs": 1000,
+            "endMs": 4100
+          }
+        }
+      ],
+      "revision": "1",
+      "approvedAt": "2026-09-30T00:00:00Z",
+      "approvedByActorId": "0199a000-0000-7000-8000-000000000079",
+      "supersedesId": null
+    }
+  ],
+  "importMappings": [
+    {
+      "id": "0199a000-0000-7000-8000-000000000082",
+      "workspaceId": "0199a000-0000-7000-8000-000000000001",
+      "sourceSystem": "notion",
+      "sourceNamespace": "exported-workspace-2026",
+      "externalKind": "page",
+      "identity": {
+        "kind": "external_id",
+        "value": "notion-page-123"
+      },
+      "localKind": "page",
+      "localId": "0199a000-0000-7000-8000-00000000000e",
+      "baseSourceRevision": "source-revision-4",
+      "baseContentHash": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+      "baseRawFileId": "0199a000-0000-7000-8000-000000000065",
+      "lastImportRunId": "0199a000-0000-7000-8000-000000000083"
+    }
+  ]
+}

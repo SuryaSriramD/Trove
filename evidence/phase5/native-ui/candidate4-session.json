@@ -1,0 +1,80 @@
+{
+  "startedAt": "2026-09-30T19:24:19.409930+00:00",
+  "candidate": "/Volumes/HD-B1/HD-Projects/Trove/build/phase5-candidate-4/Trove.app",
+  "candidateBinarySha256": "20ddd24cea0c42a9b4b7934eece1a461a8314cd7160a05c75a0983859e7be7d4",
+  "aggregateRun": "20260930T191730Z-9d0572ce",
+  "fixture": "/private/tmp/trove-phase5-native-src6q17p",
+  "workspace": "/private/tmp/trove-phase5-native-src6q17p/Trove-restored-01a0f3bc-65f7-7ee8-8cde-d7a3411b81d5",
+  "pid": 537,
+  "observations": [
+    {
+      "at": "2026-09-30T19:26:02.794790+00:00",
+      "case": "final-restart-lock-edit-clipboard",
+      "result": "passed",
+      "steps": [
+        "Candidate4 startup reopened previous restored workspace. Native acceptance retains exact Unicode paragraph,H4,alpha/beta table,Review tab/Native tab content,public audio.",
+        "Locked saved page: controls disabled, status Saved. Unlocked: controls enabled,status Saved.",
+        "Added Final candidate saved marker; saved; navigated away and reopened: exact marker retained.",
+        "Copied verified full selection Persistent notes — తెలుగు 中文 العربية 🌱 using CmdLeft,ShiftCmdRight,CmdC; pasted via CmdV into Final clipboard acceptance and saved."
+      ],
+      "harnessNote": "Initial triple-click selected Telugu word only; verified keyboard full-line selection and repeated actual native copy/paste to qualify exact full paragraph."
+    },
+    {
+      "at": "2026-09-30T19:26:02.794790+00:00",
+      "case": "final-local-ai-source-review",
+      "result": "passed",
+      "model": "Qwen2.5 1.5B Instruct Q5",
+      "prompt": "What exact marker text is on this page? Answer briefly and cite the source.",
+      "steps": [
+        "History acceptance current-page scope,memory off.",
+        "Generate locally completed with exact answer: The exact marker text on this page is \"Original history marker\". [1]",
+        "Source context2 expanded to page title and Original history marker block. Clicked [2]History acceptance; footer Opened cited source; no stale-source/error.",
+        "No generated changes applied."
+      ]
+    },
+    {
+      "at": "2026-09-30T19:26:02.794790+00:00",
+      "case": "final-linked-view-formula",
+      "result": "passed",
+      "steps": [
+        "P1 linked gallery shows1record Native shared record edit and Exact decimal0.3.",
+        "Table view formula disclosure preserves original/translated0.1+0.2,imported cached captured999(captured evidence),and calculated0.3."
+      ]
+    },
+    {
+      "at": "2026-09-30T19:28:35.720758+00:00",
+      "case": "final-native-automation-retry",
+      "result": "passed",
+      "steps": [
+        "Native acceptance rule/receipt retained after candidate4 restart.",
+        "Enabled, previewed same schedule:2026-10-01T03:30:00Z,ran occurrence again: retained single child and single succeeded receipt.",
+        "Disabled rule again."
+      ]
+    },
+    {
+      "at": "2026-09-30T19:28:35.720758+00:00",
+      "case": "final-public-audio-playback",
+      "result": "passed",
+      "steps": [
+        "Restored public JFK audio shows11second duration.",
+        "Play becomes Pause; elapsed advanced0→4seconds; paused before leaving page."
+      ],
+      "screenshot": "Inline CUA Observe final candidate public audio playback progress; no disk screenshot claimed."
+    },
+    {
+      "at": "2026-09-30T19:28:35.720758+00:00",
+      "case": "final-screenshot-cancel-error-recovery",
+      "result": "error-recovery-passed-native-escape-unverified",
+      "steps": [
+        "Clicked Capture screenshot; Escape through app-bound CUA twice did not dismiss OS process.",
+        "Read-only ps at52seconds identified screenshot child6698 of candidate4PID537.",
+        "Terminated only exact verified screenshot child; UI reenabled and displayed Error: Screenshot cancelled or denied by macOS: signal: terminated."
+      ],
+      "limits": "No screenshot content captured, permissions granted, or private microphone used. Ordinary OS-picker Escape cancellation not qualified because CUA could not target picker."
+    }
+  ],
+  "blockedAt": {
+    "at": "2026-09-30T19:28:35.720758+00:00",
+    "reason": "Mac locked; CUA automatic unlock could not unlock. Final native backup/review/restore and restart pending."
+  }
+}

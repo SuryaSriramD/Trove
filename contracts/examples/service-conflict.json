@@ -1,0 +1,20 @@
+{
+  "ok": false,
+  "error": {
+    "code": "CONFLICT",
+    "message": "Page changed since proposal",
+    "retryable": false,
+    "requestId": "0199a000-0000-7000-8000-000000000003",
+    "details": {
+      "currentRevisions": [
+        {
+          "target": {
+            "entityType": "page",
+            "entityId": "0199a000-0000-7000-8000-000000000002"
+          },
+          "revision": "8"
+        }
+      ]
+    }
+  }
+}

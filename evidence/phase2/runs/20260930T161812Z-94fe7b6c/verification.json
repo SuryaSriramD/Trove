@@ -1,0 +1,939 @@
+{
+  "recordedAt": "2026-09-30T16:22:11.497382+00:00",
+  "scope": "phase2-product",
+  "result": "failed",
+  "tests": [
+    {
+      "test": "trove.local/phase0/internal/workers.TestAudioRejectsAmbiguousFormat",
+      "result": "passed"
+    },
+    {
+      "test": "trove.local/phase0/internal/native.TestInstructionPromptEscapesSourceRoleMarkers",
+      "result": "passed"
+    },
+    {
+      "test": "trove.local/phase0/contracts.TestTypedBatchAndSchemaValidation",
+      "result": "passed"
+    },
+    {
+      "test": "trove.local/phase0/contracts.TestAllProtocolFixtures/service-batch.json",
+      "result": "passed"
+    },
+    {
+      "test": "trove.local/phase0/contracts.TestAllProtocolFixtures/service-batch-result.json",
+      "result": "passed"
+    },
+    {
+      "test": "trove.local/phase0/contracts.TestAllProtocolFixtures/service-conflict.json",
+      "result": "passed"
+    },
+    {
+      "test": "trove.local/phase0/contracts.TestAllProtocolFixtures/service-event.json",
+      "result": "passed"
+    },
+    {
+      "test": "trove.local/phase0/contracts.TestAllProtocolFixtures/service-search.json",
+      "result": "passed"
+    },
+    {
+      "test": "trove.local/phase0/contracts.TestAllProtocolFixtures/service-stale-citation.json",
+      "result": "passed"
+    },
+    {
+      "test": "trove.local/phase0/contracts.TestAllProtocolFixtures/job-transcribe.json",
+      "result": "passed"
+    },
+    {
+      "test": "trove.local/phase0/contracts.TestAllProtocolFixtures/worker-transcribe.json",
+      "result": "passed"
+    },
+    {
+      "test": "trove.local/phase0/contracts.TestAllProtocolFixtures/worker-result.json",
+      "result": "passed"
+    },
+    {
+      "test": "trove.local/phase0/contracts.TestAllProtocolFixtures/worker-transcript.json",
+      "result": "passed"
+    },
+    {
+      "test": "trove.local/phase0/contracts.TestAllProtocolFixtures/worker-cancel.json",
+      "result": "passed"
+    },
+    {
+      "test": "trove.local/phase0/contracts.TestAllProtocolFixtures/job-progress.json",
+      "result": "passed"
+    },
+    {
+      "test": "trove.local/phase0/contracts.TestAllProtocolFixtures/service-import-report.json",
+      "result": "passed"
+    },
+    {
+      "test": "trove.local/phase0/contracts.TestAllProtocolFixtures/service-task-toggle.json",
+      "result": "passed"
+    },
+    {
+      "test": "trove.local/phase0/contracts.TestAllProtocolFixtures/service-import-apply.json",
+      "result": "passed"
+    },
+    {
+      "test": "trove.local/phase0/contracts.TestAllProtocolFixtures/service-import-preview.json",
+      "result": "passed"
+    },
+    {
+      "test": "trove.local/phase0/contracts.TestAllProtocolFixtures/service-memory-proposal.json",
+      "result": "passed"
+    },
+    {
+      "test": "trove.local/phase0/contracts.TestAllProtocolFixtures",
+      "result": "passed"
+    },
+    {
+      "test": "trove.local/phase0/contracts.TestDomainTypedRoundtrip",
+      "result": "passed"
+    },
+    {
+      "test": "trove.local/phase0/contracts.TestMergedImportResolutionAndFilterRoundtrip",
+      "result": "passed"
+    },
+    {
+      "test": "trove.local/phase0/contracts.TestOptionalNullableIntentSurvivesTypedCommands",
+      "result": "passed"
+    },
+    {
+      "test": "trove.local/phase0/internal/workers.TestRealDurableTranscriptionJob",
+      "result": "passed"
+    },
+    {
+      "test": "trove.local/phase0/internal/workspace.TestMemoryApprovalInvalidationForgetRestore",
+      "result": "passed"
+    },
+    {
+      "test": "trove.local/phase0/internal/workspace.TestAIComparisonMemoryAndLiveAuthority",
+      "result": "passed"
+    },
+    {
+      "test": "trove.local/phase0/internal/workspace.TestAIValidatedCitationsAndReviewedAction",
+      "result": "passed"
+    },
+    {
+      "test": "trove.local/phase0/internal/workspace.TestAIConflictCancellationAndScope",
+      "result": "passed"
+    },
+    {
+      "test": "trove.local/phase0/internal/workers.TestTranscriptionResumesCommittedMinutesAfterRestart",
+      "result": "passed"
+    },
+    {
+      "test": "trove.local/phase0/internal/workspace.TestAISelectionAndStructuredPageTaskReview",
+      "result": "passed"
+    },
+    {
+      "test": "trove.local/phase0/internal/workspace.TestAIExactQuoteAttributionAndStaleConversationContext",
+      "result": "passed"
+    },
+    {
+      "test": "trove.local/phase0/internal/workspace.TestMemorySupersessionCannotReviveCompetingPolicy",
+      "result": "passed"
+    },
+    {
+      "test": "trove.local/phase0/internal/workspace.TestDatabaseFourViewsShareRecordsAndRestart",
+      "result": "passed"
+    },
+    {
+      "test": "trove.local/phase0/internal/workspace.TestDatabaseTypedPropertiesPreserveImportMetadata",
+      "result": "passed"
+    },
+    {
+      "test": "trove.local/phase0/internal/workspace.TestDatabaseFiltersDecimalSortCursorAndAtomicity",
+      "result": "passed"
+    },
+    {
+      "test": "trove.local/phase0/internal/workspace.TestDatabaseCrossCollectionAndScopeDenied",
+      "result": "passed"
+    },
+    {
+      "test": "trove.local/phase0/internal/workspace.TestDatabaseContainersDoNotOwnRows",
+      "result": "passed"
+    },
+    {
+      "test": "trove.local/phase0/internal/workspace.TestDatabaseDiskRestartIsolation",
+      "result": "passed"
+    },
+    {
+      "test": "trove.local/phase0/internal/workspace.TestDatabaseFilterKeepsMultiSelectBoundaries",
+      "result": "passed"
+    },
+    {
+      "test": "trove.local/phase0/internal/workspace.TestDatabaseClearValuePreservesTaskAndTitleInvariants",
+      "result": "passed"
+    },
+    {
+      "test": "trove.local/phase0/internal/workspace.TestDatabaseFileValuesGrantScopedAccessAfterRestart",
+      "result": "passed"
+    },
+    {
+      "test": "trove.local/phase0/internal/workspace.TestPortableImportPreservesInventoryHierarchyDataAndLinks",
+      "result": "passed"
+    },
+    {
+      "test": "trove.local/phase0/internal/workspace.TestPortableImportRejectsUnsafeMembersAndRetainsContainer",
+      "result": "passed"
+    },
+    {
+      "test": "trove.local/phase0/internal/workspace.TestPortableImportResumesAndRequiresConflictReview",
+      "result": "passed"
+    },
+    {
+      "test": "trove.local/phase0/internal/workspace.TestPortableCSVEditableInferenceAndConversionFallback",
+      "result": "passed"
+    },
+    {
+      "test": "trove.local/phase0/internal/workspace.TestPortableExportRoundTripIncludesAssetsAndManifest",
+      "result": "passed"
+    },
+    {
+      "test": "trove.local/phase0/internal/workspace.TestPortableQueuedImportIsBoundToReviewedPlan",
+      "result": "passed"
+    },
+    {
+      "test": "trove.local/phase0/internal/workspace.TestReviewedJobRetryPreservesInputsUnitsAndFencesOldLease",
+      "result": "passed"
+    },
+    {
+      "test": "trove.local/phase0/internal/workspace.TestImportPreviewEmitsCorrelatedInventoryProgress",
+      "result": "passed"
+    },
+    {
+      "test": "trove.local/phase0/internal/workspace.TestJobUnitReceiptAtomicFenceAndSourceConflict",
+      "result": "passed"
+    },
+    {
+      "test": "trove.local/phase0/internal/workspace.TestJobCannotBypassApprovalAndDelegationRevocation",
+      "result": "passed"
+    },
+    {
+      "test": "trove.local/phase0/internal/workspace.TestNestedJobLocationsAndProjectScope",
+      "result": "passed"
+    },
+    {
+      "test": "trove.local/phase0/internal/workspace.TestCancellationCommitLinearizationAndReplay",
+      "result": "passed"
+    },
+    {
+      "test": "trove.local/phase0/internal/workspace.TestMigrationFailureRollsBackWholeSchema",
+      "result": "passed"
+    },
+    {
+      "test": "trove.local/phase0/internal/workspace.TestRunJobsContinuesAfterFailureAndStopsCleanly",
+      "result": "passed"
+    },
+    {
+      "test": "trove.local/phase0/internal/workspace.TestBackupDestinationJobAndLostAcknowledgement",
+      "result": "passed"
+    },
+    {
+      "test": "trove.local/phase0/internal/workspace.TestJobInputRevisionAndCustomRequestSchemas",
+      "result": "passed"
+    },
+    {
+      "test": "trove.local/phase0/internal/workspace.TestRunJobsShutdownFencesUnfinishedAttempt",
+      "result": "passed"
+    },
+    {
+      "test": "trove.local/phase0/internal/workspace.TestTransientRetriesAreBoundedAndDurable",
+      "result": "passed"
+    },
+    {
+      "test": "trove.local/phase0/internal/workspace.TestFileAndMeetingJobsCannotEscapePageScope",
+      "result": "passed"
+    },
+    {
+      "test": "trove.local/phase0/internal/workspace.TestTranscriptCitationValidatesMeetingSegmentAndTime",
+      "result": "passed"
+    },
+    {
+      "test": "trove.local/phase0/internal/workspace.TestWorkspaceRestartAndExclusiveOwnership",
+      "result": "passed"
+    },
+    {
+      "test": "trove.local/phase0/internal/workspace.TestAtomicBatchRollbackAndConflict",
+      "result": "passed"
+    },
+    {
+      "test": "trove.local/phase0/internal/workspace.TestIdempotencyAndCommittedEvents",
+      "result": "passed"
+    },
+    {
+      "test": "trove.local/phase0/internal/workspace.TestScopeAndForgedContext",
+      "result": "passed"
+    },
+    {
+      "test": "trove.local/phase0/internal/workspace.TestBlockRegistryRoundtripAndHistory",
+      "result": "passed"
+    },
+    {
+      "test": "trove.local/phase0/internal/workspace.TestConcurrentStaleWriters",
+      "result": "passed"
+    },
+    {
+      "test": "trove.local/phase0/internal/workspace.TestCancellationIsolation",
+      "result": "passed"
+    },
+    {
+      "test": "trove.local/phase0/internal/workspace.TestJobsRestartCancellationAndLeaseFencing",
+      "result": "passed"
+    },
+    {
+      "test": "trove.local/phase0/internal/workspace.TestRejectedRequestsLeaveDatabaseIntact",
+      "result": "passed"
+    },
+    {
+      "test": "trove.local/phase0/internal/workspace.TestExactApprovalRequiredConsumedAndReplay",
+      "result": "passed"
+    },
+    {
+      "test": "trove.local/phase0/internal/workspace.TestCanonicalApprovalHashEscapesAndOrdering",
+      "result": "passed"
+    },
+    {
+      "test": "trove.local/phase0/internal/workspace.TestProposalHashPreservesExplicitNull",
+      "result": "passed"
+    },
+    {
+      "test": "trove.local/phase0/internal/workspace.TestDurableCatchupPreservesBlockTombstones",
+      "result": "passed"
+    },
+    {
+      "test": "trove.local/phase0/internal/workspace.TestArchiveTimestampSurvivesRenameAndRestore",
+      "result": "passed"
+    },
+    {
+      "test": "trove.local/phase0/internal/workspace.TestRecordingCrashRecoveryRetainsFlushedTailAndCanonicalWAV",
+      "result": "passed"
+    },
+    {
+      "test": "trove.local/phase0/internal/workspace.TestRecordingRejectsChangedAcknowledgedAudioAndKeepsOriginal",
+      "result": "passed"
+    },
+    {
+      "test": "trove.local/phase0/internal/workspace.TestMeetingEvidenceReviewStalenessAndCanonicalConversion",
+      "result": "passed"
+    },
+    {
+      "test": "trove.local/phase0/internal/workspace.TestMeetingSummaryRejectsUnknownEvidence",
+      "result": "passed"
+    },
+    {
+      "test": "trove.local/phase0/internal/workspace.TestAssetDeduplicationScopedReadsAndRestart",
+      "result": "passed"
+    },
+    {
+      "test": "trove.local/phase0/internal/workspace.TestFileSelectionsRejectSymlinksAndInvalidHandles",
+      "result": "passed"
+    },
+    {
+      "test": "trove.local/phase0/internal/workspace.TestTrashHistoryRestoreAndStalePreview",
+      "result": "passed"
+    },
+    {
+      "test": "trove.local/phase0/internal/workspace.TestRestoreDeletedBlockKeepsMonotonicRevision",
+      "result": "passed"
+    },
+    {
+      "test": "trove.local/phase0/internal/workspace.TestBackupSnapshotRetentionAndRecoveryPoint",
+      "result": "passed"
+    },
+    {
+      "test": "trove.local/phase0/internal/workspace.TestAbandonedAssetsBackupPinsAndTamperDetection",
+      "result": "passed"
+    },
+    {
+      "test": "trove.local/phase0/internal/workspace.TestRecordTaskHistoryRestoresValuesWithoutCopyingIdentity",
+      "result": "passed"
+    },
+    {
+      "test": "trove.local/phase0/internal/workspace.TestAttachmentReferencesFollowCoverPropertiesAndBlockChanges",
+      "result": "passed"
+    },
+    {
+      "test": "trove.local/phase0/internal/workspace.TestCancelledBackupAndRestartRecoverAbandonedPins",
+      "result": "passed"
+    },
+    {
+      "test": "trove.local/phase0/internal/workspace.TestRestoreSecondInstallationPreservesCanonicalHistoryAndEvidence",
+      "result": "passed"
+    },
+    {
+      "test": "trove.local/phase0/internal/workspace.TestRestoreRejectsCorruptUnsafeAndChangedBackups/traversal",
+      "result": "passed"
+    },
+    {
+      "test": "trove.local/phase0/internal/workspace.TestRestoreRejectsCorruptUnsafeAndChangedBackups/short_digest",
+      "result": "passed"
+    },
+    {
+      "test": "trove.local/phase0/internal/workspace.TestRestoreRejectsCorruptUnsafeAndChangedBackups/negative_size",
+      "result": "passed"
+    },
+    {
+      "test": "trove.local/phase0/internal/workspace.TestRestoreRejectsCorruptUnsafeAndChangedBackups/omitted_asset",
+      "result": "passed"
+    },
+    {
+      "test": "trove.local/phase0/internal/workspace.TestRestoreRejectsCorruptUnsafeAndChangedBackups/wrong_cursor",
+      "result": "passed"
+    },
+    {
+      "test": "trove.local/phase0/internal/workspace.TestRestoreRejectsCorruptUnsafeAndChangedBackups/wrong_workspace",
+      "result": "passed"
+    },
+    {
+      "test": "trove.local/phase0/internal/workspace.TestRestoreRejectsCorruptUnsafeAndChangedBackups",
+      "result": "passed"
+    },
+    {
+      "test": "trove.local/phase0/internal/workspace.TestRestoreSubtreeIsAtomicAndPreservesUnrelatedValues",
+      "result": "passed"
+    },
+    {
+      "test": "trove.local/phase0/internal/workspace.TestRestoreTranscriptTimingAndForgottenMemory",
+      "result": "passed"
+    },
+    {
+      "test": "trove.local/phase0/internal/workspace.TestBackupRetentionIsExplicitVerifiedAndWorkspaceBound",
+      "result": "passed"
+    },
+    {
+      "test": "trove.local/phase0/internal/workspace.TestBackupInterruptedRecordingRetainsUnjournaledTailAndRejectsActiveCapture",
+      "result": "passed"
+    },
+    {
+      "test": "trove.local/phase0/internal/workspace.TestSemanticMaintenanceTracksEditsExtractionAndRebuild",
+      "result": "passed"
+    },
+    {
+      "test": "trove.local/phase0/internal/workspace.TestSemanticSettingsKeepModelDimensionAtomic",
+      "result": "passed"
+    },
+    {
+      "test": "trove.local/phase0/internal/workspace.TestClosingWorkspaceReleasesEmbeddingProvider",
+      "result": "passed"
+    },
+    {
+      "test": "trove.local/phase0/internal/workspace.TestSearchFTSChangesDeletesScopesAndRebuild",
+      "result": "passed"
+    },
+    {
+      "test": "trove.local/phase0/internal/workspace.TestSearchTranscriptNavigationAndNoModelFallback",
+      "result": "passed"
+    },
+    {
+      "test": "trove.local/phase0/internal/workspace.TestSearchExtractionJobPersistsAndIndexesFile",
+      "result": "passed"
+    },
+    {
+      "test": "trove.local/phase0/internal/workspace.TestSearchSemanticRevisionBoundAndHybrid",
+      "result": "passed"
+    },
+    {
+      "test": "trove.local/phase0/internal/workspace.TestDocumentAllowlistAndReadableExtraction/a.md",
+      "result": "passed"
+    },
+    {
+      "test": "trove.local/phase0/internal/workspace.TestDocumentAllowlistAndReadableExtraction/a.csv",
+      "result": "passed"
+    },
+    {
+      "test": "trove.local/phase0/internal/workspace.TestDocumentAllowlistAndReadableExtraction/a.html",
+      "result": "passed"
+    },
+    {
+      "test": "trove.local/phase0/internal/workspace.TestDocumentAllowlistAndReadableExtraction",
+      "result": "passed"
+    },
+    {
+      "test": "trove.local/phase0/internal/native.TestRealInstructionAnswer",
+      "result": "passed"
+    },
+    {
+      "test": "trove.local/phase0/internal/native.TestGrammarMetadataIsBoundedAndGenerationOnly",
+      "result": "passed"
+    },
+    {
+      "test": "trove.local/phase0/internal/native.TestFramesRejectMalformed",
+      "result": "passed"
+    },
+    {
+      "test": "trove.local/phase0/internal/native.TestModelImportVerifyLeaseRemove",
+      "result": "passed"
+    },
+    {
+      "test": "trove.local/phase0/internal/native.TestAcquisitionResumesAfterManagerRestart",
+      "result": "passed"
+    },
+    {
+      "test": "trove.local/phase0/internal/native.TestSchedulerRecordingPreemptionAndEditing",
+      "result": "passed"
+    },
+    {
+      "test": "trove.local/phase0/internal/workspace.TestDocumentPDFTextLayerAndIntegrity",
+      "result": "passed"
+    },
+    {
+      "test": "trove.local/phase0/internal/workspace.TestSearchDropsSourceEditedDuringSemanticInference",
+      "result": "passed"
+    },
+    {
+      "test": "trove.local/phase0/internal/workspace.TestTasksCanonicalStatusOccurrencesPromotionAndRestart",
+      "result": "passed"
+    },
+    {
+      "test": "trove.local/phase0/internal/workspace.TestTaskStaleMutationAndMissingMappings",
+      "result": "passed"
+    },
+    {
+      "test": "trove.local/phase0/internal/workspace.TestTasksRejectPromotionWithoutCompletionMappings",
+      "result": "passed"
+    },
+    {
+      "test": "trove.local/phase0/internal/workspace.TestTranscriptCommitAtomicallyRebasesDestinationAfterGuardRead",
+      "result": "passed"
+    },
+    {
+      "test": "trove.local/phase0/internal/workspace.TestTranscriptAtomicRebaseKeepsInputAndDeletionFences/meeting",
+      "result": "passed"
+    },
+    {
+      "test": "trove.local/phase0/internal/workspace.TestTranscriptAtomicRebaseKeepsInputAndDeletionFences/file",
+      "result": "passed"
+    },
+    {
+      "test": "trove.local/phase0/internal/workspace.TestTranscriptAtomicRebaseKeepsInputAndDeletionFences/deleted_page",
+      "result": "passed"
+    },
+    {
+      "test": "trove.local/phase0/internal/workspace.TestTranscriptAtomicRebaseKeepsInputAndDeletionFences/changed_destination",
+      "result": "passed"
+    },
+    {
+      "test": "trove.local/phase0/internal/workspace.TestTranscriptAtomicRebaseKeepsInputAndDeletionFences",
+      "result": "passed"
+    },
+    {
+      "test": "trove.local/phase0/internal/workspace.TestTranscriptRebaseCapabilityRejectsUnrelatedCommands",
+      "result": "passed"
+    },
+    {
+      "test": "trove.local/phase0/internal/native.TestRealQualification",
+      "result": "passed"
+    },
+    {
+      "test": "trove.local/phase0.TestRealLocalAIWorkflow",
+      "result": "passed"
+    },
+    {
+      "test": "trove.local/phase0.TestDesktopBootstrapUsesTrustedWorkspaceIdentity",
+      "result": "passed"
+    },
+    {
+      "test": "trove.local/phase0.TestDesktopUploadDescriptorSurvivesTemporaryPathCleanup",
+      "result": "passed"
+    },
+    {
+      "test": "trove.local/phase0/internal/native.TestRealWorkerCancellationCrashAndMetal",
+      "result": "passed"
+    },
+    {
+      "test": "trove.local/phase0/internal/workers.TestOneHourSourceDoesNotBlockEditingDuringRecognition",
+      "result": "passed"
+    },
+    {
+      "test": "trove.local/phase0/internal/workers.TestRestrictedAudioFloatValidationAndWAVConversion",
+      "result": "passed"
+    },
+    {
+      "test": "trove.local/phase0/internal/workers.TestMeetingPromptChunksKeepAllUnicodeAndEvidence",
+      "result": "passed"
+    },
+    {
+      "test": "trove.local/phase0/internal/workers.TestRealLocalMeetingSummaryRequiresReview",
+      "result": "passed"
+    },
+    {
+      "test": "trove.local/phase0/internal/workers.TestMeetingGenerationRejectsSilentFieldLossAndFabricatedAliases",
+      "result": "passed"
+    },
+    {
+      "test": "trove.local/phase0/internal/workers.TestRealOneHourTranscriptionKeepsEditorResponsive",
+      "result": "passed"
+    }
+  ],
+  "checks": [
+    {
+      "name": "contracts",
+      "command": [
+        "/private/tmp/trove-phase0-venv/bin/python",
+        "-m",
+        "unittest",
+        "discover",
+        "-s",
+        "tests",
+        "-v"
+      ],
+      "result": "passed",
+      "exitCode": 0,
+      "log": "evidence/phase2/runs/20260930T161812Z-94fe7b6c/contracts.log",
+      "logSha256": "1ccef7c9b85a209195130db54fdafaf933439f676cb31ac6f6f582a5536f5e69"
+    },
+    {
+      "name": "go-race",
+      "command": [
+        "/private/tmp/trove-phase0-tools/go/bin/go",
+        "test",
+        "-race",
+        "-count=1",
+        "-json",
+        "-tags",
+        "desktop production fts5 sqlite_omit_load_extension",
+        "./..."
+      ],
+      "result": "passed",
+      "exitCode": 0,
+      "log": "evidence/phase2/runs/20260930T161812Z-94fe7b6c/go-race.log",
+      "logSha256": "1739d545f24038856c3f349aab5450b7fdfa67d102e346da071ecab0c8ee11ab"
+    },
+    {
+      "name": "frontend-types",
+      "command": [
+        "/Volumes/HD-B1/HD-Projects/Trove/frontend/node_modules/.bin/tsc",
+        "--noEmit"
+      ],
+      "result": "passed",
+      "exitCode": 0,
+      "log": "evidence/phase2/runs/20260930T161812Z-94fe7b6c/frontend-types.log",
+      "logSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "frontend-codec",
+      "command": [
+        "/opt/homebrew/bin/node",
+        "--experimental-strip-types",
+        "--test",
+        "/Volumes/HD-B1/HD-Projects/Trove/frontend/tests/codec.test.ts",
+        "/Volumes/HD-B1/HD-Projects/Trove/frontend/tests/database.test.ts"
+      ],
+      "result": "passed",
+      "exitCode": 0,
+      "log": "evidence/phase2/runs/20260930T161812Z-94fe7b6c/frontend-codec.log",
+      "logSha256": "1f996763065570ecd021dad67089412975f4f1999752ce07973b114f56c2f02e"
+    },
+    {
+      "name": "frontend-browser",
+      "command": [
+        "/opt/homebrew/bin/node",
+        "node_modules/@playwright/test/cli.js",
+        "test"
+      ],
+      "result": "passed",
+      "exitCode": 0,
+      "log": "evidence/phase2/runs/20260930T161812Z-94fe7b6c/frontend-browser.log",
+      "logSha256": "89b01b5c7ceaec82c1fc43c4948e2d90a61b9e8cb8b6d0749cef4fd36b51eca1"
+    },
+    {
+      "name": "database-browser",
+      "command": [
+        "/opt/homebrew/bin/node",
+        "/Volumes/HD-B1/HD-Projects/Trove/frontend/node_modules/@playwright/test/cli.js",
+        "test",
+        "--config",
+        "playwright.config.ts"
+      ],
+      "result": "passed",
+      "exitCode": 0,
+      "log": "evidence/phase2/runs/20260930T161812Z-94fe7b6c/database-browser.log",
+      "logSha256": "578e30399145638a959d705e4f58d8619d0fdb5b2e8324a882e0f3882551076d"
+    },
+    {
+      "name": "desktop-build",
+      "command": [
+        "/private/tmp/trove-phase0-venv/bin/python",
+        "scripts/build-desktop.py"
+      ],
+      "result": "passed",
+      "exitCode": 0,
+      "log": "evidence/phase2/runs/20260930T161812Z-94fe7b6c/desktop-build.log",
+      "logSha256": "7e739d38e9d051c6d4338c184797a9c002ec0e465d9b18fdcaf939e93e0f1c19"
+    },
+    {
+      "name": "packaged-restart-native",
+      "command": [
+        "/private/tmp/trove-phase0-venv/bin/python",
+        "scripts/verify-packaged.py",
+        "--models",
+        "/private/tmp/trove-phase1-models",
+        "--native",
+        "--evidence",
+        "/Volumes/HD-B1/HD-Projects/Trove/evidence/phase2/runs/20260930T161812Z-94fe7b6c"
+      ],
+      "result": "passed",
+      "exitCode": 0,
+      "log": "evidence/phase2/runs/20260930T161812Z-94fe7b6c/packaged-restart-native.log",
+      "logSha256": "9269526126a482f1890118f7108be336e4ae31360a27bcd38f17f0b2cca72e47"
+    },
+    {
+      "name": "source-stability",
+      "result": "failed",
+      "changedPaths": [
+        "._app_qualification.go",
+        "app_qualification.go",
+        "frontend/src/App.tsx",
+        "frontend/src/api.ts",
+        "internal/native/acquisition_test.go",
+        "internal/native/packs.go",
+        "internal/workspace/p0_acceptance_test.go",
+        "scripts/phase3-benchmark/main.go"
+      ]
+    }
+  ],
+  "inputSha256": {
+    "._app.go": "e09b0ad63c3cea21026ef70311882fb73f72e06702f4a708cb54ef7d40a49b7b",
+    "._app_ai.go": "e09b0ad63c3cea21026ef70311882fb73f72e06702f4a708cb54ef7d40a49b7b",
+    "._app_ai_test.go": "e09b0ad63c3cea21026ef70311882fb73f72e06702f4a708cb54ef7d40a49b7b",
+    "._app_backup.go": "e09b0ad63c3cea21026ef70311882fb73f72e06702f4a708cb54ef7d40a49b7b",
+    "._app_events.go": "e09b0ad63c3cea21026ef70311882fb73f72e06702f4a708cb54ef7d40a49b7b",
+    "._app_import_export.go": "e09b0ad63c3cea21026ef70311882fb73f72e06702f4a708cb54ef7d40a49b7b",
+    "._app_integration.go": "e09b0ad63c3cea21026ef70311882fb73f72e06702f4a708cb54ef7d40a49b7b",
+    "._app_models.go": "e09b0ad63c3cea21026ef70311882fb73f72e06702f4a708cb54ef7d40a49b7b",
+    "._app_native_integration.go": "e09b0ad63c3cea21026ef70311882fb73f72e06702f4a708cb54ef7d40a49b7b",
+    "._app_recording.go": "e09b0ad63c3cea21026ef70311882fb73f72e06702f4a708cb54ef7d40a49b7b",
+    "._app_restore.go": "e09b0ad63c3cea21026ef70311882fb73f72e06702f4a708cb54ef7d40a49b7b",
+    "._app_test.go": "e09b0ad63c3cea21026ef70311882fb73f72e06702f4a708cb54ef7d40a49b7b",
+    "._app_workers.go": "e09b0ad63c3cea21026ef70311882fb73f72e06702f4a708cb54ef7d40a49b7b",
+    "._main.go": "e09b0ad63c3cea21026ef70311882fb73f72e06702f4a708cb54ef7d40a49b7b",
+    "app.go": "f71970044bffd5cfb61ed2f81bd65734f17509b1df1d7b38358dcad9a1976d4f",
+    "app_ai.go": "2952a5bb62c4021f0ebcedf62eff66ec09b29f8017afc75d77805695d6a1e064",
+    "app_ai_test.go": "faecadc42b560079d0eb760062e5052da6b2fe5b5ae3c8e299b8ac5d92f10920",
+    "app_backup.go": "35a7aef66f9194405518d240c7a13411abcc7351a86c0f91cbfea3f57724cb08",
+    "app_events.go": "05fae61e5a7a4b3550214a5ce59f60458247bee52aca31616b302892292ddb61",
+    "app_import_export.go": "6ac78cc77dd188ac70be5c8a8fc2c6ff936ff082bdb1689ab4414335fa740685",
+    "app_integration.go": "bc9c0a4f5a209d8bae2b3c9cfe3befa3e5a93016f42471e3b6bab79f8e346e45",
+    "app_models.go": "2b3bd0c413ccc5e3ba0a7e1f43dab4e57ceb91a2e9f699b36c8473d53c3488a5",
+    "app_native_integration.go": "150f52d2110449c6a47a620449850df16b892dbf382e349eb9d122e449aaf7e5",
+    "app_recording.go": "bffe1dc3218b808885bc9f38bbbf65bd333be176ee361ce799a1f0570ac4b17c",
+    "app_restore.go": "9fc063df96cce1acc43125c0403304888d8cd7b38ebf071a0551cefdfa099664",
+    "app_test.go": "0761e2e60c63c60a9a4c8315ea2aeb88cc155eac1fee511f9e91b8bb992c671f",
+    "app_workers.go": "e23f2eb2001345d3491be4cf0573c9167e5408e45be855c0722c3067a4fa2f31",
+    "baseline/baseline.lock.json": "e69e3d2bbfa9ebba6647ccf93185eff693b063468eaba08b14a8f5344771251a",
+    "contracts/contracts_test.go": "1ced92bc7aa677c7c5057cd4599c26a9b641f3e189110a3c8c34faacde62babe",
+    "contracts/domain.schema.json": "bc8efa39a86a63bb76cacec23eec3aa229640fa918f20abab3591ed2d6332802",
+    "contracts/examples/domain-import-resolution.json": "24e570629c388271955a0df7957a14326fd09e8140b51c10092b4c1766534268",
+    "contracts/examples/domain-memory-context.json": "304d952fd5a0198584996c113d4e3605b50859fc23aa98c87fc811e191167813",
+    "contracts/examples/domain-registry-values.json": "4374c5ac9ca890f2274f0e4edc6c84a769200566579b797bcc3472555330d821",
+    "contracts/examples/domain-reimport-plan.json": "12275a7607ae7b03875010c6c29d0ab410259dc3537d64237d3144cdd7402e22",
+    "contracts/examples/domain-reimport.json": "123ed6c03161f75b960388f59bd7ed245c144476f305dc9af5662b957893bb8b",
+    "contracts/examples/domain-workspace.json": "fd304c695adce18a1165c2b8dadca74988b3a324da05cee3604c4a19c092631f",
+    "contracts/examples/job-progress.json": "4d972599862dcf5ccb2f749e30e9a9c121e336520d1531b18b8fe0856d6052da",
+    "contracts/examples/job-transcribe.json": "e4bdb4ef3f9708cb6f74ac6b84a2a1c5c357963f1d32bb58e642e8365eaff01f",
+    "contracts/examples/protocol-manifest.json": "fbad7a4b5134b73d326debd748e1086a50883172b051039ddca8174bde5b6924",
+    "contracts/examples/service-batch-result.json": "a46422b3945744e2e09171434cfa29f200baebc4f4527114ae00bc472c3e483d",
+    "contracts/examples/service-batch.json": "9113e047d27e115778179665ba9a9eccfa7d567469f5867c82ff9a77a9b7ab34",
+    "contracts/examples/service-conflict.json": "32f7d3724c52e4e808a85ff96d250eb0edc2e9be84a6adc331b05ec6363cb5cd",
+    "contracts/examples/service-event.json": "a0f076f05f83bb70310dae434b5047b1144bd8fdc61bf8bcb4cfcb88432759fa",
+    "contracts/examples/service-import-apply.json": "d04eadd5cd5d60ec2f00797729892e501204127700290a9a15847e8595afe737",
+    "contracts/examples/service-import-preview.json": "49ad2226b3d35d6ea62b0696cdf3f3acfdb2621bf9fa820d212250918eeb0b7d",
+    "contracts/examples/service-import-report.json": "ba110be26bfa04dd20f2de43076bd35bb7389f2c39b49137c5be85b7c5846c65",
+    "contracts/examples/service-memory-proposal.json": "b6de5ec4cc877c0c7779f27ed576c02b39d6811b56050a9aee507f21857d48ae",
+    "contracts/examples/service-search.json": "2cfa668163fcf6c476ea2f3007fb1c74293a8188a14e619eede0ba8ed8c2f35a",
+    "contracts/examples/service-stale-citation.json": "8b9a9e1cdfc3ee36242258ac210c027f7c82638c86ec57c207b59394645c346e",
+    "contracts/examples/service-task-toggle.json": "9922dfab0c5154140ab82c6c1bd4327464b236f73d322f03687e5425b117f759",
+    "contracts/examples/worker-cancel.json": "47027af03e9dce88b8a828cbd6978b0f3b9a8f739996a7d50c7f7599b80323e0",
+    "contracts/examples/worker-result.json": "7b54d00795827582f4557645dabdd5b1d2dcaccc3a713acdc4a099d5b23efedf",
+    "contracts/examples/worker-transcribe.json": "d7a1b9ef39acb5e9f7619e185b3a882fb2634c35c92491786d330c5f4a7700c8",
+    "contracts/examples/worker-transcript.json": "e5d7b87a323c1ca03848e46a12f7a8569181d451c612178f3883ad54b3409e0d",
+    "contracts/generated/consumer.ts": "ff72fe6fc408648c330f59563dabfe7ca23be56f53124f7ad595c48b035d1da5",
+    "contracts/generated/domain.ts": "e9a5f003f472afd9a0a19d8ee5c5e3e9a54f871881db02107d44b7e8e09d7cae",
+    "contracts/generated/jobs.ts": "2c40914f7dd30e988eacd7414975b888d1f7e301cf87c571872340539abf6959",
+    "contracts/generated/service.ts": "14bdf36262fcc3c550aab0062b10ffcf03c33ff15580c87a49aec914764b12a2",
+    "contracts/jobs.schema.json": "11740ffe777b9811ba1f39e7c075b9a8ad87482d62bd60b8bf78f45873176bd3",
+    "contracts/reference_domain.py": "84ab9674b310c873721c771e7bb1e8b840f8aabdcc203e1acdb16d8b63d74fd3",
+    "contracts/reference_jobs.py": "4efa27220d9884c15d8bbe2b116747652e5ba9b1a15c56dd380a50f83438cfe8",
+    "contracts/reference_service.py": "cd8d3c46ccb5ec95a7a88afde894c661ec90dcd1feb1bde0c0cf582db9c0ffc4",
+    "contracts/registries.json": "193b61ff678e38ed00a95cb489bc40cddadcdd213575c0b3d5aee19504b6cd6d",
+    "contracts/release.json": "2ddbe470a22471c1f27d61eb58cc931d15ffd9bd723e7e65ac1e8ec386eace9e",
+    "contracts/service.go": "a35475be7afa7d13c8a4b2ea5d9f904f4a07b4af0739eed858367fa7d5ef899f",
+    "contracts/service.schema.json": "c20c82e2b5a5404518f33488179031d2f5ac811c03eb25a19bb7f196af8fb9d3",
+    "contracts/tsconfig.json": "e52212240fc1476540c750c17631a201c5a261612444d4e479209603e041ff07",
+    "contracts/types_generated.go": "58bb92fc2620e35d86062b04b94dad5492825a08f925991d9ce0367f5fb7dd84",
+    "frontend/package.json": "fb2735b4eb9ed81044b54f7f9ef2c4a7caddf729633f4d39190e83bda2daff81",
+    "frontend/pnpm-lock.yaml": "22d347c319ea124813be2c629519d346bfd9907b94dd3fb52f273e13fb54f16c",
+    "frontend/src/App.tsx": "fd233130d1235f810dfa75f37f912d426a3bf0a4dd5c5e6f57f42eff8a46fd08",
+    "frontend/src/JobsPanel.tsx": "4a503927cd3e92658a2da863f8927d16b58b771f6c1a826952c56263dae4deb7",
+    "frontend/src/ModelSettings.tsx": "09076373c15db6a39958c997e939ba8effb97afacffe5513255c4f7bfa4c1c38",
+    "frontend/src/ai/AIPanel.tsx": "473d7e28b2fafdf4454e7d67ef25762080451769ca586632fa7653b1164f10fe",
+    "frontend/src/ai/ai.css": "274045431d2c5d51d32015744991cdddbcd8e8a66efe7673e5189e1821fba33b",
+    "frontend/src/api.ts": "32880b15fe8f01911af674f9830930a8b9a77b22d79446bee06516a59590dc69",
+    "frontend/src/database/DatabaseView.tsx": "7ad26a53f2a83e42d53c2a3489f825142f64b1d54066b333be3a66704e3c9421",
+    "frontend/src/database/database.css": "9de44d2542d2f46b04d555269482e651a164e9cfe94db48a68c6868923dd98c5",
+    "frontend/src/database/model.ts": "3268f11cd299a2af22f16ad59166996afa5e88279c808902350629d587796921",
+    "frontend/src/database/service.ts": "ab139eb4d0d6b4b9c438c0b0179800bc4cd945d074e84f80644fdf3d42a2a5b5",
+    "frontend/src/database/tests/database.browser.spec.ts": "03bdd18e0749d90c4b99efd4217b86ac98f1e8f5132103e7a3ebe50ba500b5ef",
+    "frontend/src/database/tests/playwright.config.ts": "c4b73275850799e68ea0581af65fda0b70d553fb28606cf37f66d7d0fddcd59e",
+    "frontend/src/editor/Editor.tsx": "eca900bb09b092dd4e5c4040fcd91a60970c151581486c13c58f48de8d4610d7",
+    "frontend/src/editor/codec.ts": "dc865279729274c61b42b546a5c11b1f26ccca581b777e03f22bf6f358ba51f3",
+    "frontend/src/editor/nodes.tsx": "db64e9f6a23962a35dfaa61dbc913364f2e0e97030043cd48da81389c7fbc2d5",
+    "frontend/src/env.d.ts": "65996936fbb042915f7b74a200fcdde7e410f32a669b1ab9597cfaa4b0faddb5",
+    "frontend/src/imports/ImportExportPanel.tsx": "662ccdd2950aafe4136d359b7ef262fe9881bd424b34a79b8d104877c2cb2d51",
+    "frontend/src/imports/imports.css": "b241238b65ce362187b4d12867451e7c176de3084dd6e112f6f7bf6fd122c0ac",
+    "frontend/src/main.tsx": "575c9833bc5993d6a7b8db0587b8ecc202809448fd71842c5a4331bec6ee7977",
+    "frontend/src/meetings/MeetingPanel.tsx": "680925b51a51cf87f438f7bc8fe4be072a21a1561cade8ed86e950d47ad1da06",
+    "frontend/src/meetings/meetings.css": "b3c9e1f1dcbbe9ed2caf15b691d77c8258723eb3df6720ea6931b3cd5b11f57b",
+    "frontend/src/recovery/BackupRestoreControls.tsx": "5eb0f1a4a98c88b97496de6c57d2ae39ae91ea14c2971316511fc36e5adf2a4e",
+    "frontend/src/recovery/RecoveryPanel.tsx": "8e2aa3abc75490d12ac51432e1f9ce5779877191fed0ca54d27b3e2e47c130c1",
+    "frontend/src/search/SearchPanel.tsx": "146f10f27cc11db72d61b85686d40179eb1a20b506a098cb378e3072a5ecffe8",
+    "frontend/src/search/search.css": "fa40b2de839f0a7bc00a52625800cb3ffb18dbf068d2f926905fce1ead824f49",
+    "frontend/src/sourceNavigation.ts": "beb8f14d9411b5d92974b3e0e4e5ff0cab4e32d1b3aba134f3dae640e045beb7",
+    "frontend/src/style.css": "8807d514892182fd0daa55993534b97effd62c20fe40aa1a99560670bb1f4c6d",
+    "frontend/tests/browser.spec.ts": "b4fffa0bf77f5f6d8566d93e2dac45236e90719315b19ddc909335a952e67c09",
+    "frontend/tests/codec.test.ts": "3a74d118448d1931ff807016b4ea1e2132fade5c01bb6611ea4a7b3126d24ef4",
+    "frontend/tests/database.test.ts": "6bb367aa851671d228f2e1e5a872ac0c2a568713acd5d8460652c87731263add",
+    "go.mod": "36cc65ac1f1d672717358189b452d41103223c2465984cefdbc803734b8b9b8a",
+    "go.sum": "ee6e5803a74a2741262aaa28e09d40642eca2ee96beab870870f66ab07f9d016",
+    "internal/integration/scenario.go": "1da06d47feed4a1c61ba128ea93b7871bd37c286e71cc5a2a338f4adb3e6ba98",
+    "internal/native/catalog.go": "7d1ebd22282135e2d01aaaf1083a1a79f73f88ae4cd80bd4044dc95cf30cd59e",
+    "internal/native/context_budget.go": "661e5ea0f6e053a8a96b0194fc9710c16e90d61e8367fb2adb38d5772937daed",
+    "internal/native/generation.go": "680ac00ce55cb4fe421b1b9286c38b763b207898a2eb08628abb4296a94c9114",
+    "internal/native/generation_test.go": "f22ea1009f7d25f849f1498e17abb0eb87e96a58c75e0d60ff7f98e926a7a9a4",
+    "internal/native/grammar_test.go": "8576ad29020cb5afb0eac56a25c23efa369913047fd541324ffb720e8e5fadf2",
+    "internal/native/inputs.go": "4f97ced57d4ee19bc930ea8a8cfa1190828b7e09f985f8155bcf6f7a11023bf0",
+    "internal/native/microphone.go": "8bf8e549c759d1d6e7b9e6dc4b12c009d2e95935d2842c74a198ffd159846b70",
+    "internal/native/native_test.go": "09204563177117451bd509d1bc886be413c89f472e5c4dcfdd10c0ec9236aeee",
+    "internal/native/packs.go": "2c8149e7f75175e76d156b8e1001e19283bb19b0a6a72122f4fd95b620909a36",
+    "internal/native/protocol.go": "a09f9a222fb4c3ed5f31b4c8beb996792754c5392cb1ea73177415ad9f897ae0",
+    "internal/native/qualification.go": "517765ba6622c7a5bf03f2bfeab6f51757e6e1c63b046e9050c2e5751775103c",
+    "internal/native/scheduler.go": "2b36bd35471aed053199c0cf6883862e265ab8b517162c9c11a4a5256c70a89d",
+    "internal/native/supervisor.go": "d3790305f2aef2ac5e2c4d28825c7414921097520569dc4c5b4e3c66616ad009",
+    "internal/workers/audio.go": "69d8e5ed5b7fcef8f537b00a63239b46ab82fbd252d45a92badda1eb1a062815",
+    "internal/workers/meeting_summary.go": "788a0902a02be5dfd27e4b3bdfe743e60ac2582f687902442cd4a55967148860",
+    "internal/workers/runner.go": "c3cef5f43493a7484ad03cac846204cf8ee48ffeb1ad32a4ec6aac8911dee537",
+    "internal/workers/runner_test.go": "11213dee2b90e0eae2ec38c40169808f930cf511e3b651a65557dafaacbf353f",
+    "internal/workers/search.go": "77d4f995b6c0fa6b7025d9dd2b53d2536321b6f7d63ec66f53ac8b1d246f3a3c",
+    "internal/workers/transcription_test.go": "7e5143a005918c68310a0eed1c92ccb40553012c1050ec5f4097ae116e254367",
+    "internal/workspace/ai.go": "95f37ed4ded8be096da50debdadf54e180470f64ad969f40cc453d1f24faea3f",
+    "internal/workspace/ai_actions.go": "c1d71d2d1bc9f8120c3441bd798790e09d87053400a96c20ae480c0e8cdfd002",
+    "internal/workspace/ai_memory_test.go": "7d5749f8f2be7dbc20b51726a483ff0693de780ff1bcf3491e3b03815eac3cf9",
+    "internal/workspace/backup.go": "8de4e8b440f229cd5b382859c4b9b1f4b2c4ef3a1ab0b14662193a3e6419a5b7",
+    "internal/workspace/backup_retention.go": "0cfa95067d9696b5947a08382d5ea57a8c606a1af5516bac13263cc1a9fff4e5",
+    "internal/workspace/canonical.go": "727ba27437dd1c20917bcae5dad5c509e5d46b1ec1ac76a58aa8b34057353459",
+    "internal/workspace/database.go": "920385780bfca2c0b98989775d5ee999c4d4964b5941d3350c13824c53aa75b8",
+    "internal/workspace/database_test.go": "72b37ecc204f98b7a26bb3c05f2ac0f477f10699f516ace512e9bc2b1d77fa1a",
+    "internal/workspace/events.go": "3e91be9c34ea23e12f2de32d8eed3af43a81935895c5962413a27657820d3900",
+    "internal/workspace/evidence_lifecycle.go": "a07c8d3c7ebc7e30ffd9e0d46bd3de43f7112b8081c196a304f008ef0e4ec2b9",
+    "internal/workspace/export.go": "51d548205615b3ba926f29fb649631d0107a23003bb345f658b49e4a57941aac",
+    "internal/workspace/extraction.go": "fd5692d98f3179e5a54bc535d3a5692c68e02aa5e49b8538dc352cd32cb0a997",
+    "internal/workspace/files.go": "8c10258407408c7a29f64ead27da334a45d9e4e4887ff9df3a00d8e049f2bc5a",
+    "internal/workspace/history.go": "9b10a511fd33c3c3e69bde5a793b208b9b176103e18857d5203936a231ac3d23",
+    "internal/workspace/import_commit.go": "8cf9f6db61d64040c2dbf97e8cc773be828732bf943c2f3f2d0b4c318f1716ef",
+    "internal/workspace/import_export_test.go": "9cf5c75cbb852cd1d56318ce8b5f1bc39509f0c8abfd16a40cef89e3bb2c33c9",
+    "internal/workspace/import_jobs.go": "86fcb992f066dc437018a0605cee2b1bdb2e5bbce243503cd57fd8800049ebbb",
+    "internal/workspace/import_parse.go": "ca8e049e3b222594b41bb1b4eccdae95c9450305c360d282d49865eee933dfca",
+    "internal/workspace/import_progress.go": "07f0576e25384e82650e6ed39b6f38683e507b96a3cee3580da59db7aaeaedc7",
+    "internal/workspace/imports.go": "d977328679e5f0088383b8986b38f38a92476fa8e8b1c38bab88a7b812fbc7f1",
+    "internal/workspace/job_backup.go": "38c711be69f95b8163464cd97c36b037de5f57e4af782989258bd15a8c131e70",
+    "internal/workspace/job_commits.go": "a5506e0e42a787774e233c1f21f250c92cecd3d523f8c7d6e4b8c247199f5c75",
+    "internal/workspace/job_retry.go": "1d0f425d5750fed98dcbeff029a2807f39613978fde057d4cf67c8c552d73e80",
+    "internal/workspace/job_retry_test.go": "bb1a4b3fb00941c4f29d952b9756c40b3dee0717f1e28b3e35a4e298ff390756",
+    "internal/workspace/jobs.go": "f29ccdbce838fbd4396221365b93013a92df6d720ccd676b9acabd0b2762eaf7",
+    "internal/workspace/jobs_test.go": "455005fc866f4edeba6e69553fbb05b4a369117915b835cbfd017e834c645a58",
+    "internal/workspace/kernel.go": "855ddb336ccc4fcde80daedf147f0d1f0077c39d72c076204a4de4a7e7c135fc",
+    "internal/workspace/kernel_test.go": "3e26d59af88821a48dc590eeb065646a4d2f12853f27a4f7500ce8e36c75403b",
+    "internal/workspace/meeting_intelligence.go": "3211d5be49f56aca0c2055c8a0ff2cf12444b0a57c31f0d9dc45e7b19a71b334",
+    "internal/workspace/meetings.go": "7b73e426ad7c761a5ecdc72cfb6b1e83fb5f326188c5f477001ce54bc4f58e56",
+    "internal/workspace/memory.go": "6282f43739cf6d6faa1d338c4b30654ead7575ca713b430609c43fe96389a161",
+    "internal/workspace/mutations.go": "94d7d1c6caf061b873f68b91863a6404833503e85a6661426521bc505ee96d6e",
+    "internal/workspace/pages.go": "f9aa7e41d88d67e2432fa744c011d5fb576c3bfbcd46eebcd495ca76c35ad246",
+    "internal/workspace/permissions.go": "6194d6bfade86bfe3e7efb18b325dee392fe8584b09bac715a53d95bb35d3163",
+    "internal/workspace/projects.go": "8f174e5ee8b0948cdbd0421566d3d64303314e82a19474fc1d04de90068dd424",
+    "internal/workspace/recordings.go": "e4e5847b35bd22b847540a7a6f6d46ec9191e57a76f1671e996a5868ae04f0b7",
+    "internal/workspace/recordings_test.go": "76d9a9289ac74cf4d18937263ca1330d51cc5d06f0b2f6825f01be802d42e36b",
+    "internal/workspace/recovery_metadata.go": "b93f02cf76e0d28f055cd5df052758606548e11183ad5f46e02b143c65a0aa0d",
+    "internal/workspace/recovery_subtree.go": "3399f6876d7aa6b061c3ff0fe99b9f974b18aed8fec3b9073d28ca77d74c2a00",
+    "internal/workspace/recovery_test.go": "9d66cc56d6b22e0d9c31d10414636f84f64758fb77819e550bda245c060d10b5",
+    "internal/workspace/restore.go": "b0db0c8008296652f77a605c382822b6e73238f728917848decc0f13d966eb0d",
+    "internal/workspace/restore_test.go": "37f690552a8ae6bece2df1c0bef231e2db0d57df4c523b2170c1974ec03bb793",
+    "internal/workspace/search.go": "30956a5753100d3a1f8f6712d2a19cd4e13c66d0648ca5602ba9cec8e86926e5",
+    "internal/workspace/search_auto.go": "28a3d97e55b1ae03f22d3c53fb3ab94b9760054a9e53b62ae2d9fc0a6abcff79",
+    "internal/workspace/search_auto_test.go": "a374028c87aa13f9857223b2d0822b95ceea26daf3ea300e8c2e623abd4083a1",
+    "internal/workspace/search_semantic.go": "cc549f7c9213b68a8b72d86b10880b5abb9100a957325651ca1aaea8d5c3a1e6",
+    "internal/workspace/search_test.go": "7bcd780b120fd3ee1388615ee968e23292d3ad476e901bcf120e6027ab418704",
+    "internal/workspace/services.go": "684bbb35ec06646f85aee2997c2e07c5b85e3c7e40af433434753183f512c297",
+    "internal/workspace/tasks.go": "6ed5c5fdfaf273a0254a75c1effa47f7e831246d178c70105d51f3efb7f71c7b",
+    "internal/workspace/tasks_test.go": "ef92e0609fdc470f8d9ab07e705578a255bf0ddaed086a35c30a1878aeac73c5",
+    "internal/workspace/transcript_commit_test.go": "debaedf63b53004f77a3e5efd5fc562bb5f4f619657ceedd57c172507cbb4c85",
+    "main.go": "719efbe9011fe42f8698a8890888b7321950e37dcc50a43c049353d76d5e635b",
+    "native/document-extractor.swift": "1b35ba18ce4989f81a6cd247cc589d62fa99fe2aaa8a351795d9ef31c456b6e3",
+    "native/llama-worker.cpp": "1cfe9aabc4aaefde459a017763e3aad0b1861ef3f4b7489b959863357603ed62",
+    "native/microphone-worker.swift": "46ff6e8cd3d48fc7f208001d79291e129046f43e5a9fb874c8ad0ebba51b44c1",
+    "native/models/catalog.json": "b8c7019be7aec68150aa5f5bb40520e48b6ba4afe5f20b612d6908a98ea4dd7c",
+    "native/models/provenance.json": "86683322c76b97f215d995e7f50def3c5b31eb0d81fc7114baa044c8423c8d67",
+    "native/whisper-worker.cpp": "3798db244aaa2fcb05573e91bc79ab341b1c84d70337d01a046531902d04f163",
+    "native/worker.hpp": "905771002045a4ec14b56b81ea54c970b5ddc0b18f21d7fbb672c73b2f91d55a",
+    "packaging/desktop.entitlements.plist": "9140d2a5939149f3e1c510fbfcdc05317d5c57d8c3cae0c13d57c4f6e87f4993",
+    "packaging/microphone.entitlements.plist": "9140d2a5939149f3e1c510fbfcdc05317d5c57d8c3cae0c13d57c4f6e87f4993",
+    "schemas/embed.go": "62ea3729e621cc75c2b5885ddfb4696deb0a70543c69ed8c9c4ab3e791d3af7e",
+    "schemas/services.sql": "a9ed90022d9fadf28468a8625b0716ba47e6dba5b45bcf3b5ce3d9fc3d8523c5",
+    "schemas/workspace.sql": "227c533aef7dea1d5fb358f41245861fd589995783172972c7edef1f9c2d82ed",
+    "scripts/acquire-test-models.py": "204b479486a1fd64f4d95b3653767702211bd14da1fcc95c260b5d078301a43e",
+    "scripts/build-desktop.py": "e109852bc13dd83571d89d5a62f2e58efd36a9ede952f268162f3d1d0be77886",
+    "scripts/build-document-extractor.py": "8ef0241b3b948aaf47c282b9363f727d611041df2435418723f00c9fc6f0124a",
+    "scripts/build-native.py": "5161a64f2af42a129fb20f7ca5272acd23a28e3a64bdbbd05e0d52d3405f2e0b",
+    "scripts/build_examples.py": "20dde85d22cdae79283b9209ec23e9be99f30f960de9d6dfaabe91e2f04f733a",
+    "scripts/build_protocol_schemas.py": "f737f58f6a7a400dde31b349e8704697a1c8b27aaedbadaaf746fa8e8a054bd1",
+    "scripts/extract_requirements.py": "6c6f997a3f9e86e173aca4a228f9e43026a5c17d85b8c35bbe1febbad1fdf183",
+    "scripts/generate_types.py": "4cb433202b69b877db70fdf9c8c870196251ad862e185b44101b0bbb4ac1e0a1",
+    "scripts/update-phase1-ledger.py": "2ec6aa5394b39e2a13186adf0d56b89d1ac65b66e49ffc627f14753c9d3bf47c",
+    "scripts/validate-baseline.py": "fe74450d3eb825b44ee8213ab728a5354ed5ea495c311fa7095fb2307114a0c0",
+    "scripts/verify-packaged.py": "2b8ac6acfaba004b7aa8738d8a37b240b9a6216d863c0f6f8bce8d88d9261149",
+    "scripts/verify-phase1.py": "8e1b2c89f1670cda7bbf39e5fa10a93da75ea4a447472b7349f77ee99779307c",
+    "scripts/verify-phase2.py": "33ead5f71ef8a8c77940514432fe2e3e66ef699322eeb865c53de2e0025ff0f2",
+    "scripts/verify_phase0.py": "640829451ef743a35700e35e4e1d05ae39ecbf3562b7398ffe36ff4c06b696fc",
+    "tests/test_contracts.py": "9efeef8336df79d90bd5269bad6553348d6e78c57fab12e1325df7cecb106167",
+    "tests/test_domain.py": "d6ea001eb60eeaba62beaa4fa0341c402246c94a568c44d4c917f108885ae5ce",
+    "tests/test_jobs.py": "2b1866de10c0cae98969e94a4fc0ce6c07d0a7b34f6aa93629eaac1f10f82edd",
+    "tests/test_ledger.py": "29a6d77e68ad5af2e0786302f493ab8f3f87dc7b6a00b19a2185a7bb148a7ef9",
+    "tests/test_services.py": "9eb1d943753c15ed3a7cee5c13b05f6b0492f922be7dde64a8866a3476c6ce1f",
+    "wails.json": "b18837f0389fb2d98b5eaa6df9b51e5015dc6875ff7b00553bc29009b60688af"
+  },
+  "runEvidencePath": "evidence/phase2/runs/20260930T161812Z-94fe7b6c/verification.json",
+  "releaseGates": [
+    {
+      "gate": "Developer ID signing and notarization",
+      "verified": false,
+      "reason": "No valid signing identity on this host."
+    },
+    {
+      "gate": "Installation on a separate clean Mac",
+      "verified": false,
+      "reason": "Only this development Mac is available."
+    },
+    {
+      "gate": "Native IME candidate selection and VoiceOver",
+      "verified": false,
+      "reason": "Browser composition/accessibility tests do not establish native assistive behavior."
+    },
+    {
+      "gate": "Real microphone authorization and recording",
+      "verified": false,
+      "reason": "Synthetic capture tested; no private audio captured."
+    },
+    {
+      "gate": "Representative one-hour meeting transcription quality",
+      "verified": false,
+      "reason": "The real one-hour transcription fixture repeats public speech; it tests duration and editing latency, not varied meeting acoustics or accuracy."
+    },
+    {
+      "gate": "General assistant and meeting quality",
+      "verified": false,
+      "reason": "Real instruction-model smoke and deterministic evidence fixtures do not establish broad answer quality."
+    }
+  ]
+}

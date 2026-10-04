@@ -1,0 +1,128 @@
+.ai-panel {
+  max-width: 940px;
+  margin: auto;
+  padding: 28px;
+  color: var(--text, #28303a);
+}
+.ai-panel h2 {
+  font-size: 26px;
+  margin: 0 0 8px;
+}
+.ai-panel > p,
+.ai-memory > p {
+  color: var(--muted, #637080);
+  line-height: 1.55;
+}
+.ai-controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  align-items: center;
+  margin: 12px 0;
+}
+.ai-panel select,
+.ai-panel input:not([type="checkbox"]),
+.ai-panel textarea {
+  padding: 9px 11px;
+  border: 1px solid var(--border, #d3d9df);
+  border-radius: 6px;
+  background: var(--surface, #fff);
+  color: inherit;
+  max-width: 100%;
+}
+.ai-panel textarea {
+  width: 100%;
+  min-height: 105px;
+  resize: vertical;
+  font: inherit;
+  line-height: 1.5;
+  box-sizing: border-box;
+  margin: 10px 0;
+}
+.ai-panel button {
+  padding: 7px 11px;
+  cursor: pointer;
+}
+.ai-panel button:disabled {
+  cursor: default;
+  opacity: 0.55;
+}
+.ai-panel details {
+  margin: 18px 0;
+}
+.ai-panel summary {
+  cursor: pointer;
+}
+.ai-answer,
+.ai-memory-card {
+  border: 1px solid var(--border, #d3d9df);
+  border-radius: 8px;
+  padding: 18px;
+  margin: 18px 0;
+}
+.ai-meta {
+  font-size: 12px;
+  text-transform: uppercase;
+  color: var(--muted, #637080);
+}
+.ai-prose {
+  white-space: pre-wrap;
+  line-height: 1.7;
+}
+.ai-citation {
+  display: inline;
+  background: transparent;
+  border: 0;
+  text-decoration: underline;
+  color: #416f9d;
+  padding: 0 !important;
+}
+.ai-error {
+  color: #b32939;
+}
+.ai-note {
+  padding: 12px;
+  background: #f8f1d8;
+  color: #5c501d;
+  line-height: 1.5;
+}
+.ai-source p {
+  white-space: pre-wrap;
+  color: var(--muted, #637080);
+  font-size: 13px;
+}
+.ai-source {
+  border-top: 1px solid var(--border, #ddd);
+  padding-top: 12px;
+}
+.ai-history {
+  display: block;
+  width: 100%;
+  text-align: left;
+  margin: 6px 0;
+}
+.ai-review textarea {
+  min-height: 240px;
+}
+.ai-proposal {
+  padding: 15px;
+  border: 1px solid var(--border, #ccc);
+  margin-top: 15px;
+}
+.ai-proposal pre {
+  max-height: 300px;
+  overflow: auto;
+  font-size: 12px;
+  white-space: pre-wrap;
+}
+.ai-memory {
+  margin-top: 36px;
+  border-top: 1px solid var(--border, #ddd);
+  padding-top: 24px;
+}
+.ai-memory-card p {
+  white-space: pre-wrap;
+}
+.ai-memory-card small {
+  color: var(--muted, #637080);
+}

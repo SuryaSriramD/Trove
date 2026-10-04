@@ -1,0 +1,13 @@
+{
+  "kind": "transcript",
+  "meetingId": "0199a000-0000-7000-8000-000000000005",
+  "segments": [
+    {
+      "segmentId": "0199a000-0000-7000-8000-000000000006",
+      "blockId": "0199a000-0000-7000-8000-000000000004",
+      "startMs": 1200,
+      "endMs": 4800,
+      "text": "Ship the migration report."
+    }
+  ]
+}

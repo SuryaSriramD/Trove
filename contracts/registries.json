@@ -1,0 +1,3279 @@
+{
+  "contractVersion": "1.0.0",
+  "formatVersion": 1,
+  "entries": [
+    {
+      "family": "block",
+      "type": "paragraph",
+      "schemaVersion": 1,
+      "schemaRef": "domain.schema.json#/$defs/block_paragraph_v1",
+      "nativeEditingRelease": "P0",
+      "p0Mode": "editable",
+      "serialization": {
+        "format": "json",
+        "envelopeVersion": 1,
+        "canonicalization": "rfc8785",
+        "unknownFields": "retain_in_fallback"
+      },
+      "migration": {
+        "fromVersions": [],
+        "policy": "explicit_pure_version_step",
+        "preserveOriginal": true
+      },
+      "fallback": {
+        "schemaRef": "domain.schema.json#/$defs/Fallback",
+        "readableRequired": true,
+        "rawRequired": true,
+        "inert": true
+      },
+      "renderer": {
+        "adapterId": "block.paragraph.v1",
+        "missingRenderer": "readable_fallback"
+      },
+      "textExtraction": {
+        "adapterId": "block.paragraph.text.v1",
+        "mode": "structured_text",
+        "includeRawExecutableContent": false
+      },
+      "import": {
+        "representation": "registry_envelope",
+        "unknownInput": "unsupported_external",
+        "retainProvenance": true
+      },
+      "export": {
+        "native": "lossless_envelope",
+        "portable": "readable_plus_raw_sidecar",
+        "adapterId": "block.paragraph.export.v1"
+      },
+      "ai": {
+        "representation": "typed_data_with_location",
+        "writable": true,
+        "untrusted": true,
+        "adapterId": "block.paragraph.ai.v1"
+      }
+    },
+    {
+      "family": "block",
+      "type": "heading_1",
+      "schemaVersion": 1,
+      "schemaRef": "domain.schema.json#/$defs/block_heading_1_v1",
+      "nativeEditingRelease": "P0",
+      "p0Mode": "editable",
+      "serialization": {
+        "format": "json",
+        "envelopeVersion": 1,
+        "canonicalization": "rfc8785",
+        "unknownFields": "retain_in_fallback"
+      },
+      "migration": {
+        "fromVersions": [],
+        "policy": "explicit_pure_version_step",
+        "preserveOriginal": true
+      },
+      "fallback": {
+        "schemaRef": "domain.schema.json#/$defs/Fallback",
+        "readableRequired": true,
+        "rawRequired": true,
+        "inert": true
+      },
+      "renderer": {
+        "adapterId": "block.heading_1.v1",
+        "missingRenderer": "readable_fallback"
+      },
+      "textExtraction": {
+        "adapterId": "block.heading_1.text.v1",
+        "mode": "structured_text",
+        "includeRawExecutableContent": false
+      },
+      "import": {
+        "representation": "registry_envelope",
+        "unknownInput": "unsupported_external",
+        "retainProvenance": true
+      },
+      "export": {
+        "native": "lossless_envelope",
+        "portable": "readable_plus_raw_sidecar",
+        "adapterId": "block.heading_1.export.v1"
+      },
+      "ai": {
+        "representation": "typed_data_with_location",
+        "writable": true,
+        "untrusted": true,
+        "adapterId": "block.heading_1.ai.v1"
+      }
+    },
+    {
+      "family": "block",
+      "type": "heading_2",
+      "schemaVersion": 1,
+      "schemaRef": "domain.schema.json#/$defs/block_heading_2_v1",
+      "nativeEditingRelease": "P0",
+      "p0Mode": "editable",
+      "serialization": {
+        "format": "json",
+        "envelopeVersion": 1,
+        "canonicalization": "rfc8785",
+        "unknownFields": "retain_in_fallback"
+      },
+      "migration": {
+        "fromVersions": [],
+        "policy": "explicit_pure_version_step",
+        "preserveOriginal": true
+      },
+      "fallback": {
+        "schemaRef": "domain.schema.json#/$defs/Fallback",
+        "readableRequired": true,
+        "rawRequired": true,
+        "inert": true
+      },
+      "renderer": {
+        "adapterId": "block.heading_2.v1",
+        "missingRenderer": "readable_fallback"
+      },
+      "textExtraction": {
+        "adapterId": "block.heading_2.text.v1",
+        "mode": "structured_text",
+        "includeRawExecutableContent": false
+      },
+      "import": {
+        "representation": "registry_envelope",
+        "unknownInput": "unsupported_external",
+        "retainProvenance": true
+      },
+      "export": {
+        "native": "lossless_envelope",
+        "portable": "readable_plus_raw_sidecar",
+        "adapterId": "block.heading_2.export.v1"
+      },
+      "ai": {
+        "representation": "typed_data_with_location",
+        "writable": true,
+        "untrusted": true,
+        "adapterId": "block.heading_2.ai.v1"
+      }
+    },
+    {
+      "family": "block",
+      "type": "heading_3",
+      "schemaVersion": 1,
+      "schemaRef": "domain.schema.json#/$defs/block_heading_3_v1",
+      "nativeEditingRelease": "P0",
+      "p0Mode": "editable",
+      "serialization": {
+        "format": "json",
+        "envelopeVersion": 1,
+        "canonicalization": "rfc8785",
+        "unknownFields": "retain_in_fallback"
+      },
+      "migration": {
+        "fromVersions": [],
+        "policy": "explicit_pure_version_step",
+        "preserveOriginal": true
+      },
+      "fallback": {
+        "schemaRef": "domain.schema.json#/$defs/Fallback",
+        "readableRequired": true,
+        "rawRequired": true,
+        "inert": true
+      },
+      "renderer": {
+        "adapterId": "block.heading_3.v1",
+        "missingRenderer": "readable_fallback"
+      },
+      "textExtraction": {
+        "adapterId": "block.heading_3.text.v1",
+        "mode": "structured_text",
+        "includeRawExecutableContent": false
+      },
+      "import": {
+        "representation": "registry_envelope",
+        "unknownInput": "unsupported_external",
+        "retainProvenance": true
+      },
+      "export": {
+        "native": "lossless_envelope",
+        "portable": "readable_plus_raw_sidecar",
+        "adapterId": "block.heading_3.export.v1"
+      },
+      "ai": {
+        "representation": "typed_data_with_location",
+        "writable": true,
+        "untrusted": true,
+        "adapterId": "block.heading_3.ai.v1"
+      }
+    },
+    {
+      "family": "block",
+      "type": "heading_4",
+      "schemaVersion": 1,
+      "schemaRef": "domain.schema.json#/$defs/block_heading_4_v1",
+      "nativeEditingRelease": "P1",
+      "p0Mode": "preserve",
+      "serialization": {
+        "format": "json",
+        "envelopeVersion": 1,
+        "canonicalization": "rfc8785",
+        "unknownFields": "retain_in_fallback"
+      },
+      "migration": {
+        "fromVersions": [],
+        "policy": "explicit_pure_version_step",
+        "preserveOriginal": true
+      },
+      "fallback": {
+        "schemaRef": "domain.schema.json#/$defs/Fallback",
+        "readableRequired": true,
+        "rawRequired": true,
+        "inert": true
+      },
+      "renderer": {
+        "adapterId": "block.heading_4.v1",
+        "missingRenderer": "readable_fallback"
+      },
+      "textExtraction": {
+        "adapterId": "block.heading_4.text.v1",
+        "mode": "readable_fallback",
+        "includeRawExecutableContent": false
+      },
+      "import": {
+        "representation": "registry_envelope",
+        "unknownInput": "unsupported_external",
+        "retainProvenance": true
+      },
+      "export": {
+        "native": "lossless_envelope",
+        "portable": "readable_plus_raw_sidecar",
+        "adapterId": "block.heading_4.export.v1"
+      },
+      "ai": {
+        "representation": "typed_data_with_location",
+        "writable": false,
+        "untrusted": true,
+        "adapterId": "block.heading_4.ai.v1"
+      }
+    },
+    {
+      "family": "block",
+      "type": "bulleted_list_item",
+      "schemaVersion": 1,
+      "schemaRef": "domain.schema.json#/$defs/block_bulleted_list_item_v1",
+      "nativeEditingRelease": "P0",
+      "p0Mode": "editable",
+      "serialization": {
+        "format": "json",
+        "envelopeVersion": 1,
+        "canonicalization": "rfc8785",
+        "unknownFields": "retain_in_fallback"
+      },
+      "migration": {
+        "fromVersions": [],
+        "policy": "explicit_pure_version_step",
+        "preserveOriginal": true
+      },
+      "fallback": {
+        "schemaRef": "domain.schema.json#/$defs/Fallback",
+        "readableRequired": true,
+        "rawRequired": true,
+        "inert": true
+      },
+      "renderer": {
+        "adapterId": "block.bulleted_list_item.v1",
+        "missingRenderer": "readable_fallback"
+      },
+      "textExtraction": {
+        "adapterId": "block.bulleted_list_item.text.v1",
+        "mode": "structured_text",
+        "includeRawExecutableContent": false
+      },
+      "import": {
+        "representation": "registry_envelope",
+        "unknownInput": "unsupported_external",
+        "retainProvenance": true
+      },
+      "export": {
+        "native": "lossless_envelope",
+        "portable": "readable_plus_raw_sidecar",
+        "adapterId": "block.bulleted_list_item.export.v1"
+      },
+      "ai": {
+        "representation": "typed_data_with_location",
+        "writable": true,
+        "untrusted": true,
+        "adapterId": "block.bulleted_list_item.ai.v1"
+      }
+    },
+    {
+      "family": "block",
+      "type": "numbered_list_item",
+      "schemaVersion": 1,
+      "schemaRef": "domain.schema.json#/$defs/block_numbered_list_item_v1",
+      "nativeEditingRelease": "P0",
+      "p0Mode": "editable",
+      "serialization": {
+        "format": "json",
+        "envelopeVersion": 1,
+        "canonicalization": "rfc8785",
+        "unknownFields": "retain_in_fallback"
+      },
+      "migration": {
+        "fromVersions": [],
+        "policy": "explicit_pure_version_step",
+        "preserveOriginal": true
+      },
+      "fallback": {
+        "schemaRef": "domain.schema.json#/$defs/Fallback",
+        "readableRequired": true,
+        "rawRequired": true,
+        "inert": true
+      },
+      "renderer": {
+        "adapterId": "block.numbered_list_item.v1",
+        "missingRenderer": "readable_fallback"
+      },
+      "textExtraction": {
+        "adapterId": "block.numbered_list_item.text.v1",
+        "mode": "structured_text",
+        "includeRawExecutableContent": false
+      },
+      "import": {
+        "representation": "registry_envelope",
+        "unknownInput": "unsupported_external",
+        "retainProvenance": true
+      },
+      "export": {
+        "native": "lossless_envelope",
+        "portable": "readable_plus_raw_sidecar",
+        "adapterId": "block.numbered_list_item.export.v1"
+      },
+      "ai": {
+        "representation": "typed_data_with_location",
+        "writable": true,
+        "untrusted": true,
+        "adapterId": "block.numbered_list_item.ai.v1"
+      }
+    },
+    {
+      "family": "block",
+      "type": "quote",
+      "schemaVersion": 1,
+      "schemaRef": "domain.schema.json#/$defs/block_quote_v1",
+      "nativeEditingRelease": "P0",
+      "p0Mode": "editable",
+      "serialization": {
+        "format": "json",
+        "envelopeVersion": 1,
+        "canonicalization": "rfc8785",
+        "unknownFields": "retain_in_fallback"
+      },
+      "migration": {
+        "fromVersions": [],
+        "policy": "explicit_pure_version_step",
+        "preserveOriginal": true
+      },
+      "fallback": {
+        "schemaRef": "domain.schema.json#/$defs/Fallback",
+        "readableRequired": true,
+        "rawRequired": true,
+        "inert": true
+      },
+      "renderer": {
+        "adapterId": "block.quote.v1",
+        "missingRenderer": "readable_fallback"
+      },
+      "textExtraction": {
+        "adapterId": "block.quote.text.v1",
+        "mode": "structured_text",
+        "includeRawExecutableContent": false
+      },
+      "import": {
+        "representation": "registry_envelope",
+        "unknownInput": "unsupported_external",
+        "retainProvenance": true
+      },
+      "export": {
+        "native": "lossless_envelope",
+        "portable": "readable_plus_raw_sidecar",
+        "adapterId": "block.quote.export.v1"
+      },
+      "ai": {
+        "representation": "typed_data_with_location",
+        "writable": true,
+        "untrusted": true,
+        "adapterId": "block.quote.ai.v1"
+      }
+    },
+    {
+      "family": "block",
+      "type": "toggle",
+      "schemaVersion": 1,
+      "schemaRef": "domain.schema.json#/$defs/block_toggle_v1",
+      "nativeEditingRelease": "P0",
+      "p0Mode": "editable",
+      "serialization": {
+        "format": "json",
+        "envelopeVersion": 1,
+        "canonicalization": "rfc8785",
+        "unknownFields": "retain_in_fallback"
+      },
+      "migration": {
+        "fromVersions": [],
+        "policy": "explicit_pure_version_step",
+        "preserveOriginal": true
+      },
+      "fallback": {
+        "schemaRef": "domain.schema.json#/$defs/Fallback",
+        "readableRequired": true,
+        "rawRequired": true,
+        "inert": true
+      },
+      "renderer": {
+        "adapterId": "block.toggle.v1",
+        "missingRenderer": "readable_fallback"
+      },
+      "textExtraction": {
+        "adapterId": "block.toggle.text.v1",
+        "mode": "structured_text",
+        "includeRawExecutableContent": false
+      },
+      "import": {
+        "representation": "registry_envelope",
+        "unknownInput": "unsupported_external",
+        "retainProvenance": true
+      },
+      "export": {
+        "native": "lossless_envelope",
+        "portable": "readable_plus_raw_sidecar",
+        "adapterId": "block.toggle.export.v1"
+      },
+      "ai": {
+        "representation": "typed_data_with_location",
+        "writable": true,
+        "untrusted": true,
+        "adapterId": "block.toggle.ai.v1"
+      }
+    },
+    {
+      "family": "block",
+      "type": "toggle_heading",
+      "schemaVersion": 1,
+      "schemaRef": "domain.schema.json#/$defs/block_toggle_heading_v1",
+      "nativeEditingRelease": "P0",
+      "p0Mode": "editable",
+      "serialization": {
+        "format": "json",
+        "envelopeVersion": 1,
+        "canonicalization": "rfc8785",
+        "unknownFields": "retain_in_fallback"
+      },
+      "migration": {
+        "fromVersions": [],
+        "policy": "explicit_pure_version_step",
+        "preserveOriginal": true
+      },
+      "fallback": {
+        "schemaRef": "domain.schema.json#/$defs/Fallback",
+        "readableRequired": true,
+        "rawRequired": true,
+        "inert": true
+      },
+      "renderer": {
+        "adapterId": "block.toggle_heading.v1",
+        "missingRenderer": "readable_fallback"
+      },
+      "textExtraction": {
+        "adapterId": "block.toggle_heading.text.v1",
+        "mode": "structured_text",
+        "includeRawExecutableContent": false
+      },
+      "import": {
+        "representation": "registry_envelope",
+        "unknownInput": "unsupported_external",
+        "retainProvenance": true
+      },
+      "export": {
+        "native": "lossless_envelope",
+        "portable": "readable_plus_raw_sidecar",
+        "adapterId": "block.toggle_heading.export.v1"
+      },
+      "ai": {
+        "representation": "typed_data_with_location",
+        "writable": true,
+        "untrusted": true,
+        "adapterId": "block.toggle_heading.ai.v1"
+      }
+    },
+    {
+      "family": "block",
+      "type": "todo",
+      "schemaVersion": 1,
+      "schemaRef": "domain.schema.json#/$defs/block_todo_v1",
+      "nativeEditingRelease": "P0",
+      "p0Mode": "editable",
+      "serialization": {
+        "format": "json",
+        "envelopeVersion": 1,
+        "canonicalization": "rfc8785",
+        "unknownFields": "retain_in_fallback"
+      },
+      "migration": {
+        "fromVersions": [],
+        "policy": "explicit_pure_version_step",
+        "preserveOriginal": true
+      },
+      "fallback": {
+        "schemaRef": "domain.schema.json#/$defs/Fallback",
+        "readableRequired": true,
+        "rawRequired": true,
+        "inert": true
+      },
+      "renderer": {
+        "adapterId": "block.todo.v1",
+        "missingRenderer": "readable_fallback"
+      },
+      "textExtraction": {
+        "adapterId": "block.todo.text.v1",
+        "mode": "referenced_record",
+        "includeRawExecutableContent": false
+      },
+      "import": {
+        "representation": "registry_envelope",
+        "unknownInput": "unsupported_external",
+        "retainProvenance": true
+      },
+      "export": {
+        "native": "lossless_envelope",
+        "portable": "readable_plus_raw_sidecar",
+        "adapterId": "block.todo.export.v1"
+      },
+      "ai": {
+        "representation": "typed_data_with_location",
+        "writable": true,
+        "untrusted": true,
+        "adapterId": "block.todo.ai.v1"
+      }
+    },
+    {
+      "family": "block",
+      "type": "callout",
+      "schemaVersion": 1,
+      "schemaRef": "domain.schema.json#/$defs/block_callout_v1",
+      "nativeEditingRelease": "P0",
+      "p0Mode": "editable",
+      "serialization": {
+        "format": "json",
+        "envelopeVersion": 1,
+        "canonicalization": "rfc8785",
+        "unknownFields": "retain_in_fallback"
+      },
+      "migration": {
+        "fromVersions": [],
+        "policy": "explicit_pure_version_step",
+        "preserveOriginal": true
+      },
+      "fallback": {
+        "schemaRef": "domain.schema.json#/$defs/Fallback",
+        "readableRequired": true,
+        "rawRequired": true,
+        "inert": true
+      },
+      "renderer": {
+        "adapterId": "block.callout.v1",
+        "missingRenderer": "readable_fallback"
+      },
+      "textExtraction": {
+        "adapterId": "block.callout.text.v1",
+        "mode": "structured_text",
+        "includeRawExecutableContent": false
+      },
+      "import": {
+        "representation": "registry_envelope",
+        "unknownInput": "unsupported_external",
+        "retainProvenance": true
+      },
+      "export": {
+        "native": "lossless_envelope",
+        "portable": "readable_plus_raw_sidecar",
+        "adapterId": "block.callout.export.v1"
+      },
+      "ai": {
+        "representation": "typed_data_with_location",
+        "writable": true,
+        "untrusted": true,
+        "adapterId": "block.callout.ai.v1"
+      }
+    },
+    {
+      "family": "block",
+      "type": "divider",
+      "schemaVersion": 1,
+      "schemaRef": "domain.schema.json#/$defs/block_divider_v1",
+      "nativeEditingRelease": "P0",
+      "p0Mode": "editable",
+      "serialization": {
+        "format": "json",
+        "envelopeVersion": 1,
+        "canonicalization": "rfc8785",
+        "unknownFields": "retain_in_fallback"
+      },
+      "migration": {
+        "fromVersions": [],
+        "policy": "explicit_pure_version_step",
+        "preserveOriginal": true
+      },
+      "fallback": {
+        "schemaRef": "domain.schema.json#/$defs/Fallback",
+        "readableRequired": true,
+        "rawRequired": true,
+        "inert": true
+      },
+      "renderer": {
+        "adapterId": "block.divider.v1",
+        "missingRenderer": "readable_fallback"
+      },
+      "textExtraction": {
+        "adapterId": "block.divider.text.v1",
+        "mode": "structured_text",
+        "includeRawExecutableContent": false
+      },
+      "import": {
+        "representation": "registry_envelope",
+        "unknownInput": "unsupported_external",
+        "retainProvenance": true
+      },
+      "export": {
+        "native": "lossless_envelope",
+        "portable": "readable_plus_raw_sidecar",
+        "adapterId": "block.divider.export.v1"
+      },
+      "ai": {
+        "representation": "typed_data_with_location",
+        "writable": true,
+        "untrusted": true,
+        "adapterId": "block.divider.ai.v1"
+      }
+    },
+    {
+      "family": "block",
+      "type": "code",
+      "schemaVersion": 1,
+      "schemaRef": "domain.schema.json#/$defs/block_code_v1",
+      "nativeEditingRelease": "P0",
+      "p0Mode": "editable",
+      "serialization": {
+        "format": "json",
+        "envelopeVersion": 1,
+        "canonicalization": "rfc8785",
+        "unknownFields": "retain_in_fallback"
+      },
+      "migration": {
+        "fromVersions": [],
+        "policy": "explicit_pure_version_step",
+        "preserveOriginal": true
+      },
+      "fallback": {
+        "schemaRef": "domain.schema.json#/$defs/Fallback",
+        "readableRequired": true,
+        "rawRequired": true,
+        "inert": true
+      },
+      "renderer": {
+        "adapterId": "block.code.v1",
+        "missingRenderer": "readable_fallback"
+      },
+      "textExtraction": {
+        "adapterId": "block.code.text.v1",
+        "mode": "structured_text",
+        "includeRawExecutableContent": false
+      },
+      "import": {
+        "representation": "registry_envelope",
+        "unknownInput": "unsupported_external",
+        "retainProvenance": true
+      },
+      "export": {
+        "native": "lossless_envelope",
+        "portable": "readable_plus_raw_sidecar",
+        "adapterId": "block.code.export.v1"
+      },
+      "ai": {
+        "representation": "typed_data_with_location",
+        "writable": true,
+        "untrusted": true,
+        "adapterId": "block.code.ai.v1"
+      }
+    },
+    {
+      "family": "block",
+      "type": "mermaid",
+      "schemaVersion": 1,
+      "schemaRef": "domain.schema.json#/$defs/block_mermaid_v1",
+      "nativeEditingRelease": "P0",
+      "p0Mode": "editable",
+      "serialization": {
+        "format": "json",
+        "envelopeVersion": 1,
+        "canonicalization": "rfc8785",
+        "unknownFields": "retain_in_fallback"
+      },
+      "migration": {
+        "fromVersions": [],
+        "policy": "explicit_pure_version_step",
+        "preserveOriginal": true
+      },
+      "fallback": {
+        "schemaRef": "domain.schema.json#/$defs/Fallback",
+        "readableRequired": true,
+        "rawRequired": true,
+        "inert": true
+      },
+      "renderer": {
+        "adapterId": "block.mermaid.v1",
+        "missingRenderer": "readable_fallback"
+      },
+      "textExtraction": {
+        "adapterId": "block.mermaid.text.v1",
+        "mode": "structured_text",
+        "includeRawExecutableContent": false
+      },
+      "import": {
+        "representation": "registry_envelope",
+        "unknownInput": "unsupported_external",
+        "retainProvenance": true
+      },
+      "export": {
+        "native": "lossless_envelope",
+        "portable": "readable_plus_raw_sidecar",
+        "adapterId": "block.mermaid.export.v1"
+      },
+      "ai": {
+        "representation": "typed_data_with_location",
+        "writable": true,
+        "untrusted": true,
+        "adapterId": "block.mermaid.ai.v1"
+      }
+    },
+    {
+      "family": "block",
+      "type": "equation",
+      "schemaVersion": 1,
+      "schemaRef": "domain.schema.json#/$defs/block_equation_v1",
+      "nativeEditingRelease": "P0",
+      "p0Mode": "editable",
+      "serialization": {
+        "format": "json",
+        "envelopeVersion": 1,
+        "canonicalization": "rfc8785",
+        "unknownFields": "retain_in_fallback"
+      },
+      "migration": {
+        "fromVersions": [],
+        "policy": "explicit_pure_version_step",
+        "preserveOriginal": true
+      },
+      "fallback": {
+        "schemaRef": "domain.schema.json#/$defs/Fallback",
+        "readableRequired": true,
+        "rawRequired": true,
+        "inert": true
+      },
+      "renderer": {
+        "adapterId": "block.equation.v1",
+        "missingRenderer": "readable_fallback"
+      },
+      "textExtraction": {
+        "adapterId": "block.equation.text.v1",
+        "mode": "structured_text",
+        "includeRawExecutableContent": false
+      },
+      "import": {
+        "representation": "registry_envelope",
+        "unknownInput": "unsupported_external",
+        "retainProvenance": true
+      },
+      "export": {
+        "native": "lossless_envelope",
+        "portable": "readable_plus_raw_sidecar",
+        "adapterId": "block.equation.export.v1"
+      },
+      "ai": {
+        "representation": "typed_data_with_location",
+        "writable": true,
+        "untrusted": true,
+        "adapterId": "block.equation.ai.v1"
+      }
+    },
+    {
+      "family": "block",
+      "type": "table",
+      "schemaVersion": 1,
+      "schemaRef": "domain.schema.json#/$defs/block_table_v1",
+      "nativeEditingRelease": "P0",
+      "p0Mode": "editable",
+      "serialization": {
+        "format": "json",
+        "envelopeVersion": 1,
+        "canonicalization": "rfc8785",
+        "unknownFields": "retain_in_fallback"
+      },
+      "migration": {
+        "fromVersions": [],
+        "policy": "explicit_pure_version_step",
+        "preserveOriginal": true
+      },
+      "fallback": {
+        "schemaRef": "domain.schema.json#/$defs/Fallback",
+        "readableRequired": true,
+        "rawRequired": true,
+        "inert": true
+      },
+      "renderer": {
+        "adapterId": "block.table.v1",
+        "missingRenderer": "readable_fallback"
+      },
+      "textExtraction": {
+        "adapterId": "block.table.text.v1",
+        "mode": "structured_text",
+        "includeRawExecutableContent": false
+      },
+      "import": {
+        "representation": "registry_envelope",
+        "unknownInput": "unsupported_external",
+        "retainProvenance": true
+      },
+      "export": {
+        "native": "lossless_envelope",
+        "portable": "readable_plus_raw_sidecar",
+        "adapterId": "block.table.export.v1"
+      },
+      "ai": {
+        "representation": "typed_data_with_location",
+        "writable": true,
+        "untrusted": true,
+        "adapterId": "block.table.ai.v1"
+      }
+    },
+    {
+      "family": "block",
+      "type": "image",
+      "schemaVersion": 1,
+      "schemaRef": "domain.schema.json#/$defs/block_image_v1",
+      "nativeEditingRelease": "P0",
+      "p0Mode": "editable",
+      "serialization": {
+        "format": "json",
+        "envelopeVersion": 1,
+        "canonicalization": "rfc8785",
+        "unknownFields": "retain_in_fallback"
+      },
+      "migration": {
+        "fromVersions": [],
+        "policy": "explicit_pure_version_step",
+        "preserveOriginal": true
+      },
+      "fallback": {
+        "schemaRef": "domain.schema.json#/$defs/Fallback",
+        "readableRequired": true,
+        "rawRequired": true,
+        "inert": true
+      },
+      "renderer": {
+        "adapterId": "block.image.v1",
+        "missingRenderer": "readable_fallback"
+      },
+      "textExtraction": {
+        "adapterId": "block.image.text.v1",
+        "mode": "structured_text",
+        "includeRawExecutableContent": false
+      },
+      "import": {
+        "representation": "registry_envelope",
+        "unknownInput": "unsupported_external",
+        "retainProvenance": true
+      },
+      "export": {
+        "native": "lossless_envelope",
+        "portable": "readable_plus_raw_sidecar",
+        "adapterId": "block.image.export.v1"
+      },
+      "ai": {
+        "representation": "typed_data_with_location",
+        "writable": true,
+        "untrusted": true,
+        "adapterId": "block.image.ai.v1"
+      }
+    },
+    {
+      "family": "block",
+      "type": "audio",
+      "schemaVersion": 1,
+      "schemaRef": "domain.schema.json#/$defs/block_audio_v1",
+      "nativeEditingRelease": "P0",
+      "p0Mode": "editable",
+      "serialization": {
+        "format": "json",
+        "envelopeVersion": 1,
+        "canonicalization": "rfc8785",
+        "unknownFields": "retain_in_fallback"
+      },
+      "migration": {
+        "fromVersions": [],
+        "policy": "explicit_pure_version_step",
+        "preserveOriginal": true
+      },
+      "fallback": {
+        "schemaRef": "domain.schema.json#/$defs/Fallback",
+        "readableRequired": true,
+        "rawRequired": true,
+        "inert": true
+      },
+      "renderer": {
+        "adapterId": "block.audio.v1",
+        "missingRenderer": "readable_fallback"
+      },
+      "textExtraction": {
+        "adapterId": "block.audio.text.v1",
+        "mode": "structured_text",
+        "includeRawExecutableContent": false
+      },
+      "import": {
+        "representation": "registry_envelope",
+        "unknownInput": "unsupported_external",
+        "retainProvenance": true
+      },
+      "export": {
+        "native": "lossless_envelope",
+        "portable": "readable_plus_raw_sidecar",
+        "adapterId": "block.audio.export.v1"
+      },
+      "ai": {
+        "representation": "typed_data_with_location",
+        "writable": true,
+        "untrusted": true,
+        "adapterId": "block.audio.ai.v1"
+      }
+    },
+    {
+      "family": "block",
+      "type": "video",
+      "schemaVersion": 1,
+      "schemaRef": "domain.schema.json#/$defs/block_video_v1",
+      "nativeEditingRelease": "P0",
+      "p0Mode": "editable",
+      "serialization": {
+        "format": "json",
+        "envelopeVersion": 1,
+        "canonicalization": "rfc8785",
+        "unknownFields": "retain_in_fallback"
+      },
+      "migration": {
+        "fromVersions": [],
+        "policy": "explicit_pure_version_step",
+        "preserveOriginal": true
+      },
+      "fallback": {
+        "schemaRef": "domain.schema.json#/$defs/Fallback",
+        "readableRequired": true,
+        "rawRequired": true,
+        "inert": true
+      },
+      "renderer": {
+        "adapterId": "block.video.v1",
+        "missingRenderer": "readable_fallback"
+      },
+      "textExtraction": {
+        "adapterId": "block.video.text.v1",
+        "mode": "structured_text",
+        "includeRawExecutableContent": false
+      },
+      "import": {
+        "representation": "registry_envelope",
+        "unknownInput": "unsupported_external",
+        "retainProvenance": true
+      },
+      "export": {
+        "native": "lossless_envelope",
+        "portable": "readable_plus_raw_sidecar",
+        "adapterId": "block.video.export.v1"
+      },
+      "ai": {
+        "representation": "typed_data_with_location",
+        "writable": true,
+        "untrusted": true,
+        "adapterId": "block.video.ai.v1"
+      }
+    },
+    {
+      "family": "block",
+      "type": "file",
+      "schemaVersion": 1,
+      "schemaRef": "domain.schema.json#/$defs/block_file_v1",
+      "nativeEditingRelease": "P0",
+      "p0Mode": "editable",
+      "serialization": {
+        "format": "json",
+        "envelopeVersion": 1,
+        "canonicalization": "rfc8785",
+        "unknownFields": "retain_in_fallback"
+      },
+      "migration": {
+        "fromVersions": [],
+        "policy": "explicit_pure_version_step",
+        "preserveOriginal": true
+      },
+      "fallback": {
+        "schemaRef": "domain.schema.json#/$defs/Fallback",
+        "readableRequired": true,
+        "rawRequired": true,
+        "inert": true
+      },
+      "renderer": {
+        "adapterId": "block.file.v1",
+        "missingRenderer": "readable_fallback"
+      },
+      "textExtraction": {
+        "adapterId": "block.file.text.v1",
+        "mode": "structured_text",
+        "includeRawExecutableContent": false
+      },
+      "import": {
+        "representation": "registry_envelope",
+        "unknownInput": "unsupported_external",
+        "retainProvenance": true
+      },
+      "export": {
+        "native": "lossless_envelope",
+        "portable": "readable_plus_raw_sidecar",
+        "adapterId": "block.file.export.v1"
+      },
+      "ai": {
+        "representation": "typed_data_with_location",
+        "writable": true,
+        "untrusted": true,
+        "adapterId": "block.file.ai.v1"
+      }
+    },
+    {
+      "family": "block",
+      "type": "pdf",
+      "schemaVersion": 1,
+      "schemaRef": "domain.schema.json#/$defs/block_pdf_v1",
+      "nativeEditingRelease": "P0",
+      "p0Mode": "editable",
+      "serialization": {
+        "format": "json",
+        "envelopeVersion": 1,
+        "canonicalization": "rfc8785",
+        "unknownFields": "retain_in_fallback"
+      },
+      "migration": {
+        "fromVersions": [],
+        "policy": "explicit_pure_version_step",
+        "preserveOriginal": true
+      },
+      "fallback": {
+        "schemaRef": "domain.schema.json#/$defs/Fallback",
+        "readableRequired": true,
+        "rawRequired": true,
+        "inert": true
+      },
+      "renderer": {
+        "adapterId": "block.pdf.v1",
+        "missingRenderer": "readable_fallback"
+      },
+      "textExtraction": {
+        "adapterId": "block.pdf.text.v1",
+        "mode": "structured_text",
+        "includeRawExecutableContent": false
+      },
+      "import": {
+        "representation": "registry_envelope",
+        "unknownInput": "unsupported_external",
+        "retainProvenance": true
+      },
+      "export": {
+        "native": "lossless_envelope",
+        "portable": "readable_plus_raw_sidecar",
+        "adapterId": "block.pdf.export.v1"
+      },
+      "ai": {
+        "representation": "typed_data_with_location",
+        "writable": true,
+        "untrusted": true,
+        "adapterId": "block.pdf.ai.v1"
+      }
+    },
+    {
+      "family": "block",
+      "type": "bookmark",
+      "schemaVersion": 1,
+      "schemaRef": "domain.schema.json#/$defs/block_bookmark_v1",
+      "nativeEditingRelease": "P1",
+      "p0Mode": "preserve",
+      "serialization": {
+        "format": "json",
+        "envelopeVersion": 1,
+        "canonicalization": "rfc8785",
+        "unknownFields": "retain_in_fallback"
+      },
+      "migration": {
+        "fromVersions": [],
+        "policy": "explicit_pure_version_step",
+        "preserveOriginal": true
+      },
+      "fallback": {
+        "schemaRef": "domain.schema.json#/$defs/Fallback",
+        "readableRequired": true,
+        "rawRequired": true,
+        "inert": true
+      },
+      "renderer": {
+        "adapterId": "block.bookmark.v1",
+        "missingRenderer": "readable_fallback"
+      },
+      "textExtraction": {
+        "adapterId": "block.bookmark.text.v1",
+        "mode": "readable_fallback",
+        "includeRawExecutableContent": false
+      },
+      "import": {
+        "representation": "registry_envelope",
+        "unknownInput": "unsupported_external",
+        "retainProvenance": true
+      },
+      "export": {
+        "native": "lossless_envelope",
+        "portable": "readable_plus_raw_sidecar",
+        "adapterId": "block.bookmark.export.v1"
+      },
+      "ai": {
+        "representation": "typed_data_with_location",
+        "writable": false,
+        "untrusted": true,
+        "adapterId": "block.bookmark.ai.v1"
+      }
+    },
+    {
+      "family": "block",
+      "type": "embed",
+      "schemaVersion": 1,
+      "schemaRef": "domain.schema.json#/$defs/block_embed_v1",
+      "nativeEditingRelease": "P1",
+      "p0Mode": "preserve",
+      "serialization": {
+        "format": "json",
+        "envelopeVersion": 1,
+        "canonicalization": "rfc8785",
+        "unknownFields": "retain_in_fallback"
+      },
+      "migration": {
+        "fromVersions": [],
+        "policy": "explicit_pure_version_step",
+        "preserveOriginal": true
+      },
+      "fallback": {
+        "schemaRef": "domain.schema.json#/$defs/Fallback",
+        "readableRequired": true,
+        "rawRequired": true,
+        "inert": true
+      },
+      "renderer": {
+        "adapterId": "block.embed.v1",
+        "missingRenderer": "readable_fallback"
+      },
+      "textExtraction": {
+        "adapterId": "block.embed.text.v1",
+        "mode": "readable_fallback",
+        "includeRawExecutableContent": false
+      },
+      "import": {
+        "representation": "registry_envelope",
+        "unknownInput": "unsupported_external",
+        "retainProvenance": true
+      },
+      "export": {
+        "native": "lossless_envelope",
+        "portable": "readable_plus_raw_sidecar",
+        "adapterId": "block.embed.export.v1"
+      },
+      "ai": {
+        "representation": "typed_data_with_location",
+        "writable": false,
+        "untrusted": true,
+        "adapterId": "block.embed.ai.v1"
+      }
+    },
+    {
+      "family": "block",
+      "type": "columns",
+      "schemaVersion": 1,
+      "schemaRef": "domain.schema.json#/$defs/block_columns_v1",
+      "nativeEditingRelease": "P1",
+      "p0Mode": "preserve",
+      "serialization": {
+        "format": "json",
+        "envelopeVersion": 1,
+        "canonicalization": "rfc8785",
+        "unknownFields": "retain_in_fallback"
+      },
+      "migration": {
+        "fromVersions": [],
+        "policy": "explicit_pure_version_step",
+        "preserveOriginal": true
+      },
+      "fallback": {
+        "schemaRef": "domain.schema.json#/$defs/Fallback",
+        "readableRequired": true,
+        "rawRequired": true,
+        "inert": true
+      },
+      "renderer": {
+        "adapterId": "block.columns.v1",
+        "missingRenderer": "readable_fallback"
+      },
+      "textExtraction": {
+        "adapterId": "block.columns.text.v1",
+        "mode": "readable_fallback",
+        "includeRawExecutableContent": false
+      },
+      "import": {
+        "representation": "registry_envelope",
+        "unknownInput": "unsupported_external",
+        "retainProvenance": true
+      },
+      "export": {
+        "native": "lossless_envelope",
+        "portable": "readable_plus_raw_sidecar",
+        "adapterId": "block.columns.export.v1"
+      },
+      "ai": {
+        "representation": "typed_data_with_location",
+        "writable": false,
+        "untrusted": true,
+        "adapterId": "block.columns.ai.v1"
+      }
+    },
+    {
+      "family": "block",
+      "type": "synced_block",
+      "schemaVersion": 1,
+      "schemaRef": "domain.schema.json#/$defs/block_synced_block_v1",
+      "nativeEditingRelease": "P1",
+      "p0Mode": "preserve",
+      "serialization": {
+        "format": "json",
+        "envelopeVersion": 1,
+        "canonicalization": "rfc8785",
+        "unknownFields": "retain_in_fallback"
+      },
+      "migration": {
+        "fromVersions": [],
+        "policy": "explicit_pure_version_step",
+        "preserveOriginal": true
+      },
+      "fallback": {
+        "schemaRef": "domain.schema.json#/$defs/Fallback",
+        "readableRequired": true,
+        "rawRequired": true,
+        "inert": true
+      },
+      "renderer": {
+        "adapterId": "block.synced_block.v1",
+        "missingRenderer": "readable_fallback"
+      },
+      "textExtraction": {
+        "adapterId": "block.synced_block.text.v1",
+        "mode": "readable_fallback",
+        "includeRawExecutableContent": false
+      },
+      "import": {
+        "representation": "registry_envelope",
+        "unknownInput": "unsupported_external",
+        "retainProvenance": true
+      },
+      "export": {
+        "native": "lossless_envelope",
+        "portable": "readable_plus_raw_sidecar",
+        "adapterId": "block.synced_block.export.v1"
+      },
+      "ai": {
+        "representation": "typed_data_with_location",
+        "writable": false,
+        "untrusted": true,
+        "adapterId": "block.synced_block.ai.v1"
+      }
+    },
+    {
+      "family": "block",
+      "type": "breadcrumb",
+      "schemaVersion": 1,
+      "schemaRef": "domain.schema.json#/$defs/block_breadcrumb_v1",
+      "nativeEditingRelease": "P1",
+      "p0Mode": "preserve",
+      "serialization": {
+        "format": "json",
+        "envelopeVersion": 1,
+        "canonicalization": "rfc8785",
+        "unknownFields": "retain_in_fallback"
+      },
+      "migration": {
+        "fromVersions": [],
+        "policy": "explicit_pure_version_step",
+        "preserveOriginal": true
+      },
+      "fallback": {
+        "schemaRef": "domain.schema.json#/$defs/Fallback",
+        "readableRequired": true,
+        "rawRequired": true,
+        "inert": true
+      },
+      "renderer": {
+        "adapterId": "block.breadcrumb.v1",
+        "missingRenderer": "readable_fallback"
+      },
+      "textExtraction": {
+        "adapterId": "block.breadcrumb.text.v1",
+        "mode": "readable_fallback",
+        "includeRawExecutableContent": false
+      },
+      "import": {
+        "representation": "registry_envelope",
+        "unknownInput": "unsupported_external",
+        "retainProvenance": true
+      },
+      "export": {
+        "native": "lossless_envelope",
+        "portable": "readable_plus_raw_sidecar",
+        "adapterId": "block.breadcrumb.export.v1"
+      },
+      "ai": {
+        "representation": "typed_data_with_location",
+        "writable": false,
+        "untrusted": true,
+        "adapterId": "block.breadcrumb.ai.v1"
+      }
+    },
+    {
+      "family": "block",
+      "type": "table_of_contents",
+      "schemaVersion": 1,
+      "schemaRef": "domain.schema.json#/$defs/block_table_of_contents_v1",
+      "nativeEditingRelease": "P1",
+      "p0Mode": "preserve",
+      "serialization": {
+        "format": "json",
+        "envelopeVersion": 1,
+        "canonicalization": "rfc8785",
+        "unknownFields": "retain_in_fallback"
+      },
+      "migration": {
+        "fromVersions": [],
+        "policy": "explicit_pure_version_step",
+        "preserveOriginal": true
+      },
+      "fallback": {
+        "schemaRef": "domain.schema.json#/$defs/Fallback",
+        "readableRequired": true,
+        "rawRequired": true,
+        "inert": true
+      },
+      "renderer": {
+        "adapterId": "block.table_of_contents.v1",
+        "missingRenderer": "readable_fallback"
+      },
+      "textExtraction": {
+        "adapterId": "block.table_of_contents.text.v1",
+        "mode": "readable_fallback",
+        "includeRawExecutableContent": false
+      },
+      "import": {
+        "representation": "registry_envelope",
+        "unknownInput": "unsupported_external",
+        "retainProvenance": true
+      },
+      "export": {
+        "native": "lossless_envelope",
+        "portable": "readable_plus_raw_sidecar",
+        "adapterId": "block.table_of_contents.export.v1"
+      },
+      "ai": {
+        "representation": "typed_data_with_location",
+        "writable": false,
+        "untrusted": true,
+        "adapterId": "block.table_of_contents.ai.v1"
+      }
+    },
+    {
+      "family": "block",
+      "type": "page_mention",
+      "schemaVersion": 1,
+      "schemaRef": "domain.schema.json#/$defs/block_page_mention_v1",
+      "nativeEditingRelease": "P1",
+      "p0Mode": "preserve",
+      "serialization": {
+        "format": "json",
+        "envelopeVersion": 1,
+        "canonicalization": "rfc8785",
+        "unknownFields": "retain_in_fallback"
+      },
+      "migration": {
+        "fromVersions": [],
+        "policy": "explicit_pure_version_step",
+        "preserveOriginal": true
+      },
+      "fallback": {
+        "schemaRef": "domain.schema.json#/$defs/Fallback",
+        "readableRequired": true,
+        "rawRequired": true,
+        "inert": true
+      },
+      "renderer": {
+        "adapterId": "block.page_mention.v1",
+        "missingRenderer": "readable_fallback"
+      },
+      "textExtraction": {
+        "adapterId": "block.page_mention.text.v1",
+        "mode": "readable_fallback",
+        "includeRawExecutableContent": false
+      },
+      "import": {
+        "representation": "registry_envelope",
+        "unknownInput": "unsupported_external",
+        "retainProvenance": true
+      },
+      "export": {
+        "native": "lossless_envelope",
+        "portable": "readable_plus_raw_sidecar",
+        "adapterId": "block.page_mention.export.v1"
+      },
+      "ai": {
+        "representation": "typed_data_with_location",
+        "writable": false,
+        "untrusted": true,
+        "adapterId": "block.page_mention.ai.v1"
+      }
+    },
+    {
+      "family": "block",
+      "type": "date_mention",
+      "schemaVersion": 1,
+      "schemaRef": "domain.schema.json#/$defs/block_date_mention_v1",
+      "nativeEditingRelease": "P1",
+      "p0Mode": "preserve",
+      "serialization": {
+        "format": "json",
+        "envelopeVersion": 1,
+        "canonicalization": "rfc8785",
+        "unknownFields": "retain_in_fallback"
+      },
+      "migration": {
+        "fromVersions": [],
+        "policy": "explicit_pure_version_step",
+        "preserveOriginal": true
+      },
+      "fallback": {
+        "schemaRef": "domain.schema.json#/$defs/Fallback",
+        "readableRequired": true,
+        "rawRequired": true,
+        "inert": true
+      },
+      "renderer": {
+        "adapterId": "block.date_mention.v1",
+        "missingRenderer": "readable_fallback"
+      },
+      "textExtraction": {
+        "adapterId": "block.date_mention.text.v1",
+        "mode": "readable_fallback",
+        "includeRawExecutableContent": false
+      },
+      "import": {
+        "representation": "registry_envelope",
+        "unknownInput": "unsupported_external",
+        "retainProvenance": true
+      },
+      "export": {
+        "native": "lossless_envelope",
+        "portable": "readable_plus_raw_sidecar",
+        "adapterId": "block.date_mention.export.v1"
+      },
+      "ai": {
+        "representation": "typed_data_with_location",
+        "writable": false,
+        "untrusted": true,
+        "adapterId": "block.date_mention.ai.v1"
+      }
+    },
+    {
+      "family": "block",
+      "type": "button",
+      "schemaVersion": 1,
+      "schemaRef": "domain.schema.json#/$defs/block_button_v1",
+      "nativeEditingRelease": "P1",
+      "p0Mode": "preserve",
+      "serialization": {
+        "format": "json",
+        "envelopeVersion": 1,
+        "canonicalization": "rfc8785",
+        "unknownFields": "retain_in_fallback"
+      },
+      "migration": {
+        "fromVersions": [],
+        "policy": "explicit_pure_version_step",
+        "preserveOriginal": true
+      },
+      "fallback": {
+        "schemaRef": "domain.schema.json#/$defs/Fallback",
+        "readableRequired": true,
+        "rawRequired": true,
+        "inert": true
+      },
+      "renderer": {
+        "adapterId": "block.button.v1",
+        "missingRenderer": "readable_fallback"
+      },
+      "textExtraction": {
+        "adapterId": "block.button.text.v1",
+        "mode": "readable_fallback",
+        "includeRawExecutableContent": false
+      },
+      "import": {
+        "representation": "registry_envelope",
+        "unknownInput": "unsupported_external",
+        "retainProvenance": true
+      },
+      "export": {
+        "native": "lossless_envelope",
+        "portable": "readable_plus_raw_sidecar",
+        "adapterId": "block.button.export.v1"
+      },
+      "ai": {
+        "representation": "typed_data_with_location",
+        "writable": false,
+        "untrusted": true,
+        "adapterId": "block.button.ai.v1"
+      }
+    },
+    {
+      "family": "block",
+      "type": "unsupported_external",
+      "schemaVersion": 1,
+      "schemaRef": "domain.schema.json#/$defs/block_unsupported_external_v1",
+      "nativeEditingRelease": "P0",
+      "p0Mode": "editable",
+      "serialization": {
+        "format": "json",
+        "envelopeVersion": 1,
+        "canonicalization": "rfc8785",
+        "unknownFields": "retain_in_fallback"
+      },
+      "migration": {
+        "fromVersions": [],
+        "policy": "explicit_pure_version_step",
+        "preserveOriginal": true
+      },
+      "fallback": {
+        "schemaRef": "domain.schema.json#/$defs/Fallback",
+        "readableRequired": true,
+        "rawRequired": true,
+        "inert": true
+      },
+      "renderer": {
+        "adapterId": "block.unsupported_external.v1",
+        "missingRenderer": "readable_fallback"
+      },
+      "textExtraction": {
+        "adapterId": "block.unsupported_external.text.v1",
+        "mode": "readable_fallback",
+        "includeRawExecutableContent": false
+      },
+      "import": {
+        "representation": "registry_envelope",
+        "unknownInput": "unsupported_external",
+        "retainProvenance": true
+      },
+      "export": {
+        "native": "lossless_envelope",
+        "portable": "readable_plus_raw_sidecar",
+        "adapterId": "block.unsupported_external.export.v1"
+      },
+      "ai": {
+        "representation": "typed_data_with_location",
+        "writable": false,
+        "untrusted": true,
+        "adapterId": "block.unsupported_external.ai.v1"
+      }
+    },
+    {
+      "family": "block",
+      "type": "tab_container",
+      "schemaVersion": 1,
+      "schemaRef": "domain.schema.json#/$defs/block_tab_container_v1",
+      "nativeEditingRelease": "P1",
+      "p0Mode": "preserve",
+      "serialization": {
+        "format": "json",
+        "envelopeVersion": 1,
+        "canonicalization": "rfc8785",
+        "unknownFields": "retain_in_fallback"
+      },
+      "migration": {
+        "fromVersions": [],
+        "policy": "explicit_pure_version_step",
+        "preserveOriginal": true
+      },
+      "fallback": {
+        "schemaRef": "domain.schema.json#/$defs/Fallback",
+        "readableRequired": true,
+        "rawRequired": true,
+        "inert": true
+      },
+      "renderer": {
+        "adapterId": "block.tab_container.v1",
+        "missingRenderer": "readable_fallback"
+      },
+      "textExtraction": {
+        "adapterId": "block.tab_container.text.v1",
+        "mode": "readable_fallback",
+        "includeRawExecutableContent": false
+      },
+      "import": {
+        "representation": "registry_envelope",
+        "unknownInput": "unsupported_external",
+        "retainProvenance": true
+      },
+      "export": {
+        "native": "lossless_envelope",
+        "portable": "readable_plus_raw_sidecar",
+        "adapterId": "block.tab_container.export.v1"
+      },
+      "ai": {
+        "representation": "typed_data_with_location",
+        "writable": false,
+        "untrusted": true,
+        "adapterId": "block.tab_container.ai.v1"
+      }
+    },
+    {
+      "family": "property",
+      "type": "title",
+      "schemaVersion": 1,
+      "schemaRef": "domain.schema.json#/$defs/property_title_v1",
+      "nativeEditingRelease": "P0",
+      "p0Mode": "editable",
+      "serialization": {
+        "format": "json",
+        "envelopeVersion": 1,
+        "canonicalization": "rfc8785",
+        "unknownFields": "retain_in_fallback"
+      },
+      "migration": {
+        "fromVersions": [],
+        "policy": "explicit_pure_version_step",
+        "preserveOriginal": true
+      },
+      "fallback": {
+        "schemaRef": "domain.schema.json#/$defs/Fallback",
+        "readableRequired": true,
+        "rawRequired": true,
+        "inert": true
+      },
+      "renderer": {
+        "adapterId": "property.title.v1",
+        "missingRenderer": "readable_fallback"
+      },
+      "textExtraction": {
+        "adapterId": "property.title.text.v1",
+        "mode": "referenced_record",
+        "includeRawExecutableContent": false
+      },
+      "import": {
+        "representation": "registry_envelope",
+        "unknownInput": "unsupported_external",
+        "retainProvenance": true
+      },
+      "export": {
+        "native": "lossless_envelope",
+        "portable": "readable_plus_raw_sidecar",
+        "adapterId": "property.title.export.v1"
+      },
+      "ai": {
+        "representation": "typed_data_with_location",
+        "writable": false,
+        "untrusted": true,
+        "adapterId": "property.title.ai.v1"
+      },
+      "configSchemaRef": "domain.schema.json#/$defs/property_title_config_v1"
+    },
+    {
+      "family": "property",
+      "type": "text",
+      "schemaVersion": 1,
+      "schemaRef": "domain.schema.json#/$defs/property_text_v1",
+      "nativeEditingRelease": "P0",
+      "p0Mode": "editable",
+      "serialization": {
+        "format": "json",
+        "envelopeVersion": 1,
+        "canonicalization": "rfc8785",
+        "unknownFields": "retain_in_fallback"
+      },
+      "migration": {
+        "fromVersions": [],
+        "policy": "explicit_pure_version_step",
+        "preserveOriginal": true
+      },
+      "fallback": {
+        "schemaRef": "domain.schema.json#/$defs/Fallback",
+        "readableRequired": true,
+        "rawRequired": true,
+        "inert": true
+      },
+      "renderer": {
+        "adapterId": "property.text.v1",
+        "missingRenderer": "readable_fallback"
+      },
+      "textExtraction": {
+        "adapterId": "property.text.text.v1",
+        "mode": "structured_text",
+        "includeRawExecutableContent": false
+      },
+      "import": {
+        "representation": "registry_envelope",
+        "unknownInput": "unsupported_external",
+        "retainProvenance": true
+      },
+      "export": {
+        "native": "lossless_envelope",
+        "portable": "readable_plus_raw_sidecar",
+        "adapterId": "property.text.export.v1"
+      },
+      "ai": {
+        "representation": "typed_data_with_location",
+        "writable": true,
+        "untrusted": true,
+        "adapterId": "property.text.ai.v1"
+      },
+      "configSchemaRef": "domain.schema.json#/$defs/property_text_config_v1"
+    },
+    {
+      "family": "property",
+      "type": "number",
+      "schemaVersion": 1,
+      "schemaRef": "domain.schema.json#/$defs/property_number_v1",
+      "nativeEditingRelease": "P0",
+      "p0Mode": "editable",
+      "serialization": {
+        "format": "json",
+        "envelopeVersion": 1,
+        "canonicalization": "rfc8785",
+        "unknownFields": "retain_in_fallback"
+      },
+      "migration": {
+        "fromVersions": [],
+        "policy": "explicit_pure_version_step",
+        "preserveOriginal": true
+      },
+      "fallback": {
+        "schemaRef": "domain.schema.json#/$defs/Fallback",
+        "readableRequired": true,
+        "rawRequired": true,
+        "inert": true
+      },
+      "renderer": {
+        "adapterId": "property.number.v1",
+        "missingRenderer": "readable_fallback"
+      },
+      "textExtraction": {
+        "adapterId": "property.number.text.v1",
+        "mode": "structured_text",
+        "includeRawExecutableContent": false
+      },
+      "import": {
+        "representation": "registry_envelope",
+        "unknownInput": "unsupported_external",
+        "retainProvenance": true
+      },
+      "export": {
+        "native": "lossless_envelope",
+        "portable": "readable_plus_raw_sidecar",
+        "adapterId": "property.number.export.v1"
+      },
+      "ai": {
+        "representation": "typed_data_with_location",
+        "writable": true,
+        "untrusted": true,
+        "adapterId": "property.number.ai.v1"
+      },
+      "configSchemaRef": "domain.schema.json#/$defs/property_number_config_v1"
+    },
+    {
+      "family": "property",
+      "type": "select",
+      "schemaVersion": 1,
+      "schemaRef": "domain.schema.json#/$defs/property_select_v1",
+      "nativeEditingRelease": "P0",
+      "p0Mode": "editable",
+      "serialization": {
+        "format": "json",
+        "envelopeVersion": 1,
+        "canonicalization": "rfc8785",
+        "unknownFields": "retain_in_fallback"
+      },
+      "migration": {
+        "fromVersions": [],
+        "policy": "explicit_pure_version_step",
+        "preserveOriginal": true
+      },
+      "fallback": {
+        "schemaRef": "domain.schema.json#/$defs/Fallback",
+        "readableRequired": true,
+        "rawRequired": true,
+        "inert": true
+      },
+      "renderer": {
+        "adapterId": "property.select.v1",
+        "missingRenderer": "readable_fallback"
+      },
+      "textExtraction": {
+        "adapterId": "property.select.text.v1",
+        "mode": "structured_text",
+        "includeRawExecutableContent": false
+      },
+      "import": {
+        "representation": "registry_envelope",
+        "unknownInput": "unsupported_external",
+        "retainProvenance": true
+      },
+      "export": {
+        "native": "lossless_envelope",
+        "portable": "readable_plus_raw_sidecar",
+        "adapterId": "property.select.export.v1"
+      },
+      "ai": {
+        "representation": "typed_data_with_location",
+        "writable": true,
+        "untrusted": true,
+        "adapterId": "property.select.ai.v1"
+      },
+      "configSchemaRef": "domain.schema.json#/$defs/property_select_config_v1"
+    },
+    {
+      "family": "property",
+      "type": "multi_select",
+      "schemaVersion": 1,
+      "schemaRef": "domain.schema.json#/$defs/property_multi_select_v1",
+      "nativeEditingRelease": "P0",
+      "p0Mode": "editable",
+      "serialization": {
+        "format": "json",
+        "envelopeVersion": 1,
+        "canonicalization": "rfc8785",
+        "unknownFields": "retain_in_fallback"
+      },
+      "migration": {
+        "fromVersions": [],
+        "policy": "explicit_pure_version_step",
+        "preserveOriginal": true
+      },
+      "fallback": {
+        "schemaRef": "domain.schema.json#/$defs/Fallback",
+        "readableRequired": true,
+        "rawRequired": true,
+        "inert": true
+      },
+      "renderer": {
+        "adapterId": "property.multi_select.v1",
+        "missingRenderer": "readable_fallback"
+      },
+      "textExtraction": {
+        "adapterId": "property.multi_select.text.v1",
+        "mode": "structured_text",
+        "includeRawExecutableContent": false
+      },
+      "import": {
+        "representation": "registry_envelope",
+        "unknownInput": "unsupported_external",
+        "retainProvenance": true
+      },
+      "export": {
+        "native": "lossless_envelope",
+        "portable": "readable_plus_raw_sidecar",
+        "adapterId": "property.multi_select.export.v1"
+      },
+      "ai": {
+        "representation": "typed_data_with_location",
+        "writable": true,
+        "untrusted": true,
+        "adapterId": "property.multi_select.ai.v1"
+      },
+      "configSchemaRef": "domain.schema.json#/$defs/property_multi_select_config_v1"
+    },
+    {
+      "family": "property",
+      "type": "status",
+      "schemaVersion": 1,
+      "schemaRef": "domain.schema.json#/$defs/property_status_v1",
+      "nativeEditingRelease": "P0",
+      "p0Mode": "editable",
+      "serialization": {
+        "format": "json",
+        "envelopeVersion": 1,
+        "canonicalization": "rfc8785",
+        "unknownFields": "retain_in_fallback"
+      },
+      "migration": {
+        "fromVersions": [],
+        "policy": "explicit_pure_version_step",
+        "preserveOriginal": true
+      },
+      "fallback": {
+        "schemaRef": "domain.schema.json#/$defs/Fallback",
+        "readableRequired": true,
+        "rawRequired": true,
+        "inert": true
+      },
+      "renderer": {
+        "adapterId": "property.status.v1",
+        "missingRenderer": "readable_fallback"
+      },
+      "textExtraction": {
+        "adapterId": "property.status.text.v1",
+        "mode": "structured_text",
+        "includeRawExecutableContent": false
+      },
+      "import": {
+        "representation": "registry_envelope",
+        "unknownInput": "unsupported_external",
+        "retainProvenance": true
+      },
+      "export": {
+        "native": "lossless_envelope",
+        "portable": "readable_plus_raw_sidecar",
+        "adapterId": "property.status.export.v1"
+      },
+      "ai": {
+        "representation": "typed_data_with_location",
+        "writable": true,
+        "untrusted": true,
+        "adapterId": "property.status.ai.v1"
+      },
+      "configSchemaRef": "domain.schema.json#/$defs/property_status_config_v1"
+    },
+    {
+      "family": "property",
+      "type": "checkbox",
+      "schemaVersion": 1,
+      "schemaRef": "domain.schema.json#/$defs/property_checkbox_v1",
+      "nativeEditingRelease": "P0",
+      "p0Mode": "editable",
+      "serialization": {
+        "format": "json",
+        "envelopeVersion": 1,
+        "canonicalization": "rfc8785",
+        "unknownFields": "retain_in_fallback"
+      },
+      "migration": {
+        "fromVersions": [],
+        "policy": "explicit_pure_version_step",
+        "preserveOriginal": true
+      },
+      "fallback": {
+        "schemaRef": "domain.schema.json#/$defs/Fallback",
+        "readableRequired": true,
+        "rawRequired": true,
+        "inert": true
+      },
+      "renderer": {
+        "adapterId": "property.checkbox.v1",
+        "missingRenderer": "readable_fallback"
+      },
+      "textExtraction": {
+        "adapterId": "property.checkbox.text.v1",
+        "mode": "structured_text",
+        "includeRawExecutableContent": false
+      },
+      "import": {
+        "representation": "registry_envelope",
+        "unknownInput": "unsupported_external",
+        "retainProvenance": true
+      },
+      "export": {
+        "native": "lossless_envelope",
+        "portable": "readable_plus_raw_sidecar",
+        "adapterId": "property.checkbox.export.v1"
+      },
+      "ai": {
+        "representation": "typed_data_with_location",
+        "writable": true,
+        "untrusted": true,
+        "adapterId": "property.checkbox.ai.v1"
+      },
+      "configSchemaRef": "domain.schema.json#/$defs/property_checkbox_config_v1"
+    },
+    {
+      "family": "property",
+      "type": "date",
+      "schemaVersion": 1,
+      "schemaRef": "domain.schema.json#/$defs/property_date_v1",
+      "nativeEditingRelease": "P0",
+      "p0Mode": "editable",
+      "serialization": {
+        "format": "json",
+        "envelopeVersion": 1,
+        "canonicalization": "rfc8785",
+        "unknownFields": "retain_in_fallback"
+      },
+      "migration": {
+        "fromVersions": [],
+        "policy": "explicit_pure_version_step",
+        "preserveOriginal": true
+      },
+      "fallback": {
+        "schemaRef": "domain.schema.json#/$defs/Fallback",
+        "readableRequired": true,
+        "rawRequired": true,
+        "inert": true
+      },
+      "renderer": {
+        "adapterId": "property.date.v1",
+        "missingRenderer": "readable_fallback"
+      },
+      "textExtraction": {
+        "adapterId": "property.date.text.v1",
+        "mode": "structured_text",
+        "includeRawExecutableContent": false
+      },
+      "import": {
+        "representation": "registry_envelope",
+        "unknownInput": "unsupported_external",
+        "retainProvenance": true
+      },
+      "export": {
+        "native": "lossless_envelope",
+        "portable": "readable_plus_raw_sidecar",
+        "adapterId": "property.date.export.v1"
+      },
+      "ai": {
+        "representation": "typed_data_with_location",
+        "writable": true,
+        "untrusted": true,
+        "adapterId": "property.date.ai.v1"
+      },
+      "configSchemaRef": "domain.schema.json#/$defs/property_date_config_v1"
+    },
+    {
+      "family": "property",
+      "type": "url",
+      "schemaVersion": 1,
+      "schemaRef": "domain.schema.json#/$defs/property_url_v1",
+      "nativeEditingRelease": "P0",
+      "p0Mode": "editable",
+      "serialization": {
+        "format": "json",
+        "envelopeVersion": 1,
+        "canonicalization": "rfc8785",
+        "unknownFields": "retain_in_fallback"
+      },
+      "migration": {
+        "fromVersions": [],
+        "policy": "explicit_pure_version_step",
+        "preserveOriginal": true
+      },
+      "fallback": {
+        "schemaRef": "domain.schema.json#/$defs/Fallback",
+        "readableRequired": true,
+        "rawRequired": true,
+        "inert": true
+      },
+      "renderer": {
+        "adapterId": "property.url.v1",
+        "missingRenderer": "readable_fallback"
+      },
+      "textExtraction": {
+        "adapterId": "property.url.text.v1",
+        "mode": "structured_text",
+        "includeRawExecutableContent": false
+      },
+      "import": {
+        "representation": "registry_envelope",
+        "unknownInput": "unsupported_external",
+        "retainProvenance": true
+      },
+      "export": {
+        "native": "lossless_envelope",
+        "portable": "readable_plus_raw_sidecar",
+        "adapterId": "property.url.export.v1"
+      },
+      "ai": {
+        "representation": "typed_data_with_location",
+        "writable": true,
+        "untrusted": true,
+        "adapterId": "property.url.ai.v1"
+      },
+      "configSchemaRef": "domain.schema.json#/$defs/property_url_config_v1"
+    },
+    {
+      "family": "property",
+      "type": "email",
+      "schemaVersion": 1,
+      "schemaRef": "domain.schema.json#/$defs/property_email_v1",
+      "nativeEditingRelease": "P0",
+      "p0Mode": "editable",
+      "serialization": {
+        "format": "json",
+        "envelopeVersion": 1,
+        "canonicalization": "rfc8785",
+        "unknownFields": "retain_in_fallback"
+      },
+      "migration": {
+        "fromVersions": [],
+        "policy": "explicit_pure_version_step",
+        "preserveOriginal": true
+      },
+      "fallback": {
+        "schemaRef": "domain.schema.json#/$defs/Fallback",
+        "readableRequired": true,
+        "rawRequired": true,
+        "inert": true
+      },
+      "renderer": {
+        "adapterId": "property.email.v1",
+        "missingRenderer": "readable_fallback"
+      },
+      "textExtraction": {
+        "adapterId": "property.email.text.v1",
+        "mode": "structured_text",
+        "includeRawExecutableContent": false
+      },
+      "import": {
+        "representation": "registry_envelope",
+        "unknownInput": "unsupported_external",
+        "retainProvenance": true
+      },
+      "export": {
+        "native": "lossless_envelope",
+        "portable": "readable_plus_raw_sidecar",
+        "adapterId": "property.email.export.v1"
+      },
+      "ai": {
+        "representation": "typed_data_with_location",
+        "writable": true,
+        "untrusted": true,
+        "adapterId": "property.email.ai.v1"
+      },
+      "configSchemaRef": "domain.schema.json#/$defs/property_email_config_v1"
+    },
+    {
+      "family": "property",
+      "type": "phone",
+      "schemaVersion": 1,
+      "schemaRef": "domain.schema.json#/$defs/property_phone_v1",
+      "nativeEditingRelease": "P0",
+      "p0Mode": "editable",
+      "serialization": {
+        "format": "json",
+        "envelopeVersion": 1,
+        "canonicalization": "rfc8785",
+        "unknownFields": "retain_in_fallback"
+      },
+      "migration": {
+        "fromVersions": [],
+        "policy": "explicit_pure_version_step",
+        "preserveOriginal": true
+      },
+      "fallback": {
+        "schemaRef": "domain.schema.json#/$defs/Fallback",
+        "readableRequired": true,
+        "rawRequired": true,
+        "inert": true
+      },
+      "renderer": {
+        "adapterId": "property.phone.v1",
+        "missingRenderer": "readable_fallback"
+      },
+      "textExtraction": {
+        "adapterId": "property.phone.text.v1",
+        "mode": "structured_text",
+        "includeRawExecutableContent": false
+      },
+      "import": {
+        "representation": "registry_envelope",
+        "unknownInput": "unsupported_external",
+        "retainProvenance": true
+      },
+      "export": {
+        "native": "lossless_envelope",
+        "portable": "readable_plus_raw_sidecar",
+        "adapterId": "property.phone.export.v1"
+      },
+      "ai": {
+        "representation": "typed_data_with_location",
+        "writable": true,
+        "untrusted": true,
+        "adapterId": "property.phone.ai.v1"
+      },
+      "configSchemaRef": "domain.schema.json#/$defs/property_phone_config_v1"
+    },
+    {
+      "family": "property",
+      "type": "files",
+      "schemaVersion": 1,
+      "schemaRef": "domain.schema.json#/$defs/property_files_v1",
+      "nativeEditingRelease": "P0",
+      "p0Mode": "editable",
+      "serialization": {
+        "format": "json",
+        "envelopeVersion": 1,
+        "canonicalization": "rfc8785",
+        "unknownFields": "retain_in_fallback"
+      },
+      "migration": {
+        "fromVersions": [],
+        "policy": "explicit_pure_version_step",
+        "preserveOriginal": true
+      },
+      "fallback": {
+        "schemaRef": "domain.schema.json#/$defs/Fallback",
+        "readableRequired": true,
+        "rawRequired": true,
+        "inert": true
+      },
+      "renderer": {
+        "adapterId": "property.files.v1",
+        "missingRenderer": "readable_fallback"
+      },
+      "textExtraction": {
+        "adapterId": "property.files.text.v1",
+        "mode": "structured_text",
+        "includeRawExecutableContent": false
+      },
+      "import": {
+        "representation": "registry_envelope",
+        "unknownInput": "unsupported_external",
+        "retainProvenance": true
+      },
+      "export": {
+        "native": "lossless_envelope",
+        "portable": "readable_plus_raw_sidecar",
+        "adapterId": "property.files.export.v1"
+      },
+      "ai": {
+        "representation": "typed_data_with_location",
+        "writable": true,
+        "untrusted": true,
+        "adapterId": "property.files.ai.v1"
+      },
+      "configSchemaRef": "domain.schema.json#/$defs/property_files_config_v1"
+    },
+    {
+      "family": "property",
+      "type": "relation",
+      "schemaVersion": 1,
+      "schemaRef": "domain.schema.json#/$defs/property_relation_v1",
+      "nativeEditingRelease": "P1",
+      "p0Mode": "preserve",
+      "serialization": {
+        "format": "json",
+        "envelopeVersion": 1,
+        "canonicalization": "rfc8785",
+        "unknownFields": "retain_in_fallback"
+      },
+      "migration": {
+        "fromVersions": [],
+        "policy": "explicit_pure_version_step",
+        "preserveOriginal": true
+      },
+      "fallback": {
+        "schemaRef": "domain.schema.json#/$defs/Fallback",
+        "readableRequired": true,
+        "rawRequired": true,
+        "inert": true
+      },
+      "renderer": {
+        "adapterId": "property.relation.v1",
+        "missingRenderer": "readable_fallback"
+      },
+      "textExtraction": {
+        "adapterId": "property.relation.text.v1",
+        "mode": "readable_fallback",
+        "includeRawExecutableContent": false
+      },
+      "import": {
+        "representation": "registry_envelope",
+        "unknownInput": "unsupported_external",
+        "retainProvenance": true
+      },
+      "export": {
+        "native": "lossless_envelope",
+        "portable": "readable_plus_raw_sidecar",
+        "adapterId": "property.relation.export.v1"
+      },
+      "ai": {
+        "representation": "typed_data_with_location",
+        "writable": false,
+        "untrusted": true,
+        "adapterId": "property.relation.ai.v1"
+      },
+      "configSchemaRef": "domain.schema.json#/$defs/property_relation_config_v1"
+    },
+    {
+      "family": "property",
+      "type": "rollup",
+      "schemaVersion": 1,
+      "schemaRef": "domain.schema.json#/$defs/property_rollup_v1",
+      "nativeEditingRelease": "P1",
+      "p0Mode": "preserve",
+      "serialization": {
+        "format": "json",
+        "envelopeVersion": 1,
+        "canonicalization": "rfc8785",
+        "unknownFields": "retain_in_fallback"
+      },
+      "migration": {
+        "fromVersions": [],
+        "policy": "explicit_pure_version_step",
+        "preserveOriginal": true
+      },
+      "fallback": {
+        "schemaRef": "domain.schema.json#/$defs/Fallback",
+        "readableRequired": true,
+        "rawRequired": true,
+        "inert": true
+      },
+      "renderer": {
+        "adapterId": "property.rollup.v1",
+        "missingRenderer": "readable_fallback"
+      },
+      "textExtraction": {
+        "adapterId": "property.rollup.text.v1",
+        "mode": "readable_fallback",
+        "includeRawExecutableContent": false
+      },
+      "import": {
+        "representation": "registry_envelope",
+        "unknownInput": "unsupported_external",
+        "retainProvenance": true
+      },
+      "export": {
+        "native": "lossless_envelope",
+        "portable": "readable_plus_raw_sidecar",
+        "adapterId": "property.rollup.export.v1"
+      },
+      "ai": {
+        "representation": "typed_data_with_location",
+        "writable": false,
+        "untrusted": true,
+        "adapterId": "property.rollup.ai.v1"
+      },
+      "configSchemaRef": "domain.schema.json#/$defs/property_rollup_config_v1"
+    },
+    {
+      "family": "property",
+      "type": "formula",
+      "schemaVersion": 1,
+      "schemaRef": "domain.schema.json#/$defs/property_formula_v1",
+      "nativeEditingRelease": "P1",
+      "p0Mode": "preserve",
+      "serialization": {
+        "format": "json",
+        "envelopeVersion": 1,
+        "canonicalization": "rfc8785",
+        "unknownFields": "retain_in_fallback"
+      },
+      "migration": {
+        "fromVersions": [],
+        "policy": "explicit_pure_version_step",
+        "preserveOriginal": true
+      },
+      "fallback": {
+        "schemaRef": "domain.schema.json#/$defs/Fallback",
+        "readableRequired": true,
+        "rawRequired": true,
+        "inert": true
+      },
+      "renderer": {
+        "adapterId": "property.formula.v1",
+        "missingRenderer": "readable_fallback"
+      },
+      "textExtraction": {
+        "adapterId": "property.formula.text.v1",
+        "mode": "readable_fallback",
+        "includeRawExecutableContent": false
+      },
+      "import": {
+        "representation": "registry_envelope",
+        "unknownInput": "unsupported_external",
+        "retainProvenance": true
+      },
+      "export": {
+        "native": "lossless_envelope",
+        "portable": "readable_plus_raw_sidecar",
+        "adapterId": "property.formula.export.v1"
+      },
+      "ai": {
+        "representation": "typed_data_with_location",
+        "writable": false,
+        "untrusted": true,
+        "adapterId": "property.formula.ai.v1"
+      },
+      "configSchemaRef": "domain.schema.json#/$defs/property_formula_config_v1"
+    },
+    {
+      "family": "property",
+      "type": "created_time",
+      "schemaVersion": 1,
+      "schemaRef": "domain.schema.json#/$defs/property_created_time_v1",
+      "nativeEditingRelease": "P1",
+      "p0Mode": "preserve",
+      "serialization": {
+        "format": "json",
+        "envelopeVersion": 1,
+        "canonicalization": "rfc8785",
+        "unknownFields": "retain_in_fallback"
+      },
+      "migration": {
+        "fromVersions": [],
+        "policy": "explicit_pure_version_step",
+        "preserveOriginal": true
+      },
+      "fallback": {
+        "schemaRef": "domain.schema.json#/$defs/Fallback",
+        "readableRequired": true,
+        "rawRequired": true,
+        "inert": true
+      },
+      "renderer": {
+        "adapterId": "property.created_time.v1",
+        "missingRenderer": "readable_fallback"
+      },
+      "textExtraction": {
+        "adapterId": "property.created_time.text.v1",
+        "mode": "readable_fallback",
+        "includeRawExecutableContent": false
+      },
+      "import": {
+        "representation": "registry_envelope",
+        "unknownInput": "unsupported_external",
+        "retainProvenance": true
+      },
+      "export": {
+        "native": "lossless_envelope",
+        "portable": "readable_plus_raw_sidecar",
+        "adapterId": "property.created_time.export.v1"
+      },
+      "ai": {
+        "representation": "typed_data_with_location",
+        "writable": false,
+        "untrusted": true,
+        "adapterId": "property.created_time.ai.v1"
+      },
+      "configSchemaRef": "domain.schema.json#/$defs/property_created_time_config_v1"
+    },
+    {
+      "family": "property",
+      "type": "last_edited_time",
+      "schemaVersion": 1,
+      "schemaRef": "domain.schema.json#/$defs/property_last_edited_time_v1",
+      "nativeEditingRelease": "P1",
+      "p0Mode": "preserve",
+      "serialization": {
+        "format": "json",
+        "envelopeVersion": 1,
+        "canonicalization": "rfc8785",
+        "unknownFields": "retain_in_fallback"
+      },
+      "migration": {
+        "fromVersions": [],
+        "policy": "explicit_pure_version_step",
+        "preserveOriginal": true
+      },
+      "fallback": {
+        "schemaRef": "domain.schema.json#/$defs/Fallback",
+        "readableRequired": true,
+        "rawRequired": true,
+        "inert": true
+      },
+      "renderer": {
+        "adapterId": "property.last_edited_time.v1",
+        "missingRenderer": "readable_fallback"
+      },
+      "textExtraction": {
+        "adapterId": "property.last_edited_time.text.v1",
+        "mode": "readable_fallback",
+        "includeRawExecutableContent": false
+      },
+      "import": {
+        "representation": "registry_envelope",
+        "unknownInput": "unsupported_external",
+        "retainProvenance": true
+      },
+      "export": {
+        "native": "lossless_envelope",
+        "portable": "readable_plus_raw_sidecar",
+        "adapterId": "property.last_edited_time.export.v1"
+      },
+      "ai": {
+        "representation": "typed_data_with_location",
+        "writable": false,
+        "untrusted": true,
+        "adapterId": "property.last_edited_time.ai.v1"
+      },
+      "configSchemaRef": "domain.schema.json#/$defs/property_last_edited_time_config_v1"
+    },
+    {
+      "family": "property",
+      "type": "unique_id",
+      "schemaVersion": 1,
+      "schemaRef": "domain.schema.json#/$defs/property_unique_id_v1",
+      "nativeEditingRelease": "P1",
+      "p0Mode": "preserve",
+      "serialization": {
+        "format": "json",
+        "envelopeVersion": 1,
+        "canonicalization": "rfc8785",
+        "unknownFields": "retain_in_fallback"
+      },
+      "migration": {
+        "fromVersions": [],
+        "policy": "explicit_pure_version_step",
+        "preserveOriginal": true
+      },
+      "fallback": {
+        "schemaRef": "domain.schema.json#/$defs/Fallback",
+        "readableRequired": true,
+        "rawRequired": true,
+        "inert": true
+      },
+      "renderer": {
+        "adapterId": "property.unique_id.v1",
+        "missingRenderer": "readable_fallback"
+      },
+      "textExtraction": {
+        "adapterId": "property.unique_id.text.v1",
+        "mode": "readable_fallback",
+        "includeRawExecutableContent": false
+      },
+      "import": {
+        "representation": "registry_envelope",
+        "unknownInput": "unsupported_external",
+        "retainProvenance": true
+      },
+      "export": {
+        "native": "lossless_envelope",
+        "portable": "readable_plus_raw_sidecar",
+        "adapterId": "property.unique_id.export.v1"
+      },
+      "ai": {
+        "representation": "typed_data_with_location",
+        "writable": false,
+        "untrusted": true,
+        "adapterId": "property.unique_id.ai.v1"
+      },
+      "configSchemaRef": "domain.schema.json#/$defs/property_unique_id_config_v1"
+    },
+    {
+      "family": "property",
+      "type": "button",
+      "schemaVersion": 1,
+      "schemaRef": "domain.schema.json#/$defs/property_button_v1",
+      "nativeEditingRelease": "P2",
+      "p0Mode": "preserve",
+      "serialization": {
+        "format": "json",
+        "envelopeVersion": 1,
+        "canonicalization": "rfc8785",
+        "unknownFields": "retain_in_fallback"
+      },
+      "migration": {
+        "fromVersions": [],
+        "policy": "explicit_pure_version_step",
+        "preserveOriginal": true
+      },
+      "fallback": {
+        "schemaRef": "domain.schema.json#/$defs/Fallback",
+        "readableRequired": true,
+        "rawRequired": true,
+        "inert": true
+      },
+      "renderer": {
+        "adapterId": "property.button.v1",
+        "missingRenderer": "readable_fallback"
+      },
+      "textExtraction": {
+        "adapterId": "property.button.text.v1",
+        "mode": "readable_fallback",
+        "includeRawExecutableContent": false
+      },
+      "import": {
+        "representation": "registry_envelope",
+        "unknownInput": "unsupported_external",
+        "retainProvenance": true
+      },
+      "export": {
+        "native": "lossless_envelope",
+        "portable": "readable_plus_raw_sidecar",
+        "adapterId": "property.button.export.v1"
+      },
+      "ai": {
+        "representation": "typed_data_with_location",
+        "writable": false,
+        "untrusted": true,
+        "adapterId": "property.button.ai.v1"
+      },
+      "configSchemaRef": "domain.schema.json#/$defs/property_button_config_v1"
+    },
+    {
+      "family": "property",
+      "type": "identity",
+      "schemaVersion": 1,
+      "schemaRef": "domain.schema.json#/$defs/property_identity_v1",
+      "nativeEditingRelease": "P1",
+      "p0Mode": "preserve",
+      "serialization": {
+        "format": "json",
+        "envelopeVersion": 1,
+        "canonicalization": "rfc8785",
+        "unknownFields": "retain_in_fallback"
+      },
+      "migration": {
+        "fromVersions": [],
+        "policy": "explicit_pure_version_step",
+        "preserveOriginal": true
+      },
+      "fallback": {
+        "schemaRef": "domain.schema.json#/$defs/Fallback",
+        "readableRequired": true,
+        "rawRequired": true,
+        "inert": true
+      },
+      "renderer": {
+        "adapterId": "property.identity.v1",
+        "missingRenderer": "readable_fallback"
+      },
+      "textExtraction": {
+        "adapterId": "property.identity.text.v1",
+        "mode": "readable_fallback",
+        "includeRawExecutableContent": false
+      },
+      "import": {
+        "representation": "registry_envelope",
+        "unknownInput": "unsupported_external",
+        "retainProvenance": true
+      },
+      "export": {
+        "native": "lossless_envelope",
+        "portable": "readable_plus_raw_sidecar",
+        "adapterId": "property.identity.export.v1"
+      },
+      "ai": {
+        "representation": "typed_data_with_location",
+        "writable": false,
+        "untrusted": true,
+        "adapterId": "property.identity.ai.v1"
+      },
+      "configSchemaRef": "domain.schema.json#/$defs/property_identity_config_v1"
+    },
+    {
+      "family": "property",
+      "type": "author",
+      "schemaVersion": 1,
+      "schemaRef": "domain.schema.json#/$defs/property_author_v1",
+      "nativeEditingRelease": "P1",
+      "p0Mode": "preserve",
+      "serialization": {
+        "format": "json",
+        "envelopeVersion": 1,
+        "canonicalization": "rfc8785",
+        "unknownFields": "retain_in_fallback"
+      },
+      "migration": {
+        "fromVersions": [],
+        "policy": "explicit_pure_version_step",
+        "preserveOriginal": true
+      },
+      "fallback": {
+        "schemaRef": "domain.schema.json#/$defs/Fallback",
+        "readableRequired": true,
+        "rawRequired": true,
+        "inert": true
+      },
+      "renderer": {
+        "adapterId": "property.author.v1",
+        "missingRenderer": "readable_fallback"
+      },
+      "textExtraction": {
+        "adapterId": "property.author.text.v1",
+        "mode": "readable_fallback",
+        "includeRawExecutableContent": false
+      },
+      "import": {
+        "representation": "registry_envelope",
+        "unknownInput": "unsupported_external",
+        "retainProvenance": true
+      },
+      "export": {
+        "native": "lossless_envelope",
+        "portable": "readable_plus_raw_sidecar",
+        "adapterId": "property.author.export.v1"
+      },
+      "ai": {
+        "representation": "typed_data_with_location",
+        "writable": false,
+        "untrusted": true,
+        "adapterId": "property.author.ai.v1"
+      },
+      "configSchemaRef": "domain.schema.json#/$defs/property_author_config_v1"
+    },
+    {
+      "family": "property",
+      "type": "place",
+      "schemaVersion": 1,
+      "schemaRef": "domain.schema.json#/$defs/property_place_v1",
+      "nativeEditingRelease": "P1",
+      "p0Mode": "preserve",
+      "serialization": {
+        "format": "json",
+        "envelopeVersion": 1,
+        "canonicalization": "rfc8785",
+        "unknownFields": "retain_in_fallback"
+      },
+      "migration": {
+        "fromVersions": [],
+        "policy": "explicit_pure_version_step",
+        "preserveOriginal": true
+      },
+      "fallback": {
+        "schemaRef": "domain.schema.json#/$defs/Fallback",
+        "readableRequired": true,
+        "rawRequired": true,
+        "inert": true
+      },
+      "renderer": {
+        "adapterId": "property.place.v1",
+        "missingRenderer": "readable_fallback"
+      },
+      "textExtraction": {
+        "adapterId": "property.place.text.v1",
+        "mode": "readable_fallback",
+        "includeRawExecutableContent": false
+      },
+      "import": {
+        "representation": "registry_envelope",
+        "unknownInput": "unsupported_external",
+        "retainProvenance": true
+      },
+      "export": {
+        "native": "lossless_envelope",
+        "portable": "readable_plus_raw_sidecar",
+        "adapterId": "property.place.export.v1"
+      },
+      "ai": {
+        "representation": "typed_data_with_location",
+        "writable": false,
+        "untrusted": true,
+        "adapterId": "property.place.ai.v1"
+      },
+      "configSchemaRef": "domain.schema.json#/$defs/property_place_config_v1"
+    },
+    {
+      "family": "property",
+      "type": "unsupported_external",
+      "schemaVersion": 1,
+      "schemaRef": "domain.schema.json#/$defs/property_unsupported_external_v1",
+      "nativeEditingRelease": "P0",
+      "p0Mode": "editable",
+      "serialization": {
+        "format": "json",
+        "envelopeVersion": 1,
+        "canonicalization": "rfc8785",
+        "unknownFields": "retain_in_fallback"
+      },
+      "migration": {
+        "fromVersions": [],
+        "policy": "explicit_pure_version_step",
+        "preserveOriginal": true
+      },
+      "fallback": {
+        "schemaRef": "domain.schema.json#/$defs/Fallback",
+        "readableRequired": true,
+        "rawRequired": true,
+        "inert": true
+      },
+      "renderer": {
+        "adapterId": "property.unsupported_external.v1",
+        "missingRenderer": "readable_fallback"
+      },
+      "textExtraction": {
+        "adapterId": "property.unsupported_external.text.v1",
+        "mode": "readable_fallback",
+        "includeRawExecutableContent": false
+      },
+      "import": {
+        "representation": "registry_envelope",
+        "unknownInput": "unsupported_external",
+        "retainProvenance": true
+      },
+      "export": {
+        "native": "lossless_envelope",
+        "portable": "readable_plus_raw_sidecar",
+        "adapterId": "property.unsupported_external.export.v1"
+      },
+      "ai": {
+        "representation": "typed_data_with_location",
+        "writable": false,
+        "untrusted": true,
+        "adapterId": "property.unsupported_external.ai.v1"
+      },
+      "configSchemaRef": "domain.schema.json#/$defs/property_unsupported_external_config_v1"
+    },
+    {
+      "family": "view",
+      "type": "table",
+      "schemaVersion": 1,
+      "schemaRef": "domain.schema.json#/$defs/view_table_v1",
+      "nativeEditingRelease": "P0",
+      "p0Mode": "editable",
+      "serialization": {
+        "format": "json",
+        "envelopeVersion": 1,
+        "canonicalization": "rfc8785",
+        "unknownFields": "retain_in_fallback"
+      },
+      "migration": {
+        "fromVersions": [],
+        "policy": "explicit_pure_version_step",
+        "preserveOriginal": true
+      },
+      "fallback": {
+        "schemaRef": "domain.schema.json#/$defs/Fallback",
+        "readableRequired": true,
+        "rawRequired": true,
+        "inert": true
+      },
+      "renderer": {
+        "adapterId": "view.table.v1",
+        "missingRenderer": "readable_fallback"
+      },
+      "textExtraction": {
+        "adapterId": "view.table.text.v1",
+        "mode": "structured_text",
+        "includeRawExecutableContent": false
+      },
+      "import": {
+        "representation": "registry_envelope",
+        "unknownInput": "unsupported_external",
+        "retainProvenance": true
+      },
+      "export": {
+        "native": "lossless_envelope",
+        "portable": "readable_plus_raw_sidecar",
+        "adapterId": "view.table.export.v1"
+      },
+      "ai": {
+        "representation": "typed_data_with_location",
+        "writable": true,
+        "untrusted": true,
+        "adapterId": "view.table.ai.v1"
+      }
+    },
+    {
+      "family": "view",
+      "type": "list",
+      "schemaVersion": 1,
+      "schemaRef": "domain.schema.json#/$defs/view_list_v1",
+      "nativeEditingRelease": "P0",
+      "p0Mode": "editable",
+      "serialization": {
+        "format": "json",
+        "envelopeVersion": 1,
+        "canonicalization": "rfc8785",
+        "unknownFields": "retain_in_fallback"
+      },
+      "migration": {
+        "fromVersions": [],
+        "policy": "explicit_pure_version_step",
+        "preserveOriginal": true
+      },
+      "fallback": {
+        "schemaRef": "domain.schema.json#/$defs/Fallback",
+        "readableRequired": true,
+        "rawRequired": true,
+        "inert": true
+      },
+      "renderer": {
+        "adapterId": "view.list.v1",
+        "missingRenderer": "readable_fallback"
+      },
+      "textExtraction": {
+        "adapterId": "view.list.text.v1",
+        "mode": "structured_text",
+        "includeRawExecutableContent": false
+      },
+      "import": {
+        "representation": "registry_envelope",
+        "unknownInput": "unsupported_external",
+        "retainProvenance": true
+      },
+      "export": {
+        "native": "lossless_envelope",
+        "portable": "readable_plus_raw_sidecar",
+        "adapterId": "view.list.export.v1"
+      },
+      "ai": {
+        "representation": "typed_data_with_location",
+        "writable": true,
+        "untrusted": true,
+        "adapterId": "view.list.ai.v1"
+      }
+    },
+    {
+      "family": "view",
+      "type": "board",
+      "schemaVersion": 1,
+      "schemaRef": "domain.schema.json#/$defs/view_board_v1",
+      "nativeEditingRelease": "P0",
+      "p0Mode": "editable",
+      "serialization": {
+        "format": "json",
+        "envelopeVersion": 1,
+        "canonicalization": "rfc8785",
+        "unknownFields": "retain_in_fallback"
+      },
+      "migration": {
+        "fromVersions": [],
+        "policy": "explicit_pure_version_step",
+        "preserveOriginal": true
+      },
+      "fallback": {
+        "schemaRef": "domain.schema.json#/$defs/Fallback",
+        "readableRequired": true,
+        "rawRequired": true,
+        "inert": true
+      },
+      "renderer": {
+        "adapterId": "view.board.v1",
+        "missingRenderer": "readable_fallback"
+      },
+      "textExtraction": {
+        "adapterId": "view.board.text.v1",
+        "mode": "structured_text",
+        "includeRawExecutableContent": false
+      },
+      "import": {
+        "representation": "registry_envelope",
+        "unknownInput": "unsupported_external",
+        "retainProvenance": true
+      },
+      "export": {
+        "native": "lossless_envelope",
+        "portable": "readable_plus_raw_sidecar",
+        "adapterId": "view.board.export.v1"
+      },
+      "ai": {
+        "representation": "typed_data_with_location",
+        "writable": true,
+        "untrusted": true,
+        "adapterId": "view.board.ai.v1"
+      }
+    },
+    {
+      "family": "view",
+      "type": "calendar",
+      "schemaVersion": 1,
+      "schemaRef": "domain.schema.json#/$defs/view_calendar_v1",
+      "nativeEditingRelease": "P0",
+      "p0Mode": "editable",
+      "serialization": {
+        "format": "json",
+        "envelopeVersion": 1,
+        "canonicalization": "rfc8785",
+        "unknownFields": "retain_in_fallback"
+      },
+      "migration": {
+        "fromVersions": [],
+        "policy": "explicit_pure_version_step",
+        "preserveOriginal": true
+      },
+      "fallback": {
+        "schemaRef": "domain.schema.json#/$defs/Fallback",
+        "readableRequired": true,
+        "rawRequired": true,
+        "inert": true
+      },
+      "renderer": {
+        "adapterId": "view.calendar.v1",
+        "missingRenderer": "readable_fallback"
+      },
+      "textExtraction": {
+        "adapterId": "view.calendar.text.v1",
+        "mode": "structured_text",
+        "includeRawExecutableContent": false
+      },
+      "import": {
+        "representation": "registry_envelope",
+        "unknownInput": "unsupported_external",
+        "retainProvenance": true
+      },
+      "export": {
+        "native": "lossless_envelope",
+        "portable": "readable_plus_raw_sidecar",
+        "adapterId": "view.calendar.export.v1"
+      },
+      "ai": {
+        "representation": "typed_data_with_location",
+        "writable": true,
+        "untrusted": true,
+        "adapterId": "view.calendar.ai.v1"
+      }
+    },
+    {
+      "family": "view",
+      "type": "gallery",
+      "schemaVersion": 1,
+      "schemaRef": "domain.schema.json#/$defs/view_gallery_v1",
+      "nativeEditingRelease": "P1",
+      "p0Mode": "preserve",
+      "serialization": {
+        "format": "json",
+        "envelopeVersion": 1,
+        "canonicalization": "rfc8785",
+        "unknownFields": "retain_in_fallback"
+      },
+      "migration": {
+        "fromVersions": [],
+        "policy": "explicit_pure_version_step",
+        "preserveOriginal": true
+      },
+      "fallback": {
+        "schemaRef": "domain.schema.json#/$defs/Fallback",
+        "readableRequired": true,
+        "rawRequired": true,
+        "inert": true
+      },
+      "renderer": {
+        "adapterId": "view.gallery.v1",
+        "missingRenderer": "readable_fallback"
+      },
+      "textExtraction": {
+        "adapterId": "view.gallery.text.v1",
+        "mode": "readable_fallback",
+        "includeRawExecutableContent": false
+      },
+      "import": {
+        "representation": "registry_envelope",
+        "unknownInput": "unsupported_external",
+        "retainProvenance": true
+      },
+      "export": {
+        "native": "lossless_envelope",
+        "portable": "readable_plus_raw_sidecar",
+        "adapterId": "view.gallery.export.v1"
+      },
+      "ai": {
+        "representation": "typed_data_with_location",
+        "writable": false,
+        "untrusted": true,
+        "adapterId": "view.gallery.ai.v1"
+      }
+    },
+    {
+      "family": "view",
+      "type": "timeline",
+      "schemaVersion": 1,
+      "schemaRef": "domain.schema.json#/$defs/view_timeline_v1",
+      "nativeEditingRelease": "P1",
+      "p0Mode": "preserve",
+      "serialization": {
+        "format": "json",
+        "envelopeVersion": 1,
+        "canonicalization": "rfc8785",
+        "unknownFields": "retain_in_fallback"
+      },
+      "migration": {
+        "fromVersions": [],
+        "policy": "explicit_pure_version_step",
+        "preserveOriginal": true
+      },
+      "fallback": {
+        "schemaRef": "domain.schema.json#/$defs/Fallback",
+        "readableRequired": true,
+        "rawRequired": true,
+        "inert": true
+      },
+      "renderer": {
+        "adapterId": "view.timeline.v1",
+        "missingRenderer": "readable_fallback"
+      },
+      "textExtraction": {
+        "adapterId": "view.timeline.text.v1",
+        "mode": "readable_fallback",
+        "includeRawExecutableContent": false
+      },
+      "import": {
+        "representation": "registry_envelope",
+        "unknownInput": "unsupported_external",
+        "retainProvenance": true
+      },
+      "export": {
+        "native": "lossless_envelope",
+        "portable": "readable_plus_raw_sidecar",
+        "adapterId": "view.timeline.export.v1"
+      },
+      "ai": {
+        "representation": "typed_data_with_location",
+        "writable": false,
+        "untrusted": true,
+        "adapterId": "view.timeline.ai.v1"
+      }
+    },
+    {
+      "family": "view",
+      "type": "chart",
+      "schemaVersion": 1,
+      "schemaRef": "domain.schema.json#/$defs/view_chart_v1",
+      "nativeEditingRelease": "P2",
+      "p0Mode": "preserve",
+      "serialization": {
+        "format": "json",
+        "envelopeVersion": 1,
+        "canonicalization": "rfc8785",
+        "unknownFields": "retain_in_fallback"
+      },
+      "migration": {
+        "fromVersions": [],
+        "policy": "explicit_pure_version_step",
+        "preserveOriginal": true
+      },
+      "fallback": {
+        "schemaRef": "domain.schema.json#/$defs/Fallback",
+        "readableRequired": true,
+        "rawRequired": true,
+        "inert": true
+      },
+      "renderer": {
+        "adapterId": "view.chart.v1",
+        "missingRenderer": "readable_fallback"
+      },
+      "textExtraction": {
+        "adapterId": "view.chart.text.v1",
+        "mode": "readable_fallback",
+        "includeRawExecutableContent": false
+      },
+      "import": {
+        "representation": "registry_envelope",
+        "unknownInput": "unsupported_external",
+        "retainProvenance": true
+      },
+      "export": {
+        "native": "lossless_envelope",
+        "portable": "readable_plus_raw_sidecar",
+        "adapterId": "view.chart.export.v1"
+      },
+      "ai": {
+        "representation": "typed_data_with_location",
+        "writable": false,
+        "untrusted": true,
+        "adapterId": "view.chart.ai.v1"
+      }
+    },
+    {
+      "family": "view",
+      "type": "form",
+      "schemaVersion": 1,
+      "schemaRef": "domain.schema.json#/$defs/view_form_v1",
+      "nativeEditingRelease": "P2",
+      "p0Mode": "preserve",
+      "serialization": {
+        "format": "json",
+        "envelopeVersion": 1,
+        "canonicalization": "rfc8785",
+        "unknownFields": "retain_in_fallback"
+      },
+      "migration": {
+        "fromVersions": [],
+        "policy": "explicit_pure_version_step",
+        "preserveOriginal": true
+      },
+      "fallback": {
+        "schemaRef": "domain.schema.json#/$defs/Fallback",
+        "readableRequired": true,
+        "rawRequired": true,
+        "inert": true
+      },
+      "renderer": {
+        "adapterId": "view.form.v1",
+        "missingRenderer": "readable_fallback"
+      },
+      "textExtraction": {
+        "adapterId": "view.form.text.v1",
+        "mode": "readable_fallback",
+        "includeRawExecutableContent": false
+      },
+      "import": {
+        "representation": "registry_envelope",
+        "unknownInput": "unsupported_external",
+        "retainProvenance": true
+      },
+      "export": {
+        "native": "lossless_envelope",
+        "portable": "readable_plus_raw_sidecar",
+        "adapterId": "view.form.export.v1"
+      },
+      "ai": {
+        "representation": "typed_data_with_location",
+        "writable": false,
+        "untrusted": true,
+        "adapterId": "view.form.ai.v1"
+      }
+    },
+    {
+      "family": "view",
+      "type": "unsupported_external",
+      "schemaVersion": 1,
+      "schemaRef": "domain.schema.json#/$defs/view_unsupported_external_v1",
+      "nativeEditingRelease": "P0",
+      "p0Mode": "editable",
+      "serialization": {
+        "format": "json",
+        "envelopeVersion": 1,
+        "canonicalization": "rfc8785",
+        "unknownFields": "retain_in_fallback"
+      },
+      "migration": {
+        "fromVersions": [],
+        "policy": "explicit_pure_version_step",
+        "preserveOriginal": true
+      },
+      "fallback": {
+        "schemaRef": "domain.schema.json#/$defs/Fallback",
+        "readableRequired": true,
+        "rawRequired": true,
+        "inert": true
+      },
+      "renderer": {
+        "adapterId": "view.unsupported_external.v1",
+        "missingRenderer": "readable_fallback"
+      },
+      "textExtraction": {
+        "adapterId": "view.unsupported_external.text.v1",
+        "mode": "readable_fallback",
+        "includeRawExecutableContent": false
+      },
+      "import": {
+        "representation": "registry_envelope",
+        "unknownInput": "unsupported_external",
+        "retainProvenance": true
+      },
+      "export": {
+        "native": "lossless_envelope",
+        "portable": "readable_plus_raw_sidecar",
+        "adapterId": "view.unsupported_external.export.v1"
+      },
+      "ai": {
+        "representation": "typed_data_with_location",
+        "writable": false,
+        "untrusted": true,
+        "adapterId": "view.unsupported_external.ai.v1"
+      }
+    }
+  ]
+}

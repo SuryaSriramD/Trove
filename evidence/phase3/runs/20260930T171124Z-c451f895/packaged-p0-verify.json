@@ -1,0 +1,30 @@
+{
+  "step": "p0-verify",
+  "passed": true,
+  "recordedAt": "2026-09-30T17:18:16.412758Z",
+  "state": {
+    "workspaceId": "01a0f352-f4bd-7ff3-ac08-beecfdff2498",
+    "pageId": "01a0f352-f6ca-745a-8419-275d47255bf3",
+    "blockId": "01a0f352-f713-781c-bdda-b5e03da6ee2b",
+    "collectionId": "",
+    "propertyId": "",
+    "recordId": "01a0f352-f6f6-70dd-ba68-7397c70249c6",
+    "recordPageId": "01a0f352-f6f6-7870-9a6e-7600f511d55e",
+    "fileId": "",
+    "fileBlockId": "",
+    "contentHash": ""
+  },
+  "checks": [
+    "Notion ZIP inventory and five-outcome reconciliation retained",
+    "imported page body and database record edits persisted",
+    "keyword search works without inference",
+    "forgotten and stale memory excluded from retrieval",
+    "durable interrupted recording remains recoverable",
+    "separate desktop restart preserved the complete data fixture",
+    "verified native backup restored to an unused workspace",
+    "restored canonical snapshot equals the source",
+    "restored interrupted recording finalized with its complete audio tail"
+  ],
+  "processExitCode": 0,
+  "installedWeightsAvailable": false
+}

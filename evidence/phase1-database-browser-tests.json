@@ -1,0 +1,343 @@
+{
+  "config": {
+    "argv": [
+      "/opt/homebrew/Cellar/node/25.5.0/bin/node",
+      "/Volumes/HD-B1/HD-Projects/Trove/frontend/node_modules/.pnpm/@playwright+test@1.63.0/node_modules/@playwright/test/cli.js",
+      "test",
+      "--config",
+      "src/database/tests/playwright.config.ts"
+    ],
+    "configFile": "/Volumes/HD-B1/HD-Projects/Trove/frontend/src/database/tests/playwright.config.ts",
+    "rootDir": "/Volumes/HD-B1/HD-Projects/Trove/frontend/src/database/tests",
+    "failOnFlakyTests": false,
+    "forbidOnly": false,
+    "fullyParallel": false,
+    "globalSetup": null,
+    "globalTeardown": null,
+    "globalTimeout": 0,
+    "grep": {},
+    "grepInvert": null,
+    "maxFailures": 0,
+    "metadata": {
+      "actualWorkers": 1
+    },
+    "preserveOutput": "always",
+    "projects": [
+      {
+        "outputDir": "/Volumes/HD-B1/HD-Projects/Trove/frontend/test-results",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 1
+        },
+        "id": "",
+        "name": "",
+        "testDir": "/Volumes/HD-B1/HD-Projects/Trove/frontend/src/database/tests",
+        "testIgnore": [],
+        "testMatch": [
+          "database.browser.spec.ts"
+        ],
+        "timeout": 30000
+      }
+    ],
+    "quiet": false,
+    "reporter": [
+      [
+        "list",
+        null
+      ],
+      [
+        "json",
+        {
+          "outputFile": "../../../../evidence/phase1-database-browser-tests.json"
+        }
+      ]
+    ],
+    "reportSlowTests": {
+      "max": 5,
+      "threshold": 300000
+    },
+    "shard": null,
+    "tags": [],
+    "updateSnapshots": "missing",
+    "updateSourceMethod": "patch",
+    "version": "1.63.0",
+    "workers": 1,
+    "webServer": null
+  },
+  "suites": [
+    {
+      "title": "database.browser.spec.ts",
+      "file": "database.browser.spec.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [
+        {
+          "title": "all four views retain canonical record identities; board and calendar call guarded record mutations",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 1227,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-01T13:06:57.992Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "a5a10b8aa35116872fcd-69f30ae84c0acd19d0f4",
+          "file": "database.browser.spec.ts",
+          "line": 364,
+          "column": 1
+        },
+        {
+          "title": "saved view filter groups, sorting, visibility, rename and move serialize without record duplication",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 689,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-01T13:06:59.533Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "a5a10b8aa35116872fcd-6db391bca7e8553f10c2",
+          "file": "database.browser.spec.ts",
+          "line": 440,
+          "column": 1
+        },
+        {
+          "title": "table creates record and edits its body title through the canonical page service",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 575,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-01T13:07:00.232Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "a5a10b8aa35116872fcd-ddea5c0f1a1758e06b41",
+          "file": "database.browser.spec.ts",
+          "line": 470,
+          "column": 1
+        },
+        {
+          "title": "P2 chart traces rows and persists display configuration",
+          "ok": false,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "failed",
+                  "duration": 5538,
+                  "error": {
+                    "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m(\u001b[22m\u001b[2m)\u001b[22m failed\n\nLocator: getByRole('img', { name: 'Donut chart; exact values in table below' })\nExpected: visible\nTimeout: 5000ms\nError: element(s) not found\n\nCall log:\n\u001b[2m  - Expect \"toBeVisible\" getByRole('img', { name: 'Donut chart; exact values in table below' }) with timeout 5000ms\u001b[22m\n\u001b[2m  - waiting for getByRole('img', { name: 'Donut chart; exact values in table below' })\u001b[22m\n",
+                    "stack": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m(\u001b[22m\u001b[2m)\u001b[22m failed\n\nLocator: getByRole('img', { name: 'Donut chart; exact values in table below' })\nExpected: visible\nTimeout: 5000ms\nError: element(s) not found\n\nCall log:\n\u001b[2m  - Expect \"toBeVisible\" getByRole('img', { name: 'Donut chart; exact values in table below' }) with timeout 5000ms\u001b[22m\n\u001b[2m  - waiting for getByRole('img', { name: 'Donut chart; exact values in table below' })\u001b[22m\n\n    at /Volumes/HD-B1/HD-Projects/Trove/frontend/src/database/tests/database.browser.spec.ts:509:5",
+                    "location": {
+                      "file": "/Volumes/HD-B1/HD-Projects/Trove/frontend/src/database/tests/database.browser.spec.ts",
+                      "column": 5,
+                      "line": 509
+                    },
+                    "snippet": "  507 |   await expect(\n  508 |     page.getByRole(\"img\", { name: \"Donut chart; exact values in table below\" }),\n> 509 |   ).toBeVisible();\n      |     ^\n  510 |   await page.reload();\n  511 |   await page\n  512 |     .getByRole(\"navigation\", { name: \"Workspace\", exact: true })"
+                  },
+                  "errors": [
+                    {
+                      "location": {
+                        "file": "/Volumes/HD-B1/HD-Projects/Trove/frontend/src/database/tests/database.browser.spec.ts",
+                        "column": 5,
+                        "line": 509
+                      },
+                      "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m(\u001b[22m\u001b[2m)\u001b[22m failed\n\nLocator: getByRole('img', { name: 'Donut chart; exact values in table below' })\nExpected: visible\nTimeout: 5000ms\nError: element(s) not found\n\nCall log:\n\u001b[2m  - Expect \"toBeVisible\" getByRole('img', { name: 'Donut chart; exact values in table below' }) with timeout 5000ms\u001b[22m\n\u001b[2m  - waiting for getByRole('img', { name: 'Donut chart; exact values in table below' })\u001b[22m\n\n\n  507 |   await expect(\n  508 |     page.getByRole(\"img\", { name: \"Donut chart; exact values in table below\" }),\n> 509 |   ).toBeVisible();\n      |     ^\n  510 |   await page.reload();\n  511 |   await page\n  512 |     .getByRole(\"navigation\", { name: \"Workspace\", exact: true })\n    at /Volumes/HD-B1/HD-Projects/Trove/frontend/src/database/tests/database.browser.spec.ts:509:5"
+                    }
+                  ],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-01T13:07:00.817Z",
+                  "annotations": [],
+                  "attachments": [
+                    {
+                      "name": "error-context",
+                      "contentType": "text/markdown",
+                      "path": "/Volumes/HD-B1/HD-Projects/Trove/frontend/test-results/database.browser-P2-chart--f791a-sists-display-configuration/error-context.md"
+                    }
+                  ],
+                  "errorLocation": {
+                    "file": "/Volumes/HD-B1/HD-Projects/Trove/frontend/src/database/tests/database.browser.spec.ts",
+                    "column": 5,
+                    "line": 509
+                  }
+                }
+              ],
+              "status": "unexpected"
+            }
+          ],
+          "id": "a5a10b8aa35116872fcd-22eaeec72401f972bfe1",
+          "file": "database.browser.spec.ts",
+          "line": 487,
+          "column": 1
+        },
+        {
+          "title": "P2 local form requires configured field then sends one guarded submission",
+          "ok": false,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 1,
+                  "parallelIndex": 0,
+                  "status": "timedOut",
+                  "duration": 30030,
+                  "error": {
+                    "message": "\u001b[31mTest timeout of 30000ms exceeded.\u001b[39m",
+                    "stack": "\u001b[31mTest timeout of 30000ms exceeded.\u001b[39m"
+                  },
+                  "errors": [
+                    {
+                      "message": "\u001b[31mTest timeout of 30000ms exceeded.\u001b[39m"
+                    },
+                    {
+                      "location": {
+                        "file": "/Volumes/HD-B1/HD-Projects/Trove/frontend/src/database/tests/database.browser.spec.ts",
+                        "column": 56,
+                        "line": 532
+                      },
+                      "message": "Error: locator.fill: Test timeout of 30000ms exceeded.\nCall log:\n\u001b[2m  - waiting for getByLabel('Form title', { exact: true })\u001b[22m\n\u001b[2m    - locator resolved to <input value=\"\" required=\"\" maxlength=\"512\" aria-label=\"Form title\"/>\u001b[22m\n\u001b[2m    - fill(\"Form submission\")\u001b[22m\n\u001b[2m  - attempting fill action\u001b[22m\n\u001b[2m    2 × waiting for element to be visible, enabled and editable\u001b[22m\n\u001b[2m      - element is not visible\u001b[22m\n\u001b[2m    - retrying fill action\u001b[22m\n\u001b[2m    - waiting 20ms\u001b[22m\n\u001b[2m    2 × waiting for element to be visible, enabled and editable\u001b[22m\n\u001b[2m      - element is not visible\u001b[22m\n\u001b[2m    - retrying fill action\u001b[22m\n\u001b[2m      - waiting 100ms\u001b[22m\n\u001b[2m    58 × waiting for element to be visible, enabled and editable\u001b[22m\n\u001b[2m       - element is not visible\u001b[22m\n\u001b[2m     - retrying fill action\u001b[22m\n\u001b[2m       - waiting 500ms\u001b[22m\n\n\n  530 |     .check();\n  531 |   await page.getByRole(\"button\", { name: \"Save form settings\" }).click();\n> 532 |   await page.getByLabel(\"Form title\", { exact: true }).fill(\"Form submission\");\n      |                                                        ^\n  533 |   await page.getByRole(\"button\", { name: \"Submit local form\" }).click();\n  534 |   expect(\n  535 |     await page.evaluate(\n    at /Volumes/HD-B1/HD-Projects/Trove/frontend/src/database/tests/database.browser.spec.ts:532:56"
+                    }
+                  ],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-01T13:07:06.681Z",
+                  "annotations": [],
+                  "attachments": [
+                    {
+                      "name": "error-context",
+                      "contentType": "text/markdown",
+                      "path": "/Volumes/HD-B1/HD-Projects/Trove/frontend/test-results/database.browser-P2-local--c3c48-ends-one-guarded-submission/error-context.md"
+                    }
+                  ]
+                }
+              ],
+              "status": "unexpected"
+            }
+          ],
+          "id": "a5a10b8aa35116872fcd-2952da421341d84cd05c",
+          "file": "database.browser.spec.ts",
+          "line": 520,
+          "column": 1
+        },
+        {
+          "title": "P2 row buttons cancel without mutation then confirm the selected row only",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 2,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 890,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-01T13:07:37.251Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "a5a10b8aa35116872fcd-53a61b6a0b556ffaa91f",
+          "file": "database.browser.spec.ts",
+          "line": 553,
+          "column": 1
+        }
+      ]
+    }
+  ],
+  "errors": [],
+  "stats": {
+    "startTime": "2026-10-01T13:06:57.657Z",
+    "duration": 40736.568,
+    "expected": 4,
+    "skipped": 0,
+    "unexpected": 2,
+    "flaky": 0
+  }
+}

@@ -1,0 +1,11 @@
+{
+  "recordedAt": "2026-10-01T13:17:24.521040+00:00",
+  "verification": "evidence/phase6/runs/20261001T131342Z-3b67a87a/verification.json",
+  "artifactSha256": {
+    "build/phase6-preview-1/Trove.app/Contents/MacOS/Trove": "990f3f590dfe786101a063d09bb505c3564d3b4ad1ef2029a041adc4da285fd5",
+    "build/phase6-preview-1/Trove.app/Contents/MacOS/trove-host": "d514e4c6a0a6f636461d24ef75b971ff2146d5116f3bf539e7e80e2d5c583ea7",
+    "build/phase6-preview-1/Trove.app/Contents/MacOS/trove-mcp": "be194562c64c42100bd0371720518cc54dcf297fd4c1a6362c6c5f5b869329f7",
+    "build/phase6-preview-1/Trove.app/Contents/Resources/native/ocr-worker": "dcb2bccae9ee1de6d3502d60b8017ee345edafd882edcff98b4a9ac7057650bd"
+  },
+  "signature": "ad-hoc; codesign --verify --deep --strict passed; see package.log"
+}

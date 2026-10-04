@@ -1,0 +1,16 @@
+{"Time":"2026-09-30T22:17:10.560663+05:30","Action":"start","Package":"trove.local/phase0/internal/native"}
+{"Time":"2026-09-30T22:17:11.111979+05:30","Action":"run","Package":"trove.local/phase0/internal/native","Test":"TestRealMicrophoneControlCancellationAndParentExit"}
+{"Time":"2026-09-30T22:17:11.112097+05:30","Action":"output","Package":"trove.local/phase0/internal/native","Test":"TestRealMicrophoneControlCancellationAndParentExit","Output":"=== RUN   TestRealMicrophoneControlCancellationAndParentExit\n","OutputType":"frame"}
+{"Time":"2026-09-30T22:17:11.112253+05:30","Action":"run","Package":"trove.local/phase0/internal/native","Test":"TestRealMicrophoneControlCancellationAndParentExit/cancel"}
+{"Time":"2026-09-30T22:17:11.112269+05:30","Action":"output","Package":"trove.local/phase0/internal/native","Test":"TestRealMicrophoneControlCancellationAndParentExit/cancel","Output":"=== RUN   TestRealMicrophoneControlCancellationAndParentExit/cancel\n","OutputType":"frame"}
+{"Time":"2026-09-30T22:17:11.528967+05:30","Action":"output","Package":"trove.local/phase0/internal/native","Test":"TestRealMicrophoneControlCancellationAndParentExit/cancel","Output":"--- PASS: TestRealMicrophoneControlCancellationAndParentExit/cancel (0.42s)\n","OutputType":"frame"}
+{"Time":"2026-09-30T22:17:11.529007+05:30","Action":"pass","Package":"trove.local/phase0/internal/native","Test":"TestRealMicrophoneControlCancellationAndParentExit/cancel","Elapsed":0.42}
+{"Time":"2026-09-30T22:17:11.529028+05:30","Action":"run","Package":"trove.local/phase0/internal/native","Test":"TestRealMicrophoneControlCancellationAndParentExit/parent_exit"}
+{"Time":"2026-09-30T22:17:11.529033+05:30","Action":"output","Package":"trove.local/phase0/internal/native","Test":"TestRealMicrophoneControlCancellationAndParentExit/parent_exit","Output":"=== RUN   TestRealMicrophoneControlCancellationAndParentExit/parent_exit\n","OutputType":"frame"}
+{"Time":"2026-09-30T22:17:11.593152+05:30","Action":"output","Package":"trove.local/phase0/internal/native","Test":"TestRealMicrophoneControlCancellationAndParentExit/parent_exit","Output":"--- PASS: TestRealMicrophoneControlCancellationAndParentExit/parent_exit (0.06s)\n","OutputType":"frame"}
+{"Time":"2026-09-30T22:17:11.593204+05:30","Action":"pass","Package":"trove.local/phase0/internal/native","Test":"TestRealMicrophoneControlCancellationAndParentExit/parent_exit","Elapsed":0.06}
+{"Time":"2026-09-30T22:17:11.593222+05:30","Action":"output","Package":"trove.local/phase0/internal/native","Test":"TestRealMicrophoneControlCancellationAndParentExit","Output":"--- PASS: TestRealMicrophoneControlCancellationAndParentExit (0.48s)\n","OutputType":"frame"}
+{"Time":"2026-09-30T22:17:11.59323+05:30","Action":"pass","Package":"trove.local/phase0/internal/native","Test":"TestRealMicrophoneControlCancellationAndParentExit","Elapsed":0.48}
+{"Time":"2026-09-30T22:17:11.593239+05:30","Action":"output","Package":"trove.local/phase0/internal/native","Output":"PASS\n","OutputType":"frame"}
+{"Time":"2026-09-30T22:17:12.599424+05:30","Action":"output","Package":"trove.local/phase0/internal/native","Output":"ok  \ttrove.local/phase0/internal/native\t2.038s\n"}
+{"Time":"2026-09-30T22:17:12.599469+05:30","Action":"pass","Package":"trove.local/phase0/internal/native","Elapsed":2.039}

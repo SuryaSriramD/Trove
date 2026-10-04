@@ -1,0 +1,430 @@
+{
+  "recordedAt": "2026-09-30T15:41:35.626260+00:00",
+  "scope": "product",
+  "result": "passed",
+  "qualificationScope": "preserved-phase1-package",
+  "currentWorkingTreeVerified": false,
+  "sourceSnapshotAvailable": false,
+  "qualificationNotes": "This archives the observed all-pass Phase 1 run and exact preserved compiled package. Concurrent Phase 2 edits subsequently changed the source. These are historical package acceptance results, not attestation of the current working tree. Per-run source fingerprints are mandatory for future promotion.",
+  "app": "/Volumes/HD-B1/HD-Projects/Trove/build/phase1-qualified/Trove.app",
+  "appBinarySha256": "431ccff1302e0327abb5c69488ab51751b8dad96e6a7e36a0bdfa1b800bb4463",
+  "repeatPackageEvidence": "evidence/phase1/qualified-package/packaged-integration.json",
+  "tests": [
+    {
+      "test": "trove.local/phase0/internal/native.TestFramesRejectMalformed",
+      "result": "passed"
+    },
+    {
+      "test": "trove.local/phase0/internal/workers.TestAudioRejectsAmbiguousFormat",
+      "result": "passed"
+    },
+    {
+      "test": "trove.local/phase0/internal/native.TestModelImportVerifyLeaseRemove",
+      "result": "passed"
+    },
+    {
+      "test": "trove.local/phase0/internal/native.TestAcquisitionResumesAfterManagerRestart",
+      "result": "passed"
+    },
+    {
+      "test": "trove.local/phase0/internal/native.TestSchedulerRecordingPreemptionAndEditing",
+      "result": "passed"
+    },
+    {
+      "test": "trove.local/phase0/contracts.TestTypedBatchAndSchemaValidation",
+      "result": "passed"
+    },
+    {
+      "test": "trove.local/phase0/contracts.TestAllProtocolFixtures/service-batch.json",
+      "result": "passed"
+    },
+    {
+      "test": "trove.local/phase0/contracts.TestAllProtocolFixtures/service-batch-result.json",
+      "result": "passed"
+    },
+    {
+      "test": "trove.local/phase0/contracts.TestAllProtocolFixtures/service-conflict.json",
+      "result": "passed"
+    },
+    {
+      "test": "trove.local/phase0/contracts.TestAllProtocolFixtures/service-event.json",
+      "result": "passed"
+    },
+    {
+      "test": "trove.local/phase0/contracts.TestAllProtocolFixtures/service-search.json",
+      "result": "passed"
+    },
+    {
+      "test": "trove.local/phase0/contracts.TestAllProtocolFixtures/service-stale-citation.json",
+      "result": "passed"
+    },
+    {
+      "test": "trove.local/phase0/contracts.TestAllProtocolFixtures/job-transcribe.json",
+      "result": "passed"
+    },
+    {
+      "test": "trove.local/phase0/contracts.TestAllProtocolFixtures/worker-transcribe.json",
+      "result": "passed"
+    },
+    {
+      "test": "trove.local/phase0/contracts.TestAllProtocolFixtures/worker-result.json",
+      "result": "passed"
+    },
+    {
+      "test": "trove.local/phase0/contracts.TestAllProtocolFixtures/worker-transcript.json",
+      "result": "passed"
+    },
+    {
+      "test": "trove.local/phase0/contracts.TestAllProtocolFixtures/worker-cancel.json",
+      "result": "passed"
+    },
+    {
+      "test": "trove.local/phase0/contracts.TestAllProtocolFixtures/job-progress.json",
+      "result": "passed"
+    },
+    {
+      "test": "trove.local/phase0/contracts.TestAllProtocolFixtures/service-import-report.json",
+      "result": "passed"
+    },
+    {
+      "test": "trove.local/phase0/contracts.TestAllProtocolFixtures/service-task-toggle.json",
+      "result": "passed"
+    },
+    {
+      "test": "trove.local/phase0/contracts.TestAllProtocolFixtures/service-import-apply.json",
+      "result": "passed"
+    },
+    {
+      "test": "trove.local/phase0/contracts.TestAllProtocolFixtures/service-import-preview.json",
+      "result": "passed"
+    },
+    {
+      "test": "trove.local/phase0/contracts.TestAllProtocolFixtures/service-memory-proposal.json",
+      "result": "passed"
+    },
+    {
+      "test": "trove.local/phase0/contracts.TestAllProtocolFixtures",
+      "result": "passed"
+    },
+    {
+      "test": "trove.local/phase0/contracts.TestDomainTypedRoundtrip",
+      "result": "passed"
+    },
+    {
+      "test": "trove.local/phase0/contracts.TestMergedImportResolutionAndFilterRoundtrip",
+      "result": "passed"
+    },
+    {
+      "test": "trove.local/phase0/contracts.TestOptionalNullableIntentSurvivesTypedCommands",
+      "result": "passed"
+    },
+    {
+      "test": "trove.local/phase0.TestDesktopBootstrapUsesTrustedWorkspaceIdentity",
+      "result": "passed"
+    },
+    {
+      "test": "trove.local/phase0.TestDesktopUploadDescriptorSurvivesTemporaryPathCleanup",
+      "result": "passed"
+    },
+    {
+      "test": "trove.local/phase0/internal/workspace.TestDatabaseFourViewsShareRecordsAndRestart",
+      "result": "passed"
+    },
+    {
+      "test": "trove.local/phase0/internal/workspace.TestDatabaseTypedPropertiesPreserveImportMetadata",
+      "result": "passed"
+    },
+    {
+      "test": "trove.local/phase0/internal/workspace.TestDatabaseFiltersDecimalSortCursorAndAtomicity",
+      "result": "passed"
+    },
+    {
+      "test": "trove.local/phase0/internal/workspace.TestDatabaseCrossCollectionAndScopeDenied",
+      "result": "passed"
+    },
+    {
+      "test": "trove.local/phase0/internal/workspace.TestDatabaseContainersDoNotOwnRows",
+      "result": "passed"
+    },
+    {
+      "test": "trove.local/phase0/internal/workspace.TestDatabaseDiskRestartIsolation",
+      "result": "passed"
+    },
+    {
+      "test": "trove.local/phase0/internal/workspace.TestDatabaseFilterKeepsMultiSelectBoundaries",
+      "result": "passed"
+    },
+    {
+      "test": "trove.local/phase0/internal/workspace.TestDatabaseClearValuePreservesTaskAndTitleInvariants",
+      "result": "passed"
+    },
+    {
+      "test": "trove.local/phase0/internal/workspace.TestDatabaseFileValuesGrantScopedAccessAfterRestart",
+      "result": "passed"
+    },
+    {
+      "test": "trove.local/phase0/internal/workspace.TestJobUnitReceiptAtomicFenceAndSourceConflict",
+      "result": "passed"
+    },
+    {
+      "test": "trove.local/phase0/internal/workspace.TestJobCannotBypassApprovalAndDelegationRevocation",
+      "result": "passed"
+    },
+    {
+      "test": "trove.local/phase0/internal/workspace.TestNestedJobLocationsAndProjectScope",
+      "result": "passed"
+    },
+    {
+      "test": "trove.local/phase0/internal/workspace.TestCancellationCommitLinearizationAndReplay",
+      "result": "passed"
+    },
+    {
+      "test": "trove.local/phase0/internal/workspace.TestMigrationFailureRollsBackWholeSchema",
+      "result": "passed"
+    },
+    {
+      "test": "trove.local/phase0/internal/workers.TestRealDurableTranscriptionJob",
+      "result": "passed"
+    },
+    {
+      "test": "trove.local/phase0/internal/workspace.TestRunJobsContinuesAfterFailureAndStopsCleanly",
+      "result": "passed"
+    },
+    {
+      "test": "trove.local/phase0/internal/workspace.TestBackupDestinationJobAndLostAcknowledgement",
+      "result": "passed"
+    },
+    {
+      "test": "trove.local/phase0/internal/workspace.TestJobInputRevisionAndCustomRequestSchemas",
+      "result": "passed"
+    },
+    {
+      "test": "trove.local/phase0/internal/workspace.TestRunJobsShutdownFencesUnfinishedAttempt",
+      "result": "passed"
+    },
+    {
+      "test": "trove.local/phase0/internal/workspace.TestTransientRetriesAreBoundedAndDurable",
+      "result": "passed"
+    },
+    {
+      "test": "trove.local/phase0/internal/workspace.TestFileAndMeetingJobsCannotEscapePageScope",
+      "result": "passed"
+    },
+    {
+      "test": "trove.local/phase0/internal/workspace.TestTranscriptCitationValidatesMeetingSegmentAndTime",
+      "result": "passed"
+    },
+    {
+      "test": "trove.local/phase0/internal/workspace.TestWorkspaceRestartAndExclusiveOwnership",
+      "result": "passed"
+    },
+    {
+      "test": "trove.local/phase0/internal/workspace.TestAtomicBatchRollbackAndConflict",
+      "result": "passed"
+    },
+    {
+      "test": "trove.local/phase0/internal/workspace.TestIdempotencyAndCommittedEvents",
+      "result": "passed"
+    },
+    {
+      "test": "trove.local/phase0/internal/workspace.TestScopeAndForgedContext",
+      "result": "passed"
+    },
+    {
+      "test": "trove.local/phase0/internal/workspace.TestBlockRegistryRoundtripAndHistory",
+      "result": "passed"
+    },
+    {
+      "test": "trove.local/phase0/internal/workspace.TestConcurrentStaleWriters",
+      "result": "passed"
+    },
+    {
+      "test": "trove.local/phase0/internal/workspace.TestCancellationIsolation",
+      "result": "passed"
+    },
+    {
+      "test": "trove.local/phase0/internal/native.TestRealQualification",
+      "result": "passed"
+    },
+    {
+      "test": "trove.local/phase0/internal/workspace.TestJobsRestartCancellationAndLeaseFencing",
+      "result": "passed"
+    },
+    {
+      "test": "trove.local/phase0/internal/workspace.TestRejectedRequestsLeaveDatabaseIntact",
+      "result": "passed"
+    },
+    {
+      "test": "trove.local/phase0/internal/workspace.TestExactApprovalRequiredConsumedAndReplay",
+      "result": "passed"
+    },
+    {
+      "test": "trove.local/phase0/internal/workspace.TestCanonicalApprovalHashEscapesAndOrdering",
+      "result": "passed"
+    },
+    {
+      "test": "trove.local/phase0/internal/workspace.TestProposalHashPreservesExplicitNull",
+      "result": "passed"
+    },
+    {
+      "test": "trove.local/phase0/internal/workspace.TestDurableCatchupPreservesBlockTombstones",
+      "result": "passed"
+    },
+    {
+      "test": "trove.local/phase0/internal/workspace.TestArchiveTimestampSurvivesRenameAndRestore",
+      "result": "passed"
+    },
+    {
+      "test": "trove.local/phase0/internal/workspace.TestAssetDeduplicationScopedReadsAndRestart",
+      "result": "passed"
+    },
+    {
+      "test": "trove.local/phase0/internal/workspace.TestFileSelectionsRejectSymlinksAndInvalidHandles",
+      "result": "passed"
+    },
+    {
+      "test": "trove.local/phase0/internal/workspace.TestTrashHistoryRestoreAndStalePreview",
+      "result": "passed"
+    },
+    {
+      "test": "trove.local/phase0/internal/workspace.TestRestoreDeletedBlockKeepsMonotonicRevision",
+      "result": "passed"
+    },
+    {
+      "test": "trove.local/phase0/internal/workspace.TestBackupSnapshotRetentionAndRecoveryPoint",
+      "result": "passed"
+    },
+    {
+      "test": "trove.local/phase0/internal/workspace.TestAbandonedAssetsBackupPinsAndTamperDetection",
+      "result": "passed"
+    },
+    {
+      "test": "trove.local/phase0/internal/workspace.TestRecordTaskHistoryRestoresValuesWithoutCopyingIdentity",
+      "result": "passed"
+    },
+    {
+      "test": "trove.local/phase0/internal/native.TestRealWorkerCancellationCrashAndMetal",
+      "result": "passed"
+    },
+    {
+      "test": "trove.local/phase0/internal/workspace.TestAttachmentReferencesFollowCoverPropertiesAndBlockChanges",
+      "result": "passed"
+    },
+    {
+      "test": "trove.local/phase0/internal/workspace.TestCancelledBackupAndRestartRecoverAbandonedPins",
+      "result": "passed"
+    },
+    {
+      "test": "trove.local/phase0/internal/workspace.TestTasksCanonicalStatusOccurrencesPromotionAndRestart",
+      "result": "passed"
+    },
+    {
+      "test": "trove.local/phase0/internal/workspace.TestTaskStaleMutationAndMissingMappings",
+      "result": "passed"
+    },
+    {
+      "test": "trove.local/phase0/internal/workspace.TestTasksRejectPromotionWithoutCompletionMappings",
+      "result": "passed"
+    }
+  ],
+  "checks": [
+    {
+      "name": "contracts",
+      "result": "passed",
+      "exitCode": 0,
+      "log": "evidence/phase1/checkpoint-20260930T154135Z/contracts.log",
+      "logSha256": "3d9e135ff63ac3ecb1ed16b592b4c17a0db6cc65371fe620d57027913d62ff70",
+      "provenance": "Completed acceptance run on 2026-09-30 at 15:41 UTC; all eight exit results observed before Phase 2 edits."
+    },
+    {
+      "name": "go-race",
+      "result": "passed",
+      "exitCode": 0,
+      "log": "evidence/phase1/checkpoint-20260930T154135Z/go-race.log",
+      "logSha256": "99576893bc1bd6d060c25586028488c52e277055df169428cbc6e6a4cd8a17f5",
+      "provenance": "Completed acceptance run on 2026-09-30 at 15:41 UTC; all eight exit results observed before Phase 2 edits."
+    },
+    {
+      "name": "frontend-types",
+      "result": "passed",
+      "exitCode": 0,
+      "log": "evidence/phase1/checkpoint-20260930T154135Z/frontend-types.log",
+      "logSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "provenance": "Completed acceptance run on 2026-09-30 at 15:41 UTC; all eight exit results observed before Phase 2 edits."
+    },
+    {
+      "name": "frontend-codec",
+      "result": "passed",
+      "exitCode": 0,
+      "log": "evidence/phase1/checkpoint-20260930T154135Z/frontend-codec.log",
+      "logSha256": "ad103f9613b916d6ff153b119645c1479a06a77f556422c3a5ebe09749aa3fc3",
+      "provenance": "Completed acceptance run on 2026-09-30 at 15:41 UTC; all eight exit results observed before Phase 2 edits."
+    },
+    {
+      "name": "frontend-browser",
+      "result": "passed",
+      "exitCode": 0,
+      "log": "evidence/phase1/checkpoint-20260930T154135Z/frontend-browser.log",
+      "logSha256": "fbc5a2eff64f1229512f06c6e8353318b57953e59e9813a5ef153debaba3b589",
+      "provenance": "Completed acceptance run on 2026-09-30 at 15:41 UTC; all eight exit results observed before Phase 2 edits."
+    },
+    {
+      "name": "database-browser",
+      "result": "passed",
+      "exitCode": 0,
+      "log": "evidence/phase1/checkpoint-20260930T154135Z/database-browser.log",
+      "logSha256": "32a9e71350b256473bc428c8ab4e7a27e4f08854c36799f332bdb3485d175e08",
+      "provenance": "Completed acceptance run on 2026-09-30 at 15:41 UTC; all eight exit results observed before Phase 2 edits."
+    },
+    {
+      "name": "desktop-build",
+      "result": "passed",
+      "exitCode": 0,
+      "log": "evidence/phase1/checkpoint-20260930T154135Z/desktop-build.log",
+      "logSha256": "8d92b34d2e5eb00e682a3b297ef8b0031ba8f3b83dd548775c2b8da2fb386a3b",
+      "provenance": "Completed acceptance run on 2026-09-30 at 15:41 UTC; all eight exit results observed before Phase 2 edits."
+    },
+    {
+      "name": "packaged-restart-native",
+      "result": "passed",
+      "exitCode": 0,
+      "log": "evidence/phase1/checkpoint-20260930T154135Z/packaged-restart-native.log",
+      "logSha256": "9269526126a482f1890118f7108be336e4ae31360a27bcd38f17f0b2cca72e47",
+      "provenance": "Completed acceptance run on 2026-09-30 at 15:41 UTC; all eight exit results observed before Phase 2 edits."
+    }
+  ],
+  "inputSha256": {
+    "build/phase1-qualified/Trove.app/Contents/Info.plist": "7130402d1730f3d322626188520c0ea45ce02cdfadaf14e75b6c0f0fa6321cab",
+    "build/phase1-qualified/Trove.app/Contents/PkgInfo": "82502191c9484b04d685374f9879a0066069c49b8acae7a04b01d38d07e8eca0",
+    "build/phase1-qualified/Trove.app/Contents/MacOS/Trove": "431ccff1302e0327abb5c69488ab51751b8dad96e6a7e36a0bdfa1b800bb4463",
+    "build/phase1-qualified/Trove.app/Contents/_CodeSignature/CodeResources": "d0b97686b3666353698bf905ee7381e73ae63bb88108592b30f571b1ba2a6b3b",
+    "build/phase1-qualified/Trove.app/Contents/Resources/native/llama-worker": "b6e214b28c1c871a370ed984d9fc647250f20a7b4e537b1411dcd1610d9b8343",
+    "build/phase1-qualified/Trove.app/Contents/Resources/native/whisper-worker": "6da645519bda5262de0f6ab5709d52894f2dba8380bda26660113cd316e22eca",
+    "build/phase1-qualified/Trove.app/Contents/Resources/native/microphone-worker": "cb7eb0cddeb8d965ba164e41fe2daa4cdc3a9ba8b629ab924d304d0c2233641a",
+    "build/phase1-qualified/Trove.app/Contents/Resources/native/manifest.json": "10f1e7ebe24b1dd20977b77db92e6d065755b16e1b1058d15dbb399606801ca6",
+    "build/phase1-qualified/Trove.app/Contents/Resources/native/models/catalog.json": "2d2b3a33732ce3518317ab397206497b7a382b42c8316fa48fe5a8da4453ef62",
+    "build/phase1-qualified/Trove.app/Contents/Resources/native/models/provenance.json": "801ea92f5a961cae24ae4c0ea0246a72e7da9c288f2738052615cd48adc8fc9b",
+    "build/phase1-qualified/Trove.app/Contents/Resources/native/fixtures/jfk.wav": "59dfb9a4acb36fe2a2affc14bacbee2920ff435cb13cc314a08c13f66ba7860e",
+    "build/phase1-qualified/Trove.app/Contents/Resources/native/notices/llama-LICENSE.txt": "94f29bbed6a22c35b992c5c6ebf0e7c92f13b836b90f36f461c9cf2f0f1d010d",
+    "build/phase1-qualified/Trove.app/Contents/Resources/native/notices/whisper-LICENSE.txt": "94f29bbed6a22c35b992c5c6ebf0e7c92f13b836b90f36f461c9cf2f0f1d010d"
+  },
+  "runEvidencePath": "evidence/phase1/checkpoint-20260930T154135Z/verification.json",
+  "releaseGates": [
+    {
+      "gate": "Developer ID signing and notarization",
+      "verified": false
+    },
+    {
+      "gate": "Separate clean Mac installation",
+      "verified": false
+    },
+    {
+      "gate": "Native IME candidate selection and VoiceOver",
+      "verified": false
+    },
+    {
+      "gate": "Real microphone authorization and recording",
+      "verified": false
+    }
+  ]
+}

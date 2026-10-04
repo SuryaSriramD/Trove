@@ -1,0 +1,13 @@
+✔ lossless mixed canonical document including unsupported imported structures (12.63925ms)
+✔ split and clipboard duplicates get fresh allocated identities; task references stay canonical (0.832292ms)
+✔ indent keeps block identity and emits canonical block.move (0.194833ms)
+✔ marks, links, Unicode and explicit line breaks survive rich text projection (0.14775ms)
+✔ deleting a nested tree emits child-first deletes (0.132166ms)
+ℹ tests 5
+ℹ suites 0
+ℹ pass 5
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 250.172208

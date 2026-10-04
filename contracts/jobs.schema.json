@@ -1,0 +1,998 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://trove.local/contracts/jobs.schema.json",
+  "title": "jobs",
+  "$ref": "#/$defs/Job",
+  "$defs": {
+    "JobKind": {
+      "type": "string",
+      "enum": [
+        "IMPORT_NOTION",
+        "EXTRACT_DOCUMENT",
+        "INDEX_CONTENT",
+        "GENERATE_EMBEDDINGS",
+        "TRANSCRIBE_AUDIO",
+        "SUMMARIZE_MEETING",
+        "CREATE_THUMBNAIL",
+        "BACKUP_WORKSPACE",
+        "MODEL_PACK_ACQUIRE",
+        "INVALIDATE_MEMORY",
+        "AUTOMATION_RUN"
+      ]
+    },
+    "JobState": {
+      "type": "string",
+      "enum": [
+        "queued",
+        "running",
+        "retry_wait",
+        "cancel_requested",
+        "cancelled",
+        "succeeded",
+        "failed",
+        "interrupted"
+      ]
+    },
+    "Progress": {
+      "type": "object",
+      "properties": {
+        "sequence": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "completed": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "total": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "unit": {
+          "type": "string",
+          "enum": [
+            "items",
+            "bytes",
+            "segments",
+            "tokens",
+            "steps"
+          ]
+        },
+        "message": {
+          "type": "string",
+          "maxLength": 2048
+        }
+      },
+      "required": [
+        "sequence",
+        "completed",
+        "unit"
+      ],
+      "additionalProperties": false
+    },
+    "ResourceLimits": {
+      "type": "object",
+      "properties": {
+        "threads": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 8
+        },
+        "memoryBytes": {
+          "type": "integer",
+          "minimum": 67108864,
+          "maximum": 17179869184
+        },
+        "timeoutMs": {
+          "type": "integer",
+          "minimum": 100,
+          "maximum": 7200000
+        },
+        "maxOutputBytes": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 67108864
+        },
+        "maxTokens": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 32768
+        }
+      },
+      "required": [
+        "threads",
+        "memoryBytes",
+        "timeoutMs",
+        "maxOutputBytes",
+        "maxTokens"
+      ],
+      "additionalProperties": false
+    },
+    "InputHandle": {
+      "type": "object",
+      "properties": {
+        "handleId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "kind": {
+          "type": "string",
+          "enum": [
+            "text",
+            "audio",
+            "model",
+            "image",
+            "embedding_batch",
+            "result"
+          ]
+        },
+        "sha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "sizeBytes": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        }
+      },
+      "required": [
+        "handleId",
+        "kind",
+        "sha256",
+        "sizeBytes"
+      ],
+      "additionalProperties": false
+    },
+    "JobPayload": {
+      "oneOf": [
+        {
+          "type": "object",
+          "properties": {
+            "kind": {
+              "const": "import"
+            },
+            "stagingId": {
+              "$ref": "domain.schema.json#/$defs/Id"
+            },
+            "sourceRevision": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "kind",
+            "stagingId",
+            "sourceRevision"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "kind": {
+              "const": "file"
+            },
+            "fileId": {
+              "$ref": "domain.schema.json#/$defs/Id"
+            },
+            "extractorVersion": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "kind",
+            "fileId",
+            "extractorVersion"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "kind": {
+              "const": "index"
+            },
+            "location": {
+              "$ref": "domain.schema.json#/$defs/Location"
+            },
+            "generationId": {
+              "$ref": "domain.schema.json#/$defs/Id"
+            }
+          },
+          "required": [
+            "kind",
+            "location",
+            "generationId"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "kind": {
+              "const": "embedding"
+            },
+            "locations": {
+              "type": "array",
+              "items": {
+                "$ref": "domain.schema.json#/$defs/Location"
+              },
+              "maxItems": 256
+            },
+            "modelPackId": {
+              "$ref": "domain.schema.json#/$defs/Id"
+            },
+            "dimension": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 8192
+            }
+          },
+          "required": [
+            "kind",
+            "locations",
+            "modelPackId",
+            "dimension"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "kind": {
+              "const": "transcribe"
+            },
+            "meetingId": {
+              "$ref": "domain.schema.json#/$defs/Id"
+            },
+            "fileId": {
+              "$ref": "domain.schema.json#/$defs/Id"
+            },
+            "modelPackId": {
+              "$ref": "domain.schema.json#/$defs/Id"
+            }
+          },
+          "required": [
+            "kind",
+            "meetingId",
+            "fileId",
+            "modelPackId"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "kind": {
+              "const": "summarize"
+            },
+            "meetingId": {
+              "$ref": "domain.schema.json#/$defs/Id"
+            },
+            "sourceRevision": {
+              "$ref": "domain.schema.json#/$defs/Revision"
+            },
+            "modelPackId": {
+              "$ref": "domain.schema.json#/$defs/Id"
+            }
+          },
+          "required": [
+            "kind",
+            "meetingId",
+            "sourceRevision",
+            "modelPackId"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "kind": {
+              "const": "backup"
+            },
+            "destinationHandle": {
+              "$ref": "domain.schema.json#/$defs/Id"
+            }
+          },
+          "required": [
+            "kind",
+            "destinationHandle"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "kind": {
+              "const": "model"
+            },
+            "acquisitionId": {
+              "$ref": "domain.schema.json#/$defs/Id"
+            }
+          },
+          "required": [
+            "kind",
+            "acquisitionId"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "kind": {
+              "const": "memory"
+            },
+            "memoryIds": {
+              "type": "array",
+              "items": {
+                "$ref": "domain.schema.json#/$defs/Id"
+              },
+              "maxItems": 1000
+            }
+          },
+          "required": [
+            "kind",
+            "memoryIds"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "kind": {
+              "const": "automation"
+            },
+            "ruleId": {
+              "$ref": "domain.schema.json#/$defs/Id"
+            },
+            "ruleVersion": {
+              "$ref": "domain.schema.json#/$defs/Revision"
+            },
+            "occurrenceKey": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "kind",
+            "ruleId",
+            "ruleVersion",
+            "occurrenceKey"
+          ],
+          "additionalProperties": false
+        }
+      ]
+    },
+    "Job": {
+      "type": "object",
+      "properties": {
+        "jobId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "workspaceId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "kind": {
+          "$ref": "#/$defs/JobKind"
+        },
+        "payloadVersion": {
+          "const": 1
+        },
+        "payload": {
+          "$ref": "#/$defs/JobPayload"
+        },
+        "state": {
+          "$ref": "#/$defs/JobState"
+        },
+        "revision": {
+          "$ref": "domain.schema.json#/$defs/Revision"
+        },
+        "idempotencyKey": {
+          "type": "string"
+        },
+        "attempt": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 5
+        },
+        "maxAttempts": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 5
+        },
+        "nextAttemptAt": {
+          "$ref": "domain.schema.json#/$defs/Timestamp"
+        },
+        "leaseToken": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "leaseExpiresAt": {
+          "$ref": "domain.schema.json#/$defs/Timestamp"
+        },
+        "checkpointRef": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "progress": {
+          "$ref": "#/$defs/Progress"
+        },
+        "createdAt": {
+          "$ref": "domain.schema.json#/$defs/Timestamp"
+        },
+        "updatedAt": {
+          "$ref": "domain.schema.json#/$defs/Timestamp"
+        },
+        "error": {
+          "$ref": "service.schema.json#/$defs/Error"
+        }
+      },
+      "required": [
+        "jobId",
+        "workspaceId",
+        "kind",
+        "payloadVersion",
+        "payload",
+        "state",
+        "revision",
+        "idempotencyKey",
+        "attempt",
+        "maxAttempts",
+        "createdAt",
+        "updatedAt"
+      ],
+      "additionalProperties": false
+    },
+    "JobProgressEvent": {
+      "type": "object",
+      "properties": {
+        "contractVersion": {
+          "const": 1
+        },
+        "jobId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "jobRevision": {
+          "$ref": "domain.schema.json#/$defs/Revision"
+        },
+        "attempt": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 5
+        },
+        "state": {
+          "$ref": "#/$defs/JobState"
+        },
+        "progress": {
+          "$ref": "#/$defs/Progress"
+        }
+      },
+      "required": [
+        "contractVersion",
+        "jobId",
+        "jobRevision",
+        "attempt",
+        "state",
+        "progress"
+      ],
+      "additionalProperties": false
+    },
+    "WorkerRequest": {
+      "type": "object",
+      "properties": {
+        "protocolVersion": {
+          "const": 1
+        },
+        "requestId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "jobId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "leaseToken": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "cancellationId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "operation": {
+          "type": "string",
+          "enum": [
+            "generate",
+            "embed",
+            "transcribe"
+          ]
+        },
+        "modelPackId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "limits": {
+          "$ref": "#/$defs/ResourceLimits"
+        },
+        "inputs": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/InputHandle"
+          },
+          "maxItems": 32
+        }
+      },
+      "required": [
+        "protocolVersion",
+        "requestId",
+        "jobId",
+        "leaseToken",
+        "cancellationId",
+        "operation",
+        "modelPackId",
+        "limits",
+        "inputs"
+      ],
+      "additionalProperties": false
+    },
+    "WorkerOutput": {
+      "oneOf": [
+        {
+          "type": "object",
+          "properties": {
+            "kind": {
+              "const": "hello"
+            },
+            "protocolVersion": {
+              "const": 1
+            },
+            "runtime": {
+              "type": "string",
+              "enum": [
+                "llama.cpp",
+                "whisper.cpp"
+              ]
+            },
+            "runtimeCommit": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{40}$"
+            },
+            "architecture": {
+              "const": "arm64"
+            },
+            "capabilities": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "enum": [
+                  "generate",
+                  "embed",
+                  "transcribe"
+                ]
+              },
+              "maxItems": 3
+            }
+          },
+          "required": [
+            "kind",
+            "protocolVersion",
+            "runtime",
+            "runtimeCommit",
+            "architecture",
+            "capabilities"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "kind": {
+              "const": "progress"
+            },
+            "requestId": {
+              "$ref": "domain.schema.json#/$defs/Id"
+            },
+            "sequence": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 9007199254740991
+            },
+            "progress": {
+              "$ref": "#/$defs/Progress"
+            }
+          },
+          "required": [
+            "kind",
+            "requestId",
+            "sequence",
+            "progress"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "kind": {
+              "const": "token"
+            },
+            "requestId": {
+              "$ref": "domain.schema.json#/$defs/Id"
+            },
+            "sequence": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 9007199254740991
+            },
+            "text": {
+              "type": "string",
+              "maxLength": 16384
+            }
+          },
+          "required": [
+            "kind",
+            "requestId",
+            "sequence",
+            "text"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "kind": {
+              "const": "result"
+            },
+            "requestId": {
+              "$ref": "domain.schema.json#/$defs/Id"
+            },
+            "leaseToken": {
+              "$ref": "domain.schema.json#/$defs/Id"
+            },
+            "sequence": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 9007199254740991
+            },
+            "resultHandle": {
+              "$ref": "#/$defs/InputHandle"
+            }
+          },
+          "required": [
+            "kind",
+            "requestId",
+            "leaseToken",
+            "sequence",
+            "resultHandle"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "kind": {
+              "const": "error"
+            },
+            "requestId": {
+              "$ref": "domain.schema.json#/$defs/Id"
+            },
+            "sequence": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 9007199254740991
+            },
+            "code": {
+              "type": "string",
+              "enum": [
+                "CANCELLED",
+                "INVALID_INPUT",
+                "MODEL_INCOMPATIBLE",
+                "RESOURCE_EXHAUSTED",
+                "RUNTIME_FAILURE"
+              ]
+            },
+            "message": {
+              "type": "string",
+              "maxLength": 2048
+            },
+            "retryable": {
+              "type": "boolean"
+            }
+          },
+          "required": [
+            "kind",
+            "requestId",
+            "sequence",
+            "code",
+            "message",
+            "retryable"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "kind": {
+              "const": "cancelled"
+            },
+            "requestId": {
+              "$ref": "domain.schema.json#/$defs/Id"
+            },
+            "sequence": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 9007199254740991
+            }
+          },
+          "required": [
+            "kind",
+            "requestId",
+            "sequence"
+          ],
+          "additionalProperties": false
+        }
+      ]
+    },
+    "WorkerCancel": {
+      "type": "object",
+      "properties": {
+        "protocolVersion": {
+          "const": 1
+        },
+        "requestId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "cancellationId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "kind": {
+          "const": "cancel"
+        }
+      },
+      "required": [
+        "protocolVersion",
+        "requestId",
+        "cancellationId",
+        "kind"
+      ],
+      "additionalProperties": false
+    },
+    "WorkerResult": {
+      "oneOf": [
+        {
+          "type": "object",
+          "properties": {
+            "kind": {
+              "const": "generation"
+            },
+            "text": {
+              "type": "string",
+              "maxLength": 1048576
+            },
+            "citations": {
+              "type": "array",
+              "items": {
+                "$ref": "domain.schema.json#/$defs/Location"
+              },
+              "maxItems": 256
+            }
+          },
+          "required": [
+            "kind",
+            "text",
+            "citations"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "kind": {
+              "const": "embedding"
+            },
+            "modelPackId": {
+              "$ref": "domain.schema.json#/$defs/Id"
+            },
+            "dimension": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 8192
+            },
+            "vectors": {
+              "type": "array",
+              "items": {
+                "type": "array",
+                "items": {
+                  "type": "number"
+                },
+                "maxItems": 8192
+              },
+              "maxItems": 256
+            },
+            "locations": {
+              "type": "array",
+              "items": {
+                "$ref": "domain.schema.json#/$defs/Location"
+              },
+              "maxItems": 256
+            }
+          },
+          "required": [
+            "kind",
+            "modelPackId",
+            "dimension",
+            "vectors",
+            "locations"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "kind": {
+              "const": "transcript"
+            },
+            "meetingId": {
+              "$ref": "domain.schema.json#/$defs/Id"
+            },
+            "segments": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "segmentId": {
+                    "$ref": "domain.schema.json#/$defs/Id"
+                  },
+                  "blockId": {
+                    "$ref": "domain.schema.json#/$defs/Id"
+                  },
+                  "startMs": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "maximum": 9007199254740991
+                  },
+                  "endMs": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "maximum": 9007199254740991
+                  },
+                  "text": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "segmentId",
+                  "blockId",
+                  "startMs",
+                  "endMs",
+                  "text"
+                ],
+                "additionalProperties": false
+              },
+              "maxItems": 256
+            }
+          },
+          "required": [
+            "kind",
+            "meetingId",
+            "segments"
+          ],
+          "additionalProperties": false
+        }
+      ]
+    },
+    "EnqueueJobRequest": {
+      "type": "object",
+      "properties": {
+        "contractVersion": {
+          "const": 1
+        },
+        "requestId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "workspaceId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "kind": {
+          "$ref": "#/$defs/JobKind"
+        },
+        "payload": {
+          "$ref": "#/$defs/JobPayload"
+        },
+        "idempotencyKey": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "contractVersion",
+        "requestId",
+        "workspaceId",
+        "kind",
+        "payload",
+        "idempotencyKey"
+      ],
+      "additionalProperties": false
+    },
+    "GetJobRequest": {
+      "type": "object",
+      "properties": {
+        "contractVersion": {
+          "const": 1
+        },
+        "requestId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "workspaceId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "jobId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        }
+      },
+      "required": [
+        "contractVersion",
+        "requestId",
+        "workspaceId",
+        "jobId"
+      ],
+      "additionalProperties": false
+    },
+    "CancelJobRequest": {
+      "type": "object",
+      "properties": {
+        "contractVersion": {
+          "const": 1
+        },
+        "requestId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "workspaceId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "jobId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "expectedRevision": {
+          "$ref": "domain.schema.json#/$defs/Revision"
+        }
+      },
+      "required": [
+        "contractVersion",
+        "requestId",
+        "workspaceId",
+        "jobId",
+        "expectedRevision"
+      ],
+      "additionalProperties": false
+    },
+    "JobResponse": {
+      "oneOf": [
+        {
+          "type": "object",
+          "properties": {
+            "ok": {
+              "const": true
+            },
+            "result": {
+              "$ref": "#/$defs/Job"
+            }
+          },
+          "required": [
+            "ok",
+            "result"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "ok": {
+              "const": false
+            },
+            "error": {
+              "$ref": "service.schema.json#/$defs/Error"
+            }
+          },
+          "required": [
+            "ok",
+            "error"
+          ],
+          "additionalProperties": false
+        }
+      ]
+    }
+  }
+}

@@ -1,0 +1,500 @@
+{
+  "schemaVersion": 1,
+  "recordedAt": "2026-09-30T11:24:40.013695+00:00",
+  "phase0Status": "verified",
+  "releaseStatus": "unverified",
+  "scope": "Native arm64 compile, linkage and no-model runtime capability probes; storage features; frontend production build. Not a packaged product acceptance test.",
+  "host": {
+    "system": "Darwin",
+    "machine": "arm64",
+    "release": "27.0.0"
+  },
+  "checks": [
+    {
+      "id": "manifest-consistency",
+      "status": "verified"
+    },
+    {
+      "id": "host-architecture",
+      "status": "verified",
+      "os": "Darwin",
+      "arch": "arm64"
+    },
+    {
+      "id": "host-version",
+      "status": "verified",
+      "command": [
+        "sw_vers"
+      ],
+      "exitCode": 0,
+      "log": "evidence/baseline-logs/host-version.log",
+      "logSha256": "98ec1edfdd0153a7f67baccc3fc2481b06de7a75d245263efaab2412ee753e57"
+    },
+    {
+      "id": "node-version",
+      "status": "verified",
+      "command": [
+        "node",
+        "--version"
+      ],
+      "exitCode": 0,
+      "log": "evidence/baseline-logs/node-version.log",
+      "logSha256": "7115e8caf2f71e342b3dea758a733ed8a2eb89e8675bc5e9437f707763abe7b2"
+    },
+    {
+      "id": "pnpm-version",
+      "status": "verified",
+      "command": [
+        "pnpm",
+        "--version"
+      ],
+      "exitCode": 0,
+      "log": "evidence/baseline-logs/pnpm-version.log",
+      "logSha256": "005206ab803f8881d8227540b7980b37e723b69a8849edb31734a90b7e7964e2"
+    },
+    {
+      "id": "cmake-version",
+      "status": "verified",
+      "command": [
+        "cmake",
+        "--version"
+      ],
+      "exitCode": 0,
+      "log": "evidence/baseline-logs/cmake-version.log",
+      "logSha256": "49da5b8c6869fe4b385bd4d095bf446bc9e6f32d0f6a86b437022e99e19f4ef7"
+    },
+    {
+      "id": "clang-version",
+      "status": "verified",
+      "command": [
+        "clang",
+        "--version"
+      ],
+      "exitCode": 0,
+      "log": "evidence/baseline-logs/clang-version.log",
+      "logSha256": "4e8a77bcb032deb6591b0db384ff9808d01d9030f00e2d877394df88a12a2536"
+    },
+    {
+      "id": "sdk",
+      "status": "verified",
+      "command": [
+        "xcrun",
+        "--show-sdk-version"
+      ],
+      "exitCode": 0,
+      "log": "evidence/baseline-logs/sdk.log",
+      "logSha256": "7b01c549928398a045692f24bcac7803b348524cdd76f21265b02984b2ba556a"
+    },
+    {
+      "id": "go-source-integrity",
+      "status": "verified",
+      "sha256": "ee215d57e0ec269c60cc9ceca68e6bda321ba9ee5afe24f4b0988703c2d87d12",
+      "source": "https://go.dev/dl/go1.27.1.darwin-arm64.tar.gz"
+    },
+    {
+      "id": "go-version",
+      "status": "verified",
+      "command": [
+        "/private/tmp/trove-phase0-tools/go/bin/go",
+        "version"
+      ],
+      "exitCode": 0,
+      "log": "evidence/baseline-logs/go-version.log",
+      "logSha256": "c528ba02b39880f1357f51dee70e41c1ef03e3a70c7a03055c080532b9635f58"
+    },
+    {
+      "id": "go-modules",
+      "status": "verified",
+      "command": [
+        "/private/tmp/trove-phase0-tools/go/bin/go",
+        "mod",
+        "verify"
+      ],
+      "exitCode": 0,
+      "log": "evidence/baseline-logs/go-modules.log",
+      "logSha256": "b4537ed75f533f993f371954de47e42a793b8e5b0587577de7e27fb3e50696bd"
+    },
+    {
+      "id": "storage-build",
+      "status": "verified",
+      "command": [
+        "/private/tmp/trove-phase0-tools/go/bin/go",
+        "test",
+        "-mod=readonly",
+        "-c",
+        "-tags",
+        "fts5 sqlite_omit_load_extension",
+        "-o",
+        "/private/tmp/trove-phase0-tools/storage-probe",
+        "."
+      ],
+      "exitCode": 0,
+      "log": "evidence/baseline-logs/storage-build.log",
+      "logSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "id": "storage",
+      "status": "verified",
+      "command": [
+        "/private/tmp/trove-phase0-tools/storage-probe",
+        "-test.v"
+      ],
+      "exitCode": 0,
+      "log": "evidence/baseline-logs/storage.log",
+      "logSha256": "a5202ddb714755a2cf2d2b66aae298151c4206d1a5381b3734854d070a4fbd30"
+    },
+    {
+      "id": "storage-linked-libraries",
+      "status": "verified",
+      "command": [
+        "otool",
+        "-L",
+        "/private/tmp/trove-phase0-tools/storage-probe"
+      ],
+      "exitCode": 0,
+      "log": "evidence/baseline-logs/storage-linked-libraries.log",
+      "logSha256": "c408cbbcc4d1943be00b11919dbbf918ae8327cdd031b44c5e8a04ebcea1d6b1"
+    },
+    {
+      "id": "wails-build",
+      "status": "verified",
+      "command": [
+        "/private/tmp/trove-phase0-tools/go/bin/go",
+        "build",
+        "-mod=readonly",
+        "-tags",
+        "desktop production fts5 sqlite_omit_load_extension",
+        "-o",
+        "/private/tmp/trove-phase0-tools/wails-probe",
+        "./shell"
+      ],
+      "exitCode": 0,
+      "log": "evidence/baseline-logs/wails-build.log",
+      "logSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "id": "wails-architecture",
+      "status": "verified",
+      "command": [
+        "file",
+        "/private/tmp/trove-phase0-tools/wails-probe"
+      ],
+      "exitCode": 0,
+      "log": "evidence/baseline-logs/wails-architecture.log",
+      "logSha256": "1e70a00af367df0d777c9243df1ed87ff526d37a7e7d8b03bf102f1c965dea85"
+    },
+    {
+      "id": "wails-linked-libraries",
+      "status": "verified",
+      "command": [
+        "otool",
+        "-L",
+        "/private/tmp/trove-phase0-tools/wails-probe"
+      ],
+      "exitCode": 0,
+      "log": "evidence/baseline-logs/wails-linked-libraries.log",
+      "logSha256": "35f6740cc2f59ed53a3670ed21c5109802a9aa77be76836371f39f37df4501eb"
+    },
+    {
+      "id": "frontend-install",
+      "status": "verified",
+      "command": [
+        "pnpm",
+        "install",
+        "--frozen-lockfile",
+        "--ignore-scripts",
+        "--store-dir",
+        "/private/tmp/trove-phase0-tools/pnpm-store",
+        "--offline"
+      ],
+      "exitCode": 0,
+      "log": "evidence/baseline-logs/frontend-install.log",
+      "logSha256": "903fd9d91b7ace329c567dd3831901956e030fc8194dc4eb0c4ebb4baf161cd7"
+    },
+    {
+      "id": "frontend-build",
+      "status": "verified",
+      "command": [
+        "pnpm",
+        "build"
+      ],
+      "exitCode": 0,
+      "log": "evidence/baseline-logs/frontend-build.log",
+      "logSha256": "56423be69ad8484d31967f06e249ef9beba475b53b0ab9921c6c92e0ccb45551"
+    },
+    {
+      "id": "llama-source-integrity",
+      "status": "verified",
+      "sha256": "8aeb94872f97ddc9c80bca3824d95aba00bdb17d1d28813db22150fb6caf6d15",
+      "source": "https://codeload.github.com/ggml-org/llama.cpp/tar.gz/d2e54583c7452353eb35d40431281f6ee984332f"
+    },
+    {
+      "id": "llama-extracted-source-integrity",
+      "status": "verified",
+      "fileCount": 3619
+    },
+    {
+      "id": "llama-configure",
+      "status": "verified",
+      "command": [
+        "cmake",
+        "-S",
+        "/private/tmp/trove-phase0-tools/llama.cpp-d2e54583c7452353eb35d40431281f6ee984332f",
+        "-B",
+        "/private/tmp/trove-phase0-tools/llama-build",
+        "-DCMAKE_BUILD_TYPE=Release",
+        "-DCMAKE_OSX_ARCHITECTURES=arm64",
+        "-DBUILD_SHARED_LIBS=OFF",
+        "-DGGML_METAL=ON",
+        "-DGGML_METAL_EMBED_LIBRARY=ON",
+        "-DLLAMA_BUILD_IS_DEV=OFF",
+        "-DLLAMA_BUILD_COMMON=OFF",
+        "-DLLAMA_BUILD_EXAMPLES=OFF",
+        "-DLLAMA_BUILD_TESTS=OFF",
+        "-DLLAMA_BUILD_TOOLS=OFF",
+        "-DLLAMA_BUILD_SERVER=OFF",
+        "-DLLAMA_BUILD_APP=OFF",
+        "-DLLAMA_OPENSSL=OFF"
+      ],
+      "exitCode": 0,
+      "log": "evidence/baseline-logs/llama-configure.log",
+      "logSha256": "1da19e1f4b821ef6ce2ad4110e8a08b9b367d4f8aac1e78cb1d4c70901a6e7c9"
+    },
+    {
+      "id": "llama-build",
+      "status": "verified",
+      "command": [
+        "cmake",
+        "--build",
+        "/private/tmp/trove-phase0-tools/llama-build",
+        "--parallel",
+        "4"
+      ],
+      "exitCode": 0,
+      "log": "evidence/baseline-logs/llama-build.log",
+      "logSha256": "8da4b6c1b69cb30a7de6051b90a8347aef2da1d45094f8fc433ecbed0c5c7a8f"
+    },
+    {
+      "id": "llama-link",
+      "status": "verified",
+      "command": [
+        "clang++",
+        "-std=c++17",
+        "-arch",
+        "arm64",
+        "-I",
+        "/private/tmp/trove-phase0-tools/llama.cpp-d2e54583c7452353eb35d40431281f6ee984332f/include",
+        "-I",
+        "/private/tmp/trove-phase0-tools/llama.cpp-d2e54583c7452353eb35d40431281f6ee984332f/ggml/include",
+        "/Volumes/HD-B1/HD-Projects/Trove/baseline/native/llama-probe.cpp",
+        "/private/tmp/trove-phase0-tools/llama-build/src/libllama.a",
+        "/private/tmp/trove-phase0-tools/llama-build/ggml/src/ggml-blas/libggml-blas.a",
+        "/private/tmp/trove-phase0-tools/llama-build/ggml/src/ggml-metal/libggml-metal.a",
+        "/private/tmp/trove-phase0-tools/llama-build/ggml/src/libggml-base.a",
+        "/private/tmp/trove-phase0-tools/llama-build/ggml/src/libggml-cpu.a",
+        "/private/tmp/trove-phase0-tools/llama-build/ggml/src/libggml.a",
+        "-framework",
+        "Accelerate",
+        "-framework",
+        "Metal",
+        "-framework",
+        "Foundation",
+        "-o",
+        "/private/tmp/trove-phase0-tools/llama-probe"
+      ],
+      "exitCode": 0,
+      "log": "evidence/baseline-logs/llama-link.log",
+      "logSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "id": "llama-runtime",
+      "status": "verified",
+      "command": [
+        "/private/tmp/trove-phase0-tools/llama-probe"
+      ],
+      "exitCode": 0,
+      "log": "evidence/baseline-logs/llama-runtime.log",
+      "logSha256": "b1e357b7799de2830af56efc974d23a3f5029f6c247bdd29b60c7b23a40be483"
+    },
+    {
+      "id": "llama-architecture",
+      "status": "verified",
+      "command": [
+        "file",
+        "/private/tmp/trove-phase0-tools/llama-probe"
+      ],
+      "exitCode": 0,
+      "log": "evidence/baseline-logs/llama-architecture.log",
+      "logSha256": "22de22012a0d9d53c818d1df0950b21094de8020662b7a4edbd303952cd95a1a"
+    },
+    {
+      "id": "llama-linked-libraries",
+      "status": "verified",
+      "command": [
+        "otool",
+        "-L",
+        "/private/tmp/trove-phase0-tools/llama-probe"
+      ],
+      "exitCode": 0,
+      "log": "evidence/baseline-logs/llama-linked-libraries.log",
+      "logSha256": "e8ecf47801ea158a93365a2bf77d896fe1585350839b1f2fb9f2839bf92ed898"
+    },
+    {
+      "id": "whisper-source-integrity",
+      "status": "verified",
+      "sha256": "41b664fee09e79176ac277b5237debec34f8d74af3c7d71f333f1ec67989ecde",
+      "source": "https://codeload.github.com/ggml-org/whisper.cpp/tar.gz/927cfce34f31707e17f2bff35c349632fb9e2c3a"
+    },
+    {
+      "id": "whisper-extracted-source-integrity",
+      "status": "verified",
+      "fileCount": 1959
+    },
+    {
+      "id": "whisper-configure",
+      "status": "verified",
+      "command": [
+        "cmake",
+        "-S",
+        "/private/tmp/trove-phase0-tools/whisper.cpp-927cfce34f31707e17f2bff35c349632fb9e2c3a",
+        "-B",
+        "/private/tmp/trove-phase0-tools/whisper-build",
+        "-DCMAKE_BUILD_TYPE=Release",
+        "-DCMAKE_OSX_ARCHITECTURES=arm64",
+        "-DBUILD_SHARED_LIBS=OFF",
+        "-DGGML_METAL=ON",
+        "-DGGML_METAL_EMBED_LIBRARY=ON",
+        "-DWHISPER_BUILD_IS_DEV=OFF",
+        "-DWHISPER_BUILD_EXAMPLES=OFF",
+        "-DWHISPER_BUILD_TESTS=OFF",
+        "-DWHISPER_BUILD_SERVER=OFF",
+        "-DWHISPER_CURL=OFF"
+      ],
+      "exitCode": 0,
+      "log": "evidence/baseline-logs/whisper-configure.log",
+      "logSha256": "583a09be7770c4aa865f3fc746279c2b48ef23c826f31ccbc4bdd255f35614bd"
+    },
+    {
+      "id": "whisper-build",
+      "status": "verified",
+      "command": [
+        "cmake",
+        "--build",
+        "/private/tmp/trove-phase0-tools/whisper-build",
+        "--parallel",
+        "4"
+      ],
+      "exitCode": 0,
+      "log": "evidence/baseline-logs/whisper-build.log",
+      "logSha256": "8afe82db76d550b134764cf5650f42b553ae9e081529ddafea80af9a9736663c"
+    },
+    {
+      "id": "whisper-link",
+      "status": "verified",
+      "command": [
+        "clang++",
+        "-std=c++17",
+        "-arch",
+        "arm64",
+        "-I",
+        "/private/tmp/trove-phase0-tools/whisper.cpp-927cfce34f31707e17f2bff35c349632fb9e2c3a/include",
+        "-I",
+        "/private/tmp/trove-phase0-tools/whisper.cpp-927cfce34f31707e17f2bff35c349632fb9e2c3a/ggml/include",
+        "/Volumes/HD-B1/HD-Projects/Trove/baseline/native/whisper-probe.cpp",
+        "/private/tmp/trove-phase0-tools/whisper-build/src/libwhisper.a",
+        "/private/tmp/trove-phase0-tools/whisper-build/ggml/src/ggml-blas/libggml-blas.a",
+        "/private/tmp/trove-phase0-tools/whisper-build/ggml/src/ggml-metal/libggml-metal.a",
+        "/private/tmp/trove-phase0-tools/whisper-build/ggml/src/libggml-base.a",
+        "/private/tmp/trove-phase0-tools/whisper-build/ggml/src/libggml-cpu.a",
+        "/private/tmp/trove-phase0-tools/whisper-build/ggml/src/libggml.a",
+        "-framework",
+        "Accelerate",
+        "-framework",
+        "Metal",
+        "-framework",
+        "Foundation",
+        "-o",
+        "/private/tmp/trove-phase0-tools/whisper-probe"
+      ],
+      "exitCode": 0,
+      "log": "evidence/baseline-logs/whisper-link.log",
+      "logSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "id": "whisper-runtime",
+      "status": "verified",
+      "command": [
+        "/private/tmp/trove-phase0-tools/whisper-probe"
+      ],
+      "exitCode": 0,
+      "log": "evidence/baseline-logs/whisper-runtime.log",
+      "logSha256": "d555b35125baefd734cdd345ddb22c2304973c00d262206a038f283e8b9a9056"
+    },
+    {
+      "id": "whisper-architecture",
+      "status": "verified",
+      "command": [
+        "file",
+        "/private/tmp/trove-phase0-tools/whisper-probe"
+      ],
+      "exitCode": 0,
+      "log": "evidence/baseline-logs/whisper-architecture.log",
+      "logSha256": "a276c910019d8c5a954ffdf4b6ff83cba1b5b39a690c943175424fef467a1a1c"
+    },
+    {
+      "id": "whisper-linked-libraries",
+      "status": "verified",
+      "command": [
+        "otool",
+        "-L",
+        "/private/tmp/trove-phase0-tools/whisper-probe"
+      ],
+      "exitCode": 0,
+      "log": "evidence/baseline-logs/whisper-linked-libraries.log",
+      "logSha256": "7c7c8483db79d3c252b454a8d44ffc44a4a0bfe52558be0125db380988de02e6"
+    }
+  ],
+  "failure": null,
+  "releaseGates": [
+    {
+      "requirement": "Signed/notarized Wails installer and bundled worker launch on a clean Mac without developer tools",
+      "status": "unverified"
+    },
+    {
+      "requirement": "Model manifests, license review, hash validation, CPU/Metal chat and embedding inference, timestamped transcription",
+      "status": "unverified"
+    },
+    {
+      "requirement": "Native permissions, capture, clipboard, deep links, lifecycle, restart and restore",
+      "status": "unverified"
+    },
+    {
+      "requirement": "Supported minimum macOS version, memory/thermal budgets, cancellation and worker crash containment",
+      "status": "unverified"
+    },
+    {
+      "requirement": "sqlite-vec newer-runtime upgrade/delete stress qualification before P0 product release",
+      "status": "unverified"
+    },
+    {
+      "requirement": "Windows and Linux independent qualification",
+      "status": "unverified"
+    }
+  ],
+  "inputSha256": {
+    "baseline/baseline.lock.json": "e69e3d2bbfa9ebba6647ccf93185eff693b063468eaba08b14a8f5344771251a",
+    "baseline/frontend/index.html": "244501072371dcb842168acd4087e7be2abce2d6fc97b36966580dd5670647ab",
+    "baseline/frontend/package.json": "eae0ba4d83217ad7e3f7c297e31437936225dec6fbe9115de8feaaada3cff54e",
+    "baseline/frontend/pnpm-lock.yaml": "81121962fffc2b6fb2e5e45e74e6af107a4bf050cdea44d32039301d7110b9b9",
+    "baseline/frontend/src/main.tsx": "97acbf77ab481e4ad7d01d734080b20b0e161681a4e8c056789a41ef5f8ad152",
+    "baseline/frontend/tsconfig.json": "d16dc856244c5bdf87fc266e9c866f5ce04edc7499df6c827c8c3dec7fc887cb",
+    "baseline/go/go.mod": "4124fb02ad597a42e44712b346015d5210fd1725b775b90ce273da0a6b133459",
+    "baseline/go/go.sum": "883ed4e3fcb76258c205061b0ea09e0f9d039e9ec599335a26c1ee0e491d6849",
+    "baseline/go/shell/index.html": "b6af8e7997f914936f5abe1974ad98d8b7063794288f0b946015ae108ee10745",
+    "baseline/go/shell/main.go": "1abda982788f9add2228f5c8b1726063be2238cfceba8e5aac9be1cba2468ce4",
+    "baseline/go/storage_test.go": "aabb9525b28a4b73e49e5ca71c0cd040cf9dce074cfc8b1bf67a515262502722",
+    "baseline/native/llama-probe.cpp": "1ea1dd35353ff3115b8977d723f87fd2360121fb33e9cc3c851e4cec1c238f16",
+    "baseline/native/whisper-probe.cpp": "a730e264722d35cb6592ab265f441d49ee16fd737a2f18e7aac3163bf481525c",
+    "scripts/validate-baseline.py": "fe74450d3eb825b44ee8213ab728a5354ed5ea495c311fa7095fb2307114a0c0"
+  }
+}

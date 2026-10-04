@@ -1,0 +1,29 @@
+✔ rectangular nested merges reversibly preserve rich text and original cell identity (6.583875ms)
+✔ post-merge edits survive splitting without removing other original content (0.141125ms)
+✔ incomplete and overlapping ranges do not erase source data (0.573917ms)
+✔ search replace crosses formatting spans and leaves canonical IDs and raw evidence intact (0.221833ms)
+✔ embed HTML escapes executable input and has no network policy (0.110667ms)
+✔ advanced canonical structures round trip through editor without spurious writes (0.526042ms)
+✔ lossless mixed canonical document including unsupported imported structures (8.14275ms)
+✔ split and clipboard duplicates get fresh allocated identities; task references stay canonical (0.407125ms)
+✔ indent keeps block identity and emits canonical block.move (0.295958ms)
+✔ marks, links, Unicode and explicit line breaks survive rich text projection (0.128333ms)
+✔ deleting a nested tree emits child-first deletes (0.08775ms)
+✔ split and formatted paste guard unchanged reordered siblings and new blocks (0.308167ms)
+✔ structural guards include an unchanged parent, moved descendants and destination siblings (0.160375ms)
+✔ calendar range rescheduling preserves duration and explicit timezone (2.28175ms)
+✔ grouping and subgrouping partition references without copying record identities (0.231458ms)
+✔ imported identities, places and author labels remain readable without interpreting raw payload (0.065209ms)
+✔ chart normalization preserves huge decimal ratios without Number overflow (1.227458ms)
+✔ donut cannot misrepresent signed aggregates as positive areas (0.181833ms)
+✔ required form values accept false and zero but reject blank rich text (0.071125ms)
+✔ Phase 5 editor replacement crosses table formatting spans without changing merged evidence (1.348042ms)
+✔ Phase 5 editor merged tables and nested tabs keep canonical identities across unrelated edits (5.773125ms)
+ℹ tests 21
+ℹ suites 0
+ℹ pass 21
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 210.285584

@@ -1,0 +1,16 @@
+
+  VITE v8.3.1  ready in 227 ms
+
+  ➜  Local:   http://127.0.0.1:4173/
+The request id "/private/tmp/trove-phase1-frontend/node_modules/.pnpm/katex@0.18.9/node_modules/katex/dist/fonts/KaTeX_Math-Italic.woff2" is outside of Vite serving allow list.
+
+- /Volumes/HD-B1/HD-Projects/Trove/frontend
+- /private/tmp/trove-phase1-frontend/node_modules/.pnpm/vite@8.3.1/node_modules/vite/dist/client
+
+Refer to docs https://vite.dev/config/server-options.html#server-fs-allow for configurations and more details.
+
+The request id "/private/tmp/trove-phase1-frontend/node_modules/.pnpm/katex@0.18.9/node_modules/katex/dist/fonts/KaTeX_Main-Regular.woff2" is outside of Vite serving allow list.
+The request id "/private/tmp/trove-phase1-frontend/node_modules/.pnpm/katex@0.18.9/node_modules/katex/dist/fonts/KaTeX_Math-Italic.woff" is outside of Vite serving allow list.
+The request id "/private/tmp/trove-phase1-frontend/node_modules/.pnpm/katex@0.18.9/node_modules/katex/dist/fonts/KaTeX_Main-Regular.woff" is outside of Vite serving allow list.
+The request id "/private/tmp/trove-phase1-frontend/node_modules/.pnpm/katex@0.18.9/node_modules/katex/dist/fonts/KaTeX_Math-Italic.ttf" is outside of Vite serving allow list.
+The request id "/private/tmp/trove-phase1-frontend/node_modules/.pnpm/katex@0.18.9/node_modules/katex/dist/fonts/KaTeX_Main-Regular.ttf" is outside of Vite serving allow list.

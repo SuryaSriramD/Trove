@@ -1,0 +1,20 @@
+{
+  "step": "p0-create",
+  "passed": false,
+  "recordedAt": "",
+  "state": {
+    "workspaceId": "",
+    "pageId": "",
+    "blockId": "",
+    "collectionId": "",
+    "propertyId": "",
+    "recordId": "",
+    "recordPageId": "",
+    "fileId": "",
+    "fileBlockId": "",
+    "contentHash": ""
+  },
+  "checks": null,
+  "processExitCode": 0,
+  "installedWeightsAvailable": false
+}

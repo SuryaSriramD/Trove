@@ -1,0 +1,497 @@
+Trove P0 third-party notices
+
+See provenance.json for exact versions, integrity digests and upstream model license URLs.
+The notices directory conservatively includes build dependencies as well as runtime dependencies.
+
+Go modules
+  github.com/leaanthony/go-ansi-parser v1.6.1
+    notices/github.com_leaanthony_go-ansi-parser_v1.6.1/LICENSE
+  github.com/leaanthony/slicer v1.6.0
+    notices/github.com_leaanthony_slicer_v1.6.0/LICENSE
+  github.com/leaanthony/u v1.1.1
+    notices/github.com_leaanthony_u_v1.1.1/LICENSE
+  github.com/mattn/go-sqlite3 v1.14.52
+    notices/github.com_mattn_go-sqlite3_v1.14.52/LICENSE
+  github.com/pkg/browser v0.0.0-20240102092130-5ac0b6a4141c
+    notices/github.com_pkg_browser_v0.0.0-20240102092130-5ac0b6a4141c/LICENSE
+  github.com/pkg/errors v0.9.1
+    notices/github.com_pkg_errors_v0.9.1/LICENSE
+  github.com/rivo/uniseg v0.4.7
+    notices/github.com_rivo_uniseg_v0.4.7/LICENSE.txt
+  github.com/samber/lo v1.49.1
+    notices/github.com_samber_lo_v1.49.1/LICENSE
+  github.com/santhosh-tekuri/jsonschema/v6 v6.0.2
+    notices/github.com_santhosh-tekuri_jsonschema_v6_v6.0.2/LICENSE
+  github.com/tkrajina/go-reflector v0.5.8
+    notices/github.com_tkrajina_go-reflector_v0.5.8/LICENSE.txt
+  github.com/wailsapp/mimetype v1.4.1
+    notices/github.com_wailsapp_mimetype_v1.4.1/LICENSE
+  github.com/wailsapp/wails/v2 v2.16.0
+    notices/github.com_wailsapp_wails_v2_v2.16.0/LICENSE
+    notices/github.com_wailsapp_wails_v2_v2.16.0/cmd/wails/internal/template/base/frontend/dist/assets/fonts/OFL.txt
+    notices/github.com_wailsapp_wails_v2_v2.16.0/internal/frontend/desktop/windows/winc/AUTHORS
+    notices/github.com_wailsapp_wails_v2_v2.16.0/internal/frontend/desktop/windows/winc/LICENSE
+    notices/github.com_wailsapp_wails_v2_v2.16.0/internal/go-common-file-dialog/LICENSE
+    notices/github.com_wailsapp_wails_v2_v2.16.0/internal/typescriptify/LICENSE.txt
+    notices/github.com_wailsapp_wails_v2_v2.16.0/pkg/templates/generate/assets/common/frontend/src/assets/fonts/OFL.txt
+    notices/github.com_wailsapp_wails_v2_v2.16.0/pkg/templates/generate/assets/lit/frontend/src/assets/fonts/OFL.txt
+    notices/github.com_wailsapp_wails_v2_v2.16.0/pkg/templates/generate/assets/preact/frontend/src/assets/fonts/OFL.txt
+    notices/github.com_wailsapp_wails_v2_v2.16.0/pkg/templates/generate/assets/react/frontend/src/assets/fonts/OFL.txt
+    notices/github.com_wailsapp_wails_v2_v2.16.0/pkg/templates/generate/assets/vue/frontend/src/assets/fonts/OFL.txt
+    notices/github.com_wailsapp_wails_v2_v2.16.0/pkg/templates/generate/plain/frontend/src/assets/fonts/OFL.txt
+    notices/github.com_wailsapp_wails_v2_v2.16.0/pkg/templates/templates/lit/frontend/src/assets/fonts/OFL.txt
+    notices/github.com_wailsapp_wails_v2_v2.16.0/pkg/templates/templates/lit-ts/frontend/src/assets/fonts/OFL.txt
+    notices/github.com_wailsapp_wails_v2_v2.16.0/pkg/templates/templates/plain/frontend/src/assets/fonts/OFL.txt
+    notices/github.com_wailsapp_wails_v2_v2.16.0/pkg/templates/templates/preact/frontend/src/assets/fonts/OFL.txt
+    notices/github.com_wailsapp_wails_v2_v2.16.0/pkg/templates/templates/preact-ts/frontend/src/assets/fonts/OFL.txt
+    notices/github.com_wailsapp_wails_v2_v2.16.0/pkg/templates/templates/react/frontend/src/assets/fonts/OFL.txt
+    notices/github.com_wailsapp_wails_v2_v2.16.0/pkg/templates/templates/react-ts/frontend/src/assets/fonts/OFL.txt
+    notices/github.com_wailsapp_wails_v2_v2.16.0/pkg/templates/templates/svelte/frontend/src/assets/fonts/OFL.txt
+    notices/github.com_wailsapp_wails_v2_v2.16.0/pkg/templates/templates/svelte-ts/frontend/src/assets/fonts/OFL.txt
+    notices/github.com_wailsapp_wails_v2_v2.16.0/pkg/templates/templates/vanilla/frontend/src/assets/fonts/OFL.txt
+    notices/github.com_wailsapp_wails_v2_v2.16.0/pkg/templates/templates/vanilla-ts/frontend/src/assets/fonts/OFL.txt
+    notices/github.com_wailsapp_wails_v2_v2.16.0/pkg/templates/templates/vue/frontend/src/assets/fonts/OFL.txt
+    notices/github.com_wailsapp_wails_v2_v2.16.0/pkg/templates/templates/vue-ts/frontend/src/assets/fonts/OFL.txt
+  golang.org/x/net v0.56.0
+    notices/golang.org_x_net_v0.56.0/LICENSE
+  golang.org/x/text v0.39.0
+    notices/golang.org_x_text_v0.39.0/LICENSE
+
+Frontend packages
+  @antfu/install-pkg 2.1.0
+    notices/_antfu_install-pkg_2.1.0/LICENSE
+  @braintree/sanitize-url 7.1.2
+    notices/_braintree_sanitize-url_7.1.2/LICENSE
+  @chevrotain/cst-dts-gen 11.1.2
+    notices/_chevrotain_cst-dts-gen_11.1.2/LICENSE.txt
+  @chevrotain/gast 11.1.2
+    notices/_chevrotain_gast_11.1.2/LICENSE.txt
+  @chevrotain/regexp-to-ast 11.1.2
+    notices/_chevrotain_regexp-to-ast_11.1.2/LICENSE.txt
+  @chevrotain/types 11.1.2
+    notices/_chevrotain_types_11.1.2/LICENSE.txt
+  @chevrotain/utils 11.1.2
+    notices/_chevrotain_utils_11.1.2/LICENSE.txt
+  @floating-ui/core 1.8.0
+    notices/_floating-ui_core_1.8.0/LICENSE
+  @floating-ui/dom 1.8.0
+    notices/_floating-ui_dom_1.8.0/LICENSE
+  @floating-ui/utils 0.2.12
+    notices/_floating-ui_utils_0.2.12/LICENSE
+  @iconify/types 2.0.0
+    notices/_iconify_types_2.0.0/license.txt
+  @iconify/utils 3.1.7
+    notices/_iconify_utils_3.1.7/license.txt
+  @mermaid-js/parser 2.0.0
+    notices/_mermaid-js_parser_2.0.0/LICENSE
+  @oxc-project/types 0.151.0
+    notices/_oxc-project_types_0.151.0/LICENSE
+  @playwright/test 1.63.0
+    notices/_playwright_test_1.63.0/LICENSE
+    notices/_playwright_test_1.63.0/NOTICE
+  @rolldown/binding-darwin-arm64 1.2.11
+    notices/_rolldown_binding-darwin-arm64_1.2.11/README.md
+    notices/_rolldown_binding-darwin-arm64_1.2.11/package.json
+  @rolldown/pluginutils 1.0.1
+    notices/_rolldown_pluginutils_1.0.1/LICENSE
+  @tiptap/core 3.31.3
+    notices/_tiptap_core_3.31.3/LICENSE.md
+  @tiptap/extension-blockquote 3.31.3
+    notices/_tiptap_extension-blockquote_3.31.3/LICENSE.md
+  @tiptap/extension-bold 3.31.3
+    notices/_tiptap_extension-bold_3.31.3/LICENSE.md
+  @tiptap/extension-bubble-menu 3.31.3
+    notices/_tiptap_extension-bubble-menu_3.31.3/LICENSE.md
+  @tiptap/extension-bullet-list 3.31.3
+    notices/_tiptap_extension-bullet-list_3.31.3/LICENSE.md
+  @tiptap/extension-code-block 3.31.3
+    notices/_tiptap_extension-code-block_3.31.3/LICENSE.md
+  @tiptap/extension-code 3.31.3
+    notices/_tiptap_extension-code_3.31.3/LICENSE.md
+  @tiptap/extension-document 3.31.3
+    notices/_tiptap_extension-document_3.31.3/LICENSE.md
+  @tiptap/extension-dropcursor 3.31.3
+    notices/_tiptap_extension-dropcursor_3.31.3/LICENSE.md
+  @tiptap/extension-floating-menu 3.31.3
+    notices/_tiptap_extension-floating-menu_3.31.3/LICENSE.md
+  @tiptap/extension-gapcursor 3.31.3
+    notices/_tiptap_extension-gapcursor_3.31.3/LICENSE.md
+  @tiptap/extension-hard-break 3.31.3
+    notices/_tiptap_extension-hard-break_3.31.3/LICENSE.md
+  @tiptap/extension-heading 3.31.3
+    notices/_tiptap_extension-heading_3.31.3/LICENSE.md
+  @tiptap/extension-horizontal-rule 3.31.3
+    notices/_tiptap_extension-horizontal-rule_3.31.3/LICENSE.md
+  @tiptap/extension-italic 3.31.3
+    notices/_tiptap_extension-italic_3.31.3/LICENSE.md
+  @tiptap/extension-link 3.31.3
+    notices/_tiptap_extension-link_3.31.3/LICENSE.md
+  @tiptap/extension-list-item 3.31.3
+    notices/_tiptap_extension-list-item_3.31.3/LICENSE.md
+  @tiptap/extension-list-keymap 3.31.3
+    notices/_tiptap_extension-list-keymap_3.31.3/LICENSE.md
+  @tiptap/extension-list 3.31.3
+    notices/_tiptap_extension-list_3.31.3/LICENSE.md
+  @tiptap/extension-ordered-list 3.31.3
+    notices/_tiptap_extension-ordered-list_3.31.3/LICENSE.md
+  @tiptap/extension-paragraph 3.31.3
+    notices/_tiptap_extension-paragraph_3.31.3/LICENSE.md
+  @tiptap/extension-strike 3.31.3
+    notices/_tiptap_extension-strike_3.31.3/LICENSE.md
+  @tiptap/extension-text 3.31.3
+    notices/_tiptap_extension-text_3.31.3/LICENSE.md
+  @tiptap/extension-underline 3.31.3
+    notices/_tiptap_extension-underline_3.31.3/LICENSE.md
+  @tiptap/extensions 3.31.3
+    notices/_tiptap_extensions_3.31.3/LICENSE.md
+  @tiptap/pm 3.31.3
+    notices/_tiptap_pm_3.31.3/LICENSE
+  @tiptap/react 3.31.3
+    notices/_tiptap_react_3.31.3/LICENSE.md
+  @tiptap/starter-kit 3.31.3
+    notices/_tiptap_starter-kit_3.31.3/LICENSE.md
+  @types/d3-array 3.2.2
+    notices/_types_d3-array_3.2.2/LICENSE
+  @types/d3-axis 3.0.6
+    notices/_types_d3-axis_3.0.6/LICENSE
+  @types/d3-brush 3.0.6
+    notices/_types_d3-brush_3.0.6/LICENSE
+  @types/d3-chord 3.0.6
+    notices/_types_d3-chord_3.0.6/LICENSE
+  @types/d3-color 3.1.3
+    notices/_types_d3-color_3.1.3/LICENSE
+  @types/d3-contour 3.0.6
+    notices/_types_d3-contour_3.0.6/LICENSE
+  @types/d3-delaunay 6.0.4
+    notices/_types_d3-delaunay_6.0.4/LICENSE
+  @types/d3-dispatch 3.0.7
+    notices/_types_d3-dispatch_3.0.7/LICENSE
+  @types/d3-drag 3.0.7
+    notices/_types_d3-drag_3.0.7/LICENSE
+  @types/d3-dsv 3.0.7
+    notices/_types_d3-dsv_3.0.7/LICENSE
+  @types/d3-ease 3.0.2
+    notices/_types_d3-ease_3.0.2/LICENSE
+  @types/d3-fetch 3.0.7
+    notices/_types_d3-fetch_3.0.7/LICENSE
+  @types/d3-force 3.0.10
+    notices/_types_d3-force_3.0.10/LICENSE
+  @types/d3-format 3.0.4
+    notices/_types_d3-format_3.0.4/LICENSE
+  @types/d3-geo 3.1.1
+    notices/_types_d3-geo_3.1.1/LICENSE
+  @types/d3-hierarchy 3.1.7
+    notices/_types_d3-hierarchy_3.1.7/LICENSE
+  @types/d3-interpolate 3.0.4
+    notices/_types_d3-interpolate_3.0.4/LICENSE
+  @types/d3-path 3.1.1
+    notices/_types_d3-path_3.1.1/LICENSE
+  @types/d3-polygon 3.0.2
+    notices/_types_d3-polygon_3.0.2/LICENSE
+  @types/d3-quadtree 3.0.6
+    notices/_types_d3-quadtree_3.0.6/LICENSE
+  @types/d3-random 3.0.4
+    notices/_types_d3-random_3.0.4/LICENSE
+  @types/d3-scale-chromatic 3.1.0
+    notices/_types_d3-scale-chromatic_3.1.0/LICENSE
+  @types/d3-scale 4.0.9
+    notices/_types_d3-scale_4.0.9/LICENSE
+  @types/d3-selection 3.0.12
+    notices/_types_d3-selection_3.0.12/LICENSE
+  @types/d3-shape 3.2.0
+    notices/_types_d3-shape_3.2.0/LICENSE
+  @types/d3-time-format 4.0.3
+    notices/_types_d3-time-format_4.0.3/LICENSE
+  @types/d3-time 3.0.4
+    notices/_types_d3-time_3.0.4/LICENSE
+  @types/d3-timer 3.0.2
+    notices/_types_d3-timer_3.0.2/LICENSE
+  @types/d3-transition 3.0.9
+    notices/_types_d3-transition_3.0.9/LICENSE
+  @types/d3-zoom 3.0.9
+    notices/_types_d3-zoom_3.0.9/LICENSE
+  @types/d3 7.4.3
+    notices/_types_d3_7.4.3/LICENSE
+  @types/geojson 7946.0.16
+    notices/_types_geojson_7946.0.16/LICENSE
+  @types/katex 0.16.8
+    notices/_types_katex_0.16.8/LICENSE
+  @types/react-dom 19.3.0
+    notices/_types_react-dom_19.3.0/LICENSE
+  @types/react 19.3.0
+    notices/_types_react_19.3.0/LICENSE
+  @types/trusted-types 2.0.7
+    notices/_types_trusted-types_2.0.7/LICENSE
+  @types/use-sync-external-store 0.0.6
+    notices/_types_use-sync-external-store_0.0.6/LICENSE
+  @typescript/typescript-darwin-arm64 7.0.2
+    notices/_typescript_typescript-darwin-arm64_7.0.2/LICENSE
+    notices/_typescript_typescript-darwin-arm64_7.0.2/NOTICE.txt
+  @upsetjs/venn.js 2.0.0
+    notices/_upsetjs_venn.js_2.0.0/LICENSE
+  chevrotain 11.1.2
+    notices/chevrotain_11.1.2/LICENSE.txt
+  commander 15.0.0
+    notices/commander_15.0.0/LICENSE
+  commander 7.2.0
+    notices/commander_7.2.0/LICENSE
+  commander 8.3.0
+    notices/commander_8.3.0/LICENSE
+  cose-base 1.0.3
+    notices/cose-base_1.0.3/LICENSE
+  cose-base 2.2.0
+    notices/cose-base_2.2.0/LICENSE
+  csstype 3.2.3
+    notices/csstype_3.2.3/LICENSE
+  cytoscape-cose-bilkent 4.1.0
+    notices/cytoscape-cose-bilkent_4.1.0/LICENSE
+  cytoscape-fcose 2.2.0
+    notices/cytoscape-fcose_2.2.0/LICENSE
+  cytoscape 3.34.3
+    notices/cytoscape_3.34.3/LICENSE
+    notices/cytoscape_3.34.3/license-update.mjs
+  d3-array 2.12.1
+    notices/d3-array_2.12.1/LICENSE
+  d3-array 3.2.4
+    notices/d3-array_3.2.4/LICENSE
+  d3-axis 3.0.0
+    notices/d3-axis_3.0.0/LICENSE
+  d3-brush 3.0.0
+    notices/d3-brush_3.0.0/LICENSE
+  d3-chord 3.0.1
+    notices/d3-chord_3.0.1/LICENSE
+  d3-color 3.1.0
+    notices/d3-color_3.1.0/LICENSE
+  d3-contour 4.0.2
+    notices/d3-contour_4.0.2/LICENSE
+  d3-delaunay 6.0.4
+    notices/d3-delaunay_6.0.4/LICENSE
+  d3-dispatch 3.0.1
+    notices/d3-dispatch_3.0.1/LICENSE
+  d3-drag 3.0.0
+    notices/d3-drag_3.0.0/LICENSE
+  d3-dsv 3.0.1
+    notices/d3-dsv_3.0.1/LICENSE
+  d3-ease 3.0.1
+    notices/d3-ease_3.0.1/LICENSE
+  d3-fetch 3.0.1
+    notices/d3-fetch_3.0.1/LICENSE
+  d3-force 3.0.0
+    notices/d3-force_3.0.0/LICENSE
+  d3-format 3.1.2
+    notices/d3-format_3.1.2/LICENSE
+  d3-geo 3.1.1
+    notices/d3-geo_3.1.1/LICENSE
+  d3-hierarchy 3.1.2
+    notices/d3-hierarchy_3.1.2/LICENSE
+  d3-interpolate 3.0.1
+    notices/d3-interpolate_3.0.1/LICENSE
+  d3-path 1.0.9
+    notices/d3-path_1.0.9/LICENSE
+  d3-path 3.1.0
+    notices/d3-path_3.1.0/LICENSE
+  d3-polygon 3.0.1
+    notices/d3-polygon_3.0.1/LICENSE
+  d3-quadtree 3.0.1
+    notices/d3-quadtree_3.0.1/LICENSE
+  d3-random 3.0.1
+    notices/d3-random_3.0.1/LICENSE
+  d3-sankey 0.12.3
+    notices/d3-sankey_0.12.3/LICENSE
+  d3-scale-chromatic 3.1.0
+    notices/d3-scale-chromatic_3.1.0/LICENSE
+  d3-scale 4.0.2
+    notices/d3-scale_4.0.2/LICENSE
+  d3-selection 3.0.0
+    notices/d3-selection_3.0.0/LICENSE
+  d3-shape 1.3.7
+    notices/d3-shape_1.3.7/LICENSE
+  d3-shape 3.2.0
+    notices/d3-shape_3.2.0/LICENSE
+  d3-time-format 4.1.0
+    notices/d3-time-format_4.1.0/LICENSE
+  d3-time 3.1.0
+    notices/d3-time_3.1.0/LICENSE
+  d3-timer 3.0.1
+    notices/d3-timer_3.0.1/LICENSE
+  d3-transition 3.0.1
+    notices/d3-transition_3.0.1/LICENSE
+  d3-zoom 3.0.0
+    notices/d3-zoom_3.0.0/LICENSE
+  d3 7.9.0
+    notices/d3_7.9.0/LICENSE
+  dagre-d3-es 7.0.14
+    notices/dagre-d3-es_7.0.14/LICENSE.md
+  dayjs 1.11.23
+    notices/dayjs_1.11.23/LICENSE
+  delaunator 5.1.0
+    notices/delaunator_5.1.0/LICENSE
+  detect-libc 2.1.2
+    notices/detect-libc_2.1.2/LICENSE
+  dompurify 3.4.16
+    notices/dompurify_3.4.16/LICENSE
+    notices/dompurify_3.4.16/LICENSE-MPL
+  elkjs 0.9.3
+    notices/elkjs_0.9.3/LICENSE.md
+  es-toolkit 1.52.0
+    notices/es-toolkit_1.52.0/LICENSE
+    notices/es-toolkit_1.52.0/NOTICE
+  fast-equals 5.4.3
+    notices/fast-equals_5.4.3/LICENSE
+  fdir 6.5.0
+    notices/fdir_6.5.0/LICENSE
+  fsevents 2.3.3
+    notices/fsevents_2.3.3/LICENSE
+  hachure-fill 0.5.2
+    notices/hachure-fill_0.5.2/LICENSE
+  highlight.js 11.12.0
+    notices/highlight.js_11.12.0/LICENSE
+  iconv-lite 0.6.3
+    notices/iconv-lite_0.6.3/LICENSE
+  import-meta-resolve 4.2.0
+    notices/import-meta-resolve_4.2.0/license
+  internmap 1.0.1
+    notices/internmap_1.0.1/LICENSE
+  internmap 2.0.3
+    notices/internmap_2.0.3/LICENSE
+  katex 0.16.47
+    notices/katex_0.16.47/LICENSE
+  katex 0.18.9
+    notices/katex_0.18.9/LICENSE
+  khroma 2.1.0
+    notices/khroma_2.1.0/license
+  layout-base 1.0.2
+    notices/layout-base_1.0.2/LICENSE
+  layout-base 2.0.1
+    notices/layout-base_2.0.1/LICENSE
+  lightningcss-darwin-arm64 1.33.0
+    notices/lightningcss-darwin-arm64_1.33.0/LICENSE
+  lightningcss 1.33.0
+    notices/lightningcss_1.33.0/LICENSE
+  linkifyjs 4.3.3
+    notices/linkifyjs_4.3.3/LICENSE
+  lodash-es 4.17.23
+    notices/lodash-es_4.17.23/LICENSE
+  lodash-es 4.18.1
+    notices/lodash-es_4.18.1/LICENSE
+  marked 16.4.2
+    notices/marked_16.4.2/LICENSE.md
+  mermaid 12.0.0
+    notices/mermaid_12.0.0/LICENSE
+  nanoid 3.3.19
+    notices/nanoid_3.3.19/LICENSE
+  orderedmap 2.1.1
+    notices/orderedmap_2.1.1/LICENSE
+  package-manager-detector 1.8.0
+    notices/package-manager-detector_1.8.0/LICENSE
+  path-data-parser 0.1.0
+    notices/path-data-parser_0.1.0/LICENSE
+  picocolors 1.1.1
+    notices/picocolors_1.1.1/LICENSE
+  picomatch 4.0.7
+    notices/picomatch_4.0.7/LICENSE
+  playwright-core 1.63.0
+    notices/playwright-core_1.63.0/LICENSE
+    notices/playwright-core_1.63.0/NOTICE
+  playwright 1.63.0
+    notices/playwright_1.63.0/LICENSE
+    notices/playwright_1.63.0/NOTICE
+  points-on-curve 0.2.0
+    notices/points-on-curve_0.2.0/LICENSE
+  points-on-path 0.2.1
+    notices/points-on-path_0.2.1/LICENSE
+  postcss 8.5.28
+    notices/postcss_8.5.28/LICENSE
+  prettier 3.9.9
+    notices/prettier_3.9.9/LICENSE
+  prosemirror-changeset 2.4.4
+    notices/prosemirror-changeset_2.4.4/LICENSE
+  prosemirror-commands 1.7.2
+    notices/prosemirror-commands_1.7.2/LICENSE
+  prosemirror-dropcursor 1.8.4
+    notices/prosemirror-dropcursor_1.8.4/LICENSE
+  prosemirror-gapcursor 1.4.1
+    notices/prosemirror-gapcursor_1.4.1/LICENSE
+  prosemirror-history 1.5.1
+    notices/prosemirror-history_1.5.1/LICENSE
+  prosemirror-inputrules 1.5.1
+    notices/prosemirror-inputrules_1.5.1/LICENSE
+  prosemirror-keymap 1.2.3
+    notices/prosemirror-keymap_1.2.3/LICENSE
+  prosemirror-model 1.25.12
+    notices/prosemirror-model_1.25.12/LICENSE
+  prosemirror-schema-list 1.5.1
+    notices/prosemirror-schema-list_1.5.1/LICENSE
+  prosemirror-state 1.4.4
+    notices/prosemirror-state_1.4.4/LICENSE
+  prosemirror-tables 1.8.5
+    notices/prosemirror-tables_1.8.5/LICENSE
+  prosemirror-transform 1.12.2
+    notices/prosemirror-transform_1.12.2/LICENSE
+  prosemirror-view 1.42.6
+    notices/prosemirror-view_1.42.6/LICENSE
+  react-dom 19.3.0
+    notices/react-dom_19.3.0/LICENSE
+  react 19.3.0
+    notices/react_19.3.0/LICENSE
+  robust-predicates 3.0.3
+    notices/robust-predicates_3.0.3/LICENSE
+  rolldown 1.2.11
+    notices/rolldown_1.2.11/LICENSE
+    notices/rolldown_1.2.11/THIRD-PARTY-LICENSE
+  rope-sequence 1.3.4
+    notices/rope-sequence_1.3.4/LICENSE
+  roughjs 4.6.6
+    notices/roughjs_4.6.6/LICENSE
+  rw 1.3.3
+    notices/rw_1.3.3/LICENSE
+  safer-buffer 2.1.2
+    notices/safer-buffer_2.1.2/LICENSE
+  scheduler 0.28.0
+    notices/scheduler_0.28.0/LICENSE
+  source-map-js 1.2.1
+    notices/source-map-js_1.2.1/LICENSE
+  stylis 4.4.0
+    notices/stylis_4.4.0/LICENSE
+  tinyexec 1.3.1
+    notices/tinyexec_1.3.1/LICENSE
+  tinyglobby 0.2.17
+    notices/tinyglobby_0.2.17/LICENSE
+  ts-dedent 2.3.0
+    notices/ts-dedent_2.3.0/LICENSE
+  typescript 7.0.2
+    notices/typescript_7.0.2/LICENSE
+    notices/typescript_7.0.2/NOTICE.txt
+  use-sync-external-store 1.7.0
+    notices/use-sync-external-store_1.7.0/LICENSE
+  uuid 14.0.2
+    notices/uuid_14.0.2/LICENSE.md
+  vite 8.3.1
+    notices/vite_8.3.1/LICENSE.md
+  w3c-keyname 2.2.8
+    notices/w3c-keyname_2.2.8/LICENSE
+
+Native runtimes
+  llama d2e54583c7452353eb35d40431281f6ee984332f
+    notices/llama.cpp/AUTHORS
+    notices/llama.cpp/LICENSE
+    notices/llama.cpp/cmake/license.cmake
+    notices/llama.cpp/gguf-py/LICENSE
+    notices/llama.cpp/licenses/LICENSE-jsonhpp
+    notices/llama.cpp/tools/ui/src/lib/vendors/big-integer/LICENSE
+    notices/llama.cpp/tools/ui/src/lib/vendors/decimal.js/LICENCE.md
+    notices/llama.cpp/tools/ui/src/lib/vendors/nerdamer-prime/LICENSE
+    notices/llama.cpp/vendor/cpp-httplib/LICENSE
+    notices/llama.cpp/vendor/hash/rotate-bits/LICENSE.md
+    notices/llama.cpp/vendor/hash/sha256/LICENSE
+    notices/llama.cpp/vendor/hash/xxhash/LICENSE
+  whisper 927cfce34f31707e17f2bff35c349632fb9e2c3a
+    notices/whisper.cpp/AUTHORS
+    notices/whisper.cpp/LICENSE
+    notices/whisper.cpp/bindings/go/LICENSE
+    notices/whisper.cpp/examples/wchess/wchess.wasm/chessboardjs-1.0.0/js/chessboard-1.0.0/LICENSE.md
+    notices/whisper.cpp/tests/earnings21/normalizers/LICENSE
+    notices/whisper.cpp/tests/librispeech/normalizers/LICENSE
+    notices/whisper.cpp/tests/librispeech-parakeet/normalizers/LICENSE
+  sqlite-vec v0.1.6
+    notices/sqlite-vec/LICENSE-MIT

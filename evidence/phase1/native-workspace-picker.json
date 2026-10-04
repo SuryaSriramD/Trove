@@ -1,0 +1,16 @@
+{
+  "verified": true,
+  "platform": "macOS Apple Silicon",
+  "application": "build/Trove.app (running pre-final rebuild)",
+  "verification": "Native CUA accessibility interactions against the packaged application's actual NSOpenPanel",
+  "selectedDirectory": "/Volumes/HD-B1/HD-Projects/Trove/build/ui-workspace",
+  "observations": [
+    "Folder row selected initially, Open temporarily disabled.",
+    "Inspected pinned Wails 2.16.0 darwin/dialog.go and WailsContext.m: OpenDirectoryDialog sends allowFiles=false and allowDirectories=true; native adapter sets NSOpenPanel properties correctly.",
+    "Opened another workspace via Settings; Cmd-Shift-G navigated to the exact fixture directory with a trailing slash.",
+    "Immediate native AX snapshot showed Open disabled; following snapshot after directory validation showed Open enabled without any code or OS setting change.",
+    "Clicked enabled Open; sheet closed and workspace Home displayed Phase 1 integration and Record with a page body, including the retained Unicode note excerpt."
+  ],
+  "diagnosis": "The observed disabled button was transient native directory validation, not a proven Wails picker defect. No picker patch required.",
+  "limitations": "Does not prove all possible native volumes or directory picker timing. Input-method candidate selection and VoiceOver narration remain separate unverified qualifications."
+}

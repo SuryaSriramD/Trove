@@ -1,0 +1,244 @@
+{
+  "fixtureVersion": "p0-pages-v1",
+  "limitations": [
+    "Service timings exclude Wails bridge, browser paint and interaction latency.",
+    "No physical disk cache flush: kernel reopen is warm, not cold application launch.",
+    "Benchmark does not establish recording acoustics or model answer quality.",
+    "Other qualification jobs may run on the same host; no thermal or power isolation is claimed."
+  ],
+  "profiles": [
+    {
+      "canonicalTextUTF8Bytes": 91300,
+      "idleEditCommit": {
+        "count": 20,
+        "maxMs": 1.091875,
+        "meanMs": 0.56234795,
+        "p50Ms": 0.493833,
+        "p95Ms": 1.0865,
+        "samplesMs": [
+          0.731625,
+          1.0865,
+          0.506708,
+          0.474042,
+          0.512459,
+          1.091875,
+          0.5265,
+          0.479625,
+          0.485125,
+          0.530292,
+          0.53025,
+          0.483416,
+          0.453667,
+          0.411625,
+          0.43725,
+          0.4265,
+          0.434875,
+          0.58625,
+          0.564542,
+          0.493833
+        ]
+      },
+      "initialIndexMs": 12.724125,
+      "keyword": {
+        "count": 5,
+        "maxMs": 1.116666,
+        "meanMs": 0.7114748,
+        "p50Ms": 0.841625,
+        "p95Ms": 1.116666,
+        "queries": [
+          "release",
+          "telescope",
+          "café",
+          "project07",
+          "absenttoken"
+        ],
+        "samplesMs": [
+          1.116666,
+          1.037333,
+          0.841625,
+          0.48125,
+          0.0805
+        ],
+        "scope": "public Go Dispatch, validation + retrieval + response serialization; excludes Wails bridge and paint",
+        "warmupQueries": 5
+      },
+      "keywordModelsInstalled": false,
+      "pages": 100,
+      "paragraphBlocks": 200,
+      "setupSeconds": 0.117268708,
+      "warmKernelOpen": {
+        "count": 5,
+        "maxMs": 2.053334,
+        "meanMs": 1.6377836,
+        "p50Ms": 1.589834,
+        "p95Ms": 2.053334,
+        "samplesMs": [
+          2.053334,
+          1.667708,
+          1.589834,
+          1.422042,
+          1.456
+        ]
+      },
+      "workspaceBytesBeforeSemantic": 6201352,
+      "workspaceBytesFinal": 2428928,
+      "workspacePath": "/var/folders/xc/s78np0812b12p6338l0ndvsm0000gn/T/trove-phase3-benchmark-2578464489/pages-100"
+    },
+    {
+      "canonicalTextUTF8Bytes": 913000,
+      "idleEditCommit": {
+        "count": 20,
+        "maxMs": 1.01425,
+        "meanMs": 0.5445104999999999,
+        "p50Ms": 0.485875,
+        "p95Ms": 0.814292,
+        "samplesMs": [
+          0.814292,
+          0.534541,
+          0.583292,
+          0.483042,
+          0.4825,
+          0.459833,
+          0.464083,
+          0.4875,
+          0.483667,
+          0.438667,
+          0.4645,
+          0.539875,
+          0.449583,
+          0.439916,
+          1.01425,
+          0.545584,
+          0.638459,
+          0.485875,
+          0.528834,
+          0.551917
+        ]
+      },
+      "initialIndexMs": 138.800916,
+      "keyword": {
+        "count": 5,
+        "maxMs": 2.70975,
+        "meanMs": 1.7220001999999996,
+        "p50Ms": 2.189667,
+        "p95Ms": 2.70975,
+        "queries": [
+          "release",
+          "telescope",
+          "café",
+          "project07",
+          "absenttoken"
+        ],
+        "samplesMs": [
+          2.70975,
+          2.284958,
+          2.189667,
+          1.305334,
+          0.120292
+        ],
+        "scope": "public Go Dispatch, validation + retrieval + response serialization; excludes Wails bridge and paint",
+        "warmupQueries": 5
+      },
+      "keywordModelsInstalled": false,
+      "pages": 1000,
+      "paragraphBlocks": 2000,
+      "setupSeconds": 0.824774792,
+      "warmKernelOpen": {
+        "count": 5,
+        "maxMs": 1.922125,
+        "meanMs": 1.7965497999999998,
+        "p50Ms": 1.77725,
+        "p95Ms": 1.922125,
+        "samplesMs": [
+          1.922125,
+          1.77725,
+          1.819666,
+          1.710125,
+          1.753583
+        ]
+      },
+      "workspaceBytesBeforeSemantic": 18702872,
+      "workspaceBytesFinal": 14680064,
+      "workspacePath": "/var/folders/xc/s78np0812b12p6338l0ndvsm0000gn/T/trove-phase3-benchmark-2578464489/pages-1000"
+    },
+    {
+      "canonicalTextUTF8Bytes": 9130000,
+      "idleEditCommit": {
+        "count": 20,
+        "maxMs": 1.2855,
+        "meanMs": 0.6640541000000001,
+        "p50Ms": 0.599292,
+        "p95Ms": 1.024584,
+        "samplesMs": [
+          1.024584,
+          0.677875,
+          0.653708,
+          1.2855,
+          0.838542,
+          0.634166,
+          0.607625,
+          0.599917,
+          0.580916,
+          0.575125,
+          0.599292,
+          0.667916,
+          0.57575,
+          0.560791,
+          0.602583,
+          0.513375,
+          0.583875,
+          0.568708,
+          0.558292,
+          0.572542
+        ]
+      },
+      "initialIndexMs": 3051.834625,
+      "keyword": {
+        "count": 5,
+        "maxMs": 27.625833,
+        "meanMs": 15.160224799999998,
+        "p50Ms": 22.033375,
+        "p95Ms": 27.625833,
+        "queries": [
+          "release",
+          "telescope",
+          "café",
+          "project07",
+          "absenttoken"
+        ],
+        "samplesMs": [
+          27.625833,
+          22.615291,
+          22.033375,
+          3.348,
+          0.178625
+        ],
+        "scope": "public Go Dispatch, validation + retrieval + response serialization; excludes Wails bridge and paint",
+        "warmupQueries": 5
+      },
+      "keywordModelsInstalled": false,
+      "pages": 10000,
+      "paragraphBlocks": 20000,
+      "setupSeconds": 9.709869334,
+      "warmKernelOpen": {
+        "count": 5,
+        "maxMs": 9.733542,
+        "meanMs": 8.7708666,
+        "p50Ms": 8.775875,
+        "p95Ms": 9.733542,
+        "samplesMs": [
+          8.852125,
+          8.775875,
+          9.733542,
+          8.087916,
+          8.404875
+        ]
+      },
+      "workspaceBytesBeforeSemantic": 141547208,
+      "workspaceBytesFinal": 137535488,
+      "workspacePath": "/var/folders/xc/s78np0812b12p6338l0ndvsm0000gn/T/trove-phase3-benchmark-2578464489/pages-10000"
+    }
+  ],
+  "recordedAt": "2026-09-30T19:15:58.906316Z",
+  "schemaVersion": 1
+}

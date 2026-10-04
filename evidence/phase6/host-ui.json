@@ -1,0 +1,17 @@
+{
+  "result": "passed",
+  "scope": "packaged host executable + packaged frontend, real authentication/page create/display persistence/graph UI",
+  "checks": [
+    "login via owner token cookie",
+    "create canonical page through hosted UI",
+    "rename page through hosted UI",
+    "persist full-width preference through hosted UI",
+    "navigate intelligence graph through actual host API",
+    "no uncaught browser errors"
+  ],
+  "pageErrors": [],
+  "recordedAt": "2026-10-01T13:18:19.619892+00:00",
+  "artifactSHA256": "d514e4c6a0a6f636461d24ef75b971ff2146d5116f3bf539e7e80e2d5c583ea7",
+  "screenshot": "evidence/phase6/host-ui.png",
+  "testNote": "Preference save assertion waits for asynchronous commit; an initial immediate checkbox assertion was corrected without changing product code."
+}

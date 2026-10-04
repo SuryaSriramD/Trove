@@ -1,0 +1,38 @@
+{
+  "package": "1C",
+  "implementation": "complete",
+  "verification": {
+    "go_real_sqlite": {
+      "passed": 12,
+      "failed": 0,
+      "evidence": "evidence/phase1-database-go-tests.jsonl"
+    },
+    "browser_fixture": {
+      "passed": 3,
+      "failed": 0,
+      "evidence": "evidence/phase1-database-browser-tests.json"
+    },
+    "model_tests": {
+      "passed": 3,
+      "failed": 0,
+      "command": "node --experimental-strip-types --test frontend/tests/database.test.ts"
+    },
+    "typescript": "passed",
+    "packaged_app": "coordinator integration evidence; not inferred from browser fixture"
+  },
+  "tests": [
+    "TestDatabaseFourViewsShareRecordsAndRestart",
+    "TestDatabaseTypedPropertiesPreserveImportMetadata",
+    "TestDatabaseFiltersDecimalSortCursorAndAtomicity",
+    "TestDatabaseCrossCollectionAndScopeDenied",
+    "TestDatabaseContainersDoNotOwnRows",
+    "TestDatabaseDiskRestartIsolation",
+    "TestDatabaseFilterKeepsMultiSelectBoundaries",
+    "TestDatabaseClearValuePreservesTaskAndTitleInvariants",
+    "TestDatabaseFileValuesGrantScopedAccessAfterRestart",
+    "TestTasksCanonicalStatusOccurrencesPromotionAndRestart",
+    "TestTaskStaleMutationAndMissingMappings",
+    "TestTasksRejectPromotionWithoutCompletionMappings"
+  ],
+  "documentation": "docs/phase-1/1c.md"
+}

@@ -1,0 +1,19 @@
+{
+  "jobId": "0199a000-0000-7000-8000-000000000016",
+  "workspaceId": "0199a000-0000-7000-8000-000000000001",
+  "kind": "TRANSCRIBE_AUDIO",
+  "payloadVersion": 1,
+  "payload": {
+    "kind": "transcribe",
+    "meetingId": "0199a000-0000-7000-8000-000000000005",
+    "fileId": "0199a000-0000-7000-8000-000000000017",
+    "modelPackId": "0199a000-0000-7000-8000-000000000018"
+  },
+  "state": "queued",
+  "revision": "1",
+  "idempotencyKey": "transcribe-file-hash-v1",
+  "attempt": 0,
+  "maxAttempts": 3,
+  "createdAt": "2026-09-30T10:00:00Z",
+  "updatedAt": "2026-09-30T10:00:00Z"
+}

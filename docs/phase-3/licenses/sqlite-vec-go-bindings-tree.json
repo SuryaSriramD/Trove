@@ -1,0 +1,45 @@
+{
+  "sha": "529a0138d40e50087db7043e361601f91d711e81",
+  "url": "https://api.github.com/repos/asg017/sqlite-vec-go-bindings/git/trees/529a0138d40e50087db7043e361601f91d711e81",
+  "tree": [
+    {
+      "path": "README.md",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "11d09452d595c1da03a5093d1e562a05a06938c6",
+      "size": 2611,
+      "url": "https://api.github.com/repos/asg017/sqlite-vec-go-bindings/git/blobs/11d09452d595c1da03a5093d1e562a05a06938c6"
+    },
+    {
+      "path": "cgo",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "b513420aa5223547862bd113f1044479f81c3e04",
+      "url": "https://api.github.com/repos/asg017/sqlite-vec-go-bindings/git/trees/b513420aa5223547862bd113f1044479f81c3e04"
+    },
+    {
+      "path": "go.mod",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "12ee717549f8998e7d8b8ec82b2aa5fca5a62c77",
+      "size": 256,
+      "url": "https://api.github.com/repos/asg017/sqlite-vec-go-bindings/git/blobs/12ee717549f8998e7d8b8ec82b2aa5fca5a62c77"
+    },
+    {
+      "path": "go.sum",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "f0f70d9beafe80e86e2a70549ed97ae697227631",
+      "size": 839,
+      "url": "https://api.github.com/repos/asg017/sqlite-vec-go-bindings/git/blobs/f0f70d9beafe80e86e2a70549ed97ae697227631"
+    },
+    {
+      "path": "ncruces",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "a71555a90992656b9db141d0adbe60631b58988f",
+      "url": "https://api.github.com/repos/asg017/sqlite-vec-go-bindings/git/trees/a71555a90992656b9db141d0adbe60631b58988f"
+    }
+  ],
+  "truncated": false
+}

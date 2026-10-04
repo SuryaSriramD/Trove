@@ -1,0 +1,32 @@
+{
+  "schemaVersion": 1,
+  "selectedAt": "2026-09-30",
+  "target": {"os": "darwin", "arch": "arm64", "qualificationOrder": ["macOS Apple Silicon", "Windows", "Linux"]},
+  "go": {
+    "version": "1.27.1",
+    "url": "https://go.dev/dl/go1.27.1.darwin-arm64.tar.gz",
+    "sha256": "ee215d57e0ec269c60cc9ceca68e6bda321ba9ee5afe24f4b0988703c2d87d12",
+    "source": "https://go.dev/dl/?mode=json"
+  },
+  "toolchain": {"node": "25.5.0", "pnpm": "11.19.0", "cmake": "4.3.2", "clang": "21.0.0", "sdk": "macOS 27.0"},
+  "goModules": {
+    "wails": {"module": "github.com/wailsapp/wails/v2", "version": "v2.16.0", "commit": "457bf210d5eb976ff3726c8629f7725575163307", "source": "https://proxy.golang.org/github.com/wailsapp/wails/v2/@v/v2.16.0.info"},
+    "sqlite": {"module": "github.com/mattn/go-sqlite3", "version": "v1.14.52", "commit": "b0be46fa28d17ee0b65c79774ac0dad84b6db068", "runtimeVersion": "3.53.4", "source": "https://proxy.golang.org/github.com/mattn/go-sqlite3/@v/v1.14.52.info"},
+    "sqliteVec": {"module": "github.com/asg017/sqlite-vec-go-bindings", "package": "github.com/asg017/sqlite-vec-go-bindings/cgo", "version": "v0.1.6", "commit": "529a0138d40e50087db7043e361601f91d711e81", "runtimeVersion": "v0.1.6", "runtimeCommit": "639fca5739fe056fdc98f3d539c4cd79328d7dc7", "source": "https://proxy.golang.org/github.com/asg017/sqlite-vec-go-bindings/@v/v0.1.6.info"}
+  },
+  "sqlite": {
+    "ownership": "single workspace service writer",
+    "buildTags": ["fts5", "sqlite_omit_load_extension"],
+    "forbiddenBuildTags": ["libsqlite3"],
+    "pragmas": {"journal_mode": "WAL", "foreign_keys": true, "busy_timeout_ms": 5000},
+    "vecIndex": "derived, disposable, model/dimension/generation-qualified",
+    "extensionRegistration": "sqlite_vec.Auto before opening any connections"
+  },
+  "frontend": {"react": "19.3.0", "reactDom": "19.3.0", "typescript": "7.0.2", "vite": "8.3.1", "tiptap": "3.31.3", "lockfile": "baseline/frontend/pnpm-lock.yaml"},
+  "workers": {
+    "llama": {"repository": "https://github.com/ggml-org/llama.cpp", "tag": "v0.5.0", "commit": "d2e54583c7452353eb35d40431281f6ee984332f", "url": "https://codeload.github.com/ggml-org/llama.cpp/tar.gz/d2e54583c7452353eb35d40431281f6ee984332f", "sha256": "8aeb94872f97ddc9c80bca3824d95aba00bdb17d1d28813db22150fb6caf6d15", "sourceDirectory": "llama.cpp-d2e54583c7452353eb35d40431281f6ee984332f", "license": "MIT"},
+    "whisper": {"repository": "https://github.com/ggml-org/whisper.cpp", "tag": "v1.9.4", "commit": "927cfce34f31707e17f2bff35c349632fb9e2c3a", "url": "https://codeload.github.com/ggml-org/whisper.cpp/tar.gz/927cfce34f31707e17f2bff35c349632fb9e2c3a", "sha256": "41b664fee09e79176ac277b5237debec34f8d74af3c7d71f333f1ec67989ecde", "sourceDirectory": "whisper.cpp-927cfce34f31707e17f2bff35c349632fb9e2c3a", "license": "MIT"}
+  },
+  "distribution": {"runtime": "bundled signed arm64 worker executables with embedded Metal library", "modelPacks": "separate chat, embedding and speech manifests with format, license and SHA-256; not yet selected", "requiredEndUserTools": []},
+  "integrity": {"goModules": "baseline/go/go.sum (Go checksum database)", "frontend": "baseline/frontend/pnpm-lock.yaml (registry integrity digests)", "native": "full commit plus downloaded source archive SHA-256", "upgradePolicy": "Explicit lockfile review and rerun baseline; never float latest, main, or version ranges in production manifests."}
+}

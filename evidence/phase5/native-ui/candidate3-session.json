@@ -1,0 +1,139 @@
+{
+  "startedAt": "2026-09-30T19:08:03.700554+00:00",
+  "candidate": "/Volumes/HD-B1/HD-Projects/Trove/build/phase5-candidate-3/Trove.app",
+  "candidateBinarySha256": "64132f222ca0690dee672c6a15c52dae3b9d272c23aa503ad4839badc6b4b142",
+  "fixture": "/private/tmp/trove-phase5-native-src6q17p",
+  "workspace": "/private/tmp/trove-phase5-native-src6q17p/workspace",
+  "pid": 69168,
+  "observations": [
+    {
+      "at": "2026-09-30T19:09:59.044160+00:00",
+      "case": "native-lock-regression",
+      "result": "passed",
+      "steps": [
+        "Reopened locked Native acceptance after candidate1 normal quit and candidate3 restart; original Unicode paragraph, H4 Restore-marker-original, alpha/beta table cells and Native tab content persisted.",
+        "Unlock restored editing immediately with status Saved.",
+        "Added Candidate3 resumed edit via Add a thought, saved, re-locked: status Saved and disabled controls, without phantom dirty state.",
+        "Unlocked and navigated to P1 linked gallery; no conflict banner or save failure."
+      ],
+      "visibleLinkedGallery": "1 record; P1 shared record edit; Exact decimal 0.3"
+    },
+    {
+      "at": "2026-09-30T19:11:24.417918+00:00",
+      "case": "linked-record-and-formula-evidence",
+      "result": "passed",
+      "steps": [
+        "Opened P1 shared record edit from linked gallery and renamed via Page title to Native shared record edit.",
+        "Source Phase 1 integration and linked gallery both showed one record with that new title and Exact decimal 0.3.",
+        "Added native Table view, expanded formula summary; observed Original expression: 0.1 + 0.2; Translated expression: 0.1 + 0.2; Imported cached value: captured 999 (captured evidence); calculated value 0.3.",
+        "Existing offline embedded card retained P1OfflineEvidence retained card."
+      ]
+    },
+    {
+      "at": "2026-09-30T19:11:24.417918+00:00",
+      "case": "native-local-automation-review-run-dedup",
+      "result": "passed",
+      "steps": [
+        "Created disabled Native acceptance note on Native acceptance; daily09:00 Asia/Kolkata, Skip and log.",
+        "Disabled Preview showed one page.create at2026-10-01T03:30:00Z; Run this occurrence disabled.",
+        "Enabled rule and refreshed preview; Run this occurrence created one child Native acceptance note · 2026-10-01T03:30:00Z and one succeeded receipt for schedule:2026-10-01T03:30:00Z.",
+        "Previewed and ran same occurrence again; no additional child or receipt appeared.",
+        "Disabled synthetic schedule afterward."
+      ],
+      "note": "Existing event rule intentionally created its second committed automation effect following canonical record title change."
+    },
+    {
+      "at": "2026-09-30T19:14:45.072523+00:00",
+      "case": "native-provider-boundaries",
+      "result": "passed",
+      "steps": [
+        "Selected only Native acceptance for Paired local MCP client. Preview showed Native acceptance Revision20 ·7 blocks and No clients connected. Did not pair or display a token.",
+        "Claude Code and Codex each displayed Unavailable in this build with explicit authentication owner text and no credentials requested."
+      ]
+    },
+    {
+      "at": "2026-09-30T19:14:45.072523+00:00",
+      "case": "native-backup-review-restore-open",
+      "result": "passed",
+      "backup": "/private/tmp/trove-phase5-native-src6q17p/Trove-backup-01a0f3bb-72de-77a0-9071-5d5446dfa172",
+      "steps": [
+        "Create backup native directory picker: Backup created and verified in selected folder.",
+        "Choose backup to review showed one managed file, zero recording objects, same workspaceId, saved through event33 and revocation/retention text.",
+        "Restore into a new folder native picker completed: Restored and verified at recorded restoredWorkspace.",
+        "Open another workspace using exact restored path returned Home.",
+        "Restored Native acceptance shows original Unicode paragraph, H4,alpha/beta table,Native tab content,Candidate3 resumed edit; linked gallery shows one Native shared record edit and Exact decimal0.3."
+      ],
+      "harnessNote": "One first attempt clicked folder text then Return but picker selected parent and app correctly rejected nonworkspace folder; explicit Go To exact restored path succeeded."
+    },
+    {
+      "at": "2026-09-30T19:14:45.072523+00:00",
+      "case": "ordinary-native-tab-title-typing",
+      "result": "passed",
+      "steps": [
+        "In restored workspace clicked Tab title, CmdA, verified selected Evidence.",
+        "In separate tool call typeText Review then Tab blur showed exact Review.",
+        "Save then linked gallery then reopen Native acceptance retained exact Review and Native tab content."
+      ],
+      "note": "No setValue or paste used for this title retest."
+    },
+    {
+      "at": "2026-09-30T19:14:45.072523+00:00",
+      "case": "native-model-status",
+      "result": "ready-after-load",
+      "steps": [
+        "Initial Settings rendered Native runtime is unavailable while async request pending.",
+        "After backup dialog, displayed Native runtimes are ready on this Mac with BGE small,Whisper tiny,Qwen0.5B,Qwen1.5B all ready."
+      ],
+      "followup": "Root changed pending label for candidate4."
+    },
+    {
+      "at": "2026-09-30T19:18:09.607391+00:00",
+      "case": "native-public-audio-attachment-playback",
+      "result": "passed",
+      "workspace": "restoredWorkspace",
+      "fixture": "/private/tmp/trove-phase0-tools/whisper.cpp-927cfce34f31707e17f2bff35c349632fb9e2c3a/samples/jfk.wav",
+      "steps": [
+        "Native Attach file picker selected public JFK.wav.",
+        "Audio Controls rendered duration11seconds; Play became Pause; elapsed advanced0→2seconds.",
+        "Paused via native control before navigation."
+      ],
+      "screenshot": "Inline CUA screenshot in tool Observe public audio playback progress; no disk screenshot claimed.",
+      "limits": "No microphone or private audio capture, no new permissions."
+    },
+    {
+      "at": "2026-09-30T19:18:09.607391+00:00",
+      "case": "native-screenshot-cancel",
+      "result": "cancelled-no-capture-review",
+      "steps": [
+        "Clicked Capture screenshot… then Escape twice.",
+        "Working… briefly remained; subsequently controls reenabled with no capture preview or retained capture shown.",
+        "Read-only process inspection after cancellation found candidate3PID69168 and no screencapture subprocess."
+      ],
+      "limits": "No permission prompt accepted; actual screenshot capture untested."
+    },
+    {
+      "at": "2026-09-30T19:18:09.607391+00:00",
+      "case": "restored-automation-receipt",
+      "result": "passed",
+      "steps": [
+        "Selected Native acceptance in Automations on restored workspace.",
+        "Native acceptance note remained Disabled, next2026-10-01T03:30:00Z Asia/Kolkata.",
+        "Run history retained single succeeded schedule:2026-10-01T03:30:00Z receipt and matching single child."
+      ]
+    },
+    {
+      "at": "2026-09-30T19:18:09.607391+00:00",
+      "case": "native-page-history-restore",
+      "result": "passed",
+      "steps": [
+        "Created History acceptance in restored workspace; saved Original history marker; replaced and saved Changed history marker.",
+        "Settings→History acceptance→Load revisions→Preview revision3 showed Original history marker.",
+        "Restore this revision returned Page restored as a new revision.",
+        "Opened History acceptance; status Saved and exact Original history marker."
+      ]
+    }
+  ],
+  "restoredWorkspace": "/private/tmp/trove-phase5-native-src6q17p/Trove-restored-01a0f3bc-65f7-7ee8-8cde-d7a3411b81d5",
+  "normalQuitAt": "2026-09-30T19:18:22.467040+00:00",
+  "finalCandidateRetestRequired": true
+}

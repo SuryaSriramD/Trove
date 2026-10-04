@@ -1,0 +1,16 @@
+✔ lossless mixed canonical document including unsupported imported structures (7.847ms)
+✔ split and clipboard duplicates get fresh allocated identities; task references stay canonical (0.562416ms)
+✔ indent keeps block identity and emits canonical block.move (0.141583ms)
+✔ marks, links, Unicode and explicit line breaks survive rich text projection (0.097666ms)
+✔ deleting a nested tree emits child-first deletes (0.077083ms)
+✔ calendar range rescheduling preserves duration and explicit timezone (1.856625ms)
+✔ grouping and subgrouping partition references without copying record identities (0.229625ms)
+✔ imported identities, places and author labels remain readable without interpreting raw payload (0.069208ms)
+ℹ tests 8
+ℹ suites 0
+ℹ pass 8
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 175.16825

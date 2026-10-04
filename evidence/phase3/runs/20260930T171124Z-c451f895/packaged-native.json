@@ -1,0 +1,51 @@
+{
+  "checks": {
+    "chat": {
+      "citations": [],
+      "kind": "generation",
+      "text": ", there was a little girl named Lily. She loved to play outside and"
+    },
+    "embedding": {
+      "dimension": 384,
+      "vectors": 1
+    },
+    "microphoneSynthetic": {
+      "bytes": 6400,
+      "sampleRate": 16000,
+      "channels": 1,
+      "format": "f32le",
+      "synthetic": true,
+      "cancelled": false
+    },
+    "speech": {
+      "kind": "transcript",
+      "meetingId": "01a0f352-fde4-7eec-a44b-95e36e7f8559",
+      "segments": [
+        {
+          "blockId": "01a0f352-fde4-7b4c-999b-160e001dce88",
+          "endMs": 8000,
+          "segmentId": "01a0f352-fde4-747b-ace0-475f44d6e70b",
+          "startMs": 0,
+          "text": " And so my fellow Americans ask not what your country can do for you"
+        },
+        {
+          "blockId": "01a0f352-fde4-7021-a161-dde68f711d9a",
+          "endMs": 11000,
+          "segmentId": "01a0f352-fde4-78d7-a258-96759e151253",
+          "startMs": 8000,
+          "text": " ask what you can do for your country."
+        }
+      ]
+    }
+  },
+  "passed": true,
+  "recordedAt": "2026-09-30T17:18:17.131714Z",
+  "step": "native",
+  "processExitCode": 0,
+  "installedWeightsAvailable": true,
+  "shell": {
+    "definition": "Go process initialization to canonical snapshot rendered plus two animation frames",
+    "recordedAt": "2026-09-30T17:18:17.531963Z",
+    "usableShellMs": 803.83
+  }
+}

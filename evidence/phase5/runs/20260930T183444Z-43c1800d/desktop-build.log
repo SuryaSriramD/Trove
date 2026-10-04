@@ -1,0 +1,9 @@
+src/database/tests/database.browser.spec.ts(363,14): error TS2591: Cannot find name 'process'. Do you need to install type definitions for node? Try `npm i --save-dev @types/node` and then add 'node' to the types field in your tsconfig.
+Traceback (most recent call last):
+  File "/Volumes/HD-B1/HD-Projects/Trove/scripts/build-desktop.py", line 45, in <module>
+    run([ROOT / 'frontend/node_modules/.bin/tsc', '--noEmit'], ROOT / 'frontend')
+  File "/Volumes/HD-B1/HD-Projects/Trove/scripts/build-desktop.py", line 40, in run
+    subprocess.run([str(v) for v in argv], cwd=cwd, env=env, check=True)
+  File "/Users/suryasriramduvvuri/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/subprocess.py", line 571, in run
+    raise CalledProcessError(retcode, process.args,
+subprocess.CalledProcessError: Command '['/Volumes/HD-B1/HD-Projects/Trove/frontend/node_modules/.bin/tsc', '--noEmit']' returned non-zero exit status 1.

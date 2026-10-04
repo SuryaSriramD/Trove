@@ -1,0 +1,35 @@
+# Phase 6 — local intelligence packages
+
+Owners E (search, evidence and reviewed assistance) and F (native runtime) retain their existing module boundaries. The kernel owns every canonical commit. These packages are independently usable from **Intelligence** in the desktop sidebar.
+
+## Knowledge graph
+
+`graph.query` projects current canonical page links into a bounded neighborhood: at most 100 nodes, 500 explicit edges, and 10,000 scanned links. Each explicit edge identifies its source page, source block and page revision. Deleted pages and pages outside the caller's grant are excluded. Navigation opens the source page, and evidence details expose the exact originating block identity.
+
+Optional retrieval associations use the existing local semantic search provider. They are shown as dashed associations, never saved as asserted relationships. Missing embeddings or an unavailable model produce a visible warning and correctly labelled keyword results. Raw links, records and blocks remain the source of truth; the graph is regenerated after imports or restores.
+
+## Local image text
+
+The optional `ocr-worker` uses Apple's on-device Vision framework in a child process. Build it with `python3 scripts/build-ocr-worker.py`; the desktop packaging workflow includes the helper and SHA-256 sidecar. The host validates its digest and supplies an authorized image descriptor. The worker accepts no workspace path, database connection, network request or mutation command.
+
+Limits are explicit: PNG/JPEG inputs up to 20 MiB and 20 megapixels; one extraction per workspace at a time; a 60-second deadline; at most 10,000 recognized lines and 1 MiB of text; a 2 MiB serialized worker-output ceiling. The pixel cap bounds decoded image size, while Vision framework allocations remain OS managed. Lines below confidence 0.5 are omitted. Confidence describes the recognizer's result, not factual correctness. Handwriting, rotation, complex columns, poor contrast and unsupported language quality need source inspection. Image description models are not advertised: no compatible vision-description pack is currently installed by this package.
+
+`ocr.run` rechecks file permissions and revision before atomically publishing derived sections. Existing extraction/search machinery makes the text discoverable with its source image and revision. The original image stays canonical and portable; native snapshots preserve extraction state, and a portable import can regenerate extraction locally. A missing helper is a clear capability state. Failed, oversized or invalid results cannot replace earlier extraction.
+
+Real native evidence is in `evidence/phase6/local-ocr-smoke.json`, with its generated image at `evidence/phase6/local-ocr-fixture.png`. Under OS network denial, both lines were recognized exactly at confidence 1.0: “TROVE LOCAL OCR 2026” and “Review sources before approval”. The helper SHA-256 was `dcb2bccae9ee1de6d3502d60b8017ee345edafd882edcff98b4a9ac7057650bd`. The observed run took 29.67 seconds. An earlier 30-second cold-start limit proved too tight, so the final product deadline is 60 seconds; the evidence retains that initial limitation. The final Go process adapter also passed the same fixture in 31.97 seconds under the 60-second budget. This is a clean printed-text fixture, not a claim of broad OCR accuracy.
+
+## Personal review
+
+This first local review agent is deterministic. It gathers cited source excerpts, current incomplete-task state, and up to ten relevant active approved memories. It does not require a generative model, invent task decisions, or execute external tools. Its bounded reviewed action appends the displayed digest to the chosen page. Existing reviewed AI tools remain separately available for richer generated actions.
+
+Plans are canonical code blocks with language `trove-review`, containing a versioned `trove.personal-review/v1` JSON object. They specify a name, enabled state, 1–32 source page identities, optional retrieval query, memory inclusion, and a daily or weekly IANA timezone schedule. This keeps plans readable to the editor, extraction, AI, history and export/import systems. Imported or pasted plans remain operationally inert until the owner explicitly activates the exact plan hash with `review.activate`. Editing a plan invalidates activation. Portable imports preserve the inert JSON; source page identities may require selecting the imported sources before reactivation.
+
+The desktop/headless owner calls `RunPersonalReviewTick` while running. Missing daylight-saving wall times are skipped; repeated wall times use the first occurrence. Downtime either records a skipped receipt or prepares one missed draft, according to the saved policy. No daemon wakeup, continuous cloud operation, multi-device synchronization or autonomous content mutation is implied. Stable plan-hash/occurrence keys deduplicate drafts across restarts. A failed source creates a failed receipt, advances that plan, and leaves other plans able to run. Disabling or changing the plan prevents future scheduled drafts.
+
+`review.accept` requires a direct user decision, validates every source location against the current page revision and block/transcript existence, validates the unchanged plan hash and the exact active memory identities/revisions, and commits through guarded `block.insert` in the kernel. Source edits, forgotten memories, deleted evidence and repeated decisions are rejected. Accepted digests are ordinary canonical blocks and participate in search, AI, history and portable export. Pending/accepted/dismissed/skipped receipts and local schedule activation survive native snapshots; receipts are operational state rather than portable automation permissions.
+
+## Acceptance evidence
+
+`internal/workspace/p2_intelligence_test.go` exercises graph traceability, permission scoping, deletion and semantic fallback; review activation, bounded catch-up, restart deduplication, stale-source rejection, memory forgetting, the old-memory/new-page-revision race, isolation between failed and valid plans, and explicit acceptance; OCR quality filtering, invalid confidence, permissions, searchable extraction, unavailable helpers and oversized raster rejection. `internal/native/p2_ocr_test.go` verifies helper digest checks and includes an opt-in real native fixture test. The browser fixture `frontend/tests/p2-intelligence.browser.spec.ts` verifies graph evidence inspection, missing-helper UI, and that no review write is submitted before explicit approval; it also checks destination/source/block revision guards.
+
+Reproduce service tests with `go test -tags sqlite_fts5 ./internal/workspace -run '^TestP2(Graph|Review|OCR)'` and native tests with `go test ./internal/native -run '^TestP2OCR'`. Set `TROVE_OCR_BUNDLE` and `TROVE_OCR_FIXTURE` to run the actual Vision adapter fixture. The browser result is recorded in `evidence/phase6/intelligence-browser.json`; the real Go-to-Vision adapter run is in `evidence/phase6/local-ocr-adapter-tests.jsonl`.

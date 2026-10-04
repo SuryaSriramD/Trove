@@ -1,0 +1,51 @@
+{
+  "schemaVersion": 1,
+  "recordedAt": "2026-09-30T17:23:18.886818+00:00",
+  "status": "candidate-awaiting-native-qualification",
+  "releaseApproved": false,
+  "version": "0.3.0",
+  "platform": "macOS27 arm64",
+  "candidate": "/Volumes/HD-B1/HD-Projects/Trove/build/phase3-candidate-2/Trove.app",
+  "installedPath": "/Users/suryasriramduvvuri/Applications/Trove.app",
+  "appBinarySha256": "5b3ac5c6a5f764bf39b8c28a56e9093c1fb7dd8d5a29f9faf0599fa5829b6e3e",
+  "automatedGate": {
+    "status": "automated_passed",
+    "report": "evidence/phase3/runs/20260930T171124Z-c451f895/verification.json",
+    "checksPassed": true,
+    "individualGoTestsAndSubtests": 182
+  },
+  "shellBenchmark": {
+    "report": "evidence/phase3/shell-benchmark-candidate-2.json",
+    "samples": 20,
+    "measurementPassed": true,
+    "allProfilesWithinDeclaredApproximateThreshold": true,
+    "largestWorkspacePages": 10000,
+    "largestWorkspaceMaxMs": 2315.355,
+    "approximateThresholdMs": 2500
+  },
+  "evidence": {
+    "installation": "evidence/phase3/installation.json",
+    "packaging": "evidence/phase3/packaging-dependencies-candidate-2.json",
+    "serviceBenchmarks": "evidence/phase3/benchmark-service.json",
+    "hardware": "evidence/phase3/benchmark-environment.json",
+    "priorNativeObservations": "evidence/phase3/first-candidate/native-observations.json",
+    "modelImport": "evidence/phase3/local-model-import.log",
+    "publicAudioSetup": "evidence/phase3/native-public-audio-setup.json",
+    "artifacts": "evidence/phase3/release-artifacts.json"
+  },
+  "blockingCondition": "Computer-use tool reports that the Mac is locked and automatic unlock failed. User was asked to unlock it; final installed-app UI checks have not been performed.",
+  "remainingNativeChecks": [
+    "Clipboard copy/paste with intended multilingual formatted fixture; save/reopen",
+    "Blob-backed playback metadata, advancing time and seek in WKWebView",
+    "Final-candidate microphone permission, live capture progress and stop/save",
+    "Visible offline public-audio transcription while editing",
+    "Quit/reopen and inspect saved edits, recordings and forgotten memory",
+    "Inspect restored workspace in installed app after native backup/restore"
+  ],
+  "distributionLimits": [
+    "Ad-hoc signature; no Developer ID/notarization identity available",
+    "Installed and tested on this development Mac; separate clean-Mac installation unverified",
+    "No other OS or Intel Mac qualification"
+  ],
+  "scope": "P0 only. No P1 providers or advanced parity dependencies."
+}

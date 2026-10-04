@@ -1,0 +1,13 @@
+{
+  "contractVersion": 1,
+  "jobId": "0199a000-0000-7000-8000-000000000016",
+  "jobRevision": "2",
+  "attempt": 1,
+  "state": "running",
+  "progress": {
+    "sequence": 1,
+    "completed": 3,
+    "total": 10,
+    "unit": "segments"
+  }
+}

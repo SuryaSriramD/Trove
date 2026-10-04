@@ -1,0 +1,7 @@
+[ 12%] Built target ggml-base
+[ 14%] Built target ggml-blas
+[ 72%] Built target ggml-metal
+[ 91%] Built target ggml-cpu
+[ 95%] Built target ggml
+[100%] Built target parakeet
+[100%] Built target whisper

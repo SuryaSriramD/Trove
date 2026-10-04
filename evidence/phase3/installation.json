@@ -1,0 +1,16 @@
+{
+  "recordedAt": "2026-09-30T17:20:10.003548+00:00",
+  "source": "/Volumes/HD-B1/HD-Projects/Trove/build/phase3-candidate-2/Trove.app",
+  "installedPath": "/Users/suryasriramduvvuri/Applications/Trove.app",
+  "method": "Copy app; strip generated AppleDouble metadata sidecars from APFS copy; compare all payload SHA256; codesign strict deep verification",
+  "bundleFilesEqual": true,
+  "removedGeneratedSidecars": [
+    "Contents/.__CodeSignature",
+    "Contents/MacOS/._Trove"
+  ],
+  "appBinarySha256": "5b3ac5c6a5f764bf39b8c28a56e9093c1fb7dd8d5a29f9faf0599fa5829b6e3e",
+  "fileCount": 293,
+  "limitations": [
+    "Same development Mac; no separate clean-machine or Gatekeeper download test"
+  ]
+}

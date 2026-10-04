@@ -1,0 +1,6 @@
+Traceback (most recent call last):
+  File "/Volumes/HD-B1/HD-Projects/Trove/scripts/verify-phase5.py", line 103, in main
+    run.execute()
+  File "/Volumes/HD-B1/HD-Projects/Trove/scripts/verify-phase5.py", line 66, in execute
+    self.record('family-' + family['id'], family['result'] == 'passed', **{k:v for k,v in family.items() if k != 'result'})
+TypeError: Qualification.record() got multiple values for argument 'name'

@@ -1,0 +1,11 @@
+ok  	trove.local/phase0	1.612s
+ok  	trove.local/phase0/contracts	1.768s
+?   	trove.local/phase0/internal/integration	[no test files]
+ok  	trove.local/phase0/internal/native	7.315s
+ok  	trove.local/phase0/internal/workers	2.504s
+--- FAIL: TestPortableExportRoundTripIncludesAssetsAndManifest (1.09s)
+    import_export_test.go:242: cursor=21 initialized=true item=pages/Import _ fixture.zip 01a0f30259327801982fe78aeddd4486/Rows 01a0f302593a7d419e2354d2cebe07f1.csv#row=1 error=INVALID_REQUEST: Record and page revisions diverged
+FAIL
+FAIL	trove.local/phase0/internal/workspace	5.028s
+?   	trove.local/phase0/schemas	[no test files]
+FAIL

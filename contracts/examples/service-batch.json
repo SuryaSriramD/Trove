@@ -1,0 +1,26 @@
+{
+  "contractVersion": 1,
+  "requestId": "0199a000-0000-7000-8000-000000000003",
+  "workspaceId": "0199a000-0000-7000-8000-000000000001",
+  "mutation": {
+    "idempotencyKey": "capture-2026-09-30-1",
+    "scopeGrantId": "0199a000-0000-7000-8000-000000000009",
+    "expectedRevisions": [
+      {
+        "target": {
+          "entityType": "page",
+          "entityId": "0199a000-0000-7000-8000-000000000002"
+        },
+        "revision": "0"
+      }
+    ]
+  },
+  "commands": [
+    {
+      "kind": "page.create",
+      "pageId": "0199a000-0000-7000-8000-000000000002",
+      "title": "Meeting notes"
+    }
+  ],
+  "cancellationId": "0199a000-0000-7000-8000-000000000010"
+}

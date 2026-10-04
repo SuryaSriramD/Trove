@@ -1,0 +1,122 @@
+[
+  {
+    "path": "service-batch.json",
+    "schema": "service",
+    "definition": "BatchRequest"
+  },
+  {
+    "path": "service-batch-result.json",
+    "schema": "service",
+    "definition": "BatchResponse"
+  },
+  {
+    "path": "service-conflict.json",
+    "schema": "service",
+    "definition": "BatchResponse"
+  },
+  {
+    "path": "service-event.json",
+    "schema": "service",
+    "definition": "CommittedChangeEvent"
+  },
+  {
+    "path": "service-search.json",
+    "schema": "service",
+    "definition": "SearchResponse"
+  },
+  {
+    "path": "service-stale-citation.json",
+    "schema": "service",
+    "definition": "ResolveCitationResponse"
+  },
+  {
+    "path": "job-transcribe.json",
+    "schema": "jobs",
+    "definition": "Job"
+  },
+  {
+    "path": "worker-transcribe.json",
+    "schema": "jobs",
+    "definition": "WorkerRequest"
+  },
+  {
+    "path": "worker-result.json",
+    "schema": "jobs",
+    "definition": "WorkerOutput"
+  },
+  {
+    "path": "worker-transcript.json",
+    "schema": "jobs",
+    "definition": "WorkerResult"
+  },
+  {
+    "path": "worker-cancel.json",
+    "schema": "jobs",
+    "definition": "WorkerCancel"
+  },
+  {
+    "path": "job-progress.json",
+    "schema": "jobs",
+    "definition": "JobProgressEvent"
+  },
+  {
+    "path": "service-import-report.json",
+    "schema": "service",
+    "definition": "GetImportReportResponse"
+  },
+  {
+    "path": "service-task-toggle.json",
+    "schema": "service",
+    "definition": "BatchRequest"
+  },
+  {
+    "path": "service-import-apply.json",
+    "schema": "service",
+    "definition": "ApplyImportPlan"
+  },
+  {
+    "path": "service-import-preview.json",
+    "schema": "service",
+    "definition": "PreviewImportResult"
+  },
+  {
+    "path": "service-memory-proposal.json",
+    "schema": "service",
+    "definition": "ProposeMemory"
+  },
+  {
+    "path": "service-p2-display.json",
+    "schema": "service",
+    "definition": "SetPageDisplay"
+  },
+  {
+    "path": "service-p2-database.json",
+    "schema": "service",
+    "definition": "ConfigureP2Database"
+  },
+  {
+    "path": "service-p2-form.json",
+    "schema": "service",
+    "definition": "SubmitLocalForm"
+  },
+  {
+    "path": "service-p2-review.json",
+    "schema": "service",
+    "definition": "AcceptPersonalReview"
+  },
+  {
+    "path": "service-p2-graph.json",
+    "schema": "service",
+    "definition": "GraphQueryRequest"
+  },
+  {
+    "path": "service-p2-ocr.json",
+    "schema": "service",
+    "definition": "OCRRunRequest"
+  },
+  {
+    "path": "service-p2-review-activate.json",
+    "schema": "service",
+    "definition": "ActivatePersonalReview"
+  }
+]

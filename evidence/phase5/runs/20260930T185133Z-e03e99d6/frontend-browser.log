@@ -1,0 +1,36 @@
+
+Running 28 tests using 1 worker
+
+(node:53488) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+
+[1/28] tests/browser.spec.ts:418:1 › 10,000-page shell keeps the full hierarchy and body search usable across refresh
+[2/28] tests/browser.spec.ts:481:1 › shell navigation, focus, quick switcher, page metadata
+[3/28] tests/browser.spec.ts:512:1 › Unicode composition, RTL, emoji, undo/redo, reopen, raw preservation
+[4/28] tests/browser.spec.ts:559:1 › mixed clipboard retains block structure and allocates distinct IDs
+[5/28] tests/browser.spec.ts:586:1 › repeated splits and formatted paste preserve imported neighbors with complete revision guards
+[6/28] tests/browser.spec.ts:660:1 › insert real code, Mermaid and KaTeX rendering
+[7/28] tests/browser.spec.ts:678:1 › Markdown shortcuts, duplication, keyboard focus and screen-reader structure
+[8/28] tests/browser.spec.ts:748:1 › page lifecycle preserves identity through nesting, icon, archive and navigation
+[9/28] tests/browser.spec.ts:862:1 › all named surfaces open and created page links generate navigable backlinks
+[10/28] tests/browser.spec.ts:908:1 › block transforms, rich marks, find and nested toggle survive save/reopen
+[11/28] tests/browser.spec.ts:980:1 › multi-file clipboard and file drop serialize uploads and preserve media captions and cover
+[12/28] tests/browser.spec.ts:1087:1 › Phase 2 search opens the exact cited block without model packs
+[13/28] tests/browser.spec.ts:1097:1 › Phase 2 import displays complete accounting and editable property preview
+[14/28] tests/browser.spec.ts:1139:1 › Phase 2 AI works without packs and shows reviewed memory controls
+[15/28] tests/browser.spec.ts:1152:1 › Phase 2 failed job retry preserves revision and resumed progress
+[16/28] tests/browser.spec.ts:1170:1 › Phase 2 native restore is reviewed before mutation and retention keeps all
+[17/28] tests/browser.spec.ts:1187:1 › Phase 2 AI review shows exact before and after and applies only on approval
+[18/28] tests/browser.spec.ts:1261:1 › background append synchronizes a clean editor without writes and survives the next edit
+[19/28] tests/browser.spec.ts:1282:1 › background append merges into a dirty editor and remains through save and local undo
+[20/28] tests/browser.spec.ts:1305:1 › background append received during an in-flight save reconciles after completion without dropping ongoing typing
+[21/28] tests/browser.spec.ts:1342:1 › overlapping background block edits preserve the local draft and require conflict review
+[22/28] tests/browser.spec.ts:1366:1 › an append racing the initial save safely rebases and retries after a revision conflict
+[23/28] tests/browser.spec.ts:1395:1 › P0 saved audio loads Blob metadata, plays, seeks, and releases old recordings
+[24/28] tests/browser.spec.ts:1421:1 › P0 audio loading aborts on selection change and reports failed authorized fetches
+[25/28] tests/browser.spec.ts:1449:1 › advanced editor H4, replacement, page lock and native column content
+[26/28] tests/browser.spec.ts:1471:1 › Phase 4 surfaces expose scoped pairing, gated vendors and reviewed capture
+[27/28] tests/browser.spec.ts:1508:1 › AI review rejects malformed Mermaid before approval
+[28/28] tests/browser.spec.ts:1540:1 › provider disconnect stays available while approval is pending
+  28 passed (52.4s)

@@ -1,0 +1,8 @@
+contracts: passed
+go-race: passed
+frontend-types: passed
+frontend-codec: passed
+frontend-browser: passed
+database-browser: passed
+desktop-build: passed
+packaged-restart-native: passed

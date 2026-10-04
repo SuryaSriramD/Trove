@@ -1,0 +1,15 @@
+{
+  "scope": "archive-mechanics-only; candidate3 is not qualified and no release archive is published",
+  "candidate": "/Volumes/HD-B1/HD-Projects/Trove/build/phase5-candidate-3/Trove.app",
+  "sourceAndExtractedFilesMatch": true,
+  "strictSignatureVerified": true,
+  "extractedOn": "/private/tmp",
+  "executableModes": {
+    "Contents/MacOS/Trove": "0o700",
+    "Contents/MacOS/trove-mcp": "0o700",
+    "Contents/Resources/native/document-extractor": "0o700",
+    "Contents/Resources/native/llama-worker": "0o700",
+    "Contents/Resources/native/whisper-worker": "0o700",
+    "Contents/Resources/native/microphone-worker": "0o700"
+  }
+}

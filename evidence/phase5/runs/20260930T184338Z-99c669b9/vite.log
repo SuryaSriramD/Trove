@@ -1,0 +1,7 @@
+
+  VITE v8.3.1  ready in 131 ms
+
+  ➜  Local:   http://127.0.0.1:62013/
+12:15:12 AM [vite] (client) [console.warn] TextSelection endpoint not pointing into a node with inline content (doc)
+12:15:25 AM [vite] (client) [console.error] flushSync was called from inside a lifecycle method. React cannot flush when React is already rendering. Consider moving this call to a scheduler task or micro task.
+12:15:25 AM [vite] (client) [console.error] flushSync was called from inside a lifecycle method. React cannot flush when React is already rendering. Consider moving this call to a scheduler task or micro task.

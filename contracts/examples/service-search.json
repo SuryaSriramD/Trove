@@ -1,0 +1,27 @@
+{
+  "ok": true,
+  "result": {
+    "hits": [
+      {
+        "location": {
+          "pageId": "0199a000-0000-7000-8000-000000000002",
+          "sourceRevision": "7",
+          "blockId": "0199a000-0000-7000-8000-000000000004",
+          "transcript": {
+            "meetingId": "0199a000-0000-7000-8000-000000000005",
+            "segmentId": "0199a000-0000-7000-8000-000000000006",
+            "startMs": 1200,
+            "endMs": 4800
+          }
+        },
+        "excerpt": "Ship the migration report.",
+        "contentHash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "score": 0.9,
+        "sourceState": "current"
+      }
+    ],
+    "snapshotCursor": "7",
+    "indexGeneration": "0199a000-0000-7000-8000-000000000014",
+    "partial": false
+  }
+}

@@ -1,0 +1,11 @@
+
+Running 3 tests using 1 worker
+
+(node:49081) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+
+[1/3] database.browser.spec.ts:297:1 › all four views retain canonical record identities; board and calendar call guarded record mutations
+[2/3] database.browser.spec.ts:373:1 › saved view filter groups, sorting, visibility, rename and move serialize without record duplication
+[3/3] database.browser.spec.ts:403:1 › table creates record and edits its body title through the canonical page service
+  3 passed (3.9s)

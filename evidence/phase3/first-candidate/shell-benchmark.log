@@ -1,0 +1,4 @@
+pages=0: maximum shell ms=910.994
+pages=100: maximum shell ms=795.511
+pages=1000: maximum shell ms=855.084
+pages=10000: maximum shell ms=3370.179

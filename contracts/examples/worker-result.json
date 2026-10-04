@@ -1,0 +1,12 @@
+{
+  "kind": "result",
+  "requestId": "0199a000-0000-7000-8000-000000000019",
+  "leaseToken": "0199a000-0000-7000-8000-000000000020",
+  "sequence": 4,
+  "resultHandle": {
+    "handleId": "0199a000-0000-7000-8000-000000000023",
+    "kind": "result",
+    "sha256": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+    "sizeBytes": 256
+  }
+}

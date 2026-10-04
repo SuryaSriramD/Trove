@@ -1,0 +1,59 @@
+{
+  "candidate": "build/phase3-candidate/Trove.app",
+  "appBinarySha256": "0b7f3a3e5de1f2a0b9dedc790ee258c3a729de9af9a8a229ee9a3a90bc525705",
+  "recordedDate": "2026-09-30",
+  "method": "Native macOS accessibility controls and screenshot through CUA; normal default workspace; no installed model weights at start",
+  "checks": [
+    {
+      "name": "imported content reopened",
+      "result": "passed",
+      "observation": "Release notebook and Milestones survived prior app quit and candidate launch."
+    },
+    {
+      "name": "native structural save",
+      "result": "passed",
+      "observation": "An imported link paragraph was split; multiple pasted paragraphs saved without the previous missing-revision-guard error. That paste was then undone, saved, and replaced by the typed P0 native save checkpoint ORCHID-472."
+    },
+    {
+      "name": "clipboard fixture fidelity",
+      "result": "unverified",
+      "observation": "The intended CUA paste fixture was not inserted; different local clipboard content appeared. It was reverted via Undo and saved. The exact automation mechanism was not established. No unrelated clipboard content is retained in this evidence."
+    },
+    {
+      "name": "keyword search without weights",
+      "result": "passed",
+      "observation": "Native Search for ORCHID-472 returned the original imported launch-code paragraph and the newly typed saved checkpoint."
+    },
+    {
+      "name": "saved audio playback",
+      "result": "failed",
+      "observation": "Valid existing 69.59-second WAV displayed Duration0seconds. Play toggled Pause but elapsed stayed0; screenshot confirmed00:00. MIME normalization alone did not resolve WKWebView playback."
+    },
+    {
+      "name": "native model chooser",
+      "result": "requires_user_assistance",
+      "observation": "Automation selected a different row than requested and Open remained disabled. Existing user-assisted ZIP selection had succeeded. Qwen import was handed to user for exact file selection."
+    },
+    {
+      "name": "database edit",
+      "result": "passed",
+      "observation": "Native Milestones table changed Restore rehearsal Estimate from2 to4 and saved after leaving the input."
+    },
+    {
+      "name": "installed model setup",
+      "result": "service_assisted_pass",
+      "observation": "User requested agent completion after native picker automation failed. Trove Manager.Import verified existing local BGE small English F16, Whisper tiny English and Qwen2.5 1.5B Q5 files into the normal app model cache. See local-model-import.log."
+    },
+    {
+      "name": "local assistant",
+      "result": "passed",
+      "observation": "Packaged UI selected Qwen2.5 1.5B; request What is the launch code in Release notebook? completed with ORCHID-472. UI clearly disclosed the answer lacked model-supplied citations and displayed7 provided sources. This UI session was not network-denied; separate actual native/model tests enforce offline behavior."
+    },
+    {
+      "name": "approved memory",
+      "result": "passed",
+      "observation": "P0 test preference moved through proposed->active->forgotten via native UI controls."
+    }
+  ],
+  "releaseApproved": false
+}

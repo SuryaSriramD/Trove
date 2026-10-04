@@ -1,0 +1,34 @@
+{
+  "contractVersion": 1,
+  "eventId": "0199a000-0000-7000-8000-000000000012",
+  "workspaceId": "0199a000-0000-7000-8000-000000000001",
+  "transactionId": "0199a000-0000-7000-8000-000000000011",
+  "cursor": "1",
+  "committedAt": "2026-09-30T10:00:00Z",
+  "context": {
+    "actor": {
+      "kind": "user",
+      "actorId": "0199a000-0000-7000-8000-000000000008"
+    },
+    "origin": "user",
+    "scope": {
+      "kind": "workspace",
+      "workspaceId": "0199a000-0000-7000-8000-000000000001"
+    },
+    "scopeGrantId": "0199a000-0000-7000-8000-000000000009",
+    "policyRevision": "1"
+  },
+  "revisions": [
+    {
+      "target": {
+        "entityType": "page",
+        "entityId": "0199a000-0000-7000-8000-000000000002"
+      },
+      "before": "0",
+      "after": "1",
+      "deleted": false
+    }
+  ],
+  "mutationHistoryId": "0199a000-0000-7000-8000-000000000013",
+  "idempotencyKey": "capture-2026-09-30-1"
+}

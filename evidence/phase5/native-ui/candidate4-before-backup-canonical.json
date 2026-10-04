@@ -1,0 +1,1387 @@
+{
+  "recordedAt": "2026-09-30T19:28:46.705971+00:00",
+  "access": "read-only SQLite transaction on synthetic workspace",
+  "candidateBinarySha256": "20ddd24cea0c42a9b4b7934eece1a461a8314cd7160a05c75a0983859e7be7d4",
+  "workspace": "/private/tmp/trove-phase5-native-src6q17p/Trove-restored-01a0f3bc-65f7-7ee8-8cde-d7a3411b81d5",
+  "tables": {
+    "pages": {
+      "count": 9,
+      "sha256": "c96deceaba14f502abecab8df6befc3c0b740d144f8a6b898981deec92e0e69b",
+      "rows": [
+        {
+          "id": "01a0f3a9-24d5-786c-bb63-d69d85a843f7",
+          "workspace_id": "01a0f3a9-2423-782d-a1ef-4717e3fcea60",
+          "parent_page_id": null,
+          "title": "Phase 1 integration",
+          "revision": "6",
+          "created_at": "2026-09-30T18:52:23.640672Z",
+          "updated_at": "2026-09-30T19:10:17.543294Z",
+          "deleted_at": null,
+          "provenance_json": null
+        },
+        {
+          "id": "01a0f3a9-24d5-7099-b61c-7ce3a04e84f9",
+          "workspace_id": "01a0f3a9-2423-782d-a1ef-4717e3fcea60",
+          "parent_page_id": "01a0f3a9-24d5-786c-bb63-d69d85a843f7",
+          "title": "Native shared record edit",
+          "revision": "3",
+          "created_at": "2026-09-30T18:52:23.658039Z",
+          "updated_at": "2026-09-30T19:10:07.295546Z",
+          "deleted_at": null,
+          "provenance_json": null
+        },
+        {
+          "id": "01a0f3a9-2509-7036-9804-b4c92df170c3",
+          "workspace_id": "01a0f3a9-2423-782d-a1ef-4717e3fcea60",
+          "parent_page_id": null,
+          "title": "P1 linked gallery",
+          "revision": "4",
+          "created_at": "2026-09-30T18:52:23.693052Z",
+          "updated_at": "2026-09-30T19:10:09.240779Z",
+          "deleted_at": null,
+          "provenance_json": null
+        },
+        {
+          "id": "7302258c-b879-7094-8d3a-0e3b5ecaeb28",
+          "workspace_id": "01a0f3a9-2423-782d-a1ef-4717e3fcea60",
+          "parent_page_id": "01a0f3a9-2509-7036-9804-b4c92df170c3",
+          "title": "P1 committed automation effect",
+          "revision": "1",
+          "created_at": "2026-09-30T18:52:23.716498Z",
+          "updated_at": "2026-09-30T18:52:23.717345Z",
+          "deleted_at": null,
+          "provenance_json": null
+        },
+        {
+          "id": "01a0f3a9-c9a1-75e4-ab3a-ba9f2671f298",
+          "workspace_id": "01a0f3a9-2423-782d-a1ef-4717e3fcea60",
+          "parent_page_id": null,
+          "title": "Native acceptance",
+          "revision": "25",
+          "created_at": "2026-09-30T18:53:05.828733Z",
+          "updated_at": "2026-09-30T19:26:30.217801Z",
+          "deleted_at": null,
+          "provenance_json": null
+        },
+        {
+          "id": "eff68e20-e0dc-7453-b0ad-150245bf142f",
+          "workspace_id": "01a0f3a9-2423-782d-a1ef-4717e3fcea60",
+          "parent_page_id": "01a0f3a9-2509-7036-9804-b4c92df170c3",
+          "title": "P1 committed automation effect",
+          "revision": "1",
+          "created_at": "2026-09-30T19:10:09.239847Z",
+          "updated_at": "2026-09-30T19:10:09.240808Z",
+          "deleted_at": null,
+          "provenance_json": null
+        },
+        {
+          "id": "2c5e67e5-f51a-736c-8bdd-0c5347a1a8ee",
+          "workspace_id": "01a0f3a9-2423-782d-a1ef-4717e3fcea60",
+          "parent_page_id": "01a0f3a9-c9a1-75e4-ab3a-ba9f2671f298",
+          "title": "Native acceptance note · 2026-10-01T03:30:00Z",
+          "revision": "1",
+          "created_at": "2026-09-30T19:10:57.42515Z",
+          "updated_at": "2026-09-30T19:10:57.426214Z",
+          "deleted_at": null,
+          "provenance_json": null
+        },
+        {
+          "id": "01a0f3bf-d4f4-7ff3-9ccc-06b9a80177ac",
+          "workspace_id": "01a0f3a9-2423-782d-a1ef-4717e3fcea60",
+          "parent_page_id": null,
+          "title": "History acceptance",
+          "revision": "5",
+          "created_at": "2026-09-30T19:17:10.517534Z",
+          "updated_at": "2026-09-30T19:17:53.14894Z",
+          "deleted_at": null,
+          "provenance_json": "null"
+        },
+        {
+          "id": "01a0f3c6-da5a-7838-92c7-53e3cc0281e7",
+          "workspace_id": "01a0f3a9-2423-782d-a1ef-4717e3fcea60",
+          "parent_page_id": null,
+          "title": "Final clipboard acceptance",
+          "revision": "4",
+          "created_at": "2026-09-30T19:24:50.651829Z",
+          "updated_at": "2026-09-30T19:25:16.57438Z",
+          "deleted_at": null,
+          "provenance_json": null
+        }
+      ]
+    },
+    "blocks": {
+      "count": 15,
+      "sha256": "d1fc266a5bffb8b9863d762b25b79010d0de2a84e0e6a46f3398a525cfd2bcc0",
+      "rows": [
+        {
+          "id": "01a0f3be-1b4d-7e34-b071-c96657d02c7d",
+          "page_id": "01a0f3a9-c9a1-75e4-ab3a-ba9f2671f298",
+          "parent_block_id": null,
+          "sort_key": "000000000006",
+          "type": "audio",
+          "schema_version": 1,
+          "data_json": "{\"caption\":[],\"fileId\":\"01a0f3be-1af7-7a3e-8b82-924b17c3e065\"}",
+          "revision": "2"
+        },
+        {
+          "id": "01a0f3a9-24d5-7c94-95dc-0993ffa5783a",
+          "page_id": "01a0f3a9-24d5-786c-bb63-d69d85a843f7",
+          "parent_block_id": null,
+          "sort_key": "000000000002",
+          "type": "file",
+          "schema_version": 1,
+          "data_json": "{\"caption\":[{\"text\":\"Durable attachment\"}],\"fileId\":\"01a0f3a9-24f9-76af-8674-03980afd9667\"}",
+          "revision": "1"
+        },
+        {
+          "id": "01a0f3aa-4bbe-7f8f-9641-8608152faf7c",
+          "page_id": "01a0f3a9-c9a1-75e4-ab3a-ba9f2671f298",
+          "parent_block_id": null,
+          "sort_key": "000000000003",
+          "type": "table",
+          "schema_version": 1,
+          "data_json": "{\"cells\":[{\"colSpan\":1,\"column\":0,\"id\":\"01a0f3aa-4899-7109-8cf7-e21df72d3f06\",\"preMergeCells\":[],\"richText\":[],\"row\":1,\"rowSpan\":1},{\"colSpan\":1,\"column\":1,\"id\":\"01a0f3aa-4899-7e12-8ede-68addeeb8176\",\"preMergeCells\":[],\"richText\":[],\"row\":1,\"rowSpan\":1},{\"colSpan\":1,\"column\":0,\"id\":\"01a0f3aa-4899-755f-86b8-3a917b68eb25\",\"preMergeCells\":[],\"richText\":[],\"row\":2,\"rowSpan\":1},{\"colSpan\":1,\"column\":1,\"id\":\"01a0f3aa-4899-738a-88cb-e15eeb039d0e\",\"preMergeCells\":[],\"richText\":[],\"row\":2,\"rowSpan\":1},{\"colSpan\":1,\"column\":0,\"id\":\"01a0f3aa-4898-721b-8896-9b99240df1e8\",\"preMergeCells\":[],\"richText\":[{\"text\":\"alpha\"}],\"row\":0,\"rowSpan\":1},{\"colSpan\":1,\"column\":1,\"id\":\"01a0f3aa-4899-7350-b7dc-36685d21f723\",\"preMergeCells\":[],\"richText\":[{\"text\":\"beta\"}],\"row\":0,\"rowSpan\":1}],\"columnCount\":2,\"columnWidths\":[240,240],\"headerColumns\":0,\"headerRows\":1,\"rowCount\":3}",
+          "revision": "12"
+        },
+        {
+          "id": "01a0f3a9-2509-76d2-add2-03b562423500",
+          "page_id": "01a0f3a9-24d5-786c-bb63-d69d85a843f7",
+          "parent_block_id": null,
+          "sort_key": "000000000004",
+          "type": "synced_block",
+          "schema_version": 1,
+          "data_json": "{\"contentSourceId\":\"01a0f3a9-24d5-753d-9437-ffba6a145bf6\"}",
+          "revision": "1"
+        },
+        {
+          "id": "01a0f3a9-2509-739b-8405-8c8a5121aa64",
+          "page_id": "01a0f3a9-24d5-786c-bb63-d69d85a843f7",
+          "parent_block_id": null,
+          "sort_key": "000000000003",
+          "type": "embed",
+          "schema_version": 1,
+          "data_json": "{\"offlineText\":\"P1OfflineEvidence retained card\",\"provider\":\"qualification\",\"sandboxPolicy\":\"no_scripts_no_network\",\"url\":\"https://example.test/offline\"}",
+          "revision": "1"
+        },
+        {
+          "id": "01a0f3b8-f53c-7b71-aea8-cf3c8ec2fb4d",
+          "page_id": "01a0f3a9-c9a1-75e4-ab3a-ba9f2671f298",
+          "parent_block_id": null,
+          "sort_key": "000000000005",
+          "type": "paragraph",
+          "schema_version": 1,
+          "data_json": "{\"richText\":[{\"text\":\"Candidate3 resumed edit\"}]}",
+          "revision": "2"
+        },
+        {
+          "id": "01a0f3ab-2a1a-71d1-9770-97a5a12f9c1b",
+          "page_id": "01a0f3a9-c9a1-75e4-ab3a-ba9f2671f298",
+          "parent_block_id": "01a0f3ab-2a1a-795c-a214-e30684f441f5",
+          "sort_key": "000000000002",
+          "type": "paragraph",
+          "schema_version": 1,
+          "data_json": "{\"richText\":[{\"text\":\"Content 2\"}]}",
+          "revision": "1"
+        },
+        {
+          "id": "01a0f3c6-ca9d-73e7-a310-5af9f2f1f6d6",
+          "page_id": "01a0f3a9-c9a1-75e4-ab3a-ba9f2671f298",
+          "parent_block_id": null,
+          "sort_key": "000000000007",
+          "type": "paragraph",
+          "schema_version": 1,
+          "data_json": "{\"richText\":[{\"text\":\"Final candidate saved marker\"}]}",
+          "revision": "1"
+        },
+        {
+          "id": "01a0f3ab-2a1a-78e3-8efb-99db0610cc74",
+          "page_id": "01a0f3a9-c9a1-75e4-ab3a-ba9f2671f298",
+          "parent_block_id": "01a0f3ab-2a1a-795c-a214-e30684f441f5",
+          "sort_key": "000000000001",
+          "type": "paragraph",
+          "schema_version": 1,
+          "data_json": "{\"richText\":[{\"text\":\"Native tab content\"}]}",
+          "revision": "2"
+        },
+        {
+          "id": "01a0f3bf-f4aa-7b0c-b79b-ee31ed4eb674",
+          "page_id": "01a0f3bf-d4f4-7ff3-9ccc-06b9a80177ac",
+          "parent_block_id": null,
+          "sort_key": "000000000001",
+          "type": "paragraph",
+          "schema_version": 1,
+          "data_json": "{\"richText\":[{\"text\":\"Original history marker\"}]}",
+          "revision": "3"
+        },
+        {
+          "id": "01a0f3a9-24d5-753d-9437-ffba6a145bf6",
+          "page_id": "01a0f3a9-24d5-786c-bb63-d69d85a843f7",
+          "parent_block_id": null,
+          "sort_key": "000000000001",
+          "type": "paragraph",
+          "schema_version": 1,
+          "data_json": "{\"richText\":[{\"text\":\"Persistent notes — తెలుగు 中文 العربية 🌱\"}]}",
+          "revision": "1"
+        },
+        {
+          "id": "01a0f3a9-e4cd-7d1d-8380-46bdee3a3b36",
+          "page_id": "01a0f3a9-c9a1-75e4-ab3a-ba9f2671f298",
+          "parent_block_id": null,
+          "sort_key": "000000000001",
+          "type": "paragraph",
+          "schema_version": 1,
+          "data_json": "{\"richText\":[{\"text\":\"Persistent notes — తెలుగు 中文 العربية 🌱\"}]}",
+          "revision": "7"
+        },
+        {
+          "id": "01a0f3c7-3f9b-7222-a220-6bdc2075111e",
+          "page_id": "01a0f3c6-da5a-7838-92c7-53e3cc0281e7",
+          "parent_block_id": null,
+          "sort_key": "000000000001",
+          "type": "paragraph",
+          "schema_version": 1,
+          "data_json": "{\"richText\":[{\"text\":\"Persistent notes — తెలుగు 中文 العربية 🌱\"}]}",
+          "revision": "1"
+        },
+        {
+          "id": "01a0f3a9-f734-766e-bfe3-92667cc41530",
+          "page_id": "01a0f3a9-c9a1-75e4-ab3a-ba9f2671f298",
+          "parent_block_id": null,
+          "sort_key": "000000000002",
+          "type": "heading_4",
+          "schema_version": 1,
+          "data_json": "{\"richText\":[{\"text\":\"Restore-marker-original\"}]}",
+          "revision": "7"
+        },
+        {
+          "id": "01a0f3ab-2a1a-795c-a214-e30684f441f5",
+          "page_id": "01a0f3a9-c9a1-75e4-ab3a-ba9f2671f298",
+          "parent_block_id": null,
+          "sort_key": "000000000004",
+          "type": "tab_container",
+          "schema_version": 1,
+          "data_json": "{\"tabs\":[{\"childBlockIds\":[\"01a0f3ab-2a1a-78e3-8efb-99db0610cc74\"],\"id\":\"01a0f3ab-2a1a-79cd-8909-d4915b07f56b\",\"title\":\"Review\"},{\"childBlockIds\":[\"01a0f3ab-2a1a-71d1-9770-97a5a12f9c1b\"],\"id\":\"01a0f3ab-2a1a-7ae7-85a5-cc29ed5751e2\",\"title\":\"Tab 2\"}]}",
+          "revision": "7"
+        }
+      ]
+    },
+    "files": {
+      "count": 2,
+      "sha256": "32841b4e22678bff271948558d4059303bd6361f68823620ab35288a94a33c97",
+      "rows": [
+        {
+          "id": "01a0f3be-1af7-7a3e-8b82-924b17c3e065",
+          "workspace_id": "01a0f3a9-2423-782d-a1ef-4717e3fcea60",
+          "content_hash": "59dfb9a4acb36fe2a2affc14bacbee2920ff435cb13cc314a08c13f66ba7860e",
+          "original_name": "jfk.wav",
+          "media_type": "audio/wave",
+          "size_bytes": 352078,
+          "storage_key": "files/59/59dfb9a4acb36fe2a2affc14bacbee2920ff435cb13cc314a08c13f66ba7860e",
+          "revision": "1"
+        },
+        {
+          "id": "01a0f3a9-24f9-76af-8674-03980afd9667",
+          "workspace_id": "01a0f3a9-2423-782d-a1ef-4717e3fcea60",
+          "content_hash": "61cb495898eb4901d8a4ea859ee4cee692bb981cc2474a55f2809e47519fd273",
+          "original_name": "trove-integration-file-484916040.txt",
+          "media_type": "text/plain; charset=utf-8",
+          "size_bytes": 88,
+          "storage_key": "files/61/61cb495898eb4901d8a4ea859ee4cee692bb981cc2474a55f2809e47519fd273",
+          "revision": "1"
+        }
+      ]
+    },
+    "attachments": {
+      "count": 2,
+      "sha256": "f7a474e73e83f080fe75eb4233229e5887b83658e2f8fbb99804c60989b5fe00",
+      "rows": [
+        {
+          "page_id": "01a0f3a9-24d5-786c-bb63-d69d85a843f7",
+          "block_id": null,
+          "file_id": "01a0f3a9-24f9-76af-8674-03980afd9667"
+        },
+        {
+          "page_id": "01a0f3a9-c9a1-75e4-ab3a-ba9f2671f298",
+          "block_id": null,
+          "file_id": "01a0f3be-1af7-7a3e-8b82-924b17c3e065"
+        }
+      ]
+    },
+    "file_references": {
+      "count": 4,
+      "sha256": "45e3a58d366098205a6a907c55d74a116074beb27f052c76030cdc6a0520aa5b",
+      "rows": [
+        {
+          "page_id": "01a0f3a9-24d5-786c-bb63-d69d85a843f7",
+          "source_kind": "explicit_block",
+          "source_id": "01a0f3a9-24d5-7c94-95dc-0993ffa5783a",
+          "file_id": "01a0f3a9-24f9-76af-8674-03980afd9667"
+        },
+        {
+          "page_id": "01a0f3a9-24d5-786c-bb63-d69d85a843f7",
+          "source_kind": "content",
+          "source_id": "01a0f3a9-24f9-76af-8674-03980afd9667",
+          "file_id": "01a0f3a9-24f9-76af-8674-03980afd9667"
+        },
+        {
+          "page_id": "01a0f3a9-c9a1-75e4-ab3a-ba9f2671f298",
+          "source_kind": "content",
+          "source_id": "01a0f3be-1af7-7a3e-8b82-924b17c3e065",
+          "file_id": "01a0f3be-1af7-7a3e-8b82-924b17c3e065"
+        },
+        {
+          "page_id": "01a0f3a9-c9a1-75e4-ab3a-ba9f2671f298",
+          "source_kind": "explicit",
+          "source_id": "01a0f3be-1af7-7a3e-8b82-924b17c3e065",
+          "file_id": "01a0f3be-1af7-7a3e-8b82-924b17c3e065"
+        }
+      ]
+    },
+    "collections": {
+      "count": 1,
+      "sha256": "fd444e1e2b3b5fa01dd71d65a12d72440e272b340cb209a252554044900923d6",
+      "rows": [
+        {
+          "id": "01a0f3a9-24d5-759e-b00d-37474019dfc3",
+          "workspace_id": "01a0f3a9-2423-782d-a1ef-4717e3fcea60",
+          "owning_page_id": "01a0f3a9-24d5-786c-bb63-d69d85a843f7",
+          "title": "Integration records",
+          "title_property_id": "01a0f3a9-24d5-735b-9a49-4d661ceda270",
+          "title_type": "title",
+          "system_role": "none",
+          "revision": "5"
+        }
+      ]
+    },
+    "containers": {
+      "count": 0,
+      "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "rows": []
+    },
+    "container_collections": {
+      "count": 0,
+      "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "rows": []
+    },
+    "records": {
+      "count": 1,
+      "sha256": "e55d10c7b48ddf0dfd3c96f1be19ce92ec72cea161423a8ea9797c70875699dd",
+      "rows": [
+        {
+          "id": "01a0f3a9-24d5-7451-a129-9ad5b071fdb0",
+          "collection_id": "01a0f3a9-24d5-759e-b00d-37474019dfc3",
+          "page_id": "01a0f3a9-24d5-7099-b61c-7ce3a04e84f9",
+          "sort_key": "000000000001",
+          "revision": "3"
+        }
+      ]
+    },
+    "properties": {
+      "count": 2,
+      "sha256": "23f2d8394f4bba6d0599079db22f37fa0297bc8629addfea4656bb039e488a17",
+      "rows": [
+        {
+          "id": "01a0f3a9-2509-7d77-9e6c-b27bf924708f",
+          "collection_id": "01a0f3a9-24d5-759e-b00d-37474019dfc3",
+          "name": "Exact decimal",
+          "type": "formula",
+          "schema_version": 1,
+          "config_json": "{\"raw\":{\"importedCachedValue\":\"captured 999\",\"originalExpression\":\"0.1 + 0.2\",\"translatedExpression\":\"0.1 + 0.2\"},\"readableText\":\"Exact decimal\",\"reason\":\"unsupported_behavior\",\"sourceType\":\"qualification.formula\",\"sourceVersion\":1}",
+          "revision": "1"
+        },
+        {
+          "id": "01a0f3a9-24d5-735b-9a49-4d661ceda270",
+          "collection_id": "01a0f3a9-24d5-759e-b00d-37474019dfc3",
+          "name": "Name",
+          "type": "title",
+          "schema_version": 1,
+          "config_json": "{}",
+          "revision": "1"
+        }
+      ]
+    },
+    "property_options": {
+      "count": 0,
+      "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "rows": []
+    },
+    "property_values": {
+      "count": 0,
+      "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "rows": []
+    },
+    "views": {
+      "count": 2,
+      "sha256": "7388179c4ac6cad90b217a9de9c8ce572c94b53a4bc4750b25a5bd1ddbcf1788",
+      "rows": [
+        {
+          "id": "01a0f3a9-2509-7025-a8d1-dae1f95c734d",
+          "collection_id": "01a0f3a9-24d5-759e-b00d-37474019dfc3",
+          "container_id": null,
+          "owning_page_id": "01a0f3a9-2509-7036-9804-b4c92df170c3",
+          "name": "Linked gallery",
+          "type": "gallery",
+          "schema_version": 1,
+          "query_json": "{\"filter\":null,\"groupByPropertyId\":null,\"sorts\":[],\"subgroupByPropertyId\":null,\"visiblePropertyIds\":[\"01a0f3a9-24d5-735b-9a49-4d661ceda270\",\"01a0f3a9-2509-7d77-9e6c-b27bf924708f\"]}",
+          "config_json": "{\"cardSize\":\"medium\",\"coverPropertyId\":null}",
+          "revision": "1"
+        },
+        {
+          "id": "01a0f3b9-87a6-75a9-a7d2-eae615f943b3",
+          "collection_id": "01a0f3a9-24d5-759e-b00d-37474019dfc3",
+          "container_id": null,
+          "owning_page_id": "01a0f3a9-24d5-786c-bb63-d69d85a843f7",
+          "name": "Table view",
+          "type": "table",
+          "schema_version": 1,
+          "query_json": "{\"filter\":null,\"groupByPropertyId\":null,\"sorts\":[],\"subgroupByPropertyId\":null,\"visiblePropertyIds\":[\"01a0f3a9-24d5-735b-9a49-4d661ceda270\",\"01a0f3a9-2509-7d77-9e6c-b27bf924708f\"]}",
+          "config_json": "{\"columnWidths\":[]}",
+          "revision": "1"
+        }
+      ]
+    },
+    "record_structure": {
+      "count": 0,
+      "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "rows": []
+    },
+    "record_dependencies": {
+      "count": 0,
+      "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "rows": []
+    },
+    "relation_edges": {
+      "count": 0,
+      "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "rows": []
+    },
+    "advanced_page_locks": {
+      "count": 1,
+      "sha256": "04c4760a2a42e7e37836217d66260dc4dfc2b0e943706b9a63ee9913fa8dca40",
+      "rows": [
+        {
+          "page_id": "01a0f3a9-c9a1-75e4-ab3a-ba9f2671f298",
+          "locked": 0,
+          "revision": 6
+        }
+      ]
+    },
+    "advanced_templates": {
+      "count": 0,
+      "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "rows": []
+    },
+    "advanced_button_actions": {
+      "count": 0,
+      "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "rows": []
+    },
+    "automation_rules": {
+      "count": 2,
+      "sha256": "c3018d3ef6d771af2fa7eb4ca01881efecff8051ea34fc3fcd5b40a262ecb4ce",
+      "rows": [
+        {
+          "id": "01a0f3b9-e997-78c6-8108-edf56fd3e9fb",
+          "page_id": "01a0f3a9-c9a1-75e4-ab3a-ba9f2671f298",
+          "version": 1,
+          "rule_json": "{\"id\":\"01a0f3b9-e997-78c6-8108-edf56fd3e9fb\",\"name\":\"Native acceptance note\",\"enabled\":false,\"paused\":false,\"allowedOrigins\":[\"user\"],\"trigger\":{\"type\":\"schedule\",\"timezone\":\"Asia/Kolkata\",\"frequency\":\"daily\",\"hour\":9,\"missedPolicy\":\"skip\",\"catchUpLimit\":3},\"actions\":[{\"kind\":\"page.create\",\"pageId\":\"$id:page\",\"parentPageId\":\"01a0f3a9-c9a1-75e4-ab3a-ba9f2671f298\",\"title\":\"Native acceptance note · {{occurrence}}\"}]}",
+          "event_cursor": 28,
+          "next_at": "2026-10-01T03:30:00Z",
+          "failures": 0
+        },
+        {
+          "id": "01a0f3a9-2509-76df-8ba3-17ec8c8157a0",
+          "page_id": "01a0f3a9-2509-7036-9804-b4c92df170c3",
+          "version": 1,
+          "rule_json": "{\"id\":\"01a0f3a9-2509-76df-8ba3-17ec8c8157a0\",\"name\":\"Offline record change\",\"enabled\":true,\"paused\":false,\"allowedOrigins\":[\"user\"],\"trigger\":{\"type\":\"event\",\"collectionId\":\"01a0f3a9-24d5-759e-b00d-37474019dfc3\"},\"actions\":[{\"kind\":\"page.create\",\"pageId\":\"$id:note\",\"parentPageId\":\"01a0f3a9-2509-7036-9804-b4c92df170c3\",\"title\":\"P1 committed automation effect\"}]}",
+          "event_cursor": 48,
+          "next_at": "",
+          "failures": 0
+        }
+      ]
+    },
+    "automation_runs": {
+      "count": 43,
+      "sha256": "fdd0693c4b172abb9a3f8c76aa2e82ed32b9289b54d8bda45b742ed3addbb4ef",
+      "rows": [
+        {
+          "id": "01a0f3ba-2391-79eb-971b-d2f1e72a7ea4",
+          "rule_id": "01a0f3b9-e997-78c6-8108-edf56fd3e9fb",
+          "rule_version": 1,
+          "occurrence_key": "schedule:2026-10-01T03:30:00Z",
+          "status": "succeeded",
+          "diagnostic": "",
+          "created_at": "2026-09-30T19:10:57.425352Z",
+          "commands_json": "[{\"kind\":\"page.create\",\"pageId\":\"2c5e67e5-f51a-736c-8bdd-0c5347a1a8ee\",\"parentPageId\":\"01a0f3a9-c9a1-75e4-ab3a-ba9f2671f298\",\"title\":\"Native acceptance note · 2026-10-01T03:30:00Z\"}]"
+        },
+        {
+          "id": "01a0f3a9-2524-77b0-978d-b7a310b7e24e",
+          "rule_id": "01a0f3a9-2509-76df-8ba3-17ec8c8157a0",
+          "rule_version": 1,
+          "occurrence_key": "event:01a0f3a9-2521-7436-a645-21c9c937070e",
+          "status": "succeeded",
+          "diagnostic": "",
+          "created_at": "2026-09-30T18:52:23.716686Z",
+          "commands_json": "[{\"kind\":\"page.create\",\"pageId\":\"7302258c-b879-7094-8d3a-0e3b5ecaeb28\",\"parentPageId\":\"01a0f3a9-2509-7036-9804-b4c92df170c3\",\"title\":\"P1 committed automation effect\"}]"
+        },
+        {
+          "id": "01a0f3b9-6758-7a3f-9dda-70a9c62901a2",
+          "rule_id": "01a0f3a9-2509-76df-8ba3-17ec8c8157a0",
+          "rule_version": 1,
+          "occurrence_key": "event:01a0f3b9-5fc0-7b1a-9f5c-9acca5bc91b3",
+          "status": "succeeded",
+          "diagnostic": "",
+          "created_at": "2026-09-30T19:10:09.240018Z",
+          "commands_json": "[{\"kind\":\"page.create\",\"pageId\":\"eff68e20-e0dc-7453-b0ad-150245bf142f\",\"parentPageId\":\"01a0f3a9-2509-7036-9804-b4c92df170c3\",\"title\":\"P1 committed automation effect\"}]"
+        },
+        {
+          "id": "01a0f3a9-2522-7fe9-a2a7-416a9a00bfaf",
+          "rule_id": "01a0f3a9-2509-76df-8ba3-17ec8c8157a0",
+          "rule_version": 1,
+          "occurrence_key": "event:01a0f3a9-251a-75aa-916b-1e09ce0f2ad0",
+          "status": "skipped",
+          "diagnostic": "Event does not match the trigger",
+          "created_at": "2026-09-30T18:52:23.714838Z",
+          "commands_json": "null"
+        },
+        {
+          "id": "01a0f3a9-2535-7f58-8dad-a2f809e62911",
+          "rule_id": "01a0f3a9-2509-76df-8ba3-17ec8c8157a0",
+          "rule_version": 1,
+          "occurrence_key": "event:01a0f3a9-2525-7d7b-9994-ad4bd5ddf16c",
+          "status": "skipped",
+          "diagnostic": "Event origin is excluded",
+          "created_at": "2026-09-30T18:52:23.733756Z",
+          "commands_json": "null"
+        },
+        {
+          "id": "01a0f3aa-0eb7-7b2c-8276-82c4ec5d97ce",
+          "rule_id": "01a0f3a9-2509-76df-8ba3-17ec8c8157a0",
+          "rule_version": 1,
+          "occurrence_key": "event:01a0f3a9-c9a6-76b5-8787-2b9286140509",
+          "status": "skipped",
+          "diagnostic": "Event does not match the trigger",
+          "created_at": "2026-09-30T18:53:23.511908Z",
+          "commands_json": "null"
+        },
+        {
+          "id": "01a0f3aa-0eb8-77e6-ae46-3118f0074ea7",
+          "rule_id": "01a0f3a9-2509-76df-8ba3-17ec8c8157a0",
+          "rule_version": 1,
+          "occurrence_key": "event:01a0f3a9-ccf3-7f85-bd34-e042da03403f",
+          "status": "skipped",
+          "diagnostic": "Event does not match the trigger",
+          "created_at": "2026-09-30T18:53:23.512698Z",
+          "commands_json": "null"
+        },
+        {
+          "id": "01a0f3aa-0eb9-77dd-9c72-9c5de3d6a5ab",
+          "rule_id": "01a0f3a9-2509-76df-8ba3-17ec8c8157a0",
+          "rule_version": 1,
+          "occurrence_key": "event:01a0f3a9-de88-7a61-a529-52d3bc471b46",
+          "status": "skipped",
+          "diagnostic": "Event does not match the trigger",
+          "created_at": "2026-09-30T18:53:23.513179Z",
+          "commands_json": "null"
+        },
+        {
+          "id": "01a0f3aa-0eb9-78c6-9ad4-7809d91bb708",
+          "rule_id": "01a0f3a9-2509-76df-8ba3-17ec8c8157a0",
+          "rule_version": 1,
+          "occurrence_key": "event:01a0f3a9-e4d3-7d27-b376-e5d4fbe5114c",
+          "status": "skipped",
+          "diagnostic": "Event does not match the trigger",
+          "created_at": "2026-09-30T18:53:23.513798Z",
+          "commands_json": "null"
+        },
+        {
+          "id": "01a0f3aa-0eba-76cf-8ce0-585eb8d3583c",
+          "rule_id": "01a0f3a9-2509-76df-8ba3-17ec8c8157a0",
+          "rule_version": 1,
+          "occurrence_key": "event:01a0f3a9-f73a-7f25-b442-368c1a49320d",
+          "status": "skipped",
+          "diagnostic": "Event does not match the trigger",
+          "created_at": "2026-09-30T18:53:23.514245Z",
+          "commands_json": "null"
+        },
+        {
+          "id": "01a0f3aa-83dc-7869-8d90-bb1afa929f57",
+          "rule_id": "01a0f3a9-2509-76df-8ba3-17ec8c8157a0",
+          "rule_version": 1,
+          "occurrence_key": "event:01a0f3aa-4bc3-7cfd-980c-36b30787741e",
+          "status": "skipped",
+          "diagnostic": "Event does not match the trigger",
+          "created_at": "2026-09-30T18:53:53.500876Z",
+          "commands_json": "null"
+        },
+        {
+          "id": "01a0f3aa-83dd-7dfc-b32e-58ddfbd6dadd",
+          "rule_id": "01a0f3a9-2509-76df-8ba3-17ec8c8157a0",
+          "rule_version": 1,
+          "occurrence_key": "event:01a0f3aa-5f3a-7249-b352-baf9f5b82648",
+          "status": "skipped",
+          "diagnostic": "Event does not match the trigger",
+          "created_at": "2026-09-30T18:53:53.501099Z",
+          "commands_json": "null"
+        },
+        {
+          "id": "01a0f3aa-f90d-7c3f-ae7c-63a0430bb0d7",
+          "rule_id": "01a0f3a9-2509-76df-8ba3-17ec8c8157a0",
+          "rule_version": 1,
+          "occurrence_key": "event:01a0f3aa-b023-7fde-84d4-7c86af3ed93f",
+          "status": "skipped",
+          "diagnostic": "Event does not match the trigger",
+          "created_at": "2026-09-30T18:54:23.501111Z",
+          "commands_json": "null"
+        },
+        {
+          "id": "01a0f3aa-f90d-7793-9165-3b74adc45d1e",
+          "rule_id": "01a0f3a9-2509-76df-8ba3-17ec8c8157a0",
+          "rule_version": 1,
+          "occurrence_key": "event:01a0f3aa-c0dc-7b2c-aafc-2eb259075fea",
+          "status": "skipped",
+          "diagnostic": "Event does not match the trigger",
+          "created_at": "2026-09-30T18:54:23.501367Z",
+          "commands_json": "null"
+        },
+        {
+          "id": "01a0f3ab-6e3d-75ec-b05c-2e05c38a9e68",
+          "rule_id": "01a0f3a9-2509-76df-8ba3-17ec8c8157a0",
+          "rule_version": 1,
+          "occurrence_key": "event:01a0f3aa-f9d8-77ae-9bcb-c2ad44a9ead1",
+          "status": "skipped",
+          "diagnostic": "Event does not match the trigger",
+          "created_at": "2026-09-30T18:54:53.501019Z",
+          "commands_json": "null"
+        },
+        {
+          "id": "01a0f3ab-6e3d-7eb8-a576-b0ba26845bfc",
+          "rule_id": "01a0f3a9-2509-76df-8ba3-17ec8c8157a0",
+          "rule_version": 1,
+          "occurrence_key": "event:01a0f3ab-1ebb-785a-ae7c-4ada3c8153f5",
+          "status": "skipped",
+          "diagnostic": "Event does not match the trigger",
+          "created_at": "2026-09-30T18:54:53.501232Z",
+          "commands_json": "null"
+        },
+        {
+          "id": "01a0f3ab-6e3d-749c-a60b-90c8e429f894",
+          "rule_id": "01a0f3a9-2509-76df-8ba3-17ec8c8157a0",
+          "rule_version": 1,
+          "occurrence_key": "event:01a0f3ab-2d41-7aad-8e5c-a1f9f8b39b67",
+          "status": "skipped",
+          "diagnostic": "Event does not match the trigger",
+          "created_at": "2026-09-30T18:54:53.50137Z",
+          "commands_json": "null"
+        },
+        {
+          "id": "01a0f3ab-6e3d-7ec5-acec-6a9be007ef2c",
+          "rule_id": "01a0f3a9-2509-76df-8ba3-17ec8c8157a0",
+          "rule_version": 1,
+          "occurrence_key": "event:01a0f3ab-5794-75ef-aa36-86e304b0c3cb",
+          "status": "skipped",
+          "diagnostic": "Event does not match the trigger",
+          "created_at": "2026-09-30T18:54:53.501496Z",
+          "commands_json": "null"
+        },
+        {
+          "id": "01a0f3ab-e371-76bf-a4af-7696cd03c7bc",
+          "rule_id": "01a0f3a9-2509-76df-8ba3-17ec8c8157a0",
+          "rule_version": 1,
+          "occurrence_key": "event:01a0f3ab-a1c7-70f8-a60d-f68662cf2202",
+          "status": "skipped",
+          "diagnostic": "Event does not match the trigger",
+          "created_at": "2026-09-30T18:55:23.505436Z",
+          "commands_json": "null"
+        },
+        {
+          "id": "01a0f3ab-e371-7e25-862c-f556f5492a69",
+          "rule_id": "01a0f3a9-2509-76df-8ba3-17ec8c8157a0",
+          "rule_version": 1,
+          "occurrence_key": "event:01a0f3ab-c29f-7afe-9f5d-9f90f58aa54f",
+          "status": "skipped",
+          "diagnostic": "Event does not match the trigger",
+          "created_at": "2026-09-30T18:55:23.505956Z",
+          "commands_json": "null"
+        },
+        {
+          "id": "01a0f3b9-6756-7cd6-9952-12d9863be258",
+          "rule_id": "01a0f3a9-2509-76df-8ba3-17ec8c8157a0",
+          "rule_version": 1,
+          "occurrence_key": "event:01a0f3b8-f547-7c90-90d4-65fce47c6f98",
+          "status": "skipped",
+          "diagnostic": "Event does not match the trigger",
+          "created_at": "2026-09-30T19:10:09.238647Z",
+          "commands_json": "null"
+        },
+        {
+          "id": "01a0f3b9-dc88-76d3-ba5c-a06da4c7584d",
+          "rule_id": "01a0f3a9-2509-76df-8ba3-17ec8c8157a0",
+          "rule_version": 1,
+          "occurrence_key": "event:01a0f3b9-6759-7421-ab17-941c4af56a43",
+          "status": "skipped",
+          "diagnostic": "Event origin is excluded",
+          "created_at": "2026-09-30T19:10:39.240173Z",
+          "commands_json": "null"
+        },
+        {
+          "id": "01a0f3b9-dc88-704e-b90e-866d266cdfd9",
+          "rule_id": "01a0f3a9-2509-76df-8ba3-17ec8c8157a0",
+          "rule_version": 1,
+          "occurrence_key": "event:01a0f3b9-87ca-7cdf-86be-5b0c0c43dbd7",
+          "status": "skipped",
+          "diagnostic": "Event does not match the trigger",
+          "created_at": "2026-09-30T19:10:39.240831Z",
+          "commands_json": "null"
+        },
+        {
+          "id": "01a0f3ba-51b7-7cca-a9c5-916b33ce09ef",
+          "rule_id": "01a0f3a9-2509-76df-8ba3-17ec8c8157a0",
+          "rule_version": 1,
+          "occurrence_key": "event:01a0f3b9-e99b-726e-af9a-a0ac1d9566f4",
+          "status": "skipped",
+          "diagnostic": "Event does not match the trigger",
+          "created_at": "2026-09-30T19:11:09.239293Z",
+          "commands_json": "null"
+        },
+        {
+          "id": "01a0f3ba-51b7-7c87-ae11-823ebdaaa273",
+          "rule_id": "01a0f3a9-2509-76df-8ba3-17ec8c8157a0",
+          "rule_version": 1,
+          "occurrence_key": "event:01a0f3ba-074b-7b11-b0e1-47e3bcf6a211",
+          "status": "skipped",
+          "diagnostic": "Event does not match the trigger",
+          "created_at": "2026-09-30T19:11:09.239638Z",
+          "commands_json": "null"
+        },
+        {
+          "id": "01a0f3ba-51b7-7f6b-99a2-02c1f7d4ae62",
+          "rule_id": "01a0f3a9-2509-76df-8ba3-17ec8c8157a0",
+          "rule_version": 1,
+          "occurrence_key": "event:01a0f3ba-2392-78b1-8d68-44de1844f5cb",
+          "status": "skipped",
+          "diagnostic": "Event origin is excluded",
+          "created_at": "2026-09-30T19:11:09.239831Z",
+          "commands_json": "null"
+        },
+        {
+          "id": "01a0f3ba-51b8-7046-bf74-264bd1d5f22f",
+          "rule_id": "01a0f3a9-2509-76df-8ba3-17ec8c8157a0",
+          "rule_version": 1,
+          "occurrence_key": "event:01a0f3ba-4bfb-7397-921e-aa13ca96c6a8",
+          "status": "skipped",
+          "diagnostic": "Event origin is excluded",
+          "created_at": "2026-09-30T19:11:09.240007Z",
+          "commands_json": "null"
+        },
+        {
+          "id": "01a0f3ba-c6e7-7d8c-9014-0d025cd1c136",
+          "rule_id": "01a0f3a9-2509-76df-8ba3-17ec8c8157a0",
+          "rule_version": 1,
+          "occurrence_key": "event:01a0f3ba-5bbb-7243-8674-3d80d6f37e8d",
+          "status": "skipped",
+          "diagnostic": "Event does not match the trigger",
+          "created_at": "2026-09-30T19:11:39.239178Z",
+          "commands_json": "null"
+        },
+        {
+          "id": "01a0f3bd-7245-7e87-9386-d559a66b8c16",
+          "rule_id": "01a0f3a9-2509-76df-8ba3-17ec8c8157a0",
+          "rule_version": 1,
+          "occurrence_key": "event:01a0f3bd-315f-7808-87dd-bc2aa41086ac",
+          "status": "skipped",
+          "diagnostic": "Event does not match the trigger",
+          "created_at": "2026-09-30T19:14:34.181557Z",
+          "commands_json": "null"
+        },
+        {
+          "id": "01a0f3be-5ca6-7949-859e-b6ddfbdc34ab",
+          "rule_id": "01a0f3a9-2509-76df-8ba3-17ec8c8157a0",
+          "rule_version": 1,
+          "occurrence_key": "event:01a0f3be-1b58-7a99-a130-0b6691e988ed",
+          "status": "skipped",
+          "diagnostic": "Event does not match the trigger",
+          "created_at": "2026-09-30T19:15:34.1821Z",
+          "commands_json": "null"
+        },
+        {
+          "id": "01a0f3c0-3166-787d-afca-e0471b57b337",
+          "rule_id": "01a0f3a9-2509-76df-8ba3-17ec8c8157a0",
+          "rule_version": 1,
+          "occurrence_key": "event:01a0f3bf-d4f6-7f59-b696-fcee8cf1b400",
+          "status": "skipped",
+          "diagnostic": "Event does not match the trigger",
+          "created_at": "2026-09-30T19:17:34.182753Z",
+          "commands_json": "null"
+        },
+        {
+          "id": "01a0f3c0-3166-74be-ba9e-0f65c99581f2",
+          "rule_id": "01a0f3a9-2509-76df-8ba3-17ec8c8157a0",
+          "rule_version": 1,
+          "occurrence_key": "event:01a0f3bf-ee87-7b1f-bdd4-981a9c46aecb",
+          "status": "skipped",
+          "diagnostic": "Event does not match the trigger",
+          "created_at": "2026-09-30T19:17:34.182965Z",
+          "commands_json": "null"
+        },
+        {
+          "id": "01a0f3c0-3167-72e7-bf9e-d0b7f6a88d65",
+          "rule_id": "01a0f3a9-2509-76df-8ba3-17ec8c8157a0",
+          "rule_version": 1,
+          "occurrence_key": "event:01a0f3bf-f4ac-735e-9dbc-e1e70346f1d3",
+          "status": "skipped",
+          "diagnostic": "Event does not match the trigger",
+          "created_at": "2026-09-30T19:17:34.183101Z",
+          "commands_json": "null"
+        },
+        {
+          "id": "01a0f3c0-3167-7ebf-954c-23bfa4010002",
+          "rule_id": "01a0f3a9-2509-76df-8ba3-17ec8c8157a0",
+          "rule_version": 1,
+          "occurrence_key": "event:01a0f3c0-060c-7c9a-8a00-824c7e0888c9",
+          "status": "skipped",
+          "diagnostic": "Event does not match the trigger",
+          "created_at": "2026-09-30T19:17:34.183241Z",
+          "commands_json": "null"
+        },
+        {
+          "id": "01a0f3c0-a696-7f4d-8e92-4c9d8049e441",
+          "rule_id": "01a0f3a9-2509-76df-8ba3-17ec8c8157a0",
+          "rule_version": 1,
+          "occurrence_key": "event:01a0f3c0-7b7d-7f88-95dc-46e922967603",
+          "status": "skipped",
+          "diagnostic": "Event origin is excluded",
+          "created_at": "2026-09-30T19:18:04.182454Z",
+          "commands_json": "null"
+        },
+        {
+          "id": "01a0f3c6-d73f-76fc-b95a-bb9abcfaa798",
+          "rule_id": "01a0f3a9-2509-76df-8ba3-17ec8c8157a0",
+          "rule_version": 1,
+          "occurrence_key": "event:01a0f3c6-caa4-7e52-afeb-15a59b7f6361",
+          "status": "skipped",
+          "diagnostic": "Event does not match the trigger",
+          "created_at": "2026-09-30T19:24:49.855262Z",
+          "commands_json": "null"
+        },
+        {
+          "id": "01a0f3c7-4c70-7c00-bdbf-d658cc19c2ff",
+          "rule_id": "01a0f3a9-2509-76df-8ba3-17ec8c8157a0",
+          "rule_version": 1,
+          "occurrence_key": "event:01a0f3c6-da5c-7bf1-9710-c3befd105b57",
+          "status": "skipped",
+          "diagnostic": "Event does not match the trigger",
+          "created_at": "2026-09-30T19:25:19.856046Z",
+          "commands_json": "null"
+        },
+        {
+          "id": "01a0f3c7-4c70-70a2-a761-b002f9bb0895",
+          "rule_id": "01a0f3a9-2509-76df-8ba3-17ec8c8157a0",
+          "rule_version": 1,
+          "occurrence_key": "event:01a0f3c6-efd4-7827-ade8-8855bc3d1958",
+          "status": "skipped",
+          "diagnostic": "Event does not match the trigger",
+          "created_at": "2026-09-30T19:25:19.856286Z",
+          "commands_json": "null"
+        },
+        {
+          "id": "01a0f3c7-4c70-7153-973a-e2a77d57c9e4",
+          "rule_id": "01a0f3a9-2509-76df-8ba3-17ec8c8157a0",
+          "rule_version": 1,
+          "occurrence_key": "event:01a0f3c6-f5c3-74c5-8ea4-a034d68770dc",
+          "status": "skipped",
+          "diagnostic": "Event does not match the trigger",
+          "created_at": "2026-09-30T19:25:19.856429Z",
+          "commands_json": "null"
+        },
+        {
+          "id": "01a0f3c7-4c70-70ff-addb-6694d89e9dbf",
+          "rule_id": "01a0f3a9-2509-76df-8ba3-17ec8c8157a0",
+          "rule_version": 1,
+          "occurrence_key": "event:01a0f3c7-3f9e-7b71-b90a-10badde9e665",
+          "status": "skipped",
+          "diagnostic": "Event does not match the trigger",
+          "created_at": "2026-09-30T19:25:19.856573Z",
+          "commands_json": "null"
+        },
+        {
+          "id": "01a0f3c8-abff-7406-9d4b-959d514f0365",
+          "rule_id": "01a0f3a9-2509-76df-8ba3-17ec8c8157a0",
+          "rule_version": 1,
+          "occurrence_key": "event:01a0f3c8-3feb-76e2-aa84-b1b61f5555c8",
+          "status": "skipped",
+          "diagnostic": "Event does not match the trigger",
+          "created_at": "2026-09-30T19:26:49.85587Z",
+          "commands_json": "null"
+        },
+        {
+          "id": "01a0f3c8-ac00-7f12-b508-ba37168b67a0",
+          "rule_id": "01a0f3a9-2509-76df-8ba3-17ec8c8157a0",
+          "rule_version": 1,
+          "occurrence_key": "event:01a0f3c8-4cbf-74b4-a4ce-514786085462",
+          "status": "skipped",
+          "diagnostic": "Event origin is excluded",
+          "created_at": "2026-09-30T19:26:49.856275Z",
+          "commands_json": "null"
+        },
+        {
+          "id": "01a0f3c8-ac00-771c-bffe-2af71cb411d5",
+          "rule_id": "01a0f3a9-2509-76df-8ba3-17ec8c8157a0",
+          "rule_version": 1,
+          "occurrence_key": "event:01a0f3c8-5f4a-78cc-9ad3-8f982427dae3",
+          "status": "skipped",
+          "diagnostic": "Event does not match the trigger",
+          "created_at": "2026-09-30T19:26:49.856492Z",
+          "commands_json": "null"
+        }
+      ]
+    },
+    "ai_runs": {
+      "count": 1,
+      "sha256": "742b0ac58e26f4b4f0d77ab61a08113efdb3810b0302e40440b00d36a4e6d078",
+      "rows": [
+        {
+          "id": "01a0f3c7-74f3-79dc-b34f-cd13f201b135",
+          "conversation_id": "01a0f3c7-74d8-7335-b054-81150f8631e9",
+          "actor_id": "01a0f3a9-2423-7861-8c04-e8359b2e6800",
+          "state": "completed",
+          "request_json": "{\"conversationId\":\"01a0f3c7-74d8-7335-b054-81150f8631e9\",\"pageId\":\"01a0f3bf-d4f4-7ff3-9ccc-06b9a80177ac\",\"mode\":\"answer\",\"prompt\":\"What exact marker text is on this page? Answer briefly and cite the source.\",\"useMemory\":false,\"modelPackId\":\"01990000-0000-7000-8000-000000000105\"}",
+          "text": "The exact marker text on this page is \"Original history marker\". [1]",
+          "sources_json": "[{\"number\":1,\"title\":\"History acceptance\",\"text\":\"History acceptance\",\"location\":{\"pageId\":\"01a0f3bf-d4f4-7ff3-9ccc-06b9a80177ac\",\"sourceRevision\":\"5\"}},{\"number\":2,\"title\":\"History acceptance\",\"text\":\"Original history marker\",\"location\":{\"pageId\":\"01a0f3bf-d4f4-7ff3-9ccc-06b9a80177ac\",\"sourceRevision\":\"5\",\"blockId\":\"01a0f3bf-f4aa-7b0c-b79b-ee31ed4eb674\"}}]",
+          "citations_json": "[{\"number\":1,\"title\":\"History acceptance\",\"location\":{\"pageId\":\"01a0f3bf-d4f4-7ff3-9ccc-06b9a80177ac\",\"sourceRevision\":\"5\"},\"state\":\"current\"}]",
+          "warning": "",
+          "error": "",
+          "created_at": "2026-09-30T19:25:30.227296Z"
+        }
+      ]
+    },
+    "ai_proposals": {
+      "count": 0,
+      "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "rows": []
+    },
+    "import_runs": {
+      "count": 0,
+      "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "rows": []
+    },
+    "import_mappings": {
+      "count": 0,
+      "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "rows": []
+    },
+    "import_observations": {
+      "count": 0,
+      "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "rows": []
+    },
+    "import_mapping_state": {
+      "count": 0,
+      "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "rows": []
+    },
+    "page_snapshots": {
+      "count": 50,
+      "sha256": "f0eb36e36998c363b94648bf89757f37da6cc461cd993fdfa0066c6c8caaeef5",
+      "rows": [
+        {
+          "snapshot_id": "01a0f3a9-24d9-7779-ab1d-451f8ff93e1f",
+          "page_id": "01a0f3a9-24d5-786c-bb63-d69d85a843f7",
+          "revision": "1",
+          "snapshot_json": "{\"page\":{\"createdAt\":\"2026-09-30T18:52:23.640672Z\",\"deletedAt\":null,\"id\":\"01a0f3a9-24d5-786c-bb63-d69d85a843f7\",\"parentPageId\":null,\"revision\":\"1\",\"title\":\"Phase 1 integration\",\"updatedAt\":\"2026-09-30T18:52:23.641506Z\",\"workspaceId\":\"01a0f3a9-2423-782d-a1ef-4717e3fcea60\"},\"blocks\":[],\"snapshotCursor\":\"1\",\"recoveryMetadataVersion\":3}",
+          "created_at": "2026-09-30T18:52:23.641889Z"
+        },
+        {
+          "snapshot_id": "01a0f3a9-24df-7e6e-b6a0-b06de020938b",
+          "page_id": "01a0f3a9-24d5-786c-bb63-d69d85a843f7",
+          "revision": "2",
+          "snapshot_json": "{\"page\":{\"createdAt\":\"2026-09-30T18:52:23.640672Z\",\"deletedAt\":null,\"id\":\"01a0f3a9-24d5-786c-bb63-d69d85a843f7\",\"parentPageId\":null,\"revision\":\"2\",\"title\":\"Phase 1 integration\",\"updatedAt\":\"2026-09-30T18:52:23.646741Z\",\"workspaceId\":\"01a0f3a9-2423-782d-a1ef-4717e3fcea60\"},\"blocks\":[{\"id\":\"01a0f3a9-24d5-753d-9437-ffba6a145bf6\",\"pageId\":\"01a0f3a9-24d5-786c-bb63-d69d85a843f7\",\"parentBlockId\":null,\"sortKey\":\"000000000001\",\"type\":\"paragraph\",\"schemaVersion\":1,\"data\":{\"richText\":[{\"text\":\"Persistent notes — తెలుగు 中文 العربية 🌱\"}]},\"revision\":\"1\"}],\"snapshotCursor\":\"2\",\"recoveryMetadataVersion\":3}",
+          "created_at": "2026-09-30T18:52:23.647018Z"
+        },
+        {
+          "snapshot_id": "01a0f3a9-24e4-7017-90c0-668b8c85d4a9",
+          "page_id": "01a0f3a9-24d5-786c-bb63-d69d85a843f7",
+          "revision": "3",
+          "snapshot_json": "{\"page\":{\"createdAt\":\"2026-09-30T18:52:23.640672Z\",\"deletedAt\":null,\"id\":\"01a0f3a9-24d5-786c-bb63-d69d85a843f7\",\"parentPageId\":null,\"revision\":\"3\",\"title\":\"Phase 1 integration\",\"updatedAt\":\"2026-09-30T18:52:23.651848Z\",\"workspaceId\":\"01a0f3a9-2423-782d-a1ef-4717e3fcea60\"},\"blocks\":[{\"id\":\"01a0f3a9-24d5-753d-9437-ffba6a145bf6\",\"pageId\":\"01a0f3a9-24d5-786c-bb63-d69d85a843f7\",\"parentBlockId\":null,\"sortKey\":\"000000000001\",\"type\":\"paragraph\",\"schemaVersion\":1,\"data\":{\"richText\":[{\"text\":\"Persistent notes — తెలుగు 中文 العربية 🌱\"}]},\"revision\":\"1\"}],\"snapshotCursor\":\"3\",\"recoveryMetadataVersion\":3}",
+          "created_at": "2026-09-30T18:52:23.652173Z"
+        },
+        {
+          "snapshot_id": "01a0f3a9-24eb-7d91-a012-c63fa672b591",
+          "page_id": "01a0f3a9-24d5-7099-b61c-7ce3a04e84f9",
+          "revision": "1",
+          "snapshot_json": "{\"page\":{\"createdAt\":\"2026-09-30T18:52:23.658039Z\",\"deletedAt\":null,\"id\":\"01a0f3a9-24d5-7099-b61c-7ce3a04e84f9\",\"parentPageId\":\"01a0f3a9-24d5-786c-bb63-d69d85a843f7\",\"revision\":\"1\",\"title\":\"Record with a page body\",\"updatedAt\":\"2026-09-30T18:52:23.658834Z\",\"workspaceId\":\"01a0f3a9-2423-782d-a1ef-4717e3fcea60\"},\"blocks\":[],\"snapshotCursor\":\"4\",\"record\":{\"id\":\"01a0f3a9-24d5-7451-a129-9ad5b071fdb0\",\"collectionId\":\"01a0f3a9-24d5-759e-b00d-37474019dfc3\",\"pageId\":\"01a0f3a9-24d5-7099-b61c-7ce3a04e84f9\",\"revision\":\"1\",\"sortKey\":\"000000000001\",\"values\":[{\"propertyId\":\"01a0f3a9-24d5-735b-9a49-4d661ceda270\",\"schemaVersion\":1,\"value\":{\"pageId\":\"01a0f3a9-24d5-7099-b61c-7ce3a04e84f9\"}}]},\"recordStructure\":{\"parentRecordId\":null,\"dependencyRecordIds\":[]},\"recoveryMetadataVersion\":3,\"propertyDefinitions\":[{\"id\":\"01a0f3a9-24d5-735b-9a49-4d661ceda270\",\"collectionId\":\"01a0f3a9-24d5-759e-b00d-37474019dfc3\",\"name\":\"Name\",\"type\":\"title\",\"schemaVersion\":1,\"config\":{},\"revision\":\"1\"}]}",
+          "created_at": "2026-09-30T18:52:23.659409Z"
+        },
+        {
+          "snapshot_id": "01a0f3a9-2503-7f80-904d-a8f7e2ecd94d",
+          "page_id": "01a0f3a9-24d5-786c-bb63-d69d85a843f7",
+          "revision": "4",
+          "snapshot_json": "{\"page\":{\"createdAt\":\"2026-09-30T18:52:23.640672Z\",\"deletedAt\":null,\"id\":\"01a0f3a9-24d5-786c-bb63-d69d85a843f7\",\"parentPageId\":null,\"revision\":\"4\",\"title\":\"Phase 1 integration\",\"updatedAt\":\"2026-09-30T18:52:23.68281Z\",\"workspaceId\":\"01a0f3a9-2423-782d-a1ef-4717e3fcea60\"},\"blocks\":[{\"id\":\"01a0f3a9-24d5-753d-9437-ffba6a145bf6\",\"pageId\":\"01a0f3a9-24d5-786c-bb63-d69d85a843f7\",\"parentBlockId\":null,\"sortKey\":\"000000000001\",\"type\":\"paragraph\",\"schemaVersion\":1,\"data\":{\"richText\":[{\"text\":\"Persistent notes — తెలుగు 中文 العربية 🌱\"}]},\"revision\":\"1\"},{\"id\":\"01a0f3a9-24d5-7c94-95dc-0993ffa5783a\",\"pageId\":\"01a0f3a9-24d5-786c-bb63-d69d85a843f7\",\"parentBlockId\":null,\"sortKey\":\"000000000002\",\"type\":\"file\",\"schemaVersion\":1,\"data\":{\"caption\":[{\"text\":\"Durable attachment\"}],\"fileId\":\"01a0f3a9-24f9-76af-8674-03980afd9667\"},\"revision\":\"1\"}],\"snapshotCursor\":\"5\",\"attachmentFileIds\":[\"01a0f3a9-24f9-76af-8674-03980afd9667\"],\"recoveryMetadataVersion\":3}",
+          "created_at": "2026-09-30T18:52:23.683112Z"
+        },
+        {
+          "snapshot_id": "01a0f3a9-2511-74ea-8c02-ed68fa4a8c76",
+          "page_id": "01a0f3a9-2509-7036-9804-b4c92df170c3",
+          "revision": "1",
+          "snapshot_json": "{\"page\":{\"createdAt\":\"2026-09-30T18:52:23.693052Z\",\"deletedAt\":null,\"id\":\"01a0f3a9-2509-7036-9804-b4c92df170c3\",\"parentPageId\":null,\"revision\":\"1\",\"title\":\"P1 linked gallery\",\"updatedAt\":\"2026-09-30T18:52:23.696619Z\",\"workspaceId\":\"01a0f3a9-2423-782d-a1ef-4717e3fcea60\"},\"blocks\":[],\"snapshotCursor\":\"6\",\"recoveryMetadataVersion\":3}",
+          "created_at": "2026-09-30T18:52:23.697022Z"
+        },
+        {
+          "snapshot_id": "01a0f3a9-2511-77e9-b188-dc092c1fb436",
+          "page_id": "01a0f3a9-24d5-786c-bb63-d69d85a843f7",
+          "revision": "5",
+          "snapshot_json": "{\"page\":{\"createdAt\":\"2026-09-30T18:52:23.640672Z\",\"deletedAt\":null,\"id\":\"01a0f3a9-24d5-786c-bb63-d69d85a843f7\",\"parentPageId\":null,\"revision\":\"5\",\"title\":\"Phase 1 integration\",\"updatedAt\":\"2026-09-30T18:52:23.696585Z\",\"workspaceId\":\"01a0f3a9-2423-782d-a1ef-4717e3fcea60\"},\"blocks\":[{\"id\":\"01a0f3a9-24d5-753d-9437-ffba6a145bf6\",\"pageId\":\"01a0f3a9-24d5-786c-bb63-d69d85a843f7\",\"parentBlockId\":null,\"sortKey\":\"000000000001\",\"type\":\"paragraph\",\"schemaVersion\":1,\"data\":{\"richText\":[{\"text\":\"Persistent notes — తెలుగు 中文 العربية 🌱\"}]},\"revision\":\"1\"},{\"id\":\"01a0f3a9-24d5-7c94-95dc-0993ffa5783a\",\"pageId\":\"01a0f3a9-24d5-786c-bb63-d69d85a843f7\",\"parentBlockId\":null,\"sortKey\":\"000000000002\",\"type\":\"file\",\"schemaVersion\":1,\"data\":{\"caption\":[{\"text\":\"Durable attachment\"}],\"fileId\":\"01a0f3a9-24f9-76af-8674-03980afd9667\"},\"revision\":\"1\"},{\"id\":\"01a0f3a9-2509-739b-8405-8c8a5121aa64\",\"pageId\":\"01a0f3a9-24d5-786c-bb63-d69d85a843f7\",\"parentBlockId\":null,\"sortKey\":\"000000000003\",\"type\":\"embed\",\"schemaVersion\":1,\"data\":{\"offlineText\":\"P1OfflineEvidence retained card\",\"provider\":\"qualification\",\"sandboxPolicy\":\"no_scripts_no_network\",\"url\":\"https://example.test/offline\"},\"revision\":\"1\"},{\"id\":\"01a0f3a9-2509-76d2-add2-03b562423500\",\"pageId\":\"01a0f3a9-24d5-786c-bb63-d69d85a843f7\",\"parentBlockId\":null,\"sortKey\":\"000000000004\",\"type\":\"synced_block\",\"schemaVersion\":1,\"data\":{\"contentSourceId\":\"01a0f3a9-24d5-753d-9437-ffba6a145bf6\"},\"revision\":\"1\"}],\"snapshotCursor\":\"6\",\"attachmentFileIds\":[\"01a0f3a9-24f9-76af-8674-03980afd9667\"],\"recoveryMetadataVersion\":3}",
+          "created_at": "2026-09-30T18:52:23.697255Z"
+        },
+        {
+          "snapshot_id": "01a0f3a9-251a-78fc-968d-062e9c008dd1",
+          "page_id": "01a0f3a9-2509-7036-9804-b4c92df170c3",
+          "revision": "2",
+          "snapshot_json": "{\"page\":{\"createdAt\":\"2026-09-30T18:52:23.693052Z\",\"deletedAt\":null,\"id\":\"01a0f3a9-2509-7036-9804-b4c92df170c3\",\"parentPageId\":null,\"revision\":\"2\",\"title\":\"P1 linked gallery\",\"updatedAt\":\"2026-09-30T18:52:23.706385Z\",\"workspaceId\":\"01a0f3a9-2423-782d-a1ef-4717e3fcea60\"},\"blocks\":[],\"snapshotCursor\":\"7\",\"recoveryMetadataVersion\":3}",
+          "created_at": "2026-09-30T18:52:23.706631Z"
+        },
+        {
+          "snapshot_id": "01a0f3a9-2521-72d4-866f-5ff986b71a8b",
+          "page_id": "01a0f3a9-24d5-7099-b61c-7ce3a04e84f9",
+          "revision": "2",
+          "snapshot_json": "{\"page\":{\"createdAt\":\"2026-09-30T18:52:23.658039Z\",\"deletedAt\":null,\"id\":\"01a0f3a9-24d5-7099-b61c-7ce3a04e84f9\",\"parentPageId\":\"01a0f3a9-24d5-786c-bb63-d69d85a843f7\",\"revision\":\"2\",\"title\":\"P1 shared record edit\",\"updatedAt\":\"2026-09-30T18:52:23.713056Z\",\"workspaceId\":\"01a0f3a9-2423-782d-a1ef-4717e3fcea60\"},\"blocks\":[],\"snapshotCursor\":\"8\",\"record\":{\"id\":\"01a0f3a9-24d5-7451-a129-9ad5b071fdb0\",\"collectionId\":\"01a0f3a9-24d5-759e-b00d-37474019dfc3\",\"pageId\":\"01a0f3a9-24d5-7099-b61c-7ce3a04e84f9\",\"revision\":\"2\",\"sortKey\":\"000000000001\",\"values\":[{\"propertyId\":\"01a0f3a9-24d5-735b-9a49-4d661ceda270\",\"schemaVersion\":1,\"value\":{\"pageId\":\"01a0f3a9-24d5-7099-b61c-7ce3a04e84f9\"}}]},\"recordStructure\":{\"parentRecordId\":null,\"dependencyRecordIds\":[]},\"recoveryMetadataVersion\":3,\"propertyDefinitions\":[{\"id\":\"01a0f3a9-24d5-735b-9a49-4d661ceda270\",\"collectionId\":\"01a0f3a9-24d5-759e-b00d-37474019dfc3\",\"name\":\"Name\",\"type\":\"title\",\"schemaVersion\":1,\"config\":{},\"revision\":\"1\"}]}",
+          "created_at": "2026-09-30T18:52:23.713544Z"
+        },
+        {
+          "snapshot_id": "01a0f3a9-2525-7669-8081-4d7f9ecc76ee",
+          "page_id": "01a0f3a9-2509-7036-9804-b4c92df170c3",
+          "revision": "3",
+          "snapshot_json": "{\"page\":{\"createdAt\":\"2026-09-30T18:52:23.693052Z\",\"deletedAt\":null,\"id\":\"01a0f3a9-2509-7036-9804-b4c92df170c3\",\"parentPageId\":null,\"revision\":\"3\",\"title\":\"P1 linked gallery\",\"updatedAt\":\"2026-09-30T18:52:23.717311Z\",\"workspaceId\":\"01a0f3a9-2423-782d-a1ef-4717e3fcea60\"},\"blocks\":[],\"snapshotCursor\":\"9\",\"recoveryMetadataVersion\":3}",
+          "created_at": "2026-09-30T18:52:23.717556Z"
+        },
+        {
+          "snapshot_id": "01a0f3a9-2525-75a1-b745-38c2ffca9641",
+          "page_id": "7302258c-b879-7094-8d3a-0e3b5ecaeb28",
+          "revision": "1",
+          "snapshot_json": "{\"page\":{\"createdAt\":\"2026-09-30T18:52:23.716498Z\",\"deletedAt\":null,\"id\":\"7302258c-b879-7094-8d3a-0e3b5ecaeb28\",\"parentPageId\":\"01a0f3a9-2509-7036-9804-b4c92df170c3\",\"revision\":\"1\",\"title\":\"P1 committed automation effect\",\"updatedAt\":\"2026-09-30T18:52:23.717345Z\",\"workspaceId\":\"01a0f3a9-2423-782d-a1ef-4717e3fcea60\"},\"blocks\":[],\"snapshotCursor\":\"9\",\"recoveryMetadataVersion\":3}",
+          "created_at": "2026-09-30T18:52:23.717765Z"
+        },
+        {
+          "snapshot_id": "01a0f3a9-c9a6-7919-a5ba-6cda6b27f8e6",
+          "page_id": "01a0f3a9-c9a1-75e4-ab3a-ba9f2671f298",
+          "revision": "1",
+          "snapshot_json": "{\"page\":{\"createdAt\":\"2026-09-30T18:53:05.828733Z\",\"deletedAt\":null,\"id\":\"01a0f3a9-c9a1-75e4-ab3a-ba9f2671f298\",\"parentPageId\":null,\"revision\":\"1\",\"title\":\"Untitled\",\"updatedAt\":\"2026-09-30T18:53:05.8301Z\",\"workspaceId\":\"01a0f3a9-2423-782d-a1ef-4717e3fcea60\"},\"blocks\":[],\"snapshotCursor\":\"10\",\"recoveryMetadataVersion\":3}",
+          "created_at": "2026-09-30T18:53:05.830398Z"
+        },
+        {
+          "snapshot_id": "01a0f3a9-ccf3-7ffb-9125-bc8d591abba8",
+          "page_id": "01a0f3a9-c9a1-75e4-ab3a-ba9f2671f298",
+          "revision": "2",
+          "snapshot_json": "{\"page\":{\"createdAt\":\"2026-09-30T18:53:05.828733Z\",\"deletedAt\":null,\"id\":\"01a0f3a9-c9a1-75e4-ab3a-ba9f2671f298\",\"parentPageId\":null,\"revision\":\"2\",\"title\":\"Untitled\",\"updatedAt\":\"2026-09-30T18:53:06.674676Z\",\"workspaceId\":\"01a0f3a9-2423-782d-a1ef-4717e3fcea60\"},\"blocks\":[{\"id\":\"01a0f3a9-cce5-74e4-ab46-4003af91a978\",\"pageId\":\"01a0f3a9-c9a1-75e4-ab3a-ba9f2671f298\",\"parentBlockId\":null,\"sortKey\":\"000000000001\",\"type\":\"paragraph\",\"schemaVersion\":1,\"data\":{\"richText\":[]},\"revision\":\"1\"}],\"snapshotCursor\":\"11\",\"recoveryMetadataVersion\":3}",
+          "created_at": "2026-09-30T18:53:06.675007Z"
+        },
+        {
+          "snapshot_id": "01a0f3a9-de88-72dd-93e2-c745b8660f31",
+          "page_id": "01a0f3a9-c9a1-75e4-ab3a-ba9f2671f298",
+          "revision": "3",
+          "snapshot_json": "{\"page\":{\"createdAt\":\"2026-09-30T18:53:05.828733Z\",\"deletedAt\":null,\"id\":\"01a0f3a9-c9a1-75e4-ab3a-ba9f2671f298\",\"parentPageId\":null,\"revision\":\"3\",\"title\":\"Native acceptance\",\"updatedAt\":\"2026-09-30T18:53:11.175957Z\",\"workspaceId\":\"01a0f3a9-2423-782d-a1ef-4717e3fcea60\"},\"blocks\":[{\"id\":\"01a0f3a9-cce5-74e4-ab46-4003af91a978\",\"pageId\":\"01a0f3a9-c9a1-75e4-ab3a-ba9f2671f298\",\"parentBlockId\":null,\"sortKey\":\"000000000001\",\"type\":\"paragraph\",\"schemaVersion\":1,\"data\":{\"richText\":[]},\"revision\":\"1\"}],\"snapshotCursor\":\"12\",\"recoveryMetadataVersion\":3}",
+          "created_at": "2026-09-30T18:53:11.176277Z"
+        },
+        {
+          "snapshot_id": "01a0f3a9-e4d3-77e0-98c3-54dc41ff3235",
+          "page_id": "01a0f3a9-c9a1-75e4-ab3a-ba9f2671f298",
+          "revision": "4",
+          "snapshot_json": "{\"page\":{\"createdAt\":\"2026-09-30T18:53:05.828733Z\",\"deletedAt\":null,\"id\":\"01a0f3a9-c9a1-75e4-ab3a-ba9f2671f298\",\"parentPageId\":null,\"revision\":\"4\",\"title\":\"Native acceptance\",\"updatedAt\":\"2026-09-30T18:53:12.78716Z\",\"workspaceId\":\"01a0f3a9-2423-782d-a1ef-4717e3fcea60\"},\"blocks\":[{\"id\":\"01a0f3a9-e4cd-7d1d-8380-46bdee3a3b36\",\"pageId\":\"01a0f3a9-c9a1-75e4-ab3a-ba9f2671f298\",\"parentBlockId\":null,\"sortKey\":\"000000000001\",\"type\":\"paragraph\",\"schemaVersion\":1,\"data\":{\"richText\":[{\"text\":\"Persistent notes — తెలుగు 中文 العربية 🌱\"}]},\"revision\":\"1\"}],\"snapshotCursor\":\"13\",\"recoveryMetadataVersion\":3}",
+          "created_at": "2026-09-30T18:53:12.787821Z"
+        },
+        {
+          "snapshot_id": "01a0f3a9-f73a-72b7-a783-8211127391c7",
+          "page_id": "01a0f3a9-c9a1-75e4-ab3a-ba9f2671f298",
+          "revision": "5",
+          "snapshot_json": "{\"page\":{\"createdAt\":\"2026-09-30T18:53:05.828733Z\",\"deletedAt\":null,\"id\":\"01a0f3a9-c9a1-75e4-ab3a-ba9f2671f298\",\"parentPageId\":null,\"revision\":\"5\",\"title\":\"Native acceptance\",\"updatedAt\":\"2026-09-30T18:53:17.498121Z\",\"workspaceId\":\"01a0f3a9-2423-782d-a1ef-4717e3fcea60\"},\"blocks\":[{\"id\":\"01a0f3a9-e4cd-7d1d-8380-46bdee3a3b36\",\"pageId\":\"01a0f3a9-c9a1-75e4-ab3a-ba9f2671f298\",\"parentBlockId\":null,\"sortKey\":\"000000000001\",\"type\":\"paragraph\",\"schemaVersion\":1,\"data\":{\"richText\":[{\"text\":\"Persistent notes — తెలుగు 中文 العربية 🌱\"}]},\"revision\":\"2\"},{\"id\":\"01a0f3a9-f734-766e-bfe3-92667cc41530\",\"pageId\":\"01a0f3a9-c9a1-75e4-ab3a-ba9f2671f298\",\"parentBlockId\":null,\"sortKey\":\"000000000002\",\"type\":\"paragraph\",\"schemaVersion\":1,\"data\":{\"richText\":[{\"text\":\"Restore-marker-original\"}]},\"revision\":\"1\"}],\"snapshotCursor\":\"14\",\"recoveryMetadataVersion\":3}",
+          "created_at": "2026-09-30T18:53:17.498481Z"
+        },
+        {
+          "snapshot_id": "01a0f3aa-4bc3-78de-81b3-0097d6ba965c",
+          "page_id": "01a0f3a9-c9a1-75e4-ab3a-ba9f2671f298",
+          "revision": "6",
+          "snapshot_json": "{\"page\":{\"createdAt\":\"2026-09-30T18:53:05.828733Z\",\"deletedAt\":null,\"id\":\"01a0f3a9-c9a1-75e4-ab3a-ba9f2671f298\",\"parentPageId\":null,\"revision\":\"6\",\"title\":\"Native acceptance\",\"updatedAt\":\"2026-09-30T18:53:39.139581Z\",\"workspaceId\":\"01a0f3a9-2423-782d-a1ef-4717e3fcea60\"},\"blocks\":[{\"id\":\"01a0f3a9-e4cd-7d1d-8380-46bdee3a3b36\",\"pageId\":\"01a0f3a9-c9a1-75e4-ab3a-ba9f2671f298\",\"parentBlockId\":null,\"sortKey\":\"000000000001\",\"type\":\"paragraph\",\"schemaVersion\":1,\"data\":{\"richText\":[{\"text\":\"Persistent notes — తెలుగు 中文 العربية 🌱\"}]},\"revision\":\"3\"},{\"id\":\"01a0f3a9-f734-766e-bfe3-92667cc41530\",\"pageId\":\"01a0f3a9-c9a1-75e4-ab3a-ba9f2671f298\",\"parentBlockId\":null,\"sortKey\":\"000000000002\",\"type\":\"paragraph\",\"schemaVersion\":1,\"data\":{\"richText\":[{\"text\":\"Restore-marker-original\"}]},\"revision\":\"2\"},{\"id\":\"01a0f3aa-4bbe-7f8f-9641-8608152faf7c\",\"pageId\":\"01a0f3a9-c9a1-75e4-ab3a-ba9f2671f298\",\"parentBlockId\":null,\"sortKey\":\"000000000003\",\"type\":\"table\",\"schemaVersion\":1,\"data\":{\"cells\":[{\"colSpan\":1,\"column\":0,\"id\":\"01a0f3aa-4898-721b-8896-9b99240df1e8\",\"preMergeCells\":[],\"richText\":[],\"row\":0,\"rowSpan\":1},{\"colSpan\":1,\"column\":1,\"id\":\"01a0f3aa-4899-7350-b7dc-36685d21f723\",\"preMergeCells\":[],\"richText\":[],\"row\":0,\"rowSpan\":1},{\"colSpan\":1,\"column\":0,\"id\":\"01a0f3aa-4899-7109-8cf7-e21df72d3f06\",\"preMergeCells\":[],\"richText\":[],\"row\":1,\"rowSpan\":1},{\"colSpan\":1,\"column\":1,\"id\":\"01a0f3aa-4899-7e12-8ede-68addeeb8176\",\"preMergeCells\":[],\"richText\":[],\"row\":1,\"rowSpan\":1},{\"colSpan\":1,\"column\":0,\"id\":\"01a0f3aa-4899-755f-86b8-3a917b68eb25\",\"preMergeCells\":[],\"richText\":[],\"row\":2,\"rowSpan\":1},{\"colSpan\":1,\"column\":1,\"id\":\"01a0f3aa-4899-738a-88cb-e15eeb039d0e\",\"preMergeCells\":[],\"richText\":[],\"row\":2,\"rowSpan\":1}],\"columnCount\":2,\"columnWidths\":[240,240],\"headerColumns\":0,\"headerRows\":1,\"rowCount\":3},\"revision\":\"1\"}],\"snapshotCursor\":\"15\",\"recoveryMetadataVersion\":3}",
+          "created_at": "2026-09-30T18:53:39.139847Z"
+        },
+        {
+          "snapshot_id": "01a0f3aa-5f3a-7dcb-98b4-5e83079e771c",
+          "page_id": "01a0f3a9-c9a1-75e4-ab3a-ba9f2671f298",
+          "revision": "7",
+          "snapshot_json": "{\"page\":{\"createdAt\":\"2026-09-30T18:53:05.828733Z\",\"deletedAt\":null,\"id\":\"01a0f3a9-c9a1-75e4-ab3a-ba9f2671f298\",\"parentPageId\":null,\"revision\":\"7\",\"title\":\"Native acceptance\",\"updatedAt\":\"2026-09-30T18:53:44.121899Z\",\"workspaceId\":\"01a0f3a9-2423-782d-a1ef-4717e3fcea60\"},\"blocks\":[{\"id\":\"01a0f3a9-e4cd-7d1d-8380-46bdee3a3b36\",\"pageId\":\"01a0f3a9-c9a1-75e4-ab3a-ba9f2671f298\",\"parentBlockId\":null,\"sortKey\":\"000000000001\",\"type\":\"paragraph\",\"schemaVersion\":1,\"data\":{\"richText\":[{\"text\":\"Persistent notes — తెలుగు 中文 العربية 🌱\"}]},\"revision\":\"3\"},{\"id\":\"01a0f3a9-f734-766e-bfe3-92667cc41530\",\"pageId\":\"01a0f3a9-c9a1-75e4-ab3a-ba9f2671f298\",\"parentBlockId\":null,\"sortKey\":\"000000000002\",\"type\":\"paragraph\",\"schemaVersion\":1,\"data\":{\"richText\":[{\"text\":\"Restore-marker-original\"}]},\"revision\":\"2\"},{\"id\":\"01a0f3aa-4bbe-7f8f-9641-8608152faf7c\",\"pageId\":\"01a0f3a9-c9a1-75e4-ab3a-ba9f2671f298\",\"parentBlockId\":null,\"sortKey\":\"000000000003\",\"type\":\"table\",\"schemaVersion\":1,\"data\":{\"cells\":[{\"colSpan\":1,\"column\":0,\"id\":\"01a0f3aa-4898-721b-8896-9b99240df1e8\",\"preMergeCells\":[],\"richText\":[{\"text\":\"alpha\"}],\"row\":0,\"rowSpan\":1},{\"colSpan\":1,\"column\":1,\"id\":\"01a0f3aa-4899-7350-b7dc-36685d21f723\",\"preMergeCells\":[],\"richText\":[{\"text\":\"beta\"}],\"row\":0,\"rowSpan\":1},{\"colSpan\":1,\"column\":0,\"id\":\"01a0f3aa-4899-7109-8cf7-e21df72d3f06\",\"preMergeCells\":[],\"richText\":[],\"row\":1,\"rowSpan\":1},{\"colSpan\":1,\"column\":1,\"id\":\"01a0f3aa-4899-7e12-8ede-68addeeb8176\",\"preMergeCells\":[],\"richText\":[],\"row\":1,\"rowSpan\":1},{\"colSpan\":1,\"column\":0,\"id\":\"01a0f3aa-4899-755f-86b8-3a917b68eb25\",\"preMergeCells\":[],\"richText\":[],\"row\":2,\"rowSpan\":1},{\"colSpan\":1,\"column\":1,\"id\":\"01a0f3aa-4899-738a-88cb-e15eeb039d0e\",\"preMergeCells\":[],\"richText\":[],\"row\":2,\"rowSpan\":1}],\"columnCount\":2,\"columnWidths\":[240,240],\"headerColumns\":0,\"headerRows\":1,\"rowCount\":3},\"revision\":\"2\"}],\"snapshotCursor\":\"16\",\"recoveryMetadataVersion\":3}",
+          "created_at": "2026-09-30T18:53:44.122166Z"
+        },
+        {
+          "snapshot_id": "01a0f3aa-b023-7a9a-bb29-bdf596a714b5",
+          "page_id": "01a0f3a9-c9a1-75e4-ab3a-ba9f2671f298",
+          "revision": "8",
+          "snapshot_json": "{\"page\":{\"createdAt\":\"2026-09-30T18:53:05.828733Z\",\"deletedAt\":null,\"id\":\"01a0f3a9-c9a1-75e4-ab3a-ba9f2671f298\",\"parentPageId\":null,\"revision\":\"8\",\"title\":\"Native acceptance\",\"updatedAt\":\"2026-09-30T18:54:04.835269Z\",\"workspaceId\":\"01a0f3a9-2423-782d-a1ef-4717e3fcea60\"},\"blocks\":[{\"id\":\"01a0f3a9-e4cd-7d1d-8380-46bdee3a3b36\",\"pageId\":\"01a0f3a9-c9a1-75e4-ab3a-ba9f2671f298\",\"parentBlockId\":null,\"sortKey\":\"000000000001\",\"type\":\"paragraph\",\"schemaVersion\":1,\"data\":{\"richText\":[{\"text\":\"Persistent notes — తెలుగు 中文 العربية 🌱\"}]},\"revision\":\"3\"},{\"id\":\"01a0f3a9-f734-766e-bfe3-92667cc41530\",\"pageId\":\"01a0f3a9-c9a1-75e4-ab3a-ba9f2671f298\",\"parentBlockId\":null,\"sortKey\":\"000000000002\",\"type\":\"paragraph\",\"schemaVersion\":1,\"data\":{\"richText\":[{\"text\":\"Restore-marker-original\"}]},\"revision\":\"2\"},{\"id\":\"01a0f3aa-4bbe-7f8f-9641-8608152faf7c\",\"pageId\":\"01a0f3a9-c9a1-75e4-ab3a-ba9f2671f298\",\"parentBlockId\":null,\"sortKey\":\"000000000003\",\"type\":\"table\",\"schemaVersion\":1,\"data\":{\"cells\":[{\"colSpan\":1,\"column\":0,\"id\":\"01a0f3aa-4899-7109-8cf7-e21df72d3f06\",\"preMergeCells\":[],\"richText\":[],\"row\":1,\"rowSpan\":1},{\"colSpan\":1,\"column\":1,\"id\":\"01a0f3aa-4899-7e12-8ede-68addeeb8176\",\"preMergeCells\":[],\"richText\":[],\"row\":1,\"rowSpan\":1},{\"colSpan\":1,\"column\":0,\"id\":\"01a0f3aa-4899-755f-86b8-3a917b68eb25\",\"preMergeCells\":[],\"richText\":[],\"row\":2,\"rowSpan\":1},{\"colSpan\":1,\"column\":1,\"id\":\"01a0f3aa-4899-738a-88cb-e15eeb039d0e\",\"preMergeCells\":[],\"richText\":[],\"row\":2,\"rowSpan\":1},{\"colSpan\":2,\"column\":0,\"id\":\"01a0f3aa-4898-721b-8896-9b99240df1e8\",\"preMergeCells\":[{\"colSpan\":1,\"column\":0,\"id\":\"01a0f3aa-4898-721b-8896-9b99240df1e8\",\"preMergeCells\":[],\"richText\":[{\"text\":\"alpha\"}],\"row\":0,\"rowSpan\":1},{\"colSpan\":1,\"column\":1,\"id\":\"01a0f3aa-4899-7350-b7dc-36685d21f723\",\"preMergeCells\":[],\"richText\":[{\"text\":\"beta\"}],\"row\":0,\"rowSpan\":1}],\"richText\":[{\"text\":\"alpha\"},{\"text\":\"\\n\"},{\"text\":\"beta\"}],\"row\":0,\"rowSpan\":1}],\"columnCount\":2,\"columnWidths\":[240,240],\"headerColumns\":0,\"headerRows\":1,\"rowCount\":3},\"revision\":\"3\"}],\"snapshotCursor\":\"17\",\"recoveryMetadataVersion\":3}",
+          "created_at": "2026-09-30T18:54:04.835452Z"
+        },
+        {
+          "snapshot_id": "01a0f3aa-c0dc-736b-a8f4-64192f59cbda",
+          "page_id": "01a0f3a9-c9a1-75e4-ab3a-ba9f2671f298",
+          "revision": "9",
+          "snapshot_json": "{\"page\":{\"createdAt\":\"2026-09-30T18:53:05.828733Z\",\"deletedAt\":null,\"id\":\"01a0f3a9-c9a1-75e4-ab3a-ba9f2671f298\",\"parentPageId\":null,\"revision\":\"9\",\"title\":\"Native acceptance\",\"updatedAt\":\"2026-09-30T18:54:09.116298Z\",\"workspaceId\":\"01a0f3a9-2423-782d-a1ef-4717e3fcea60\"},\"blocks\":[{\"id\":\"01a0f3a9-e4cd-7d1d-8380-46bdee3a3b36\",\"pageId\":\"01a0f3a9-c9a1-75e4-ab3a-ba9f2671f298\",\"parentBlockId\":null,\"sortKey\":\"000000000001\",\"type\":\"paragraph\",\"schemaVersion\":1,\"data\":{\"richText\":[{\"text\":\"Persistent notes — తెలుగు 中文 العربية 🌱\"}]},\"revision\":\"3\"},{\"id\":\"01a0f3a9-f734-766e-bfe3-92667cc41530\",\"pageId\":\"01a0f3a9-c9a1-75e4-ab3a-ba9f2671f298\",\"parentBlockId\":null,\"sortKey\":\"000000000002\",\"type\":\"paragraph\",\"schemaVersion\":1,\"data\":{\"richText\":[{\"text\":\"Restore-marker-original\"}]},\"revision\":\"2\"},{\"id\":\"01a0f3aa-4bbe-7f8f-9641-8608152faf7c\",\"pageId\":\"01a0f3a9-c9a1-75e4-ab3a-ba9f2671f298\",\"parentBlockId\":null,\"sortKey\":\"000000000003\",\"type\":\"table\",\"schemaVersion\":1,\"data\":{\"cells\":[{\"colSpan\":1,\"column\":0,\"id\":\"01a0f3aa-4899-7109-8cf7-e21df72d3f06\",\"preMergeCells\":[],\"richText\":[],\"row\":1,\"rowSpan\":1},{\"colSpan\":1,\"column\":1,\"id\":\"01a0f3aa-4899-7e12-8ede-68addeeb8176\",\"preMergeCells\":[],\"richText\":[],\"row\":1,\"rowSpan\":1},{\"colSpan\":1,\"column\":0,\"id\":\"01a0f3aa-4899-755f-86b8-3a917b68eb25\",\"preMergeCells\":[],\"richText\":[],\"row\":2,\"rowSpan\":1},{\"colSpan\":1,\"column\":1,\"id\":\"01a0f3aa-4899-738a-88cb-e15eeb039d0e\",\"preMergeCells\":[],\"richText\":[],\"row\":2,\"rowSpan\":1},{\"colSpan\":1,\"column\":0,\"id\":\"01a0f3aa-4898-721b-8896-9b99240df1e8\",\"preMergeCells\":[],\"richText\":[{\"text\":\"alpha\"}],\"row\":0,\"rowSpan\":1},{\"colSpan\":1,\"column\":1,\"id\":\"01a0f3aa-4899-7350-b7dc-36685d21f723\",\"preMergeCells\":[],\"richText\":[{\"text\":\"beta\"}],\"row\":0,\"rowSpan\":1}],\"columnCount\":2,\"columnWidths\":[240,240],\"headerColumns\":0,\"headerRows\":1,\"rowCount\":3},\"revision\":\"4\"}],\"snapshotCursor\":\"18\",\"recoveryMetadataVersion\":3}",
+          "created_at": "2026-09-30T18:54:09.116599Z"
+        },
+        {
+          "snapshot_id": "01a0f3aa-f9d8-742f-8024-7eee9854244e",
+          "page_id": "01a0f3a9-c9a1-75e4-ab3a-ba9f2671f298",
+          "revision": "10",
+          "snapshot_json": "{\"page\":{\"createdAt\":\"2026-09-30T18:53:05.828733Z\",\"deletedAt\":null,\"id\":\"01a0f3a9-c9a1-75e4-ab3a-ba9f2671f298\",\"parentPageId\":null,\"revision\":\"10\",\"title\":\"Native acceptance\",\"updatedAt\":\"2026-09-30T18:54:23.703964Z\",\"workspaceId\":\"01a0f3a9-2423-782d-a1ef-4717e3fcea60\"},\"blocks\":[{\"id\":\"01a0f3a9-e4cd-7d1d-8380-46bdee3a3b36\",\"pageId\":\"01a0f3a9-c9a1-75e4-ab3a-ba9f2671f298\",\"parentBlockId\":null,\"sortKey\":\"000000000001\",\"type\":\"paragraph\",\"schemaVersion\":1,\"data\":{\"richText\":[{\"text\":\"Persistent notes — తెలుగు 中文 العربية 🌱\"}]},\"revision\":\"3\"},{\"id\":\"01a0f3a9-f734-766e-bfe3-92667cc41530\",\"pageId\":\"01a0f3a9-c9a1-75e4-ab3a-ba9f2671f298\",\"parentBlockId\":null,\"sortKey\":\"000000000002\",\"type\":\"heading_4\",\"schemaVersion\":1,\"data\":{\"richText\":[{\"text\":\"Restore-marker-original\"}]},\"revision\":\"3\"},{\"id\":\"01a0f3aa-4bbe-7f8f-9641-8608152faf7c\",\"pageId\":\"01a0f3a9-c9a1-75e4-ab3a-ba9f2671f298\",\"parentBlockId\":null,\"sortKey\":\"000000000003\",\"type\":\"table\",\"schemaVersion\":1,\"data\":{\"cells\":[{\"colSpan\":1,\"column\":0,\"id\":\"01a0f3aa-4899-7109-8cf7-e21df72d3f06\",\"preMergeCells\":[],\"richText\":[],\"row\":1,\"rowSpan\":1},{\"colSpan\":1,\"column\":1,\"id\":\"01a0f3aa-4899-7e12-8ede-68addeeb8176\",\"preMergeCells\":[],\"richText\":[],\"row\":1,\"rowSpan\":1},{\"colSpan\":1,\"column\":0,\"id\":\"01a0f3aa-4899-755f-86b8-3a917b68eb25\",\"preMergeCells\":[],\"richText\":[],\"row\":2,\"rowSpan\":1},{\"colSpan\":1,\"column\":1,\"id\":\"01a0f3aa-4899-738a-88cb-e15eeb039d0e\",\"preMergeCells\":[],\"richText\":[],\"row\":2,\"rowSpan\":1},{\"colSpan\":1,\"column\":0,\"id\":\"01a0f3aa-4898-721b-8896-9b99240df1e8\",\"preMergeCells\":[],\"richText\":[{\"text\":\"alpha\"}],\"row\":0,\"rowSpan\":1},{\"colSpan\":1,\"column\":1,\"id\":\"01a0f3aa-4899-7350-b7dc-36685d21f723\",\"preMergeCells\":[],\"richText\":[{\"text\":\"beta\"}],\"row\":0,\"rowSpan\":1}],\"columnCount\":2,\"columnWidths\":[240,240],\"headerColumns\":0,\"headerRows\":1,\"rowCount\":3},\"revision\":\"5\"}],\"snapshotCursor\":\"19\",\"recoveryMetadataVersion\":3}",
+          "created_at": "2026-09-30T18:54:23.704054Z"
+        },
+        {
+          "snapshot_id": "01a0f3ab-1ebb-7281-b721-8ceead562a65",
+          "page_id": "01a0f3a9-c9a1-75e4-ab3a-ba9f2671f298",
+          "revision": "11",
+          "snapshot_json": "{\"page\":{\"createdAt\":\"2026-09-30T18:53:05.828733Z\",\"deletedAt\":null,\"id\":\"01a0f3a9-c9a1-75e4-ab3a-ba9f2671f298\",\"parentPageId\":null,\"revision\":\"11\",\"title\":\"Native acceptance\",\"updatedAt\":\"2026-09-30T18:54:33.147257Z\",\"workspaceId\":\"01a0f3a9-2423-782d-a1ef-4717e3fcea60\"},\"blocks\":[{\"id\":\"01a0f3a9-e4cd-7d1d-8380-46bdee3a3b36\",\"pageId\":\"01a0f3a9-c9a1-75e4-ab3a-ba9f2671f298\",\"parentBlockId\":null,\"sortKey\":\"000000000001\",\"type\":\"paragraph\",\"schemaVersion\":1,\"data\":{\"richText\":[{\"text\":\"Persistent notes — తెలుగు 中文 العربية 🌱\"}]},\"revision\":\"4\"},{\"id\":\"01a0f3a9-f734-766e-bfe3-92667cc41530\",\"pageId\":\"01a0f3a9-c9a1-75e4-ab3a-ba9f2671f298\",\"parentBlockId\":null,\"sortKey\":\"000000000002\",\"type\":\"heading_4\",\"schemaVersion\":1,\"data\":{\"richText\":[{\"text\":\"Restore-marker-original\"}]},\"revision\":\"4\"},{\"id\":\"01a0f3aa-4bbe-7f8f-9641-8608152faf7c\",\"pageId\":\"01a0f3a9-c9a1-75e4-ab3a-ba9f2671f298\",\"parentBlockId\":null,\"sortKey\":\"000000000003\",\"type\":\"table\",\"schemaVersion\":1,\"data\":{\"cells\":[{\"colSpan\":1,\"column\":0,\"id\":\"01a0f3aa-4899-7109-8cf7-e21df72d3f06\",\"preMergeCells\":[],\"richText\":[],\"row\":1,\"rowSpan\":1},{\"colSpan\":1,\"column\":1,\"id\":\"01a0f3aa-4899-7e12-8ede-68addeeb8176\",\"preMergeCells\":[],\"richText\":[],\"row\":1,\"rowSpan\":1},{\"colSpan\":1,\"column\":0,\"id\":\"01a0f3aa-4899-755f-86b8-3a917b68eb25\",\"preMergeCells\":[],\"richText\":[],\"row\":2,\"rowSpan\":1},{\"colSpan\":1,\"column\":1,\"id\":\"01a0f3aa-4899-738a-88cb-e15eeb039d0e\",\"preMergeCells\":[],\"richText\":[],\"row\":2,\"rowSpan\":1},{\"colSpan\":1,\"column\":0,\"id\":\"01a0f3aa-4898-721b-8896-9b99240df1e8\",\"preMergeCells\":[],\"richText\":[{\"text\":\"alpha\"}],\"row\":0,\"rowSpan\":1},{\"colSpan\":1,\"column\":1,\"id\":\"01a0f3aa-4899-7350-b7dc-36685d21f723\",\"preMergeCells\":[],\"richText\":[{\"text\":\"beta\"}],\"row\":0,\"rowSpan\":1}],\"columnCount\":2,\"columnWidths\":[240,240],\"headerColumns\":0,\"headerRows\":1,\"rowCount\":3},\"revision\":\"6\"},{\"id\":\"01a0f3ab-1eb7-7f8e-b266-ba9010710ec9\",\"pageId\":\"01a0f3a9-c9a1-75e4-ab3a-ba9f2671f298\",\"parentBlockId\":null,\"sortKey\":\"000000000004\",\"type\":\"paragraph\",\"schemaVersion\":1,\"data\":{\"richText\":[]},\"revision\":\"1\"}],\"snapshotCursor\":\"20\",\"recoveryMetadataVersion\":3}",
+          "created_at": "2026-09-30T18:54:33.147877Z"
+        },
+        {
+          "snapshot_id": "01a0f3ab-2d41-7def-ab84-e1fd2fcce816",
+          "page_id": "01a0f3a9-c9a1-75e4-ab3a-ba9f2671f298",
+          "revision": "12",
+          "snapshot_json": "{\"page\":{\"createdAt\":\"2026-09-30T18:53:05.828733Z\",\"deletedAt\":null,\"id\":\"01a0f3a9-c9a1-75e4-ab3a-ba9f2671f298\",\"parentPageId\":null,\"revision\":\"12\",\"title\":\"Native acceptance\",\"updatedAt\":\"2026-09-30T18:54:36.865693Z\",\"workspaceId\":\"01a0f3a9-2423-782d-a1ef-4717e3fcea60\"},\"blocks\":[{\"id\":\"01a0f3a9-e4cd-7d1d-8380-46bdee3a3b36\",\"pageId\":\"01a0f3a9-c9a1-75e4-ab3a-ba9f2671f298\",\"parentBlockId\":null,\"sortKey\":\"000000000001\",\"type\":\"paragraph\",\"schemaVersion\":1,\"data\":{\"richText\":[{\"text\":\"Persistent notes — తెలుగు 中文 العربية 🌱\"}]},\"revision\":\"5\"},{\"id\":\"01a0f3ab-2a1a-78e3-8efb-99db0610cc74\",\"pageId\":\"01a0f3a9-c9a1-75e4-ab3a-ba9f2671f298\",\"parentBlockId\":\"01a0f3ab-2a1a-795c-a214-e30684f441f5\",\"sortKey\":\"000000000001\",\"type\":\"paragraph\",\"schemaVersion\":1,\"data\":{\"richText\":[{\"text\":\"Content 1\"}]},\"revision\":\"1\"},{\"id\":\"01a0f3a9-f734-766e-bfe3-92667cc41530\",\"pageId\":\"01a0f3a9-c9a1-75e4-ab3a-ba9f2671f298\",\"parentBlockId\":null,\"sortKey\":\"000000000002\",\"type\":\"heading_4\",\"schemaVersion\":1,\"data\":{\"richText\":[{\"text\":\"Restore-marker-original\"}]},\"revision\":\"5\"},{\"id\":\"01a0f3ab-2a1a-71d1-9770-97a5a12f9c1b\",\"pageId\":\"01a0f3a9-c9a1-75e4-ab3a-ba9f2671f298\",\"parentBlockId\":\"01a0f3ab-2a1a-795c-a214-e30684f441f5\",\"sortKey\":\"000000000002\",\"type\":\"paragraph\",\"schemaVersion\":1,\"data\":{\"richText\":[{\"text\":\"Content 2\"}]},\"revision\":\"1\"},{\"id\":\"01a0f3aa-4bbe-7f8f-9641-8608152faf7c\",\"pageId\":\"01a0f3a9-c9a1-75e4-ab3a-ba9f2671f298\",\"parentBlockId\":null,\"sortKey\":\"000000000003\",\"type\":\"table\",\"schemaVersion\":1,\"data\":{\"cells\":[{\"colSpan\":1,\"column\":0,\"id\":\"01a0f3aa-4899-7109-8cf7-e21df72d3f06\",\"preMergeCells\":[],\"richText\":[],\"row\":1,\"rowSpan\":1},{\"colSpan\":1,\"column\":1,\"id\":\"01a0f3aa-4899-7e12-8ede-68addeeb8176\",\"preMergeCells\":[],\"richText\":[],\"row\":1,\"rowSpan\":1},{\"colSpan\":1,\"column\":0,\"id\":\"01a0f3aa-4899-755f-86b8-3a917b68eb25\",\"preMergeCells\":[],\"richText\":[],\"row\":2,\"rowSpan\":1},{\"colSpan\":1,\"column\":1,\"id\":\"01a0f3aa-4899-738a-88cb-e15eeb039d0e\",\"preMergeCells\":[],\"richText\":[],\"row\":2,\"rowSpan\":1},{\"colSpan\":1,\"column\":0,\"id\":\"01a0f3aa-4898-721b-8896-9b99240df1e8\",\"preMergeCells\":[],\"richText\":[{\"text\":\"alpha\"}],\"row\":0,\"rowSpan\":1},{\"colSpan\":1,\"column\":1,\"id\":\"01a0f3aa-4899-7350-b7dc-36685d21f723\",\"preMergeCells\":[],\"richText\":[{\"text\":\"beta\"}],\"row\":0,\"rowSpan\":1}],\"columnCount\":2,\"columnWidths\":[240,240],\"headerColumns\":0,\"headerRows\":1,\"rowCount\":3},\"revision\":\"7\"},{\"id\":\"01a0f3ab-2a1a-795c-a214-e30684f441f5\",\"pageId\":\"01a0f3a9-c9a1-75e4-ab3a-ba9f2671f298\",\"parentBlockId\":null,\"sortKey\":\"000000000004\",\"type\":\"tab_container\",\"schemaVersion\":1,\"data\":{\"tabs\":[{\"childBlockIds\":[\"01a0f3ab-2a1a-78e3-8efb-99db0610cc74\"],\"id\":\"01a0f3ab-2a1a-79cd-8909-d4915b07f56b\",\"title\":\"Tab 1\"},{\"childBlockIds\":[\"01a0f3ab-2a1a-71d1-9770-97a5a12f9c1b\"],\"id\":\"01a0f3ab-2a1a-7ae7-85a5-cc29ed5751e2\",\"title\":\"Tab 2\"}]},\"revision\":\"1\"}],\"snapshotCursor\":\"21\",\"recoveryMetadataVersion\":3}",
+          "created_at": "2026-09-30T18:54:36.865843Z"
+        },
+        {
+          "snapshot_id": "01a0f3ab-5794-7dbf-ae9d-e75f2c4db023",
+          "page_id": "01a0f3a9-c9a1-75e4-ab3a-ba9f2671f298",
+          "revision": "13",
+          "snapshot_json": "{\"page\":{\"createdAt\":\"2026-09-30T18:53:05.828733Z\",\"deletedAt\":null,\"id\":\"01a0f3a9-c9a1-75e4-ab3a-ba9f2671f298\",\"parentPageId\":null,\"revision\":\"13\",\"title\":\"Native acceptance\",\"updatedAt\":\"2026-09-30T18:54:47.700452Z\",\"workspaceId\":\"01a0f3a9-2423-782d-a1ef-4717e3fcea60\"},\"blocks\":[{\"id\":\"01a0f3a9-e4cd-7d1d-8380-46bdee3a3b36\",\"pageId\":\"01a0f3a9-c9a1-75e4-ab3a-ba9f2671f298\",\"parentBlockId\":null,\"sortKey\":\"000000000001\",\"type\":\"paragraph\",\"schemaVersion\":1,\"data\":{\"richText\":[{\"text\":\"Persistent notes — తెలుగు 中文 العربية 🌱\"}]},\"revision\":\"5\"},{\"id\":\"01a0f3ab-2a1a-78e3-8efb-99db0610cc74\",\"pageId\":\"01a0f3a9-c9a1-75e4-ab3a-ba9f2671f298\",\"parentBlockId\":\"01a0f3ab-2a1a-795c-a214-e30684f441f5\",\"sortKey\":\"000000000001\",\"type\":\"paragraph\",\"schemaVersion\":1,\"data\":{\"richText\":[{\"text\":\"Native tab content\"}]},\"revision\":\"2\"},{\"id\":\"01a0f3a9-f734-766e-bfe3-92667cc41530\",\"pageId\":\"01a0f3a9-c9a1-75e4-ab3a-ba9f2671f298\",\"parentBlockId\":null,\"sortKey\":\"000000000002\",\"type\":\"heading_4\",\"schemaVersion\":1,\"data\":{\"richText\":[{\"text\":\"Restore-marker-original\"}]},\"revision\":\"5\"},{\"id\":\"01a0f3ab-2a1a-71d1-9770-97a5a12f9c1b\",\"pageId\":\"01a0f3a9-c9a1-75e4-ab3a-ba9f2671f298\",\"parentBlockId\":\"01a0f3ab-2a1a-795c-a214-e30684f441f5\",\"sortKey\":\"000000000002\",\"type\":\"paragraph\",\"schemaVersion\":1,\"data\":{\"richText\":[{\"text\":\"Content 2\"}]},\"revision\":\"1\"},{\"id\":\"01a0f3aa-4bbe-7f8f-9641-8608152faf7c\",\"pageId\":\"01a0f3a9-c9a1-75e4-ab3a-ba9f2671f298\",\"parentBlockId\":null,\"sortKey\":\"000000000003\",\"type\":\"table\",\"schemaVersion\":1,\"data\":{\"cells\":[{\"colSpan\":1,\"column\":0,\"id\":\"01a0f3aa-4899-7109-8cf7-e21df72d3f06\",\"preMergeCells\":[],\"richText\":[],\"row\":1,\"rowSpan\":1},{\"colSpan\":1,\"column\":1,\"id\":\"01a0f3aa-4899-7e12-8ede-68addeeb8176\",\"preMergeCells\":[],\"richText\":[],\"row\":1,\"rowSpan\":1},{\"colSpan\":1,\"column\":0,\"id\":\"01a0f3aa-4899-755f-86b8-3a917b68eb25\",\"preMergeCells\":[],\"richText\":[],\"row\":2,\"rowSpan\":1},{\"colSpan\":1,\"column\":1,\"id\":\"01a0f3aa-4899-738a-88cb-e15eeb039d0e\",\"preMergeCells\":[],\"richText\":[],\"row\":2,\"rowSpan\":1},{\"colSpan\":1,\"column\":0,\"id\":\"01a0f3aa-4898-721b-8896-9b99240df1e8\",\"preMergeCells\":[],\"richText\":[{\"text\":\"alpha\"}],\"row\":0,\"rowSpan\":1},{\"colSpan\":1,\"column\":1,\"id\":\"01a0f3aa-4899-7350-b7dc-36685d21f723\",\"preMergeCells\":[],\"richText\":[{\"text\":\"beta\"}],\"row\":0,\"rowSpan\":1}],\"columnCount\":2,\"columnWidths\":[240,240],\"headerColumns\":0,\"headerRows\":1,\"rowCount\":3},\"revision\":\"8\"},{\"id\":\"01a0f3ab-2a1a-795c-a214-e30684f441f5\",\"pageId\":\"01a0f3a9-c9a1-75e4-ab3a-ba9f2671f298\",\"parentBlockId\":null,\"sortKey\":\"000000000004\",\"type\":\"tab_container\",\"schemaVersion\":1,\"data\":{\"tabs\":[{\"childBlockIds\":[\"01a0f3ab-2a1a-78e3-8efb-99db0610cc74\"],\"id\":\"01a0f3ab-2a1a-79cd-8909-d4915b07f56b\",\"title\":\"vidence\"},{\"childBlockIds\":[\"01a0f3ab-2a1a-71d1-9770-97a5a12f9c1b\"],\"id\":\"01a0f3ab-2a1a-7ae7-85a5-cc29ed5751e2\",\"title\":\"Tab 2\"}]},\"revision\":\"2\"}],\"snapshotCursor\":\"22\",\"recoveryMetadataVersion\":3}",
+          "created_at": "2026-09-30T18:54:47.700567Z"
+        },
+        {
+          "snapshot_id": "01a0f3ab-a1c7-7f70-9f6e-1f0ecd828bdf",
+          "page_id": "01a0f3a9-c9a1-75e4-ab3a-ba9f2671f298",
+          "revision": "14",
+          "snapshot_json": "{\"page\":{\"createdAt\":\"2026-09-30T18:53:05.828733Z\",\"deletedAt\":null,\"id\":\"01a0f3a9-c9a1-75e4-ab3a-ba9f2671f298\",\"parentPageId\":null,\"revision\":\"14\",\"title\":\"Native acceptance\",\"updatedAt\":\"2026-09-30T18:55:06.695316Z\",\"workspaceId\":\"01a0f3a9-2423-782d-a1ef-4717e3fcea60\"},\"blocks\":[{\"id\":\"01a0f3a9-e4cd-7d1d-8380-46bdee3a3b36\",\"pageId\":\"01a0f3a9-c9a1-75e4-ab3a-ba9f2671f298\",\"parentBlockId\":null,\"sortKey\":\"000000000001\",\"type\":\"paragraph\",\"schemaVersion\":1,\"data\":{\"richText\":[{\"text\":\"Persistent notes — తెలుగు 中文 العربية 🌱\"}]},\"revision\":\"5\"},{\"id\":\"01a0f3ab-2a1a-78e3-8efb-99db0610cc74\",\"pageId\":\"01a0f3a9-c9a1-75e4-ab3a-ba9f2671f298\",\"parentBlockId\":\"01a0f3ab-2a1a-795c-a214-e30684f441f5\",\"sortKey\":\"000000000001\",\"type\":\"paragraph\",\"schemaVersion\":1,\"data\":{\"richText\":[{\"text\":\"Native tab content\"}]},\"revision\":\"2\"},{\"id\":\"01a0f3a9-f734-766e-bfe3-92667cc41530\",\"pageId\":\"01a0f3a9-c9a1-75e4-ab3a-ba9f2671f298\",\"parentBlockId\":null,\"sortKey\":\"000000000002\",\"type\":\"heading_4\",\"schemaVersion\":1,\"data\":{\"richText\":[{\"text\":\"Restore-marker-original\"}]},\"revision\":\"5\"},{\"id\":\"01a0f3ab-2a1a-71d1-9770-97a5a12f9c1b\",\"pageId\":\"01a0f3a9-c9a1-75e4-ab3a-ba9f2671f298\",\"parentBlockId\":\"01a0f3ab-2a1a-795c-a214-e30684f441f5\",\"sortKey\":\"000000000002\",\"type\":\"paragraph\",\"schemaVersion\":1,\"data\":{\"richText\":[{\"text\":\"Content 2\"}]},\"revision\":\"1\"},{\"id\":\"01a0f3aa-4bbe-7f8f-9641-8608152faf7c\",\"pageId\":\"01a0f3a9-c9a1-75e4-ab3a-ba9f2671f298\",\"parentBlockId\":null,\"sortKey\":\"000000000003\",\"type\":\"table\",\"schemaVersion\":1,\"data\":{\"cells\":[{\"colSpan\":1,\"column\":0,\"id\":\"01a0f3aa-4899-7109-8cf7-e21df72d3f06\",\"preMergeCells\":[],\"richText\":[],\"row\":1,\"rowSpan\":1},{\"colSpan\":1,\"column\":1,\"id\":\"01a0f3aa-4899-7e12-8ede-68addeeb8176\",\"preMergeCells\":[],\"richText\":[],\"row\":1,\"rowSpan\":1},{\"colSpan\":1,\"column\":0,\"id\":\"01a0f3aa-4899-755f-86b8-3a917b68eb25\",\"preMergeCells\":[],\"richText\":[],\"row\":2,\"rowSpan\":1},{\"colSpan\":1,\"column\":1,\"id\":\"01a0f3aa-4899-738a-88cb-e15eeb039d0e\",\"preMergeCells\":[],\"richText\":[],\"row\":2,\"rowSpan\":1},{\"colSpan\":1,\"column\":0,\"id\":\"01a0f3aa-4898-721b-8896-9b99240df1e8\",\"preMergeCells\":[],\"richText\":[{\"text\":\"alpha\"}],\"row\":0,\"rowSpan\":1},{\"colSpan\":1,\"column\":1,\"id\":\"01a0f3aa-4899-7350-b7dc-36685d21f723\",\"preMergeCells\":[],\"richText\":[{\"text\":\"beta\"}],\"row\":0,\"rowSpan\":1}],\"columnCount\":2,\"columnWidths\":[240,240],\"headerColumns\":0,\"headerRows\":1,\"rowCount\":3},\"revision\":\"9\"},{\"id\":\"01a0f3ab-2a1a-795c-a214-e30684f441f5\",\"pageId\":\"01a0f3a9-c9a1-75e4-ab3a-ba9f2671f298\",\"parentBlockId\":null,\"sortKey\":\"000000000004\",\"type\":\"tab_container\",\"schemaVersion\":1,\"data\":{\"tabs\":[{\"childBlockIds\":[\"01a0f3ab-2a1a-78e3-8efb-99db0610cc74\"],\"id\":\"01a0f3ab-2a1a-79cd-8909-d4915b07f56b\",\"title\":\"Persistent notes — తెలుగు 中文 العربية 🌱\"},{\"childBlockIds\":[\"01a0f3ab-2a1a-71d1-9770-97a5a12f9c1b\"],\"id\":\"01a0f3ab-2a1a-7ae7-85a5-cc29ed5751e2\",\"title\":\"Tab 2\"}]},\"revision\":\"3\"}],\"snapshotCursor\":\"23\",\"recoveryMetadataVersion\":3}",
+          "created_at": "2026-09-30T18:55:06.695424Z"
+        },
+        {
+          "snapshot_id": "01a0f3ab-c29f-763c-a2f2-f94b86baa78f",
+          "page_id": "01a0f3a9-c9a1-75e4-ab3a-ba9f2671f298",
+          "revision": "15",
+          "snapshot_json": "{\"page\":{\"createdAt\":\"2026-09-30T18:53:05.828733Z\",\"deletedAt\":null,\"id\":\"01a0f3a9-c9a1-75e4-ab3a-ba9f2671f298\",\"parentPageId\":null,\"revision\":\"15\",\"title\":\"Native acceptance\",\"updatedAt\":\"2026-09-30T18:55:15.103617Z\",\"workspaceId\":\"01a0f3a9-2423-782d-a1ef-4717e3fcea60\"},\"blocks\":[{\"id\":\"01a0f3a9-e4cd-7d1d-8380-46bdee3a3b36\",\"pageId\":\"01a0f3a9-c9a1-75e4-ab3a-ba9f2671f298\",\"parentBlockId\":null,\"sortKey\":\"000000000001\",\"type\":\"paragraph\",\"schemaVersion\":1,\"data\":{\"richText\":[{\"text\":\"Persistent notes — తెలుగు 中文 العربية 🌱\"}]},\"revision\":\"5\"},{\"id\":\"01a0f3ab-2a1a-78e3-8efb-99db0610cc74\",\"pageId\":\"01a0f3a9-c9a1-75e4-ab3a-ba9f2671f298\",\"parentBlockId\":\"01a0f3ab-2a1a-795c-a214-e30684f441f5\",\"sortKey\":\"000000000001\",\"type\":\"paragraph\",\"schemaVersion\":1,\"data\":{\"richText\":[{\"text\":\"Native tab content\"}]},\"revision\":\"2\"},{\"id\":\"01a0f3a9-f734-766e-bfe3-92667cc41530\",\"pageId\":\"01a0f3a9-c9a1-75e4-ab3a-ba9f2671f298\",\"parentBlockId\":null,\"sortKey\":\"000000000002\",\"type\":\"heading_4\",\"schemaVersion\":1,\"data\":{\"richText\":[{\"text\":\"Restore-marker-original\"}]},\"revision\":\"5\"},{\"id\":\"01a0f3ab-2a1a-71d1-9770-97a5a12f9c1b\",\"pageId\":\"01a0f3a9-c9a1-75e4-ab3a-ba9f2671f298\",\"parentBlockId\":\"01a0f3ab-2a1a-795c-a214-e30684f441f5\",\"sortKey\":\"000000000002\",\"type\":\"paragraph\",\"schemaVersion\":1,\"data\":{\"richText\":[{\"text\":\"Content 2\"}]},\"revision\":\"1\"},{\"id\":\"01a0f3aa-4bbe-7f8f-9641-8608152faf7c\",\"pageId\":\"01a0f3a9-c9a1-75e4-ab3a-ba9f2671f298\",\"parentBlockId\":null,\"sortKey\":\"000000000003\",\"type\":\"table\",\"schemaVersion\":1,\"data\":{\"cells\":[{\"colSpan\":1,\"column\":0,\"id\":\"01a0f3aa-4899-7109-8cf7-e21df72d3f06\",\"preMergeCells\":[],\"richText\":[],\"row\":1,\"rowSpan\":1},{\"colSpan\":1,\"column\":1,\"id\":\"01a0f3aa-4899-7e12-8ede-68addeeb8176\",\"preMergeCells\":[],\"richText\":[],\"row\":1,\"rowSpan\":1},{\"colSpan\":1,\"column\":0,\"id\":\"01a0f3aa-4899-755f-86b8-3a917b68eb25\",\"preMergeCells\":[],\"richText\":[],\"row\":2,\"rowSpan\":1},{\"colSpan\":1,\"column\":1,\"id\":\"01a0f3aa-4899-738a-88cb-e15eeb039d0e\",\"preMergeCells\":[],\"richText\":[],\"row\":2,\"rowSpan\":1},{\"colSpan\":1,\"column\":0,\"id\":\"01a0f3aa-4898-721b-8896-9b99240df1e8\",\"preMergeCells\":[],\"richText\":[{\"text\":\"alpha\"}],\"row\":0,\"rowSpan\":1},{\"colSpan\":1,\"column\":1,\"id\":\"01a0f3aa-4899-7350-b7dc-36685d21f723\",\"preMergeCells\":[],\"richText\":[{\"text\":\"beta\"}],\"row\":0,\"rowSpan\":1}],\"columnCount\":2,\"columnWidths\":[240,240],\"headerColumns\":0,\"headerRows\":1,\"rowCount\":3},\"revision\":\"10\"},{\"id\":\"01a0f3ab-2a1a-795c-a214-e30684f441f5\",\"pageId\":\"01a0f3a9-c9a1-75e4-ab3a-ba9f2671f298\",\"parentBlockId\":null,\"sortKey\":\"000000000004\",\"type\":\"tab_container\",\"schemaVersion\":1,\"data\":{\"tabs\":[{\"childBlockIds\":[\"01a0f3ab-2a1a-78e3-8efb-99db0610cc74\"],\"id\":\"01a0f3ab-2a1a-79cd-8909-d4915b07f56b\",\"title\":\"Evidence\"},{\"childBlockIds\":[\"01a0f3ab-2a1a-71d1-9770-97a5a12f9c1b\"],\"id\":\"01a0f3ab-2a1a-7ae7-85a5-cc29ed5751e2\",\"title\":\"Tab 2\"}]},\"revision\":\"4\"}],\"snapshotCursor\":\"24\",\"recoveryMetadataVersion\":3}",
+          "created_at": "2026-09-30T18:55:15.103788Z"
+        },
+        {
+          "snapshot_id": "01a0f3b8-f547-7654-87f5-84a5a54b6663",
+          "page_id": "01a0f3a9-c9a1-75e4-ab3a-ba9f2671f298",
+          "revision": "16",
+          "snapshot_json": "{\"page\":{\"createdAt\":\"2026-09-30T18:53:05.828733Z\",\"deletedAt\":null,\"id\":\"01a0f3a9-c9a1-75e4-ab3a-ba9f2671f298\",\"parentPageId\":null,\"revision\":\"16\",\"title\":\"Native acceptance\",\"updatedAt\":\"2026-09-30T19:09:40.039571Z\",\"workspaceId\":\"01a0f3a9-2423-782d-a1ef-4717e3fcea60\"},\"blocks\":[{\"id\":\"01a0f3a9-e4cd-7d1d-8380-46bdee3a3b36\",\"pageId\":\"01a0f3a9-c9a1-75e4-ab3a-ba9f2671f298\",\"parentBlockId\":null,\"sortKey\":\"000000000001\",\"type\":\"paragraph\",\"schemaVersion\":1,\"data\":{\"richText\":[{\"text\":\"Persistent notes — తెలుగు 中文 العربية 🌱\"}]},\"revision\":\"6\"},{\"id\":\"01a0f3ab-2a1a-78e3-8efb-99db0610cc74\",\"pageId\":\"01a0f3a9-c9a1-75e4-ab3a-ba9f2671f298\",\"parentBlockId\":\"01a0f3ab-2a1a-795c-a214-e30684f441f5\",\"sortKey\":\"000000000001\",\"type\":\"paragraph\",\"schemaVersion\":1,\"data\":{\"richText\":[{\"text\":\"Native tab content\"}]},\"revision\":\"2\"},{\"id\":\"01a0f3a9-f734-766e-bfe3-92667cc41530\",\"pageId\":\"01a0f3a9-c9a1-75e4-ab3a-ba9f2671f298\",\"parentBlockId\":null,\"sortKey\":\"000000000002\",\"type\":\"heading_4\",\"schemaVersion\":1,\"data\":{\"richText\":[{\"text\":\"Restore-marker-original\"}]},\"revision\":\"6\"},{\"id\":\"01a0f3ab-2a1a-71d1-9770-97a5a12f9c1b\",\"pageId\":\"01a0f3a9-c9a1-75e4-ab3a-ba9f2671f298\",\"parentBlockId\":\"01a0f3ab-2a1a-795c-a214-e30684f441f5\",\"sortKey\":\"000000000002\",\"type\":\"paragraph\",\"schemaVersion\":1,\"data\":{\"richText\":[{\"text\":\"Content 2\"}]},\"revision\":\"1\"},{\"id\":\"01a0f3aa-4bbe-7f8f-9641-8608152faf7c\",\"pageId\":\"01a0f3a9-c9a1-75e4-ab3a-ba9f2671f298\",\"parentBlockId\":null,\"sortKey\":\"000000000003\",\"type\":\"table\",\"schemaVersion\":1,\"data\":{\"cells\":[{\"colSpan\":1,\"column\":0,\"id\":\"01a0f3aa-4899-7109-8cf7-e21df72d3f06\",\"preMergeCells\":[],\"richText\":[],\"row\":1,\"rowSpan\":1},{\"colSpan\":1,\"column\":1,\"id\":\"01a0f3aa-4899-7e12-8ede-68addeeb8176\",\"preMergeCells\":[],\"richText\":[],\"row\":1,\"rowSpan\":1},{\"colSpan\":1,\"column\":0,\"id\":\"01a0f3aa-4899-755f-86b8-3a917b68eb25\",\"preMergeCells\":[],\"richText\":[],\"row\":2,\"rowSpan\":1},{\"colSpan\":1,\"column\":1,\"id\":\"01a0f3aa-4899-738a-88cb-e15eeb039d0e\",\"preMergeCells\":[],\"richText\":[],\"row\":2,\"rowSpan\":1},{\"colSpan\":1,\"column\":0,\"id\":\"01a0f3aa-4898-721b-8896-9b99240df1e8\",\"preMergeCells\":[],\"richText\":[{\"text\":\"alpha\"}],\"row\":0,\"rowSpan\":1},{\"colSpan\":1,\"column\":1,\"id\":\"01a0f3aa-4899-7350-b7dc-36685d21f723\",\"preMergeCells\":[],\"richText\":[{\"text\":\"beta\"}],\"row\":0,\"rowSpan\":1}],\"columnCount\":2,\"columnWidths\":[240,240],\"headerColumns\":0,\"headerRows\":1,\"rowCount\":3},\"revision\":\"11\"},{\"id\":\"01a0f3ab-2a1a-795c-a214-e30684f441f5\",\"pageId\":\"01a0f3a9-c9a1-75e4-ab3a-ba9f2671f298\",\"parentBlockId\":null,\"sortKey\":\"000000000004\",\"type\":\"tab_container\",\"schemaVersion\":1,\"data\":{\"tabs\":[{\"childBlockIds\":[\"01a0f3ab-2a1a-78e3-8efb-99db0610cc74\"],\"id\":\"01a0f3ab-2a1a-79cd-8909-d4915b07f56b\",\"title\":\"Evidence\"},{\"childBlockIds\":[\"01a0f3ab-2a1a-71d1-9770-97a5a12f9c1b\"],\"id\":\"01a0f3ab-2a1a-7ae7-85a5-cc29ed5751e2\",\"title\":\"Tab 2\"}]},\"revision\":\"5\"},{\"id\":\"01a0f3b8-f53c-7b71-aea8-cf3c8ec2fb4d\",\"pageId\":\"01a0f3a9-c9a1-75e4-ab3a-ba9f2671f298\",\"parentBlockId\":null,\"sortKey\":\"000000000005\",\"type\":\"paragraph\",\"schemaVersion\":1,\"data\":{\"richText\":[{\"text\":\"Candidate3 resumed edit\"}]},\"revision\":\"1\"}],\"snapshotCursor\":\"25\",\"recoveryMetadataVersion\":3}",
+          "created_at": "2026-09-30T19:09:40.039896Z"
+        },
+        {
+          "snapshot_id": "01a0f3b9-5fc0-77d1-8e4f-10b41d0f349d",
+          "page_id": "01a0f3a9-24d5-7099-b61c-7ce3a04e84f9",
+          "revision": "3",
+          "snapshot_json": "{\"page\":{\"createdAt\":\"2026-09-30T18:52:23.658039Z\",\"deletedAt\":null,\"id\":\"01a0f3a9-24d5-7099-b61c-7ce3a04e84f9\",\"parentPageId\":\"01a0f3a9-24d5-786c-bb63-d69d85a843f7\",\"revision\":\"3\",\"title\":\"Native shared record edit\",\"updatedAt\":\"2026-09-30T19:10:07.295546Z\",\"workspaceId\":\"01a0f3a9-2423-782d-a1ef-4717e3fcea60\"},\"blocks\":[],\"snapshotCursor\":\"26\",\"record\":{\"id\":\"01a0f3a9-24d5-7451-a129-9ad5b071fdb0\",\"collectionId\":\"01a0f3a9-24d5-759e-b00d-37474019dfc3\",\"pageId\":\"01a0f3a9-24d5-7099-b61c-7ce3a04e84f9\",\"revision\":\"3\",\"sortKey\":\"000000000001\",\"values\":[{\"propertyId\":\"01a0f3a9-24d5-735b-9a49-4d661ceda270\",\"schemaVersion\":1,\"value\":{\"pageId\":\"01a0f3a9-24d5-7099-b61c-7ce3a04e84f9\"}}]},\"recordStructure\":{\"parentRecordId\":null,\"dependencyRecordIds\":[]},\"recoveryMetadataVersion\":3,\"propertyDefinitions\":[{\"id\":\"01a0f3a9-24d5-735b-9a49-4d661ceda270\",\"collectionId\":\"01a0f3a9-24d5-759e-b00d-37474019dfc3\",\"name\":\"Name\",\"type\":\"title\",\"schemaVersion\":1,\"config\":{},\"revision\":\"1\"}]}",
+          "created_at": "2026-09-30T19:10:07.296041Z"
+        },
+        {
+          "snapshot_id": "01a0f3b9-6758-7259-bd88-41b41fb719d7",
+          "page_id": "01a0f3a9-2509-7036-9804-b4c92df170c3",
+          "revision": "4",
+          "snapshot_json": "{\"page\":{\"createdAt\":\"2026-09-30T18:52:23.693052Z\",\"deletedAt\":null,\"id\":\"01a0f3a9-2509-7036-9804-b4c92df170c3\",\"parentPageId\":null,\"revision\":\"4\",\"title\":\"P1 linked gallery\",\"updatedAt\":\"2026-09-30T19:10:09.240779Z\",\"workspaceId\":\"01a0f3a9-2423-782d-a1ef-4717e3fcea60\"},\"blocks\":[],\"snapshotCursor\":\"27\",\"recoveryMetadataVersion\":3}",
+          "created_at": "2026-09-30T19:10:09.240976Z"
+        },
+        {
+          "snapshot_id": "01a0f3b9-6759-7264-b935-2e90ce105fb3",
+          "page_id": "eff68e20-e0dc-7453-b0ad-150245bf142f",
+          "revision": "1",
+          "snapshot_json": "{\"page\":{\"createdAt\":\"2026-09-30T19:10:09.239847Z\",\"deletedAt\":null,\"id\":\"eff68e20-e0dc-7453-b0ad-150245bf142f\",\"parentPageId\":\"01a0f3a9-2509-7036-9804-b4c92df170c3\",\"revision\":\"1\",\"title\":\"P1 committed automation effect\",\"updatedAt\":\"2026-09-30T19:10:09.240808Z\",\"workspaceId\":\"01a0f3a9-2423-782d-a1ef-4717e3fcea60\"},\"blocks\":[],\"snapshotCursor\":\"27\",\"recoveryMetadataVersion\":3}",
+          "created_at": "2026-09-30T19:10:09.241109Z"
+        },
+        {
+          "snapshot_id": "01a0f3b9-87ca-7c67-848c-9dd5401332c8",
+          "page_id": "01a0f3a9-24d5-786c-bb63-d69d85a843f7",
+          "revision": "6",
+          "snapshot_json": "{\"page\":{\"createdAt\":\"2026-09-30T18:52:23.640672Z\",\"deletedAt\":null,\"id\":\"01a0f3a9-24d5-786c-bb63-d69d85a843f7\",\"parentPageId\":null,\"revision\":\"6\",\"title\":\"Phase 1 integration\",\"updatedAt\":\"2026-09-30T19:10:17.543294Z\",\"workspaceId\":\"01a0f3a9-2423-782d-a1ef-4717e3fcea60\"},\"blocks\":[{\"id\":\"01a0f3a9-24d5-753d-9437-ffba6a145bf6\",\"pageId\":\"01a0f3a9-24d5-786c-bb63-d69d85a843f7\",\"parentBlockId\":null,\"sortKey\":\"000000000001\",\"type\":\"paragraph\",\"schemaVersion\":1,\"data\":{\"richText\":[{\"text\":\"Persistent notes — తెలుగు 中文 العربية 🌱\"}]},\"revision\":\"1\"},{\"id\":\"01a0f3a9-24d5-7c94-95dc-0993ffa5783a\",\"pageId\":\"01a0f3a9-24d5-786c-bb63-d69d85a843f7\",\"parentBlockId\":null,\"sortKey\":\"000000000002\",\"type\":\"file\",\"schemaVersion\":1,\"data\":{\"caption\":[{\"text\":\"Durable attachment\"}],\"fileId\":\"01a0f3a9-24f9-76af-8674-03980afd9667\"},\"revision\":\"1\"},{\"id\":\"01a0f3a9-2509-739b-8405-8c8a5121aa64\",\"pageId\":\"01a0f3a9-24d5-786c-bb63-d69d85a843f7\",\"parentBlockId\":null,\"sortKey\":\"000000000003\",\"type\":\"embed\",\"schemaVersion\":1,\"data\":{\"offlineText\":\"P1OfflineEvidence retained card\",\"provider\":\"qualification\",\"sandboxPolicy\":\"no_scripts_no_network\",\"url\":\"https://example.test/offline\"},\"revision\":\"1\"},{\"id\":\"01a0f3a9-2509-76d2-add2-03b562423500\",\"pageId\":\"01a0f3a9-24d5-786c-bb63-d69d85a843f7\",\"parentBlockId\":null,\"sortKey\":\"000000000004\",\"type\":\"synced_block\",\"schemaVersion\":1,\"data\":{\"contentSourceId\":\"01a0f3a9-24d5-753d-9437-ffba6a145bf6\"},\"revision\":\"1\"}],\"snapshotCursor\":\"28\",\"attachmentFileIds\":[\"01a0f3a9-24f9-76af-8674-03980afd9667\"],\"recoveryMetadataVersion\":3}",
+          "created_at": "2026-09-30T19:10:17.546773Z"
+        },
+        {
+          "snapshot_id": "01a0f3b9-e99b-778c-b0e8-c8e8408efd97",
+          "page_id": "01a0f3a9-c9a1-75e4-ab3a-ba9f2671f298",
+          "revision": "17",
+          "snapshot_json": "{\"page\":{\"createdAt\":\"2026-09-30T18:53:05.828733Z\",\"deletedAt\":null,\"id\":\"01a0f3a9-c9a1-75e4-ab3a-ba9f2671f298\",\"parentPageId\":null,\"revision\":\"17\",\"title\":\"Native acceptance\",\"updatedAt\":\"2026-09-30T19:10:42.587522Z\",\"workspaceId\":\"01a0f3a9-2423-782d-a1ef-4717e3fcea60\"},\"blocks\":[{\"id\":\"01a0f3a9-e4cd-7d1d-8380-46bdee3a3b36\",\"pageId\":\"01a0f3a9-c9a1-75e4-ab3a-ba9f2671f298\",\"parentBlockId\":null,\"sortKey\":\"000000000001\",\"type\":\"paragraph\",\"schemaVersion\":1,\"data\":{\"richText\":[{\"text\":\"Persistent notes — తెలుగు 中文 العربية 🌱\"}]},\"revision\":\"6\"},{\"id\":\"01a0f3ab-2a1a-78e3-8efb-99db0610cc74\",\"pageId\":\"01a0f3a9-c9a1-75e4-ab3a-ba9f2671f298\",\"parentBlockId\":\"01a0f3ab-2a1a-795c-a214-e30684f441f5\",\"sortKey\":\"000000000001\",\"type\":\"paragraph\",\"schemaVersion\":1,\"data\":{\"richText\":[{\"text\":\"Native tab content\"}]},\"revision\":\"2\"},{\"id\":\"01a0f3a9-f734-766e-bfe3-92667cc41530\",\"pageId\":\"01a0f3a9-c9a1-75e4-ab3a-ba9f2671f298\",\"parentBlockId\":null,\"sortKey\":\"000000000002\",\"type\":\"heading_4\",\"schemaVersion\":1,\"data\":{\"richText\":[{\"text\":\"Restore-marker-original\"}]},\"revision\":\"6\"},{\"id\":\"01a0f3ab-2a1a-71d1-9770-97a5a12f9c1b\",\"pageId\":\"01a0f3a9-c9a1-75e4-ab3a-ba9f2671f298\",\"parentBlockId\":\"01a0f3ab-2a1a-795c-a214-e30684f441f5\",\"sortKey\":\"000000000002\",\"type\":\"paragraph\",\"schemaVersion\":1,\"data\":{\"richText\":[{\"text\":\"Content 2\"}]},\"revision\":\"1\"},{\"id\":\"01a0f3aa-4bbe-7f8f-9641-8608152faf7c\",\"pageId\":\"01a0f3a9-c9a1-75e4-ab3a-ba9f2671f298\",\"parentBlockId\":null,\"sortKey\":\"000000000003\",\"type\":\"table\",\"schemaVersion\":1,\"data\":{\"cells\":[{\"colSpan\":1,\"column\":0,\"id\":\"01a0f3aa-4899-7109-8cf7-e21df72d3f06\",\"preMergeCells\":[],\"richText\":[],\"row\":1,\"rowSpan\":1},{\"colSpan\":1,\"column\":1,\"id\":\"01a0f3aa-4899-7e12-8ede-68addeeb8176\",\"preMergeCells\":[],\"richText\":[],\"row\":1,\"rowSpan\":1},{\"colSpan\":1,\"column\":0,\"id\":\"01a0f3aa-4899-755f-86b8-3a917b68eb25\",\"preMergeCells\":[],\"richText\":[],\"row\":2,\"rowSpan\":1},{\"colSpan\":1,\"column\":1,\"id\":\"01a0f3aa-4899-738a-88cb-e15eeb039d0e\",\"preMergeCells\":[],\"richText\":[],\"row\":2,\"rowSpan\":1},{\"colSpan\":1,\"column\":0,\"id\":\"01a0f3aa-4898-721b-8896-9b99240df1e8\",\"preMergeCells\":[],\"richText\":[{\"text\":\"alpha\"}],\"row\":0,\"rowSpan\":1},{\"colSpan\":1,\"column\":1,\"id\":\"01a0f3aa-4899-7350-b7dc-36685d21f723\",\"preMergeCells\":[],\"richText\":[{\"text\":\"beta\"}],\"row\":0,\"rowSpan\":1}],\"columnCount\":2,\"columnWidths\":[240,240],\"headerColumns\":0,\"headerRows\":1,\"rowCount\":3},\"revision\":\"11\"},{\"id\":\"01a0f3ab-2a1a-795c-a214-e30684f441f5\",\"pageId\":\"01a0f3a9-c9a1-75e4-ab3a-ba9f2671f298\",\"parentBlockId\":null,\"sortKey\":\"000000000004\",\"type\":\"tab_container\",\"schemaVersion\":1,\"data\":{\"tabs\":[{\"childBlockIds\":[\"01a0f3ab-2a1a-78e3-8efb-99db0610cc74\"],\"id\":\"01a0f3ab-2a1a-79cd-8909-d4915b07f56b\",\"title\":\"Evidence\"},{\"childBlockIds\":[\"01a0f3ab-2a1a-71d1-9770-97a5a12f9c1b\"],\"id\":\"01a0f3ab-2a1a-7ae7-85a5-cc29ed5751e2\",\"title\":\"Tab 2\"}]},\"revision\":\"5\"},{\"id\":\"01a0f3b8-f53c-7b71-aea8-cf3c8ec2fb4d\",\"pageId\":\"01a0f3a9-c9a1-75e4-ab3a-ba9f2671f298\",\"parentBlockId\":null,\"sortKey\":\"000000000005\",\"type\":\"paragraph\",\"schemaVersion\":1,\"data\":{\"richText\":[{\"text\":\"Candidate3 resumed edit\"}]},\"revision\":\"1\"}],\"snapshotCursor\":\"29\",\"recoveryMetadataVersion\":3}",
+          "created_at": "2026-09-30T19:10:42.587779Z"
+        },
+        {
+          "snapshot_id": "01a0f3ba-074b-739c-b27c-080eacf16972",
+          "page_id": "01a0f3a9-c9a1-75e4-ab3a-ba9f2671f298",
+          "revision": "18",
+          "snapshot_json": "{\"page\":{\"createdAt\":\"2026-09-30T18:53:05.828733Z\",\"deletedAt\":null,\"id\":\"01a0f3a9-c9a1-75e4-ab3a-ba9f2671f298\",\"parentPageId\":null,\"revision\":\"18\",\"title\":\"Native acceptance\",\"updatedAt\":\"2026-09-30T19:10:50.186738Z\",\"workspaceId\":\"01a0f3a9-2423-782d-a1ef-4717e3fcea60\"},\"blocks\":[{\"id\":\"01a0f3a9-e4cd-7d1d-8380-46bdee3a3b36\",\"pageId\":\"01a0f3a9-c9a1-75e4-ab3a-ba9f2671f298\",\"parentBlockId\":null,\"sortKey\":\"000000000001\",\"type\":\"paragraph\",\"schemaVersion\":1,\"data\":{\"richText\":[{\"text\":\"Persistent notes — తెలుగు 中文 العربية 🌱\"}]},\"revision\":\"6\"},{\"id\":\"01a0f3ab-2a1a-78e3-8efb-99db0610cc74\",\"pageId\":\"01a0f3a9-c9a1-75e4-ab3a-ba9f2671f298\",\"parentBlockId\":\"01a0f3ab-2a1a-795c-a214-e30684f441f5\",\"sortKey\":\"000000000001\",\"type\":\"paragraph\",\"schemaVersion\":1,\"data\":{\"richText\":[{\"text\":\"Native tab content\"}]},\"revision\":\"2\"},{\"id\":\"01a0f3a9-f734-766e-bfe3-92667cc41530\",\"pageId\":\"01a0f3a9-c9a1-75e4-ab3a-ba9f2671f298\",\"parentBlockId\":null,\"sortKey\":\"000000000002\",\"type\":\"heading_4\",\"schemaVersion\":1,\"data\":{\"richText\":[{\"text\":\"Restore-marker-original\"}]},\"revision\":\"6\"},{\"id\":\"01a0f3ab-2a1a-71d1-9770-97a5a12f9c1b\",\"pageId\":\"01a0f3a9-c9a1-75e4-ab3a-ba9f2671f298\",\"parentBlockId\":\"01a0f3ab-2a1a-795c-a214-e30684f441f5\",\"sortKey\":\"000000000002\",\"type\":\"paragraph\",\"schemaVersion\":1,\"data\":{\"richText\":[{\"text\":\"Content 2\"}]},\"revision\":\"1\"},{\"id\":\"01a0f3aa-4bbe-7f8f-9641-8608152faf7c\",\"pageId\":\"01a0f3a9-c9a1-75e4-ab3a-ba9f2671f298\",\"parentBlockId\":null,\"sortKey\":\"000000000003\",\"type\":\"table\",\"schemaVersion\":1,\"data\":{\"cells\":[{\"colSpan\":1,\"column\":0,\"id\":\"01a0f3aa-4899-7109-8cf7-e21df72d3f06\",\"preMergeCells\":[],\"richText\":[],\"row\":1,\"rowSpan\":1},{\"colSpan\":1,\"column\":1,\"id\":\"01a0f3aa-4899-7e12-8ede-68addeeb8176\",\"preMergeCells\":[],\"richText\":[],\"row\":1,\"rowSpan\":1},{\"colSpan\":1,\"column\":0,\"id\":\"01a0f3aa-4899-755f-86b8-3a917b68eb25\",\"preMergeCells\":[],\"richText\":[],\"row\":2,\"rowSpan\":1},{\"colSpan\":1,\"column\":1,\"id\":\"01a0f3aa-4899-738a-88cb-e15eeb039d0e\",\"preMergeCells\":[],\"richText\":[],\"row\":2,\"rowSpan\":1},{\"colSpan\":1,\"column\":0,\"id\":\"01a0f3aa-4898-721b-8896-9b99240df1e8\",\"preMergeCells\":[],\"richText\":[{\"text\":\"alpha\"}],\"row\":0,\"rowSpan\":1},{\"colSpan\":1,\"column\":1,\"id\":\"01a0f3aa-4899-7350-b7dc-36685d21f723\",\"preMergeCells\":[],\"richText\":[{\"text\":\"beta\"}],\"row\":0,\"rowSpan\":1}],\"columnCount\":2,\"columnWidths\":[240,240],\"headerColumns\":0,\"headerRows\":1,\"rowCount\":3},\"revision\":\"11\"},{\"id\":\"01a0f3ab-2a1a-795c-a214-e30684f441f5\",\"pageId\":\"01a0f3a9-c9a1-75e4-ab3a-ba9f2671f298\",\"parentBlockId\":null,\"sortKey\":\"000000000004\",\"type\":\"tab_container\",\"schemaVersion\":1,\"data\":{\"tabs\":[{\"childBlockIds\":[\"01a0f3ab-2a1a-78e3-8efb-99db0610cc74\"],\"id\":\"01a0f3ab-2a1a-79cd-8909-d4915b07f56b\",\"title\":\"Evidence\"},{\"childBlockIds\":[\"01a0f3ab-2a1a-71d1-9770-97a5a12f9c1b\"],\"id\":\"01a0f3ab-2a1a-7ae7-85a5-cc29ed5751e2\",\"title\":\"Tab 2\"}]},\"revision\":\"5\"},{\"id\":\"01a0f3b8-f53c-7b71-aea8-cf3c8ec2fb4d\",\"pageId\":\"01a0f3a9-c9a1-75e4-ab3a-ba9f2671f298\",\"parentBlockId\":null,\"sortKey\":\"000000000005\",\"type\":\"paragraph\",\"schemaVersion\":1,\"data\":{\"richText\":[{\"text\":\"Candidate3 resumed edit\"}]},\"revision\":\"1\"}],\"snapshotCursor\":\"30\",\"recoveryMetadataVersion\":3}",
+          "created_at": "2026-09-30T19:10:50.187079Z"
+        },
+        {
+          "snapshot_id": "01a0f3ba-2392-74c8-b402-d648769a3e1c",
+          "page_id": "2c5e67e5-f51a-736c-8bdd-0c5347a1a8ee",
+          "revision": "1",
+          "snapshot_json": "{\"page\":{\"createdAt\":\"2026-09-30T19:10:57.42515Z\",\"deletedAt\":null,\"id\":\"2c5e67e5-f51a-736c-8bdd-0c5347a1a8ee\",\"parentPageId\":\"01a0f3a9-c9a1-75e4-ab3a-ba9f2671f298\",\"revision\":\"1\",\"title\":\"Native acceptance note · 2026-10-01T03:30:00Z\",\"updatedAt\":\"2026-09-30T19:10:57.426214Z\",\"workspaceId\":\"01a0f3a9-2423-782d-a1ef-4717e3fcea60\"},\"blocks\":[],\"snapshotCursor\":\"31\",\"recoveryMetadataVersion\":3}",
+          "created_at": "2026-09-30T19:10:57.42634Z"
+        },
+        {
+          "snapshot_id": "01a0f3ba-2392-7d76-b1fc-2098c9f02ff0",
+          "page_id": "01a0f3a9-c9a1-75e4-ab3a-ba9f2671f298",
+          "revision": "19",
+          "snapshot_json": "{\"page\":{\"createdAt\":\"2026-09-30T18:53:05.828733Z\",\"deletedAt\":null,\"id\":\"01a0f3a9-c9a1-75e4-ab3a-ba9f2671f298\",\"parentPageId\":null,\"revision\":\"19\",\"title\":\"Native acceptance\",\"updatedAt\":\"2026-09-30T19:10:57.42619Z\",\"workspaceId\":\"01a0f3a9-2423-782d-a1ef-4717e3fcea60\"},\"blocks\":[{\"id\":\"01a0f3a9-e4cd-7d1d-8380-46bdee3a3b36\",\"pageId\":\"01a0f3a9-c9a1-75e4-ab3a-ba9f2671f298\",\"parentBlockId\":null,\"sortKey\":\"000000000001\",\"type\":\"paragraph\",\"schemaVersion\":1,\"data\":{\"richText\":[{\"text\":\"Persistent notes — తెలుగు 中文 العربية 🌱\"}]},\"revision\":\"6\"},{\"id\":\"01a0f3ab-2a1a-78e3-8efb-99db0610cc74\",\"pageId\":\"01a0f3a9-c9a1-75e4-ab3a-ba9f2671f298\",\"parentBlockId\":\"01a0f3ab-2a1a-795c-a214-e30684f441f5\",\"sortKey\":\"000000000001\",\"type\":\"paragraph\",\"schemaVersion\":1,\"data\":{\"richText\":[{\"text\":\"Native tab content\"}]},\"revision\":\"2\"},{\"id\":\"01a0f3a9-f734-766e-bfe3-92667cc41530\",\"pageId\":\"01a0f3a9-c9a1-75e4-ab3a-ba9f2671f298\",\"parentBlockId\":null,\"sortKey\":\"000000000002\",\"type\":\"heading_4\",\"schemaVersion\":1,\"data\":{\"richText\":[{\"text\":\"Restore-marker-original\"}]},\"revision\":\"6\"},{\"id\":\"01a0f3ab-2a1a-71d1-9770-97a5a12f9c1b\",\"pageId\":\"01a0f3a9-c9a1-75e4-ab3a-ba9f2671f298\",\"parentBlockId\":\"01a0f3ab-2a1a-795c-a214-e30684f441f5\",\"sortKey\":\"000000000002\",\"type\":\"paragraph\",\"schemaVersion\":1,\"data\":{\"richText\":[{\"text\":\"Content 2\"}]},\"revision\":\"1\"},{\"id\":\"01a0f3aa-4bbe-7f8f-9641-8608152faf7c\",\"pageId\":\"01a0f3a9-c9a1-75e4-ab3a-ba9f2671f298\",\"parentBlockId\":null,\"sortKey\":\"000000000003\",\"type\":\"table\",\"schemaVersion\":1,\"data\":{\"cells\":[{\"colSpan\":1,\"column\":0,\"id\":\"01a0f3aa-4899-7109-8cf7-e21df72d3f06\",\"preMergeCells\":[],\"richText\":[],\"row\":1,\"rowSpan\":1},{\"colSpan\":1,\"column\":1,\"id\":\"01a0f3aa-4899-7e12-8ede-68addeeb8176\",\"preMergeCells\":[],\"richText\":[],\"row\":1,\"rowSpan\":1},{\"colSpan\":1,\"column\":0,\"id\":\"01a0f3aa-4899-755f-86b8-3a917b68eb25\",\"preMergeCells\":[],\"richText\":[],\"row\":2,\"rowSpan\":1},{\"colSpan\":1,\"column\":1,\"id\":\"01a0f3aa-4899-738a-88cb-e15eeb039d0e\",\"preMergeCells\":[],\"richText\":[],\"row\":2,\"rowSpan\":1},{\"colSpan\":1,\"column\":0,\"id\":\"01a0f3aa-4898-721b-8896-9b99240df1e8\",\"preMergeCells\":[],\"richText\":[{\"text\":\"alpha\"}],\"row\":0,\"rowSpan\":1},{\"colSpan\":1,\"column\":1,\"id\":\"01a0f3aa-4899-7350-b7dc-36685d21f723\",\"preMergeCells\":[],\"richText\":[{\"text\":\"beta\"}],\"row\":0,\"rowSpan\":1}],\"columnCount\":2,\"columnWidths\":[240,240],\"headerColumns\":0,\"headerRows\":1,\"rowCount\":3},\"revision\":\"11\"},{\"id\":\"01a0f3ab-2a1a-795c-a214-e30684f441f5\",\"pageId\":\"01a0f3a9-c9a1-75e4-ab3a-ba9f2671f298\",\"parentBlockId\":null,\"sortKey\":\"000000000004\",\"type\":\"tab_container\",\"schemaVersion\":1,\"data\":{\"tabs\":[{\"childBlockIds\":[\"01a0f3ab-2a1a-78e3-8efb-99db0610cc74\"],\"id\":\"01a0f3ab-2a1a-79cd-8909-d4915b07f56b\",\"title\":\"Evidence\"},{\"childBlockIds\":[\"01a0f3ab-2a1a-71d1-9770-97a5a12f9c1b\"],\"id\":\"01a0f3ab-2a1a-7ae7-85a5-cc29ed5751e2\",\"title\":\"Tab 2\"}]},\"revision\":\"5\"},{\"id\":\"01a0f3b8-f53c-7b71-aea8-cf3c8ec2fb4d\",\"pageId\":\"01a0f3a9-c9a1-75e4-ab3a-ba9f2671f298\",\"parentBlockId\":null,\"sortKey\":\"000000000005\",\"type\":\"paragraph\",\"schemaVersion\":1,\"data\":{\"richText\":[{\"text\":\"Candidate3 resumed edit\"}]},\"revision\":\"1\"}],\"snapshotCursor\":\"31\",\"recoveryMetadataVersion\":3}",
+          "created_at": "2026-09-30T19:10:57.426607Z"
+        },
+        {
+          "snapshot_id": "01a0f3ba-5bbb-7d32-afe5-f4aba396d93e",
+          "page_id": "01a0f3a9-c9a1-75e4-ab3a-ba9f2671f298",
+          "revision": "20",
+          "snapshot_json": "{\"page\":{\"createdAt\":\"2026-09-30T18:53:05.828733Z\",\"deletedAt\":null,\"id\":\"01a0f3a9-c9a1-75e4-ab3a-ba9f2671f298\",\"parentPageId\":null,\"revision\":\"20\",\"title\":\"Native acceptance\",\"updatedAt\":\"2026-09-30T19:11:11.803479Z\",\"workspaceId\":\"01a0f3a9-2423-782d-a1ef-4717e3fcea60\"},\"blocks\":[{\"id\":\"01a0f3a9-e4cd-7d1d-8380-46bdee3a3b36\",\"pageId\":\"01a0f3a9-c9a1-75e4-ab3a-ba9f2671f298\",\"parentBlockId\":null,\"sortKey\":\"000000000001\",\"type\":\"paragraph\",\"schemaVersion\":1,\"data\":{\"richText\":[{\"text\":\"Persistent notes — తెలుగు 中文 العربية 🌱\"}]},\"revision\":\"6\"},{\"id\":\"01a0f3ab-2a1a-78e3-8efb-99db0610cc74\",\"pageId\":\"01a0f3a9-c9a1-75e4-ab3a-ba9f2671f298\",\"parentBlockId\":\"01a0f3ab-2a1a-795c-a214-e30684f441f5\",\"sortKey\":\"000000000001\",\"type\":\"paragraph\",\"schemaVersion\":1,\"data\":{\"richText\":[{\"text\":\"Native tab content\"}]},\"revision\":\"2\"},{\"id\":\"01a0f3a9-f734-766e-bfe3-92667cc41530\",\"pageId\":\"01a0f3a9-c9a1-75e4-ab3a-ba9f2671f298\",\"parentBlockId\":null,\"sortKey\":\"000000000002\",\"type\":\"heading_4\",\"schemaVersion\":1,\"data\":{\"richText\":[{\"text\":\"Restore-marker-original\"}]},\"revision\":\"6\"},{\"id\":\"01a0f3ab-2a1a-71d1-9770-97a5a12f9c1b\",\"pageId\":\"01a0f3a9-c9a1-75e4-ab3a-ba9f2671f298\",\"parentBlockId\":\"01a0f3ab-2a1a-795c-a214-e30684f441f5\",\"sortKey\":\"000000000002\",\"type\":\"paragraph\",\"schemaVersion\":1,\"data\":{\"richText\":[{\"text\":\"Content 2\"}]},\"revision\":\"1\"},{\"id\":\"01a0f3aa-4bbe-7f8f-9641-8608152faf7c\",\"pageId\":\"01a0f3a9-c9a1-75e4-ab3a-ba9f2671f298\",\"parentBlockId\":null,\"sortKey\":\"000000000003\",\"type\":\"table\",\"schemaVersion\":1,\"data\":{\"cells\":[{\"colSpan\":1,\"column\":0,\"id\":\"01a0f3aa-4899-7109-8cf7-e21df72d3f06\",\"preMergeCells\":[],\"richText\":[],\"row\":1,\"rowSpan\":1},{\"colSpan\":1,\"column\":1,\"id\":\"01a0f3aa-4899-7e12-8ede-68addeeb8176\",\"preMergeCells\":[],\"richText\":[],\"row\":1,\"rowSpan\":1},{\"colSpan\":1,\"column\":0,\"id\":\"01a0f3aa-4899-755f-86b8-3a917b68eb25\",\"preMergeCells\":[],\"richText\":[],\"row\":2,\"rowSpan\":1},{\"colSpan\":1,\"column\":1,\"id\":\"01a0f3aa-4899-738a-88cb-e15eeb039d0e\",\"preMergeCells\":[],\"richText\":[],\"row\":2,\"rowSpan\":1},{\"colSpan\":1,\"column\":0,\"id\":\"01a0f3aa-4898-721b-8896-9b99240df1e8\",\"preMergeCells\":[],\"richText\":[{\"text\":\"alpha\"}],\"row\":0,\"rowSpan\":1},{\"colSpan\":1,\"column\":1,\"id\":\"01a0f3aa-4899-7350-b7dc-36685d21f723\",\"preMergeCells\":[],\"richText\":[{\"text\":\"beta\"}],\"row\":0,\"rowSpan\":1}],\"columnCount\":2,\"columnWidths\":[240,240],\"headerColumns\":0,\"headerRows\":1,\"rowCount\":3},\"revision\":\"11\"},{\"id\":\"01a0f3ab-2a1a-795c-a214-e30684f441f5\",\"pageId\":\"01a0f3a9-c9a1-75e4-ab3a-ba9f2671f298\",\"parentBlockId\":null,\"sortKey\":\"000000000004\",\"type\":\"tab_container\",\"schemaVersion\":1,\"data\":{\"tabs\":[{\"childBlockIds\":[\"01a0f3ab-2a1a-78e3-8efb-99db0610cc74\"],\"id\":\"01a0f3ab-2a1a-79cd-8909-d4915b07f56b\",\"title\":\"Evidence\"},{\"childBlockIds\":[\"01a0f3ab-2a1a-71d1-9770-97a5a12f9c1b\"],\"id\":\"01a0f3ab-2a1a-7ae7-85a5-cc29ed5751e2\",\"title\":\"Tab 2\"}]},\"revision\":\"5\"},{\"id\":\"01a0f3b8-f53c-7b71-aea8-cf3c8ec2fb4d\",\"pageId\":\"01a0f3a9-c9a1-75e4-ab3a-ba9f2671f298\",\"parentBlockId\":null,\"sortKey\":\"000000000005\",\"type\":\"paragraph\",\"schemaVersion\":1,\"data\":{\"richText\":[{\"text\":\"Candidate3 resumed edit\"}]},\"revision\":\"1\"}],\"snapshotCursor\":\"33\",\"recoveryMetadataVersion\":3}",
+          "created_at": "2026-09-30T19:11:11.80371Z"
+        },
+        {
+          "snapshot_id": "01a0f3bd-315f-7974-ac92-741cdb76289a",
+          "page_id": "01a0f3a9-c9a1-75e4-ab3a-ba9f2671f298",
+          "revision": "21",
+          "snapshot_json": "{\"page\":{\"createdAt\":\"2026-09-30T18:53:05.828733Z\",\"deletedAt\":null,\"id\":\"01a0f3a9-c9a1-75e4-ab3a-ba9f2671f298\",\"parentPageId\":null,\"revision\":\"21\",\"title\":\"Native acceptance\",\"updatedAt\":\"2026-09-30T19:14:17.56706Z\",\"workspaceId\":\"01a0f3a9-2423-782d-a1ef-4717e3fcea60\"},\"blocks\":[{\"id\":\"01a0f3a9-e4cd-7d1d-8380-46bdee3a3b36\",\"pageId\":\"01a0f3a9-c9a1-75e4-ab3a-ba9f2671f298\",\"parentBlockId\":null,\"sortKey\":\"000000000001\",\"type\":\"paragraph\",\"schemaVersion\":1,\"data\":{\"richText\":[{\"text\":\"Persistent notes — తెలుగు 中文 العربية 🌱\"}]},\"revision\":\"6\"},{\"id\":\"01a0f3ab-2a1a-78e3-8efb-99db0610cc74\",\"pageId\":\"01a0f3a9-c9a1-75e4-ab3a-ba9f2671f298\",\"parentBlockId\":\"01a0f3ab-2a1a-795c-a214-e30684f441f5\",\"sortKey\":\"000000000001\",\"type\":\"paragraph\",\"schemaVersion\":1,\"data\":{\"richText\":[{\"text\":\"Native tab content\"}]},\"revision\":\"2\"},{\"id\":\"01a0f3a9-f734-766e-bfe3-92667cc41530\",\"pageId\":\"01a0f3a9-c9a1-75e4-ab3a-ba9f2671f298\",\"parentBlockId\":null,\"sortKey\":\"000000000002\",\"type\":\"heading_4\",\"schemaVersion\":1,\"data\":{\"richText\":[{\"text\":\"Restore-marker-original\"}]},\"revision\":\"6\"},{\"id\":\"01a0f3ab-2a1a-71d1-9770-97a5a12f9c1b\",\"pageId\":\"01a0f3a9-c9a1-75e4-ab3a-ba9f2671f298\",\"parentBlockId\":\"01a0f3ab-2a1a-795c-a214-e30684f441f5\",\"sortKey\":\"000000000002\",\"type\":\"paragraph\",\"schemaVersion\":1,\"data\":{\"richText\":[{\"text\":\"Content 2\"}]},\"revision\":\"1\"},{\"id\":\"01a0f3aa-4bbe-7f8f-9641-8608152faf7c\",\"pageId\":\"01a0f3a9-c9a1-75e4-ab3a-ba9f2671f298\",\"parentBlockId\":null,\"sortKey\":\"000000000003\",\"type\":\"table\",\"schemaVersion\":1,\"data\":{\"cells\":[{\"colSpan\":1,\"column\":0,\"id\":\"01a0f3aa-4899-7109-8cf7-e21df72d3f06\",\"preMergeCells\":[],\"richText\":[],\"row\":1,\"rowSpan\":1},{\"colSpan\":1,\"column\":1,\"id\":\"01a0f3aa-4899-7e12-8ede-68addeeb8176\",\"preMergeCells\":[],\"richText\":[],\"row\":1,\"rowSpan\":1},{\"colSpan\":1,\"column\":0,\"id\":\"01a0f3aa-4899-755f-86b8-3a917b68eb25\",\"preMergeCells\":[],\"richText\":[],\"row\":2,\"rowSpan\":1},{\"colSpan\":1,\"column\":1,\"id\":\"01a0f3aa-4899-738a-88cb-e15eeb039d0e\",\"preMergeCells\":[],\"richText\":[],\"row\":2,\"rowSpan\":1},{\"colSpan\":1,\"column\":0,\"id\":\"01a0f3aa-4898-721b-8896-9b99240df1e8\",\"preMergeCells\":[],\"richText\":[{\"text\":\"alpha\"}],\"row\":0,\"rowSpan\":1},{\"colSpan\":1,\"column\":1,\"id\":\"01a0f3aa-4899-7350-b7dc-36685d21f723\",\"preMergeCells\":[],\"richText\":[{\"text\":\"beta\"}],\"row\":0,\"rowSpan\":1}],\"columnCount\":2,\"columnWidths\":[240,240],\"headerColumns\":0,\"headerRows\":1,\"rowCount\":3},\"revision\":\"11\"},{\"id\":\"01a0f3ab-2a1a-795c-a214-e30684f441f5\",\"pageId\":\"01a0f3a9-c9a1-75e4-ab3a-ba9f2671f298\",\"parentBlockId\":null,\"sortKey\":\"000000000004\",\"type\":\"tab_container\",\"schemaVersion\":1,\"data\":{\"tabs\":[{\"childBlockIds\":[\"01a0f3ab-2a1a-78e3-8efb-99db0610cc74\"],\"id\":\"01a0f3ab-2a1a-79cd-8909-d4915b07f56b\",\"title\":\"Review\"},{\"childBlockIds\":[\"01a0f3ab-2a1a-71d1-9770-97a5a12f9c1b\"],\"id\":\"01a0f3ab-2a1a-7ae7-85a5-cc29ed5751e2\",\"title\":\"Tab 2\"}]},\"revision\":\"6\"},{\"id\":\"01a0f3b8-f53c-7b71-aea8-cf3c8ec2fb4d\",\"pageId\":\"01a0f3a9-c9a1-75e4-ab3a-ba9f2671f298\",\"parentBlockId\":null,\"sortKey\":\"000000000005\",\"type\":\"paragraph\",\"schemaVersion\":1,\"data\":{\"richText\":[{\"text\":\"Candidate3 resumed edit\"}]},\"revision\":\"1\"}],\"snapshotCursor\":\"34\",\"recoveryMetadataVersion\":3}",
+          "created_at": "2026-09-30T19:14:17.567787Z"
+        },
+        {
+          "snapshot_id": "01a0f3be-1b58-78a6-8339-cd9cc8423744",
+          "page_id": "01a0f3a9-c9a1-75e4-ab3a-ba9f2671f298",
+          "revision": "22",
+          "snapshot_json": "{\"page\":{\"createdAt\":\"2026-09-30T18:53:05.828733Z\",\"deletedAt\":null,\"id\":\"01a0f3a9-c9a1-75e4-ab3a-ba9f2671f298\",\"parentPageId\":null,\"revision\":\"22\",\"title\":\"Native acceptance\",\"updatedAt\":\"2026-09-30T19:15:17.464617Z\",\"workspaceId\":\"01a0f3a9-2423-782d-a1ef-4717e3fcea60\"},\"blocks\":[{\"id\":\"01a0f3a9-e4cd-7d1d-8380-46bdee3a3b36\",\"pageId\":\"01a0f3a9-c9a1-75e4-ab3a-ba9f2671f298\",\"parentBlockId\":null,\"sortKey\":\"000000000001\",\"type\":\"paragraph\",\"schemaVersion\":1,\"data\":{\"richText\":[{\"text\":\"Persistent notes — తెలుగు 中文 العربية 🌱\"}]},\"revision\":\"6\"},{\"id\":\"01a0f3ab-2a1a-78e3-8efb-99db0610cc74\",\"pageId\":\"01a0f3a9-c9a1-75e4-ab3a-ba9f2671f298\",\"parentBlockId\":\"01a0f3ab-2a1a-795c-a214-e30684f441f5\",\"sortKey\":\"000000000001\",\"type\":\"paragraph\",\"schemaVersion\":1,\"data\":{\"richText\":[{\"text\":\"Native tab content\"}]},\"revision\":\"2\"},{\"id\":\"01a0f3a9-f734-766e-bfe3-92667cc41530\",\"pageId\":\"01a0f3a9-c9a1-75e4-ab3a-ba9f2671f298\",\"parentBlockId\":null,\"sortKey\":\"000000000002\",\"type\":\"heading_4\",\"schemaVersion\":1,\"data\":{\"richText\":[{\"text\":\"Restore-marker-original\"}]},\"revision\":\"6\"},{\"id\":\"01a0f3ab-2a1a-71d1-9770-97a5a12f9c1b\",\"pageId\":\"01a0f3a9-c9a1-75e4-ab3a-ba9f2671f298\",\"parentBlockId\":\"01a0f3ab-2a1a-795c-a214-e30684f441f5\",\"sortKey\":\"000000000002\",\"type\":\"paragraph\",\"schemaVersion\":1,\"data\":{\"richText\":[{\"text\":\"Content 2\"}]},\"revision\":\"1\"},{\"id\":\"01a0f3aa-4bbe-7f8f-9641-8608152faf7c\",\"pageId\":\"01a0f3a9-c9a1-75e4-ab3a-ba9f2671f298\",\"parentBlockId\":null,\"sortKey\":\"000000000003\",\"type\":\"table\",\"schemaVersion\":1,\"data\":{\"cells\":[{\"colSpan\":1,\"column\":0,\"id\":\"01a0f3aa-4899-7109-8cf7-e21df72d3f06\",\"preMergeCells\":[],\"richText\":[],\"row\":1,\"rowSpan\":1},{\"colSpan\":1,\"column\":1,\"id\":\"01a0f3aa-4899-7e12-8ede-68addeeb8176\",\"preMergeCells\":[],\"richText\":[],\"row\":1,\"rowSpan\":1},{\"colSpan\":1,\"column\":0,\"id\":\"01a0f3aa-4899-755f-86b8-3a917b68eb25\",\"preMergeCells\":[],\"richText\":[],\"row\":2,\"rowSpan\":1},{\"colSpan\":1,\"column\":1,\"id\":\"01a0f3aa-4899-738a-88cb-e15eeb039d0e\",\"preMergeCells\":[],\"richText\":[],\"row\":2,\"rowSpan\":1},{\"colSpan\":1,\"column\":0,\"id\":\"01a0f3aa-4898-721b-8896-9b99240df1e8\",\"preMergeCells\":[],\"richText\":[{\"text\":\"alpha\"}],\"row\":0,\"rowSpan\":1},{\"colSpan\":1,\"column\":1,\"id\":\"01a0f3aa-4899-7350-b7dc-36685d21f723\",\"preMergeCells\":[],\"richText\":[{\"text\":\"beta\"}],\"row\":0,\"rowSpan\":1}],\"columnCount\":2,\"columnWidths\":[240,240],\"headerColumns\":0,\"headerRows\":1,\"rowCount\":3},\"revision\":\"11\"},{\"id\":\"01a0f3ab-2a1a-795c-a214-e30684f441f5\",\"pageId\":\"01a0f3a9-c9a1-75e4-ab3a-ba9f2671f298\",\"parentBlockId\":null,\"sortKey\":\"000000000004\",\"type\":\"tab_container\",\"schemaVersion\":1,\"data\":{\"tabs\":[{\"childBlockIds\":[\"01a0f3ab-2a1a-78e3-8efb-99db0610cc74\"],\"id\":\"01a0f3ab-2a1a-79cd-8909-d4915b07f56b\",\"title\":\"Review\"},{\"childBlockIds\":[\"01a0f3ab-2a1a-71d1-9770-97a5a12f9c1b\"],\"id\":\"01a0f3ab-2a1a-7ae7-85a5-cc29ed5751e2\",\"title\":\"Tab 2\"}]},\"revision\":\"6\"},{\"id\":\"01a0f3b8-f53c-7b71-aea8-cf3c8ec2fb4d\",\"pageId\":\"01a0f3a9-c9a1-75e4-ab3a-ba9f2671f298\",\"parentBlockId\":null,\"sortKey\":\"000000000005\",\"type\":\"paragraph\",\"schemaVersion\":1,\"data\":{\"richText\":[{\"text\":\"Candidate3 resumed edit\"}]},\"revision\":\"1\"},{\"id\":\"01a0f3be-1b4d-7e34-b071-c96657d02c7d\",\"pageId\":\"01a0f3a9-c9a1-75e4-ab3a-ba9f2671f298\",\"parentBlockId\":null,\"sortKey\":\"000000000006\",\"type\":\"audio\",\"schemaVersion\":1,\"data\":{\"caption\":[],\"fileId\":\"01a0f3be-1af7-7a3e-8b82-924b17c3e065\"},\"revision\":\"1\"}],\"snapshotCursor\":\"35\",\"attachmentFileIds\":[\"01a0f3be-1af7-7a3e-8b82-924b17c3e065\"],\"recoveryMetadataVersion\":3}",
+          "created_at": "2026-09-30T19:15:17.464816Z"
+        },
+        {
+          "snapshot_id": "01a0f3bf-d4f6-7a17-b791-6b6f1593420e",
+          "page_id": "01a0f3bf-d4f4-7ff3-9ccc-06b9a80177ac",
+          "revision": "1",
+          "snapshot_json": "{\"page\":{\"createdAt\":\"2026-09-30T19:17:10.517534Z\",\"deletedAt\":null,\"id\":\"01a0f3bf-d4f4-7ff3-9ccc-06b9a80177ac\",\"parentPageId\":null,\"revision\":\"1\",\"title\":\"Untitled\",\"updatedAt\":\"2026-09-30T19:17:10.517907Z\",\"workspaceId\":\"01a0f3a9-2423-782d-a1ef-4717e3fcea60\"},\"blocks\":[],\"snapshotCursor\":\"36\",\"recoveryMetadataVersion\":3}",
+          "created_at": "2026-09-30T19:17:10.51801Z"
+        },
+        {
+          "snapshot_id": "01a0f3bf-ee87-7d29-a3b5-f975890ad0cb",
+          "page_id": "01a0f3bf-d4f4-7ff3-9ccc-06b9a80177ac",
+          "revision": "2",
+          "snapshot_json": "{\"page\":{\"createdAt\":\"2026-09-30T19:17:10.517534Z\",\"deletedAt\":null,\"id\":\"01a0f3bf-d4f4-7ff3-9ccc-06b9a80177ac\",\"parentPageId\":null,\"revision\":\"2\",\"title\":\"History acceptance\",\"updatedAt\":\"2026-09-30T19:17:17.063755Z\",\"workspaceId\":\"01a0f3a9-2423-782d-a1ef-4717e3fcea60\"},\"blocks\":[],\"snapshotCursor\":\"37\",\"recoveryMetadataVersion\":3}",
+          "created_at": "2026-09-30T19:17:17.063832Z"
+        },
+        {
+          "snapshot_id": "01a0f3bf-f4ac-7e93-be50-46c65793597b",
+          "page_id": "01a0f3bf-d4f4-7ff3-9ccc-06b9a80177ac",
+          "revision": "3",
+          "snapshot_json": "{\"page\":{\"createdAt\":\"2026-09-30T19:17:10.517534Z\",\"deletedAt\":null,\"id\":\"01a0f3bf-d4f4-7ff3-9ccc-06b9a80177ac\",\"parentPageId\":null,\"revision\":\"3\",\"title\":\"History acceptance\",\"updatedAt\":\"2026-09-30T19:17:18.636808Z\",\"workspaceId\":\"01a0f3a9-2423-782d-a1ef-4717e3fcea60\"},\"blocks\":[{\"id\":\"01a0f3bf-f4aa-7b0c-b79b-ee31ed4eb674\",\"pageId\":\"01a0f3bf-d4f4-7ff3-9ccc-06b9a80177ac\",\"parentBlockId\":null,\"sortKey\":\"000000000001\",\"type\":\"paragraph\",\"schemaVersion\":1,\"data\":{\"richText\":[{\"text\":\"Original history marker\"}]},\"revision\":\"1\"}],\"snapshotCursor\":\"38\",\"recoveryMetadataVersion\":3}",
+          "created_at": "2026-09-30T19:17:18.636911Z"
+        },
+        {
+          "snapshot_id": "01a0f3c0-060c-7beb-a87d-f492fc8dbd3b",
+          "page_id": "01a0f3bf-d4f4-7ff3-9ccc-06b9a80177ac",
+          "revision": "4",
+          "snapshot_json": "{\"page\":{\"createdAt\":\"2026-09-30T19:17:10.517534Z\",\"deletedAt\":null,\"id\":\"01a0f3bf-d4f4-7ff3-9ccc-06b9a80177ac\",\"parentPageId\":null,\"revision\":\"4\",\"title\":\"History acceptance\",\"updatedAt\":\"2026-09-30T19:17:23.0845Z\",\"workspaceId\":\"01a0f3a9-2423-782d-a1ef-4717e3fcea60\"},\"blocks\":[{\"id\":\"01a0f3bf-f4aa-7b0c-b79b-ee31ed4eb674\",\"pageId\":\"01a0f3bf-d4f4-7ff3-9ccc-06b9a80177ac\",\"parentBlockId\":null,\"sortKey\":\"000000000001\",\"type\":\"paragraph\",\"schemaVersion\":1,\"data\":{\"richText\":[{\"text\":\"Changed history marker\"}]},\"revision\":\"2\"}],\"snapshotCursor\":\"39\",\"recoveryMetadataVersion\":3}",
+          "created_at": "2026-09-30T19:17:23.084856Z"
+        },
+        {
+          "snapshot_id": "01a0f3c0-7b7d-7362-85c7-7dbe94d7ecee",
+          "page_id": "01a0f3bf-d4f4-7ff3-9ccc-06b9a80177ac",
+          "revision": "5",
+          "snapshot_json": "{\"page\":{\"createdAt\":\"2026-09-30T19:17:10.517534Z\",\"deletedAt\":null,\"id\":\"01a0f3bf-d4f4-7ff3-9ccc-06b9a80177ac\",\"parentPageId\":null,\"revision\":\"5\",\"title\":\"History acceptance\",\"updatedAt\":\"2026-09-30T19:17:53.14894Z\",\"workspaceId\":\"01a0f3a9-2423-782d-a1ef-4717e3fcea60\"},\"blocks\":[{\"id\":\"01a0f3bf-f4aa-7b0c-b79b-ee31ed4eb674\",\"pageId\":\"01a0f3bf-d4f4-7ff3-9ccc-06b9a80177ac\",\"parentBlockId\":null,\"sortKey\":\"000000000001\",\"type\":\"paragraph\",\"schemaVersion\":1,\"data\":{\"richText\":[{\"text\":\"Original history marker\"}]},\"revision\":\"3\"}],\"snapshotCursor\":\"40\",\"recoveryMetadataVersion\":3}",
+          "created_at": "2026-09-30T19:17:53.149047Z"
+        },
+        {
+          "snapshot_id": "01a0f3c6-caa4-787d-8760-c97c6bf4b9af",
+          "page_id": "01a0f3a9-c9a1-75e4-ab3a-ba9f2671f298",
+          "revision": "23",
+          "snapshot_json": "{\"page\":{\"createdAt\":\"2026-09-30T18:53:05.828733Z\",\"deletedAt\":null,\"id\":\"01a0f3a9-c9a1-75e4-ab3a-ba9f2671f298\",\"parentPageId\":null,\"revision\":\"23\",\"title\":\"Native acceptance\",\"updatedAt\":\"2026-09-30T19:24:46.628177Z\",\"workspaceId\":\"01a0f3a9-2423-782d-a1ef-4717e3fcea60\"},\"blocks\":[{\"id\":\"01a0f3a9-e4cd-7d1d-8380-46bdee3a3b36\",\"pageId\":\"01a0f3a9-c9a1-75e4-ab3a-ba9f2671f298\",\"parentBlockId\":null,\"sortKey\":\"000000000001\",\"type\":\"paragraph\",\"schemaVersion\":1,\"data\":{\"richText\":[{\"text\":\"Persistent notes — తెలుగు 中文 العربية 🌱\"}]},\"revision\":\"7\"},{\"id\":\"01a0f3ab-2a1a-78e3-8efb-99db0610cc74\",\"pageId\":\"01a0f3a9-c9a1-75e4-ab3a-ba9f2671f298\",\"parentBlockId\":\"01a0f3ab-2a1a-795c-a214-e30684f441f5\",\"sortKey\":\"000000000001\",\"type\":\"paragraph\",\"schemaVersion\":1,\"data\":{\"richText\":[{\"text\":\"Native tab content\"}]},\"revision\":\"2\"},{\"id\":\"01a0f3a9-f734-766e-bfe3-92667cc41530\",\"pageId\":\"01a0f3a9-c9a1-75e4-ab3a-ba9f2671f298\",\"parentBlockId\":null,\"sortKey\":\"000000000002\",\"type\":\"heading_4\",\"schemaVersion\":1,\"data\":{\"richText\":[{\"text\":\"Restore-marker-original\"}]},\"revision\":\"7\"},{\"id\":\"01a0f3ab-2a1a-71d1-9770-97a5a12f9c1b\",\"pageId\":\"01a0f3a9-c9a1-75e4-ab3a-ba9f2671f298\",\"parentBlockId\":\"01a0f3ab-2a1a-795c-a214-e30684f441f5\",\"sortKey\":\"000000000002\",\"type\":\"paragraph\",\"schemaVersion\":1,\"data\":{\"richText\":[{\"text\":\"Content 2\"}]},\"revision\":\"1\"},{\"id\":\"01a0f3aa-4bbe-7f8f-9641-8608152faf7c\",\"pageId\":\"01a0f3a9-c9a1-75e4-ab3a-ba9f2671f298\",\"parentBlockId\":null,\"sortKey\":\"000000000003\",\"type\":\"table\",\"schemaVersion\":1,\"data\":{\"cells\":[{\"colSpan\":1,\"column\":0,\"id\":\"01a0f3aa-4899-7109-8cf7-e21df72d3f06\",\"preMergeCells\":[],\"richText\":[],\"row\":1,\"rowSpan\":1},{\"colSpan\":1,\"column\":1,\"id\":\"01a0f3aa-4899-7e12-8ede-68addeeb8176\",\"preMergeCells\":[],\"richText\":[],\"row\":1,\"rowSpan\":1},{\"colSpan\":1,\"column\":0,\"id\":\"01a0f3aa-4899-755f-86b8-3a917b68eb25\",\"preMergeCells\":[],\"richText\":[],\"row\":2,\"rowSpan\":1},{\"colSpan\":1,\"column\":1,\"id\":\"01a0f3aa-4899-738a-88cb-e15eeb039d0e\",\"preMergeCells\":[],\"richText\":[],\"row\":2,\"rowSpan\":1},{\"colSpan\":1,\"column\":0,\"id\":\"01a0f3aa-4898-721b-8896-9b99240df1e8\",\"preMergeCells\":[],\"richText\":[{\"text\":\"alpha\"}],\"row\":0,\"rowSpan\":1},{\"colSpan\":1,\"column\":1,\"id\":\"01a0f3aa-4899-7350-b7dc-36685d21f723\",\"preMergeCells\":[],\"richText\":[{\"text\":\"beta\"}],\"row\":0,\"rowSpan\":1}],\"columnCount\":2,\"columnWidths\":[240,240],\"headerColumns\":0,\"headerRows\":1,\"rowCount\":3},\"revision\":\"12\"},{\"id\":\"01a0f3ab-2a1a-795c-a214-e30684f441f5\",\"pageId\":\"01a0f3a9-c9a1-75e4-ab3a-ba9f2671f298\",\"parentBlockId\":null,\"sortKey\":\"000000000004\",\"type\":\"tab_container\",\"schemaVersion\":1,\"data\":{\"tabs\":[{\"childBlockIds\":[\"01a0f3ab-2a1a-78e3-8efb-99db0610cc74\"],\"id\":\"01a0f3ab-2a1a-79cd-8909-d4915b07f56b\",\"title\":\"Review\"},{\"childBlockIds\":[\"01a0f3ab-2a1a-71d1-9770-97a5a12f9c1b\"],\"id\":\"01a0f3ab-2a1a-7ae7-85a5-cc29ed5751e2\",\"title\":\"Tab 2\"}]},\"revision\":\"7\"},{\"id\":\"01a0f3b8-f53c-7b71-aea8-cf3c8ec2fb4d\",\"pageId\":\"01a0f3a9-c9a1-75e4-ab3a-ba9f2671f298\",\"parentBlockId\":null,\"sortKey\":\"000000000005\",\"type\":\"paragraph\",\"schemaVersion\":1,\"data\":{\"richText\":[{\"text\":\"Candidate3 resumed edit\"}]},\"revision\":\"2\"},{\"id\":\"01a0f3be-1b4d-7e34-b071-c96657d02c7d\",\"pageId\":\"01a0f3a9-c9a1-75e4-ab3a-ba9f2671f298\",\"parentBlockId\":null,\"sortKey\":\"000000000006\",\"type\":\"audio\",\"schemaVersion\":1,\"data\":{\"caption\":[],\"fileId\":\"01a0f3be-1af7-7a3e-8b82-924b17c3e065\"},\"revision\":\"2\"},{\"id\":\"01a0f3c6-ca9d-73e7-a310-5af9f2f1f6d6\",\"pageId\":\"01a0f3a9-c9a1-75e4-ab3a-ba9f2671f298\",\"parentBlockId\":null,\"sortKey\":\"000000000007\",\"type\":\"paragraph\",\"schemaVersion\":1,\"data\":{\"richText\":[{\"text\":\"Final candidate saved marker\"}]},\"revision\":\"1\"}],\"snapshotCursor\":\"41\",\"attachmentFileIds\":[\"01a0f3be-1af7-7a3e-8b82-924b17c3e065\"],\"recoveryMetadataVersion\":3}",
+          "created_at": "2026-09-30T19:24:46.628322Z"
+        },
+        {
+          "snapshot_id": "01a0f3c6-da5c-7300-867b-872424990e04",
+          "page_id": "01a0f3c6-da5a-7838-92c7-53e3cc0281e7",
+          "revision": "1",
+          "snapshot_json": "{\"page\":{\"createdAt\":\"2026-09-30T19:24:50.651829Z\",\"deletedAt\":null,\"id\":\"01a0f3c6-da5a-7838-92c7-53e3cc0281e7\",\"parentPageId\":null,\"revision\":\"1\",\"title\":\"Untitled\",\"updatedAt\":\"2026-09-30T19:24:50.652094Z\",\"workspaceId\":\"01a0f3a9-2423-782d-a1ef-4717e3fcea60\"},\"blocks\":[],\"snapshotCursor\":\"42\",\"recoveryMetadataVersion\":3}",
+          "created_at": "2026-09-30T19:24:50.652186Z"
+        },
+        {
+          "snapshot_id": "01a0f3c6-efd4-70fe-b9c0-09c692543824",
+          "page_id": "01a0f3c6-da5a-7838-92c7-53e3cc0281e7",
+          "revision": "2",
+          "snapshot_json": "{\"page\":{\"createdAt\":\"2026-09-30T19:24:50.651829Z\",\"deletedAt\":null,\"id\":\"01a0f3c6-da5a-7838-92c7-53e3cc0281e7\",\"parentPageId\":null,\"revision\":\"2\",\"title\":\"Final clipboard acceptance\",\"updatedAt\":\"2026-09-30T19:24:56.14856Z\",\"workspaceId\":\"01a0f3a9-2423-782d-a1ef-4717e3fcea60\"},\"blocks\":[],\"snapshotCursor\":\"43\",\"recoveryMetadataVersion\":3}",
+          "created_at": "2026-09-30T19:24:56.148643Z"
+        },
+        {
+          "snapshot_id": "01a0f3c6-f5c3-77c6-9351-e50530640973",
+          "page_id": "01a0f3c6-da5a-7838-92c7-53e3cc0281e7",
+          "revision": "3",
+          "snapshot_json": "{\"page\":{\"createdAt\":\"2026-09-30T19:24:50.651829Z\",\"deletedAt\":null,\"id\":\"01a0f3c6-da5a-7838-92c7-53e3cc0281e7\",\"parentPageId\":null,\"revision\":\"3\",\"title\":\"Final clipboard acceptance\",\"updatedAt\":\"2026-09-30T19:24:57.667339Z\",\"workspaceId\":\"01a0f3a9-2423-782d-a1ef-4717e3fcea60\"},\"blocks\":[{\"id\":\"01a0f3c6-f5bd-7631-99d9-27f95462ddb6\",\"pageId\":\"01a0f3c6-da5a-7838-92c7-53e3cc0281e7\",\"parentBlockId\":null,\"sortKey\":\"000000000001\",\"type\":\"paragraph\",\"schemaVersion\":1,\"data\":{\"richText\":[{\"text\":\"తెలుగు\"}]},\"revision\":\"1\"}],\"snapshotCursor\":\"44\",\"recoveryMetadataVersion\":3}",
+          "created_at": "2026-09-30T19:24:57.66763Z"
+        },
+        {
+          "snapshot_id": "01a0f3c7-3f9e-7873-b028-e563e5515d15",
+          "page_id": "01a0f3c6-da5a-7838-92c7-53e3cc0281e7",
+          "revision": "4",
+          "snapshot_json": "{\"page\":{\"createdAt\":\"2026-09-30T19:24:50.651829Z\",\"deletedAt\":null,\"id\":\"01a0f3c6-da5a-7838-92c7-53e3cc0281e7\",\"parentPageId\":null,\"revision\":\"4\",\"title\":\"Final clipboard acceptance\",\"updatedAt\":\"2026-09-30T19:25:16.57438Z\",\"workspaceId\":\"01a0f3a9-2423-782d-a1ef-4717e3fcea60\"},\"blocks\":[{\"id\":\"01a0f3c7-3f9b-7222-a220-6bdc2075111e\",\"pageId\":\"01a0f3c6-da5a-7838-92c7-53e3cc0281e7\",\"parentBlockId\":null,\"sortKey\":\"000000000001\",\"type\":\"paragraph\",\"schemaVersion\":1,\"data\":{\"richText\":[{\"text\":\"Persistent notes — తెలుగు 中文 العربية 🌱\"}]},\"revision\":\"1\"}],\"snapshotCursor\":\"45\",\"recoveryMetadataVersion\":3}",
+          "created_at": "2026-09-30T19:25:16.574505Z"
+        },
+        {
+          "snapshot_id": "01a0f3c8-3feb-7721-b116-4e3e3d66442c",
+          "page_id": "01a0f3a9-c9a1-75e4-ab3a-ba9f2671f298",
+          "revision": "24",
+          "snapshot_json": "{\"page\":{\"createdAt\":\"2026-09-30T18:53:05.828733Z\",\"deletedAt\":null,\"id\":\"01a0f3a9-c9a1-75e4-ab3a-ba9f2671f298\",\"parentPageId\":null,\"revision\":\"24\",\"title\":\"Native acceptance\",\"updatedAt\":\"2026-09-30T19:26:22.187113Z\",\"workspaceId\":\"01a0f3a9-2423-782d-a1ef-4717e3fcea60\"},\"blocks\":[{\"id\":\"01a0f3a9-e4cd-7d1d-8380-46bdee3a3b36\",\"pageId\":\"01a0f3a9-c9a1-75e4-ab3a-ba9f2671f298\",\"parentBlockId\":null,\"sortKey\":\"000000000001\",\"type\":\"paragraph\",\"schemaVersion\":1,\"data\":{\"richText\":[{\"text\":\"Persistent notes — తెలుగు 中文 العربية 🌱\"}]},\"revision\":\"7\"},{\"id\":\"01a0f3ab-2a1a-78e3-8efb-99db0610cc74\",\"pageId\":\"01a0f3a9-c9a1-75e4-ab3a-ba9f2671f298\",\"parentBlockId\":\"01a0f3ab-2a1a-795c-a214-e30684f441f5\",\"sortKey\":\"000000000001\",\"type\":\"paragraph\",\"schemaVersion\":1,\"data\":{\"richText\":[{\"text\":\"Native tab content\"}]},\"revision\":\"2\"},{\"id\":\"01a0f3a9-f734-766e-bfe3-92667cc41530\",\"pageId\":\"01a0f3a9-c9a1-75e4-ab3a-ba9f2671f298\",\"parentBlockId\":null,\"sortKey\":\"000000000002\",\"type\":\"heading_4\",\"schemaVersion\":1,\"data\":{\"richText\":[{\"text\":\"Restore-marker-original\"}]},\"revision\":\"7\"},{\"id\":\"01a0f3ab-2a1a-71d1-9770-97a5a12f9c1b\",\"pageId\":\"01a0f3a9-c9a1-75e4-ab3a-ba9f2671f298\",\"parentBlockId\":\"01a0f3ab-2a1a-795c-a214-e30684f441f5\",\"sortKey\":\"000000000002\",\"type\":\"paragraph\",\"schemaVersion\":1,\"data\":{\"richText\":[{\"text\":\"Content 2\"}]},\"revision\":\"1\"},{\"id\":\"01a0f3aa-4bbe-7f8f-9641-8608152faf7c\",\"pageId\":\"01a0f3a9-c9a1-75e4-ab3a-ba9f2671f298\",\"parentBlockId\":null,\"sortKey\":\"000000000003\",\"type\":\"table\",\"schemaVersion\":1,\"data\":{\"cells\":[{\"colSpan\":1,\"column\":0,\"id\":\"01a0f3aa-4899-7109-8cf7-e21df72d3f06\",\"preMergeCells\":[],\"richText\":[],\"row\":1,\"rowSpan\":1},{\"colSpan\":1,\"column\":1,\"id\":\"01a0f3aa-4899-7e12-8ede-68addeeb8176\",\"preMergeCells\":[],\"richText\":[],\"row\":1,\"rowSpan\":1},{\"colSpan\":1,\"column\":0,\"id\":\"01a0f3aa-4899-755f-86b8-3a917b68eb25\",\"preMergeCells\":[],\"richText\":[],\"row\":2,\"rowSpan\":1},{\"colSpan\":1,\"column\":1,\"id\":\"01a0f3aa-4899-738a-88cb-e15eeb039d0e\",\"preMergeCells\":[],\"richText\":[],\"row\":2,\"rowSpan\":1},{\"colSpan\":1,\"column\":0,\"id\":\"01a0f3aa-4898-721b-8896-9b99240df1e8\",\"preMergeCells\":[],\"richText\":[{\"text\":\"alpha\"}],\"row\":0,\"rowSpan\":1},{\"colSpan\":1,\"column\":1,\"id\":\"01a0f3aa-4899-7350-b7dc-36685d21f723\",\"preMergeCells\":[],\"richText\":[{\"text\":\"beta\"}],\"row\":0,\"rowSpan\":1}],\"columnCount\":2,\"columnWidths\":[240,240],\"headerColumns\":0,\"headerRows\":1,\"rowCount\":3},\"revision\":\"12\"},{\"id\":\"01a0f3ab-2a1a-795c-a214-e30684f441f5\",\"pageId\":\"01a0f3a9-c9a1-75e4-ab3a-ba9f2671f298\",\"parentBlockId\":null,\"sortKey\":\"000000000004\",\"type\":\"tab_container\",\"schemaVersion\":1,\"data\":{\"tabs\":[{\"childBlockIds\":[\"01a0f3ab-2a1a-78e3-8efb-99db0610cc74\"],\"id\":\"01a0f3ab-2a1a-79cd-8909-d4915b07f56b\",\"title\":\"Review\"},{\"childBlockIds\":[\"01a0f3ab-2a1a-71d1-9770-97a5a12f9c1b\"],\"id\":\"01a0f3ab-2a1a-7ae7-85a5-cc29ed5751e2\",\"title\":\"Tab 2\"}]},\"revision\":\"7\"},{\"id\":\"01a0f3b8-f53c-7b71-aea8-cf3c8ec2fb4d\",\"pageId\":\"01a0f3a9-c9a1-75e4-ab3a-ba9f2671f298\",\"parentBlockId\":null,\"sortKey\":\"000000000005\",\"type\":\"paragraph\",\"schemaVersion\":1,\"data\":{\"richText\":[{\"text\":\"Candidate3 resumed edit\"}]},\"revision\":\"2\"},{\"id\":\"01a0f3be-1b4d-7e34-b071-c96657d02c7d\",\"pageId\":\"01a0f3a9-c9a1-75e4-ab3a-ba9f2671f298\",\"parentBlockId\":null,\"sortKey\":\"000000000006\",\"type\":\"audio\",\"schemaVersion\":1,\"data\":{\"caption\":[],\"fileId\":\"01a0f3be-1af7-7a3e-8b82-924b17c3e065\"},\"revision\":\"2\"},{\"id\":\"01a0f3c6-ca9d-73e7-a310-5af9f2f1f6d6\",\"pageId\":\"01a0f3a9-c9a1-75e4-ab3a-ba9f2671f298\",\"parentBlockId\":null,\"sortKey\":\"000000000007\",\"type\":\"paragraph\",\"schemaVersion\":1,\"data\":{\"richText\":[{\"text\":\"Final candidate saved marker\"}]},\"revision\":\"1\"}],\"snapshotCursor\":\"46\",\"attachmentFileIds\":[\"01a0f3be-1af7-7a3e-8b82-924b17c3e065\"],\"recoveryMetadataVersion\":3}",
+          "created_at": "2026-09-30T19:26:22.187296Z"
+        },
+        {
+          "snapshot_id": "01a0f3c8-5f4a-7aff-a470-86a052bdb4b1",
+          "page_id": "01a0f3a9-c9a1-75e4-ab3a-ba9f2671f298",
+          "revision": "25",
+          "snapshot_json": "{\"page\":{\"createdAt\":\"2026-09-30T18:53:05.828733Z\",\"deletedAt\":null,\"id\":\"01a0f3a9-c9a1-75e4-ab3a-ba9f2671f298\",\"parentPageId\":null,\"revision\":\"25\",\"title\":\"Native acceptance\",\"updatedAt\":\"2026-09-30T19:26:30.217801Z\",\"workspaceId\":\"01a0f3a9-2423-782d-a1ef-4717e3fcea60\"},\"blocks\":[{\"id\":\"01a0f3a9-e4cd-7d1d-8380-46bdee3a3b36\",\"pageId\":\"01a0f3a9-c9a1-75e4-ab3a-ba9f2671f298\",\"parentBlockId\":null,\"sortKey\":\"000000000001\",\"type\":\"paragraph\",\"schemaVersion\":1,\"data\":{\"richText\":[{\"text\":\"Persistent notes — తెలుగు 中文 العربية 🌱\"}]},\"revision\":\"7\"},{\"id\":\"01a0f3ab-2a1a-78e3-8efb-99db0610cc74\",\"pageId\":\"01a0f3a9-c9a1-75e4-ab3a-ba9f2671f298\",\"parentBlockId\":\"01a0f3ab-2a1a-795c-a214-e30684f441f5\",\"sortKey\":\"000000000001\",\"type\":\"paragraph\",\"schemaVersion\":1,\"data\":{\"richText\":[{\"text\":\"Native tab content\"}]},\"revision\":\"2\"},{\"id\":\"01a0f3a9-f734-766e-bfe3-92667cc41530\",\"pageId\":\"01a0f3a9-c9a1-75e4-ab3a-ba9f2671f298\",\"parentBlockId\":null,\"sortKey\":\"000000000002\",\"type\":\"heading_4\",\"schemaVersion\":1,\"data\":{\"richText\":[{\"text\":\"Restore-marker-original\"}]},\"revision\":\"7\"},{\"id\":\"01a0f3ab-2a1a-71d1-9770-97a5a12f9c1b\",\"pageId\":\"01a0f3a9-c9a1-75e4-ab3a-ba9f2671f298\",\"parentBlockId\":\"01a0f3ab-2a1a-795c-a214-e30684f441f5\",\"sortKey\":\"000000000002\",\"type\":\"paragraph\",\"schemaVersion\":1,\"data\":{\"richText\":[{\"text\":\"Content 2\"}]},\"revision\":\"1\"},{\"id\":\"01a0f3aa-4bbe-7f8f-9641-8608152faf7c\",\"pageId\":\"01a0f3a9-c9a1-75e4-ab3a-ba9f2671f298\",\"parentBlockId\":null,\"sortKey\":\"000000000003\",\"type\":\"table\",\"schemaVersion\":1,\"data\":{\"cells\":[{\"colSpan\":1,\"column\":0,\"id\":\"01a0f3aa-4899-7109-8cf7-e21df72d3f06\",\"preMergeCells\":[],\"richText\":[],\"row\":1,\"rowSpan\":1},{\"colSpan\":1,\"column\":1,\"id\":\"01a0f3aa-4899-7e12-8ede-68addeeb8176\",\"preMergeCells\":[],\"richText\":[],\"row\":1,\"rowSpan\":1},{\"colSpan\":1,\"column\":0,\"id\":\"01a0f3aa-4899-755f-86b8-3a917b68eb25\",\"preMergeCells\":[],\"richText\":[],\"row\":2,\"rowSpan\":1},{\"colSpan\":1,\"column\":1,\"id\":\"01a0f3aa-4899-738a-88cb-e15eeb039d0e\",\"preMergeCells\":[],\"richText\":[],\"row\":2,\"rowSpan\":1},{\"colSpan\":1,\"column\":0,\"id\":\"01a0f3aa-4898-721b-8896-9b99240df1e8\",\"preMergeCells\":[],\"richText\":[{\"text\":\"alpha\"}],\"row\":0,\"rowSpan\":1},{\"colSpan\":1,\"column\":1,\"id\":\"01a0f3aa-4899-7350-b7dc-36685d21f723\",\"preMergeCells\":[],\"richText\":[{\"text\":\"beta\"}],\"row\":0,\"rowSpan\":1}],\"columnCount\":2,\"columnWidths\":[240,240],\"headerColumns\":0,\"headerRows\":1,\"rowCount\":3},\"revision\":\"12\"},{\"id\":\"01a0f3ab-2a1a-795c-a214-e30684f441f5\",\"pageId\":\"01a0f3a9-c9a1-75e4-ab3a-ba9f2671f298\",\"parentBlockId\":null,\"sortKey\":\"000000000004\",\"type\":\"tab_container\",\"schemaVersion\":1,\"data\":{\"tabs\":[{\"childBlockIds\":[\"01a0f3ab-2a1a-78e3-8efb-99db0610cc74\"],\"id\":\"01a0f3ab-2a1a-79cd-8909-d4915b07f56b\",\"title\":\"Review\"},{\"childBlockIds\":[\"01a0f3ab-2a1a-71d1-9770-97a5a12f9c1b\"],\"id\":\"01a0f3ab-2a1a-7ae7-85a5-cc29ed5751e2\",\"title\":\"Tab 2\"}]},\"revision\":\"7\"},{\"id\":\"01a0f3b8-f53c-7b71-aea8-cf3c8ec2fb4d\",\"pageId\":\"01a0f3a9-c9a1-75e4-ab3a-ba9f2671f298\",\"parentBlockId\":null,\"sortKey\":\"000000000005\",\"type\":\"paragraph\",\"schemaVersion\":1,\"data\":{\"richText\":[{\"text\":\"Candidate3 resumed edit\"}]},\"revision\":\"2\"},{\"id\":\"01a0f3be-1b4d-7e34-b071-c96657d02c7d\",\"pageId\":\"01a0f3a9-c9a1-75e4-ab3a-ba9f2671f298\",\"parentBlockId\":null,\"sortKey\":\"000000000006\",\"type\":\"audio\",\"schemaVersion\":1,\"data\":{\"caption\":[],\"fileId\":\"01a0f3be-1af7-7a3e-8b82-924b17c3e065\"},\"revision\":\"2\"},{\"id\":\"01a0f3c6-ca9d-73e7-a310-5af9f2f1f6d6\",\"pageId\":\"01a0f3a9-c9a1-75e4-ab3a-ba9f2671f298\",\"parentBlockId\":null,\"sortKey\":\"000000000007\",\"type\":\"paragraph\",\"schemaVersion\":1,\"data\":{\"richText\":[{\"text\":\"Final candidate saved marker\"}]},\"revision\":\"1\"}],\"snapshotCursor\":\"48\",\"attachmentFileIds\":[\"01a0f3be-1af7-7a3e-8b82-924b17c3e065\"],\"recoveryMetadataVersion\":3}",
+          "created_at": "2026-09-30T19:26:30.21826Z"
+        }
+      ]
+    },
+    "page_links": {
+      "count": 0,
+      "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "rows": []
+    },
+    "page_metadata": {
+      "count": 4,
+      "sha256": "7d3cbcb4d708e395e50447c8370733409334f4f3623902978a04d2dd9173d8d2",
+      "rows": [
+        {
+          "page_id": "01a0f3a9-24d5-7099-b61c-7ce3a04e84f9",
+          "archived": 0,
+          "icon": null,
+          "cover_file_id": null,
+          "favorite": 0,
+          "last_opened_at": null,
+          "archived_at": null
+        },
+        {
+          "page_id": "01a0f3a9-c9a1-75e4-ab3a-ba9f2671f298",
+          "archived": 0,
+          "icon": null,
+          "cover_file_id": null,
+          "favorite": 0,
+          "last_opened_at": null,
+          "archived_at": null
+        },
+        {
+          "page_id": "01a0f3bf-d4f4-7ff3-9ccc-06b9a80177ac",
+          "archived": 0,
+          "icon": null,
+          "cover_file_id": null,
+          "favorite": 0,
+          "last_opened_at": null,
+          "archived_at": null
+        },
+        {
+          "page_id": "01a0f3c6-da5a-7838-92c7-53e3cc0281e7",
+          "archived": 0,
+          "icon": null,
+          "cover_file_id": null,
+          "favorite": 0,
+          "last_opened_at": null,
+          "archived_at": null
+        }
+      ]
+    }
+  }
+}

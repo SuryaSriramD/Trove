@@ -1,0 +1,7 @@
+[  4%] Built target vendor-hash
+[ 12%] Built target ggml-base
+[ 13%] Built target ggml-blas
+[ 51%] Built target ggml-metal
+[ 64%] Built target ggml-cpu
+[ 66%] Built target ggml
+[100%] Built target llama

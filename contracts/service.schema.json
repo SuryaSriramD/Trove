@@ -1,0 +1,4016 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://trove.local/contracts/service.schema.json",
+  "title": "service",
+  "$ref": "#/$defs/BatchRequest",
+  "$defs": {
+    "EntityRef": {
+      "type": "object",
+      "properties": {
+        "entityType": {
+          "type": "string",
+          "enum": [
+            "page",
+            "block",
+            "collection",
+            "property",
+            "record",
+            "view",
+            "container",
+            "file",
+            "meeting",
+            "transcript_segment",
+            "memory",
+            "project",
+            "import_plan",
+            "job"
+          ]
+        },
+        "entityId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        }
+      },
+      "required": [
+        "entityType",
+        "entityId"
+      ],
+      "additionalProperties": false
+    },
+    "ExpectedRevision": {
+      "type": "object",
+      "properties": {
+        "target": {
+          "$ref": "#/$defs/EntityRef"
+        },
+        "revision": {
+          "oneOf": [
+            {
+              "$ref": "domain.schema.json#/$defs/Revision"
+            },
+            {
+              "const": "0"
+            }
+          ]
+        }
+      },
+      "required": [
+        "target",
+        "revision"
+      ],
+      "additionalProperties": false
+    },
+    "Error": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "string",
+          "enum": [
+            "INVALID_REQUEST",
+            "UNSUPPORTED_VERSION",
+            "NOT_FOUND",
+            "CONFLICT",
+            "SCOPE_DENIED",
+            "APPROVAL_REQUIRED",
+            "APPROVAL_EXPIRED",
+            "IDEMPOTENCY_CONFLICT",
+            "CANCELLED",
+            "ALREADY_COMMITTED",
+            "RESOURCE_EXHAUSTED",
+            "WORKSPACE_LOCKED",
+            "UNSUPPORTED_SCHEMA",
+            "IMPORT_CONFLICT",
+            "INTEGRITY_ERROR",
+            "WORKER_FAILED",
+            "INTERNAL"
+          ]
+        },
+        "message": {
+          "type": "string"
+        },
+        "retryable": {
+          "type": "boolean"
+        },
+        "requestId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "details": {
+          "type": "object",
+          "properties": {
+            "path": {
+              "type": "string"
+            },
+            "currentRevisions": {
+              "type": "array",
+              "items": {
+                "$ref": "#/$defs/ExpectedRevision"
+              },
+              "maxItems": 1000
+            },
+            "requiredApprovalHash": {
+              "type": "string"
+            },
+            "retryAfterMs": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 9007199254740991
+            },
+            "jobId": {
+              "$ref": "domain.schema.json#/$defs/Id"
+            }
+          },
+          "required": [],
+          "additionalProperties": false
+        }
+      },
+      "required": [
+        "code",
+        "message",
+        "retryable",
+        "requestId"
+      ],
+      "additionalProperties": false
+    },
+    "Actor": {
+      "type": "object",
+      "properties": {
+        "kind": {
+          "type": "string",
+          "enum": [
+            "user",
+            "local_ai",
+            "external_client",
+            "importer",
+            "job",
+            "automation",
+            "migration"
+          ]
+        },
+        "actorId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "runId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        }
+      },
+      "required": [
+        "kind",
+        "actorId"
+      ],
+      "additionalProperties": false
+    },
+    "ExecutionContext": {
+      "type": "object",
+      "properties": {
+        "actor": {
+          "$ref": "#/$defs/Actor"
+        },
+        "origin": {
+          "type": "string",
+          "enum": [
+            "user",
+            "ai",
+            "external",
+            "import",
+            "restore",
+            "automation",
+            "system",
+            "migration"
+          ]
+        },
+        "scope": {
+          "$ref": "domain.schema.json#/$defs/Scope"
+        },
+        "scopeGrantId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "policyRevision": {
+          "$ref": "domain.schema.json#/$defs/Revision"
+        },
+        "approvalId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "causationId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        }
+      },
+      "required": [
+        "actor",
+        "origin",
+        "scope",
+        "scopeGrantId",
+        "policyRevision"
+      ],
+      "additionalProperties": false
+    },
+    "Approval": {
+      "type": "object",
+      "properties": {
+        "approvalId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "workspaceId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "actorId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "scopeGrantId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "policyRevision": {
+          "$ref": "domain.schema.json#/$defs/Revision"
+        },
+        "commandHash": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "expectedRevisions": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/ExpectedRevision"
+          },
+          "maxItems": 1000
+        },
+        "expiresAt": {
+          "$ref": "domain.schema.json#/$defs/Timestamp"
+        },
+        "state": {
+          "type": "string",
+          "enum": [
+            "pending",
+            "approved",
+            "consumed",
+            "revoked",
+            "expired"
+          ]
+        },
+        "approvedBy": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        }
+      },
+      "required": [
+        "approvalId",
+        "workspaceId",
+        "actorId",
+        "scopeGrantId",
+        "policyRevision",
+        "commandHash",
+        "expectedRevisions",
+        "expiresAt",
+        "state"
+      ],
+      "additionalProperties": false
+    },
+    "MutationMeta": {
+      "type": "object",
+      "properties": {
+        "idempotencyKey": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "scopeGrantId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "approvalId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "expectedRevisions": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/ExpectedRevision"
+          },
+          "maxItems": 1000
+        }
+      },
+      "required": [
+        "idempotencyKey",
+        "scopeGrantId",
+        "expectedRevisions"
+      ],
+      "additionalProperties": false
+    },
+    "ValueInput": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "type": "string",
+          "not": {
+            "const": "title"
+          }
+        },
+        "schemaVersion": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "value": {
+          "type": [
+            "object",
+            "array",
+            "string",
+            "number",
+            "integer",
+            "boolean",
+            "null"
+          ]
+        }
+      },
+      "required": [
+        "type",
+        "schemaVersion",
+        "value"
+      ],
+      "additionalProperties": false
+    },
+    "RichTextInput": {
+      "$ref": "domain.schema.json#/$defs/RichText"
+    },
+    "BlockInput": {
+      "type": "object",
+      "properties": {
+        "blockId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "pageId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "parentBlockId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "type": {
+          "type": "string"
+        },
+        "schemaVersion": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "data": {
+          "type": [
+            "object",
+            "array",
+            "string",
+            "number",
+            "integer",
+            "boolean",
+            "null"
+          ]
+        },
+        "afterBlockId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        }
+      },
+      "required": [
+        "blockId",
+        "pageId",
+        "type",
+        "schemaVersion",
+        "data"
+      ],
+      "additionalProperties": false
+    },
+    "P2ChartConfig": {
+      "type": "object",
+      "properties": {
+        "groupPropertyId": {
+          "oneOf": [
+            {
+              "$ref": "domain.schema.json#/$defs/Id"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "valuePropertyId": {
+          "oneOf": [
+            {
+              "$ref": "domain.schema.json#/$defs/Id"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "aggregation": {
+          "type": "string",
+          "enum": [
+            "count",
+            "sum",
+            "average",
+            "min",
+            "max"
+          ]
+        },
+        "visualization": {
+          "type": "string",
+          "enum": [
+            "bar",
+            "donut"
+          ]
+        }
+      },
+      "required": [
+        "groupPropertyId",
+        "valuePropertyId",
+        "aggregation",
+        "visualization"
+      ],
+      "additionalProperties": false
+    },
+    "P2FormConfig": {
+      "type": "object",
+      "properties": {
+        "enabled": {
+          "type": "boolean"
+        },
+        "requiredPropertyIds": {
+          "type": "array",
+          "items": {
+            "$ref": "domain.schema.json#/$defs/Id"
+          },
+          "maxItems": 64
+        }
+      },
+      "required": [
+        "enabled",
+        "requiredPropertyIds"
+      ],
+      "additionalProperties": false
+    },
+    "P2RowButton": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "label": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 120
+        },
+        "propertyId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "value": {
+          "$ref": "#/$defs/ValueInput"
+        },
+        "confirmationRequired": {
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "id",
+        "label",
+        "propertyId",
+        "value",
+        "confirmationRequired"
+      ],
+      "additionalProperties": false
+    },
+    "P2DatabaseConfig": {
+      "type": "object",
+      "properties": {
+        "chart": {
+          "$ref": "#/$defs/P2ChartConfig"
+        },
+        "form": {
+          "$ref": "#/$defs/P2FormConfig"
+        },
+        "buttons": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/P2RowButton"
+          },
+          "maxItems": 16
+        }
+      },
+      "required": [
+        "chart",
+        "form",
+        "buttons"
+      ],
+      "additionalProperties": false
+    },
+    "CreatePage": {
+      "type": "object",
+      "properties": {
+        "kind": {
+          "const": "page.create"
+        },
+        "pageId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "title": {
+          "type": "string"
+        },
+        "parentPageId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        }
+      },
+      "required": [
+        "kind",
+        "pageId",
+        "title"
+      ],
+      "additionalProperties": false
+    },
+    "UpdatePage": {
+      "type": "object",
+      "properties": {
+        "kind": {
+          "const": "page.update"
+        },
+        "pageId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "title": {
+          "type": "string"
+        },
+        "archived": {
+          "type": "boolean"
+        },
+        "icon": {
+          "oneOf": [
+            {
+              "type": "string",
+              "maxLength": 128
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "coverFileId": {
+          "oneOf": [
+            {
+              "$ref": "domain.schema.json#/$defs/Id"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "required": [
+        "kind",
+        "pageId"
+      ],
+      "additionalProperties": false
+    },
+    "MovePage": {
+      "type": "object",
+      "properties": {
+        "kind": {
+          "const": "page.move"
+        },
+        "pageId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "parentPageId": {
+          "oneOf": [
+            {
+              "$ref": "domain.schema.json#/$defs/Id"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "required": [
+        "kind",
+        "pageId",
+        "parentPageId"
+      ],
+      "additionalProperties": false
+    },
+    "TrashPage": {
+      "type": "object",
+      "properties": {
+        "kind": {
+          "const": "page.trash"
+        },
+        "pageId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "includeDescendants": {
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "kind",
+        "pageId",
+        "includeDescendants"
+      ],
+      "additionalProperties": false
+    },
+    "InsertBlock": {
+      "type": "object",
+      "properties": {
+        "kind": {
+          "const": "block.insert"
+        },
+        "block": {
+          "$ref": "#/$defs/BlockInput"
+        }
+      },
+      "required": [
+        "kind",
+        "block"
+      ],
+      "additionalProperties": false
+    },
+    "UpdateBlock": {
+      "type": "object",
+      "properties": {
+        "kind": {
+          "const": "block.update"
+        },
+        "blockId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "type": {
+          "type": "string"
+        },
+        "schemaVersion": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "data": {
+          "type": [
+            "object",
+            "array",
+            "string",
+            "number",
+            "integer",
+            "boolean",
+            "null"
+          ]
+        }
+      },
+      "required": [
+        "kind",
+        "blockId",
+        "type",
+        "schemaVersion",
+        "data"
+      ],
+      "additionalProperties": false
+    },
+    "DeleteBlock": {
+      "type": "object",
+      "properties": {
+        "kind": {
+          "const": "block.delete"
+        },
+        "blockId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "includeDescendants": {
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "kind",
+        "blockId",
+        "includeDescendants"
+      ],
+      "additionalProperties": false
+    },
+    "MoveBlock": {
+      "type": "object",
+      "properties": {
+        "kind": {
+          "const": "block.move"
+        },
+        "blockId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "pageId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "parentBlockId": {
+          "oneOf": [
+            {
+              "$ref": "domain.schema.json#/$defs/Id"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "afterBlockId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        }
+      },
+      "required": [
+        "kind",
+        "blockId",
+        "pageId",
+        "parentBlockId"
+      ],
+      "additionalProperties": false
+    },
+    "ReorderBlocks": {
+      "type": "object",
+      "properties": {
+        "kind": {
+          "const": "block.reorder"
+        },
+        "pageId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "parentBlockId": {
+          "oneOf": [
+            {
+              "$ref": "domain.schema.json#/$defs/Id"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "orderedBlockIds": {
+          "type": "array",
+          "items": {
+            "$ref": "domain.schema.json#/$defs/Id"
+          },
+          "maxItems": 1000
+        }
+      },
+      "required": [
+        "kind",
+        "pageId",
+        "parentBlockId",
+        "orderedBlockIds"
+      ],
+      "additionalProperties": false
+    },
+    "CreateCollection": {
+      "type": "object",
+      "properties": {
+        "kind": {
+          "const": "collection.create"
+        },
+        "collectionId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "owningPageId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "titlePropertyId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "title": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "kind",
+        "collectionId",
+        "owningPageId",
+        "titlePropertyId",
+        "title"
+      ],
+      "additionalProperties": false
+    },
+    "AddProperty": {
+      "type": "object",
+      "properties": {
+        "kind": {
+          "const": "collection.addProperty"
+        },
+        "propertyId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "collectionId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "name": {
+          "type": "string"
+        },
+        "type": {
+          "type": "string"
+        },
+        "schemaVersion": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "config": {
+          "type": [
+            "object",
+            "array",
+            "string",
+            "number",
+            "integer",
+            "boolean",
+            "null"
+          ]
+        }
+      },
+      "required": [
+        "kind",
+        "propertyId",
+        "collectionId",
+        "name",
+        "type",
+        "schemaVersion",
+        "config"
+      ],
+      "additionalProperties": false
+    },
+    "CreateRecord": {
+      "type": "object",
+      "properties": {
+        "kind": {
+          "const": "record.create"
+        },
+        "recordId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "collectionId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "pageId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "title": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "kind",
+        "recordId",
+        "collectionId",
+        "pageId",
+        "title"
+      ],
+      "additionalProperties": false
+    },
+    "SetValue": {
+      "type": "object",
+      "properties": {
+        "kind": {
+          "const": "record.setValue"
+        },
+        "recordId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "propertyId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "value": {
+          "$ref": "#/$defs/ValueInput"
+        }
+      },
+      "required": [
+        "kind",
+        "recordId",
+        "propertyId",
+        "value"
+      ],
+      "additionalProperties": false
+    },
+    "ClearValue": {
+      "type": "object",
+      "properties": {
+        "kind": {
+          "const": "record.clearValue"
+        },
+        "recordId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "propertyId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        }
+      },
+      "required": [
+        "kind",
+        "recordId",
+        "propertyId"
+      ],
+      "additionalProperties": false
+    },
+    "SaveView": {
+      "type": "object",
+      "properties": {
+        "kind": {
+          "const": "view.save"
+        },
+        "viewId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "collectionId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "owningPageId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "containerId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "type": {
+          "type": "string"
+        },
+        "schemaVersion": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "config": {
+          "type": [
+            "object",
+            "array",
+            "string",
+            "number",
+            "integer",
+            "boolean",
+            "null"
+          ]
+        },
+        "query": {
+          "$ref": "domain.schema.json#/$defs/ViewQuery"
+        },
+        "name": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "kind",
+        "viewId",
+        "collectionId",
+        "owningPageId",
+        "type",
+        "schemaVersion",
+        "config",
+        "query",
+        "name"
+      ],
+      "additionalProperties": false
+    },
+    "SetProjectScope": {
+      "type": "object",
+      "properties": {
+        "kind": {
+          "const": "project.setScope"
+        },
+        "projectId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "memberPageIds": {
+          "type": "array",
+          "items": {
+            "$ref": "domain.schema.json#/$defs/Id"
+          },
+          "maxItems": 1000
+        },
+        "pinnedPageIds": {
+          "type": "array",
+          "items": {
+            "$ref": "domain.schema.json#/$defs/Id"
+          },
+          "maxItems": 1000
+        },
+        "excludedPageIds": {
+          "type": "array",
+          "items": {
+            "$ref": "domain.schema.json#/$defs/Id"
+          },
+          "maxItems": 1000
+        },
+        "inheritAncestorPreferences": {
+          "type": "boolean"
+        },
+        "inheritWorkspacePreferences": {
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "kind",
+        "projectId",
+        "memberPageIds",
+        "pinnedPageIds",
+        "excludedPageIds",
+        "inheritAncestorPreferences",
+        "inheritWorkspacePreferences"
+      ],
+      "additionalProperties": false
+    },
+    "CreateContainer": {
+      "type": "object",
+      "properties": {
+        "kind": {
+          "const": "container.create"
+        },
+        "containerId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "owningPageId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "label": {
+          "type": "string"
+        },
+        "containerKind": {
+          "type": "string",
+          "enum": [
+            "database",
+            "project"
+          ]
+        },
+        "parentProjectId": {
+          "oneOf": [
+            {
+              "$ref": "domain.schema.json#/$defs/Id"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "required": [
+        "kind",
+        "containerId",
+        "owningPageId",
+        "label",
+        "containerKind",
+        "parentProjectId"
+      ],
+      "additionalProperties": false
+    },
+    "LinkCollection": {
+      "type": "object",
+      "properties": {
+        "kind": {
+          "const": "container.linkCollection"
+        },
+        "containerId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "collectionId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        }
+      },
+      "required": [
+        "kind",
+        "containerId",
+        "collectionId"
+      ],
+      "additionalProperties": false
+    },
+    "CreateTask": {
+      "type": "object",
+      "properties": {
+        "kind": {
+          "const": "task.create"
+        },
+        "recordId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "pageId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "title": {
+          "type": "string"
+        },
+        "collectionId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "statusPropertyId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        }
+      },
+      "required": [
+        "kind",
+        "recordId",
+        "pageId",
+        "title"
+      ],
+      "additionalProperties": false,
+      "dependentRequired": {
+        "collectionId": [
+          "statusPropertyId"
+        ],
+        "statusPropertyId": [
+          "collectionId"
+        ]
+      }
+    },
+    "EnsureTasks": {
+      "type": "object",
+      "properties": {
+        "kind": {
+          "const": "tasks.ensure"
+        },
+        "pageId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "collectionId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "titlePropertyId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "statusPropertyId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "duePropertyId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "defaultOptionId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "doneOptionId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        }
+      },
+      "required": [
+        "kind",
+        "pageId",
+        "collectionId",
+        "titlePropertyId",
+        "statusPropertyId",
+        "duePropertyId",
+        "defaultOptionId",
+        "doneOptionId"
+      ],
+      "additionalProperties": false
+    },
+    "PromoteTask": {
+      "type": "object",
+      "properties": {
+        "kind": {
+          "const": "task.promote"
+        },
+        "recordId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "statusPropertyId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        }
+      },
+      "required": [
+        "kind",
+        "recordId",
+        "statusPropertyId"
+      ],
+      "additionalProperties": false
+    },
+    "SetTaskStatus": {
+      "type": "object",
+      "properties": {
+        "kind": {
+          "const": "task.setStatus"
+        },
+        "recordId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "statusOptionId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        }
+      },
+      "required": [
+        "kind",
+        "recordId",
+        "statusOptionId"
+      ],
+      "additionalProperties": false
+    },
+    "AttachFile": {
+      "type": "object",
+      "properties": {
+        "kind": {
+          "const": "file.attach"
+        },
+        "fileId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "ingestHandle": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "pageId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "blockId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        }
+      },
+      "required": [
+        "kind",
+        "fileId",
+        "ingestHandle",
+        "pageId"
+      ],
+      "additionalProperties": false
+    },
+    "CreateMeeting": {
+      "type": "object",
+      "properties": {
+        "kind": {
+          "const": "meeting.create"
+        },
+        "meetingId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "pageId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "recordingFileId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "startedAt": {
+          "$ref": "domain.schema.json#/$defs/Timestamp"
+        }
+      },
+      "required": [
+        "kind",
+        "meetingId",
+        "pageId",
+        "recordingFileId",
+        "startedAt"
+      ],
+      "additionalProperties": false
+    },
+    "AppendTranscript": {
+      "type": "object",
+      "properties": {
+        "kind": {
+          "const": "meeting.appendSegments"
+        },
+        "meetingId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "segments": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "segmentId": {
+                "$ref": "domain.schema.json#/$defs/Id"
+              },
+              "blockId": {
+                "$ref": "domain.schema.json#/$defs/Id"
+              },
+              "startMs": {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 9007199254740991
+              },
+              "endMs": {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 9007199254740991
+              },
+              "text": {
+                "type": "string"
+              },
+              "speakerLabel": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "segmentId",
+              "blockId",
+              "startMs",
+              "endMs",
+              "text"
+            ],
+            "additionalProperties": false
+          },
+          "maxItems": 256
+        }
+      },
+      "required": [
+        "kind",
+        "meetingId",
+        "segments"
+      ],
+      "additionalProperties": false
+    },
+    "FinalizeMeeting": {
+      "type": "object",
+      "properties": {
+        "kind": {
+          "const": "meeting.finalize"
+        },
+        "meetingId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "durationMs": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        }
+      },
+      "required": [
+        "kind",
+        "meetingId",
+        "durationMs"
+      ],
+      "additionalProperties": false
+    },
+    "ProposeMemory": {
+      "type": "object",
+      "properties": {
+        "kind": {
+          "const": "memory.propose"
+        },
+        "memoryId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "pageId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "scope": {
+          "$ref": "domain.schema.json#/$defs/Scope"
+        },
+        "memoryKind": {
+          "type": "string",
+          "enum": [
+            "preference",
+            "project_context",
+            "decision"
+          ]
+        },
+        "content": {
+          "type": "string"
+        },
+        "pageRef": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "sources": {
+          "type": "array",
+          "items": {
+            "$ref": "domain.schema.json#/$defs/Location"
+          },
+          "maxItems": 64
+        },
+        "supersedesId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        }
+      },
+      "required": [
+        "kind",
+        "memoryId",
+        "pageId",
+        "scope",
+        "memoryKind",
+        "sources"
+      ],
+      "additionalProperties": false,
+      "oneOf": [
+        {
+          "required": [
+            "content"
+          ],
+          "not": {
+            "required": [
+              "pageRef"
+            ]
+          }
+        },
+        {
+          "required": [
+            "pageRef"
+          ],
+          "not": {
+            "required": [
+              "content"
+            ]
+          }
+        }
+      ],
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "memoryKind": {
+                "const": "project_context"
+              }
+            }
+          },
+          "then": {
+            "required": [
+              "pageRef"
+            ]
+          },
+          "else": {
+            "required": [
+              "content"
+            ]
+          }
+        }
+      ]
+    },
+    "ApproveMemory": {
+      "type": "object",
+      "properties": {
+        "kind": {
+          "const": "memory.approve"
+        },
+        "memoryId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        }
+      },
+      "required": [
+        "kind",
+        "memoryId"
+      ],
+      "additionalProperties": false
+    },
+    "ForgetMemory": {
+      "type": "object",
+      "properties": {
+        "kind": {
+          "const": "memory.forget"
+        },
+        "memoryId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        }
+      },
+      "required": [
+        "kind",
+        "memoryId"
+      ],
+      "additionalProperties": false
+    },
+    "UpdateMemory": {
+      "type": "object",
+      "properties": {
+        "kind": {
+          "const": "memory.update"
+        },
+        "memoryId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "content": {
+          "type": "string",
+          "maxLength": 65536
+        },
+        "sources": {
+          "type": "array",
+          "items": {
+            "$ref": "domain.schema.json#/$defs/Location"
+          },
+          "maxItems": 64
+        }
+      },
+      "required": [
+        "kind",
+        "memoryId"
+      ],
+      "additionalProperties": false,
+      "anyOf": [
+        {
+          "required": [
+            "content"
+          ]
+        },
+        {
+          "required": [
+            "sources"
+          ]
+        }
+      ]
+    },
+    "SetMemoryStatus": {
+      "type": "object",
+      "properties": {
+        "kind": {
+          "const": "memory.setStatus"
+        },
+        "memoryId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "status": {
+          "type": "string",
+          "enum": [
+            "proposed",
+            "disabled",
+            "superseded"
+          ]
+        }
+      },
+      "required": [
+        "kind",
+        "memoryId",
+        "status"
+      ],
+      "additionalProperties": false
+    },
+    "ApplyImportPlan": {
+      "type": "object",
+      "properties": {
+        "kind": {
+          "const": "import.applyPlan"
+        },
+        "planId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "planHash": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "resolutions": {
+          "type": "array",
+          "items": {
+            "$ref": "domain.schema.json#/$defs/ImportResolution"
+          },
+          "maxItems": 1000
+        }
+      },
+      "required": [
+        "kind",
+        "planId",
+        "planHash",
+        "resolutions"
+      ],
+      "additionalProperties": false
+    },
+    "RestoreRevision": {
+      "type": "object",
+      "properties": {
+        "kind": {
+          "const": "history.restore"
+        },
+        "pageId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "restoreRevision": {
+          "$ref": "domain.schema.json#/$defs/Revision"
+        },
+        "previewId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        }
+      },
+      "required": [
+        "kind",
+        "pageId",
+        "restoreRevision",
+        "previewId"
+      ],
+      "additionalProperties": false
+    },
+    "ConfigureCollection": {
+      "type": "object",
+      "properties": {
+        "kind": {
+          "const": "collection.configure"
+        },
+        "collectionId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "locked": {
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "kind",
+        "collectionId",
+        "locked"
+      ],
+      "additionalProperties": false
+    },
+    "ConfigureRecord": {
+      "type": "object",
+      "properties": {
+        "kind": {
+          "const": "record.configure"
+        },
+        "recordId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "parentRecordId": {
+          "oneOf": [
+            {
+              "$ref": "domain.schema.json#/$defs/Id"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "dependencyRecordIds": {
+          "type": "array",
+          "items": {
+            "$ref": "domain.schema.json#/$defs/Id"
+          },
+          "maxItems": 128
+        }
+      },
+      "required": [
+        "kind",
+        "recordId",
+        "parentRecordId",
+        "dependencyRecordIds"
+      ],
+      "additionalProperties": false
+    },
+    "SaveAutomation": {
+      "type": "object",
+      "properties": {
+        "kind": {
+          "const": "automation.save"
+        },
+        "pageId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "rule": {
+          "type": "object"
+        }
+      },
+      "required": [
+        "kind",
+        "pageId",
+        "rule"
+      ],
+      "additionalProperties": false
+    },
+    "RunAutomation": {
+      "type": "object",
+      "properties": {
+        "kind": {
+          "const": "automation.run"
+        },
+        "pageId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "ruleId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "occurrenceKey": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "eventId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "at": {
+          "$ref": "domain.schema.json#/$defs/Timestamp"
+        }
+      },
+      "required": [
+        "kind",
+        "pageId",
+        "ruleId",
+        "occurrenceKey",
+        "at"
+      ],
+      "additionalProperties": false
+    },
+    "StateAutomation": {
+      "type": "object",
+      "properties": {
+        "kind": {
+          "const": "automation.state"
+        },
+        "pageId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "ruleId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "enabled": {
+          "type": "boolean"
+        },
+        "paused": {
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "kind",
+        "pageId",
+        "ruleId",
+        "enabled",
+        "paused"
+      ],
+      "additionalProperties": false
+    },
+    "ConfigureP2Database": {
+      "type": "object",
+      "properties": {
+        "kind": {
+          "const": "database.p2Configure"
+        },
+        "collectionId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "config": {
+          "$ref": "#/$defs/P2DatabaseConfig"
+        }
+      },
+      "required": [
+        "kind",
+        "collectionId",
+        "config"
+      ],
+      "additionalProperties": false
+    },
+    "SubmitLocalForm": {
+      "type": "object",
+      "properties": {
+        "kind": {
+          "const": "database.formSubmit"
+        },
+        "collectionId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "recordId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "pageId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "title": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 2000
+        },
+        "values": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "propertyId": {
+                "$ref": "domain.schema.json#/$defs/Id"
+              },
+              "value": {
+                "$ref": "#/$defs/ValueInput"
+              }
+            },
+            "required": [
+              "propertyId",
+              "value"
+            ],
+            "additionalProperties": false
+          },
+          "maxItems": 128
+        }
+      },
+      "required": [
+        "kind",
+        "collectionId",
+        "recordId",
+        "pageId",
+        "title",
+        "values"
+      ],
+      "additionalProperties": false
+    },
+    "RunRowButton": {
+      "type": "object",
+      "properties": {
+        "kind": {
+          "const": "database.rowButtonRun"
+        },
+        "collectionId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "recordId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "buttonId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "confirmed": {
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "kind",
+        "collectionId",
+        "recordId",
+        "buttonId",
+        "confirmed"
+      ],
+      "additionalProperties": false
+    },
+    "SetPageDisplay": {
+      "type": "object",
+      "properties": {
+        "kind": {
+          "const": "page.display.set"
+        },
+        "pageId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "fullWidth": {
+          "type": "boolean"
+        },
+        "presentation": {
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "kind",
+        "pageId",
+        "fullWidth",
+        "presentation"
+      ],
+      "additionalProperties": false
+    },
+    "ActivatePersonalReview": {
+      "type": "object",
+      "properties": {
+        "kind": {
+          "const": "review.activate"
+        },
+        "pageId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "planBlockId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "enabled": {
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "kind",
+        "pageId",
+        "planBlockId",
+        "enabled"
+      ],
+      "additionalProperties": false
+    },
+    "AcceptPersonalReview": {
+      "type": "object",
+      "properties": {
+        "kind": {
+          "const": "review.accept"
+        },
+        "pageId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "runId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "blockId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "approved": {
+          "const": true
+        }
+      },
+      "required": [
+        "kind",
+        "pageId",
+        "runId",
+        "blockId",
+        "approved"
+      ],
+      "additionalProperties": false
+    },
+    "DismissPersonalReview": {
+      "type": "object",
+      "properties": {
+        "kind": {
+          "const": "review.dismiss"
+        },
+        "pageId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "runId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        }
+      },
+      "required": [
+        "kind",
+        "pageId",
+        "runId"
+      ],
+      "additionalProperties": false
+    },
+    "Command": {
+      "oneOf": [
+        {
+          "$ref": "#/$defs/CreatePage"
+        },
+        {
+          "$ref": "#/$defs/UpdatePage"
+        },
+        {
+          "$ref": "#/$defs/MovePage"
+        },
+        {
+          "$ref": "#/$defs/TrashPage"
+        },
+        {
+          "$ref": "#/$defs/InsertBlock"
+        },
+        {
+          "$ref": "#/$defs/UpdateBlock"
+        },
+        {
+          "$ref": "#/$defs/DeleteBlock"
+        },
+        {
+          "$ref": "#/$defs/MoveBlock"
+        },
+        {
+          "$ref": "#/$defs/ReorderBlocks"
+        },
+        {
+          "$ref": "#/$defs/CreateCollection"
+        },
+        {
+          "$ref": "#/$defs/AddProperty"
+        },
+        {
+          "$ref": "#/$defs/CreateRecord"
+        },
+        {
+          "$ref": "#/$defs/SetValue"
+        },
+        {
+          "$ref": "#/$defs/ClearValue"
+        },
+        {
+          "$ref": "#/$defs/SaveView"
+        },
+        {
+          "$ref": "#/$defs/SetProjectScope"
+        },
+        {
+          "$ref": "#/$defs/CreateContainer"
+        },
+        {
+          "$ref": "#/$defs/LinkCollection"
+        },
+        {
+          "$ref": "#/$defs/CreateTask"
+        },
+        {
+          "$ref": "#/$defs/EnsureTasks"
+        },
+        {
+          "$ref": "#/$defs/PromoteTask"
+        },
+        {
+          "$ref": "#/$defs/SetTaskStatus"
+        },
+        {
+          "$ref": "#/$defs/AttachFile"
+        },
+        {
+          "$ref": "#/$defs/CreateMeeting"
+        },
+        {
+          "$ref": "#/$defs/AppendTranscript"
+        },
+        {
+          "$ref": "#/$defs/FinalizeMeeting"
+        },
+        {
+          "$ref": "#/$defs/ProposeMemory"
+        },
+        {
+          "$ref": "#/$defs/ApproveMemory"
+        },
+        {
+          "$ref": "#/$defs/ForgetMemory"
+        },
+        {
+          "$ref": "#/$defs/UpdateMemory"
+        },
+        {
+          "$ref": "#/$defs/SetMemoryStatus"
+        },
+        {
+          "$ref": "#/$defs/ApplyImportPlan"
+        },
+        {
+          "$ref": "#/$defs/RestoreRevision"
+        },
+        {
+          "$ref": "#/$defs/ConfigureCollection"
+        },
+        {
+          "$ref": "#/$defs/ConfigureRecord"
+        },
+        {
+          "$ref": "#/$defs/SaveAutomation"
+        },
+        {
+          "$ref": "#/$defs/RunAutomation"
+        },
+        {
+          "$ref": "#/$defs/StateAutomation"
+        },
+        {
+          "$ref": "#/$defs/ConfigureP2Database"
+        },
+        {
+          "$ref": "#/$defs/SubmitLocalForm"
+        },
+        {
+          "$ref": "#/$defs/RunRowButton"
+        },
+        {
+          "$ref": "#/$defs/SetPageDisplay"
+        },
+        {
+          "$ref": "#/$defs/ActivatePersonalReview"
+        },
+        {
+          "$ref": "#/$defs/AcceptPersonalReview"
+        },
+        {
+          "$ref": "#/$defs/DismissPersonalReview"
+        }
+      ]
+    },
+    "DatabaseP2Request": {
+      "type": "object",
+      "properties": {
+        "contractVersion": {
+          "const": 1
+        },
+        "requestId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "workspaceId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "collectionId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        }
+      },
+      "required": [
+        "contractVersion",
+        "requestId",
+        "workspaceId",
+        "collectionId"
+      ],
+      "additionalProperties": false
+    },
+    "DatabaseChartRequest": {
+      "type": "object",
+      "properties": {
+        "contractVersion": {
+          "const": 1
+        },
+        "requestId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "workspaceId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "collectionId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        }
+      },
+      "required": [
+        "contractVersion",
+        "requestId",
+        "workspaceId",
+        "collectionId"
+      ],
+      "additionalProperties": false
+    },
+    "PageDisplayGetRequest": {
+      "type": "object",
+      "properties": {
+        "contractVersion": {
+          "const": 1
+        },
+        "requestId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "workspaceId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "pageId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        }
+      },
+      "required": [
+        "contractVersion",
+        "requestId",
+        "workspaceId",
+        "pageId"
+      ],
+      "additionalProperties": false
+    },
+    "GraphQueryRequest": {
+      "type": "object",
+      "properties": {
+        "contractVersion": {
+          "const": 1
+        },
+        "requestId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "workspaceId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "pageId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "query": {
+          "type": "string",
+          "maxLength": 8192
+        },
+        "includeSemantic": {
+          "type": "boolean"
+        },
+        "limit": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 100
+        }
+      },
+      "required": [
+        "contractVersion",
+        "requestId",
+        "workspaceId"
+      ],
+      "additionalProperties": false
+    },
+    "OCRStatusRequest": {
+      "type": "object",
+      "properties": {
+        "contractVersion": {
+          "const": 1
+        },
+        "requestId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "workspaceId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        }
+      },
+      "required": [
+        "contractVersion",
+        "requestId",
+        "workspaceId"
+      ],
+      "additionalProperties": false
+    },
+    "OCRRunRequest": {
+      "type": "object",
+      "properties": {
+        "contractVersion": {
+          "const": 1
+        },
+        "requestId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "workspaceId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "fileId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        }
+      },
+      "required": [
+        "contractVersion",
+        "requestId",
+        "workspaceId",
+        "fileId"
+      ],
+      "additionalProperties": false
+    },
+    "ReviewListRequest": {
+      "type": "object",
+      "properties": {
+        "contractVersion": {
+          "const": 1
+        },
+        "requestId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "workspaceId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        }
+      },
+      "required": [
+        "contractVersion",
+        "requestId",
+        "workspaceId"
+      ],
+      "additionalProperties": false
+    },
+    "ReviewRunRequest": {
+      "type": "object",
+      "properties": {
+        "contractVersion": {
+          "const": 1
+        },
+        "requestId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "workspaceId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "planBlockId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        }
+      },
+      "required": [
+        "contractVersion",
+        "requestId",
+        "workspaceId",
+        "planBlockId"
+      ],
+      "additionalProperties": false
+    },
+    "BatchRequest": {
+      "type": "object",
+      "properties": {
+        "contractVersion": {
+          "const": 1
+        },
+        "requestId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "workspaceId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "mutation": {
+          "$ref": "#/$defs/MutationMeta"
+        },
+        "commands": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/Command"
+          },
+          "maxItems": 256,
+          "minItems": 1
+        },
+        "cancellationId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        }
+      },
+      "required": [
+        "contractVersion",
+        "requestId",
+        "workspaceId",
+        "mutation",
+        "commands"
+      ],
+      "additionalProperties": false
+    },
+    "RevisionChange": {
+      "type": "object",
+      "properties": {
+        "target": {
+          "$ref": "#/$defs/EntityRef"
+        },
+        "before": {
+          "oneOf": [
+            {
+              "$ref": "domain.schema.json#/$defs/Revision"
+            },
+            {
+              "const": "0"
+            }
+          ]
+        },
+        "after": {
+          "$ref": "domain.schema.json#/$defs/Revision"
+        },
+        "deleted": {
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "target",
+        "before",
+        "after",
+        "deleted"
+      ],
+      "additionalProperties": false
+    },
+    "BatchResult": {
+      "type": "object",
+      "properties": {
+        "requestId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "transactionId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "eventCursor": {
+          "$ref": "domain.schema.json#/$defs/Revision"
+        },
+        "revisions": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/RevisionChange"
+          },
+          "maxItems": 1000
+        },
+        "replayed": {
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "requestId",
+        "transactionId",
+        "eventCursor",
+        "revisions",
+        "replayed"
+      ],
+      "additionalProperties": false
+    },
+    "BatchResponse": {
+      "oneOf": [
+        {
+          "type": "object",
+          "properties": {
+            "ok": {
+              "const": true
+            },
+            "result": {
+              "$ref": "#/$defs/BatchResult"
+            }
+          },
+          "required": [
+            "ok",
+            "result"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "ok": {
+              "const": false
+            },
+            "error": {
+              "$ref": "#/$defs/Error"
+            }
+          },
+          "required": [
+            "ok",
+            "error"
+          ],
+          "additionalProperties": false
+        }
+      ]
+    },
+    "CommittedChangeEvent": {
+      "type": "object",
+      "properties": {
+        "contractVersion": {
+          "const": 1
+        },
+        "eventId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "workspaceId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "transactionId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "cursor": {
+          "$ref": "domain.schema.json#/$defs/Revision"
+        },
+        "committedAt": {
+          "$ref": "domain.schema.json#/$defs/Timestamp"
+        },
+        "context": {
+          "$ref": "#/$defs/ExecutionContext"
+        },
+        "revisions": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/RevisionChange"
+          },
+          "maxItems": 1000
+        },
+        "mutationHistoryId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "idempotencyKey": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "contractVersion",
+        "eventId",
+        "workspaceId",
+        "transactionId",
+        "cursor",
+        "committedAt",
+        "context",
+        "revisions",
+        "mutationHistoryId",
+        "idempotencyKey"
+      ],
+      "additionalProperties": false
+    },
+    "MutationHistory": {
+      "type": "object",
+      "properties": {
+        "historyId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "transactionId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "requestId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "context": {
+          "$ref": "#/$defs/ExecutionContext"
+        },
+        "approvalId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "commandHash": {
+          "type": "string"
+        },
+        "idempotencyKey": {
+          "type": "string"
+        },
+        "changes": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/RevisionChange"
+          },
+          "maxItems": 1000
+        },
+        "beforeSnapshotRefs": {
+          "type": "array",
+          "items": {
+            "$ref": "domain.schema.json#/$defs/Id"
+          },
+          "maxItems": 1000
+        },
+        "afterSnapshotRefs": {
+          "type": "array",
+          "items": {
+            "$ref": "domain.schema.json#/$defs/Id"
+          },
+          "maxItems": 1000
+        },
+        "committedAt": {
+          "$ref": "domain.schema.json#/$defs/Timestamp"
+        }
+      },
+      "required": [
+        "historyId",
+        "transactionId",
+        "requestId",
+        "context",
+        "commandHash",
+        "idempotencyKey",
+        "changes",
+        "beforeSnapshotRefs",
+        "afterSnapshotRefs",
+        "committedAt"
+      ],
+      "additionalProperties": false
+    },
+    "AllocateIdsRequest": {
+      "type": "object",
+      "properties": {
+        "contractVersion": {
+          "const": 1
+        },
+        "requestId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "workspaceId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "count": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 1000
+        }
+      },
+      "required": [
+        "contractVersion",
+        "requestId",
+        "workspaceId",
+        "count"
+      ],
+      "additionalProperties": false
+    },
+    "AllocateIdsResult": {
+      "type": "object",
+      "properties": {
+        "ids": {
+          "type": "array",
+          "items": {
+            "$ref": "domain.schema.json#/$defs/Id"
+          },
+          "maxItems": 1000
+        }
+      },
+      "required": [
+        "ids"
+      ],
+      "additionalProperties": false
+    },
+    "WorkspaceSnapshotRequest": {
+      "type": "object",
+      "properties": {
+        "contractVersion": {
+          "const": 1
+        },
+        "requestId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "workspaceId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        }
+      },
+      "required": [
+        "contractVersion",
+        "requestId",
+        "workspaceId"
+      ],
+      "additionalProperties": false
+    },
+    "BacklinksRequest": {
+      "type": "object",
+      "properties": {
+        "contractVersion": {
+          "const": 1
+        },
+        "requestId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "workspaceId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "pageId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        }
+      },
+      "required": [
+        "contractVersion",
+        "requestId",
+        "workspaceId",
+        "pageId"
+      ],
+      "additionalProperties": false
+    },
+    "BacklinksResult": {
+      "type": "object",
+      "properties": {
+        "links": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "pageId": {
+                "$ref": "domain.schema.json#/$defs/Id"
+              },
+              "blockId": {
+                "$ref": "domain.schema.json#/$defs/Id"
+              }
+            },
+            "required": [
+              "pageId",
+              "blockId"
+            ],
+            "additionalProperties": false
+          },
+          "maxItems": 10000
+        }
+      },
+      "required": [
+        "links"
+      ],
+      "additionalProperties": false
+    },
+    "JobsListRequest": {
+      "type": "object",
+      "properties": {
+        "contractVersion": {
+          "const": 1
+        },
+        "requestId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "workspaceId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "limit": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 200
+        },
+        "state": {
+          "type": "string",
+          "enum": [
+            "queued",
+            "running",
+            "retry_wait",
+            "cancel_requested",
+            "cancelled",
+            "succeeded",
+            "failed",
+            "interrupted"
+          ]
+        }
+      },
+      "required": [
+        "contractVersion",
+        "requestId",
+        "workspaceId",
+        "limit"
+      ],
+      "additionalProperties": false
+    },
+    "ReadPageRequest": {
+      "type": "object",
+      "properties": {
+        "contractVersion": {
+          "const": 1
+        },
+        "requestId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "workspaceId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "pageId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "atRevision": {
+          "$ref": "domain.schema.json#/$defs/Revision"
+        }
+      },
+      "required": [
+        "contractVersion",
+        "requestId",
+        "workspaceId",
+        "pageId"
+      ],
+      "additionalProperties": false
+    },
+    "ReadPageResult": {
+      "type": "object",
+      "properties": {
+        "page": {
+          "$ref": "domain.schema.json#/$defs/Page"
+        },
+        "blocks": {
+          "type": "array",
+          "items": {
+            "$ref": "domain.schema.json#/$defs/Block"
+          },
+          "maxItems": 1000
+        },
+        "snapshotCursor": {
+          "oneOf": [
+            {
+              "$ref": "domain.schema.json#/$defs/Revision"
+            },
+            {
+              "const": "0"
+            }
+          ]
+        }
+      },
+      "required": [
+        "page",
+        "blocks",
+        "snapshotCursor"
+      ],
+      "additionalProperties": false
+    },
+    "HistoryListRequest": {
+      "type": "object",
+      "properties": {
+        "contractVersion": {
+          "const": 1
+        },
+        "requestId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "workspaceId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "pageId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        }
+      },
+      "required": [
+        "contractVersion",
+        "requestId",
+        "workspaceId",
+        "pageId"
+      ],
+      "additionalProperties": false
+    },
+    "HistoryListResult": {
+      "type": "object",
+      "properties": {
+        "revisions": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "revision": {
+                "$ref": "domain.schema.json#/$defs/Revision"
+              },
+              "createdAt": {
+                "$ref": "domain.schema.json#/$defs/Timestamp"
+              },
+              "deleted": {
+                "type": "boolean"
+              },
+              "title": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "revision",
+              "createdAt",
+              "deleted",
+              "title"
+            ],
+            "additionalProperties": false
+          },
+          "maxItems": 10000
+        },
+        "snapshotCursor": {
+          "oneOf": [
+            {
+              "$ref": "domain.schema.json#/$defs/Revision"
+            },
+            {
+              "const": "0"
+            }
+          ]
+        }
+      },
+      "required": [
+        "revisions",
+        "snapshotCursor"
+      ],
+      "additionalProperties": false
+    },
+    "HistoryPreviewRestoreRequest": {
+      "type": "object",
+      "properties": {
+        "contractVersion": {
+          "const": 1
+        },
+        "requestId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "workspaceId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "pageId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "restoreRevision": {
+          "$ref": "domain.schema.json#/$defs/Revision"
+        }
+      },
+      "required": [
+        "contractVersion",
+        "requestId",
+        "workspaceId",
+        "pageId",
+        "restoreRevision"
+      ],
+      "additionalProperties": false
+    },
+    "HistoryPreviewRestoreResult": {
+      "type": "object",
+      "properties": {
+        "previewId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "pageId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "restoreRevision": {
+          "$ref": "domain.schema.json#/$defs/Revision"
+        },
+        "expiresAt": {
+          "$ref": "domain.schema.json#/$defs/Timestamp"
+        },
+        "expectedRevisions": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/ExpectedRevision"
+          },
+          "maxItems": 1000
+        },
+        "affectedFileIds": {
+          "type": "array",
+          "items": {
+            "$ref": "domain.schema.json#/$defs/Id"
+          },
+          "maxItems": 1000
+        },
+        "snapshot": {
+          "$ref": "#/$defs/ReadPageResult"
+        },
+        "warnings": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "maxItems": 1000
+        }
+      },
+      "required": [
+        "previewId",
+        "pageId",
+        "restoreRevision",
+        "expiresAt",
+        "expectedRevisions",
+        "affectedFileIds",
+        "snapshot",
+        "warnings"
+      ],
+      "additionalProperties": false
+    },
+    "HistoryTrashRequest": {
+      "type": "object",
+      "properties": {
+        "contractVersion": {
+          "const": 1
+        },
+        "requestId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "workspaceId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        }
+      },
+      "required": [
+        "contractVersion",
+        "requestId",
+        "workspaceId"
+      ],
+      "additionalProperties": false
+    },
+    "HistoryTrashResult": {
+      "type": "object",
+      "properties": {
+        "pages": {
+          "type": "array",
+          "items": {
+            "$ref": "domain.schema.json#/$defs/Page"
+          },
+          "maxItems": 10000
+        }
+      },
+      "required": [
+        "pages"
+      ],
+      "additionalProperties": false
+    },
+    "HistoryRecoveryPointRequest": {
+      "type": "object",
+      "properties": {
+        "contractVersion": {
+          "const": 1
+        },
+        "requestId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "workspaceId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "label": {
+          "type": "string",
+          "maxLength": 256
+        },
+        "idempotencyKey": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        }
+      },
+      "required": [
+        "contractVersion",
+        "requestId",
+        "workspaceId",
+        "label",
+        "idempotencyKey"
+      ],
+      "additionalProperties": false
+    },
+    "HistoryRecoveryPointResult": {
+      "type": "object",
+      "properties": {
+        "recoveryPointId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "createdAt": {
+          "$ref": "domain.schema.json#/$defs/Timestamp"
+        },
+        "eventCursor": {
+          "oneOf": [
+            {
+              "$ref": "domain.schema.json#/$defs/Revision"
+            },
+            {
+              "const": "0"
+            }
+          ]
+        }
+      },
+      "required": [
+        "recoveryPointId",
+        "createdAt",
+        "eventCursor"
+      ],
+      "additionalProperties": false
+    },
+    "QueryRecordsRequest": {
+      "type": "object",
+      "properties": {
+        "contractVersion": {
+          "const": 1
+        },
+        "requestId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "workspaceId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "collectionId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "viewId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "cursor": {
+          "type": "string"
+        },
+        "limit": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 200
+        }
+      },
+      "required": [
+        "contractVersion",
+        "requestId",
+        "workspaceId",
+        "collectionId",
+        "limit"
+      ],
+      "additionalProperties": false
+    },
+    "QueryRecordsResult": {
+      "type": "object",
+      "properties": {
+        "recordIds": {
+          "type": "array",
+          "items": {
+            "$ref": "domain.schema.json#/$defs/Id"
+          },
+          "maxItems": 200
+        },
+        "records": {
+          "type": "array",
+          "items": {
+            "$ref": "domain.schema.json#/$defs/Record"
+          },
+          "maxItems": 200
+        },
+        "nextCursor": {
+          "type": "string"
+        },
+        "snapshotCursor": {
+          "oneOf": [
+            {
+              "$ref": "domain.schema.json#/$defs/Revision"
+            },
+            {
+              "const": "0"
+            }
+          ]
+        }
+      },
+      "required": [
+        "recordIds",
+        "records",
+        "snapshotCursor"
+      ],
+      "additionalProperties": false
+    },
+    "SearchRequest": {
+      "type": "object",
+      "properties": {
+        "contractVersion": {
+          "const": 1
+        },
+        "requestId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "workspaceId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "query": {
+          "type": "string",
+          "maxLength": 8192
+        },
+        "scope": {
+          "$ref": "domain.schema.json#/$defs/Scope"
+        },
+        "limit": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 100
+        },
+        "mode": {
+          "type": "string",
+          "enum": [
+            "keyword",
+            "hybrid"
+          ]
+        }
+      },
+      "required": [
+        "contractVersion",
+        "requestId",
+        "workspaceId",
+        "query",
+        "scope",
+        "limit",
+        "mode"
+      ],
+      "additionalProperties": false
+    },
+    "SearchHit": {
+      "type": "object",
+      "properties": {
+        "location": {
+          "$ref": "domain.schema.json#/$defs/Location"
+        },
+        "excerpt": {
+          "type": "string"
+        },
+        "contentHash": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "score": {
+          "type": "number"
+        },
+        "sourceState": {
+          "type": "string",
+          "enum": [
+            "current",
+            "stale",
+            "deleted",
+            "unavailable"
+          ]
+        }
+      },
+      "required": [
+        "location",
+        "excerpt",
+        "contentHash",
+        "score",
+        "sourceState"
+      ],
+      "additionalProperties": false
+    },
+    "SearchResult": {
+      "type": "object",
+      "properties": {
+        "hits": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/SearchHit"
+          },
+          "maxItems": 100
+        },
+        "snapshotCursor": {
+          "oneOf": [
+            {
+              "$ref": "domain.schema.json#/$defs/Revision"
+            },
+            {
+              "const": "0"
+            }
+          ]
+        },
+        "indexGeneration": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "partial": {
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "hits",
+        "snapshotCursor",
+        "indexGeneration",
+        "partial"
+      ],
+      "additionalProperties": false
+    },
+    "ResolveCitationRequest": {
+      "type": "object",
+      "properties": {
+        "contractVersion": {
+          "const": 1
+        },
+        "requestId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "workspaceId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "location": {
+          "$ref": "domain.schema.json#/$defs/Location"
+        }
+      },
+      "required": [
+        "contractVersion",
+        "requestId",
+        "workspaceId",
+        "location"
+      ],
+      "additionalProperties": false
+    },
+    "ResolveCitationResult": {
+      "type": "object",
+      "properties": {
+        "location": {
+          "$ref": "domain.schema.json#/$defs/Location"
+        },
+        "state": {
+          "type": "string",
+          "enum": [
+            "current",
+            "stale",
+            "deleted",
+            "unavailable"
+          ]
+        },
+        "currentRevision": {
+          "$ref": "domain.schema.json#/$defs/Revision"
+        },
+        "excerpt": {
+          "type": "string"
+        },
+        "historicalSnapshotRef": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        }
+      },
+      "required": [
+        "location",
+        "state"
+      ],
+      "additionalProperties": false
+    },
+    "ReadEventsRequest": {
+      "type": "object",
+      "properties": {
+        "contractVersion": {
+          "const": 1
+        },
+        "requestId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "workspaceId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "afterCursor": {
+          "oneOf": [
+            {
+              "$ref": "domain.schema.json#/$defs/Revision"
+            },
+            {
+              "const": "0"
+            }
+          ]
+        },
+        "limit": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 500
+        }
+      },
+      "required": [
+        "contractVersion",
+        "requestId",
+        "workspaceId",
+        "afterCursor",
+        "limit"
+      ],
+      "additionalProperties": false
+    },
+    "ReadEventsResult": {
+      "type": "object",
+      "properties": {
+        "events": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/CommittedChangeEvent"
+          },
+          "maxItems": 500
+        },
+        "nextCursor": {
+          "oneOf": [
+            {
+              "$ref": "domain.schema.json#/$defs/Revision"
+            },
+            {
+              "const": "0"
+            }
+          ]
+        },
+        "requiresSnapshot": {
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "events",
+        "nextCursor",
+        "requiresSnapshot"
+      ],
+      "additionalProperties": false
+    },
+    "CancelRequest": {
+      "type": "object",
+      "properties": {
+        "contractVersion": {
+          "const": 1
+        },
+        "requestId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "workspaceId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "cancellationId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        }
+      },
+      "required": [
+        "contractVersion",
+        "requestId",
+        "workspaceId",
+        "cancellationId"
+      ],
+      "additionalProperties": false
+    },
+    "CancelResult": {
+      "type": "object",
+      "properties": {
+        "cancellationId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "state": {
+          "type": "string",
+          "enum": [
+            "requested",
+            "cancelled",
+            "already_committed",
+            "not_found"
+          ]
+        },
+        "transactionId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        }
+      },
+      "required": [
+        "cancellationId",
+        "state"
+      ],
+      "additionalProperties": false
+    },
+    "PrepareFileRequest": {
+      "type": "object",
+      "properties": {
+        "contractVersion": {
+          "const": 1
+        },
+        "requestId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "workspaceId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "selectionHandle": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        }
+      },
+      "required": [
+        "contractVersion",
+        "requestId",
+        "workspaceId",
+        "selectionHandle"
+      ],
+      "additionalProperties": false
+    },
+    "PrepareFileResult": {
+      "type": "object",
+      "properties": {
+        "ingestHandle": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "contentHash": {
+          "$ref": "domain.schema.json#/$defs/Hash"
+        },
+        "sizeBytes": {
+          "type": "string",
+          "pattern": "^(0|[1-9][0-9]{0,18})$"
+        },
+        "mediaType": {
+          "type": "string"
+        },
+        "fileId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "expiresAt": {
+          "$ref": "domain.schema.json#/$defs/Timestamp"
+        }
+      },
+      "required": [
+        "ingestHandle",
+        "contentHash",
+        "sizeBytes",
+        "mediaType",
+        "fileId",
+        "expiresAt"
+      ],
+      "additionalProperties": false
+    },
+    "ImportItemOutcome": {
+      "type": "object",
+      "properties": {
+        "sourceLocator": {
+          "type": "string"
+        },
+        "mappingId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "outcome": {
+          "type": "string",
+          "enum": [
+            "preserved",
+            "adapted",
+            "partial",
+            "unsupported_but_retained",
+            "failed"
+          ]
+        },
+        "reason": {
+          "type": "string"
+        },
+        "retainedFileId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "location": {
+          "$ref": "domain.schema.json#/$defs/Location"
+        }
+      },
+      "required": [
+        "sourceLocator",
+        "outcome",
+        "reason"
+      ],
+      "additionalProperties": false
+    },
+    "ImportReport": {
+      "type": "object",
+      "properties": {
+        "runId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "jobId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "state": {
+          "type": "string",
+          "enum": [
+            "preview",
+            "running",
+            "partial",
+            "completed",
+            "failed",
+            "cancelled"
+          ]
+        },
+        "sourceCompleteness": {
+          "type": "string",
+          "enum": [
+            "complete",
+            "partial",
+            "unknown"
+          ]
+        },
+        "discoveredCount": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "accountedCount": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "items": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/ImportItemOutcome"
+          },
+          "maxItems": 10000
+        },
+        "committedBatchIds": {
+          "type": "array",
+          "items": {
+            "$ref": "domain.schema.json#/$defs/Id"
+          },
+          "maxItems": 10000
+        },
+        "unresolvedSourceIds": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "maxItems": 10000
+        },
+        "sourceOmissions": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "maxItems": 10000
+        }
+      },
+      "required": [
+        "runId",
+        "jobId",
+        "state",
+        "sourceCompleteness",
+        "discoveredCount",
+        "accountedCount",
+        "items",
+        "committedBatchIds",
+        "unresolvedSourceIds",
+        "sourceOmissions"
+      ],
+      "additionalProperties": false
+    },
+    "PreviewImportRequest": {
+      "type": "object",
+      "properties": {
+        "contractVersion": {
+          "const": 1
+        },
+        "requestId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "workspaceId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "sourceHandle": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "sourceNamespace": {
+          "type": "string"
+        },
+        "channel": {
+          "type": "string",
+          "enum": [
+            "zip",
+            "html",
+            "api"
+          ]
+        },
+        "destinationScope": {
+          "$ref": "domain.schema.json#/$defs/Scope"
+        }
+      },
+      "required": [
+        "contractVersion",
+        "requestId",
+        "workspaceId",
+        "sourceHandle",
+        "sourceNamespace",
+        "channel",
+        "destinationScope"
+      ],
+      "additionalProperties": false
+    },
+    "PreviewImportResult": {
+      "type": "object",
+      "properties": {
+        "planId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "planHash": {
+          "$ref": "domain.schema.json#/$defs/Hash"
+        },
+        "report": {
+          "$ref": "#/$defs/ImportReport"
+        },
+        "reimportPlans": {
+          "type": "array",
+          "items": {
+            "$ref": "domain.schema.json#/$defs/ReimportPlan"
+          },
+          "maxItems": 10000
+        },
+        "requiredRevisions": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/ExpectedRevision"
+          },
+          "maxItems": 10000
+        }
+      },
+      "required": [
+        "planId",
+        "planHash",
+        "report",
+        "reimportPlans",
+        "requiredRevisions"
+      ],
+      "additionalProperties": false
+    },
+    "GetImportReportRequest": {
+      "type": "object",
+      "properties": {
+        "contractVersion": {
+          "const": 1
+        },
+        "requestId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "workspaceId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "runId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        }
+      },
+      "required": [
+        "contractVersion",
+        "requestId",
+        "workspaceId",
+        "runId"
+      ],
+      "additionalProperties": false
+    },
+    "GetImportReportResult": {
+      "$ref": "#/$defs/ImportReport"
+    },
+    "ListMemoryRequest": {
+      "type": "object",
+      "properties": {
+        "contractVersion": {
+          "const": 1
+        },
+        "requestId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "workspaceId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "scope": {
+          "$ref": "domain.schema.json#/$defs/Scope"
+        },
+        "includeInactive": {
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "contractVersion",
+        "requestId",
+        "workspaceId",
+        "scope",
+        "includeInactive"
+      ],
+      "additionalProperties": false
+    },
+    "ListMemoryResult": {
+      "type": "object",
+      "properties": {
+        "entries": {
+          "type": "array",
+          "items": {
+            "$ref": "domain.schema.json#/$defs/Memory"
+          },
+          "maxItems": 1000
+        },
+        "snapshotCursor": {
+          "oneOf": [
+            {
+              "$ref": "domain.schema.json#/$defs/Revision"
+            },
+            {
+              "const": "0"
+            }
+          ]
+        }
+      },
+      "required": [
+        "entries",
+        "snapshotCursor"
+      ],
+      "additionalProperties": false
+    },
+    "AllocateIdsResponse": {
+      "oneOf": [
+        {
+          "type": "object",
+          "properties": {
+            "ok": {
+              "const": true
+            },
+            "result": {
+              "$ref": "#/$defs/AllocateIdsResult"
+            }
+          },
+          "required": [
+            "ok",
+            "result"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "ok": {
+              "const": false
+            },
+            "error": {
+              "$ref": "#/$defs/Error"
+            }
+          },
+          "required": [
+            "ok",
+            "error"
+          ],
+          "additionalProperties": false
+        }
+      ]
+    },
+    "PreviewImportResponse": {
+      "oneOf": [
+        {
+          "type": "object",
+          "properties": {
+            "ok": {
+              "const": true
+            },
+            "result": {
+              "$ref": "#/$defs/PreviewImportResult"
+            }
+          },
+          "required": [
+            "ok",
+            "result"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "ok": {
+              "const": false
+            },
+            "error": {
+              "$ref": "#/$defs/Error"
+            }
+          },
+          "required": [
+            "ok",
+            "error"
+          ],
+          "additionalProperties": false
+        }
+      ]
+    },
+    "GetImportReportResponse": {
+      "oneOf": [
+        {
+          "type": "object",
+          "properties": {
+            "ok": {
+              "const": true
+            },
+            "result": {
+              "$ref": "#/$defs/GetImportReportResult"
+            }
+          },
+          "required": [
+            "ok",
+            "result"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "ok": {
+              "const": false
+            },
+            "error": {
+              "$ref": "#/$defs/Error"
+            }
+          },
+          "required": [
+            "ok",
+            "error"
+          ],
+          "additionalProperties": false
+        }
+      ]
+    },
+    "ListMemoryResponse": {
+      "oneOf": [
+        {
+          "type": "object",
+          "properties": {
+            "ok": {
+              "const": true
+            },
+            "result": {
+              "$ref": "#/$defs/ListMemoryResult"
+            }
+          },
+          "required": [
+            "ok",
+            "result"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "ok": {
+              "const": false
+            },
+            "error": {
+              "$ref": "#/$defs/Error"
+            }
+          },
+          "required": [
+            "ok",
+            "error"
+          ],
+          "additionalProperties": false
+        }
+      ]
+    },
+    "ReadPageResponse": {
+      "oneOf": [
+        {
+          "type": "object",
+          "properties": {
+            "ok": {
+              "const": true
+            },
+            "result": {
+              "$ref": "#/$defs/ReadPageResult"
+            }
+          },
+          "required": [
+            "ok",
+            "result"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "ok": {
+              "const": false
+            },
+            "error": {
+              "$ref": "#/$defs/Error"
+            }
+          },
+          "required": [
+            "ok",
+            "error"
+          ],
+          "additionalProperties": false
+        }
+      ]
+    },
+    "QueryRecordsResponse": {
+      "oneOf": [
+        {
+          "type": "object",
+          "properties": {
+            "ok": {
+              "const": true
+            },
+            "result": {
+              "$ref": "#/$defs/QueryRecordsResult"
+            }
+          },
+          "required": [
+            "ok",
+            "result"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "ok": {
+              "const": false
+            },
+            "error": {
+              "$ref": "#/$defs/Error"
+            }
+          },
+          "required": [
+            "ok",
+            "error"
+          ],
+          "additionalProperties": false
+        }
+      ]
+    },
+    "SearchResponse": {
+      "oneOf": [
+        {
+          "type": "object",
+          "properties": {
+            "ok": {
+              "const": true
+            },
+            "result": {
+              "$ref": "#/$defs/SearchResult"
+            }
+          },
+          "required": [
+            "ok",
+            "result"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "ok": {
+              "const": false
+            },
+            "error": {
+              "$ref": "#/$defs/Error"
+            }
+          },
+          "required": [
+            "ok",
+            "error"
+          ],
+          "additionalProperties": false
+        }
+      ]
+    },
+    "ResolveCitationResponse": {
+      "oneOf": [
+        {
+          "type": "object",
+          "properties": {
+            "ok": {
+              "const": true
+            },
+            "result": {
+              "$ref": "#/$defs/ResolveCitationResult"
+            }
+          },
+          "required": [
+            "ok",
+            "result"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "ok": {
+              "const": false
+            },
+            "error": {
+              "$ref": "#/$defs/Error"
+            }
+          },
+          "required": [
+            "ok",
+            "error"
+          ],
+          "additionalProperties": false
+        }
+      ]
+    },
+    "ReadEventsResponse": {
+      "oneOf": [
+        {
+          "type": "object",
+          "properties": {
+            "ok": {
+              "const": true
+            },
+            "result": {
+              "$ref": "#/$defs/ReadEventsResult"
+            }
+          },
+          "required": [
+            "ok",
+            "result"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "ok": {
+              "const": false
+            },
+            "error": {
+              "$ref": "#/$defs/Error"
+            }
+          },
+          "required": [
+            "ok",
+            "error"
+          ],
+          "additionalProperties": false
+        }
+      ]
+    },
+    "CancelResponse": {
+      "oneOf": [
+        {
+          "type": "object",
+          "properties": {
+            "ok": {
+              "const": true
+            },
+            "result": {
+              "$ref": "#/$defs/CancelResult"
+            }
+          },
+          "required": [
+            "ok",
+            "result"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "ok": {
+              "const": false
+            },
+            "error": {
+              "$ref": "#/$defs/Error"
+            }
+          },
+          "required": [
+            "ok",
+            "error"
+          ],
+          "additionalProperties": false
+        }
+      ]
+    },
+    "PrepareFileResponse": {
+      "oneOf": [
+        {
+          "type": "object",
+          "properties": {
+            "ok": {
+              "const": true
+            },
+            "result": {
+              "$ref": "#/$defs/PrepareFileResult"
+            }
+          },
+          "required": [
+            "ok",
+            "result"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "ok": {
+              "const": false
+            },
+            "error": {
+              "$ref": "#/$defs/Error"
+            }
+          },
+          "required": [
+            "ok",
+            "error"
+          ],
+          "additionalProperties": false
+        }
+      ]
+    }
+  }
+}

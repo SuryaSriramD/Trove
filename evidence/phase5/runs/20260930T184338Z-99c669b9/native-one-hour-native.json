@@ -1,0 +1,19 @@
+{
+  "checks": [
+    "actual bundled whisper.cpp inference for all 60 minute units",
+    "queued durable job and canonical finalization",
+    "timestamped transcript retains recognizable source speech",
+    "same-page guarded edits during recognition",
+    "all observed edit commits below two seconds"
+  ],
+  "durationMs": 3600000,
+  "elapsedSeconds": 115.077196791,
+  "maxEditLatencyMs": 416.09275,
+  "passed": true,
+  "source": "public JFK speech sample repeated to exactly one hour; synthetic repetition, not microphone capture or real-meeting accuracy qualification",
+  "speechPackId": "01990000-0000-7000-8000-000000000103",
+  "successfulEditorMutations": 51,
+  "target": "darwin/arm64",
+  "transcriptSegments": 694,
+  "verifiedAt": "2026-09-30T18:50:02.564497Z"
+}

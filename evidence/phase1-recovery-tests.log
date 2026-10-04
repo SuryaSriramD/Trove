@@ -1,0 +1,20 @@
+=== RUN   TestAssetDeduplicationScopedReadsAndRestart
+--- PASS: TestAssetDeduplicationScopedReadsAndRestart (0.38s)
+=== RUN   TestFileSelectionsRejectSymlinksAndInvalidHandles
+--- PASS: TestFileSelectionsRejectSymlinksAndInvalidHandles (0.05s)
+=== RUN   TestTrashHistoryRestoreAndStalePreview
+--- PASS: TestTrashHistoryRestoreAndStalePreview (0.12s)
+=== RUN   TestRestoreDeletedBlockKeepsMonotonicRevision
+--- PASS: TestRestoreDeletedBlockKeepsMonotonicRevision (0.09s)
+=== RUN   TestBackupSnapshotRetentionAndRecoveryPoint
+--- PASS: TestBackupSnapshotRetentionAndRecoveryPoint (0.13s)
+=== RUN   TestAbandonedAssetsBackupPinsAndTamperDetection
+--- PASS: TestAbandonedAssetsBackupPinsAndTamperDetection (0.07s)
+=== RUN   TestRecordTaskHistoryRestoresValuesWithoutCopyingIdentity
+--- PASS: TestRecordTaskHistoryRestoresValuesWithoutCopyingIdentity (0.09s)
+=== RUN   TestAttachmentReferencesFollowCoverPropertiesAndBlockChanges
+--- PASS: TestAttachmentReferencesFollowCoverPropertiesAndBlockChanges (0.14s)
+=== RUN   TestCancelledBackupAndRestartRecoverAbandonedPins
+--- PASS: TestCancelledBackupAndRestartRecoverAbandonedPins (0.06s)
+PASS
+ok  	trove.local/phase0/internal/workspace	2.737s

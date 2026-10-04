@@ -1,0 +1,28 @@
+{
+  "recordedAt": "2026-09-30T19:14:14.334813+00:00",
+  "status": "confirmed-regression-incomplete-baseline",
+  "benchmarkProcessId": 69185,
+  "benchmarkStartedAtLocal": "2026-10-01 00:38:04.171 +0530",
+  "processCPUPercentObserved": 138.6,
+  "sample": "evidence/phase5/performance-diagnosis/benchmark-process-sample.txt",
+  "observations": [
+    {
+      "unixSeconds": 1790795494.604001,
+      "profilePages": 10000,
+      "completedPages": 5859,
+      "completedBlocks": 11718
+    },
+    {
+      "unixSeconds": 1790795531.44913,
+      "profilePages": 10000,
+      "completedPages": 6453
+    }
+  ],
+  "historicalP0SetupSeconds10000": 13.991834959,
+  "finding": "validateAdvancedEditor SELECTs and JSON-decodes every workspace block after every mutation, causing quadratic setup and linear ordinary-edit cost with workspace size. Symbolicated two-second native sample had seven active batch validator paths, six at full-block decoding/map insertion.",
+  "sourceLocations": [
+    "internal/workspace/advanced_editor.go:127",
+    "internal/workspace/advanced_editor.go:143"
+  ],
+  "termination": "SIGTERM sent only to disposable benchmark process 69185 before completion; wrapper retains failed/incomplete evidence. These are diagnosis observations, not qualified completed benchmark results."
+}

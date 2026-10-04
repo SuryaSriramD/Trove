@@ -1,0 +1,70 @@
+{
+  "checks": [
+    "real local instruction inference",
+    "strict structured output and duplicate key rejection",
+    "canonical segment citation mapping",
+    "summary contains fixture launch checklist and beta",
+    "beta decision, named checklist action, and offline activation question preserved",
+    "no canonical write until user approval",
+    "approval appends notes and persists applied state"
+  ],
+  "draft": {
+    "summary": [
+      {
+        "text": "Maya will send the launch checklist by Friday.",
+        "segmentIds": [
+          "01a0f3a4-a822-724d-bb07-a7f95afa11e0"
+        ]
+      },
+      {
+        "text": "We decided to ship the beta on Monday.",
+        "segmentIds": [
+          "01a0f3a4-a822-724d-bb07-a7f95afa11e0"
+        ]
+      }
+    ],
+    "keyPoints": [
+      {
+        "text": "Maya will send the launch checklist by Friday.",
+        "segmentIds": [
+          "01a0f3a4-a822-724d-bb07-a7f95afa11e0"
+        ]
+      }
+    ],
+    "decisions": [
+      {
+        "text": "We decided to ship the beta on Monday.",
+        "segmentIds": [
+          "01a0f3a4-a822-724d-bb07-a7f95afa11e0"
+        ]
+      }
+    ],
+    "questions": [
+      {
+        "text": "Whether the vendor supports offline activation",
+        "segmentIds": [
+          "01a0f3a4-a822-724d-bb07-a7f95afa11e0"
+        ]
+      }
+    ],
+    "actionItems": [
+      {
+        "text": "Maya will send the launch checklist by Friday.",
+        "segmentIds": [
+          "01a0f3a4-a822-724d-bb07-a7f95afa11e0"
+        ]
+      },
+      {
+        "text": "We decided to ship the beta on Monday.",
+        "segmentIds": [
+          "01a0f3a4-a822-724d-bb07-a7f95afa11e0"
+        ]
+      }
+    ]
+  },
+  "input": "Deterministic canonical meeting transcript with a commitment, decision, and open question",
+  "modelPackId": "01990000-0000-7000-8000-000000000105",
+  "passed": true,
+  "target": "darwin/arm64",
+  "verifiedAt": "2026-09-30T18:48:00.94261Z"
+}

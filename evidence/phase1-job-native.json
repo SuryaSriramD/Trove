@@ -1,0 +1,18 @@
+{
+  "attempt": 1,
+  "checks": [
+    "file ID authorized",
+    "WAV safely converted outside SQLite",
+    "verified Whisper pack loaded",
+    "real bundled helper transcribed JFK sample",
+    "lease and source revision fenced",
+    "transcript unit committed atomically",
+    "job terminal state committed with transcript",
+    "transcript page reopened after restart"
+  ],
+  "jobId": "01a0f3c3-0b76-7dc4-a9e7-97d75304b013",
+  "state": "succeeded",
+  "target": "darwin/arm64",
+  "verified": true,
+  "verifiedAt": "2026-09-30T19:20:41.448413Z"
+}

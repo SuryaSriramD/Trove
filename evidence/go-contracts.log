@@ -1,0 +1,44 @@
+=== RUN   TestTypedBatchAndSchemaValidation
+--- PASS: TestTypedBatchAndSchemaValidation (0.03s)
+=== RUN   TestAllProtocolFixtures
+=== RUN   TestAllProtocolFixtures/service-batch.json
+=== RUN   TestAllProtocolFixtures/service-batch-result.json
+=== RUN   TestAllProtocolFixtures/service-conflict.json
+=== RUN   TestAllProtocolFixtures/service-event.json
+=== RUN   TestAllProtocolFixtures/service-search.json
+=== RUN   TestAllProtocolFixtures/service-stale-citation.json
+=== RUN   TestAllProtocolFixtures/job-transcribe.json
+=== RUN   TestAllProtocolFixtures/worker-transcribe.json
+=== RUN   TestAllProtocolFixtures/worker-result.json
+=== RUN   TestAllProtocolFixtures/worker-transcript.json
+=== RUN   TestAllProtocolFixtures/worker-cancel.json
+=== RUN   TestAllProtocolFixtures/job-progress.json
+=== RUN   TestAllProtocolFixtures/service-import-report.json
+=== RUN   TestAllProtocolFixtures/service-task-toggle.json
+=== RUN   TestAllProtocolFixtures/service-import-apply.json
+=== RUN   TestAllProtocolFixtures/service-import-preview.json
+=== RUN   TestAllProtocolFixtures/service-memory-proposal.json
+--- PASS: TestAllProtocolFixtures (0.01s)
+    --- PASS: TestAllProtocolFixtures/service-batch.json (0.00s)
+    --- PASS: TestAllProtocolFixtures/service-batch-result.json (0.00s)
+    --- PASS: TestAllProtocolFixtures/service-conflict.json (0.00s)
+    --- PASS: TestAllProtocolFixtures/service-event.json (0.00s)
+    --- PASS: TestAllProtocolFixtures/service-search.json (0.00s)
+    --- PASS: TestAllProtocolFixtures/service-stale-citation.json (0.00s)
+    --- PASS: TestAllProtocolFixtures/job-transcribe.json (0.00s)
+    --- PASS: TestAllProtocolFixtures/worker-transcribe.json (0.00s)
+    --- PASS: TestAllProtocolFixtures/worker-result.json (0.00s)
+    --- PASS: TestAllProtocolFixtures/worker-transcript.json (0.00s)
+    --- PASS: TestAllProtocolFixtures/worker-cancel.json (0.00s)
+    --- PASS: TestAllProtocolFixtures/job-progress.json (0.00s)
+    --- PASS: TestAllProtocolFixtures/service-import-report.json (0.00s)
+    --- PASS: TestAllProtocolFixtures/service-task-toggle.json (0.00s)
+    --- PASS: TestAllProtocolFixtures/service-import-apply.json (0.00s)
+    --- PASS: TestAllProtocolFixtures/service-import-preview.json (0.00s)
+    --- PASS: TestAllProtocolFixtures/service-memory-proposal.json (0.00s)
+=== RUN   TestDomainTypedRoundtrip
+--- PASS: TestDomainTypedRoundtrip (0.00s)
+=== RUN   TestMergedImportResolutionAndFilterRoundtrip
+--- PASS: TestMergedImportResolutionAndFilterRoundtrip (0.00s)
+PASS
+ok  	trove.local/phase0/contracts	0.538s

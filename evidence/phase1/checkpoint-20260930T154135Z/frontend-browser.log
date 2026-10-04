@@ -1,0 +1,12 @@
+
+Running 5 tests using 1 worker
+
+(node:59959) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓  1 tests/browser.spec.ts:225:1 › shell navigation, focus, quick switcher, page metadata (1.5s)
+  ✓  2 tests/browser.spec.ts:256:1 › Unicode composition, RTL, emoji, undo/redo, reopen, raw preservation (1.6s)
+  ✓  3 tests/browser.spec.ts:303:1 › mixed clipboard retains block structure and allocates distinct IDs (988ms)
+  ✓  4 tests/browser.spec.ts:329:1 › insert real code, Mermaid and KaTeX rendering (1.5s)
+  ✓  5 tests/browser.spec.ts:347:1 › Markdown shortcuts, duplication, keyboard focus and screen-reader structure (955ms)
+
+  5 passed (8.3s)

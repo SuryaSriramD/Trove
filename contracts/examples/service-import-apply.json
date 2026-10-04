@@ -1,0 +1,24 @@
+{
+  "kind": "import.applyPlan",
+  "planId": "0199a000-0000-7000-8000-000000000028",
+  "planHash": "dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd",
+  "resolutions": [
+    {
+      "id": "0199a000-0000-7000-8000-00000000008d",
+      "planId": "0199a000-0000-7000-8000-00000000008c",
+      "mappingId": "0199a000-0000-7000-8000-000000000082",
+      "expectedLocalRevision": "1",
+      "incomingSourceRevision": "source-revision-5",
+      "fields": [
+        {
+          "path": "/title",
+          "choice": "merged",
+          "value": {
+            "present": true,
+            "value": "Reviewed merged title"
+          }
+        }
+      ]
+    }
+  ]
+}

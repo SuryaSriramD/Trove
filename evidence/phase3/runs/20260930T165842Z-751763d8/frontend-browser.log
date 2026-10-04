@@ -1,0 +1,29 @@
+
+Running 21 tests using 1 worker
+
+(node:17545) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+
+[1/21] tests/browser.spec.ts:347:1 › shell navigation, focus, quick switcher, page metadata
+[2/21] tests/browser.spec.ts:378:1 › Unicode composition, RTL, emoji, undo/redo, reopen, raw preservation
+[3/21] tests/browser.spec.ts:425:1 › mixed clipboard retains block structure and allocates distinct IDs
+[4/21] tests/browser.spec.ts:452:1 › repeated splits and formatted paste preserve imported neighbors with complete revision guards
+[5/21] tests/browser.spec.ts:526:1 › insert real code, Mermaid and KaTeX rendering
+[6/21] tests/browser.spec.ts:544:1 › Markdown shortcuts, duplication, keyboard focus and screen-reader structure
+[7/21] tests/browser.spec.ts:614:1 › page lifecycle preserves identity through nesting, icon, archive and navigation
+[8/21] tests/browser.spec.ts:728:1 › all named surfaces open and created page links generate navigable backlinks
+[9/21] tests/browser.spec.ts:774:1 › block transforms, rich marks, find and nested toggle survive save/reopen
+[10/21] tests/browser.spec.ts:846:1 › multi-file clipboard and file drop serialize uploads and preserve media captions and cover
+[11/21] tests/browser.spec.ts:953:1 › Phase 2 search opens the exact cited block without model packs
+[12/21] tests/browser.spec.ts:963:1 › Phase 2 import displays complete accounting and editable property preview
+[13/21] tests/browser.spec.ts:1005:1 › Phase 2 AI works without packs and shows reviewed memory controls
+[14/21] tests/browser.spec.ts:1018:1 › Phase 2 failed job retry preserves revision and resumed progress
+[15/21] tests/browser.spec.ts:1036:1 › Phase 2 native restore is reviewed before mutation and retention keeps all
+[16/21] tests/browser.spec.ts:1053:1 › Phase 2 AI review shows exact before and after and applies only on approval
+[17/21] tests/browser.spec.ts:1127:1 › background append synchronizes a clean editor without writes and survives the next edit
+[18/21] tests/browser.spec.ts:1148:1 › background append merges into a dirty editor and remains through save and local undo
+[19/21] tests/browser.spec.ts:1171:1 › background append received during an in-flight save reconciles after completion without dropping ongoing typing
+[20/21] tests/browser.spec.ts:1208:1 › overlapping background block edits preserve the local draft and require conflict review
+[21/21] tests/browser.spec.ts:1232:1 › an append racing the initial save safely rebases and retries after a revision conflict
+  21 passed (21.6s)

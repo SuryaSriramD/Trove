@@ -1,0 +1,7 @@
+ok  	trove.local/phase0	1.676s
+ok  	trove.local/phase0/contracts	1.604s
+?   	trove.local/phase0/internal/integration	[no test files]
+ok  	trove.local/phase0/internal/native	1.591s
+ok  	trove.local/phase0/internal/workers	10.653s
+ok  	trove.local/phase0/internal/workspace	6.181s
+?   	trove.local/phase0/schemas	[no test files]

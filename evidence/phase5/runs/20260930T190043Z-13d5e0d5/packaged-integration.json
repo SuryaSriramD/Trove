@@ -1,0 +1,35 @@
+{
+  "recordedAt": "2026-09-30T19:06:48.339302+00:00",
+  "app": "/Volumes/HD-B1/HD-Projects/Trove/build/phase5-candidate-3/Trove.app",
+  "appBinarySha256": "64132f222ca0690dee672c6a15c52dae3b9d272c23aa503ad4839badc6b4b142",
+  "fixture": "/var/folders/xc/s78np0812b12p6338l0ndvsm0000gn/T/trove-packaged-zo7sreef",
+  "checks": [
+    {
+      "step": "p0-create",
+      "passed": false,
+      "recordedAt": "",
+      "state": {
+        "workspaceId": "",
+        "pageId": "",
+        "blockId": "",
+        "collectionId": "",
+        "propertyId": "",
+        "recordId": "",
+        "recordPageId": "",
+        "fileId": "",
+        "fileBlockId": "",
+        "contentHash": ""
+      },
+      "checks": null,
+      "processExitCode": 0,
+      "installedWeightsAvailable": false
+    }
+  ],
+  "networkDeniedByOS": true,
+  "passed": false,
+  "limitations": [
+    "Ad-hoc developer signature; not Developer ID or notarized.",
+    "Executed on this Mac with minimal PATH; a separate clean-machine installation is unverified.",
+    "Service integration fixture; interactive editing and accessibility use separate tests."
+  ]
+}

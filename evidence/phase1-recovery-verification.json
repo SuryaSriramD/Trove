@@ -1,0 +1,32 @@
+{
+  "package": "1D",
+  "implemented": true,
+  "verified": true,
+  "recordedAt": "2026-09-30T15:13:18.867842+00:00",
+  "platform": "macOS-27.0-arm64-arm-64bit",
+  "architecture": "arm64",
+  "command": "go test -race -tags 'fts5 sqlite_omit_load_extension' ./internal/workspace -run 'Test(Asset|FileSelections|TrashHistory|RestoreDeleted|BackupSnapshot|AbandonedAssets|RecordTaskHistory|AttachmentReferences|CancelledBackup)' -count=1 -v",
+  "exitCode": 0,
+  "testsPassed": 9,
+  "testLog": "evidence/phase1-recovery-tests.log",
+  "additionalVerification": {
+    "externalVolume": "/Volumes/HD-B1/HD-Projects/Trove/build/recovery-volume-tests",
+    "tests": [
+      "TestAssetDeduplicationScopedReadsAndRestart",
+      "TestBackupSnapshotRetentionAndRecoveryPoint"
+    ],
+    "exitCode": 0,
+    "note": "Test executable compiled on /private/tmp; test workspace and backup fixtures ran on target external volume."
+  },
+  "limitations": [
+    "Canonical assets are retained for the lifetime of P0 history; destructive retention/purge is intentionally unavailable.",
+    "Opening a backup itself modifies its database: copy a verified archive to a working directory before opening."
+  ],
+  "sha256": {
+    "internal/workspace/files.go": "8c10258407408c7a29f64ead27da334a45d9e4e4887ff9df3a00d8e049f2bc5a",
+    "internal/workspace/history.go": "dd107f2f9c8e93d8912f87336bb13d1d8cbd43d2b53f124e3583a7934f2978ac",
+    "internal/workspace/backup.go": "c49256a60a09e245215d6609cc100b09db0621fa09d9b6231e497f15d169ec37",
+    "internal/workspace/recovery_test.go": "9d66cc56d6b22e0d9c31d10414636f84f64758fb77819e550bda245c060d10b5",
+    "docs/phase-1/1d.md": "9a039f9bdeedda50b9f78905ebdc8e998bb2c04b29dbfbdb6079d4046cd38082"
+  }
+}
