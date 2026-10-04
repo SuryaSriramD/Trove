@@ -404,6 +404,9 @@ func editorTemplates(ctx context.Context, k *Kernel, e contracts.ServiceExecutio
 	return map[string]any{"templates": out}, nil
 }
 func editorSaveTemplate(ctx context.Context, k *Kernel, e contracts.ServiceExecutionContext, r map[string]any) (any, error) {
+	if err := contracts.Validate("service", "TemplateCaptureRequest", marshal(r)); err != nil {
+		return nil, Fail("INVALID_REQUEST", err.Error())
+	}
 	if e.Actor.Kind != "user" || e.Origin != "user" {
 		return nil, Fail("SCOPE_DENIED", "Only the user can save a template")
 	}
@@ -423,10 +426,11 @@ func editorSaveTemplate(ctx context.Context, k *Kernel, e contracts.ServiceExecu
 		if string(p.Page.Revision) != str(r["expectedPageRevision"]) {
 			return Fail("CONFLICT", "Page changed before template capture")
 		}
-		if len(p.Blocks) > 400 {
-			return Fail("RESOURCE_EXHAUSTED", "Template exceeds 400 blocks")
+		snapshot, err := captureUnifiedTemplate(ctx, k, tx, e, p)
+		if err != nil {
+			return err
 		}
-		_, err = tx.ExecContext(ctx, "INSERT INTO advanced_templates VALUES(?,?,?,?,?)", id, page, name, string(marshal(p)), now())
+		_, err = tx.ExecContext(ctx, "INSERT INTO advanced_templates VALUES(?,?,?,?,?)", id, page, name, string(marshal(snapshot)), now())
 		return err
 	})
 	return map[string]any{"id": id}, err
@@ -439,7 +443,9 @@ func editorTemplate(ctx context.Context, k *Kernel, e contracts.ServiceExecution
 	if err := k.authorizePage(ctx, k.db, e, page); err != nil {
 		return nil, err
 	}
-	var out any
+	// Compatibility reads expose the original page-body shape. Captured owned
+	// tasks/defaults are resolved only through the scoped unified preview.
+	var out contracts.ServiceReadPageResult
 	err := json.Unmarshal([]byte(raw), &out)
 	return out, err
 }

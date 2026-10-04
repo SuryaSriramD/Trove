@@ -1551,6 +1551,22 @@
       ],
       "additionalProperties": false
     },
+    "ApplyTemplate": {
+      "type": "object",
+      "properties": {
+        "kind": {
+          "const": "template.apply"
+        },
+        "previewId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        }
+      },
+      "required": [
+        "kind",
+        "previewId"
+      ],
+      "additionalProperties": false
+    },
     "ConfigureCollection": {
       "type": "object",
       "properties": {
@@ -1984,6 +2000,9 @@
           "$ref": "#/$defs/RestoreRevision"
         },
         {
+          "$ref": "#/$defs/ApplyTemplate"
+        },
+        {
           "$ref": "#/$defs/ConfigureCollection"
         },
         {
@@ -2020,6 +2039,241 @@
           "$ref": "#/$defs/DismissPersonalReview"
         }
       ]
+    },
+    "TemplatePropertyDecision": {
+      "oneOf": [
+        {
+          "type": "object",
+          "properties": {
+            "sourcePropertyId": {
+              "$ref": "domain.schema.json#/$defs/Id"
+            },
+            "action": {
+              "const": "omit"
+            }
+          },
+          "required": [
+            "sourcePropertyId",
+            "action"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "sourcePropertyId": {
+              "$ref": "domain.schema.json#/$defs/Id"
+            },
+            "action": {
+              "const": "map"
+            },
+            "targetPropertyId": {
+              "$ref": "domain.schema.json#/$defs/Id"
+            },
+            "value": {
+              "type": [
+                "object",
+                "array",
+                "string",
+                "number",
+                "integer",
+                "boolean",
+                "null"
+              ]
+            }
+          },
+          "required": [
+            "sourcePropertyId",
+            "action",
+            "targetPropertyId",
+            "value"
+          ],
+          "additionalProperties": false
+        }
+      ]
+    },
+    "TemplatePreviewRequest": {
+      "type": "object",
+      "properties": {
+        "contractVersion": {
+          "const": 1
+        },
+        "requestId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "workspaceId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "templateId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "title": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 2000
+        },
+        "collectionId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "propertyDecisions": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/TemplatePropertyDecision"
+          },
+          "maxItems": 256
+        }
+      },
+      "required": [
+        "contractVersion",
+        "requestId",
+        "workspaceId",
+        "templateId",
+        "title"
+      ],
+      "additionalProperties": false
+    },
+    "TemplatePropertyIssue": {
+      "type": "object",
+      "properties": {
+        "sourceProperty": {
+          "$ref": "domain.schema.json#/$defs/PropertyDefinition"
+        },
+        "value": {
+          "type": [
+            "object",
+            "array",
+            "string",
+            "number",
+            "integer",
+            "boolean",
+            "null"
+          ]
+        },
+        "reason": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "sourceProperty",
+        "value",
+        "reason"
+      ],
+      "additionalProperties": false
+    },
+    "TemplatePreviewResult": {
+      "type": "object",
+      "properties": {
+        "previewId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "pageId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "recordId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "expiresAt": {
+          "$ref": "domain.schema.json#/$defs/Timestamp"
+        },
+        "expectedRevisions": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/ExpectedRevision"
+          },
+          "maxItems": 1000
+        },
+        "command": {
+          "$ref": "#/$defs/ApplyTemplate"
+        },
+        "blockCount": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "valueCount": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "taskCount": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "warnings": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "maxItems": 1000
+        },
+        "propertyIssues": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/TemplatePropertyIssue"
+          },
+          "maxItems": 256
+        },
+        "targetProperties": {
+          "type": "array",
+          "items": {
+            "$ref": "domain.schema.json#/$defs/PropertyDefinition"
+          },
+          "maxItems": 256
+        },
+        "canApply": {
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "previewId",
+        "pageId",
+        "expiresAt",
+        "expectedRevisions",
+        "command",
+        "blockCount",
+        "valueCount",
+        "taskCount",
+        "warnings",
+        "propertyIssues",
+        "targetProperties",
+        "canApply"
+      ],
+      "additionalProperties": false
+    },
+    "TemplateCaptureRequest": {
+      "type": "object",
+      "properties": {
+        "contractVersion": {
+          "const": 1
+        },
+        "requestId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "workspaceId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "pageId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "name": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 200
+        },
+        "expectedPageRevision": {
+          "$ref": "domain.schema.json#/$defs/Revision"
+        }
+      },
+      "required": [
+        "contractVersion",
+        "requestId",
+        "workspaceId",
+        "pageId",
+        "name",
+        "expectedPageRevision"
+      ],
+      "additionalProperties": false
     },
     "DatabaseP2Request": {
       "type": "object",

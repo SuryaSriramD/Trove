@@ -1029,6 +1029,10 @@ PageId DomainId `json:"pageId"`
 RestoreRevision DomainRevision `json:"restoreRevision"`
 PreviewId DomainId `json:"previewId"`
 }
+type ServiceApplyTemplate struct {
+Kind string `json:"kind"`
+PreviewId DomainId `json:"previewId"`
+}
 type ServiceConfigureCollection struct {
 Kind string `json:"kind"`
 CollectionId DomainId `json:"collectionId"`
@@ -1142,6 +1146,7 @@ func (ServiceUpdateMemory) isServiceCommand() {}
 func (ServiceSetMemoryStatus) isServiceCommand() {}
 func (ServiceApplyImportPlan) isServiceCommand() {}
 func (ServiceRestoreRevision) isServiceCommand() {}
+func (ServiceApplyTemplate) isServiceCommand() {}
 func (ServiceConfigureCollection) isServiceCommand() {}
 func (ServiceConfigureRecord) isServiceCommand() {}
 func (ServiceSaveAutomation) isServiceCommand() {}
@@ -1191,6 +1196,7 @@ if matchesVariant(fields,[]string{"kind","memoryId"},map[string]string{"kind":"\
 if matchesVariant(fields,[]string{"kind","memoryId","status"},map[string]string{"kind":"\"memory.setStatus\""},map[string][]string{"status":{"\"proposed\"","\"disabled\"","\"superseded\""}},[]string{"kind","memoryId","status"}) { var result ServiceSetMemoryStatus; if err := json.Unmarshal(data,&result); err != nil {return err}; v.Value=result; return nil }
 if matchesVariant(fields,[]string{"kind","planId","planHash","resolutions"},map[string]string{"kind":"\"import.applyPlan\""},map[string][]string{},[]string{"kind","planId","planHash","resolutions"}) { var result ServiceApplyImportPlan; if err := json.Unmarshal(data,&result); err != nil {return err}; v.Value=result; return nil }
 if matchesVariant(fields,[]string{"kind","pageId","restoreRevision","previewId"},map[string]string{"kind":"\"history.restore\""},map[string][]string{},[]string{"kind","pageId","restoreRevision","previewId"}) { var result ServiceRestoreRevision; if err := json.Unmarshal(data,&result); err != nil {return err}; v.Value=result; return nil }
+if matchesVariant(fields,[]string{"kind","previewId"},map[string]string{"kind":"\"template.apply\""},map[string][]string{},[]string{"kind","previewId"}) { var result ServiceApplyTemplate; if err := json.Unmarshal(data,&result); err != nil {return err}; v.Value=result; return nil }
 if matchesVariant(fields,[]string{"kind","collectionId","locked"},map[string]string{"kind":"\"collection.configure\""},map[string][]string{},[]string{"kind","collectionId","locked"}) { var result ServiceConfigureCollection; if err := json.Unmarshal(data,&result); err != nil {return err}; v.Value=result; return nil }
 if matchesVariant(fields,[]string{"kind","recordId","parentRecordId","dependencyRecordIds"},map[string]string{"kind":"\"record.configure\""},map[string][]string{},[]string{"kind","recordId","parentRecordId","dependencyRecordIds"}) { var result ServiceConfigureRecord; if err := json.Unmarshal(data,&result); err != nil {return err}; v.Value=result; return nil }
 if matchesVariant(fields,[]string{"kind","pageId","rule"},map[string]string{"kind":"\"automation.save\""},map[string][]string{},[]string{"kind","pageId","rule"}) { var result ServiceSaveAutomation; if err := json.Unmarshal(data,&result); err != nil {return err}; v.Value=result; return nil }
@@ -1204,6 +1210,55 @@ if matchesVariant(fields,[]string{"kind","pageId","planBlockId","enabled"},map[s
 if matchesVariant(fields,[]string{"kind","pageId","runId","blockId","approved"},map[string]string{"kind":"\"review.accept\"","approved":"true"},map[string][]string{},[]string{"kind","pageId","runId","blockId","approved"}) { var result ServiceAcceptPersonalReview; if err := json.Unmarshal(data,&result); err != nil {return err}; v.Value=result; return nil }
 if matchesVariant(fields,[]string{"kind","pageId","runId"},map[string]string{"kind":"\"review.dismiss\""},map[string][]string{},[]string{"kind","pageId","runId"}) { var result ServiceDismissPersonalReview; if err := json.Unmarshal(data,&result); err != nil {return err}; v.Value=result; return nil }
 return fmt.Errorf("unknown or incomplete ServiceCommand variant")
+}
+type ServiceTemplatePropertyDecisionValue interface { isServiceTemplatePropertyDecision() }
+type ServiceTemplatePropertyDecision struct { Value ServiceTemplatePropertyDecisionValue }
+func (ServiceTemplatePropertyDecisionVariant1) isServiceTemplatePropertyDecision() {}
+func (ServiceTemplatePropertyDecisionVariant2) isServiceTemplatePropertyDecision() {}
+func (v ServiceTemplatePropertyDecision) MarshalJSON() ([]byte,error) { return json.Marshal(v.Value) }
+func (v *ServiceTemplatePropertyDecision) UnmarshalJSON(data []byte) error {
+var fields map[string]json.RawMessage
+if err := json.Unmarshal(data, &fields); err != nil {return err}
+if matchesVariant(fields,[]string{"sourcePropertyId","action"},map[string]string{"action":"\"omit\""},map[string][]string{},[]string{"sourcePropertyId","action"}) { var result ServiceTemplatePropertyDecisionVariant1; if err := json.Unmarshal(data,&result); err != nil {return err}; v.Value=result; return nil }
+if matchesVariant(fields,[]string{"sourcePropertyId","action","targetPropertyId","value"},map[string]string{"action":"\"map\""},map[string][]string{},[]string{"sourcePropertyId","action","targetPropertyId","value"}) { var result ServiceTemplatePropertyDecisionVariant2; if err := json.Unmarshal(data,&result); err != nil {return err}; v.Value=result; return nil }
+return fmt.Errorf("unknown or incomplete ServiceTemplatePropertyDecision variant")
+}
+type ServiceTemplatePreviewRequest struct {
+ContractVersion int64 `json:"contractVersion"`
+RequestId DomainId `json:"requestId"`
+WorkspaceId DomainId `json:"workspaceId"`
+TemplateId DomainId `json:"templateId"`
+Title string `json:"title"`
+CollectionId *DomainId `json:"collectionId,omitempty"`
+PropertyDecisions []ServiceTemplatePropertyDecision `json:"propertyDecisions,omitempty"`
+}
+type ServiceTemplatePropertyIssue struct {
+SourceProperty DomainPropertyDefinition `json:"sourceProperty"`
+Value json.RawMessage `json:"value"`
+Reason string `json:"reason"`
+}
+type ServiceTemplatePreviewResult struct {
+PreviewId DomainId `json:"previewId"`
+PageId DomainId `json:"pageId"`
+RecordId *DomainId `json:"recordId,omitempty"`
+ExpiresAt DomainTimestamp `json:"expiresAt"`
+ExpectedRevisions []ServiceExpectedRevision `json:"expectedRevisions"`
+Command ServiceApplyTemplate `json:"command"`
+BlockCount int64 `json:"blockCount"`
+ValueCount int64 `json:"valueCount"`
+TaskCount int64 `json:"taskCount"`
+Warnings []string `json:"warnings"`
+PropertyIssues []ServiceTemplatePropertyIssue `json:"propertyIssues"`
+TargetProperties []DomainPropertyDefinition `json:"targetProperties"`
+CanApply bool `json:"canApply"`
+}
+type ServiceTemplateCaptureRequest struct {
+ContractVersion int64 `json:"contractVersion"`
+RequestId DomainId `json:"requestId"`
+WorkspaceId DomainId `json:"workspaceId"`
+PageId DomainId `json:"pageId"`
+Name string `json:"name"`
+ExpectedPageRevision DomainRevision `json:"expectedPageRevision"`
 }
 type ServiceDatabaseP2Request struct {
 ContractVersion int64 `json:"contractVersion"`
@@ -2038,6 +2093,16 @@ LocalId DomainId `json:"localId"`
 }
 type DomainImportIdentityResolutionVariant2 struct {
 Choice string `json:"choice"`
+}
+type ServiceTemplatePropertyDecisionVariant1 struct {
+SourcePropertyId DomainId `json:"sourcePropertyId"`
+Action string `json:"action"`
+}
+type ServiceTemplatePropertyDecisionVariant2 struct {
+SourcePropertyId DomainId `json:"sourcePropertyId"`
+Action string `json:"action"`
+TargetPropertyId DomainId `json:"targetPropertyId"`
+Value json.RawMessage `json:"value"`
 }
 type ServiceBatchResponseVariant1 struct {
 Ok bool `json:"ok"`

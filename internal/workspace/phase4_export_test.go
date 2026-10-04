@@ -60,10 +60,11 @@ func TestPhase4PortableMetadataRetainedWithoutActivation(t *testing.T) {
 	restored, owner := testKernel(t)
 	plan := importFixture(t, restored, owner, entries)
 	completeImportFixture(t, restored, owner, plan)
-	var rules, buttons int
+	var rules, buttons, templates int
 	restored.db.QueryRow("SELECT count(*) FROM automation_rules").Scan(&rules)
 	restored.db.QueryRow("SELECT count(*) FROM advanced_button_actions").Scan(&buttons)
-	if rules != 0 || buttons != 0 {
+	restored.db.QueryRow("SELECT count(*) FROM advanced_templates").Scan(&templates)
+	if rules != 0 || buttons != 0 || templates != 0 {
 		t.Fatal("untrusted actions activated on import")
 	}
 }

@@ -6,13 +6,13 @@ import {
   envelope,
   ids,
   pageGuards,
-  readRecord,
   type D,
   type WorkspaceSnapshot,
 } from "../api";
 import { guard, saveView, uniqueGuards } from "./service";
 import { displayValue, valueOf } from "./model";
 import { VirtualRows } from "./VirtualRows";
+import { TemplateLibrary } from "../advanced/TemplateLibrary";
 
 export type DerivedCell = {
   propertyId: string;
@@ -201,7 +201,6 @@ export function AdvancedDatabasePanel({
   const [parent, setParent] = useState("");
   const [deps, setDeps] = useState<string[]>([]);
   const [destination, setDestination] = useState("");
-  const [template, setTemplate] = useState("");
   useEffect(() => {
     let live = true;
     if (!expanded) return;
@@ -393,114 +392,17 @@ export function AdvancedDatabasePanel({
               <small>All linked views read and edit the same records.</small>
             </fieldset>
           )}
-          <fieldset disabled={busy || state?.locked}>
-            <legend>Record templates</legend>
-            <label>
-              Use record as a template{" "}
-              <select
-                value={template}
-                onChange={(e) => setTemplate(e.target.value)}
-              >
-                <option value="">Choose a record</option>
-                {records.map((r) => (
-                  <option key={r.id} value={r.id}>
-                    {title(r)}
-                  </option>
-                ))}
-              </select>
-            </label>
-            <button
-              disabled={!template}
-              onClick={() =>
-                void run(async () => {
-                  const source =
-                    w.contentMode === "shell"
-                      ? await readRecord(w, template)
-                      : records.find((r) => r.id === template)!;
-                  const name = prompt(
-                    "New record title",
-                    `${title(source)} copy`,
-                  );
-                  if (!name) return;
-                  const [recordId, pageId] = await ids(w, 2);
-                  const editable = new Set(
-                    w.properties
-                      .filter(
-                        (p) =>
-                          p.collectionId === collection.id &&
-                          ![
-                            "title",
-                            "formula",
-                            "rollup",
-                            "created_time",
-                            "last_edited_time",
-                            "unique_id",
-                          ].includes(p.type),
-                      )
-                      .map((p) => p.id),
-                  );
-                  const vals = source.values.filter((v) =>
-                    editable.has(v.propertyId),
-                  );
-                  const guards = uniqueGuards([
-                    guard("collection", collection.id, collection.revision),
-                    guard("record", recordId, "0"),
-                    guard("page", pageId, "0"),
-                    ...vals.map((v) =>
-                      guard(
-                        "property",
-                        v.propertyId,
-                        w.properties.find((p) => p.id === v.propertyId)!
-                          .revision,
-                      ),
-                    ),
-                    ...vals.flatMap((v) =>
-                      w.properties.find((p) => p.id === v.propertyId)?.type ===
-                      "relation"
-                        ? (v.value as string[]).map((id) =>
-                            guard(
-                              "record",
-                              id,
-                              w.records.find((r) => r.id === id)!.revision,
-                            ),
-                          )
-                        : [],
-                    ),
-                  ]);
-                  await batch(
-                    w,
-                    [
-                      {
-                        kind: "record.create",
-                        recordId,
-                        pageId,
-                        collectionId: collection.id,
-                        title: name,
-                      },
-                      ...vals.map((v) => ({
-                        kind: "record.setValue" as const,
-                        recordId,
-                        propertyId: v.propertyId,
-                        value: {
-                          type: w.properties.find((p) => p.id === v.propertyId)!
-                            .type,
-                          schemaVersion: v.schemaVersion,
-                          value: v.value,
-                        },
-                      })),
-                    ],
-                    guards,
-                  );
-                })
-              }
-            >
-              Create from template
-            </button>
-            <small>
-              Copies editable property values; the new record has its own
-              identity and page.
-            </small>
-          </fieldset>
+          <TemplateLibrary
+            workspace={w}
+            collectionId={collection.id}
+            sourcePages={records.flatMap((r) => {
+              const page = w.pages.find((p) => p.id === r.pageId);
+              return page ? [page] : [];
+            })}
+            disabled={busy || state?.locked}
+            onCommitted={onCommitted}
+            onError={onError}
+          />
         </>
       )}
     </details>

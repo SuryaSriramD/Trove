@@ -1,5 +1,4 @@
-import {batch,dispatch,envelope,ids,pageGuards,requestID,readBlock,type D,type S,type WorkspaceSnapshot} from '../api';
-import {orderedBlocks} from '../editor/codec';
+import {batch,dispatch,envelope,readBlock,type D,type S,type WorkspaceSnapshot} from '../api';
 export type PageLock={locked:boolean;revision:string};
 export const getLock=(w:WorkspaceSnapshot,pageId:string)=>dispatch<PageLock>('editor.lock',{...envelope(w),pageId});
 export const setLock=(w:WorkspaceSnapshot,p:D.Page,lock:PageLock)=>dispatch<PageLock>('editor.setLock',{...envelope(w),pageId:p.id,locked:!lock.locked,expectedRevision:lock.revision,expectedPageRevision:p.revision});
@@ -9,21 +8,10 @@ export const saveTemplate=(w:WorkspaceSnapshot,p:D.Page,name:string)=>dispatch('
 export type Reference={pageId:string;title:string;kind:'unlinked'|'related';reason:string};
 export const references=(w:WorkspaceSnapshot,pageId:string)=>dispatch<{references:Reference[]}>('editor.references',{...envelope(w),pageId});
 
-// A template is immutable captured canonical content. New identities are allocated
-// by the kernel; references internal to the template are remapped as a unit.
-export async function applyTemplate(w:WorkspaceSnapshot,templateId:string,title:string,collectionId?:string){
- const source=await dispatch<S.ReadPageResult>('editor.template',{...envelope(w),templateId});
- const allocated=await ids(w,source.blocks.length+2),pageId=allocated[0],recordId=allocated[1];
- const remap=new Map(source.blocks.map((b,i)=>[b.id,allocated[i+2]]));remap.set(source.page.id,pageId);
- const replace=(value:any,key=''):any=>Array.isArray(value)?value.map(v=>replace(v,key)):value&&typeof value==='object'?Object.fromEntries(Object.entries(value).map(([k,v])=>[k,replace(v,k)])):typeof value==='string'&&(['childBlockIds','contentSourceId','targetPageId'].includes(key))?(remap.get(value)??value):value;
- const commands:S.Command[]=collectionId?[{kind:'record.create',recordId,pageId,collectionId,title}]:[{kind:'page.create',pageId,title}];
- const guards:S.ExpectedRevision[]=[{target:{entityType:'page',entityId:pageId},revision:'0'}];
- if(collectionId){const c=w.collections.find(c=>c.id===collectionId);if(!c)throw new Error('Collection is unavailable');guards.push({target:{entityType:'record',entityId:recordId},revision:'0'},{target:{entityType:'collection',entityId:collectionId},revision:c.revision});}
- for(const b of orderedBlocks(source.blocks)){
-  commands.push({kind:'block.insert',block:{blockId:remap.get(b.id)!,pageId,...(b.parentBlockId?{parentBlockId:remap.get(b.parentBlockId)}:{}),type:b.type,schemaVersion:1,data:replace(b.data)}});
-  guards.push({target:{entityType:'block',entityId:remap.get(b.id)!},revision:'0'});
- }
- await batch(w,commands,guards);return pageId;
+export const previewTemplate=(w:WorkspaceSnapshot,templateId:string,title:string,collectionId?:string,propertyDecisions:S.TemplatePropertyDecision[]=[])=>dispatch<S.TemplatePreviewResult>('template.preview',{...envelope(w),templateId,title,...(collectionId?{collectionId}:{}),propertyDecisions});
+export async function applyTemplate(w:WorkspaceSnapshot,preview:S.TemplatePreviewResult){
+ if(!preview.canApply)throw new Error('Resolve template property mappings before creating a record.');
+ await batch(w,[preview.command],preview.expectedRevisions);return preview.pageId;
 }
 export async function previewButton(w:WorkspaceSnapshot,actionDefinitionId:string){return dispatch<{label:string;commands:S.Command[]}>('editor.button',{...envelope(w),actionDefinitionId});}
 export async function runButton(w:WorkspaceSnapshot,commands:S.Command[]){

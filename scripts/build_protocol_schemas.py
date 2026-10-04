@@ -64,6 +64,7 @@ commands={
 'SetMemoryStatus':tagged('memory.setStatus',{'memoryId':D('Id'),'status':enum('proposed','disabled','superseded')}),
 'ApplyImportPlan':tagged('import.applyPlan',{'planId':D('Id'),'planHash':{'type':'string','pattern':'^[0-9a-f]{64}$'},'resolutions':arr(D('ImportResolution'))}),
 'RestoreRevision':tagged('history.restore',{'pageId':D('Id'),'restoreRevision':D('Revision'),'previewId':D('Id')}),
+'ApplyTemplate':tagged('template.apply',{'previewId':D('Id')}),
 'ConfigureCollection':tagged('collection.configure',{'collectionId':D('Id'),'locked':B}),
 'ConfigureRecord':tagged('record.configure',{'recordId':D('Id'),'parentRecordId':{'oneOf':[D('Id'),{'type':'null'}]},'dependencyRecordIds':arr(D('Id'),128)}),
 'SaveAutomation':tagged('automation.save',{'pageId':D('Id'),'rule':{'type':'object'}}),
@@ -93,6 +94,11 @@ commands['UpdateMemory']['anyOf']=[{'required':['content']},{'required':['source
 defs.update(commands)
 defs['Command']={'oneOf':[R(n) for n in commands]}
 header={'contractVersion':{'const':1},'requestId':D('Id'),'workspaceId':D('Id')}
+defs['TemplatePropertyDecision']={'oneOf':[obj({'sourcePropertyId':D('Id'),'action':{'const':'omit'}}),obj({'sourcePropertyId':D('Id'),'action':{'const':'map'},'targetPropertyId':D('Id'),'value':json_value})]}
+defs['TemplatePreviewRequest']=obj({**header,'templateId':D('Id'),'title':{'type':'string','minLength':1,'maxLength':2000},'collectionId':D('Id'),'propertyDecisions':arr(R('TemplatePropertyDecision'),256)},[*header,'templateId','title'])
+defs['TemplatePropertyIssue']=obj({'sourceProperty':D('PropertyDefinition'),'value':json_value,'reason':S})
+defs['TemplatePreviewResult']=obj({'previewId':D('Id'),'pageId':D('Id'),'recordId':D('Id'),'expiresAt':D('Timestamp'),'expectedRevisions':arr(R('ExpectedRevision')),'command':R('ApplyTemplate'),'blockCount':N,'valueCount':N,'taskCount':N,'warnings':arr(S),'propertyIssues':arr(R('TemplatePropertyIssue'),256),'targetProperties':arr(D('PropertyDefinition'),256),'canApply':B},['previewId','pageId','expiresAt','expectedRevisions','command','blockCount','valueCount','taskCount','warnings','propertyIssues','targetProperties','canApply'])
+defs['TemplateCaptureRequest']=obj({**header,'pageId':D('Id'),'name':{'type':'string','minLength':1,'maxLength':200},'expectedPageRevision':D('Revision')})
 defs['DatabaseP2Request']=obj({**header,'collectionId':D('Id')})
 defs['DatabaseChartRequest']=obj({**header,'collectionId':D('Id')})
 defs['PageDisplayGetRequest']=obj({**header,'pageId':D('Id')})
