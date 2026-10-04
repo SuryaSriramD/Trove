@@ -342,7 +342,7 @@ func TestBackupRetentionIsExplicitVerifiedAndWorkspaceBound(t *testing.T) {
 	}
 }
 
-func TestBackupInterruptedRecordingRetainsUnjournaledTailAndRejectsActiveCapture(t *testing.T) {
+func TestBackupInterruptedRecordingRetainsTailAndActiveCaptureUsesCheckpoint(t *testing.T) {
 	ctx := context.Background()
 	k, e := testKernel(t)
 	draft, audio, err := k.BeginRecording(ctx, e, "Crash audio")
@@ -356,8 +356,16 @@ func TestBackupInterruptedRecordingRetainsUnjournaledTailAndRejectsActiveCapture
 	if _, err = k.CheckpointRecording(ctx, e, draft.ID, false, ""); err != nil {
 		t.Fatal(err)
 	}
-	if _, err = k.CreateBackup(ctx, e, filepath.Join(t.TempDir(), "active")); err == nil {
-		t.Fatal("active capture was backed up without a stable boundary")
+	activeBackup := filepath.Join(t.TempDir(), "active")
+	if _, err = k.CreateBackup(ctx, e, activeBackup); err != nil {
+		t.Fatal(err)
+	}
+	if _, err = VerifyBackup(ctx, activeBackup); err != nil {
+		t.Fatal(err)
+	}
+	current, err := k.readRecording(e, draft.ID)
+	if err != nil || current.State != "recording" || current.Bytes != 640 {
+		t.Fatal("backup changed active capture", current, err)
 	}
 	if _, err = audio.Write(make([]byte, 128)); err != nil {
 		t.Fatal(err)

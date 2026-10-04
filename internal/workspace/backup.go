@@ -40,9 +40,13 @@ type BackupManifest struct {
 func parseSize(s string) int64 { n, _ := strconv.ParseInt(s, 10, 64); return n }
 
 // CreateBackup requires a trusted native destination. It never accepts renderer
-// paths and never overwrites an existing directory. SQLite VACUUM INTO uses the
-// engine's consistent snapshot facility, including committed WAL transactions.
+// paths and never overwrites an existing directory. The online backup API copies
+// a pinned WAL read snapshot without holding the application writer lock.
 func (k *Kernel) CreateBackup(ctx context.Context, e contracts.ServiceExecutionContext, destination string) (manifest BackupManifest, err error) {
+	return k.createBackup(ctx, e, destination, nil)
+}
+
+func (k *Kernel) createBackup(ctx context.Context, e contracts.ServiceExecutionContext, destination string, afterDatabaseStep func() error) (manifest BackupManifest, err error) {
 	if err = requireOwnerScope(k, e); err != nil {
 		return manifest, err
 	}
@@ -75,12 +79,24 @@ func (k *Kernel) CreateBackup(ctx context.Context, e contracts.ServiceExecutionC
 	}()
 	captureLock := recordingLock(k)
 	captureLock.Lock()
-	recordingErr := k.backupRecordingFiles(ctx, destination, &manifest)
+	recordings, recordingErr := k.captureBackupRecordings(ctx)
+	var source *sqliteBackupSource
 	if recordingErr == nil {
-		recordingErr = k.backupSnapshot(ctx, e, manifest.BackupID, manifest.CreatedAt, dbPath)
+		source, recordingErr = k.captureBackupSource(ctx, e, manifest.BackupID, manifest.CreatedAt)
 	}
 	captureLock.Unlock()
+	defer closeBackupRecordings(recordings)
 	if err = recordingErr; err != nil {
+		return manifest, err
+	}
+	defer source.Close()
+	if err = copySQLiteBackup(ctx, source.conn, dbPath, afterDatabaseStep); err != nil {
+		return manifest, err
+	}
+	// Release the WAL read snapshot as soon as database copying finishes. Asset
+	// pins and opened recording descriptors protect the remaining file copies.
+	source.Close()
+	if err = writeBackupRecordings(ctx, destination, recordings, &manifest); err != nil {
 		return manifest, err
 	}
 	snap, err := sql.Open("sqlite3", (&url.URL{Scheme: "file", Path: dbPath}).String()+"?mode=ro&_foreign_keys=on")
@@ -192,40 +208,53 @@ func (k *Kernel) CreateBackup(ctx context.Context, e contracts.ServiceExecutionC
 	}
 	return manifest, err
 }
-func (k *Kernel) backupSnapshot(ctx context.Context, e contracts.ServiceExecutionContext, id, created, path string) error {
+func (k *Kernel) captureBackupSource(ctx context.Context, e contracts.ServiceExecutionContext, id, created string) (*sqliteBackupSource, error) {
 	select {
 	case k.pending <- struct{}{}:
 	default:
-		return Fail("RESOURCE_EXHAUSTED", "Workspace write queue is full")
+		return nil, Fail("RESOURCE_EXHAUSTED", "Workspace write queue is full")
 	}
 	defer func() { <-k.pending }()
 	select {
 	case k.writer <- struct{}{}:
 	case <-ctx.Done():
-		return ctx.Err()
+		return nil, ctx.Err()
 	}
 	defer func() { <-k.writer }()
 	if err := requireOwnerScope(k, e); err != nil {
-		return err
+		return nil, err
 	}
 	tx, err := k.writeDB.BeginTx(ctx, nil)
 	if err != nil {
-		return err
+		return nil, err
 	}
 	defer tx.Rollback()
 	if _, err = tx.ExecContext(ctx, "INSERT INTO backups VALUES(?,'active',?,?)", id, created, created); err != nil {
-		return err
+		return nil, err
 	}
 	if _, err = tx.ExecContext(ctx, "INSERT INTO backup_pins SELECT ?,content_hash FROM files", id); err != nil {
-		return err
+		return nil, err
 	}
 	if err = tx.Commit(); err != nil {
-		return err
+		return nil, err
 	}
-	// Content writers remain serialized through the snapshot boundary. Asset copy
-	// runs after releasing this lock; persistent pins protect the captured set.
-	_, err = k.db.ExecContext(ctx, "VACUUM INTO ?", path)
-	return err
+	// Start and materialize the source read transaction while writers are still
+	// serialized. The pinned asset set and the database have the same boundary.
+	conn, err := k.db.Conn(ctx)
+	if err != nil {
+		return nil, err
+	}
+	source := &sqliteBackupSource{conn: conn}
+	source.tx, err = conn.BeginTx(ctx, &sql.TxOptions{ReadOnly: true})
+	if err == nil {
+		var cursor int64
+		err = source.tx.QueryRowContext(ctx, "SELECT COALESCE(MAX(cursor),0) FROM committed_events").Scan(&cursor)
+	}
+	if err != nil {
+		source.Close()
+		return nil, err
+	}
+	return source, nil
 }
 func hashFile(ctx context.Context, path string) (string, int64, error) {
 	f, err := openAsset(path)

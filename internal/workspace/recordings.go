@@ -117,6 +117,9 @@ func (k *Kernel) readRecording(e contracts.ServiceExecutionContext, id string) (
 // BeginRecording creates the recovery journal before the microphone process is
 // admitted. The returned descriptor is workspace-owned and never a /tmp file.
 func (k *Kernel) BeginRecording(ctx context.Context, e contracts.ServiceExecutionContext, title string) (RecordingDraft, *os.File, error) {
+	lock := recordingLock(k)
+	lock.Lock()
+	defer lock.Unlock()
 	var d RecordingDraft
 	if err := requireOwnerScope(k, e); err != nil {
 		return d, nil, err
