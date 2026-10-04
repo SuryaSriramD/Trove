@@ -1,32 +1,72 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import type { NodeViewProps } from "@tiptap/react";
 import type { Editor } from "@tiptap/core";
+import { closeHistory } from "@tiptap/pm/history";
 import type { D, WorkspaceSnapshot } from "../api";
 import { richNodes, richText } from "./codec";
 import { InlineRichEditor } from "./InlineRichEditor";
+import { insertTableLine, removeTableLine, tableLineRemoval, tableWidths } from "./tableStructure";
 import { blockReadable, inertEmbedDocument, mergeCells, safeWebURL, splitCell } from "./advanced";
 import { previewButton, runButton } from "../advanced/service";
 
-export function AdvancedTable({ data: d, update, owner, readOnly = false }: {
-  data: D.block_table_v1; update: (value: Partial<D.block_table_v1>) => void; owner: Editor; readOnly?: boolean;
+export function AdvancedTable({ data: d, update, owner, allocateIds, readOnly = false }: {
+  data: D.block_table_v1; update: (value: Partial<D.block_table_v1>) => void; owner: Editor; allocateIds: (count: number) => Promise<string[]>; readOnly?: boolean;
 }) {
+  const latest = useRef({data:d,update,readOnly}); latest.current = {data:d,update,readOnly};
   const [first, setFirst] = useState(""), [last, setLast] = useState(""), [error, setError] = useState("");
+  const [row, setRow] = useState(0), [column, setColumn] = useState(0), [busy, setBusy] = useState(false);
+  const [removal, setRemoval] = useState<{axis: "row" | "column"; index: number} | null>(null);
+  const commitStructure = (value: Partial<D.block_table_v1>) => {
+    owner.view.dispatch(closeHistory(owner.state.tr));
+    latest.current.update(value);
+    owner.view.dispatch(closeHistory(owner.state.tr));
+  };
   const action = (fn: () => void) => { try { fn(); setError(""); } catch (e) { setError((e as Error).message); } };
+  const add = async (axis: "row" | "column", index: number) => {
+    if (readOnly || busy) return;
+    setBusy(true);
+    try {
+      const allocated = await allocateIds(axis === "row" ? d.columnCount : d.rowCount), current = latest.current;
+      if (current.readOnly) return;
+      if (current.data.rowCount !== d.rowCount || current.data.columnCount !== d.columnCount) throw new Error("The table changed while adding cells. Try again.");
+      commitStructure(insertTableLine(current.data, axis, index, allocated)); setError("");
+    }
+    catch (e) { setError((e as Error).message); } finally { setBusy(false); }
+  };
+  const remove = (axis: "row" | "column", index: number) => action(() => {
+    if (tableLineRemoval(d, axis, index).length) setRemoval({axis,index});
+    else commitStructure(removeTableLine(d,axis,index));
+  });
+  const widths = tableWidths(d);
   return <div className="table-scroll">
+    <details className="table-structure"><summary>Table structure</summary>
+      <fieldset disabled={readOnly || busy}>
+        {(["row", "column"] as const).map(axis => {
+          const count = axis === "row" ? d.rowCount : d.columnCount, selected = Math.min(axis === "row" ? row : column, count - 1);
+          return <div key={axis} className="table-axis-controls"><label>Selected {axis}<select aria-label={`Selected table ${axis}`} value={selected} onChange={event => (axis === "row" ? setRow : setColumn)(Number(event.target.value))}>
+            {Array.from({length: count}, (_, i) => <option key={i} value={i}>{i + 1}</option>)}
+          </select></label><button type="button" onClick={() => void add(axis, selected)}>Insert {axis} before</button><button type="button" onClick={() => void add(axis, selected + 1)}>Insert {axis} after</button><button type="button" disabled={count <= 1} onClick={() => remove(axis, selected)}>Remove {axis}</button></div>;
+        })}
+        <label>Header rows<input aria-label="Header rows" type="number" min="0" max={d.rowCount} value={d.headerRows} onChange={event => update({headerRows: Math.max(0,Math.min(d.rowCount,Math.floor(Number(event.target.value) || 0)))})}/></label>
+        <label>Header columns<input aria-label="Header columns" type="number" min="0" max={d.columnCount} value={d.headerColumns} onChange={event => update({headerColumns: Math.max(0,Math.min(d.columnCount,Math.floor(Number(event.target.value) || 0)))})}/></label>
+        <div className="table-width-controls">{widths.map((width,index) => <label key={index}>Column {index+1} width<input aria-label={`Column ${index+1} width in pixels`} type="number" min="40" max="2400" value={width} onChange={event => update({columnWidths: widths.map((value,i) => i === index ? Math.max(40,Math.min(2400,Number(event.target.value) || 40)) : value)})}/></label>)}</div>
+      </fieldset>
+    </details>
+    {removal && <div role="alertdialog" aria-label={`Remove table ${removal.axis}`} className="table-removal"><p>Remove {removal.axis} {removal.index+1} and its populated cells? This can be undone.</p><button type="button" onClick={() => setRemoval(null)}>Keep cells</button><button type="button" disabled={readOnly} onClick={() => action(() => {commitStructure(removeTableLine(d,removal.axis,removal.index));setRemoval(null);})}>Remove populated {removal.axis}</button></div>}
     <fieldset className="table-controls" disabled={readOnly}>
       <label>First cell <select value={first} onChange={e => setFirst(e.target.value)}><option value="">Choose</option>{d.cells.map(c => <option key={c.id} value={c.id}>{c.row + 1}:{c.column + 1}</option>)}</select></label>
       <label>Last cell <select value={last} onChange={e => setLast(e.target.value)}><option value="">Choose</option>{d.cells.map(c => <option key={c.id} value={c.id}>{c.row + 1}:{c.column + 1}</option>)}</select></label>
-      <button type="button" onClick={() => action(() => update(mergeCells(d, first, last)))}>Merge range</button>
+      <button type="button" onClick={() => action(() => commitStructure(mergeCells(d, first, last)))}>Merge range</button>
       {error && <span role="alert">{error}</span>}
     </fieldset>
-    <table className="simple-table"><tbody>{Array.from({ length: d.rowCount }, (_, row) => <tr key={row}>
-      {d.cells.filter(c => c.row === row).sort((a, b) => a.column - b.column).map(cell => <td key={cell.id} rowSpan={cell.rowSpan} colSpan={cell.colSpan}>
+    <table className="simple-table" style={{width: widths.reduce((sum,width) => sum+width,0), tableLayout:"fixed"}}><colgroup>{widths.map((width,index) => <col key={index} style={{width}}/>)}</colgroup><tbody>{Array.from({ length: d.rowCount }, (_, row) => <tr key={row}>
+      {d.cells.filter(c => c.row === row).sort((a, b) => a.column - b.column).map(cell => {const Cell = cell.row < d.headerRows || cell.column < d.headerColumns ? "th" : "td"; return <Cell key={cell.id} rowSpan={cell.rowSpan} colSpan={cell.colSpan} scope={cell.row < d.headerRows ? "col" : cell.column < d.headerColumns ? "row" : undefined}>
         <InlineRichEditor label={`Row ${row + 1} column ${cell.column + 1}`} value={cell.richText} owner={owner} readOnly={readOnly}
           onChange={value => update({ cells: d.cells.map(c => c.id === cell.id ? { ...c, richText: value } : c) })} />
         {(cell.colSpan > 1 || cell.rowSpan > 1) && <button type="button" disabled={readOnly || !cell.preMergeCells.length}
           title={!cell.preMergeCells.length ? "Imported merge has no original cell evidence" : undefined}
-          onClick={() => action(() => update(splitCell(d, cell.id)))}>Restore cells</button>}
-      </td>)}
+          onClick={() => action(() => commitStructure(splitCell(d, cell.id)))}>Restore cells</button>}
+      </Cell>;})}
     </tr>)}</tbody></table>
   </div>;
 }

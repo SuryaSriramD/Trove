@@ -13,7 +13,7 @@ import { clearTemporaryReveal, temporarilyExpanded } from "./visibility";
 import { AdvancedBlock, AdvancedTable } from "./AdvancedBlocks";
 import katex from "katex";
 import mermaid from "mermaid";
-import hljs from "highlight.js";
+import { CodeBlock, ImageBlock } from "./TechnicalBlocks";
 import "katex/dist/katex.min.css";
 import "highlight.js/styles/github.css";
 export const EditorContext = createContext<{
@@ -221,37 +221,7 @@ function AtomView(props: NodeViewProps) {
         </button>
       </div>
     );
-  else if (kind === "code")
-    body = (
-      <>
-        <div className="code-heading">
-          <input
-            aria-label="Code language"
-            value={d.language ?? "text"}
-            onChange={(e) => update({ language: e.target.value })}
-          />
-          <span>Code</span>
-        </div>
-        <pre className="code-preview">
-          <code
-            dangerouslySetInnerHTML={{
-              __html: hljs.getLanguage(d.language)
-                ? hljs.highlight(d.source ?? "", { language: d.language }).value
-                : hljs.highlightAuto(d.source ?? "").value,
-            }}
-          />
-        </pre>
-        <details>
-          <summary>Edit source</summary>
-          <textarea
-            aria-label="Code source"
-            spellCheck={false}
-            value={d.source ?? ""}
-            onChange={(e) => update({ source: e.target.value })}
-          />
-        </details>
-      </>
-    );
+  else if (kind === "code") body = <CodeBlock data={d} update={update} owner={props.editor} readOnly={readOnly} onError={onError}/>;
   else if (kind === "mermaid")
     body = (
       <>
@@ -297,15 +267,12 @@ function AtomView(props: NodeViewProps) {
         </details>
       </>
     );
-  else if (kind === "table") body = <AdvancedTable data={d} update={update} owner={props.editor} readOnly={readOnly} />;
+  else if (kind === "table") body = <AdvancedTable data={d} update={update} owner={props.editor} allocateIds={count => w ? ids(w,count) : Promise.reject(new Error("Workspace unavailable"))} readOnly={readOnly} />;
   else if (["image", "audio", "video", "pdf", "file"].includes(kind))
     body = (
       <figure>
         {kind === "image" ? (
-          <img
-            src={fileURL(d.fileId)}
-            alt={d.altText ?? file?.originalName ?? "Attached image"}
-          />
+          <ImageBlock data={d} update={update} originalName={file?.originalName} readOnly={readOnly}/>
         ) : kind === "audio" ? (
           <audio controls src={fileURL(d.fileId)} />
         ) : kind === "video" ? (

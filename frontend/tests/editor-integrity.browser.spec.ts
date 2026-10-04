@@ -21,6 +21,8 @@ const initial = {
     block(33,"code",{source:"const retained = 42",language:"javascript"},31),
     block(34,"bulleted_list_item",{richText:[{text:"Direct child"}]},30),
     block(40,"paragraph",{richText:[{text:"Visible sibling"}]}),
+    block(41,"code",{source:'/* Multi\ncomment */\nconst text = "<script>🌱";\n',language:"javascript",filename:"imported.js",wrap:false,lineNumbers:true}),
+    block(42,"image",{fileId:id(91),caption:[{text:"Managed image"}],altText:"A retained image",width:320,alignment:"right"}),
   ],
   collections:[],properties:[],records:[],views:[],files:[],meetings:[],taskFacets:[],containers:[],containerCollections:[],transcriptSegments:[],projectScopes:[],memories:[],importMappings:[],
 };
@@ -70,6 +72,7 @@ test.beforeEach(async ({page}) => {
       return ok({requestId:req.requestId,transactionId:makeID(),eventCursor:state.snapshotCursor,revisions,replayed:false});
     }}}};
   },{initial});
+  await page.route("**/files/019a1234-5678-7000-8000-000000000091", route=>route.fulfill({contentType:"image/png",body:Buffer.from("iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+a2ioAAAAASUVORK5CYII=","base64")}));
   await page.goto(process.env.TROVE_TEST_URL??"http://127.0.0.1:4173");
   await page.getByRole("button",{name:/Editor integrity/}).first().click();
 });
@@ -150,4 +153,54 @@ test("outer page clipboard preserves table rich data and allocates new identitie
  expect(tables).toHaveLength(2);
  expect(new Set(tables.map((b:any)=>b.id)).size).toBe(2);
  expect(tables[1].data).toEqual(tables[0].data);
+});
+
+test("table structure controls preserve header widths, confirm populated removal, and undo through reload",async({page})=>{
+ const table=page.locator(".block-table");
+ await table.getByText("Table structure",{exact:true}).click();
+ await table.getByRole("button",{name:"Insert row after",exact:true}).click();
+ const added=table.getByRole("textbox",{name:"Row 2 column 1",exact:true});await expect(added).toBeVisible();
+ await added.fill("Retain this cell");
+ await table.getByRole("spinbutton",{name:"Header columns",exact:true}).fill("1");
+ await table.getByRole("spinbutton",{name:"Column 1 width in pixels",exact:true}).fill("220");
+ await expect(table.locator('th[scope="row"]')).toHaveCount(1);
+ await expect(table.locator("col").first()).toHaveCSS("width","220px");
+ await table.getByRole("combobox",{name:"Selected table row",exact:true}).selectOption("1");
+ await table.getByRole("button",{name:"Remove row",exact:true}).click();
+ const confirm=table.getByRole("alertdialog",{name:"Remove table row"});await expect(confirm).toBeVisible();
+ await expect(added).toHaveText("Retain this cell");await confirm.getByRole("button",{name:"Keep cells",exact:true}).click();
+ await table.getByRole("button",{name:"Remove row",exact:true}).click();await confirm.getByRole("button",{name:"Remove populated row",exact:true}).click();
+ await expect(added).toHaveCount(0);await page.getByRole("button",{name:"Undo",exact:true}).click();await expect(added).toHaveText("Retain this cell");
+ await save(page);await page.reload();await page.getByRole("button",{name:/Editor integrity/}).first().click();
+ await expect(added).toHaveText("Retain this cell");await expect(table.locator('th[scope="col"]')).toHaveCount(1);await expect(table.locator('th[scope="row"]')).toHaveCount(1);
+ const data=await page.evaluate(()=>(window as any).integrityState().blocks.find((b:any)=>b.type==="table").data);
+ expect(data.rowCount).toBe(2);expect(data.columnWidths).toEqual([220,200]);expect(data.cells[0].preMergeCells[1].richText).toEqual([{text:"Original retained cell"}]);
+});
+
+test("code controls copy exact source bytes and persist filename, wrapping and line numbers",async({page,context})=>{
+ await context.grantPermissions(["clipboard-read","clipboard-write"]);
+ const code=page.locator(`[data-block-id="${id(41)}"]`),source=initial.blocks.find(b=>b.id===id(41))!.data as any;
+ await expect(code.locator(".code-line-number")).toHaveCount(4);
+ await expect(code.locator(".code-line").first().locator(".hljs-comment")).toContainText("/* Multi");
+ await expect(code.locator(".code-line").nth(1).locator(".hljs-comment")).toContainText("comment */");
+ await code.getByRole("button",{name:"Copy code",exact:true}).click();
+ expect(await page.evaluate(()=>navigator.clipboard.readText())).toBe(source.source);
+ await code.getByRole("textbox",{name:"Code filename",exact:true}).fill("retained.js");
+ await code.getByRole("checkbox",{name:"Wrap code",exact:true}).check();
+ await code.getByRole("checkbox",{name:"Code line numbers",exact:true}).uncheck();
+ await expect(code.locator(".code-line-number")).toHaveCount(0);await expect(code.locator(".code-line code").first()).toHaveCSS("white-space","pre-wrap");
+ await save(page);await page.reload();await page.getByRole("button",{name:/Editor integrity/}).first().click();
+ await expect(code.getByRole("textbox",{name:"Code filename",exact:true})).toHaveValue("retained.js");await expect(code.getByRole("checkbox",{name:"Wrap code",exact:true})).toBeChecked();
+ expect(await page.evaluate(id=>(window as any).integrityState().blocks.find((b:any)=>b.id===id).data.source,id(41))).toBe(source.source);
+});
+
+test("managed images honor dimensions and alignment with zoom and a scoped original link",async({page})=>{
+ const image=page.locator(`[data-block-id="${id(42)}"]`);
+ await expect(image.locator(".image-zoom-trigger")).toHaveCSS("width","320px");await expect(image.locator(".managed-image-preview")).toHaveCSS("justify-content","flex-end");
+ await image.getByText("Image display",{exact:true}).click();await image.getByRole("spinbutton",{name:"Image width in pixels",exact:true}).fill("240");await image.getByRole("combobox",{name:"Image alignment",exact:true}).selectOption("center");
+ await image.getByRole("button",{name:"Zoom image",exact:true}).click();const zoom=page.getByRole("dialog",{name:"Image zoom",exact:true});await expect(zoom).toBeVisible();
+ await expect(zoom.getByRole("img")).toHaveAttribute("src",`/files/${id(91)}`);await expect(zoom.getByRole("link",{name:"Open original image"})).toHaveAttribute("href",`/files/${id(91)}`);
+ await zoom.getByRole("button",{name:"Close image zoom"}).click();await expect(zoom).toHaveCount(0);
+ await save(page);await page.reload();await page.getByRole("button",{name:/Editor integrity/}).first().click();
+ await expect(image.locator(".image-zoom-trigger")).toHaveCSS("width","240px");await expect(image.locator(".managed-image-preview")).toHaveCSS("justify-content","center");await expect(image.locator(".image-zoom-trigger img")).toHaveAttribute("alt","A retained image");
 });

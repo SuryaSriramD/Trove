@@ -3,6 +3,7 @@ package workspace
 import (
 	"archive/zip"
 	"context"
+	"encoding/base64"
 	"encoding/json"
 	"path/filepath"
 	"testing"
@@ -11,12 +12,19 @@ import (
 func TestEditorIntegrityRichContentAndCollapseSurviveRecoveryAndPortability(t *testing.T) {
 	k, e := testKernel(t)
 	page := createPage(t, k, e, "Rich editing evidence")
-	toggle, paragraph, table := NewID(), NewID(), NewID()
+	toggle, paragraph, table, code, image := NewID(), NewID(), NewID(), NewID(), NewID()
+	imageBytes, err := base64.StdEncoding.DecodeString("iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+a2ioAAAAASUVORK5CYII=")
+	if err != nil {
+		t.Fatal(err)
+	}
+	fileID, _ := attachTestFile(t, k, e, page, stageTestFile(t, k, e, string(imageBytes)), false)
+	codeData := map[string]any{"source": "// exact bytes\r\nconst text = `🌱`;\n", "language": "javascript", "filename": "retained.js", "wrap": true, "lineNumbers": true}
+	imageData := map[string]any{"fileId": fileID, "caption": richImport("Image caption"), "altText": "Image description", "width": 240, "alignment": "right"}
 	rich := []any{map[string]any{"text": "Keep! ", "marks": []any{"bold"}}, map[string]any{"text": "linked", "link": "https://example.test/source"}, map[string]any{"text": " తెలుగు 🌱"}}
 	toggleData := map[string]any{"richText": richImport("Toggle"), "collapsed": true}
 	paragraphData := map[string]any{"richText": rich}
 	cell := map[string]any{"id": NewID(), "row": 0, "column": 0, "rowSpan": 1, "colSpan": 1, "richText": rich, "preMergeCells": []any{map[string]any{"retained": "original source evidence"}}}
-	tableData := map[string]any{"rowCount": 1, "columnCount": 1, "headerRows": 1, "headerColumns": 0, "columnWidths": []any{180}, "cells": []any{cell}}
+	tableData := map[string]any{"rowCount": 2, "columnCount": 1, "headerRows": 1, "headerColumns": 1, "columnWidths": []any{220}, "cells": []any{cell, map[string]any{"id": NewID(), "row": 1, "column": 0, "rowSpan": 1, "colSpan": 1, "richText": richImport("Added row"), "preMergeCells": []any{}}}}
 	insert := func(id, kind, parent string, data any) any {
 		block := map[string]any{"blockId": id, "pageId": page, "type": kind, "schemaVersion": 1, "data": data}
 		if parent != "" {
@@ -24,7 +32,7 @@ func TestEditorIntegrityRichContentAndCollapseSurviveRecoveryAndPortability(t *t
 		}
 		return map[string]any{"kind": "block.insert", "block": block}
 	}
-	testOK(t, dbBatch(t, k, e, []any{insert(toggle, "toggle", "", toggleData), insert(paragraph, "paragraph", toggle, paragraphData), insert(table, "table", toggle, tableData)}, "page", page, "block", toggle, "block", paragraph, "block", table))
+	testOK(t, dbBatch(t, k, e, []any{insert(toggle, "toggle", "", toggleData), insert(paragraph, "paragraph", toggle, paragraphData), insert(table, "table", toggle, tableData), insert(code, "code", toggle, codeData), insert(image, "image", toggle, imageData)}, "page", page, "block", toggle, "block", paragraph, "block", table, "block", code, "block", image))
 	revision := str(readPage(t, k, e, page)["page"].(map[string]any)["revision"])
 	testOK(t, dbBatch(t, k, e, []any{map[string]any{"kind": "block.update", "blockId": toggle, "type": "toggle", "schemaVersion": 1, "data": map[string]any{"richText": richImport("Toggle"), "collapsed": false}}, map[string]any{"kind": "block.update", "blockId": paragraph, "type": "paragraph", "schemaVersion": 1, "data": map[string]any{"richText": richImport("Changed later")}}}, "page", page, "block", toggle, "block", paragraph))
 	testOK(t, restoreTest(t, k, e, page, revision))
@@ -35,7 +43,7 @@ func TestEditorIntegrityRichContentAndCollapseSurviveRecoveryAndPortability(t *t
 		t.Fatal(err)
 	}
 	defer reopened.Close()
-	expected := map[string]any{toggle: toggleData, paragraph: paragraphData, table: tableData}
+	expected := map[string]any{toggle: toggleData, paragraph: paragraphData, table: tableData, code: codeData, image: imageData}
 	for _, raw := range readPage(t, reopened, reopened.OwnerContext(), page)["blocks"].([]any) {
 		block := raw.(map[string]any)
 		if string(marshal(block["data"])) != string(marshal(expected[str(block["id"])])) {
@@ -93,6 +101,7 @@ func TestEditorIntegrityRichContentAndCollapseSurviveRecoveryAndPortability(t *t
 	}
 	plan := completeImportFixture(t, k2, e2, preview.(ImportPlan))
 	matched := false
+	controls := map[string]bool{}
 	for _, item := range plan.Items {
 		if item.PageID == "" || item.Title != "Rich editing evidence" {
 			continue
@@ -106,10 +115,33 @@ func TestEditorIntegrityRichContentAndCollapseSurviveRecoveryAndPortability(t *t
 				}
 				matched = true
 			}
+			if block["type"] == "code" {
+				if string(marshal(data)) != string(marshal(codeData)) {
+					t.Fatal("code settings or bytes lost in portable import", data)
+				}
+				controls["code"] = true
+			}
+			if block["type"] == "image" {
+				if data["alignment"] != "right" || str(data["fileId"]) == "" || string(marshal(data["width"])) != "240" || data["altText"] != "Image description" {
+					t.Fatal("image settings lost in portable import", data)
+				}
+				controls["image"] = true
+			}
+			if block["type"] == "table" {
+				for _, key := range []string{"rowCount", "columnCount", "headerRows", "headerColumns", "columnWidths"} {
+					if string(marshal(data[key])) != string(marshal(tableData[key])) {
+						t.Fatal("table structure lost in portable import", key, data)
+					}
+				}
+				controls["table"] = true
+			}
 			if block["type"] == "paragraph" && string(marshal(data["richText"])) != string(marshal(rich)) {
 				t.Fatal("portable import flattened marks/links", data)
 			}
 		}
+	}
+	if len(controls) != 3 {
+		t.Fatal("portable import omitted editor controls", controls)
 	}
 	if !matched {
 		t.Fatalf("canonical toggle not reconstructed on portable import: %s", marshal(plan.Items))
