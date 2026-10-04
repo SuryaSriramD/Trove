@@ -160,6 +160,12 @@ test.beforeEach(async ({ page }) => {
               requests.push({ method, ...req });
               const ok = (result: any) => JSON.stringify({ ok: true, result });
               if (method === "workspace.snapshot") return ok(state);
+              if (method === "pageDisplay.get") return ok({pageId:req.pageId,fullWidth:false,presentation:false,revision:"1"});
+              if (method === "editor.lock") return ok({locked:false,revision:"0"});
+              if (method === "editor.templates") return ok({templates:[]});
+              if (method === "editor.references") return ok({references:[]});
+              if (method === "ai.runs") return ok([]);
+              if (method === "memory.list") return ok({entries:[]});
               state.p2 ??= {
                 chart: {
                   groupPropertyId: null,
@@ -434,6 +440,38 @@ test("all four views retain canonical record identities; board and calendar call
     .getByRole("button", { name: /Pages$/ })
     .click();
   await expect(page.locator(".db-table tbody tr")).toHaveCount(2);
+});
+
+test("linked placements open their own view and retain multiple local tabs after restart", async ({page}) => {
+  await page.evaluate(() => {
+    const state=(window as any).dbState();
+    const id=(n:number)=>`019a1234-5678-7000-8000-${String(n).padStart(12,'0')}`;
+    state.pages.push({...state.pages[0],id:id(60),title:'Linked project'}, {...state.pages[0],id:id(61),title:'Linked archive'});
+    for (const [n,parent,name,visible] of [[62,60,'Project titles',[11]],[63,60,'Project status',[11,12]],[64,61,'Archive dates',[11,13]]] as const) {
+      const view=structuredClone(state.views[0]);
+      Object.assign(view,{id:id(n),owningPageId:id(parent),name,query:{...view.query,visiblePropertyIds:visible.map(id)}});
+      state.views.push(view);
+    }
+    localStorage.setItem('databaseFixture',JSON.stringify(state));
+  });
+  await page.reload();
+  await page.locator('.tree-item').filter({hasText:'Linked project'}).click();
+  const database=page.getByRole('region',{name:'Database',exact:true});
+  await expect(database.getByRole('tab',{name:/Project titles$/})).toHaveAttribute('aria-selected','true');
+  await expect(database.getByRole('tab')).toHaveCount(2);
+  await expect(database.locator('.db-table thead th')).toHaveCount(2);
+  await expect.poll(()=>page.evaluate(()=>(window as any).dbRequests.filter((r:any)=>r.method==='queryRecords').at(-1)?.viewId)).toBe(id(62));
+  await database.getByRole('tab',{name:/Project status$/}).click();
+  await expect(database.locator('.db-table thead th')).toHaveCount(3);
+  await expect.poll(()=>page.evaluate(()=>(window as any).dbRequests.filter((r:any)=>r.method==='queryRecords').at(-1)?.viewId)).toBe(id(63));
+  await page.locator('.tree-item').filter({hasText:'Linked archive'}).click();
+  await expect(database.getByRole('tab',{name:/Archive dates$/})).toHaveAttribute('aria-selected','true');
+  await expect(database.getByRole('tab')).toHaveCount(1);
+  await expect(database.locator('.db-table thead')).toContainText('When');
+  await page.reload();
+  await page.locator('.tree-item').filter({hasText:'Linked archive'}).click();
+  await expect(database.getByRole('tab',{name:/Archive dates$/})).toHaveAttribute('aria-selected','true');
+  await expect.poll(()=>page.evaluate(()=>(window as any).dbRequests.filter((r:any)=>r.method==='queryRecords').at(-1)?.viewId)).toBe(id(64));
 });
 test("saved view filter groups, sorting, visibility, rename and move serialize without record duplication", async ({
   page,

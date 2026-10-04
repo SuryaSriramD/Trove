@@ -12,8 +12,17 @@ var canonicalLinkID = regexp.MustCompile(`^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-
 // suffix as a page identity breaks save, recovery and portable ID remapping.
 func parseCanonicalPageLink(raw string) (pageID, blockID string, ok bool) {
 	u, err := url.Parse(raw)
-	if err != nil || u.Scheme != "trove" || u.Host != "page" || u.User != nil || u.RawQuery != "" {
+	if err != nil || len(raw) > 512 || u.Scheme != "trove" || u.Host != "page" || u.User != nil || u.RawPath != "" {
 		return "", "", false
+	}
+	query, err := url.ParseQuery(u.RawQuery)
+	if err != nil {
+		return "", "", false
+	}
+	for key, values := range query {
+		if key != "workspace" || len(values) != 1 || !canonicalLinkID.MatchString(values[0]) {
+			return "", "", false
+		}
 	}
 	parts := strings.Split(strings.TrimPrefix(u.Path, "/"), "/")
 	if len(parts) != 1 && len(parts) != 3 {

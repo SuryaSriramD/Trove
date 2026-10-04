@@ -387,8 +387,12 @@ func rewritePortableDatabaseValue(v any, ids map[string]string, key string) any 
 			}
 		}
 		if key == "link" && strings.HasPrefix(x, "trove://page/") {
-			if id := ids[strings.TrimPrefix(x, "trove://page/")]; id != "" {
-				return "trove://page/" + id
+			page, block, ok := parseCanonicalPageLink(x)
+			if id := ids[page]; ok && id != "" {
+				if mapped := ids[block]; mapped != "" {
+					block = mapped
+				}
+				return canonicalPageLink(id, block)
 			}
 		}
 		return x

@@ -92,6 +92,7 @@ info = {
     'TroveReleaseChannel': 'P2 development preview' if args.phase6 else 'P1 personal-use candidate' if args.phase5 else ('P1 development preview' if args.phase4 else 'P0 release candidate'),
     'NSHighResolutionCapable': True,
     'NSMicrophoneUsageDescription': 'Trove records meetings locally when you start a recording.',
+    'CFBundleURLTypes': [{'CFBundleURLName': 'local.trove.workspace', 'CFBundleURLSchemes': ['trove']}],
     'NSHumanReadableCopyright': 'Trove contributors',
 }
 with (contents / 'Info.plist').open('wb') as f:

@@ -16,6 +16,7 @@ declare global {
           PickModelPack?(packId: string): Promise<void>;
           SetEditing?(active: boolean): Promise<void>;
           ShellReady?(): Promise<void>;
+          PendingDeepLink?(): Promise<string>;
           StageUpload?(
             name: string,
             mediaType: string,

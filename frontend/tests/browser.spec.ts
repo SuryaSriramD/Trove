@@ -1095,6 +1095,56 @@ test("Phase 2 search opens the exact cited block without model packs", async ({ 
   await expect(page.locator(".app-footer")).toContainText("Opened cited source");
 });
 
+test("copied page and block links route through editor navigation", async ({ page }) => {
+  await page.evaluate(() => {
+    const state = (window as any).fixtureState();
+    const target = "019a1234-5678-7000-8000-000000000802";
+    const block = "019a1234-5678-7000-8000-000000000803";
+    state.pages.push({...state.pages[0], id: target, title: "Linked destination"});
+    state.blocks.push({...state.blocks[1], id: block, pageId: target, data: {richText: [{text: "Exact target paragraph"}]}});
+    state.blocks[1].data.richText = [{text: "Open target block", link: `trove://page/${target}/block/${block}?workspace=${state.workspaceId}`}];
+    localStorage.setItem("fixture", JSON.stringify(state));
+  });
+  await page.reload();
+  await open(page);
+  await page.getByRole("link", {name: "Open target block"}).click();
+  await expect(page.getByRole("textbox", {name: "Page title"})).toHaveValue("Linked destination");
+  await expect(page.locator(`[data-block-id="${id(803)}"]`)).toHaveClass(/source-highlight/);
+  await expect(page.locator(".app-footer")).toContainText("Opened linked block");
+});
+
+test("native URL events consume a pending block link once", async ({ page }) => {
+  await navSurface(page, "Search");
+  await page.evaluate(() => {
+    let pending = "trove://page/019a1234-5678-7000-8000-000000000002/block/019a1234-5678-7000-8000-000000000011";
+    (window as any).go.main.App.PendingDeepLink = async () => {const value = pending; pending = ""; return value;};
+    (window as any).emitFixtureEvent("native:openURL");
+  });
+  await expect(page.getByRole("textbox", {name: "Page title"})).toHaveValue("A garden of ideas");
+  await expect(page.locator(`[data-block-id="${id(11)}"]`)).toHaveClass(/source-highlight/);
+  await navSurface(page, "Search");
+  await page.evaluate(() => (window as any).emitFixtureEvent("native:openURL"));
+  await expect(page.getByRole("searchbox", {name: "Search text"})).toBeVisible();
+});
+
+test("links report unavailable workspaces and missing blocks without leaving the current page", async ({ page }) => {
+  await open(page);
+  for (const [href, message] of [
+    [`trove://page/${id(2)}?workspace=${id(999)}`, "another workspace"],
+    [`trove://page/${id(2)}/block/${id(998)}`, "block is unavailable"],
+    [`trove://page/${id(997)}`, "page is unavailable"],
+  ]) {
+    await page.evaluate((href) => {
+      const app = (window as any).go.main.App;
+      let pending = href;
+      app.PendingDeepLink = async () => {const value = pending; pending = ""; return value;};
+      (window as any).emitFixtureEvent("native:openURL");
+    }, href);
+    await expect(page.getByRole("alert")).toContainText(message);
+    await expect(page.getByRole("textbox", {name: "Page title"})).toHaveValue("A garden of ideas");
+  }
+});
+
 test("Phase 2 import displays complete accounting and editable property preview", async ({ page }) => {
   await page.evaluate(() => {
     const app = (window as any).go.main.App;

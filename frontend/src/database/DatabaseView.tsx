@@ -41,6 +41,7 @@ import {
 type Props = {
   workspace: WorkspaceSnapshot;
   collectionId?: string;
+  owningPageId?: string;
   onCommitted: () => Promise<void>;
   onError: (error: unknown) => void;
   openPage: (id: string) => void;
@@ -64,6 +65,7 @@ const editableTypes = [
 export default function DatabaseView({
   workspace: w,
   collectionId,
+  owningPageId,
   onCommitted,
   onError,
   openPage,
@@ -90,7 +92,12 @@ export default function DatabaseView({
   const properties = w.properties.filter(
     (p) => p.collectionId === collection?.id,
   );
-  const views = w.views.filter((v) => v.collectionId === collection?.id);
+  // A saved view belongs to a page independently of its shared collection.
+  // Page embeds must not pick a default/filter from another page's placement.
+  const views = w.views.filter(
+    (v) => v.collectionId === collection?.id &&
+      (!owningPageId || v.owningPageId === owningPageId),
+  );
   const view = views.find((v) => v.id === active) ?? views[0];
   useEffect(() => {
     if (collectionId) setSelected(collectionId);
@@ -356,7 +363,7 @@ export default function DatabaseView({
       id,
       collectionId: collection.id,
       containerId: null,
-      owningPageId: collection.owningPageId,
+      owningPageId: owningPageId ?? collection.owningPageId,
       name: `${type[0].toUpperCase() + type.slice(1)} view`,
       type,
       schemaVersion: 1,

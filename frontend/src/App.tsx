@@ -25,6 +25,7 @@ import RecoveryPanel from "./recovery/RecoveryPanel";
 import { PageEditor } from "./editor/Editor";
 import { readable } from "./editor/codec";
 import { focusSourceLocation } from "./sourceNavigation";
+import { parseDeepLink } from "./deepLinks";
 import { SearchPanel } from "./search/SearchPanel";
 import { MeetingPanel } from "./meetings/MeetingPanel";
 import { ImportExportPanel } from "./imports/ImportExportPanel";
@@ -300,7 +301,7 @@ export default function App() {
   const backlinks = (active && backlinksByPage.get(active)) || [];
   const navigate = useCallback(
     async (target: string, record = true) => {
-      if (flushEditor.current && !(await flushEditor.current())) return;
+      if (flushEditor.current && !(await flushEditor.current())) return false;
       setSourceLocation(null);
       if (nav.some((n) => n[0] === target)) {
         setSurface(target as Surface);
@@ -319,9 +320,56 @@ export default function App() {
         setHistory((h) => [...h.slice(0, position + 1), target]);
         setPosition(position + 1);
       }
+      return true;
     },
     [position],
   );
+  const deepLinkHandler = useRef<(href: string) => Promise<void>>(async () => {});
+  deepLinkHandler.current = async (href: string) => {
+    try {
+      const target = parseDeepLink(href);
+      if (flushEditor.current && !(await flushEditor.current())) return;
+      const current = await snapshot();
+      if (target.workspaceId && target.workspaceId !== current.workspaceId)
+        throw new Error("This link belongs to another workspace. Open that workspace in Settings, then follow the link again.");
+      const targetPage = current.pages.find(p => p.id === target.pageId && !p.deletedAt);
+      if (!targetPage) throw new Error("The linked page is unavailable in this workspace or is in Trash.");
+      if (target.blockId && !current.blocks.some(b => b.id === target.blockId && b.pageId === target.pageId))
+        throw new Error("The linked block is unavailable or has moved to another page.");
+      setW(current);
+      if (!(await navigate(target.pageId))) return;
+      setSourceLocation({pageId: target.pageId, sourceRevision: targetPage.revision,
+        ...(target.blockId ? {blockId: target.blockId} : {})});
+      setStatus(target.blockId ? "Opened linked block." : "Opened linked page.");
+    } catch (error) { errorHandler(error); }
+  };
+  useEffect(() => {
+    // Delegate at the application boundary so links inside nested rich editors,
+    // ordinary page content and imported readable fallbacks share one resolver.
+    const click = (event: MouseEvent) => {
+      const link = (event.target as Element | null)?.closest?.<HTMLAnchorElement>("a[href]");
+      const href = link?.getAttribute("href") ?? "";
+      if (!/^trove:/i.test(href)) return;
+      event.preventDefault();
+      event.stopPropagation();
+      void deepLinkHandler.current(href);
+    };
+    document.addEventListener("click", click, true);
+    return () => document.removeEventListener("click", click, true);
+  }, []);
+  useEffect(() => {
+    if (loading || !w) return;
+    let active = true;
+    const consume = async () => {
+      try {
+        const href = await window.go?.main.App.PendingDeepLink?.();
+        if (active && href) await deepLinkHandler.current(href);
+      } catch (error) { if (active) errorHandler(error); }
+    };
+    const off = window.runtime?.EventsOn("native:openURL", () => void consume());
+    void consume();
+    return () => { active = false; off?.(); };
+  }, [loading, w?.workspaceId, errorHandler]);
   async function navigateSource(location: D.Location) {
     if (!w) return;
     try {
@@ -901,7 +949,7 @@ export default function App() {
                   key={id}
                   workspace={w}
                   collectionId={id}
-
+                  owningPageId={page.id}
                   onCommitted={refresh}
                   onError={errorHandler}
                   openPage={navigate}

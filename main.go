@@ -18,6 +18,9 @@ var frontendAssets embed.FS
 
 func main() {
 	app := NewApp()
+	for _, argument := range os.Args[1:] {
+		app.openURL(argument)
+	}
 	assets, err := fs.Sub(frontendAssets, "frontend/dist")
 	if err != nil {
 		fmt.Fprintln(os.Stderr, err)
@@ -28,7 +31,7 @@ func main() {
 		AssetServer:      &assetserver.Options{Assets: assets, Handler: http.HandlerFunc(app.serveFile)},
 		OnStartup:        app.startup, OnDomReady: app.domReady, OnShutdown: app.shutdown, Bind: []interface{}{app},
 		DragAndDrop: &options.DragAndDrop{EnableFileDrop: true},
-		Mac:         &mac.Options{TitleBar: mac.TitleBarDefault()},
+		Mac:         &mac.Options{TitleBar: mac.TitleBarDefault(), OnUrlOpen: app.openURL},
 	})
 	if err != nil {
 		fmt.Fprintln(os.Stderr, err)

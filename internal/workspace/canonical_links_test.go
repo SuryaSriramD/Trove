@@ -15,7 +15,7 @@ func TestCanonicalBlockLinksSaveRecoverAndExportAnchors(t *testing.T) {
 	targetPage := createPage(t, k, e, "Target")
 	sourcePage := createPage(t, k, e, "Links")
 	code, linkBlock := NewID(), NewID()
-	link := canonicalPageLink(targetPage, code)
+	link := canonicalPageLink(targetPage, code) + "?workspace=" + k.ID()
 	testOK(t, dbBatch(t, k, e, []any{map[string]any{"kind": "block.insert", "block": map[string]any{"blockId": code, "pageId": targetPage, "type": "code", "schemaVersion": 1, "data": map[string]any{"language": "go", "source": "func Preserved() {}"}}}}, "page", targetPage, "block", code))
 	testOK(t, dbBatch(t, k, e, []any{map[string]any{"kind": "block.insert", "block": map[string]any{"blockId": linkBlock, "pageId": sourcePage, "type": "paragraph", "schemaVersion": 1, "data": map[string]any{"richText": []any{map[string]any{"text": "Code source", "link": link}}}}}}, "page", sourcePage, "block", linkBlock))
 	var target string
@@ -182,13 +182,13 @@ func TestRecoveryAllowsOnlyHistoricalUnavailableSyncedReferences(t *testing.T) {
 }
 func TestCanonicalPageLinkParsingRejectsAmbiguousRoutes(t *testing.T) {
 	page, block := NewID(), NewID()
-	for _, link := range []string{canonicalPageLink(page, ""), canonicalPageLink(page, block), "trove://page/" + page + "#" + block} {
+	for _, link := range []string{canonicalPageLink(page, ""), canonicalPageLink(page, block), canonicalPageLink(page, block) + "?workspace=" + NewID(), "trove://page/" + page + "#" + block} {
 		p, b, ok := parseCanonicalPageLink(link)
 		if !ok || p != page || (strings.Contains(link, "block") && b != block) {
 			t.Fatal(link, p, b, ok)
 		}
 	}
-	for _, link := range []string{"trove://evil/" + page, "trove://page/" + page + "/block/", "trove://page/" + page + "/extra", "trove://page/" + page + "?override=1"} {
+	for _, link := range []string{"trove://evil/" + page, "trove://page/" + page + "/block/", "trove://page/" + page + "/extra", "trove://page/" + page + "?override=1", canonicalPageLink(page, block) + "?workspace=invalid", canonicalPageLink(page, block) + "?workspace=" + NewID() + "&workspace=" + NewID()} {
 		if _, _, ok := parseCanonicalPageLink(link); ok {
 			t.Fatal("ambiguous URL accepted", link)
 		}

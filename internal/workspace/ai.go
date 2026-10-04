@@ -130,7 +130,7 @@ func (k *Kernel) PrepareAI(ctx context.Context, e contracts.ServiceExecutionCont
 	if prior != nil && r.PageID == "" {
 		retrieval.Prompt = r.Prompt + " " + prior.Request.Prompt
 	}
-	sources, err := k.aiSources(ctx, e, retrieval)
+	sources, retrievalWarning, err := k.aiSources(ctx, e, retrieval)
 	if err != nil {
 		return out, err
 	}
@@ -178,9 +178,9 @@ func (k *Kernel) PrepareAI(ctx context.Context, e contracts.ServiceExecutionCont
 	if len(kept) == 0 && !aiSourceOptional(r.Mode) {
 		return out, Fail("RESOURCE_EXHAUSTED", "No source excerpt fits the local model context; use a shorter question or a selected block")
 	}
-	run := AIRun{ID: NewID(), ConversationID: r.ConversationID, State: "running", Request: r, Sources: kept, Citations: []AICitation{}, CreatedAt: now()}
+	run := AIRun{ID: NewID(), ConversationID: r.ConversationID, State: "running", Request: r, Sources: kept, Citations: []AICitation{}, Warning: retrievalWarning, CreatedAt: now()}
 	if partial {
-		run.Warning = "Source context was shortened to fit the local model. This response covers the displayed excerpts, not every part of the page or workspace."
+		run.Warning = strings.TrimSpace(run.Warning + " " + "Source context was shortened to fit the local model. This response covers the displayed excerpts, not every part of the page or workspace.")
 	}
 	instructions := map[string]string{"answer": "Answer the question using only the evidence. Cite each factual statement with [number]. Say when the evidence does not answer it.", "rewrite": "Rewrite the selected text or page clearly, preserving all facts.", "summarize": "Summarize the selected text or page. Cite factual statements with [number].", "explain": "Explain the selected text or page using the evidence. Cite factual statements with [number].", "shorten": "Shorten the selected text or page while preserving its meaning.", "expand": "Expand the selected text or page without inventing facts. Label suggestions explicitly.", "outline": "Return a concise outline with Markdown headings and bullet points; distinguish suggestions from sourced facts.", "generate": "Create a page with a title, Markdown headings and paragraphs. Distinguish suggestions from sourced facts."}
 	if instruction, ok := advancedAIInstructions[r.Mode]; ok {
@@ -217,11 +217,12 @@ func truncateAI(s string, n int) string {
 	}
 	return s[:n] + "…"
 }
-func (k *Kernel) aiSources(ctx context.Context, e contracts.ServiceExecutionContext, r AIRequest) ([]AIEvidence, error) {
+func (k *Kernel) aiSources(ctx context.Context, e contracts.ServiceExecutionContext, r AIRequest) ([]AIEvidence, string, error) {
 	if err := k.FlushSearch(ctx); err != nil {
-		return nil, err
+		return nil, "", err
 	}
 	out := []AIEvidence{}
+	warning := ""
 	seen := map[string]bool{}
 	add := func(title, text string, loc contracts.DomainLocation) {
 		var n int
@@ -238,13 +239,13 @@ func (k *Kernel) aiSources(ctx context.Context, e contracts.ServiceExecutionCont
 	if r.PageID != "" {
 		rows, err := k.db.QueryContext(ctx, `SELECT c.title,c.body,c.location_json FROM search_chunks c JOIN pages p ON p.id=c.page_id AND p.revision=c.source_revision WHERE c.page_id=? AND p.deleted_at IS NULL ORDER BY CASE WHEN c.block_id=? THEN 0 WHEN c.block_id IS NULL THEN 1 ELSE 2 END,c.rowid LIMIT 100`, r.PageID, r.BlockID)
 		if err != nil {
-			return nil, err
+			return nil, "", err
 		}
 		for rows.Next() {
 			var title, text, raw string
 			if err = rows.Scan(&title, &text, &raw); err != nil {
 				rows.Close()
-				return nil, err
+				return nil, "", err
 			}
 			var loc contracts.DomainLocation
 			json.Unmarshal([]byte(raw), &loc)
@@ -253,21 +254,42 @@ func (k *Kernel) aiSources(ctx context.Context, e contracts.ServiceExecutionCont
 		err = rows.Err()
 		rows.Close()
 		if err != nil {
-			return nil, err
+			return nil, "", err
 		}
 	} else {
-		request := map[string]any{"query": r.Prompt, "limit": float64(12)}
+		request := map[string]any{"query": r.Prompt, "limit": float64(12), "mode": "keyword"}
+		// Use only the model enabled by the workspace owner, never an arbitrary
+		// retained index or the chat model. This read does not widen caller scope.
+		var model string
+		var compatible int
+		if err := k.db.QueryRowContext(ctx, `SELECT COALESCE((SELECT value FROM search_meta WHERE key='semantic_model'),''), EXISTS(SELECT 1 FROM search_embeddings v JOIN search_chunks c ON c.id=v.chunk_id AND c.content_hash=v.content_hash JOIN pages p ON p.id=c.page_id AND p.revision=c.source_revision AND p.deleted_at IS NULL WHERE v.model_pack_id=(SELECT value FROM search_meta WHERE key='semantic_model') AND v.dimension=CAST((SELECT value FROM search_meta WHERE key='semantic_dimension') AS INTEGER))`).Scan(&model, &compatible); err != nil {
+			return nil, "", err
+		}
+		if model != "" && compatible != 0 {
+			request["mode"], request["modelPackId"] = "hybrid", model
+		} else if model == "" {
+			warning = "Semantic retrieval is not enabled. Using keyword sources."
+		} else {
+			warning = "No compatible semantic index is ready. Using keyword sources."
+		}
 		if r.ProjectID != "" {
 			request["scope"] = map[string]any{"kind": "project", "workspaceId": k.id, "projectId": r.ProjectID}
 		}
 		result, err := searchQuery(ctx, k, e, request)
 		if err != nil {
-			return nil, err
+			return nil, "", err
 		}
-		hits := result.(SearchResults).Hits
+		searched := result.(SearchResults)
+		hits := searched.Hits
+		if searched.Warning != "" {
+			warning = searched.Warning
+		}
 		// Natural questions rarely share every token with a source. Union single-term
 		// results only after strict search found none; live filters remain identical.
 		if len(hits) == 0 {
+			// Query embeddings already covered the complete question. Do not start
+			// another model inference for each token during lexical fallback.
+			request["mode"] = "keyword"
 			for _, term := range strings.Fields(r.Prompt) {
 				if len(term) < 4 {
 					continue
@@ -275,7 +297,7 @@ func (k *Kernel) aiSources(ctx context.Context, e contracts.ServiceExecutionCont
 				request["query"] = term
 				res, err := searchQuery(ctx, k, e, request)
 				if err != nil {
-					return nil, err
+					return nil, "", err
 				}
 				hits = append(hits, res.(SearchResults).Hits...)
 				if len(hits) >= 12 {
@@ -290,7 +312,7 @@ func (k *Kernel) aiSources(ctx context.Context, e contracts.ServiceExecutionCont
 	if r.UseMemory {
 		memories, err := readMemories(ctx, k, k.db, e, false)
 		if err != nil {
-			return nil, err
+			return nil, "", err
 		}
 		var scope contracts.DomainScope
 		if r.ProjectID != "" {
@@ -321,7 +343,7 @@ func (k *Kernel) aiSources(ctx context.Context, e contracts.ServiceExecutionCont
 				}
 				rows, err := k.db.QueryContext(ctx, "SELECT title,body,location_json FROM search_chunks WHERE page_id=? ORDER BY rowid LIMIT 5", *m.PageRef)
 				if err != nil {
-					return nil, err
+					return nil, "", err
 				}
 				for rows.Next() {
 					var t, b, l string
@@ -339,7 +361,7 @@ func (k *Kernel) aiSources(ctx context.Context, e contracts.ServiceExecutionCont
 		}
 		out = append(out, prefix...)
 	}
-	return out, nil
+	return out, warning, nil
 }
 
 func (k *Kernel) CheckpointAI(ctx context.Context, e contracts.ServiceExecutionContext, id, text string) error {

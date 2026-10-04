@@ -11,6 +11,7 @@ export function focusSourceLocation(location: D.Location): () => void {
   let focused: HTMLElement | null = null;
   const visit = () => {
     if (disposed) return;
+    if (location.blockId) window.dispatchEvent(new CustomEvent("trove:reveal-block", {detail: {blockId: location.blockId}}));
     const block = location.blockId
       ? document.querySelector<HTMLElement>(`[data-block-id="${CSS.escape(location.blockId)}"]`)
       : document.querySelector<HTMLElement>(".page-heading");
