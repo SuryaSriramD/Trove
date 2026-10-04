@@ -5793,6 +5793,170 @@
           "additionalProperties": false
         }
       ]
+    },
+    "ProviderManagedStatusRequest": {
+      "type": "object",
+      "properties": {
+        "contractVersion": {
+          "const": 1
+        },
+        "requestId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "workspaceId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        }
+      },
+      "required": [
+        "contractVersion",
+        "requestId",
+        "workspaceId"
+      ],
+      "additionalProperties": false
+    },
+    "ProviderDiscoverRequest": {
+      "type": "object",
+      "properties": {
+        "contractVersion": {
+          "const": 1
+        },
+        "requestId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "workspaceId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "provider": {
+          "type": "string",
+          "enum": [
+            "codex",
+            "claude_code"
+          ]
+        }
+      },
+      "required": [
+        "contractVersion",
+        "requestId",
+        "workspaceId",
+        "provider"
+      ],
+      "additionalProperties": false
+    },
+    "ProviderManagedStartRequest": {
+      "type": "object",
+      "properties": {
+        "contractVersion": {
+          "const": 1
+        },
+        "requestId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "workspaceId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "provider": {
+          "type": "string",
+          "enum": [
+            "codex",
+            "claude_code"
+          ]
+        },
+        "registrationId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 256
+        },
+        "billingMode": {
+          "type": "string",
+          "enum": [
+            "chatgpt_plan",
+            "subscription",
+            "api"
+          ]
+        },
+        "model": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "prompt": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 65536
+        },
+        "pageIds": {
+          "type": "array",
+          "items": {
+            "$ref": "domain.schema.json#/$defs/Id"
+          },
+          "maxItems": 100,
+          "minItems": 1,
+          "uniqueItems": true
+        },
+        "tools": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": [
+              "readPage",
+              "search.query",
+              "queryRecords",
+              "resolveCitation",
+              "allocateIds",
+              "proposeChanges",
+              "proposeActions"
+            ]
+          },
+          "maxItems": 7,
+          "minItems": 1,
+          "uniqueItems": true
+        },
+        "previewHash": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        },
+        "resumeRunId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        }
+      },
+      "required": [
+        "contractVersion",
+        "requestId",
+        "workspaceId",
+        "provider",
+        "registrationId",
+        "billingMode",
+        "model",
+        "prompt",
+        "pageIds",
+        "tools",
+        "previewHash"
+      ],
+      "additionalProperties": false
+    },
+    "ProviderManagedCancelRequest": {
+      "type": "object",
+      "properties": {
+        "contractVersion": {
+          "const": 1
+        },
+        "requestId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "workspaceId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "runId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        }
+      },
+      "required": [
+        "contractVersion",
+        "requestId",
+        "workspaceId",
+        "runId"
+      ],
+      "additionalProperties": false
     }
   }
 }

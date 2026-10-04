@@ -2033,6 +2033,37 @@ if matchesVariant(fields,[]string{"ok","result"},map[string]string{"ok":"true"},
 if matchesVariant(fields,[]string{"ok","error"},map[string]string{"ok":"false"},map[string][]string{},[]string{"ok","error"}) { var result ServicePrepareFileResponseVariant2; if err := json.Unmarshal(data,&result); err != nil {return err}; v.Value=result; return nil }
 return fmt.Errorf("unknown or incomplete ServicePrepareFileResponse variant")
 }
+type ServiceProviderManagedStatusRequest struct {
+ContractVersion int64 `json:"contractVersion"`
+RequestId DomainId `json:"requestId"`
+WorkspaceId DomainId `json:"workspaceId"`
+}
+type ServiceProviderDiscoverRequest struct {
+ContractVersion int64 `json:"contractVersion"`
+RequestId DomainId `json:"requestId"`
+WorkspaceId DomainId `json:"workspaceId"`
+Provider string `json:"provider"`
+}
+type ServiceProviderManagedStartRequest struct {
+ContractVersion int64 `json:"contractVersion"`
+RequestId DomainId `json:"requestId"`
+WorkspaceId DomainId `json:"workspaceId"`
+Provider string `json:"provider"`
+RegistrationId string `json:"registrationId"`
+BillingMode string `json:"billingMode"`
+Model string `json:"model"`
+Prompt string `json:"prompt"`
+PageIds []DomainId `json:"pageIds"`
+Tools []string `json:"tools"`
+PreviewHash string `json:"previewHash"`
+ResumeRunId *DomainId `json:"resumeRunId,omitempty"`
+}
+type ServiceProviderManagedCancelRequest struct {
+ContractVersion int64 `json:"contractVersion"`
+RequestId DomainId `json:"requestId"`
+WorkspaceId DomainId `json:"workspaceId"`
+RunId DomainId `json:"runId"`
+}
 type JobsJobKind string
 type JobsJobState string
 type JobsProgress struct {
