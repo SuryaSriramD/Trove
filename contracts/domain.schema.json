@@ -162,6 +162,12 @@
           },
           "link": {
             "type": "string"
+          },
+          "color": {
+            "$ref": "#/$defs/ColorToken"
+          },
+          "highlight": {
+            "$ref": "#/$defs/ColorToken"
           }
         },
         "required": [
@@ -4589,6 +4595,20 @@
         "fields"
       ],
       "additionalProperties": false
+    },
+    "ColorToken": {
+      "type": "string",
+      "enum": [
+        "gray",
+        "brown",
+        "orange",
+        "yellow",
+        "green",
+        "blue",
+        "purple",
+        "pink",
+        "red"
+      ]
     }
   }
 }

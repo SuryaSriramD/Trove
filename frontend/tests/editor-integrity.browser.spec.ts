@@ -2,7 +2,7 @@ import { test, expect, type Page, type Locator } from "@playwright/test";
 
 const id = (n: number) => `019a1234-5678-7000-8000-${String(n).padStart(12, "0")}`;
 const pageId = id(2);
-const rich = [{ text: "Keep ", marks: ["bold"] }, { text: "linked", link: "https://example.test/source" }, { text: " tail" }];
+const rich = [{ text: "Keep ", marks: ["bold"], color:"purple", highlight:"yellow" }, { text: "linked", link: "https://example.test/source" }, { text: " tail" }];
 const block = (n: number, type: string, data: unknown, parent: number | null = null) => ({
   id: id(n), pageId, parentBlockId: parent === null ? null : id(parent), sortKey: String(n).padStart(12, "0"), type, data, schemaVersion: 1, revision: "1",
 });
@@ -109,6 +109,8 @@ for(const kind of ["table","layout"] as const) test(`actual ${kind} editor prese
   const value=await persistedRich(page,kind);
   expect(value.map((run:any)=>run.text).join("")).toBe("Keep! linked tail");
   expect(value.find((run:any)=>run.text.includes("Keep"))?.marks).toContain("bold");
+  expect(value.find((run:any)=>run.text.includes("Keep"))?.color).toBe("purple");
+  expect(value.find((run:any)=>run.text.includes("Keep"))?.highlight).toBe("yellow");
   expect(value.find((run:any)=>run.text==="linked")?.link).toBe("https://example.test/source");
   if(kind==="table") expect(await page.evaluate(()=>(window as any).integrityState().blocks.find((b:any)=>b.type==="table").data.cells[0].preMergeCells[1].richText)).toEqual([{text:"Original retained cell"}]);
   await page.reload();await page.getByRole("button",{name:/Editor integrity/}).first().click();
@@ -203,4 +205,31 @@ test("managed images honor dimensions and alignment with zoom and a scoped origi
  await zoom.getByRole("button",{name:"Close image zoom"}).click();await expect(zoom).toHaveCount(0);
  await save(page);await page.reload();await page.getByRole("button",{name:/Editor integrity/}).first().click();
  await expect(image.locator(".image-zoom-trigger")).toHaveCSS("width","240px");await expect(image.locator(".managed-image-preview")).toHaveCSS("justify-content","center");await expect(image.locator(".image-zoom-trigger img")).toHaveAttribute("alt","A retained image");
+});
+
+test("outer text colors and highlights survive live selection, undo and reload",async({page})=>{
+ const paragraph=page.locator(`[data-block-id="${id(40)}"] .block-text`);
+ await paragraph.click();await page.keyboard.press("Home");await page.keyboard.press("Shift+End");
+ await page.getByRole("combobox",{name:"Text color",exact:true}).selectOption("blue");
+ await page.getByRole("combobox",{name:"Text highlight",exact:true}).selectOption("yellow");
+ await expect(paragraph.locator('[data-trove-color="blue"]')).toContainText("Visible sibling");
+ await expect(paragraph.locator('[data-trove-highlight="yellow"]')).toContainText("Visible sibling");
+ await page.getByRole("button",{name:"Undo",exact:true}).click();await expect(paragraph.locator('[data-trove-highlight="yellow"]')).toHaveCount(0);
+ await page.getByRole("button",{name:"Redo",exact:true}).click();await expect(paragraph.locator('[data-trove-highlight="yellow"]')).toContainText("Visible sibling");
+ await save(page);await page.reload();await page.getByRole("button",{name:/Editor integrity/}).first().click();
+ await expect(paragraph.locator('[data-trove-color="blue"]')).toContainText("Visible sibling");await expect(paragraph.locator('[data-trove-highlight="yellow"]')).toContainText("Visible sibling");
+});
+
+test("known pasted styles become finite tokens while unknown CSS remains inert source evidence",async({page,context})=>{
+ await context.grantPermissions(["clipboard-read","clipboard-write"]);
+ const html='<p><span style="color:rgb(255,0,0);background-color:#ffff00">Known color</span> <span style="color:#123456">Unknown color</span></p>';
+ await page.evaluate(async html=>navigator.clipboard.write([new ClipboardItem({"text/html":new Blob([html],{type:"text/html"}),"text/plain":new Blob(["Known color Unknown color"],{type:"text/plain"})})]),html);
+ const field=page.getByRole("textbox",{name:"Row 1 column 1",exact:true});await field.click();await field.press("End");await field.press("Meta+v");
+ await expect(field.locator('[data-trove-color="red"]')).toContainText("Known color");await expect(field.locator('[data-trove-highlight="yellow"]').filter({hasText:"Known color"})).toContainText("Known color");
+ await expect(page.locator(".preserved")).toContainText("Unsupported pasted colors are retained");await save(page);
+ const blocks=await page.evaluate(()=>(window as any).integrityState().blocks),cell=blocks.find((b:any)=>b.type==="table").data.cells[0];
+ expect(cell.richText.find((run:any)=>run.text.includes("Known color"))).toMatchObject({color:"red",highlight:"yellow"});
+ expect(cell.richText.find((run:any)=>run.text.includes("Unknown color"))).not.toHaveProperty("color");
+ expect(blocks.find((b:any)=>b.type==="unsupported_external").data.raw.html).toContain(html);
+ await page.reload();await page.getByRole("button",{name:/Editor integrity/}).first().click();await expect(field.locator('[data-trove-color="red"]')).toContainText("Known color");
 });

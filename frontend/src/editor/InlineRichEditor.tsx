@@ -3,6 +3,7 @@ import { EditorContent, useEditor } from "@tiptap/react";
 import { Extension, type Editor } from "@tiptap/core";
 import StarterKit from "@tiptap/starter-kit";
 import type { RichText } from "../../../contracts/generated/domain";
+import { TextColor, TextHighlight, ColorControls, preserveStyledPaste } from "./ColorMarks";
 import { richNodes, richText, type NodeJSON } from "./codec";
 
 function inlineDocument(value: RichText) {
@@ -31,6 +32,7 @@ export function InlineRichEditor({ value, onChange, label, owner, readOnly = fal
   const editor = useEditor({
     shouldRerenderOnTransaction: true,
     extensions: [
+      TextColor, TextHighlight,
       StarterKit.configure({
         heading: false, blockquote: false, bulletList: false, orderedList: false,
         listItem: false, codeBlock: false, horizontalRule: false, trailingNode: false,
@@ -54,6 +56,7 @@ export function InlineRichEditor({ value, onChange, label, owner, readOnly = fal
     editable: !readOnly,
     editorProps: {
       attributes: { role: "textbox", "aria-label": label, "aria-multiline": "true", dir: "auto", class: "inline-rich-content" },
+      handlePaste: preserveStyledPaste(()=>latest.current.owner),
       handleDOMEvents: {
         compositionstart: () => { composing.current = true; return false; },
         compositionend: () => {
@@ -80,6 +83,7 @@ export function InlineRichEditor({ value, onChange, label, owner, readOnly = fal
   if (!editor) return null;
   return <div className="inline-rich-editor" data-inline-editor="">
     {!readOnly && <div className="inline-rich-toolbar" role="toolbar" aria-label={`${label} formatting`}>
+      <ColorControls editor={editor} label={label}/>
       {(["bold", "italic", "underline", "strike", "code"] as const).map(mark =>
         <button type="button" key={mark} aria-label={`${label} ${mark}`} aria-pressed={editor.isActive(mark)}
           onMouseDown={event => event.preventDefault()}

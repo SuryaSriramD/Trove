@@ -60,13 +60,19 @@ func parseImportHTML(source string, item *ImportItem, pages, assets map[string]s
 	}
 	blocks := []ImportBlock{}
 	omitted, unresolved := 0, 0
-	var spans func(*html.Node, []string, string) []any
-	spans = func(n *html.Node, marks []string, link string) []any {
+	var spans func(*html.Node, []string, string, string, string) []any
+	spans = func(n *html.Node, marks []string, link, color, highlight string) []any {
 		if n.Type == html.TextNode {
 			if n.Data == "" {
 				return nil
 			}
 			s := map[string]any{"text": n.Data}
+			if color != "" {
+				s["color"] = color
+			}
+			if highlight != "" {
+				s["highlight"] = highlight
+			}
 			if len(marks) > 0 {
 				s["marks"] = append([]string{}, marks...)
 			}
@@ -76,6 +82,42 @@ func parseImportHTML(source string, item *ImportItem, pages, assets map[string]s
 			return []any{s}
 		}
 		if n.Type == html.ElementNode {
+			for _, field := range []string{"color", "highlight"} {
+				if raw := htmlImportAttr(n, "data-trove-"+field); raw != "" {
+					if _, ok := richForeground[raw]; ok {
+						if field == "color" {
+							color = raw
+						} else {
+							highlight = raw
+						}
+					} else {
+						omitted++
+					}
+				}
+			}
+			if n.Data == "mark" && highlight == "" {
+				highlight = "yellow"
+			}
+			for _, declaration := range strings.Split(htmlImportAttr(n, "style"), ";") {
+				pair := strings.SplitN(declaration, ":", 2)
+				if len(pair) != 2 {
+					continue
+				}
+				key := strings.ToLower(strings.TrimSpace(pair[0]))
+				isHighlight := key == "background-color" || key == "background"
+				if key != "color" && !isHighlight {
+					continue
+				}
+				if token := richColorToken(pair[1], isHighlight); token != "" {
+					if isHighlight {
+						highlight = token
+					} else {
+						color = token
+					}
+				} else {
+					omitted++
+				}
+			}
 			switch n.Data {
 			case "script", "style", "iframe", "object", "embed", "template":
 				omitted++
@@ -84,12 +126,27 @@ func parseImportHTML(source string, item *ImportItem, pages, assets map[string]s
 				marks = append(append([]string{}, marks...), "bold")
 			case "em", "i":
 				marks = append(append([]string{}, marks...), "italic")
+			case "u":
+				marks = append(append([]string{}, marks...), "underline")
 			case "del", "s":
 				marks = append(append([]string{}, marks...), "strike")
 			case "code":
 				marks = append(append([]string{}, marks...), "code")
 			case "br":
-				return richImport("\n")
+				span := map[string]any{"text": "\n"}
+				if color != "" {
+					span["color"] = color
+				}
+				if highlight != "" {
+					span["highlight"] = highlight
+				}
+				if len(marks) > 0 {
+					span["marks"] = append([]string{}, marks...)
+				}
+				if link != "" {
+					span["link"] = link
+				}
+				return []any{span}
 			case "a":
 				raw := htmlImportAttr(n, "href")
 				if safeImportURL(raw) {
@@ -108,7 +165,7 @@ func parseImportHTML(source string, item *ImportItem, pages, assets map[string]s
 		}
 		out := []any{}
 		for c := n.FirstChild; c != nil; c = c.NextSibling {
-			out = append(out, spans(c, marks, link)...)
+			out = append(out, spans(c, marks, link, color, highlight)...)
 		}
 		return out
 	}
@@ -162,7 +219,7 @@ func parseImportHTML(source string, item *ImportItem, pages, assets map[string]s
 				}
 				return
 			case "table":
-				if data, ok := importHTMLTable(n, func(cell *html.Node) []any { return spans(cell, nil, "") }); ok {
+				if data, ok := importHTMLTable(n, func(cell *html.Node) []any { return spans(cell, nil, "", "", "") }); ok {
 					blocks = append(blocks, ImportBlock{NewID(), "table", data})
 				} else {
 					blocks = append(blocks, fallbackImportBlock(item, strings.TrimSpace(inertHTMLText(n))))
@@ -173,7 +230,7 @@ func parseImportHTML(source string, item *ImportItem, pages, assets map[string]s
 				omitted++
 			}
 			if kind != "" {
-				content := spans(n, nil, "")
+				content := spans(n, nil, "", "", "")
 				if len(content) > 0 {
 					blocks = append(blocks, ImportBlock{NewID(), kind, map[string]any{"richText": content}})
 				}
@@ -256,16 +313,18 @@ func importHTMLTable(table *html.Node, rich func(*html.Node) []any) (map[string]
 	cells := []any{}
 	cols := 0
 	headerRows := 0
+	rowHeaderColumns := []int{}
 	for row, tr := range rows {
 		col := 0
 		headers := true
+		leadingHeaders := 0
 		count := 0
 		for td := tr.FirstChild; td != nil; td = td.NextSibling {
 			if td.Type != html.ElementNode || (td.Data != "td" && td.Data != "th") {
 				continue
 			}
 			count++
-			headers = headers && td.Data == "th"
+			headers = headers && td.Data == "th" && htmlImportAttr(td, "scope") != "row"
 			for occupied[[2]int{row, col}] {
 				col++
 			}
@@ -284,6 +343,9 @@ func importHTMLTable(table *html.Node, rich func(*html.Node) []any) (map[string]
 			if rs < 1 || cs < 1 || rs > 1000 || cs > 256 || row+rs > len(rows) || col+cs > 256 {
 				return nil, false
 			}
+			if td.Data == "th" && htmlImportAttr(td, "scope") != "col" && col == leadingHeaders {
+				leadingHeaders += cs
+			}
 			for r := row; r < row+rs; r++ {
 				for c := col; c < col+cs; c++ {
 					key := [2]int{r, c}
@@ -299,6 +361,7 @@ func importHTMLTable(table *html.Node, rich func(*html.Node) []any) (map[string]
 				cols = col
 			}
 		}
+		rowHeaderColumns = append(rowHeaderColumns, leadingHeaders)
 		if headers && count > 0 && headerRows == row {
 			headerRows++
 		}
@@ -313,9 +376,46 @@ func importHTMLTable(table *html.Node, rich func(*html.Node) []any) (map[string]
 			}
 		}
 	}
+	headerColumns := cols
+	for row := headerRows; row < len(rows); row++ {
+		if rowHeaderColumns[row] < headerColumns {
+			headerColumns = rowHeaderColumns[row]
+		}
+	}
+	if headerRows == len(rows) {
+		headerColumns = 0
+	}
 	widths := []any{}
-	for c := 0; c < cols; c++ {
+	var collectWidths func(*html.Node)
+	collectWidths = func(parent *html.Node) {
+		for child := parent.FirstChild; child != nil; child = child.NextSibling {
+			if child.Data == "colgroup" {
+				collectWidths(child)
+			} else if child.Data == "col" {
+				raw := htmlImportAttr(child, "width")
+				for _, declaration := range strings.Split(htmlImportAttr(child, "style"), ";") {
+					pair := strings.SplitN(declaration, ":", 2)
+					if len(pair) == 2 && strings.TrimSpace(strings.ToLower(pair[0])) == "width" {
+						raw = strings.TrimSpace(pair[1])
+					}
+				}
+				width, err := strconv.ParseFloat(strings.TrimSuffix(raw, "px"), 64)
+				if err != nil || width <= 0 || width > 100000 {
+					width = 160
+				}
+				span, err := strconv.Atoi(htmlImportAttr(child, "span"))
+				if err != nil || span < 1 || span > cols {
+					span = 1
+				}
+				for i := 0; i < span && len(widths) < cols; i++ {
+					widths = append(widths, width)
+				}
+			}
+		}
+	}
+	collectWidths(table)
+	for len(widths) < cols {
 		widths = append(widths, 160)
 	}
-	return map[string]any{"rowCount": len(rows), "columnCount": cols, "headerRows": headerRows, "headerColumns": 0, "columnWidths": widths, "cells": cells}, true
+	return map[string]any{"rowCount": len(rows), "columnCount": cols, "headerRows": headerRows, "headerColumns": headerColumns, "columnWidths": widths, "cells": cells}, true
 }

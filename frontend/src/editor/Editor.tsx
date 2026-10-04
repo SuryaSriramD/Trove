@@ -7,6 +7,7 @@ import { AdvancedPanel } from "../advanced/AdvancedPanel";
 import { getLock, setLock, type PageLock } from "../advanced/service";
 import { replaceDocument, safeWebURL } from "./advanced";
 import "./advanced.css";
+import { TextColor, TextHighlight, ColorControls, preserveStyledPaste } from "./ColorMarks";
 import { BlockVisibility } from "./visibility";
 import { dispatch, envelope } from "../api";
 import { AllSelection, NodeSelection, Selection, TextSelection } from "@tiptap/pm/state";
@@ -269,6 +270,7 @@ export function PageEditor({
   });
   const editor = useEditor({
     extensions: [
+      TextColor, TextHighlight,
       StarterKit.configure({
         paragraph: false,
         heading: false,
@@ -302,6 +304,7 @@ export function PageEditor({
           ],
         },
     editorProps: {
+      handlePaste: preserveStyledPaste(),
       handleClick: (_view, _position, event) => {
         const link = (
           event.target as Element | null
@@ -884,6 +887,7 @@ export function PageEditor({
             {label}
           </button>
         ))}
+        {editor && <ColorControls editor={editor}/>}
         <button
           aria-label="Add link"
           onClick={() => {

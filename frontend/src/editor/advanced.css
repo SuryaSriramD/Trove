@@ -39,3 +39,34 @@
 .image-lightbox { position: fixed; inset: 4vh 4vw; width: 92vw; height: 92vh; padding: 16px; background: var(--surface, white); box-shadow: 0 0 0 100vmax #0009; }
 .image-lightbox>div { display: flex; gap: 20px; margin-bottom: 12px; }
 .image-lightbox img { max-width: 100%; max-height: calc(92vh - 90px); width: auto; height: auto; object-fit: contain; }
+
+.color-control { display: inline-flex; align-items: center; gap: 4px; font-size: 11px; }
+.color-control select { max-width: 90px; padding: 3px; }
+.inline-rich-toolbar .color-control span { position: absolute; width: 1px; height: 1px; overflow: hidden; }
+
+[data-theme="dark"] [data-trove-color="gray"] { color: #bfc2c9 !important; }
+[data-theme="dark"] [data-trove-highlight="gray"] { background-color: #34363b !important; }
+
+[data-theme="dark"] [data-trove-color="brown"] { color: #d4aa86 !important; }
+[data-theme="dark"] [data-trove-highlight="brown"] { background-color: #483629 !important; }
+
+[data-theme="dark"] [data-trove-color="orange"] { color: #ffb66b !important; }
+[data-theme="dark"] [data-trove-highlight="orange"] { background-color: #513718 !important; }
+
+[data-theme="dark"] [data-trove-color="yellow"] { color: #ebd36c !important; }
+[data-theme="dark"] [data-trove-highlight="yellow"] { background-color: #4b421b !important; }
+
+[data-theme="dark"] [data-trove-color="green"] { color: #87ce99 !important; }
+[data-theme="dark"] [data-trove-highlight="green"] { background-color: #263f2d !important; }
+
+[data-theme="dark"] [data-trove-color="blue"] { color: #93bffd !important; }
+[data-theme="dark"] [data-trove-highlight="blue"] { background-color: #263951 !important; }
+
+[data-theme="dark"] [data-trove-color="purple"] { color: #c7a4ef !important; }
+[data-theme="dark"] [data-trove-highlight="purple"] { background-color: #3c2c50 !important; }
+
+[data-theme="dark"] [data-trove-color="pink"] { color: #efa5d0 !important; }
+[data-theme="dark"] [data-trove-highlight="pink"] { background-color: #4d2b40 !important; }
+
+[data-theme="dark"] [data-trove-color="red"] { color: #ffa1a1 !important; }
+[data-theme="dark"] [data-trove-highlight="red"] { background-color: #512a2a !important; }

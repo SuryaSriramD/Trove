@@ -6,6 +6,8 @@ import (
 	"database/sql"
 	"encoding/csv"
 	"encoding/json"
+	"fmt"
+	"html"
 	"os"
 	"path"
 	"regexp"
@@ -352,6 +354,10 @@ func exportRichText(v any, source string, pages, files map[string]string) string
 	var out strings.Builder
 	for _, raw := range parts {
 		span, _ := raw.(map[string]any)
+		if str(span["color"]) != "" || str(span["highlight"]) != "" {
+			out.WriteString(exportRichHTML([]any{span}, source, pages, files))
+			continue
+		}
 		text := str(span["text"])
 		if marks, ok := span["marks"].([]any); ok {
 			for _, mark := range marks {
@@ -435,13 +441,7 @@ func exportBlockMarkdown(block contracts.DomainBlock, source string, pages, file
 		}
 		return strings.Join(parts, "\n\n")
 	case "table":
-		cells, _ := data["cells"].([]any)
-		parts := []string{}
-		for _, raw := range cells {
-			cell, _ := raw.(map[string]any)
-			parts = append(parts, exportRichText(cell["richText"], source, pages, files))
-		}
-		return strings.Join(parts, " | ")
+		return exportTableHTML(data, source, pages, files)
 	case "breadcrumb":
 		return "Page trail: " + source
 	case "table_of_contents":
@@ -512,4 +512,88 @@ func exportCellText(ctx context.Context, q querier, kind string, v any) string {
 	}
 	b, _ := json.Marshal(v)
 	return string(b)
+}
+
+// Escape content before emitting the finite presentation vocabulary. This is
+// readable outside Trove while the manifest retains exact canonical structure.
+func exportRichHTML(v any, source string, pages, files map[string]string) string {
+	parts, _ := v.([]any)
+	var out strings.Builder
+	for _, raw := range parts {
+		span, _ := raw.(map[string]any)
+		text := strings.ReplaceAll(html.EscapeString(str(span["text"])), "\n", "<br>")
+		marks, _ := span["marks"].([]any)
+		for _, mark := range marks {
+			if tag := map[string]string{"bold": "strong", "italic": "em", "underline": "u", "strike": "s", "code": "code"}[str(mark)]; tag != "" {
+				text = "<" + tag + ">" + text + "</" + tag + ">"
+			}
+		}
+		attributes := ""
+		styles := []string{}
+		if token := str(span["color"]); richForeground[token] != "" {
+			attributes += ` data-trove-color="` + token + `"`
+			styles = append(styles, "color:"+richForeground[token])
+		}
+		if token := str(span["highlight"]); richBackground[token] != "" {
+			attributes += ` data-trove-highlight="` + token + `"`
+			styles = append(styles, "background-color:"+richBackground[token])
+		}
+		if len(styles) > 0 {
+			text = "<span" + attributes + ` style="` + strings.Join(styles, ";") + `">` + text + "</span>"
+		}
+		if link := str(span["link"]); link != "" {
+			if strings.HasPrefix(link, "trove://page/") {
+				link = portablePageLink(link, source, pages)
+			} else if strings.HasPrefix(link, "/files/") {
+				if target := files[strings.TrimPrefix(link, "/files/")]; target != "" {
+					link = relativeExportLink(source, target)
+				}
+			}
+			if safeImportURL(link) {
+				text = `<a href="` + html.EscapeString(strings.ReplaceAll(link, " ", "%20")) + `">` + text + "</a>"
+			}
+		}
+		out.WriteString(text)
+	}
+	return out.String()
+}
+func exportTableHTML(data map[string]any, source string, pages, files map[string]string) string {
+	var out strings.Builder
+	out.WriteString("<table><colgroup>")
+	widths, _ := data["columnWidths"].([]any)
+	for column := int64(0); column < number(data["columnCount"]); column++ {
+		width := int64(180)
+		if int(column) < len(widths) && number(widths[column]) > 0 {
+			width = number(widths[column])
+		}
+		out.WriteString(fmt.Sprintf(`<col style="width:%dpx">`, width))
+	}
+	out.WriteString("</colgroup><tbody>")
+	cells, _ := data["cells"].([]any)
+	positions := map[[2]int64]map[string]any{}
+	for _, raw := range cells {
+		cell, _ := raw.(map[string]any)
+		positions[[2]int64{number(cell["row"]), number(cell["column"])}] = cell
+	}
+	for row := int64(0); row < number(data["rowCount"]); row++ {
+		out.WriteString("<tr>")
+		for column := int64(0); column < number(data["columnCount"]); column++ {
+			cell, exists := positions[[2]int64{row, column}]
+			if !exists {
+				continue
+			}
+			tag, scope := "td", ""
+			if row < number(data["headerRows"]) {
+				tag, scope = "th", ` scope="col"`
+			} else if column < number(data["headerColumns"]) {
+				tag, scope = "th", ` scope="row"`
+			}
+			out.WriteString(fmt.Sprintf(`<%s%s rowspan="%d" colspan="%d">`, tag, scope, number(cell["rowSpan"]), number(cell["colSpan"])))
+			out.WriteString(exportRichHTML(cell["richText"], source, pages, files))
+			out.WriteString("</" + tag + ">")
+		}
+		out.WriteString("</tr>")
+	}
+	out.WriteString("</tbody></table>")
+	return out.String()
 }

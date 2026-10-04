@@ -41,6 +41,8 @@ type DomainRichText []struct {
 Text string `json:"text"`
 Marks []string `json:"marks,omitempty"`
 Link *string `json:"link,omitempty"`
+Color *DomainColorToken `json:"color,omitempty"`
+Highlight *DomainColorToken `json:"highlight,omitempty"`
 }
 type DomainRawValue = json.RawMessage
 type DomainFallback struct {
@@ -695,6 +697,7 @@ IdentityChoice *DomainImportIdentityResolution `json:"identityChoice,omitempty"`
 DeletionChoice *string `json:"deletionChoice,omitempty"`
 Fields []DomainImportFieldResolution `json:"fields"`
 }
+type DomainColorToken string
 type ServiceEntityRef struct {
 EntityType string `json:"entityType"`
 EntityId DomainId `json:"entityId"`

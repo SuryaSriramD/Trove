@@ -20,7 +20,7 @@ func TestEditorIntegrityRichContentAndCollapseSurviveRecoveryAndPortability(t *t
 	fileID, _ := attachTestFile(t, k, e, page, stageTestFile(t, k, e, string(imageBytes)), false)
 	codeData := map[string]any{"source": "// exact bytes\r\nconst text = `🌱`;\n", "language": "javascript", "filename": "retained.js", "wrap": true, "lineNumbers": true}
 	imageData := map[string]any{"fileId": fileID, "caption": richImport("Image caption"), "altText": "Image description", "width": 240, "alignment": "right"}
-	rich := []any{map[string]any{"text": "Keep! ", "marks": []any{"bold"}}, map[string]any{"text": "linked", "link": "https://example.test/source"}, map[string]any{"text": " తెలుగు 🌱"}}
+	rich := []any{map[string]any{"text": "Keep! ", "marks": []any{"bold"}, "color": "purple", "highlight": "yellow"}, map[string]any{"text": "linked", "link": "https://example.test/source"}, map[string]any{"text": " తెలుగు 🌱"}}
 	toggleData := map[string]any{"richText": richImport("Toggle"), "collapsed": true}
 	paragraphData := map[string]any{"richText": rich}
 	cell := map[string]any{"id": NewID(), "row": 0, "column": 0, "rowSpan": 1, "colSpan": 1, "richText": rich, "preMergeCells": []any{map[string]any{"retained": "original source evidence"}}}

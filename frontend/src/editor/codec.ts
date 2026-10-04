@@ -3,6 +3,7 @@ import type {
   Command,
   ExpectedRevision,
 } from "../../../contracts/generated/service";
+import { colorToken } from "./palette.ts";
 export type NodeJSON = {
   type: string;
   attrs?: { [key: string]: any };
@@ -29,7 +30,10 @@ export function richNodes(rt: RichText): NodeJSON[] {
     .filter((x) => x.text)
     .flatMap((x) =>
       x.text.split("\n").flatMap((text, index) => [
-        ...(index ? [{ type: "hardBreak" }] : []),
+        ...(index ? [{ type: "hardBreak", marks: [
+          ...(x.marks ?? []).map(type=>({type})),...(x.link?[{type:"link",attrs:{href:x.link}}]:[]),
+          ...(x.color?[{type:"textColor",attrs:{token:x.color}}]:[]),...(x.highlight?[{type:"textHighlight",attrs:{token:x.highlight}}]:[]),
+        ] }] : []),
         ...(text
           ? [
               {
@@ -37,6 +41,8 @@ export function richNodes(rt: RichText): NodeJSON[] {
                 text,
                 marks: [
                   ...(x.marks ?? []).map((type) => ({ type })),
+                  ...(x.color ? [{type:"textColor",attrs:{token:x.color}}] : []),
+                  ...(x.highlight ? [{type:"textHighlight",attrs:{token:x.highlight}}] : []),
                   ...(x.link
                     ? [{ type: "link", attrs: { href: x.link } }]
                     : []),
@@ -50,19 +56,18 @@ export function richNodes(rt: RichText): NodeJSON[] {
 export function richText(nodes: NodeJSON[] = []): RichText {
   const out: RichText = [];
   for (const n of nodes) {
-    if (n.type === "hardBreak") {
-      out.push({ text: "\n" });
-      continue;
-    }
-    if (!n.text) continue;
+    const text = n.type === "hardBreak" ? "\n" : n.text;
+    if (!text) continue;
     const marks = (n.marks ?? [])
       .filter((m) =>
         ["bold", "italic", "underline", "strike", "code"].includes(m.type),
       )
       .map((m) => m.type) as NonNullable<RichText[number]["marks"]>;
     const link = n.marks?.find((m) => m.type === "link")?.attrs?.href;
+    const color=colorToken(n.marks?.find(m=>m.type==="textColor")?.attrs?.token),highlight=colorToken(n.marks?.find(m=>m.type==="textHighlight")?.attrs?.token);
     out.push({
-      text: n.text,
+      text,
+      ...(color?{color}:{}),...(highlight?{highlight}:{}),
       ...(marks.length ? { marks } : {}),
       ...(link ? { link } : {}),
     });

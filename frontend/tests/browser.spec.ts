@@ -543,7 +543,7 @@ test("Unicode composition, RTL, emoji, undo/redo, reopen, raw preservation", asy
   await expect(editor.getByRole("heading", { level: 4 })).toHaveText(
     "Imported detail",
   );
-  await expect(editor.locator('td[colspan="2"]')).toBeVisible();
+  await expect(editor.locator('th[scope="col"][colspan="2"]')).toBeVisible();
   await expect
     .poll(() =>
       page.evaluate(

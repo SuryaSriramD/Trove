@@ -217,8 +217,18 @@ func notionRichText(v any) []any {
 			s["link"] = link
 		}
 		annotations, _ := span["annotations"].(map[string]any)
+		if value := str(annotations["color"]); value != "" && value != "default" {
+			highlight := strings.HasSuffix(value, "_background")
+			if token := richColorToken(strings.TrimSuffix(value, "_background"), highlight); token != "" {
+				if highlight {
+					s["highlight"] = token
+				} else {
+					s["color"] = token
+				}
+			}
+		}
 		marks := []string{}
-		for key, mark := range map[string]string{"bold": "bold", "italic": "italic", "strikethrough": "strike", "code": "code"} {
+		for key, mark := range map[string]string{"bold": "bold", "italic": "italic", "underline": "underline", "strikethrough": "strike", "code": "code"} {
 			if annotations[key] == true {
 				marks = append(marks, mark)
 			}
