@@ -7,7 +7,6 @@ import (
 	"io"
 	"os"
 	"path/filepath"
-	"runtime"
 	"strings"
 	"testing"
 )
@@ -114,26 +113,6 @@ func TestWebCaptureRequiresOwnerAndUsesImportReview(t *testing.T) {
 		t.Fatal("capture skipped review or provenance")
 	}
 	completeImportFixture(t, k, e, p)
-}
-func TestReadablePDFExportNativeConverter(t *testing.T) {
-	if runtime.GOOS != "darwin" {
-		t.Skip("macOS converter qualification")
-	}
-	if _, err := os.Stat("/usr/sbin/cupsfilter"); err != nil {
-		t.Skip("OS converter unavailable")
-	}
-	k, e := testKernel(t)
-	p := importFixture(t, k, e, map[string]string{"Unicode.md": "# Résumé\nReadable café 東京"})
-	completeImportFixture(t, k, e, p)
-	destination := filepath.Join(t.TempDir(), "output.pdf")
-	result, err := k.ExportPDF(context.Background(), e, destination)
-	if err != nil {
-		t.Fatal(err)
-	}
-	b, err := os.ReadFile(destination)
-	if err != nil || !strings.HasPrefix(string(b), "%PDF-") || len(result.SourceOmissions) == 0 {
-		t.Fatal("PDF or fidelity report missing", err)
-	}
 }
 
 func TestPortableManifestRestoresAdvancedBlocksAndParentReferences(t *testing.T) {

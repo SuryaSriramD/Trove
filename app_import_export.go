@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/wailsapp/wails/v2/pkg/runtime"
+	"io/fs"
 )
 
 func (a *App) ExportPortable() (string, error) {
@@ -43,7 +44,7 @@ func (a *App) ExportHTML() (string, error) {
 }
 
 func (a *App) ExportPDF() (string, error) {
-	destination, err := runtime.SaveFileDialog(a.ctx, runtime.SaveDialogOptions{Title: "Export readable text PDF", DefaultFilename: "Trove-readable.pdf", Filters: []runtime.FileFilter{{DisplayName: "PDF document", Pattern: "*.pdf"}}})
+	destination, err := runtime.SaveFileDialog(a.ctx, runtime.SaveDialogOptions{Title: "Export rich page PDF", DefaultFilename: "Trove-pages.pdf", Filters: []runtime.FileFilter{{DisplayName: "PDF document", Pattern: "*.pdf"}}})
 	if err != nil || destination == "" {
 		return "", err
 	}
@@ -52,7 +53,11 @@ func (a *App) ExportPDF() (string, error) {
 	if a.kernel == nil {
 		return "", fmt.Errorf("workspace is not open")
 	}
-	result, err := a.kernel.ExportPDF(a.ctx, a.execution, destination)
+	assets, err := fs.Sub(frontendAssets, "frontend/dist")
+	if err != nil {
+		return "", err
+	}
+	result, err := a.kernel.ExportPDF(a.ctx, a.execution, destination, assets)
 	if err != nil {
 		return "", err
 	}

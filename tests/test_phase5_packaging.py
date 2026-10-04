@@ -31,7 +31,7 @@ class P1CandidatePackagingTests(unittest.TestCase):
         native.mkdir(parents=True)
         helpers = ['llama-worker', 'whisper-worker', 'microphone-worker']
         (native / 'manifest.json').write_text(json.dumps({'helpers': [{'name': name} for name in helpers]}))
-        for name in helpers + ['document-extractor']:
+        for name in helpers + ['document-extractor', 'pdf-renderer']:
             (native / name).write_text(name)
             (native / name).chmod(0o700)
         self.source = {'source.go': 'a' * 64}
@@ -126,7 +126,7 @@ class P1CandidatePackagingTests(unittest.TestCase):
 
     def test_lost_executable_permissions_are_rejected_even_when_content_matches(self):
         for relative in ('Contents/MacOS/Trove', 'Contents/MacOS/trove-mcp',
-                         'Contents/Resources/native/document-extractor', 'Contents/Resources/native/llama-worker'):
+                         'Contents/Resources/native/document-extractor', 'Contents/Resources/native/pdf-renderer', 'Contents/Resources/native/llama-worker'):
             path = self.app / relative
             path.chmod(0o600)
             self.assertEqual(packaging.p0.tree_fingerprint(self.app), self.bundle)

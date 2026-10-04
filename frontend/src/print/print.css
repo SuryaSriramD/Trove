@@ -1,0 +1,189 @@
+@page {
+  size: A4;
+  margin: 14mm 13mm 15mm;
+}
+* {
+  box-sizing: border-box;
+}
+html {
+  font:
+    12pt/1.5 -apple-system,
+    BlinkMacSystemFont,
+    "Helvetica Neue",
+    Arial,
+    sans-serif;
+  color: #20232a;
+  background: white;
+}
+body {
+  margin: 0;
+  padding: 0;
+}
+article + article,
+.export-notes {
+  break-before: page;
+}
+h1 {
+  font-size: 25pt;
+  line-height: 1.2;
+  margin: 0 0 16pt;
+}
+h2 {
+  font-size: 19pt;
+}
+h3 {
+  font-size: 15pt;
+}
+h4,
+h5 {
+  font-size: 13pt;
+}
+h1,
+h2,
+h3,
+h4,
+h5 {
+  break-after: avoid;
+}
+p {
+  margin: 7pt 0;
+  orphans: 3;
+  widows: 3;
+}
+a {
+  color: #225e94;
+  overflow-wrap: anywhere;
+  text-decoration: underline;
+}
+small {
+  display: block;
+  font-size: 9pt;
+  color: #666;
+}
+pre {
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  font:
+    9.5pt/1.45 ui-monospace,
+    SFMono-Regular,
+    Menlo,
+    monospace;
+  background: #f4f5f6;
+  padding: 10pt;
+  border-radius: 4pt;
+}
+code {
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+}
+blockquote,
+aside {
+  margin: 10pt 0;
+  padding: 8pt 12pt;
+  border-left: 3pt solid #bcc8d2;
+  background: #f6f8fa;
+}
+table {
+  border-collapse: collapse;
+  width: 100%;
+  table-layout: fixed;
+  font-size: 10pt;
+  margin: 10pt 0;
+}
+td,
+th {
+  border: 1px solid #b6bec8;
+  padding: 7pt;
+  overflow-wrap: anywhere;
+  vertical-align: top;
+}
+th {
+  background: #eaf0f6;
+  text-align: left;
+}
+thead {
+  display: table-header-group;
+}
+tr {
+  break-inside: avoid;
+}
+figure {
+  margin: 12pt 0;
+  break-inside: avoid;
+}
+img {
+  max-width: 100%;
+  max-height: 650pt;
+  object-fit: contain;
+  height: auto;
+  display: block;
+}
+figure.align-center img {
+  margin: auto;
+}
+figure.align-right img {
+  margin-left: auto;
+}
+figcaption {
+  font-size: 10pt;
+  color: #515763;
+  margin-top: 6pt;
+}
+.diagram svg {
+  display: block;
+  width: 100%;
+  max-width: 100%;
+  max-height: 650pt;
+  height: auto;
+}
+.equation {
+  break-inside: avoid;
+  overflow-wrap: anywhere;
+}
+.katex-display {
+  max-width: 100%;
+  font-size: 1em;
+}
+.table-chunk {
+  break-inside: avoid;
+}
+.columns {
+  display: flex;
+  gap: 14pt;
+  align-items: flex-start;
+}
+.layout-group {
+  min-width: 0;
+  flex: 1;
+}
+.tabs > .layout-group {
+  border-top: 1pt solid #ccd3dc;
+  padding: 8pt 0;
+}
+.reusable {
+  border-left: 2pt solid #afbbce;
+  padding-left: 10pt;
+}
+.fallback,
+.attachment {
+  font-size: 10pt;
+  color: #515763;
+}
+.code-label {
+  font-size: 9pt;
+  color: #666;
+  margin-top: 8pt;
+}
+.export-notes {
+  font-size: 10pt;
+}
+hr {
+  border: 0;
+  border-top: 1px solid #bbc2cb;
+  margin: 16pt 0;
+}
+@media print {
+  html {
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+}

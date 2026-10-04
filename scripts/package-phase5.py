@@ -95,7 +95,7 @@ def verify_executables(candidate):
     require({'llama-worker', 'whisper-worker', 'microphone-worker'} <= names,
             'Required native helper declarations are missing')
     paths = [candidate / 'Contents/MacOS/Trove', candidate / 'Contents/MacOS/trove-mcp',
-             native / 'document-extractor']
+             native / 'document-extractor', native / 'pdf-renderer']
     for name in names:
         require(isinstance(name, str) and name and Path(name).name == name and name not in ('.', '..'),
                 'Invalid native helper name')
