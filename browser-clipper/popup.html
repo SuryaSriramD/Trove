@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Trove Web Clipper</title>
+    <link rel="stylesheet" href="popup.css" />
+  </head>
+  <body>
+    <h1>Trove Web Clipper</h1>
+    <p>Capture a draft, then review and save it in Trove.</p>
+    <details id="pairing" open>
+      <summary>Pair with the open Trove app</summary>
+      <p>In Trove → Capture, approve this extension ID and destinations:</p>
+      <code id="extension-id"></code
+      ><label
+        >Local endpoint<input
+          id="endpoint"
+          placeholder="http://127.0.0.1:12345"
+          autocomplete="off" /></label
+      ><label
+        >One-time pairing code<input
+          id="pair-code"
+          type="password"
+          autocomplete="off" /></label
+      ><button id="pair">Pair for this app session</button>
+      <p>Restarting Trove or switching workspace requires pairing again.</p>
+    </details>
+    <section>
+      <label
+        >Capture mode<select id="mode">
+          <option value="article">Article / main content</option>
+          <option value="selection">Selected text and formatting</option>
+          <option value="url">URL only</option>
+        </select></label
+      ><button id="capture">Read the active tab</button
+      ><label>Title<input id="title" maxlength="512" /></label
+      ><label>Approved destination<select id="destination"></select></label
+      ><button id="destinations">Refresh destinations</button>
+      <p id="source"></p>
+      <pre id="preview"></pre>
+      <fieldset id="image-choices">
+        <legend>Optional image acquisition</legend>
+        <p>
+          Images stay as links unless selected. Acquiring them requests the
+          listed origins without cookies or authentication. PNG/JPEG/GIF only; 2
+          MiB total.
+        </p>
+        <div id="images"></div>
+        <button id="acquire">Acquire selected images once</button>
+      </fieldset>
+      <button id="send">Send draft for review</button
+      ><button id="retry">Retry retained draft</button
+      ><button id="discard">Discard local draft</button>
+    </section>
+    <p id="status" role="status"></p>
+    <p id="error" role="alert"></p>
+    <button id="forget">Forget pairing on this browser</button>
+    <script type="module" src="popup.js"></script>
+  </body>
+</html>

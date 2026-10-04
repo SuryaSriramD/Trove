@@ -1,0 +1,26 @@
+{
+  "manifest_version": 3,
+  "name": "Trove Web Clipper",
+  "description": "Explicitly capture readable pages, selections, URLs and chosen raster images into a paired local Trove review inbox.",
+  "version": "1.0.0",
+  "permissions": [
+    "activeTab",
+    "scripting",
+    "storage"
+  ],
+  "host_permissions": [
+    "http://127.0.0.1/*"
+  ],
+  "optional_host_permissions": [
+    "https://*/*",
+    "http://*/*"
+  ],
+  "action": {
+    "default_title": "Capture to Trove",
+    "default_popup": "popup.html"
+  },
+  "content_security_policy": {
+    "extension_pages": "script-src 'self'; object-src 'none'; base-uri 'none'"
+  },
+  "key": "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA452xNGzvR9wiT81U6G8lil/9CUQ9YsSauXozFti6VyDXmnNh3qmz35bh/7OsW+ThI+INBJpx9t28XhRIqKiCzqQ9gBNjOGEd7ZxnHvi/NgmxDA5XkqpIGS7D9p8uIcq5pE6/NAL1D2ZJtMU5hfFXqxoMX8jj8gWNOCgiTGAP0gXt6bBWQGyncPrIEwBRvBClNURjDDz92z3CSnwbkKGkmZtLOVF2z6/APv90nxwf7LSWITrqdj5QUGSUG4eu+oe6kmz/qw66QcdVqnq1IfnwBYTg7jH0IEEpQK245Rbi34qmiDHItMBY2jk0EUZdCtIOc0tEQC58Rjz3zzyyMptgMQIDAQAB"
+}

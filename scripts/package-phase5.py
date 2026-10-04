@@ -94,6 +94,10 @@ def verify_executables(candidate):
     names = {helper.get('name') for helper in helpers if isinstance(helper, dict)}
     require({'llama-worker', 'whisper-worker', 'microphone-worker'} <= names,
             'Required native helper declarations are missing')
+    clipper = candidate / 'Contents/Resources/browser-clipper'
+    for name in ('manifest.json', 'popup.html', 'popup.js', 'popup.css', 'extract.js', 'README.md'):
+        path = clipper / name
+        require(path.is_file() and not path.is_symlink(), 'Browser clipper resource is missing: ' + name)
     paths = [candidate / 'Contents/MacOS/Trove', candidate / 'Contents/MacOS/trove-mcp',
              native / 'document-extractor', native / 'pdf-renderer']
     for name in names:

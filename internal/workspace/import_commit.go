@@ -119,6 +119,21 @@ func applyPortableImport(m *Mutation, c map[string]any) error {
 	if p.State == "complete" {
 		return nil
 	}
+	if p.RootParentID != "" {
+		if err = m.AuthorizePage(p.RootParentID); err != nil {
+			return err
+		}
+		var revision string
+		if err = m.Tx.QueryRowContext(m.Context, "SELECT revision FROM pages WHERE id=? AND deleted_at IS NULL", p.RootParentID).Scan(&revision); err != nil {
+			return Fail("NOT_FOUND", "Capture destination is unavailable")
+		}
+		if !p.Initialized && revision != p.ExpectedParentRevision {
+			return Fail("CONFLICT", "Capture destination changed after preview; create a new reviewed capture")
+		}
+		if err = guardImport(m, "page", p.RootParentID); err != nil {
+			return err
+		}
+	}
 	if !p.Initialized {
 		if err := prepareNotionGraphChoice(&p); err != nil {
 			return err
@@ -229,7 +244,7 @@ func applyPortableImport(m *Mutation, c map[string]any) error {
 		if err = guardImport(m, "page", p.RootID); err != nil {
 			return err
 		}
-		if err = pageCommand(m, map[string]any{"kind": "page.create", "pageId": p.RootID, "title": "Import · " + p.SourceName}); err != nil {
+		if err = pageCommand(m, map[string]any{"kind": "page.create", "pageId": p.RootID, "title": "Import · " + p.SourceName, "parentPageId": nullable(p.RootParentID)}); err != nil {
 			return err
 		}
 		if err = importAttach(m, p.RootID, p.SourceFileID); err != nil {

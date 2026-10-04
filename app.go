@@ -144,6 +144,7 @@ func (a *App) shutdown(context.Context) {
 	a.shutdownOnce.Do(func() { close(a.shutdownDone) })
 	a.lifecycle.Lock()
 	defer a.lifecycle.Unlock()
+	a.stopClipper()
 	a.stopRecordings()
 	a.stopAI()
 	a.stopProviders()
@@ -176,6 +177,7 @@ func (a *App) open(path string, create bool) error {
 	return a.openLocked(path, create)
 }
 func (a *App) openLocked(path string, create bool) error {
+	a.stopClipper()
 	a.stopRecordings()
 	a.stopAI()
 	a.stopProviders()

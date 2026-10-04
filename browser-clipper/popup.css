@@ -1,0 +1,88 @@
+body {
+  width: 410px;
+  margin: 0;
+  padding: 18px;
+  font: 14px/1.5 system-ui;
+  background: #f7f7f4;
+  color: #202b32;
+}
+h1 {
+  font-size: 22px;
+  margin: 0;
+}
+label {
+  display: block;
+  margin: 10px 0;
+}
+input,
+select {
+  display: block;
+  box-sizing: border-box;
+  width: 100%;
+  padding: 7px;
+  border: 1px solid #adb6bb;
+  border-radius: 5px;
+  font: inherit;
+}
+button {
+  font: inherit;
+  padding: 7px 10px;
+  margin: 5px 4px 5px 0;
+  border: 1px solid #9aacb5;
+  border-radius: 5px;
+  background: white;
+  color: #17475e;
+  cursor: pointer;
+}
+button:disabled {
+  opacity: 0.5;
+  cursor: wait;
+}
+code {
+  font-size: 11px;
+  word-break: break-all;
+}
+details,
+fieldset {
+  padding: 10px;
+  border: 1px solid #cad3d7;
+  border-radius: 6px;
+  margin: 12px 0;
+}
+pre {
+  max-height: 180px;
+  overflow: auto;
+  white-space: pre-wrap;
+  font: 12px/1.4 system-ui;
+  background: white;
+  padding: 8px;
+}
+#source {
+  font-size: 12px;
+  overflow-wrap: anywhere;
+  color: #50616a;
+}
+#error {
+  color: #a32626;
+}
+#status {
+  color: #225e38;
+}
+#images label {
+  display: flex;
+  gap: 6px;
+  overflow-wrap: anywhere;
+  font-size: 12px;
+}
+#images input {
+  width: auto;
+  display: inline;
+}
+#send {
+  background: #205b69;
+  color: white;
+}
+#retry,
+#discard {
+  display: none;
+}

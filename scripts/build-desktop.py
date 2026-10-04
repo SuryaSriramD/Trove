@@ -61,6 +61,7 @@ shutil.copytree(ROOT / 'native/models', native / 'models', dirs_exist_ok=True)
 contents = args.output / 'Contents'
 (contents / 'MacOS').mkdir(parents=True, exist_ok=True)
 (contents / 'Resources').mkdir(parents=True, exist_ok=True)
+shutil.copytree(ROOT / 'browser-clipper', contents / 'Resources' / 'browser-clipper', dirs_exist_ok=True, ignore=shutil.ignore_patterns('._*', '.DS_Store'))
 run([go, 'build', '-mod=readonly', '-trimpath', '-tags',
      'desktop production fts5 sqlite_omit_load_extension', '-o',
      contents / 'MacOS' / 'Trove', '.'])

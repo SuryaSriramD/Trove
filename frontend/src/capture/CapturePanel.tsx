@@ -1,6 +1,7 @@
 import {useEffect,useState} from "react";
 import {dispatch,envelope,type WorkspaceSnapshot} from "../api";
 import "../imports/imports.css";
+import {ClipperPanel} from "./ClipperPanel";
 
 type Root={id:string;path:string;repository:boolean;approved:boolean;lastScan:string};
 type Source={id:string;path:string;state:string;language:string;hash:string};
@@ -25,7 +26,7 @@ export function CapturePanel({workspace,onChanged,onOpenPage}:{workspace:Workspa
   <label>Shared selection<textarea rows={7} value={content} onChange={e=>setContent(e.target.value)} placeholder="Paste selected text or HTML from your browser" style={{width:"100%"}}/></label>
   <div className="import-controls"><label><input type="checkbox" checked={asHTML} onChange={e=>setAsHTML(e.target.checked)}/>Selection contains HTML</label><button disabled={busy||!content.trim()} onClick={preview}>Preview clip</button><button disabled={busy} onClick={screenshot}>Capture screenshot…</button></div>
   {plan&&<div><h3>Capture review</h3><ul>{plan.items.map((item,i)=><li key={i}>{item.sourceLocator} · {item.outcome}: {item.reason}</li>)}</ul>{plan.state!=="complete"?<button disabled={busy} onClick={commit}>Save reviewed capture</button>:<button onClick={()=>onOpenPage?.(plan.rootPageId)}>Open capture</button>}</div>}
-  <hr/><h3>Approved external folders</h3><p>Files remain references. Approved roots refresh every 30 seconds while Trove is running; Refresh index scans immediately. Missing files retain their identities and page links. Secrets, binary files, symlinks, and ignored paths are excluded.</p>
+  <hr/><ClipperPanel workspace={workspace} onChanged={onChanged} onOpenPage={onOpenPage}/><hr/><h3>Approved external folders</h3><p>Files remain references. Approved roots refresh every 30 seconds while Trove is running; Refresh index scans immediately. Missing files retain their identities and page links. Secrets, binary files, symlinks, and ignored paths are excluded.</p>
   <div className="import-controls"><label><input type="checkbox" checked={repository} onChange={e=>setRepository(e.target.checked)}/>Code repository</label><button disabled={busy} onClick={choose}>Approve folder…</button></div>
   {roots.map(root=><div key={root.id} className="import-conflict"><strong>{root.path}</strong><p>{root.repository?"Repository":"Folder"} · {root.approved?"Approved":"Revoked"} · {root.lastScan||"Not scanned"}</p><button disabled={busy||!root.approved} onClick={()=>scan(root)}>Refresh index</button> <button disabled={busy} onClick={()=>act(async()=>{setSelected(root.id);setSources(await request<Source[]>("index.entries",{rootId:root.id}))})}>Inspect references</button> <button disabled={busy||!root.approved} onClick={()=>act(async()=>{await request("index.revoke",{rootId:root.id});await refresh();setHits([]);setNotice("Folder approval revoked; indexed text removed. Page reference identities remain.")})}>Revoke</button></div>)}
   {selected&&<details open><summary>External file references ({sources.length})</summary><table><thead><tr><th>Path</th><th>State</th><th>Language</th></tr></thead><tbody>{sources.map(source=><tr key={source.id}><td>{source.path}</td><td>{source.state}</td><td>{source.language}</td></tr>)}</tbody></table></details>}

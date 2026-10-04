@@ -34,6 +34,10 @@ class P1CandidatePackagingTests(unittest.TestCase):
         for name in helpers + ['document-extractor', 'pdf-renderer']:
             (native / name).write_text(name)
             (native / name).chmod(0o700)
+        clipper = self.app / 'Contents/Resources/browser-clipper'
+        clipper.mkdir(parents=True)
+        for name in ('manifest.json', 'popup.html', 'popup.js', 'popup.css', 'extract.js', 'README.md'):
+            (clipper / name).write_text(name)
         self.source = {'source.go': 'a' * 64}
         self.bundle = packaging.p0.tree_fingerprint(self.app)
         checks = [{'name': name, 'result': 'passed'} for name in sorted(packaging.MANDATORY_CHECKS)]

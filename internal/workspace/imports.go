@@ -75,11 +75,18 @@ type ImportItem struct {
 	Provenance         any                     `json:"provenance,omitempty"`
 }
 type ImportPlan struct {
-	NotionGraph         bool                       `json:"notionGraph,omitempty"`
-	NotionKeepGraph     bool                       `json:"notionKeepGraph,omitempty"`
-	NotionCopyGraph     bool                       `json:"notionCopyGraph,omitempty"`
-	NotionContainers    []NotionContainerImport    `json:"notionContainers,omitempty"`
-	NotionIdentities    []NotionIdentityImport     `json:"notionIdentities,omitempty"`
+	NotionGraph             bool                    `json:"notionGraph,omitempty"`
+	NotionKeepGraph         bool                    `json:"notionKeepGraph,omitempty"`
+	NotionCopyGraph         bool                    `json:"notionCopyGraph,omitempty"`
+	NotionContainers        []NotionContainerImport `json:"notionContainers,omitempty"`
+	NotionIdentities        []NotionIdentityImport  `json:"notionIdentities,omitempty"`
+	RootParentID            string                  `json:"rootParentPageId,omitempty"`
+	ExpectedParentRevision  string                  `json:"expectedParentRevision,omitempty"`
+	CaptureDigest           string                  `json:"captureDigest,omitempty"`
+	CaptureExtension        string                  `json:"captureExtension,omitempty"`
+	CaptureDestination      string                  `json:"captureDestination,omitempty"`
+	CaptureDestinationTitle string                  `json:"captureDestinationTitle,omitempty"`
+
 	PortableCollections []PortableCollectionImport `json:"portableCollections,omitempty"`
 	ID                  string                     `json:"planId"`
 	Hash                string                     `json:"planHash"`
