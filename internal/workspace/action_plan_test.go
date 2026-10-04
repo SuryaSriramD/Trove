@@ -83,3 +83,44 @@ func TestActionPlanRejectsAmbiguousStaleAndInvalidValues(t *testing.T) {
 	}
 	_ = f
 }
+
+func TestActionPlanUsesTaskBindingsAndExplainsDatabaseCreation(t *testing.T) {
+	k, e := testKernel(t)
+	ctx := context.Background()
+	f := ensureTestTasks(t, k, e)
+	// Names are presentation; persisted task bindings remain authoritative.
+	if _, err := k.writeDB.Exec("UPDATE properties SET name=CASE id WHEN ? THEN 'Progress' ELSE 'Deadline' END WHERE id IN (?,?)", f.status, f.status, f.date); err != nil {
+		t.Fatal(err)
+	}
+	plan := ActionPlan{Version: 1, Actions: []PlannedAction{{Kind: "create_task", Destination: "Tasks", Title: "Review archives", Due: "2026-10-21"}}}
+	resolved, err := k.ResolveActionPlan(ctx, e, plan, nil)
+	if err != nil {
+		t.Fatal(err)
+	}
+	testOK(t, testDispatch(t, k, e, "batch", testRequest(k, e, resolved.Commands, resolved.Guards...)))
+	plan.Actions = []PlannedAction{{Kind: "update_task", Target: "Review archives", Status: "Done", Due: "2026-10-22"}}
+	resolved, err = k.ResolveActionPlan(ctx, e, plan, nil)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if resolved.Changes[0].Label != "Set Progress" || resolved.Changes[0].Before != "To do" || resolved.Changes[0].After != "Done" {
+		t.Fatal("unreadable status review", resolved.Changes)
+	}
+	testOK(t, testDispatch(t, k, e, "batch", testRequest(k, e, resolved.Commands, resolved.Guards...)))
+	var completed bool
+	if err = k.db.QueryRow("SELECT completed FROM task_state WHERE record_id=(SELECT id FROM records WHERE page_id=?)", resolved.PageIDs[0]).Scan(&completed); err != nil || !completed {
+		t.Fatal("bound status did not complete task", err)
+	}
+	plan.Actions = []PlannedAction{{Kind: "create_database", Destination: "@workspace", Title: "Inventory", Properties: []PlannedProperty{{Name: "Quantity", Type: "number"}}}}
+	resolved, err = k.ResolveActionPlan(ctx, e, plan, nil)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if resolved.Changes[0].After != "Table view with Name (title)\nProperty: Quantity (number)" {
+		t.Fatal(resolved.Changes)
+	}
+	plan.Actions = []PlannedAction{{Kind: "create_page", Destination: "@workspace", Title: "   "}}
+	if _, err = k.ResolveActionPlan(ctx, e, plan, nil); err == nil {
+		t.Fatal("blank title accepted")
+	}
+}

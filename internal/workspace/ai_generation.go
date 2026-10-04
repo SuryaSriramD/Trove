@@ -23,6 +23,10 @@ func aiRequiresCitations(mode string) bool {
 // provisional stream exposes readable claim text; grammar JSON and supporting
 // quotes stay internal. Unsupported quotes leave an unapplied failed draft.
 func GeneratePreparedAI(ctx context.Context, prepared AIPrepared, generate AIGenerator, onToken func(string)) (AICompletion, error) {
+	if prepared.Run.Request.Mode == "workspace_agent" {
+		text, err := generate(ctx, prepared.System, prepared.Prompt, prepared.OutputTokens, actionPlanGrammar(), nil)
+		return AICompletion{Text: text}, err
+	}
 	if len(prepared.Run.Sources) == 0 || !aiRequiresCitations(prepared.Run.Request.Mode) {
 		text, err := generate(ctx, prepared.System, prepared.Prompt, prepared.OutputTokens, "", onToken)
 		return AICompletion{Text: text}, err

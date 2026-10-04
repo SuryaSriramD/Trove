@@ -44,6 +44,8 @@ type ProviderConnection struct {
 	Token          string   `json:"token,omitempty"`
 }
 type ProviderProposal struct {
+	PlanHash     string                        `json:"planHash,omitempty"`
+	Changes      []ActionReview                `json:"changes,omitempty"`
 	ID           string                        `json:"id"`
 	ConnectionID string                        `json:"connectionId"`
 	State        string                        `json:"state"`
@@ -51,12 +53,12 @@ type ProviderProposal struct {
 	Result       json.RawMessage               `json:"result,omitempty"`
 }
 
-var providerTools = map[string]bool{"readPage": true, "queryRecords": true, "search.query": true, "resolveCitation": true, "allocateIds": true, "proposeChanges": true}
+var providerTools = map[string]bool{"readPage": true, "queryRecords": true, "search.query": true, "resolveCitation": true, "allocateIds": true, "proposeChanges": true, "proposeActions": true}
 
 func init() {
 	RegisterInitializer(func(ctx context.Context, k *Kernel) error {
 		return k.write(ctx, func(tx *sql.Tx) error {
-			_, err := tx.ExecContext(ctx, `CREATE TABLE IF NOT EXISTS provider_connections(id TEXT PRIMARY KEY,body_json TEXT NOT NULL,state TEXT NOT NULL); CREATE TABLE IF NOT EXISTS provider_proposals(id TEXT PRIMARY KEY,connection_id TEXT NOT NULL,state TEXT NOT NULL,body_json TEXT NOT NULL,result_json TEXT,created_at TEXT NOT NULL); CREATE TABLE IF NOT EXISTS provider_audit(id TEXT PRIMARY KEY,connection_id TEXT NOT NULL,action TEXT NOT NULL,state TEXT NOT NULL,detail TEXT NOT NULL,created_at TEXT NOT NULL); UPDATE provider_connections SET state='disconnected'; UPDATE provider_proposals SET state='applied',result_json=(SELECT response_json FROM idempotency_receipts WHERE actor_id=provider_proposals.connection_id AND idempotency_key=json_extract(provider_proposals.body_json,'$.request.mutation.idempotencyKey')) WHERE result_json IS NULL AND EXISTS(SELECT 1 FROM idempotency_receipts WHERE actor_id=provider_proposals.connection_id AND idempotency_key=json_extract(provider_proposals.body_json,'$.request.mutation.idempotencyKey')); UPDATE provider_proposals SET state='interrupted' WHERE state='pending';`)
+			_, err := tx.ExecContext(ctx, `CREATE TABLE IF NOT EXISTS provider_connections(id TEXT PRIMARY KEY,body_json TEXT NOT NULL,state TEXT NOT NULL); CREATE TABLE IF NOT EXISTS provider_proposals(id TEXT PRIMARY KEY,connection_id TEXT NOT NULL,state TEXT NOT NULL,body_json TEXT NOT NULL,result_json TEXT,created_at TEXT NOT NULL); CREATE TABLE IF NOT EXISTS provider_audit(id TEXT PRIMARY KEY,connection_id TEXT NOT NULL,action TEXT NOT NULL,state TEXT NOT NULL,detail TEXT NOT NULL,created_at TEXT NOT NULL); UPDATE provider_connections SET state='disconnected'; UPDATE provider_proposals SET state='applied',result_json=(SELECT json_object('ok',json('true'),'result',json(response_json)) FROM idempotency_receipts WHERE actor_id=provider_proposals.connection_id AND idempotency_key=json_extract(provider_proposals.body_json,'$.request.mutation.idempotencyKey')) WHERE result_json IS NULL AND EXISTS(SELECT 1 FROM idempotency_receipts WHERE actor_id=provider_proposals.connection_id AND idempotency_key=json_extract(provider_proposals.body_json,'$.request.mutation.idempotencyKey')); UPDATE provider_proposals SET state='interrupted' WHERE state='pending';`)
 			return err
 		})
 	})
@@ -181,6 +183,9 @@ func (b *ProviderBridge) Call(ctx context.Context, id, token, tool string, args 
 	if err != nil {
 		return nil, err
 	}
+	if err := b.kernel.authorize(c.execution); err != nil {
+		return nil, err
+	}
 	if !c.tools[tool] {
 		b.audit(ctx, id, tool, "denied", "Capability not approved")
 		return nil, Fail("SCOPE_DENIED", "Tool is not approved")
@@ -189,6 +194,9 @@ func (b *ProviderBridge) Call(ctx context.Context, id, token, tool string, args 
 	defer cancel()
 	stop := context.AfterFunc(c.ctx, cancel)
 	defer stop()
+	if tool == "proposeActions" {
+		return b.proposeActions(live, c, args)
+	}
 	if tool == "proposeChanges" {
 		return b.propose(live, c, args)
 	}
@@ -204,6 +212,9 @@ func (b *ProviderBridge) Call(ctx context.Context, id, token, tool string, args 
 	return response, nil
 }
 func (b *ProviderBridge) propose(ctx context.Context, c *providerConnection, args map[string]any) (json.RawMessage, error) {
+	return b.persistProposal(ctx, c, args, "", nil)
+}
+func (b *ProviderBridge) persistProposal(ctx context.Context, c *providerConnection, args map[string]any, planHash string, changes []ActionReview) (json.RawMessage, error) {
 	key := str(args["idempotencyKey"])
 	if key == "" || len(key) > 80 {
 		return nil, Fail("INVALID_REQUEST", "Proposal requires a stable idempotencyKey of 1–80 characters")
@@ -213,8 +224,8 @@ func (b *ProviderBridge) propose(ctx context.Context, c *providerConnection, arg
 	if err != nil {
 		return nil, Fail("INVALID_REQUEST", err.Error())
 	}
-	// New-page creation can widen a pages grant. Keep this bridge's writes inside
-	// the explicit page manifest; adding context requires a new reviewed connection.
+	// Only the trusted typed planner may supply creation commands. New pages do
+	// not become readable through the connection's unchanged explicit manifest.
 	for _, g := range req.Mutation.ExpectedRevisions {
 		if g.Revision != "0" {
 			if err := b.kernel.authorizeEntity(ctx, b.kernel.db, c.execution, g.Target.EntityType, string(g.Target.EntityId)); err != nil {
@@ -227,6 +238,10 @@ func (b *ProviderBridge) propose(ctx context.Context, c *providerConnection, arg
 		json.Unmarshal(marshal(command), &v)
 		switch str(v["kind"]) {
 		case "page.update", "block.insert", "block.update", "record.setValue", "record.clearValue", "view.save":
+		case "page.create", "collection.create", "collection.addProperty", "task.create", "record.create":
+			if planHash == "" {
+				return nil, Fail("SCOPE_DENIED", "Use reviewed named actions to create content")
+			}
 		default:
 			return nil, Fail("SCOPE_DENIED", "This bridge allows only updates to approved context; deletion and broader access require separate authorization")
 		}
@@ -237,7 +252,7 @@ func (b *ProviderBridge) propose(ctx context.Context, c *providerConnection, arg
 	}
 	sum := sha256.Sum256([]byte(c.info.ID + ":" + key))
 	id := hex.EncodeToString(sum[:])
-	p := ProviderProposal{ID: id, ConnectionID: c.info.ID, State: "pending", Request: req}
+	p := ProviderProposal{ID: id, ConnectionID: c.info.ID, State: "pending", Request: req, PlanHash: planHash, Changes: changes}
 	err = b.kernel.write(ctx, func(tx *sql.Tx) error {
 		var previous, previousState string
 		var previousResult sql.NullString
@@ -248,7 +263,7 @@ func (b *ProviderBridge) propose(ctx context.Context, c *providerConnection, arg
 				return err
 			}
 			h, _ := commandHash(old.Request, true)
-			if h != hash {
+			if (planHash == "" && (old.PlanHash != "" || h != hash)) || (planHash != "" && old.PlanHash != planHash) {
 				return Fail("IDEMPOTENCY_CONFLICT", "Proposal retry changed its reviewed content")
 			}
 			p = old
@@ -309,6 +324,9 @@ func (b *ProviderBridge) Approve(ctx context.Context, id string) (json.RawMessag
 	b.mu.Unlock()
 	if !connected {
 		return nil, Fail("SCOPE_DENIED", "Connection was revoked; reconnect and review a fresh proposal")
+	}
+	if err := b.kernel.authorize(c.execution); err != nil {
+		return nil, err
 	}
 	if result.Valid {
 		return json.RawMessage(result.String), nil

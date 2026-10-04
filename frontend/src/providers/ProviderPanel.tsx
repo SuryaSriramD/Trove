@@ -11,7 +11,8 @@ const toolLabels: Record<string, string> = {
   queryRecords: "Read database records",
   resolveCitation: "Resolve source references",
   allocateIds: "Prepare identifiers for new content",
-  proposeChanges: "Propose changes for my review",
+  proposeChanges: "Propose edits to selected content",
+  proposeActions: "Propose named page, task and database changes for review",
 };
 type Connection = {
   id: string;
@@ -28,6 +29,12 @@ type Proposal = {
   connectionId: string;
   state: string;
   request: unknown;
+  changes?: {
+    label: string;
+    destination: string;
+    before?: string;
+    after: string;
+  }[];
   result?: unknown;
 };
 type Capability = {
@@ -166,6 +173,7 @@ export function ProviderPanel({
               "resolveCitation",
               "allocateIds",
               "proposeChanges",
+              "proposeActions",
             ].map((t) => (
               <label key={t} style={{ display: "block" }}>
                 <input
@@ -185,6 +193,12 @@ export function ProviderPanel({
               </label>
             ))}
           </fieldset>
+          {tools.includes("proposeActions") && (
+            <p>
+              New pages and tasks require approval in a selected destination.
+              Created pages remain private until you explicitly share them.
+            </p>
+          )}
           <button
             disabled={busy || !pages.length || !tools.length}
             onClick={() =>
@@ -333,7 +347,18 @@ export function ProviderPanel({
       {proposals.map((p) => (
         <article key={p.id}>
           <strong>{p.state}</strong>
-          <pre>{JSON.stringify(p.request, null, 2)}</pre>
+          {p.changes?.map((change, index) => (
+            <section key={index}>
+              <h4>{change.label}</h4>
+              <p>Destination: {change.destination}</p>
+              {change.before && <p>Before: {change.before}</p>}
+              <pre>{change.after}</pre>
+            </section>
+          ))}
+          <details>
+            <summary>Exact commands and revision checks</summary>
+            <pre>{JSON.stringify(p.request, null, 2)}</pre>
+          </details>
           {p.state === "pending" && (
             <>
               <button

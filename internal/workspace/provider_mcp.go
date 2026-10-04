@@ -8,6 +8,7 @@ import (
 	"net/http"
 	"strings"
 	"sync"
+	"trove.local/phase0/contracts"
 )
 
 // MCPHandler is a bounded JSON-response Streamable HTTP endpoint. The shell
@@ -39,6 +40,9 @@ func (b *ProviderBridge) MCPHandler() http.Handler {
 		id := r.Header.Get("Trove-Connection-Id")
 		token := strings.TrimPrefix(r.Header.Get("Authorization"), "Bearer ")
 		c, err := b.authenticate(id, token)
+		if err == nil {
+			err = b.kernel.authorize(c.execution)
+		}
 		if err != nil {
 			http.Error(w, "Unauthorized", http.StatusUnauthorized)
 			return
@@ -109,13 +113,13 @@ func (b *ProviderBridge) MCPHandler() http.Handler {
 		switch req.Method {
 		case "initialize":
 			w.Header().Set("Mcp-Session-Id", id)
-			reply(map[string]any{"protocolVersion": "2025-03-26", "capabilities": map[string]any{"tools": map[string]any{"listChanged": false}}, "serverInfo": map[string]any{"name": "Trove", "version": "0.5.0"}, "instructions": "Only explicitly selected Trove context is accessible. Submit changes with proposeChanges; a person approves them in Trove."})
+			reply(map[string]any{"protocolVersion": "2025-03-26", "capabilities": map[string]any{"tools": map[string]any{"listChanged": false}}, "serverInfo": map[string]any{"name": "Trove", "version": "0.5.0"}, "instructions": "Only explicitly selected Trove context is accessible. Submit named create/update actions with proposeActions or existing scoped edits with proposeChanges; a person approves them in Trove. Creating a child does not share that new page with this connection."})
 		case "ping":
 			reply(map[string]any{})
 		case "tools/list":
 			tools := []map[string]any{}
 			for _, name := range c.info.Tools {
-				tools = append(tools, map[string]any{"name": name, "description": "Scoped Trove workspace service: " + name, "inputSchema": mcpInputSchema(name), "annotations": map[string]any{"readOnlyHint": name != "proposeChanges", "destructiveHint": false, "openWorldHint": false}})
+				tools = append(tools, map[string]any{"name": name, "description": "Scoped Trove workspace service: " + name, "inputSchema": mcpInputSchema(name), "annotations": map[string]any{"readOnlyHint": name != "proposeChanges" && name != "proposeActions", "destructiveHint": false, "openWorldHint": false}})
 			}
 			reply(map[string]any{"tools": tools})
 		case "tools/call":
@@ -175,6 +179,14 @@ func mcpInputSchema(name string) any {
 	case "allocateIds":
 		props["count"] = map[string]any{"type": "integer", "minimum": 1, "maximum": 1000}
 		required = []string{"count"}
+	case "proposeActions":
+		plan, err := contracts.InlineDefinition("service", "ActionPlan")
+		if err != nil {
+			return map[string]any{"not": map[string]any{}}
+		}
+		props["idempotencyKey"] = map[string]any{"type": "string", "minLength": 1, "maxLength": 80}
+		props["plan"] = plan
+		required = []string{"idempotencyKey", "plan"}
 	case "proposeChanges":
 		props["idempotencyKey"] = text
 		props["commands"] = map[string]any{"type": "array", "maxItems": 256, "items": map[string]any{"type": "object"}}

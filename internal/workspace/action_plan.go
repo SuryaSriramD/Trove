@@ -10,6 +10,8 @@ import (
 	"trove.local/phase0/contracts"
 )
 
+const actionPlanInstructions = `Return only a JSON plan: {"version":1,"actions":[{"kind":"create_page","destination":"Exact existing page title","title":"New page title","body":"Markdown text"}]}. Use human-readable exact existing page, database, record and property names; never output IDs, revisions, grants, permissions or raw commands. Supported actions: create_page(destination,title,optional body); update_page(target,optional title,optional body to APPEND); create_task(destination=canonical Tasks page name,title,optional body,status,due YYYY-MM-DD); update_task(target,optional status,due); create_database(destination,title,properties:[{name,type}]); create_record(destination=database page title,title,optional body); update_record(target=record page title,property,value). Database property types: text,number,checkbox,date,url,email,phone. Values use text or decimal strings, boolean, date YYYY-MM-DD, or an existing status/select label. At most 32 actions. Use destination @workspace only for a root page/database specifically requested in workspace scope. If a reference is unclear, use its requested name; the application will ask for a unique title instead of guessing. Do not claim any action has run. All writes require explicit review and approval.`
+
 // ActionPlan contains user-facing references and values, never authoritative
 // IDs, permissions or revision guards. Both local AI and paired clients use it.
 type ActionPlan struct {
@@ -230,6 +232,68 @@ func (b *actionResolver) property(collection, name string) (contracts.DomainProp
 	}
 	return p, b.current("property", ids[0])
 }
+
+// Existing tasks use their persisted facet bindings. New canonical tasks follow
+// the same stable property selection as task.create/promoteTask, never names.
+func (b *actionResolver) taskProperty(collection, record, kind string) (contracts.DomainPropertyDefinition, error) {
+	var id sql.NullString
+	var err error
+	if record != "" {
+		column := "status_property_id"
+		if kind == "date" {
+			column = "due_property_id"
+		}
+		err = b.tx.QueryRowContext(b.ctx, "SELECT "+column+" FROM task_facets WHERE record_id=? AND collection_id=?", record, collection).Scan(&id)
+	} else {
+		err = b.tx.QueryRowContext(b.ctx, "SELECT id FROM properties WHERE collection_id=? AND type=? ORDER BY id LIMIT 1", collection, kind).Scan(&id)
+	}
+	if err != nil || !id.Valid {
+		return contracts.DomainPropertyDefinition{}, Fail("INVALID_REQUEST", "This task has no configured "+kind+" property")
+	}
+	p, err := propertyDefinition(b.ctx, b.tx, id.String)
+	if err != nil {
+		return p, err
+	}
+	if p.Type != kind || string(p.CollectionId) != collection {
+		return p, Fail("INVALID_REQUEST", "Task property binding is invalid")
+	}
+	return p, b.current("property", id.String)
+}
+func (b *actionResolver) reviewValue(p contracts.DomainPropertyDefinition, raw string) string {
+	if raw == "" {
+		return "Not set"
+	}
+	var value any
+	if json.Unmarshal([]byte(raw), &value) != nil {
+		return raw
+	}
+	if value == nil {
+		return "Not set"
+	}
+	if p.Type == "status" || p.Type == "select" {
+		if id, ok := value.(string); ok {
+			var label string
+			if b.tx.QueryRowContext(b.ctx, "SELECT label FROM property_options WHERE property_id=? AND id=?", p.Id, id).Scan(&label) == nil {
+				return label
+			}
+		}
+	}
+	if p.Type == "text" {
+		if runs, ok := value.([]any); ok {
+			var text strings.Builder
+			for _, run := range runs {
+				if r, ok := run.(map[string]any); ok {
+					text.WriteString(str(r["text"]))
+				}
+			}
+			return text.String()
+		}
+	}
+	if v, ok := value.(string); ok {
+		return v
+	}
+	return raw
+}
 func (b *actionResolver) value(p contracts.DomainPropertyDefinition, value any) (any, error) {
 	var config map[string]any
 	json.Unmarshal(p.Config, &config)
@@ -294,9 +358,15 @@ func (b *actionResolver) setValue(record string, p contracts.DomainPropertyDefin
 		return "", err
 	}
 	b.out.Commands = append(b.out.Commands, map[string]any{"kind": "record.setValue", "recordId": record, "propertyId": p.Id, "value": input})
-	return old.String, nil
+	return b.reviewValue(p, old.String), nil
 }
 func (b *actionResolver) action(a PlannedAction) error {
+	if strings.HasPrefix(a.Kind, "create_") && strings.TrimSpace(a.Title) == "" {
+		return Fail("INVALID_REQUEST", "A proposed title must contain text")
+	}
+	if a.Kind == "update_page" && strings.TrimSpace(a.Title) == "" && strings.TrimSpace(a.Body) == "" {
+		return Fail("INVALID_REQUEST", "A page update must contain a title or appended text")
+	}
 	switch a.Kind {
 	case "create_page", "create_database":
 		parent, label, err := b.destination(a.Destination)
@@ -335,7 +405,7 @@ func (b *actionResolver) action(a PlannedAction) error {
 			}
 			b.out.Commands = append(b.out.Commands, map[string]any{"kind": "view.save", "viewId": view, "collectionId": collection, "owningPageId": page, "type": "table", "name": "All records", "schemaVersion": 1, "config": map[string]any{"columnWidths": []any{}}, "query": map[string]any{"filter": nil, "sorts": []any{}, "visiblePropertyIds": visible, "groupByPropertyId": nil, "subgroupByPropertyId": nil}})
 		}
-		b.out.Changes = append(b.out.Changes, ActionReview{Label: strings.ReplaceAll(a.Kind, "_", " ") + ": " + a.Title, Destination: label, After: a.Body})
+		b.out.Changes = append(b.out.Changes, ActionReview{Label: strings.ReplaceAll(a.Kind, "_", " ") + ": " + a.Title, Destination: label, After: actionCreationReview(a)})
 		return nil
 	case "update_page":
 		page, title, err := b.page(a.Target)
@@ -347,7 +417,7 @@ func (b *actionResolver) action(a PlannedAction) error {
 		}
 		b.body(page, a.Body)
 		b.out.PageIDs = append(b.out.PageIDs, page)
-		b.out.Changes = append(b.out.Changes, ActionReview{Label: "Update page", Destination: title, Before: title, After: "Title: " + a.Title + "\nAppend: " + a.Body})
+		b.out.Changes = append(b.out.Changes, ActionReview{Label: "Update page", Destination: title, Before: title, After: actionPageReview(a)})
 		return nil
 	case "create_task", "create_record":
 		destination, label, err := b.page(a.Destination)
@@ -369,7 +439,7 @@ func (b *actionResolver) action(a PlannedAction) error {
 			if role != "tasks" {
 				return Fail("INVALID_REQUEST", "Choose the canonical Tasks database for task creation")
 			}
-			status, err := b.property(collection, "Status")
+			status, err := b.taskProperty(collection, "", "status")
 			if err != nil {
 				return err
 			}
@@ -380,7 +450,7 @@ func (b *actionResolver) action(a PlannedAction) error {
 		b.out.PageIDs = append(b.out.PageIDs, page)
 		b.body(page, a.Body)
 		if a.Status != "" {
-			p, err := b.property(collection, "Status")
+			p, err := b.taskProperty(collection, "", "status")
 			if err != nil {
 				return err
 			}
@@ -389,7 +459,7 @@ func (b *actionResolver) action(a PlannedAction) error {
 			}
 		}
 		if a.Due != "" {
-			p, err := b.property(collection, "Due")
+			p, err := b.taskProperty(collection, "", "date")
 			if err != nil {
 				return err
 			}
@@ -397,7 +467,7 @@ func (b *actionResolver) action(a PlannedAction) error {
 				return err
 			}
 		}
-		b.out.Changes = append(b.out.Changes, ActionReview{Label: strings.ReplaceAll(a.Kind, "_", " ") + ": " + a.Title, Destination: label, After: a.Body + "\nStatus: " + a.Status + "\nDue: " + a.Due})
+		b.out.Changes = append(b.out.Changes, ActionReview{Label: strings.ReplaceAll(a.Kind, "_", " ") + ": " + a.Title, Destination: label, After: actionCreationReview(a)})
 		return nil
 	case "update_record", "update_task":
 		page, title, err := b.page(a.Target)
@@ -439,7 +509,16 @@ func (b *actionResolver) action(a PlannedAction) error {
 			}
 		}
 		for _, change := range changes {
-			p, err := b.property(collection, change.name)
+			var p contracts.DomainPropertyDefinition
+			if a.Kind == "update_task" {
+				kind := "status"
+				if change.name == "Due" {
+					kind = "date"
+				}
+				p, err = b.taskProperty(collection, record, kind)
+			} else {
+				p, err = b.property(collection, change.name)
+			}
 			if err != nil {
 				return err
 			}
@@ -447,10 +526,47 @@ func (b *actionResolver) action(a PlannedAction) error {
 			if err != nil {
 				return err
 			}
-			b.out.Changes = append(b.out.Changes, ActionReview{Label: "Set " + p.Name, Destination: title, Before: before, After: string(marshal(change.value))})
+			b.out.Changes = append(b.out.Changes, ActionReview{Label: "Set " + p.Name, Destination: title, Before: before, After: b.reviewValue(p, string(marshal(change.value)))})
 		}
 		b.out.PageIDs = append(b.out.PageIDs, page)
 		return nil
 	}
 	return Fail("INVALID_REQUEST", "Unsupported proposed action")
+}
+
+func actionPageReview(a PlannedAction) string {
+	parts := []string{}
+	if a.Title != "" {
+		parts = append(parts, "Title: "+a.Title)
+	}
+	if a.Body != "" {
+		parts = append(parts, "Append: "+a.Body)
+	}
+	return strings.Join(parts, "\n")
+}
+func actionCreationReview(a PlannedAction) string {
+	parts := []string{}
+	if a.Body != "" {
+		parts = append(parts, a.Body)
+	}
+	if a.Kind == "create_database" {
+		parts = append(parts, "Table view with Name (title)")
+		for _, p := range a.Properties {
+			parts = append(parts, "Property: "+p.Name+" ("+p.Type+")")
+		}
+	}
+	if a.Kind == "create_task" {
+		if a.Status != "" {
+			parts = append(parts, "Status: "+a.Status)
+		} else {
+			parts = append(parts, "Status: configured default")
+		}
+		if a.Due != "" {
+			parts = append(parts, "Due: "+a.Due)
+		}
+	}
+	if len(parts) == 0 {
+		return "Empty page body"
+	}
+	return strings.Join(parts, "\n")
 }

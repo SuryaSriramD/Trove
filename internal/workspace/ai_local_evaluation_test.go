@@ -132,10 +132,16 @@ func TestRealLocalMemoryPreferenceAndCurrentAuthority(t *testing.T) {
 				testOK(t, dbBatch(t, k, e, []any{map[string]any{"kind": "memory.forget", "memoryId": preference}}, "page", preferencePage, "memory", preference))
 			}
 		})
+		state, failure := "completed", ""
 		if err != nil {
-			t.Fatal(err)
+			if !strings.Contains(err.Error(), "OUTPUT_LIMIT:") {
+				t.Fatal(err)
+			}
+			// Incomplete output is still checked for memory erasure. Reaching
+			// a token cap must not skip the privacy acceptance assertion.
+			state, failure = "failed", err.Error()
 		}
-		run, err := k.FinishAI(ctx, e, prepared.Run.ID, answer, "completed", "")
+		run, err := k.FinishAI(ctx, e, prepared.Run.ID, answer, state, failure)
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -152,4 +158,68 @@ func TestRealLocalMemoryPreferenceAndCurrentAuthority(t *testing.T) {
 			}
 		}
 	})
+}
+
+func TestRealLocalNamedWorkspacePlan(t *testing.T) {
+	if os.Getenv("TROVE_NATIVE_INTEGRATION") != "1" {
+		t.Skip("requires supported local model and native helpers")
+	}
+	manager, err := native.NewManager(os.Getenv("TROVE_MODEL_ROOT"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	supervisor, err := native.NewSupervisor(os.Getenv("TROVE_NATIVE_BUNDLE"), manager)
+	if err != nil {
+		t.Fatal(err)
+	}
+	k, e := testKernel(t)
+	ctx := context.Background()
+	page := createPage(t, k, e, "Launch")
+	pack := "01990000-0000-7000-8000-000000000105"
+	budget := AIBudget{ContextTokens: 8192, OutputTokens: 512, CountTokens: func(ctx context.Context, prompts []AIPrompt) ([]int, error) {
+		texts := []string{}
+		for _, p := range prompts {
+			texts = append(texts, native.ChatPrompt(p.System, p.User))
+		}
+		return supervisor.CountTokens(ctx, pack, texts)
+	}}
+	prepared, err := k.PrepareAIWithBudget(ctx, e, AIRequest{PageID: page, Mode: "workspace_agent", Prompt: "Create one page titled Backup checklist under Launch. Its body must be the single sentence: Verify the restored files. Do not propose any other changes.", ModelPackID: pack}, budget)
+	if err != nil {
+		t.Fatal(err)
+	}
+	completion, err := GeneratePreparedAI(ctx, prepared, func(ctx context.Context, system, prompt string, tokens int, grammar string, stream func(string)) (string, error) {
+		return supervisor.GenerateTextWithGrammar(ctx, pack, native.ChatPrompt(system, prompt), tokens, grammar, stream)
+	}, nil)
+	if err != nil {
+		t.Fatal(err)
+	}
+	t.Logf("synthetic proposed plan: %s", completion.Text)
+	run, err := k.FinishAI(ctx, e, prepared.Run.ID, completion.Text, "completed", "")
+	if err != nil {
+		t.Fatal(err)
+	}
+	value, err := prepareAIAction(ctx, k, e, map[string]any{"runId": run.ID, "kind": "workspace_patch"})
+	if err != nil {
+		t.Fatal(err)
+	}
+	proposal := value.(AIProposal)
+	if len(proposal.Changes) != 1 || proposal.Changes[0].Destination != "Launch" || !strings.Contains(proposal.Changes[0].Label, "Backup checklist") || strings.TrimSpace(proposal.Changes[0].After) != "Verify the restored files." {
+		t.Fatal("natural-language task rubric failed", proposal.Changes)
+	}
+	var count int
+	k.db.QueryRow("SELECT count(*) FROM pages WHERE title='Backup checklist'").Scan(&count)
+	if count != 0 {
+		t.Fatal("generation changed content before review")
+	}
+	if _, err = applyAIAction(ctx, k, e, map[string]any{"proposalId": proposal.ID}); err != nil {
+		t.Fatal(err)
+	}
+	if _, err = applyAIAction(ctx, k, e, map[string]any{"proposalId": proposal.ID}); err != nil {
+		t.Fatal(err)
+	}
+	k.db.QueryRow("SELECT count(*) FROM pages WHERE title='Backup checklist'").Scan(&count)
+	if count != 1 {
+		t.Fatal("review did not create exactly one page", count)
+	}
+	t.Log("real local named action resolved and applied after explicit approval; no broad mode/release qualification")
 }

@@ -86,3 +86,63 @@ type WorkspaceServices interface {
 	GetJob(context.Context, ServiceExecutionContext, JobsGetJobRequest) JobsJobResponse
 	CancelJob(context.Context, ServiceExecutionContext, JobsCancelJobRequest) JobsJobResponse
 }
+
+// InlineDefinition exposes a closed schema for tool discovery. It resolves only
+// local references in a bundled document, never arbitrary files or URLs.
+func InlineDefinition(document, name string) (any, error) {
+	raw, err := schemas.ReadFile(document + ".schema.json")
+	if err != nil {
+		return nil, err
+	}
+	var root map[string]any
+	if err = json.Unmarshal(raw, &root); err != nil {
+		return nil, err
+	}
+	definitions, _ := root["$defs"].(map[string]any)
+	var expand func(any, int) (any, error)
+	expand = func(v any, depth int) (any, error) {
+		if depth > 32 {
+			return nil, fmt.Errorf("schema recursion exceeds tool boundary")
+		}
+		switch node := v.(type) {
+		case map[string]any:
+			if ref, ok := node["$ref"].(string); ok {
+				const prefix = "#/$defs/"
+				if len(ref) <= len(prefix) || ref[:len(prefix)] != prefix {
+					return nil, fmt.Errorf("nonlocal schema reference")
+				}
+				next, ok := definitions[ref[len(prefix):]]
+				if !ok {
+					return nil, fmt.Errorf("missing schema reference")
+				}
+				return expand(next, depth+1)
+			}
+			result := map[string]any{}
+			for key, value := range node {
+				resolved, err := expand(value, depth+1)
+				if err != nil {
+					return nil, err
+				}
+				result[key] = resolved
+			}
+			return result, nil
+		case []any:
+			result := make([]any, len(node))
+			for i, value := range node {
+				resolved, err := expand(value, depth+1)
+				if err != nil {
+					return nil, err
+				}
+				result[i] = resolved
+			}
+			return result, nil
+		default:
+			return node, nil
+		}
+	}
+	value, ok := definitions[name]
+	if !ok {
+		return nil, fmt.Errorf("unknown schema definition")
+	}
+	return expand(value, 0)
+}

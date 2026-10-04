@@ -34,6 +34,7 @@ type Kernel struct {
 	writer                chan struct{}
 	pending               chan struct{}
 	mu                    sync.Mutex
+	reviewMu              sync.Mutex
 	semanticMaintenanceMu sync.Mutex
 	closed                bool
 	grants                map[string]contracts.ServiceExecutionContext
@@ -48,6 +49,7 @@ type cancellation struct {
 	cancelled   bool
 }
 type commitGrantKey struct{}
+type approvalSourceGrantKey struct{}
 type CommandHandler func(*Mutation, map[string]any) error
 type QueryHandler func(context.Context, *Kernel, contracts.ServiceExecutionContext, map[string]any) (any, error)
 
@@ -329,9 +331,15 @@ func (k *Kernel) write(ctx context.Context, fn func(*sql.Tx) error) error {
 	if e, ok := ctx.Value(commitGrantKey{}).(contracts.ServiceExecutionContext); ok {
 		k.mu.Lock()
 		defer k.mu.Unlock()
-		g, live := k.grants[string(e.ScopeGrantId)]
-		if !live || string(marshal(g)) != string(marshal(e)) {
-			return Fail("SCOPE_DENIED", "Connection was revoked before commit")
+		contexts := []contracts.ServiceExecutionContext{e}
+		if parent, ok := ctx.Value(approvalSourceGrantKey{}).(contracts.ServiceExecutionContext); ok {
+			contexts = append(contexts, parent)
+		}
+		for _, execution := range contexts {
+			g, live := k.grants[string(execution.ScopeGrantId)]
+			if !live || string(marshal(g)) != string(marshal(execution)) {
+				return Fail("SCOPE_DENIED", "Connection or approving scope was revoked before commit")
+			}
 		}
 	}
 	return tx.Commit()

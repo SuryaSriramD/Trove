@@ -2,7 +2,9 @@ package workspace
 
 import (
 	"context"
+	"crypto/sha256"
 	"database/sql"
+	"encoding/hex"
 	"encoding/json"
 	"strings"
 
@@ -10,17 +12,19 @@ import (
 )
 
 type AIProposal struct {
-	Before   string                              `json:"before,omitempty"`
-	After    string                              `json:"after"`
-	ID       string                              `json:"id"`
-	RunID    string                              `json:"runId"`
-	State    string                              `json:"state"`
-	Kind     string                              `json:"kind"`
-	PageID   string                              `json:"pageId"`
-	Title    string                              `json:"title"`
-	Body     string                              `json:"body"`
-	Commands []any                               `json:"commands"`
-	Guards   []contracts.ServiceExpectedRevision `json:"expectedRevisions"`
+	RequestHash string                              `json:"requestHash,omitempty"`
+	Changes     []ActionReview                      `json:"changes,omitempty"`
+	Before      string                              `json:"before,omitempty"`
+	After       string                              `json:"after"`
+	ID          string                              `json:"id"`
+	RunID       string                              `json:"runId"`
+	State       string                              `json:"state"`
+	Kind        string                              `json:"kind"`
+	PageID      string                              `json:"pageId"`
+	Title       string                              `json:"title"`
+	Body        string                              `json:"body"`
+	Commands    []any                               `json:"commands"`
+	Guards      []contracts.ServiceExpectedRevision `json:"expectedRevisions"`
 }
 
 func prepareAIAction(ctx context.Context, k *Kernel, e contracts.ServiceExecutionContext, r map[string]any) (any, error) {
@@ -46,6 +50,8 @@ func prepareAIAction(ctx context.Context, k *Kernel, e contracts.ServiceExecutio
 	if strings.TrimSpace(p.Body) == "" || len(p.Body) > 64000 {
 		return nil, Fail("INVALID_REQUEST", "Review text between 1 and 64000 bytes")
 	}
+	hash := sha256.Sum256(marshal(map[string]any{"runId": p.RunID, "kind": p.Kind, "title": p.Title, "body": p.Body}))
+	p.RequestHash = hex.EncodeToString(hash[:])
 	p.After = p.Body
 	guards := map[string]bool{}
 	guard := func(kind, id, rev string) {
@@ -215,7 +221,19 @@ func prepareAIAction(ctx context.Context, k *Kernel, e contracts.ServiceExecutio
 		return nil, Fail("INVALID_REQUEST", err.Error())
 	}
 	err = k.write(ctx, func(tx *sql.Tx) error {
-		_, err := tx.ExecContext(ctx, "INSERT INTO ai_proposals VALUES(?,?,'draft',?,?)", p.ID, run.ID, string(marshal(p)), now())
+		var previous, state string
+		err := tx.QueryRowContext(ctx, "SELECT body_json,state FROM ai_proposals WHERE run_id=? AND json_extract(body_json,'$.requestHash')=? LIMIT 1", p.RunID, p.RequestHash).Scan(&previous, &state)
+		if err == nil {
+			if err = json.Unmarshal([]byte(previous), &p); err != nil {
+				return err
+			}
+			p.State = state
+			return nil
+		}
+		if err != sql.ErrNoRows {
+			return err
+		}
+		_, err = tx.ExecContext(ctx, "INSERT INTO ai_proposals VALUES(?,?,'draft',?,?)", p.ID, run.ID, string(marshal(p)), now())
 		return err
 	})
 	return p, err
@@ -247,6 +265,8 @@ func aiDraftBlocks(body string) []map[string]any {
 	return out
 }
 func applyAIAction(ctx context.Context, k *Kernel, e contracts.ServiceExecutionContext, r map[string]any) (any, error) {
+	k.reviewMu.Lock()
+	defer k.reviewMu.Unlock()
 	if e.Actor.Kind != "user" || e.Origin != "user" {
 		return nil, Fail("APPROVAL_REQUIRED", "AI proposals require explicit user approval")
 	}
@@ -270,9 +290,22 @@ func applyAIAction(ctx context.Context, k *Kernel, e contracts.ServiceExecutionC
 			return nil, err
 		}
 	}
-	req := map[string]any{"contractVersion": 1, "requestId": NewID(), "workspaceId": k.id, "mutation": map[string]any{"idempotencyKey": "ai-proposal-" + p.ID, "scopeGrantId": e.ScopeGrantId, "expectedRevisions": p.Guards}, "commands": p.Commands}
+	runID := contracts.DomainId(p.RunID)
+	target := k.Grant(contracts.ServiceActor{Kind: "local_ai", ActorId: e.Actor.ActorId, RunId: &runID}, "ai", e.Scope)
+	defer k.RevokeGrant(string(target.ScopeGrantId))
+	req := map[string]any{"contractVersion": 1, "requestId": NewID(), "workspaceId": k.id, "mutation": map[string]any{"idempotencyKey": "ai-proposal-" + p.ID, "scopeGrantId": target.ScopeGrantId, "expectedRevisions": p.Guards}, "commands": p.Commands}
+	typed, err := contracts.DecodeBatch(marshal(req))
+	if err != nil {
+		return nil, err
+	}
+	approval, err := k.Approve(ctx, e, typed, target)
+	if err != nil {
+		return nil, err
+	}
+	req["mutation"].(map[string]any)["approvalId"] = approval
+	ctx = context.WithValue(ctx, approvalSourceGrantKey{}, e)
 	var response map[string]any
-	json.Unmarshal(k.batch(ctx, e, marshal(req)), &response)
+	json.Unmarshal(k.batch(ctx, target, marshal(req)), &response)
 	if response["ok"] != true {
 		d := response["error"].(map[string]any)
 		return nil, Fail(str(d["code"]), str(d["message"]))
@@ -307,8 +340,8 @@ func init() {
 		if actor != string(m.Execution.Actor.ActorId) {
 			return Fail("SCOPE_DENIED", "Proposal belongs to another actor")
 		}
-		if m.Execution.Actor.Kind != "user" || m.Execution.Origin != "user" {
-			return Fail("APPROVAL_REQUIRED", "Only the user can approve an AI proposal")
+		if m.Execution.Actor.Kind != "local_ai" || m.Execution.Origin != "ai" || m.Request.Mutation.ApprovalId == nil {
+			return Fail("APPROVAL_REQUIRED", "Only an explicitly approved local AI proposal may commit")
 		}
 		_, err := m.Exec("UPDATE ai_proposals SET state='applied' WHERE id=?", id)
 		return err

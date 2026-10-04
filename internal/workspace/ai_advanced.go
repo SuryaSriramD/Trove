@@ -22,14 +22,14 @@ var advancedAIInstructions = map[string]string{
 	"code_refactor":   "Return only replacement code, without Markdown fences. Preserve intended behavior. Never execute code. The user will review a source diff.",
 	"code_comment":    "Return only replacement code with useful comments added, without Markdown fences. Preserve behavior. Never execute code.",
 	"organize":        "Suggest page organization, tags and links using only the approved source context. Each suggestion must explain why and remain unapplied. Never claim a change was made.",
-	"workspace_agent": "Propose a bounded workspace plan with explicit source references, rationale, individual changes and verification. Do not perform actions. All changes require the user to review exact commands separately.",
+	"workspace_agent": actionPlanInstructions,
 }
 
 func aiSourceOptional(mode string) bool {
-	return mode == "generate" || mode == "outline" || mode == "database" || mode == "schema" || mode == "mermaid"
+	return mode == "workspace_agent" || mode == "generate" || mode == "outline" || mode == "database" || mode == "schema" || mode == "mermaid"
 }
 func aiLiteralOutput(mode string) bool {
-	return mode == "database" || mode == "schema" || mode == "mermaid" || mode == "code_refactor" || mode == "code_comment"
+	return mode == "workspace_agent" || mode == "database" || mode == "schema" || mode == "mermaid" || mode == "code_refactor" || mode == "code_comment"
 }
 
 func decodeAIDraft(body string, out any) error {
@@ -219,51 +219,26 @@ func prepareAdvancedAI(ctx context.Context, k *Kernel, e contracts.ServiceExecut
 		p.After = string(marshal(p.Commands))
 		return nil
 	case "workspace_patch":
-		var draft struct {
-			Commands []map[string]any                    `json:"commands"`
-			Expected []contracts.ServiceExpectedRevision `json:"expectedRevisions"`
+		if err := contracts.Validate("service", "ActionPlan", []byte(p.Body)); err != nil {
+			return Fail("INVALID_REQUEST", "The plan must contain supported named actions: "+err.Error())
 		}
+		var draft ActionPlan
 		if err := decodeAIDraft(p.Body, &draft); err != nil {
 			return err
 		}
-		if len(draft.Commands) < 1 || len(draft.Commands) > 32 {
-			return Fail("INVALID_REQUEST", "Workspace draft must contain 1–32 changes")
+		resolved, err := k.ResolveActionPlan(ctx, e, draft, p.Guards)
+		if err != nil {
+			return err
 		}
-		allowed := map[string]bool{"page.update": true, "page.move": true, "block.insert": true, "block.update": true, "collection.addProperty": true, "view.save": true, "record.setValue": true, "record.clearValue": true}
-		for _, g := range draft.Expected {
-			if g.Revision != "0" {
-				if err := k.authorizeEntity(ctx, k.db, e, g.Target.EntityType, string(g.Target.EntityId)); err != nil {
-					return err
-				}
-			}
-			guard(g.Target.EntityType, string(g.Target.EntityId), g.Revision)
+		p.Commands, p.Guards, p.Changes = resolved.Commands, resolved.Guards, resolved.Changes
+		if len(resolved.PageIDs) > 0 {
+			p.PageID = resolved.PageIDs[0]
 		}
-		for _, c := range draft.Commands {
-			kind := str(c["kind"])
-			if !allowed[kind] {
-				return Fail("SCOPE_DENIED", "This reviewed agent action is unavailable: "+kind)
-			}
-			switch kind {
-			case "block.insert", "block.update":
-				b := c
-				if kind == "block.insert" {
-					b, _ = c["block"].(map[string]any)
-				}
-				if err := validateBlock(str(b["type"]), number(b["schemaVersion"]), b["data"]); err != nil {
-					return err
-				}
-			case "collection.addProperty":
-				if err := contracts.Validate("domain", "property_"+str(c["type"])+"_config_v1", marshal(c["config"])); err != nil {
-					return Fail("INVALID_REQUEST", err.Error())
-				}
-			case "view.save":
-				if err := contracts.Validate("domain", "view_"+str(c["type"])+"_v1", marshal(c["config"])); err != nil {
-					return Fail("INVALID_REQUEST", err.Error())
-				}
-			}
-			p.Commands = append(p.Commands, c)
+		lines := []string{}
+		for _, change := range resolved.Changes {
+			lines = append(lines, change.Label+" → "+change.Destination+"\n"+change.After)
 		}
-		p.After = string(marshal(p.Commands))
+		p.After = strings.Join(lines, "\n\n")
 		return nil
 	}
 	return Fail("INVALID_REQUEST", "Unknown advanced AI action")

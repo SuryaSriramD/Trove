@@ -10,7 +10,10 @@ import {
 import type { Location, Memory } from "../../../contracts/generated/domain";
 import "./ai.css";
 import { Suggestions } from "./Suggestions";
-import { validateMermaidDraft, validateMermaidCommands } from "./validateMermaid";
+import {
+  validateMermaidDraft,
+  validateMermaidCommands,
+} from "./validateMermaid";
 
 type Citation = {
   number: number;
@@ -240,11 +243,15 @@ export function AIPanel({
     setBusy(true);
     setProposal(null);
     try {
-      if (action === "mermaid") await validateMermaidDraft(draft || current.text);
+      if (action === "mermaid")
+        await validateMermaidDraft(draft || current.text);
       const p = await dispatch<Proposal>("ai.prepareAction", {
         ...envelope(workspace),
         runId: current.id,
-        kind: action,
+        kind:
+          current.request.mode === "workspace_agent"
+            ? "workspace_patch"
+            : action,
         title,
         body: draft,
       });
@@ -467,25 +474,35 @@ export function AIPanel({
               finishes.
             </p>
           )}
-          <div className="ai-prose">
-            {current.text.split(/(\[\d+\])/g).map((part, i) => {
-              const c = current.citations.find((c) => `[${c.number}]` === part);
-              return c ? (
-                <button
-                  className="ai-citation"
-                  key={i}
-                  disabled={c.state !== "current"}
-                  onClick={() => openCitation(c)}
-                  title={c.title}
-                >
-                  {part}
-                  {c.state !== "current" ? " stale" : ""}
-                </button>
-              ) : (
-                <span key={i}>{part}</span>
-              );
-            })}
-          </div>
+          {current.request.mode === "workspace_agent" ? (
+            <p>
+              {current.state === "completed"
+                ? "Your workspace plan is ready to review. No changes have been applied."
+                : "Preparing a workspace plan…"}
+            </p>
+          ) : (
+            <div className="ai-prose">
+              {current.text.split(/(\[\d+\])/g).map((part, i) => {
+                const c = current.citations.find(
+                  (c) => `[${c.number}]` === part,
+                );
+                return c ? (
+                  <button
+                    className="ai-citation"
+                    key={i}
+                    disabled={c.state !== "current"}
+                    onClick={() => openCitation(c)}
+                    title={c.title}
+                  >
+                    {part}
+                    {c.state !== "current" ? " stale" : ""}
+                  </button>
+                ) : (
+                  <span key={i}>{part}</span>
+                );
+              })}
+            </div>
+          )}
           {current.warning && <p className="ai-note">{current.warning}</p>}
           {current.error && <p role="alert">{current.error}</p>}
           <details>
@@ -507,54 +524,60 @@ export function AIPanel({
             <details className="ai-review">
               <summary>Review a page or task change</summary>
               <p>
-                Edit the proposed text, then inspect the exact changes before
-                approval. A text replacement removes formatting in replaced
-                text.
+                {current.request.mode === "workspace_agent"
+                  ? "Review the destinations and each proposed change. If the plan needs corrections, change your request and generate a fresh plan."
+                  : "Edit the proposed text, then inspect the exact changes before approval. A text replacement removes formatting in replaced text."}
               </p>
-              <textarea
-                aria-label="Reviewed draft text"
-                value={draft || current.text}
-                onChange={(e) => {
-                  setDraft(e.target.value);
-                  setProposal(null);
-                }}
-              />
-              <select
-                aria-label="Reviewed action"
-                value={action}
-                onChange={(e) => {
-                  setAction(e.target.value);
-                  setProposal(null);
-                }}
-              >
-                <option value="append">Append blocks to source page</option>
-                <option value="replace_block">
-                  Replace selected source block/text
-                </option>
-                <option value="replace_page">Replace plain text page</option>
-                <option value="create_page">Create page</option>
-                <option value="create_task">Create task</option>
-                <option value="create_database">
-                  Create database from JSON draft
-                </option>
-                <option value="mermaid">Insert or update Mermaid</option>
-                <option value="replace_code">
-                  Replace selected code (never execute)
-                </option>
-                <option value="workspace_patch">
-                  Review workspace command draft
-                </option>
-              </select>
-              {action.startsWith("create_") && (
-                <input
-                  aria-label="New page or task title"
-                  placeholder="Title"
-                  value={title}
-                  onChange={(e) => {
-                    setTitle(e.target.value);
-                    setProposal(null);
-                  }}
-                />
+              {current.request.mode !== "workspace_agent" && (
+                <>
+                  <textarea
+                    aria-label="Reviewed draft text"
+                    value={draft || current.text}
+                    onChange={(e) => {
+                      setDraft(e.target.value);
+                      setProposal(null);
+                    }}
+                  />
+                  <select
+                    aria-label="Reviewed action"
+                    value={action}
+                    onChange={(e) => {
+                      setAction(e.target.value);
+                      setProposal(null);
+                    }}
+                  >
+                    <option value="append">Append blocks to source page</option>
+                    <option value="replace_block">
+                      Replace selected source block/text
+                    </option>
+                    <option value="replace_page">
+                      Replace plain text page
+                    </option>
+                    <option value="create_page">Create page</option>
+                    <option value="create_task">Create task</option>
+                    <option value="create_database">
+                      Create database from JSON draft
+                    </option>
+                    <option value="mermaid">Insert or update Mermaid</option>
+                    <option value="replace_code">
+                      Replace selected code (never execute)
+                    </option>
+                    <option value="workspace_patch">
+                      Review named workspace plan
+                    </option>
+                  </select>
+                  {action.startsWith("create_") && (
+                    <input
+                      aria-label="New page or task title"
+                      placeholder="Title"
+                      value={title}
+                      onChange={(e) => {
+                        setTitle(e.target.value);
+                        setProposal(null);
+                      }}
+                    />
+                  )}
+                </>
               )}
               <button disabled={busy} onClick={review}>
                 Preview exact changes
