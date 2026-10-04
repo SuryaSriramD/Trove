@@ -1,7 +1,7 @@
 import { test, expect } from "@playwright/test";
 
 test.beforeEach(async ({ page }) => {
-  await page.goto(`${process.env.TROVE_RECOVERY_TEST_URL ?? "http://127.0.0.1:4186"}/tests/recovery-fixture.html`);
+  await page.goto(`${process.env.TROVE_RECOVERY_TEST_URL ?? process.env.TROVE_TEST_URL ?? "http://127.0.0.1:4173"}/tests/recovery-fixture.html`);
   await page.getByLabel("Page history").selectOption({ label: "Historical record" });
   await page.getByRole("button", { name: "Load revisions", exact: true }).click();
   await page.getByRole("button", { name: /^Preview revision 2/ }).click();

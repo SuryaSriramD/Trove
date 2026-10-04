@@ -663,7 +663,7 @@ test("P2 row buttons cancel without mutation then confirm the selected row only"
     .getByText("Charts, local forms and row buttons", { exact: true })
     .scrollIntoViewIfNeeded();
   await page.screenshot({
-    path: "/Volumes/HD-B1/HD-Projects/Trove/evidence/phase6/database-ui.png",
+    path: test.info().outputPath("database-ui.png"),
     fullPage: true,
   });
   expect(call.commands[0]).toMatchObject({
