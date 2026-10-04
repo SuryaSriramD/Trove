@@ -1,0 +1,16 @@
+
+Running 9 tests using 1 worker
+
+(node:84343) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓  1 database.browser.spec.ts:368:1 › all four views retain canonical record identities; board and calendar call guarded record mutations (4.6s)
+  ✓  2 database.browser.spec.ts:445:1 › linked placements open their own view and retain multiple local tabs after restart (3.1s)
+  ✓  3 database.browser.spec.ts:476:1 › saved view filter groups, sorting, visibility, rename and move serialize without record duplication (2.4s)
+  ✓  4 database.browser.spec.ts:506:1 › table creates record and edits its body title through the canonical page service (2.3s)
+  ✓  5 database.browser.spec.ts:523:1 › table property order and widths persist through view save and restart (8.5s)
+  ✓  6 database.browser.spec.ts:541:1 › calendar resizes a range using its end field and drag handle with guarded writes (4.7s)
+  ✓  7 database.browser.spec.ts:554:1 › P2 chart traces rows and persists display configuration (4.8s)
+  ✓  8 database.browser.spec.ts:587:1 › P2 local form requires configured field then sends one guarded submission (3.5s)
+  ✓  9 database.browser.spec.ts:620:1 › P2 row buttons cancel without mutation then confirm the selected row only (4.5s)
+
+  9 passed (56.2s)

@@ -1,0 +1,203 @@
+
+Running 57 tests using 1 worker
+
+(node:68333) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✘   1 tests/browser.spec.ts:419:1 › 10,000-page shell keeps the full hierarchy and body search usable across refresh (16.0s)
+(node:68614) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓   2 tests/browser.spec.ts:482:1 › shell navigation, focus, quick switcher, page metadata (1.7s)
+  ✓   3 tests/browser.spec.ts:513:1 › Unicode composition, RTL, emoji, undo/redo, reopen, raw preservation (1.8s)
+  ✓   4 tests/browser.spec.ts:560:1 › mixed clipboard retains block structure and allocates distinct IDs (1.4s)
+  ✓   5 tests/browser.spec.ts:588:1 › repeated splits and formatted paste preserve imported neighbors with complete revision guards (1.5s)
+  ✘   6 tests/browser.spec.ts:662:1 › insert real code, Mermaid and KaTeX rendering (7.3s)
+(node:69426) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓   7 tests/browser.spec.ts:680:1 › Markdown shortcuts, duplication, keyboard focus and screen-reader structure (2.5s)
+  ✓   8 tests/browser.spec.ts:750:1 › page lifecycle preserves identity through nesting, icon, archive and navigation (4.5s)
+  ✓   9 tests/browser.spec.ts:864:1 › all named surfaces open and created page links generate navigable backlinks (3.0s)
+  ✓  10 tests/browser.spec.ts:910:1 › block transforms, rich marks, find and nested toggle survive save/reopen (2.8s)
+  ✘  11 tests/browser.spec.ts:982:1 › multi-file clipboard and file drop serialize uploads and preserve media captions and cover (4.1s)
+(node:69984) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓  12 tests/browser.spec.ts:1089:1 › Phase 2 search opens the exact cited block without model packs (2.2s)
+  ✓  13 tests/browser.spec.ts:1099:1 › copied page and block links route through editor navigation (2.0s)
+  ✓  14 tests/browser.spec.ts:1117:1 › native URL events consume a pending block link once (1.7s)
+  ✓  15 tests/browser.spec.ts:1131:1 › links report unavailable workspaces and missing blocks without leaving the current page (1.6s)
+  ✓  16 tests/browser.spec.ts:1149:1 › Phase 2 import displays complete accounting and editable property preview (1.5s)
+  ✓  17 tests/browser.spec.ts:1191:1 › Phase 2 AI works without packs and shows reviewed memory controls (1.6s)
+  ✓  18 tests/browser.spec.ts:1204:1 › Phase 2 failed job retry preserves revision and resumed progress (992ms)
+  ✓  19 tests/browser.spec.ts:1222:1 › Phase 2 native restore is reviewed before mutation and retention keeps all (919ms)
+  ✓  20 tests/browser.spec.ts:1239:1 › Phase 2 AI review shows exact before and after and applies only on approval (1.1s)
+  ✓  21 tests/browser.spec.ts:1313:1 › background append synchronizes a clean editor without writes and survives the next edit (1.2s)
+  ✓  22 tests/browser.spec.ts:1334:1 › background append merges into a dirty editor and remains through save and local undo (1.2s)
+  ✓  23 tests/browser.spec.ts:1357:1 › background append received during an in-flight save reconciles after completion without dropping ongoing typing (1.0s)
+  ✓  24 tests/browser.spec.ts:1394:1 › overlapping background block edits preserve the local draft and require conflict review (1.0s)
+  ✓  25 tests/browser.spec.ts:1418:1 › an append racing the initial save safely rebases and retries after a revision conflict (2.3s)
+  ✓  26 tests/browser.spec.ts:1447:1 › P0 saved audio loads Blob metadata, plays, seeks, and releases old recordings (2.2s)
+  ✓  27 tests/browser.spec.ts:1473:1 › P0 audio loading aborts on selection change and reports failed authorized fetches (707ms)
+  ✓  28 tests/browser.spec.ts:1501:1 › advanced editor H4, replacement, page lock and native column content (1.4s)
+  ✓  29 tests/browser.spec.ts:1568:1 › Phase 5 page lock keeps saved advanced content clean and unlock permits editing (2.6s)
+  ✓  30 tests/browser.spec.ts:1603:1 › Phase 5 remote page lock preserves a pending draft and unlock retries it safely (1.0s)
+  ✓  31 tests/browser.spec.ts:1630:1 › Phase 5 locking a dirty page commits its draft before changing the lock (1.1s)
+  ✓  32 tests/browser.spec.ts:1650:1 › Phase 5 unlock preserves an overlapping draft and its original content revision fence (1.2s)
+  ✓  33 tests/browser.spec.ts:1672:1 › Phase 4 surfaces expose scoped pairing, gated vendors and reviewed capture (1.2s)
+  ✓  34 tests/browser.spec.ts:1709:1 › AI review rejects malformed Mermaid before approval (1.0s)
+  ✓  35 tests/browser.spec.ts:1741:1 › provider disconnect stays available while approval is pending (835ms)
+  ✓  36 tests/database-scaling.browser.spec.ts:220:1 › shell loads one requested page body and retrieves backlinks independently (975ms)
+  ✓  37 tests/database-scaling.browser.spec.ts:251:1 › table and gallery retain a single page with a small rendered window (2.0s)
+  ✓  38 tests/editor-integrity.browser.spec.ts:109:48 › actual table editor preserves links and marks through one-character edit, outer undo and reload (2.2s)
+  ✓  39 tests/editor-integrity.browser.spec.ts:109:48 › actual layout editor preserves links and marks through one-character edit, outer undo and reload (2.7s)
+  ✓  40 tests/editor-integrity.browser.spec.ts:131:1 › nested toggles retain their own states, move safely, and reveal citations without writing a locked page (2.8s)
+  ✓  41 tests/editor-integrity.browser.spec.ts:157:1 › outer page clipboard preserves table rich data and allocates new identities (1.9s)
+  ✓  42 tests/editor-integrity.browser.spec.ts:171:1 › table structure controls preserve header widths, confirm populated removal, and undo through reload (3.1s)
+  ✓  43 tests/editor-integrity.browser.spec.ts:193:1 › code controls copy exact source bytes and persist filename, wrapping and line numbers (3.5s)
+  ✓  44 tests/editor-integrity.browser.spec.ts:212:1 › managed images honor dimensions and alignment with zoom and a scoped original link (2.5s)
+  ✓  45 tests/editor-integrity.browser.spec.ts:223:1 › outer text colors and highlights survive live selection, undo and reload (2.4s)
+  ✓  46 tests/editor-integrity.browser.spec.ts:236:1 › known pasted styles become finite tokens while unknown CSS remains inert source evidence (2.1s)
+  ✓  47 tests/editor-integrity.browser.spec.ts:250:1 › PDF.js renders managed pages offline, remembers the page and never executes PDF JavaScript (3.2s)
+  ✓  48 tests/editor-integrity.browser.spec.ts:265:1 › a damaged PDF reports a bounded preview error and retains the managed original (1.9s)
+  ✓  49 tests/editor-integrity.browser.spec.ts:276:1 › rich layout controls move and edit code, tables, images and nested columns without flattening (2.8s)
+  ✓  50 tests/editor-integrity.browser.spec.ts:288:1 › layout group removal keeps content and subtree duplication/removal are undoable (1.9s)
+  ✓  51 tests/editor-integrity.browser.spec.ts:298:1 › reusable blocks show rich canonical sources, update live and retain unavailable references (3.0s)
+  ✓  52 tests/editor-integrity.browser.spec.ts:307:1 › a reusable layout resolves its scoped remote source subtree without a workspace block preload (1.7s)
+  ✓  53 tests/p2-display.browser.spec.ts:3:1 › page display settings persist per page and presentation layout exits after restart (1.6s)
+  ✓  54 tests/p2-intelligence.browser.spec.ts:3:1 › knowledge graph exposes evidence, OCR availability, and explicitly reviewed digests (912ms)
+  ✘  55 tests/recovery.browser.spec.ts:10:1 › maps a typed value only after reviewing the latest decision (201ms)
+(node:79038) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✘  56 tests/recovery.browser.spec.ts:36:1 › requires an explicit retention choice and displays its reviewed effect (608ms)
+(node:79257) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✘  57 tests/recovery.browser.spec.ts:49:1 › keeps unknown historical payloads readable without assuming a current shape (833ms)
+
+
+  1) tests/browser.spec.ts:419:1 › 10,000-page shell keeps the full hierarchy and body search usable across refresh 
+
+    Error: expect(received).toBeLessThan(expected)
+
+    Expected: < 2000
+    Received:   2176.8999999910593
+
+      425 |     contentType: "application/json",
+      426 |   });
+    > 427 |   expect(shellMs).toBeLessThan(2000);
+          |                   ^
+      428 |   const tree = page.getByRole("navigation", { name: "Page tree" });
+      429 |   await expect(tree.locator(".tree-item")).toHaveCount(9997);
+      430 |   await expect(tree.locator(".tree-item").nth(1)).toContainText("Page 00001");
+        at /Volumes/HD-B1/HD-Projects/Trove/frontend/tests/browser.spec.ts:427:19
+
+    Error Context: ../evidence/completion/browser-results/browser-10-000-page-shell--6934b-earch-usable-across-refresh/error-context.md
+
+  2) tests/browser.spec.ts:662:1 › insert real code, Mermaid and KaTeX rendering ───────────────────
+
+    Error: expect(locator).toBeVisible() failed
+
+    Locator: locator('.code-preview .hljs-comment')
+    Expected: visible
+    Timeout: 5000ms
+    Error: element(s) not found
+
+    Call log:
+      - Expect "toBeVisible" locator('.code-preview .hljs-comment') with timeout 5000ms
+      - waiting for locator('.code-preview .hljs-comment')
+
+
+      676 |   await expect(page.locator(".block-mermaid svg")).toBeVisible();
+      677 |   await expect(page.locator(".katex")).toBeVisible();
+    > 678 |   await expect(page.locator(".code-preview .hljs-comment")).toBeVisible();
+          |                                                             ^
+      679 | });
+      680 | test("Markdown shortcuts, duplication, keyboard focus and screen-reader structure", async ({
+      681 |   page,
+        at /Volumes/HD-B1/HD-Projects/Trove/frontend/tests/browser.spec.ts:678:61
+
+    Error Context: ../evidence/completion/browser-results/browser-insert-real-code-Mermaid-and-KaTeX-rendering/error-context.md
+
+  3) tests/browser.spec.ts:982:1 › multi-file clipboard and file drop serialize uploads and preserve media captions and cover 
+
+    Error: expect(locator).toHaveValue(expected) failed
+
+    Locator: getByRole('textbox', { name: 'Page body' }).locator('.block-image').getByRole('textbox', { name: 'Attachment caption', exact: true })
+    Expected: "A visual reference"
+    Error: Not an input element
+
+    Call log:
+      - Expect "toHaveValue" getByRole('textbox', { name: 'Page body' }).locator('.block-image').getByRole('textbox', { name: 'Attachment caption', exact: true }) with timeout 5000ms
+      - waiting for getByRole('textbox', { name: 'Page body' }).locator('.block-image').getByRole('textbox', { name: 'Attachment caption', exact: true })
+
+
+      1073 |       .locator(".block-image")
+      1074 |       .getByRole("textbox", { name: "Attachment caption", exact: true }),
+    > 1075 |   ).toHaveValue("A visual reference");
+           |     ^
+      1076 |   await expect(editor.locator("audio")).toHaveAttribute("controls", "");
+      1077 |   await expect(editor.locator("video")).toHaveAttribute("controls", "");
+      1078 |   await expect(editor.locator("object")).toHaveAttribute(
+        at /Volumes/HD-B1/HD-Projects/Trove/frontend/tests/browser.spec.ts:1075:5
+
+    Error Context: ../evidence/completion/browser-results/browser-multi-file-clipboa-3f180-ve-media-captions-and-cover/error-context.md
+
+  4) tests/recovery.browser.spec.ts:10:1 › maps a typed value only after reviewing the latest decision 
+
+    Error: page.goto: net::ERR_CONNECTION_REFUSED at http://127.0.0.1:4186/tests/recovery-fixture.html
+    Call log:
+      - navigating to "http://127.0.0.1:4186/tests/recovery-fixture.html", waiting until "load"
+
+
+      2 |
+      3 | test.beforeEach(async ({ page }) => {
+    > 4 |   await page.goto(`${process.env.TROVE_RECOVERY_TEST_URL ?? "http://127.0.0.1:4186"}/tests/recovery-fixture.html`);
+        |              ^
+      5 |   await page.getByLabel("Page history").selectOption({ label: "Historical record" });
+      6 |   await page.getByRole("button", { name: "Load revisions", exact: true }).click();
+      7 |   await page.getByRole("button", { name: /^Preview revision 2/ }).click();
+        at /Volumes/HD-B1/HD-Projects/Trove/frontend/tests/recovery.browser.spec.ts:4:14
+
+    Error Context: ../evidence/completion/browser-results/recovery.browser-maps-a-ty-3e4bd-viewing-the-latest-decision/error-context.md
+
+  5) tests/recovery.browser.spec.ts:36:1 › requires an explicit retention choice and displays its reviewed effect 
+
+    Error: page.goto: net::ERR_CONNECTION_REFUSED at http://127.0.0.1:4186/tests/recovery-fixture.html
+    Call log:
+      - navigating to "http://127.0.0.1:4186/tests/recovery-fixture.html", waiting until "load"
+
+
+      2 |
+      3 | test.beforeEach(async ({ page }) => {
+    > 4 |   await page.goto(`${process.env.TROVE_RECOVERY_TEST_URL ?? "http://127.0.0.1:4186"}/tests/recovery-fixture.html`);
+        |              ^
+      5 |   await page.getByLabel("Page history").selectOption({ label: "Historical record" });
+      6 |   await page.getByRole("button", { name: "Load revisions", exact: true }).click();
+      7 |   await page.getByRole("button", { name: /^Preview revision 2/ }).click();
+        at /Volumes/HD-B1/HD-Projects/Trove/frontend/tests/recovery.browser.spec.ts:4:14
+
+    Error Context: ../evidence/completion/browser-results/recovery.browser-requires--cb15a-isplays-its-reviewed-effect/error-context.md
+
+  6) tests/recovery.browser.spec.ts:49:1 › keeps unknown historical payloads readable without assuming a current shape 
+
+    Error: page.goto: net::ERR_CONNECTION_REFUSED at http://127.0.0.1:4186/tests/recovery-fixture.html
+    Call log:
+      - navigating to "http://127.0.0.1:4186/tests/recovery-fixture.html", waiting until "load"
+
+
+      2 |
+      3 | test.beforeEach(async ({ page }) => {
+    > 4 |   await page.goto(`${process.env.TROVE_RECOVERY_TEST_URL ?? "http://127.0.0.1:4186"}/tests/recovery-fixture.html`);
+        |              ^
+      5 |   await page.getByLabel("Page history").selectOption({ label: "Historical record" });
+      6 |   await page.getByRole("button", { name: "Load revisions", exact: true }).click();
+      7 |   await page.getByRole("button", { name: /^Preview revision 2/ }).click();
+        at /Volumes/HD-B1/HD-Projects/Trove/frontend/tests/recovery.browser.spec.ts:4:14
+
+    Error Context: ../evidence/completion/browser-results/recovery.browser-keeps-unk-47717-ut-assuming-a-current-shape/error-context.md
+
+  6 failed
+    tests/browser.spec.ts:419:1 › 10,000-page shell keeps the full hierarchy and body search usable across refresh 
+    tests/browser.spec.ts:662:1 › insert real code, Mermaid and KaTeX rendering ────────────────────
+    tests/browser.spec.ts:982:1 › multi-file clipboard and file drop serialize uploads and preserve media captions and cover 
+    tests/recovery.browser.spec.ts:10:1 › maps a typed value only after reviewing the latest decision 
+    tests/recovery.browser.spec.ts:36:1 › requires an explicit retention choice and displays its reviewed effect 
+    tests/recovery.browser.spec.ts:49:1 › keeps unknown historical payloads readable without assuming a current shape 
+  51 passed (2.5m)

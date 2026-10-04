@@ -1,0 +1,10 @@
+{"Time":"2026-10-04T22:33:04.866208+05:30","Action":"start","Package":"trove.local/phase0/internal/workspace"}
+{"Time":"2026-10-04T22:33:05.396837+05:30","Action":"run","Package":"trove.local/phase0/internal/workspace","Test":"TestRealLocalNamedWorkspacePlan"}
+{"Time":"2026-10-04T22:33:05.397158+05:30","Action":"output","Package":"trove.local/phase0/internal/workspace","Test":"TestRealLocalNamedWorkspacePlan","Output":"=== RUN   TestRealLocalNamedWorkspacePlan\n","OutputType":"frame"}
+{"Time":"2026-10-04T22:33:17.33846+05:30","Action":"output","Package":"trove.local/phase0/internal/workspace","Test":"TestRealLocalNamedWorkspacePlan","Output":"    ai_local_evaluation_test.go:190: synthetic proposed plan: {\"version\":1,\"actions\":[{\"kind\":\"create_page\",\"destination\":\"Launch\",\"title\":\"Backup checklist\",\"body\":\"Verify the restored files.\"}]}\n"}
+{"Time":"2026-10-04T22:33:17.564642+05:30","Action":"output","Package":"trove.local/phase0/internal/workspace","Test":"TestRealLocalNamedWorkspacePlan","Output":"    ai_local_evaluation_test.go:218: real local named action resolved and applied after explicit approval; no broad mode/release qualification\n"}
+{"Time":"2026-10-04T22:33:17.602123+05:30","Action":"output","Package":"trove.local/phase0/internal/workspace","Test":"TestRealLocalNamedWorkspacePlan","Output":"--- PASS: TestRealLocalNamedWorkspacePlan (12.20s)\n","OutputType":"frame"}
+{"Time":"2026-10-04T22:33:17.602223+05:30","Action":"pass","Package":"trove.local/phase0/internal/workspace","Test":"TestRealLocalNamedWorkspacePlan","Elapsed":12.2}
+{"Time":"2026-10-04T22:33:17.60275+05:30","Action":"output","Package":"trove.local/phase0/internal/workspace","Output":"PASS\n","OutputType":"frame"}
+{"Time":"2026-10-04T22:33:17.676811+05:30","Action":"output","Package":"trove.local/phase0/internal/workspace","Output":"ok  \ttrove.local/phase0/internal/workspace\t12.790s\n"}
+{"Time":"2026-10-04T22:33:17.678879+05:30","Action":"pass","Package":"trove.local/phase0/internal/workspace","Elapsed":12.813}

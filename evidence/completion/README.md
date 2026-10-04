@@ -1,0 +1,11 @@
+# Completion development evidence
+
+These logs belong to incremental C0–C8 development, not an immutable release candidate. Historical phase reports remain unchanged. Optional skipped hardware/model/account tests do not qualify a requirement.
+
+Checkpoint source: integration commit `c776bee`, incorporating through `17bbbd8` and the shared proposal implementation. `c4-integrated-go.jsonl` ran this implementation before formatting-only cleanup/commit: 416 test/subtest passes and 14 optional skips, no failures. Command: pinned Go 1.27.1 `go test -tags 'fts5 sqlite_omit_load_extension' -json ./...`, with the project cache paths and `CGO_LDFLAGS='-framework UniformTypeIdentifiers'`. These results include host local transports; they do not establish clean installation or signing.
+
+`c4-frontend-units.txt`: 46 passed, direct Node TypeScript test runner. `c4-proposals-browser.json` / `.txt`: two explicit-approval UI cases passed in local Chromium via Playwright against Vite on 127.0.0.1:4173. `c4-real-named-plan-rerun.jsonl`: actual Qwen 1.5B native generation plus reviewed commit and duplicate-approval assertion passed. `c4-real-named-plan.jsonl` was interrupted during integration and is superseded by that rerun. The model pack is `01990000-0000-7000-8000-000000000105`, SHA256 `b46661073c18e5b56a41fa320975f866a00def1ff08feef4718e013258896f8c`. Helper/token-budget identities and hardware metadata are retained under `checkpoint-1/`.
+
+The earlier combined browser run's failures are retained: obsolete editor selectors and a wrong fixture port were corrected; the large-shell fixture was corrected to honor lazy content and exposed a real quick-search regression fixed in `17bbbd8`. Repeated targeted checks support those corrections. Failed memory/factual-answer rubrics under `checkpoint-1/` remain failures; syntactic citation validity does not supersede semantic expected outcomes.
+
+Some earlier development logs identify only the tested working revision or command in their own output. Do not infer an exact immutable source/binary identity where none was captured. Candidate-specific qualification must freeze source, app, helper, model and fixture hashes and rerun applicable scenarios. See the completion registry and per-feature documents for remaining implementation and qualification boundaries.

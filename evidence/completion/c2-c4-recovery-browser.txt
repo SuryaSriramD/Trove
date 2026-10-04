@@ -1,0 +1,10 @@
+
+Running 3 tests using 1 worker
+
+(node:86098) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓  1 tests/recovery.browser.spec.ts:10:1 › maps a typed value only after reviewing the latest decision (4.2s)
+  ✓  2 tests/recovery.browser.spec.ts:36:1 › requires an explicit retention choice and displays its reviewed effect (2.8s)
+  ✓  3 tests/recovery.browser.spec.ts:49:1 › keeps unknown historical payloads readable without assuming a current shape (3.3s)
+
+  3 passed (40.0s)

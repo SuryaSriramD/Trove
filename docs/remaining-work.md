@@ -4,7 +4,7 @@ Audit baseline: 1 October 2026. Requirements: Trove PRD and TRD version 3.1. Aud
 
 This backlog records the remaining work identified by the code, requirements, and release-evidence audit. Trove has a substantial working foundation, but P0 and P1 are not yet fully satisfied. Completing development phases and passing the current tests do not establish complete product acceptance. The immediate objective is reliable everyday use, with content preservation and recovery verified before further feature expansion.
 
-This file does not mark any fixes as completed. Existing implementations should be retained and extended. Items described as qualification gaps require evidence; they do not imply that the underlying feature is absent or necessarily broken.
+Implementation is underway in the [C0–C8 completion record](completion/README.md) and [51-item registry](completion/registry.json). This file does not mark any fixes as release-qualified. Existing implementations should be retained and extended. Items described as qualification gaps require evidence; they do not imply that the underlying feature is absent or necessarily broken.
 
 ## How to use this backlog
 

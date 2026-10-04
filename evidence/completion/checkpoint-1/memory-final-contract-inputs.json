@@ -1,0 +1,60 @@
+{
+  "scope": "development real-model evaluation; not release qualification",
+  "recordedAt": "2026-10-04T16:38:37.299895+00:00",
+  "baseCommit": "244f1ea97eceb7325b4bc0ac33a1462fa3b514bc",
+  "uncommittedSourceSHA256": {
+    "internal/workspace/ai_context.go": "1aa2eae70adbd9c2eddbe8402f4da9df65f244801c04ec47dbaf98ca5c921df3",
+    "internal/workspace/ai_generation.go": "f33899efb00ca6257bdd8223d1488b691434a4f6fd8341214b6041315790beab",
+    "internal/workspace/ai_local_evaluation_test.go": "06656f29735ee996cde39d57ec90ec7ab88850769c03d17c71c136cf8f7a7dd4",
+    "internal/native/generation.go": "88b7bf60a242177150244a0cbfbbf17b93f2157c25061ae62260276dbec7feac",
+    "native/llama-worker.cpp": "7dc2063e6aaea5a361bf3002c5d68b59af3241b39d480b74e19a609d07bbb528",
+    "native/models/catalog.json": "64f86eddccfd2c84372f52fd42702a7d05c6c9f8813e290123a01cb5a2857478"
+  },
+  "system": "macOS-27.0.1-arm64-arm-64bit",
+  "hardware": [
+    "Mac16,12",
+    "25769803776",
+    "Apple M4"
+  ],
+  "nativeManifest": {
+    "schemaVersion": 1,
+    "helpers": [
+      {
+        "name": "llama-worker",
+        "sha256": "45d8005e95b7a82cedd19a8746d90855d04fb0afb45532385e752edb82302df6",
+        "runtime": "llama.cpp",
+        "runtimeCommit": "d2e54583c7452353eb35d40431281f6ee984332f",
+        "architecture": "arm64"
+      },
+      {
+        "name": "whisper-worker",
+        "sha256": "8f3adc67146d89936b03bcff15c21da5c09987dc0af6b89473b3b21bdd57ca05",
+        "runtime": "whisper.cpp",
+        "runtimeCommit": "927cfce34f31707e17f2bff35c349632fb9e2c3a",
+        "architecture": "arm64"
+      },
+      {
+        "name": "microphone-worker",
+        "sha256": "9940c517026dfad18329843e1bc33ee47d0c67512d5c6f10a819a7753619e448",
+        "runtime": "microphone",
+        "runtimeCommit": "trove-microphone-v1",
+        "architecture": "arm64"
+      }
+    ],
+    "minimumMacOS": "27.0",
+    "buildFlags": [
+      "arm64",
+      "static",
+      "CPU",
+      "Metal",
+      "embedded Metal shaders",
+      "no model downloads"
+    ],
+    "baselineLockSHA256": "e69e3d2bbfa9ebba6647ccf93185eff693b063468eaba08b14a8f5344771251a"
+  },
+  "modelId": "01990000-0000-7000-8000-000000000105",
+  "modelSHA256": "b46661073c18e5b56a41fa320975f866a00def1ff08feef4718e013258896f8c",
+  "command": "go test -count=1 -tags 'fts5 sqlite_omit_load_extension' -run '^TestRealLocalMemoryPreferenceAndCurrentAuthority$' -json ./internal/workspace",
+  "resultLog": "memory-final-contract.jsonl",
+  "releaseQualified": false
+}

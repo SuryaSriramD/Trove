@@ -1,0 +1,2255 @@
+{
+  "config": {
+    "argv": [
+      "/opt/homebrew/Cellar/node/25.5.0/bin/node",
+      "/Volumes/HD-B1/HD-Projects/Trove/frontend/node_modules/@playwright/test/cli.js",
+      "test",
+      "--config",
+      "playwright.config.ts",
+      "--output",
+      "../evidence/completion/browser-results"
+    ],
+    "configFile": "/Volumes/HD-B1/HD-Projects/Trove/frontend/playwright.config.ts",
+    "rootDir": "/Volumes/HD-B1/HD-Projects/Trove/frontend/tests",
+    "failOnFlakyTests": false,
+    "forbidOnly": false,
+    "fullyParallel": false,
+    "globalSetup": null,
+    "globalTeardown": null,
+    "globalTimeout": 0,
+    "grep": {},
+    "grepInvert": null,
+    "maxFailures": 0,
+    "metadata": {
+      "actualWorkers": 1
+    },
+    "preserveOutput": "always",
+    "projects": [
+      {
+        "outputDir": "/Volumes/HD-B1/HD-Projects/Trove/evidence/completion/browser-results",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 1
+        },
+        "id": "",
+        "name": "",
+        "testDir": "/Volumes/HD-B1/HD-Projects/Trove/frontend/tests",
+        "testIgnore": [
+          "**/._*"
+        ],
+        "testMatch": [
+          "browser.spec.ts",
+          "*.browser.spec.ts"
+        ],
+        "timeout": 30000
+      }
+    ],
+    "quiet": false,
+    "reporter": [
+      [
+        "list",
+        null
+      ],
+      [
+        "json",
+        {
+          "outputFile": "/Volumes/HD-B1/HD-Projects/Trove/evidence/completion/c2-c4-browser.json"
+        }
+      ]
+    ],
+    "reportSlowTests": {
+      "max": 5,
+      "threshold": 300000
+    },
+    "shard": null,
+    "tags": [],
+    "updateSnapshots": "missing",
+    "updateSourceMethod": "patch",
+    "version": "1.63.0",
+    "workers": 1,
+    "webServer": null
+  },
+  "suites": [
+    {
+      "title": "browser.spec.ts",
+      "file": "browser.spec.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [
+        {
+          "title": "10,000-page shell keeps the full hierarchy and body search usable across refresh",
+          "ok": false,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "failed",
+                  "duration": 15961,
+                  "error": {
+                    "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBeLessThan\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m\n\nExpected: < \u001b[32m2000\u001b[39m\nReceived:   \u001b[31m2176.8999999910593\u001b[39m",
+                    "stack": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBeLessThan\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m\n\nExpected: < \u001b[32m2000\u001b[39m\nReceived:   \u001b[31m2176.8999999910593\u001b[39m\n    at /Volumes/HD-B1/HD-Projects/Trove/frontend/tests/browser.spec.ts:427:19",
+                    "location": {
+                      "file": "/Volumes/HD-B1/HD-Projects/Trove/frontend/tests/browser.spec.ts",
+                      "column": 19,
+                      "line": 427
+                    },
+                    "snippet": "  425 |     contentType: \"application/json\",\n  426 |   });\n> 427 |   expect(shellMs).toBeLessThan(2000);\n      |                   ^\n  428 |   const tree = page.getByRole(\"navigation\", { name: \"Page tree\" });\n  429 |   await expect(tree.locator(\".tree-item\")).toHaveCount(9997);\n  430 |   await expect(tree.locator(\".tree-item\").nth(1)).toContainText(\"Page 00001\");"
+                  },
+                  "errors": [
+                    {
+                      "location": {
+                        "file": "/Volumes/HD-B1/HD-Projects/Trove/frontend/tests/browser.spec.ts",
+                        "column": 19,
+                        "line": 427
+                      },
+                      "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBeLessThan\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m\n\nExpected: < \u001b[32m2000\u001b[39m\nReceived:   \u001b[31m2176.8999999910593\u001b[39m\n\n  425 |     contentType: \"application/json\",\n  426 |   });\n> 427 |   expect(shellMs).toBeLessThan(2000);\n      |                   ^\n  428 |   const tree = page.getByRole(\"navigation\", { name: \"Page tree\" });\n  429 |   await expect(tree.locator(\".tree-item\")).toHaveCount(9997);\n  430 |   await expect(tree.locator(\".tree-item\").nth(1)).toContainText(\"Page 00001\");\n    at /Volumes/HD-B1/HD-Projects/Trove/frontend/tests/browser.spec.ts:427:19"
+                    }
+                  ],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-04T16:35:32.454Z",
+                  "annotations": [],
+                  "attachments": [
+                    {
+                      "name": "large-workspace-renderer-ready",
+                      "contentType": "application/json",
+                      "body": "eyJwYWdlcyI6MTAwMDAsImJsb2NrcyI6MjAwMDAsInNoZWxsTXMiOjIxNzYuODk5OTk5OTkxMDU5MywiZW5kcG9pbnQiOiJzbmFwc2hvdCByZXNwb25zZSB0byByZW5kZXJlZCBzaGVsbCBwbHVzIHR3byBmcmFtZXMifQ=="
+                    },
+                    {
+                      "name": "error-context",
+                      "contentType": "text/markdown",
+                      "path": "/Volumes/HD-B1/HD-Projects/Trove/evidence/completion/browser-results/browser-10-000-page-shell--6934b-earch-usable-across-refresh/error-context.md"
+                    }
+                  ],
+                  "errorLocation": {
+                    "file": "/Volumes/HD-B1/HD-Projects/Trove/frontend/tests/browser.spec.ts",
+                    "column": 19,
+                    "line": 427
+                  }
+                }
+              ],
+              "status": "unexpected"
+            }
+          ],
+          "id": "fbeac1b2decfba2c3acd-016680da47dd9af7c47b",
+          "file": "browser.spec.ts",
+          "line": 419,
+          "column": 1
+        },
+        {
+          "title": "shell navigation, focus, quick switcher, page metadata",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 1,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 1664,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-04T16:36:01.006Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "fbeac1b2decfba2c3acd-e9db4d0c476b59934755",
+          "file": "browser.spec.ts",
+          "line": 482,
+          "column": 1
+        },
+        {
+          "title": "Unicode composition, RTL, emoji, undo/redo, reopen, raw preservation",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 1,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 1843,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-04T16:36:03.725Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "fbeac1b2decfba2c3acd-e839f5ca8e385378c99e",
+          "file": "browser.spec.ts",
+          "line": 513,
+          "column": 1
+        },
+        {
+          "title": "mixed clipboard retains block structure and allocates distinct IDs",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 1,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 1372,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-04T16:36:05.585Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "fbeac1b2decfba2c3acd-de384b45f707a6e7e67e",
+          "file": "browser.spec.ts",
+          "line": 560,
+          "column": 1
+        },
+        {
+          "title": "repeated splits and formatted paste preserve imported neighbors with complete revision guards",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 1,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 1523,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-04T16:36:06.977Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "fbeac1b2decfba2c3acd-9c75ac668d01d58ba7b7",
+          "file": "browser.spec.ts",
+          "line": 588,
+          "column": 1
+        },
+        {
+          "title": "insert real code, Mermaid and KaTeX rendering",
+          "ok": false,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 1,
+                  "parallelIndex": 0,
+                  "status": "failed",
+                  "duration": 7310,
+                  "error": {
+                    "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m(\u001b[22m\u001b[2m)\u001b[22m failed\n\nLocator: locator('.code-preview .hljs-comment')\nExpected: visible\nTimeout: 5000ms\nError: element(s) not found\n\nCall log:\n\u001b[2m  - Expect \"toBeVisible\" locator('.code-preview .hljs-comment') with timeout 5000ms\u001b[22m\n\u001b[2m  - waiting for locator('.code-preview .hljs-comment')\u001b[22m\n",
+                    "stack": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m(\u001b[22m\u001b[2m)\u001b[22m failed\n\nLocator: locator('.code-preview .hljs-comment')\nExpected: visible\nTimeout: 5000ms\nError: element(s) not found\n\nCall log:\n\u001b[2m  - Expect \"toBeVisible\" locator('.code-preview .hljs-comment') with timeout 5000ms\u001b[22m\n\u001b[2m  - waiting for locator('.code-preview .hljs-comment')\u001b[22m\n\n    at /Volumes/HD-B1/HD-Projects/Trove/frontend/tests/browser.spec.ts:678:61",
+                    "location": {
+                      "file": "/Volumes/HD-B1/HD-Projects/Trove/frontend/tests/browser.spec.ts",
+                      "column": 61,
+                      "line": 678
+                    },
+                    "snippet": "  676 |   await expect(page.locator(\".block-mermaid svg\")).toBeVisible();\n  677 |   await expect(page.locator(\".katex\")).toBeVisible();\n> 678 |   await expect(page.locator(\".code-preview .hljs-comment\")).toBeVisible();\n      |                                                             ^\n  679 | });\n  680 | test(\"Markdown shortcuts, duplication, keyboard focus and screen-reader structure\", async ({\n  681 |   page,"
+                  },
+                  "errors": [
+                    {
+                      "location": {
+                        "file": "/Volumes/HD-B1/HD-Projects/Trove/frontend/tests/browser.spec.ts",
+                        "column": 61,
+                        "line": 678
+                      },
+                      "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m(\u001b[22m\u001b[2m)\u001b[22m failed\n\nLocator: locator('.code-preview .hljs-comment')\nExpected: visible\nTimeout: 5000ms\nError: element(s) not found\n\nCall log:\n\u001b[2m  - Expect \"toBeVisible\" locator('.code-preview .hljs-comment') with timeout 5000ms\u001b[22m\n\u001b[2m  - waiting for locator('.code-preview .hljs-comment')\u001b[22m\n\n\n  676 |   await expect(page.locator(\".block-mermaid svg\")).toBeVisible();\n  677 |   await expect(page.locator(\".katex\")).toBeVisible();\n> 678 |   await expect(page.locator(\".code-preview .hljs-comment\")).toBeVisible();\n      |                                                             ^\n  679 | });\n  680 | test(\"Markdown shortcuts, duplication, keyboard focus and screen-reader structure\", async ({\n  681 |   page,\n    at /Volumes/HD-B1/HD-Projects/Trove/frontend/tests/browser.spec.ts:678:61"
+                    }
+                  ],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-04T16:36:08.520Z",
+                  "annotations": [],
+                  "attachments": [
+                    {
+                      "name": "error-context",
+                      "contentType": "text/markdown",
+                      "path": "/Volumes/HD-B1/HD-Projects/Trove/evidence/completion/browser-results/browser-insert-real-code-Mermaid-and-KaTeX-rendering/error-context.md"
+                    }
+                  ],
+                  "errorLocation": {
+                    "file": "/Volumes/HD-B1/HD-Projects/Trove/frontend/tests/browser.spec.ts",
+                    "column": 61,
+                    "line": 678
+                  }
+                }
+              ],
+              "status": "unexpected"
+            }
+          ],
+          "id": "fbeac1b2decfba2c3acd-fae9cda6478a21d64f0e",
+          "file": "browser.spec.ts",
+          "line": 662,
+          "column": 1
+        },
+        {
+          "title": "Markdown shortcuts, duplication, keyboard focus and screen-reader structure",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 2,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 2511,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-04T16:36:16.653Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "fbeac1b2decfba2c3acd-938c5e5bdcd583d0f97e",
+          "file": "browser.spec.ts",
+          "line": 680,
+          "column": 1
+        },
+        {
+          "title": "page lifecycle preserves identity through nesting, icon, archive and navigation",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 2,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 4546,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-04T16:36:20.131Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "fbeac1b2decfba2c3acd-4e1fd4372c724d2a24bb",
+          "file": "browser.spec.ts",
+          "line": 750,
+          "column": 1
+        },
+        {
+          "title": "all named surfaces open and created page links generate navigable backlinks",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 2,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 3049,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-04T16:36:24.720Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "fbeac1b2decfba2c3acd-3577f922d679b3a31e4d",
+          "file": "browser.spec.ts",
+          "line": 864,
+          "column": 1
+        },
+        {
+          "title": "block transforms, rich marks, find and nested toggle survive save/reopen",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 2,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 2759,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-04T16:36:27.813Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "fbeac1b2decfba2c3acd-1449b5b3635894dbcf85",
+          "file": "browser.spec.ts",
+          "line": 910,
+          "column": 1
+        },
+        {
+          "title": "multi-file clipboard and file drop serialize uploads and preserve media captions and cover",
+          "ok": false,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 2,
+                  "parallelIndex": 0,
+                  "status": "failed",
+                  "duration": 4094,
+                  "error": {
+                    "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoHaveValue\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m failed\n\nLocator: getByRole('textbox', { name: 'Page body' }).locator('.block-image').getByRole('textbox', { name: 'Attachment caption', exact: true })\nExpected: \u001b[32m\"A visual reference\"\u001b[39m\nError: Not an input element\n\nCall log:\n\u001b[2m  - Expect \"toHaveValue\" getByRole('textbox', { name: 'Page body' }).locator('.block-image').getByRole('textbox', { name: 'Attachment caption', exact: true }) with timeout 5000ms\u001b[22m\n\u001b[2m  - waiting for getByRole('textbox', { name: 'Page body' }).locator('.block-image').getByRole('textbox', { name: 'Attachment caption', exact: true })\u001b[22m\n",
+                    "stack": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoHaveValue\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m failed\n\nLocator: getByRole('textbox', { name: 'Page body' }).locator('.block-image').getByRole('textbox', { name: 'Attachment caption', exact: true })\nExpected: \u001b[32m\"A visual reference\"\u001b[39m\nError: Not an input element\n\nCall log:\n\u001b[2m  - Expect \"toHaveValue\" getByRole('textbox', { name: 'Page body' }).locator('.block-image').getByRole('textbox', { name: 'Attachment caption', exact: true }) with timeout 5000ms\u001b[22m\n\u001b[2m  - waiting for getByRole('textbox', { name: 'Page body' }).locator('.block-image').getByRole('textbox', { name: 'Attachment caption', exact: true })\u001b[22m\n\n    at /Volumes/HD-B1/HD-Projects/Trove/frontend/tests/browser.spec.ts:1075:5",
+                    "location": {
+                      "file": "/Volumes/HD-B1/HD-Projects/Trove/frontend/tests/browser.spec.ts",
+                      "column": 5,
+                      "line": 1075
+                    },
+                    "snippet": "  1073 |       .locator(\".block-image\")\n  1074 |       .getByRole(\"textbox\", { name: \"Attachment caption\", exact: true }),\n> 1075 |   ).toHaveValue(\"A visual reference\");\n       |     ^\n  1076 |   await expect(editor.locator(\"audio\")).toHaveAttribute(\"controls\", \"\");\n  1077 |   await expect(editor.locator(\"video\")).toHaveAttribute(\"controls\", \"\");\n  1078 |   await expect(editor.locator(\"object\")).toHaveAttribute("
+                  },
+                  "errors": [
+                    {
+                      "location": {
+                        "file": "/Volumes/HD-B1/HD-Projects/Trove/frontend/tests/browser.spec.ts",
+                        "column": 5,
+                        "line": 1075
+                      },
+                      "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoHaveValue\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m failed\n\nLocator: getByRole('textbox', { name: 'Page body' }).locator('.block-image').getByRole('textbox', { name: 'Attachment caption', exact: true })\nExpected: \u001b[32m\"A visual reference\"\u001b[39m\nError: Not an input element\n\nCall log:\n\u001b[2m  - Expect \"toHaveValue\" getByRole('textbox', { name: 'Page body' }).locator('.block-image').getByRole('textbox', { name: 'Attachment caption', exact: true }) with timeout 5000ms\u001b[22m\n\u001b[2m  - waiting for getByRole('textbox', { name: 'Page body' }).locator('.block-image').getByRole('textbox', { name: 'Attachment caption', exact: true })\u001b[22m\n\n\n  1073 |       .locator(\".block-image\")\n  1074 |       .getByRole(\"textbox\", { name: \"Attachment caption\", exact: true }),\n> 1075 |   ).toHaveValue(\"A visual reference\");\n       |     ^\n  1076 |   await expect(editor.locator(\"audio\")).toHaveAttribute(\"controls\", \"\");\n  1077 |   await expect(editor.locator(\"video\")).toHaveAttribute(\"controls\", \"\");\n  1078 |   await expect(editor.locator(\"object\")).toHaveAttribute(\n    at /Volumes/HD-B1/HD-Projects/Trove/frontend/tests/browser.spec.ts:1075:5"
+                    }
+                  ],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-04T16:36:30.605Z",
+                  "annotations": [],
+                  "attachments": [
+                    {
+                      "name": "error-context",
+                      "contentType": "text/markdown",
+                      "path": "/Volumes/HD-B1/HD-Projects/Trove/evidence/completion/browser-results/browser-multi-file-clipboa-3f180-ve-media-captions-and-cover/error-context.md"
+                    }
+                  ],
+                  "errorLocation": {
+                    "file": "/Volumes/HD-B1/HD-Projects/Trove/frontend/tests/browser.spec.ts",
+                    "column": 5,
+                    "line": 1075
+                  }
+                }
+              ],
+              "status": "unexpected"
+            }
+          ],
+          "id": "fbeac1b2decfba2c3acd-42724df5864db6cb4fec",
+          "file": "browser.spec.ts",
+          "line": 982,
+          "column": 1
+        },
+        {
+          "title": "Phase 2 search opens the exact cited block without model packs",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 3,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 2223,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-04T16:36:36.203Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "fbeac1b2decfba2c3acd-93ecb4c2fa32a90797db",
+          "file": "browser.spec.ts",
+          "line": 1089,
+          "column": 1
+        },
+        {
+          "title": "copied page and block links route through editor navigation",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 3,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 2047,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-04T16:36:39.081Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "fbeac1b2decfba2c3acd-3f5a0aa0c38ca166b97f",
+          "file": "browser.spec.ts",
+          "line": 1099,
+          "column": 1
+        },
+        {
+          "title": "native URL events consume a pending block link once",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 3,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 1658,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-04T16:36:41.171Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "fbeac1b2decfba2c3acd-21f110216f42aa6eefda",
+          "file": "browser.spec.ts",
+          "line": 1117,
+          "column": 1
+        },
+        {
+          "title": "links report unavailable workspaces and missing blocks without leaving the current page",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 3,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 1562,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-04T16:36:42.871Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "fbeac1b2decfba2c3acd-bf9ddd458af4ff077bed",
+          "file": "browser.spec.ts",
+          "line": 1131,
+          "column": 1
+        },
+        {
+          "title": "Phase 2 import displays complete accounting and editable property preview",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 3,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 1462,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-04T16:36:44.473Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "fbeac1b2decfba2c3acd-cbeab2b8786afe0dbb1a",
+          "file": "browser.spec.ts",
+          "line": 1149,
+          "column": 1
+        },
+        {
+          "title": "Phase 2 AI works without packs and shows reviewed memory controls",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 3,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 1584,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-04T16:36:45.984Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "fbeac1b2decfba2c3acd-c67a8d50dc7f337fab46",
+          "file": "browser.spec.ts",
+          "line": 1191,
+          "column": 1
+        },
+        {
+          "title": "Phase 2 failed job retry preserves revision and resumed progress",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 3,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 992,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-04T16:36:47.621Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "fbeac1b2decfba2c3acd-89597c17a054e50490a2",
+          "file": "browser.spec.ts",
+          "line": 1204,
+          "column": 1
+        },
+        {
+          "title": "Phase 2 native restore is reviewed before mutation and retention keeps all",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 3,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 919,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-04T16:36:48.629Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "fbeac1b2decfba2c3acd-38eb9c1e562aae62869c",
+          "file": "browser.spec.ts",
+          "line": 1222,
+          "column": 1
+        },
+        {
+          "title": "Phase 2 AI review shows exact before and after and applies only on approval",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 3,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 1112,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-04T16:36:49.558Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "fbeac1b2decfba2c3acd-250ab33e3942f89f58e7",
+          "file": "browser.spec.ts",
+          "line": 1239,
+          "column": 1
+        },
+        {
+          "title": "background append synchronizes a clean editor without writes and survives the next edit",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 3,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 1156,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-04T16:36:50.682Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "fbeac1b2decfba2c3acd-a2ba748ffdb6404a225a",
+          "file": "browser.spec.ts",
+          "line": 1313,
+          "column": 1
+        },
+        {
+          "title": "background append merges into a dirty editor and remains through save and local undo",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 3,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 1199,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-04T16:36:51.849Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "fbeac1b2decfba2c3acd-13571a2c03bb7b063ec6",
+          "file": "browser.spec.ts",
+          "line": 1334,
+          "column": 1
+        },
+        {
+          "title": "background append received during an in-flight save reconciles after completion without dropping ongoing typing",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 3,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 1036,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-04T16:36:53.060Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "fbeac1b2decfba2c3acd-ede75bf293fa2951046c",
+          "file": "browser.spec.ts",
+          "line": 1357,
+          "column": 1
+        },
+        {
+          "title": "overlapping background block edits preserve the local draft and require conflict review",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 3,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 1012,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-04T16:36:54.107Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "fbeac1b2decfba2c3acd-0fd184addca5e3dd75d7",
+          "file": "browser.spec.ts",
+          "line": 1394,
+          "column": 1
+        },
+        {
+          "title": "an append racing the initial save safely rebases and retries after a revision conflict",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 3,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 2321,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-04T16:36:55.131Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "fbeac1b2decfba2c3acd-98593cf279b1aef66507",
+          "file": "browser.spec.ts",
+          "line": 1418,
+          "column": 1
+        },
+        {
+          "title": "P0 saved audio loads Blob metadata, plays, seeks, and releases old recordings",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 3,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 2247,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-04T16:36:57.469Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "fbeac1b2decfba2c3acd-db24c5db5a5e78f6e30b",
+          "file": "browser.spec.ts",
+          "line": 1447,
+          "column": 1
+        },
+        {
+          "title": "P0 audio loading aborts on selection change and reports failed authorized fetches",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 3,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 707,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-04T16:36:59.728Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "fbeac1b2decfba2c3acd-1ab201da3b226277b38a",
+          "file": "browser.spec.ts",
+          "line": 1473,
+          "column": 1
+        },
+        {
+          "title": "advanced editor H4, replacement, page lock and native column content",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 3,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 1405,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-04T16:37:00.449Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "fbeac1b2decfba2c3acd-ac26e63568da8794c4d4",
+          "file": "browser.spec.ts",
+          "line": 1501,
+          "column": 1
+        },
+        {
+          "title": "Phase 5 page lock keeps saved advanced content clean and unlock permits editing",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 3,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 2615,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-04T16:37:01.864Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "fbeac1b2decfba2c3acd-509a6fe2bf0114e67dd3",
+          "file": "browser.spec.ts",
+          "line": 1568,
+          "column": 1
+        },
+        {
+          "title": "Phase 5 remote page lock preserves a pending draft and unlock retries it safely",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 3,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 1039,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-04T16:37:04.491Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "fbeac1b2decfba2c3acd-e2809281df4350c282a7",
+          "file": "browser.spec.ts",
+          "line": 1603,
+          "column": 1
+        },
+        {
+          "title": "Phase 5 locking a dirty page commits its draft before changing the lock",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 3,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 1085,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-04T16:37:05.543Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "fbeac1b2decfba2c3acd-e71d13a5669c6507c884",
+          "file": "browser.spec.ts",
+          "line": 1630,
+          "column": 1
+        },
+        {
+          "title": "Phase 5 unlock preserves an overlapping draft and its original content revision fence",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 3,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 1233,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-04T16:37:06.640Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "fbeac1b2decfba2c3acd-9eacd805709c08356d6d",
+          "file": "browser.spec.ts",
+          "line": 1650,
+          "column": 1
+        },
+        {
+          "title": "Phase 4 surfaces expose scoped pairing, gated vendors and reviewed capture",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 3,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 1207,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-04T16:37:07.884Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "fbeac1b2decfba2c3acd-688d7ffdbd28dc5c1444",
+          "file": "browser.spec.ts",
+          "line": 1672,
+          "column": 1
+        },
+        {
+          "title": "AI review rejects malformed Mermaid before approval",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 3,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 1041,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-04T16:37:09.102Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "fbeac1b2decfba2c3acd-9e7dc88784b0f9f3236b",
+          "file": "browser.spec.ts",
+          "line": 1709,
+          "column": 1
+        },
+        {
+          "title": "provider disconnect stays available while approval is pending",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 3,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 835,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-04T16:37:10.154Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "fbeac1b2decfba2c3acd-9209246d022b30dd0ec4",
+          "file": "browser.spec.ts",
+          "line": 1741,
+          "column": 1
+        }
+      ]
+    },
+    {
+      "title": "database-scaling.browser.spec.ts",
+      "file": "database-scaling.browser.spec.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [
+        {
+          "title": "shell loads one requested page body and retrieves backlinks independently",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 3,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 975,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-04T16:37:11.017Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "9ca85e0885b36fe5f540-f1dd3026d4971de13eaf",
+          "file": "database-scaling.browser.spec.ts",
+          "line": 220,
+          "column": 1
+        },
+        {
+          "title": "table and gallery retain a single page with a small rendered window",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 3,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 1987,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-04T16:37:12.003Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "9ca85e0885b36fe5f540-83ed91e4df820658356f",
+          "file": "database-scaling.browser.spec.ts",
+          "line": 251,
+          "column": 1
+        }
+      ]
+    },
+    {
+      "title": "editor-integrity.browser.spec.ts",
+      "file": "editor-integrity.browser.spec.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [
+        {
+          "title": "actual table editor preserves links and marks through one-character edit, outer undo and reload",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 3,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 2180,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-04T16:37:14.071Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "ed03789d31223c5c995c-8726074530dc5687234d",
+          "file": "editor-integrity.browser.spec.ts",
+          "line": 109,
+          "column": 48
+        },
+        {
+          "title": "actual layout editor preserves links and marks through one-character edit, outer undo and reload",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 3,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 2684,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-04T16:37:16.265Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "ed03789d31223c5c995c-9f5be4308fc06ec37655",
+          "file": "editor-integrity.browser.spec.ts",
+          "line": 109,
+          "column": 48
+        },
+        {
+          "title": "nested toggles retain their own states, move safely, and reveal citations without writing a locked page",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 3,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 2796,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-04T16:37:18.966Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "ed03789d31223c5c995c-c24fdc5c25e2a0cc65c9",
+          "file": "editor-integrity.browser.spec.ts",
+          "line": 131,
+          "column": 1
+        },
+        {
+          "title": "outer page clipboard preserves table rich data and allocates new identities",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 3,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 1943,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-04T16:37:21.777Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "ed03789d31223c5c995c-c9e80055e338376e4f9b",
+          "file": "editor-integrity.browser.spec.ts",
+          "line": 157,
+          "column": 1
+        },
+        {
+          "title": "table structure controls preserve header widths, confirm populated removal, and undo through reload",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 3,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 3127,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-04T16:37:23.737Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "ed03789d31223c5c995c-740e4253d8d3afc5ea76",
+          "file": "editor-integrity.browser.spec.ts",
+          "line": 171,
+          "column": 1
+        },
+        {
+          "title": "code controls copy exact source bytes and persist filename, wrapping and line numbers",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 3,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 3467,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-04T16:37:26.887Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "ed03789d31223c5c995c-bd4470c4c25f1736e125",
+          "file": "editor-integrity.browser.spec.ts",
+          "line": 193,
+          "column": 1
+        },
+        {
+          "title": "managed images honor dimensions and alignment with zoom and a scoped original link",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 3,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 2456,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-04T16:37:30.369Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "ed03789d31223c5c995c-fba5e6707eab6adc104d",
+          "file": "editor-integrity.browser.spec.ts",
+          "line": 212,
+          "column": 1
+        },
+        {
+          "title": "outer text colors and highlights survive live selection, undo and reload",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 3,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 2359,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-04T16:37:32.839Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "ed03789d31223c5c995c-b66789b727b183e146f7",
+          "file": "editor-integrity.browser.spec.ts",
+          "line": 223,
+          "column": 1
+        },
+        {
+          "title": "known pasted styles become finite tokens while unknown CSS remains inert source evidence",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 3,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 2093,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-04T16:37:35.213Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "ed03789d31223c5c995c-d969b9caef7f5613eefb",
+          "file": "editor-integrity.browser.spec.ts",
+          "line": 236,
+          "column": 1
+        },
+        {
+          "title": "PDF.js renders managed pages offline, remembers the page and never executes PDF JavaScript",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 3,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 3208,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-04T16:37:37.322Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "ed03789d31223c5c995c-d5c2de7c573bacb26fb3",
+          "file": "editor-integrity.browser.spec.ts",
+          "line": 250,
+          "column": 1
+        },
+        {
+          "title": "a damaged PDF reports a bounded preview error and retains the managed original",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 3,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 1891,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-04T16:37:40.543Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "ed03789d31223c5c995c-f323240ac80c4fb00de7",
+          "file": "editor-integrity.browser.spec.ts",
+          "line": 265,
+          "column": 1
+        },
+        {
+          "title": "rich layout controls move and edit code, tables, images and nested columns without flattening",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 3,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 2795,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-04T16:37:42.445Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "ed03789d31223c5c995c-63c3467ea31cf0aaadde",
+          "file": "editor-integrity.browser.spec.ts",
+          "line": 276,
+          "column": 1
+        },
+        {
+          "title": "layout group removal keeps content and subtree duplication/removal are undoable",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 3,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 1937,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-04T16:37:45.253Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "ed03789d31223c5c995c-bf92c59bc3ea78b27db3",
+          "file": "editor-integrity.browser.spec.ts",
+          "line": 288,
+          "column": 1
+        },
+        {
+          "title": "reusable blocks show rich canonical sources, update live and retain unavailable references",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 3,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 2974,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-04T16:37:47.202Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "ed03789d31223c5c995c-a7090eb5369665ef03b6",
+          "file": "editor-integrity.browser.spec.ts",
+          "line": 298,
+          "column": 1
+        },
+        {
+          "title": "a reusable layout resolves its scoped remote source subtree without a workspace block preload",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 3,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 1734,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-04T16:37:50.188Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "ed03789d31223c5c995c-c015ed1a60caffa3c131",
+          "file": "editor-integrity.browser.spec.ts",
+          "line": 307,
+          "column": 1
+        }
+      ]
+    },
+    {
+      "title": "p2-display.browser.spec.ts",
+      "file": "p2-display.browser.spec.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [
+        {
+          "title": "page display settings persist per page and presentation layout exits after restart",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 3,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 1576,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-04T16:37:52.264Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "aab69bd1c8f0a7d7cf87-57091dc253fd06484662",
+          "file": "p2-display.browser.spec.ts",
+          "line": 3,
+          "column": 1
+        }
+      ]
+    },
+    {
+      "title": "p2-intelligence.browser.spec.ts",
+      "file": "p2-intelligence.browser.spec.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [
+        {
+          "title": "knowledge graph exposes evidence, OCR availability, and explicitly reviewed digests",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 3,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 912,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-04T16:37:53.871Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "3efcd66abe512130c305-ac37bbb6cd0556b86568",
+          "file": "p2-intelligence.browser.spec.ts",
+          "line": 3,
+          "column": 1
+        }
+      ]
+    },
+    {
+      "title": "recovery.browser.spec.ts",
+      "file": "recovery.browser.spec.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [
+        {
+          "title": "maps a typed value only after reviewing the latest decision",
+          "ok": false,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 3,
+                  "parallelIndex": 0,
+                  "status": "failed",
+                  "duration": 201,
+                  "error": {
+                    "message": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://127.0.0.1:4186/tests/recovery-fixture.html\nCall log:\n\u001b[2m  - navigating to \"http://127.0.0.1:4186/tests/recovery-fixture.html\", waiting until \"load\"\u001b[22m\n",
+                    "stack": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://127.0.0.1:4186/tests/recovery-fixture.html\nCall log:\n\u001b[2m  - navigating to \"http://127.0.0.1:4186/tests/recovery-fixture.html\", waiting until \"load\"\u001b[22m\n\n    at /Volumes/HD-B1/HD-Projects/Trove/frontend/tests/recovery.browser.spec.ts:4:14",
+                    "location": {
+                      "file": "/Volumes/HD-B1/HD-Projects/Trove/frontend/tests/recovery.browser.spec.ts",
+                      "column": 14,
+                      "line": 4
+                    },
+                    "snippet": "  2 |\n  3 | test.beforeEach(async ({ page }) => {\n> 4 |   await page.goto(`${process.env.TROVE_RECOVERY_TEST_URL ?? \"http://127.0.0.1:4186\"}/tests/recovery-fixture.html`);\n    |              ^\n  5 |   await page.getByLabel(\"Page history\").selectOption({ label: \"Historical record\" });\n  6 |   await page.getByRole(\"button\", { name: \"Load revisions\", exact: true }).click();\n  7 |   await page.getByRole(\"button\", { name: /^Preview revision 2/ }).click();"
+                  },
+                  "errors": [
+                    {
+                      "location": {
+                        "file": "/Volumes/HD-B1/HD-Projects/Trove/frontend/tests/recovery.browser.spec.ts",
+                        "column": 14,
+                        "line": 4
+                      },
+                      "message": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://127.0.0.1:4186/tests/recovery-fixture.html\nCall log:\n\u001b[2m  - navigating to \"http://127.0.0.1:4186/tests/recovery-fixture.html\", waiting until \"load\"\u001b[22m\n\n\n  2 |\n  3 | test.beforeEach(async ({ page }) => {\n> 4 |   await page.goto(`${process.env.TROVE_RECOVERY_TEST_URL ?? \"http://127.0.0.1:4186\"}/tests/recovery-fixture.html`);\n    |              ^\n  5 |   await page.getByLabel(\"Page history\").selectOption({ label: \"Historical record\" });\n  6 |   await page.getByRole(\"button\", { name: \"Load revisions\", exact: true }).click();\n  7 |   await page.getByRole(\"button\", { name: /^Preview revision 2/ }).click();\n    at /Volumes/HD-B1/HD-Projects/Trove/frontend/tests/recovery.browser.spec.ts:4:14"
+                    }
+                  ],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-04T16:37:54.815Z",
+                  "annotations": [],
+                  "attachments": [
+                    {
+                      "name": "error-context",
+                      "contentType": "text/markdown",
+                      "path": "/Volumes/HD-B1/HD-Projects/Trove/evidence/completion/browser-results/recovery.browser-maps-a-ty-3e4bd-viewing-the-latest-decision/error-context.md"
+                    }
+                  ],
+                  "errorLocation": {
+                    "file": "/Volumes/HD-B1/HD-Projects/Trove/frontend/tests/recovery.browser.spec.ts",
+                    "column": 14,
+                    "line": 4
+                  }
+                }
+              ],
+              "status": "unexpected"
+            }
+          ],
+          "id": "2cdad9e5ae07e02c3e26-067c649b661b88c57e77",
+          "file": "recovery.browser.spec.ts",
+          "line": 10,
+          "column": 1
+        },
+        {
+          "title": "requires an explicit retention choice and displays its reviewed effect",
+          "ok": false,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 4,
+                  "parallelIndex": 0,
+                  "status": "failed",
+                  "duration": 608,
+                  "error": {
+                    "message": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://127.0.0.1:4186/tests/recovery-fixture.html\nCall log:\n\u001b[2m  - navigating to \"http://127.0.0.1:4186/tests/recovery-fixture.html\", waiting until \"load\"\u001b[22m\n",
+                    "stack": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://127.0.0.1:4186/tests/recovery-fixture.html\nCall log:\n\u001b[2m  - navigating to \"http://127.0.0.1:4186/tests/recovery-fixture.html\", waiting until \"load\"\u001b[22m\n\n    at /Volumes/HD-B1/HD-Projects/Trove/frontend/tests/recovery.browser.spec.ts:4:14",
+                    "location": {
+                      "file": "/Volumes/HD-B1/HD-Projects/Trove/frontend/tests/recovery.browser.spec.ts",
+                      "column": 14,
+                      "line": 4
+                    },
+                    "snippet": "  2 |\n  3 | test.beforeEach(async ({ page }) => {\n> 4 |   await page.goto(`${process.env.TROVE_RECOVERY_TEST_URL ?? \"http://127.0.0.1:4186\"}/tests/recovery-fixture.html`);\n    |              ^\n  5 |   await page.getByLabel(\"Page history\").selectOption({ label: \"Historical record\" });\n  6 |   await page.getByRole(\"button\", { name: \"Load revisions\", exact: true }).click();\n  7 |   await page.getByRole(\"button\", { name: /^Preview revision 2/ }).click();"
+                  },
+                  "errors": [
+                    {
+                      "location": {
+                        "file": "/Volumes/HD-B1/HD-Projects/Trove/frontend/tests/recovery.browser.spec.ts",
+                        "column": 14,
+                        "line": 4
+                      },
+                      "message": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://127.0.0.1:4186/tests/recovery-fixture.html\nCall log:\n\u001b[2m  - navigating to \"http://127.0.0.1:4186/tests/recovery-fixture.html\", waiting until \"load\"\u001b[22m\n\n\n  2 |\n  3 | test.beforeEach(async ({ page }) => {\n> 4 |   await page.goto(`${process.env.TROVE_RECOVERY_TEST_URL ?? \"http://127.0.0.1:4186\"}/tests/recovery-fixture.html`);\n    |              ^\n  5 |   await page.getByLabel(\"Page history\").selectOption({ label: \"Historical record\" });\n  6 |   await page.getByRole(\"button\", { name: \"Load revisions\", exact: true }).click();\n  7 |   await page.getByRole(\"button\", { name: /^Preview revision 2/ }).click();\n    at /Volumes/HD-B1/HD-Projects/Trove/frontend/tests/recovery.browser.spec.ts:4:14"
+                    }
+                  ],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-04T16:37:55.660Z",
+                  "annotations": [],
+                  "attachments": [
+                    {
+                      "name": "error-context",
+                      "contentType": "text/markdown",
+                      "path": "/Volumes/HD-B1/HD-Projects/Trove/evidence/completion/browser-results/recovery.browser-requires--cb15a-isplays-its-reviewed-effect/error-context.md"
+                    }
+                  ],
+                  "errorLocation": {
+                    "file": "/Volumes/HD-B1/HD-Projects/Trove/frontend/tests/recovery.browser.spec.ts",
+                    "column": 14,
+                    "line": 4
+                  }
+                }
+              ],
+              "status": "unexpected"
+            }
+          ],
+          "id": "2cdad9e5ae07e02c3e26-d40dd5ddb3fd559ecf10",
+          "file": "recovery.browser.spec.ts",
+          "line": 36,
+          "column": 1
+        },
+        {
+          "title": "keeps unknown historical payloads readable without assuming a current shape",
+          "ok": false,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 5,
+                  "parallelIndex": 0,
+                  "status": "failed",
+                  "duration": 833,
+                  "error": {
+                    "message": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://127.0.0.1:4186/tests/recovery-fixture.html\nCall log:\n\u001b[2m  - navigating to \"http://127.0.0.1:4186/tests/recovery-fixture.html\", waiting until \"load\"\u001b[22m\n",
+                    "stack": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://127.0.0.1:4186/tests/recovery-fixture.html\nCall log:\n\u001b[2m  - navigating to \"http://127.0.0.1:4186/tests/recovery-fixture.html\", waiting until \"load\"\u001b[22m\n\n    at /Volumes/HD-B1/HD-Projects/Trove/frontend/tests/recovery.browser.spec.ts:4:14",
+                    "location": {
+                      "file": "/Volumes/HD-B1/HD-Projects/Trove/frontend/tests/recovery.browser.spec.ts",
+                      "column": 14,
+                      "line": 4
+                    },
+                    "snippet": "  2 |\n  3 | test.beforeEach(async ({ page }) => {\n> 4 |   await page.goto(`${process.env.TROVE_RECOVERY_TEST_URL ?? \"http://127.0.0.1:4186\"}/tests/recovery-fixture.html`);\n    |              ^\n  5 |   await page.getByLabel(\"Page history\").selectOption({ label: \"Historical record\" });\n  6 |   await page.getByRole(\"button\", { name: \"Load revisions\", exact: true }).click();\n  7 |   await page.getByRole(\"button\", { name: /^Preview revision 2/ }).click();"
+                  },
+                  "errors": [
+                    {
+                      "location": {
+                        "file": "/Volumes/HD-B1/HD-Projects/Trove/frontend/tests/recovery.browser.spec.ts",
+                        "column": 14,
+                        "line": 4
+                      },
+                      "message": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://127.0.0.1:4186/tests/recovery-fixture.html\nCall log:\n\u001b[2m  - navigating to \"http://127.0.0.1:4186/tests/recovery-fixture.html\", waiting until \"load\"\u001b[22m\n\n\n  2 |\n  3 | test.beforeEach(async ({ page }) => {\n> 4 |   await page.goto(`${process.env.TROVE_RECOVERY_TEST_URL ?? \"http://127.0.0.1:4186\"}/tests/recovery-fixture.html`);\n    |              ^\n  5 |   await page.getByLabel(\"Page history\").selectOption({ label: \"Historical record\" });\n  6 |   await page.getByRole(\"button\", { name: \"Load revisions\", exact: true }).click();\n  7 |   await page.getByRole(\"button\", { name: /^Preview revision 2/ }).click();\n    at /Volumes/HD-B1/HD-Projects/Trove/frontend/tests/recovery.browser.spec.ts:4:14"
+                    }
+                  ],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-04T16:37:57.288Z",
+                  "annotations": [],
+                  "attachments": [
+                    {
+                      "name": "error-context",
+                      "contentType": "text/markdown",
+                      "path": "/Volumes/HD-B1/HD-Projects/Trove/evidence/completion/browser-results/recovery.browser-keeps-unk-47717-ut-assuming-a-current-shape/error-context.md"
+                    }
+                  ],
+                  "errorLocation": {
+                    "file": "/Volumes/HD-B1/HD-Projects/Trove/frontend/tests/recovery.browser.spec.ts",
+                    "column": 14,
+                    "line": 4
+                  }
+                }
+              ],
+              "status": "unexpected"
+            }
+          ],
+          "id": "2cdad9e5ae07e02c3e26-3c2dedb98a6629bab4fb",
+          "file": "recovery.browser.spec.ts",
+          "line": 49,
+          "column": 1
+        }
+      ]
+    }
+  ],
+  "errors": [],
+  "stats": {
+    "startTime": "2026-10-04T16:35:30.946Z",
+    "duration": 147717.216,
+    "expected": 51,
+    "skipped": 0,
+    "unexpected": 6,
+    "flaky": 0
+  }
+}

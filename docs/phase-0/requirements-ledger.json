@@ -15745,5 +15745,14 @@
     "sharedContractOwner": "A — Kernel and contracts",
     "contractVersion": "1.3.0",
     "missingEvidence": "The separate 307-behavior Notion research report and its fixtures were not supplied."
+  },
+  "completionRoadmap": {
+    "registry": "docs/completion/registry.json",
+    "roadmap": "docs/completion/README.md",
+    "baselineCommit": "632d0cd0141dc2dcdc7922274757e10083623616",
+    "implementationStatus": "in_progress",
+    "releaseApproved": false,
+    "policy": "Implementation and targeted checks do not close native, real-model, account, device or candidate qualification. Never infer a pass from absent evidence.",
+    "backlogItemCount": 51
   }
 }

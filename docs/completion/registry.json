@@ -1,0 +1,1389 @@
+{
+  "schemaVersion": 1,
+  "authority": "Accepted Trove completion roadmap C0\u2013C8; acceptance in docs/remaining-work.md remains binding",
+  "updatedAt": "2026-10-04",
+  "baselineCommit": "632d0cd0141dc2dcdc7922274757e10083623616",
+  "integrationBranch": "integration",
+  "ownerRoles": {
+    "A": "Kernel, contracts, permissions, integration and automation",
+    "B": "Editor, navigation and desktop interface",
+    "C": "Databases, formulas, views and templates",
+    "D": "Migration, assets, export, history and recovery",
+    "E": "Retrieval, AI, memory and intelligence",
+    "F": "Native runtime, audio, providers, packaging and platforms"
+  },
+  "phases": {
+    "C0": "Development and verification foundation",
+    "C1": "Correctness and content preservation",
+    "C2": "P0 product foundation",
+    "C3": "macOS P0 qualification",
+    "C4": "P1 workspace and reviewed local AI",
+    "C5": "External integrations and macOS P1 qualification",
+    "C6": "P2 image understanding and personal reviews",
+    "C7": "Windows 11 x64 release",
+    "C8": "Ubuntu 24.04 x64 release and final reconciliation"
+  },
+  "statusPolicy": "Implementation and targeted checks do not close native, real-model, account, device or candidate qualification. Never infer a pass from absent evidence.",
+  "externalPrerequisites": [
+    {
+      "id": "research",
+      "status": "not_supplied",
+      "neededFor": [
+        "GOV-004"
+      ],
+      "description": "Referenced 307-behavior Notion research report; no report located in the audited workspace."
+    },
+    {
+      "id": "clean-platforms",
+      "status": "availability_unknown",
+      "neededFor": [
+        "REL-005",
+        "REL-009"
+      ],
+      "description": "Independent clean macOS, Windows 11 x64 and Ubuntu 24.04 x64 installations."
+    },
+    {
+      "id": "authorized-datasets",
+      "status": "availability_unknown",
+      "neededFor": [
+        "REL-003",
+        "REL-004"
+      ],
+      "description": "Consented physical microphone/screenshots and representative import/audio/image evaluation datasets."
+    },
+    {
+      "id": "live-accounts",
+      "status": "availability_unknown",
+      "neededFor": [
+        "PARITY-006",
+        "EXT-001",
+        "EXT-002",
+        "EXT-004",
+        "EXT-005"
+      ],
+      "description": "Eligible Notion/provider accounts and reachable authenticated HTTPS test environment; authenticate through supported product flows."
+    },
+    {
+      "id": "distribution",
+      "status": "availability_unknown",
+      "neededFor": [
+        "REL-006"
+      ],
+      "description": "Apple signing/notarization access and model redistribution evidence."
+    }
+  ],
+  "items": [
+    {
+      "id": "FIX-001",
+      "title": "Exclude trashed-only attachments from portable exports",
+      "owners": [
+        "D"
+      ],
+      "phases": [
+        "C1"
+      ],
+      "interface_boundary": "Versioned content, live asset graph, recovery and page/view identities",
+      "acceptance_scenario": "A trashed-only or otherwise unreferenced private asset is absent from current-content exports; a shared asset still referenced by a live page remains present; Markdown/CSV and HTML exports behave consistently. Verify archive bytes, not just manifest counts.",
+      "backlog_anchor": "../remaining-work.md#fix-001-exclude-trashed-only-attachments-from-portable-exports",
+      "implementation": "implemented",
+      "implementation_commit": "d703404",
+      "verification": {
+        "service_or_interface": "targeted_checks_passed",
+        "candidate": null,
+        "macOS": "unqualified",
+        "Windows": "unqualified",
+        "Linux": "unqualified"
+      },
+      "evidence_target": "evidence/completion/FIX-001/",
+      "followup_commits": [
+        "d521e7a"
+      ],
+      "implementation_evidence": [
+        "docs/completion/recovery.md"
+      ]
+    },
+    {
+      "id": "FIX-002",
+      "title": "Restore meeting history when transcript segments still exist",
+      "owners": [
+        "A",
+        "D"
+      ],
+      "phases": [
+        "C1"
+      ],
+      "interface_boundary": "Versioned content, live asset graph, recovery and page/view identities",
+      "acceptance_scenario": "Ordinary meeting restore and recovery after transcript deletion both pass. Test existing, edited, deleted, stale, and unauthorized segments; preserve timing and audio references; do not rewind unrelated records.",
+      "backlog_anchor": "../remaining-work.md#fix-002-restore-meeting-history-when-transcript-segments-still-exist",
+      "implementation": "implemented",
+      "implementation_commit": "231d0ee",
+      "verification": {
+        "service_or_interface": "targeted_checks_passed",
+        "candidate": null,
+        "macOS": "unqualified",
+        "Windows": "unqualified",
+        "Linux": "unqualified"
+      },
+      "evidence_target": "evidence/completion/FIX-002/"
+    },
+    {
+      "id": "FIX-003",
+      "title": "Preserve rich formatting and links during table and layout edits",
+      "owners": [
+        "B"
+      ],
+      "phases": [
+        "C1"
+      ],
+      "interface_boundary": "Versioned content, live asset graph, recovery and page/view identities",
+      "acceptance_scenario": "Import a cell and layout paragraph containing bold text and links, change one character through the visible control, save, reopen, undo/redo, export, and restore. Unaffected formatting and targets remain intact. Test the actual change handlers, not only serialization helpers.",
+      "backlog_anchor": "../remaining-work.md#fix-003-preserve-rich-formatting-and-links-during-table-and-layout-edits",
+      "implementation": "implemented",
+      "implementation_commit": "831a34f",
+      "verification": {
+        "service_or_interface": "targeted_checks_passed",
+        "candidate": null,
+        "macOS": "unqualified",
+        "Windows": "unqualified",
+        "Linux": "unqualified"
+      },
+      "evidence_target": "evidence/completion/FIX-003/"
+    },
+    {
+      "id": "FIX-004",
+      "title": "Open the correct linked database view on its owning page",
+      "owners": [
+        "B",
+        "C"
+      ],
+      "phases": [
+        "C1"
+      ],
+      "interface_boundary": "Versioned content, live asset graph, recovery and page/view identities",
+      "acceptance_scenario": "Two pages can display different filtered views of one collection; each opens with its own configuration. Multiple views on the same page remain distinct while sharing the same records through rename, move, restart, and restore.",
+      "backlog_anchor": "../remaining-work.md#fix-004-open-the-correct-linked-database-view-on-its-owning-page",
+      "implementation": "implemented",
+      "implementation_commit": "b97405b",
+      "verification": {
+        "service_or_interface": "targeted_checks_passed",
+        "candidate": null,
+        "macOS": "unqualified",
+        "Windows": "unqualified",
+        "Linux": "unqualified"
+      },
+      "evidence_target": "evidence/completion/FIX-004/"
+    },
+    {
+      "id": "FIX-005",
+      "title": "Make copied block links navigable",
+      "owners": [
+        "B",
+        "F"
+      ],
+      "phases": [
+        "C1"
+      ],
+      "interface_boundary": "Versioned content, live asset graph, recovery and page/view identities",
+      "acceptance_scenario": "A copied link pasted into another page opens and focuses the correct block. External launch routing is tested in the packaged app. Missing/deleted targets and unavailable workspaces produce useful errors. Existing search-citation navigation remains functional.",
+      "backlog_anchor": "../remaining-work.md#fix-005-make-copied-block-links-navigable",
+      "implementation": "implemented",
+      "implementation_commit": "b97405b",
+      "verification": {
+        "service_or_interface": "targeted_checks_passed",
+        "candidate": null,
+        "macOS": "unqualified",
+        "Windows": "unqualified",
+        "Linux": "unqualified"
+      },
+      "evidence_target": "evidence/completion/FIX-005/"
+    },
+    {
+      "id": "FIX-006",
+      "title": "Correct nested toggle visibility and collapse persistence",
+      "owners": [
+        "B"
+      ],
+      "phases": [
+        "C1"
+      ],
+      "interface_boundary": "Versioned content, live asset graph, recovery and page/view identities",
+      "acceptance_scenario": "A toggle containing nested lists, paragraphs, and technical blocks hides all descendants; reopening restores them intact. Save/reopen, moving children, and undo/redo preserve the agreed collapse behavior.",
+      "backlog_anchor": "../remaining-work.md#fix-006-correct-nested-toggle-visibility-and-collapse-persistence",
+      "implementation": "implemented",
+      "implementation_commit": "831a34f",
+      "verification": {
+        "service_or_interface": "targeted_checks_passed",
+        "candidate": null,
+        "macOS": "unqualified",
+        "Windows": "unqualified",
+        "Linux": "unqualified"
+      },
+      "evidence_target": "evidence/completion/FIX-006/"
+    },
+    {
+      "id": "CORE-001",
+      "title": "Complete simple table structure controls",
+      "owners": [
+        "B"
+      ],
+      "phases": [
+        "C2"
+      ],
+      "interface_boundary": "Versioned content, database queries, recovery snapshots, model generations and native workers",
+      "acceptance_scenario": "Users can grow and shrink tables without dropping populated cells silently; header rendering, undo, import, export, and restart preserve structure. P1 merge/unmerge continues to preserve original cell content.",
+      "backlog_anchor": "../remaining-work.md#core-001-complete-simple-table-structure-controls",
+      "implementation": "implemented",
+      "implementation_commit": "c29cb77",
+      "verification": {
+        "service_or_interface": "targeted_checks_passed",
+        "candidate": null,
+        "macOS": "unqualified",
+        "Windows": "unqualified",
+        "Linux": "unqualified"
+      },
+      "evidence_target": "evidence/completion/CORE-001/"
+    },
+    {
+      "id": "CORE-002",
+      "title": "Add rich-text colors and highlights",
+      "owners": [
+        "A",
+        "B"
+      ],
+      "phases": [
+        "C2"
+      ],
+      "interface_boundary": "Versioned content, database queries, recovery snapshots, model generations and native workers",
+      "acceptance_scenario": "Supported colors/highlights survive editing, mixed paste, undo, restart, and portability. Older content remains compatible; unsupported incoming values are retained safely.",
+      "backlog_anchor": "../remaining-work.md#core-002-add-rich-text-colors-and-highlights",
+      "implementation": "implemented",
+      "implementation_commit": "755a245",
+      "verification": {
+        "service_or_interface": "targeted_checks_passed",
+        "candidate": null,
+        "macOS": "unqualified",
+        "Windows": "unqualified",
+        "Linux": "unqualified"
+      },
+      "evidence_target": "evidence/completion/CORE-002/"
+    },
+    {
+      "id": "CORE-003",
+      "title": "Finish code and image block controls",
+      "owners": [
+        "B"
+      ],
+      "phases": [
+        "C2"
+      ],
+      "interface_boundary": "Versioned content, database queries, recovery snapshots, model generations and native workers",
+      "acceptance_scenario": "Controls work in the packaged app, source bytes remain unchanged, settings survive restart/round trips, and file access remains scoped to managed IDs.",
+      "backlog_anchor": "../remaining-work.md#core-003-finish-code-and-image-block-controls",
+      "implementation": "implemented",
+      "implementation_commit": "c29cb77",
+      "verification": {
+        "service_or_interface": "targeted_checks_passed",
+        "candidate": null,
+        "macOS": "unqualified",
+        "Windows": "unqualified",
+        "Linux": "unqualified"
+      },
+      "evidence_target": "evidence/completion/CORE-003/"
+    },
+    {
+      "id": "CORE-004",
+      "title": "Connect workspace Q&A to hybrid retrieval",
+      "owners": [
+        "E"
+      ],
+      "phases": [
+        "C2"
+      ],
+      "interface_boundary": "Versioned content, database queries, recovery snapshots, model generations and native workers",
+      "acceptance_scenario": "Paraphrased/conceptual questions retrieve relevant differently worded notes. Scope restrictions, current-source checks, deleted evidence, memory invalidation, and citation navigation remain correct. Include a real local-model/desktop acceptance case.",
+      "backlog_anchor": "../remaining-work.md#core-004-connect-workspace-qa-to-hybrid-retrieval",
+      "implementation": "implemented",
+      "implementation_commit": "b97405b",
+      "verification": {
+        "service_or_interface": "targeted_checks_passed",
+        "candidate": null,
+        "macOS": "unqualified",
+        "Windows": "unqualified",
+        "Linux": "unqualified"
+      },
+      "evidence_target": "evidence/completion/CORE-004/",
+      "implementation_evidence": [
+        "docs/completion/retrieval.md"
+      ]
+    },
+    {
+      "id": "CORE-005",
+      "title": "Decode and normalize common uploaded audio",
+      "owners": [
+        "F",
+        "E"
+      ],
+      "phases": [
+        "C2"
+      ],
+      "interface_boundary": "Versioned content, database queries, recovery snapshots, model generations and native workers",
+      "acceptance_scenario": "Supported MP3/M4A/AAC and ordinary stereo/44.1/48 kHz WAV inputs are normalized and transcribed locally. Keep originals; bound resource use; deny arbitrary network inputs; support cancellation/retry and recoverable unsupported/corrupt inputs. Publish the exact supported codec matrix.",
+      "backlog_anchor": "../remaining-work.md#core-005-decode-and-normalize-common-uploaded-audio",
+      "implementation": "implemented",
+      "implementation_commit": "c3c7047",
+      "verification": {
+        "service_or_interface": "targeted_checks_passed",
+        "candidate": null,
+        "macOS": "unqualified",
+        "Windows": "unqualified",
+        "Linux": "unqualified"
+      },
+      "evidence_target": "evidence/completion/CORE-005/",
+      "implementation_evidence": [
+        "docs/completion/audio-decoding.md"
+      ]
+    },
+    {
+      "id": "CORE-006",
+      "title": "Provide schema-aware historical value restoration",
+      "owners": [
+        "A",
+        "C"
+      ],
+      "phases": [
+        "C2"
+      ],
+      "interface_boundary": "Versioned content, database queries, recovery snapshots, model generations and native workers",
+      "acceptance_scenario": "A schema change exposes incompatible old values in a preview; the user can map or deliberately retain them as evidence. Applying restoration creates a new revision, preserves the current recovery point, and does not rewind shared schemas or unrelated records.",
+      "backlog_anchor": "../remaining-work.md#core-006-provide-schema-aware-historical-value-restoration",
+      "implementation": "implemented",
+      "implementation_commit": "97714c2",
+      "verification": {
+        "service_or_interface": "targeted_checks_passed",
+        "candidate": null,
+        "macOS": "unqualified",
+        "Windows": "unqualified",
+        "Linux": "unqualified"
+      },
+      "evidence_target": "evidence/completion/CORE-006/",
+      "implementation_evidence": [
+        "docs/completion/recovery.md"
+      ]
+    },
+    {
+      "id": "CORE-007",
+      "title": "Complete database query scaling and virtualization",
+      "owners": [
+        "A",
+        "C"
+      ],
+      "phases": [
+        "C2",
+        "C4"
+      ],
+      "interface_boundary": "Versioned content, database queries, recovery snapshots, model generations and native workers",
+      "acceptance_scenario": "Large representative collections load incrementally with bounded memory and visible-row rendering. Typed filters, formula/rollup behavior, stable sorting, scopes, and cursor invalidation remain correct. Measure bridge/paint as well as service time; do not reuse page-search benchmarks as database-view evidence.",
+      "backlog_anchor": "../remaining-work.md#core-007-complete-database-query-scaling-and-virtualization",
+      "implementation": "implemented",
+      "implementation_commit": "17bbbd8",
+      "verification": {
+        "service_or_interface": "targeted development checks passed; integrated Go suite 416 passed / 14 optional checks skipped; release evidence pending",
+        "candidate": null,
+        "macOS": "unqualified",
+        "Windows": "unqualified",
+        "Linux": "unqualified"
+      },
+      "evidence_target": "evidence/completion/CORE-007/",
+      "implementation_evidence": [
+        "docs/completion/database-query-scaling.md"
+      ]
+    },
+    {
+      "id": "CORE-008",
+      "title": "Honor core view configuration and calendar range editing",
+      "owners": [
+        "C"
+      ],
+      "phases": [
+        "C2"
+      ],
+      "interface_boundary": "Versioned content, database queries, recovery snapshots, model generations and native workers",
+      "acceptance_scenario": "Property order, width, visibility, sort/group configuration, and calendar ranges survive restart and linked-view use. Resizing changes duration through guarded mutations and preserves timezone semantics.",
+      "backlog_anchor": "../remaining-work.md#core-008-honor-core-view-configuration-and-calendar-range-editing",
+      "implementation": "implemented",
+      "implementation_commit": "02cdb68",
+      "verification": {
+        "service_or_interface": "targeted_checks_passed",
+        "candidate": null,
+        "macOS": "unqualified",
+        "Windows": "unqualified",
+        "Linux": "unqualified"
+      },
+      "evidence_target": "evidence/completion/CORE-008/",
+      "implementation_evidence": [
+        "docs/completion/views.md"
+      ]
+    },
+    {
+      "id": "CORE-009",
+      "title": "Resolve semantic index implementation and scale",
+      "owners": [
+        "A",
+        "E"
+      ],
+      "phases": [
+        "C2"
+      ],
+      "interface_boundary": "Versioned content, database queries, recovery snapshots, model generations and native workers",
+      "acceptance_scenario": "Exact model/hash/dimension generations are maintained; incompatible changes rebuild derived indexes without affecting notes; scope/revision checks hold; large-corpus latency and memory meet the declared benchmark profile.",
+      "backlog_anchor": "../remaining-work.md#core-009-resolve-semantic-index-implementation-and-scale",
+      "implementation": "implemented",
+      "implementation_commit": "971c5c3",
+      "verification": {
+        "service_or_interface": "targeted_checks_passed",
+        "candidate": null,
+        "macOS": "unqualified",
+        "Windows": "unqualified",
+        "Linux": "unqualified"
+      },
+      "evidence_target": "evidence/completion/CORE-009/",
+      "implementation_evidence": [
+        "docs/completion/retrieval.md"
+      ]
+    },
+    {
+      "id": "CORE-010",
+      "title": "Resolve the backup snapshot contract",
+      "owners": [
+        "A",
+        "D"
+      ],
+      "phases": [
+        "C2"
+      ],
+      "interface_boundary": "Versioned content, database queries, recovery snapshots, model generations and native workers",
+      "acceptance_scenario": "Concurrent edits and recording remain within documented responsiveness bounds; database/asset consistency, cancellation, insufficient disk, crash recovery, staged restore, and source preservation pass. Do not label existing backups corrupt solely because their implementation differs.",
+      "backlog_anchor": "../remaining-work.md#core-010-resolve-the-backup-snapshot-contract",
+      "implementation": "implemented",
+      "implementation_commit": "82ad139",
+      "verification": {
+        "service_or_interface": "targeted_checks_passed",
+        "candidate": null,
+        "macOS": "unqualified",
+        "Windows": "unqualified",
+        "Linux": "unqualified"
+      },
+      "evidence_target": "evidence/completion/CORE-010/",
+      "implementation_evidence": [
+        "docs/completion/recovery.md"
+      ]
+    },
+    {
+      "id": "PARITY-001",
+      "title": "Complete rich layout and reusable-block editing",
+      "owners": [
+        "B"
+      ],
+      "phases": [
+        "C4"
+      ],
+      "interface_boundary": "Layouts, templates, formula values, migration source identities, capture and automation",
+      "acceptance_scenario": "Code, media, tables, and nested content can be edited through supported layout controls without flattening. Identity, moves, duplication, source updates, cycle rejection, undo, preservation, and recovery remain correct.",
+      "backlog_anchor": "../remaining-work.md#parity-001-complete-rich-layout-and-reusable-block-editing",
+      "implementation": "implemented",
+      "implementation_commit": "244f1ea",
+      "verification": {
+        "service_or_interface": "targeted development checks passed; integrated Go suite 416 passed / 14 optional checks skipped; release evidence pending",
+        "candidate": null,
+        "macOS": "unqualified",
+        "Windows": "unqualified",
+        "Linux": "unqualified"
+      },
+      "evidence_target": "evidence/completion/PARITY-001/",
+      "implementation_evidence": [
+        "docs/completion/rich-layouts.md"
+      ]
+    },
+    {
+      "id": "PARITY-002",
+      "title": "Complete bookmarks and optional online embeds",
+      "owners": [
+        "B",
+        "D"
+      ],
+      "phases": [
+        "C4"
+      ],
+      "interface_boundary": "Layouts, templates, formula values, migration source identities, capture and automation",
+      "acceptance_scenario": "No network request occurs without the intended explicit action. Supported sources display in a restricted context, unsafe content remains inert, and offline/source-unavailable behavior uses the cached fallback. Never execute imported HTML automatically.",
+      "backlog_anchor": "../remaining-work.md#parity-002-complete-bookmarks-and-optional-online-embeds",
+      "implementation": "implemented",
+      "implementation_commit": "fc1c183",
+      "verification": {
+        "service_or_interface": "targeted development checks passed; integrated Go suite 416 passed / 14 optional checks skipped; release evidence pending",
+        "candidate": null,
+        "macOS": "unqualified",
+        "Windows": "unqualified",
+        "Linux": "unqualified"
+      },
+      "evidence_target": "evidence/completion/PARITY-002/",
+      "implementation_evidence": [
+        "docs/completion/online-content.md"
+      ]
+    },
+    {
+      "id": "PARITY-003",
+      "title": "Complete timeline behavior",
+      "owners": [
+        "C"
+      ],
+      "phases": [
+        "C4"
+      ],
+      "interface_boundary": "Layouts, templates, formula values, migration source identities, capture and automation",
+      "acceptance_scenario": "Scale changes alter the visible time axis meaningfully; saved grouping and dependency relationships are visible; date ranges and configured ordering are respected after restart. No scheduling optimizer is required.",
+      "backlog_anchor": "../remaining-work.md#parity-003-complete-timeline-behavior",
+      "implementation": "implemented",
+      "implementation_commit": "e96706b",
+      "verification": {
+        "service_or_interface": "targeted development checks passed; integrated Go suite 416 passed / 14 optional checks skipped; release evidence pending",
+        "candidate": null,
+        "macOS": "unqualified",
+        "Windows": "unqualified",
+        "Linux": "unqualified"
+      },
+      "evidence_target": "evidence/completion/PARITY-003/",
+      "implementation_evidence": [
+        "docs/completion/timeline.md"
+      ]
+    },
+    {
+      "id": "PARITY-004",
+      "title": "Unify database templates with values and page bodies",
+      "owners": [
+        "B",
+        "C"
+      ],
+      "phases": [
+        "C4"
+      ],
+      "interface_boundary": "Layouts, templates, formula values, migration source identities, capture and automation",
+      "acceptance_scenario": "A selected template creates a new page-backed record with both parts, fresh/remapped identities, preserved references, normal approval/revision rules, and no accidental shared mutable template content.",
+      "backlog_anchor": "../remaining-work.md#parity-004-unify-database-templates-with-values-and-page-bodies",
+      "implementation": "implemented",
+      "implementation_commit": "7c3fe22",
+      "verification": {
+        "service_or_interface": "targeted development checks passed; integrated Go suite 416 passed / 14 optional checks skipped; release evidence pending",
+        "candidate": null,
+        "macOS": "unqualified",
+        "Windows": "unqualified",
+        "Linux": "unqualified"
+      },
+      "evidence_target": "evidence/completion/PARITY-004/",
+      "implementation_evidence": [
+        "docs/completion/unified-templates.md"
+      ]
+    },
+    {
+      "id": "PARITY-005",
+      "title": "Close the formula compatibility contract",
+      "owners": [
+        "C"
+      ],
+      "phases": [
+        "C4"
+      ],
+      "interface_boundary": "Layouts, templates, formula values, migration source identities, capture and automation",
+      "acceptance_scenario": "Independent expected-output fixtures cover every claimed feature; original expressions and captured values remain distinct from live results; unsupported expressions preserve evidence and report useful errors. Full proprietary Notion-function parity is not required.",
+      "backlog_anchor": "../remaining-work.md#parity-005-close-the-formula-compatibility-contract",
+      "implementation": "in progress",
+      "implementation_commit": null,
+      "verification": {
+        "service_or_interface": "pending",
+        "candidate": null,
+        "macOS": "unqualified",
+        "Windows": "unqualified",
+        "Linux": "unqualified"
+      },
+      "evidence_target": "evidence/completion/PARITY-005/"
+    },
+    {
+      "id": "PARITY-006",
+      "title": "Complete Notion API database and source reconstruction",
+      "owners": [
+        "C",
+        "D"
+      ],
+      "phases": [
+        "C4"
+      ],
+      "interface_boundary": "Layouts, templates, formula values, migration source identities, capture and automation",
+      "acceptance_scenario": "Multiple sources in one container remain distinct; linked views share canonical records; interrupted pagination/downloads resume without duplication; permissions never look like empty content; original formulas/caches/provenance remain separate; captured content works after disconnect.",
+      "backlog_anchor": "../remaining-work.md#parity-006-complete-notion-api-database-and-source-reconstruction",
+      "implementation": "in progress",
+      "implementation_commit": null,
+      "verification": {
+        "service_or_interface": "pending",
+        "candidate": null,
+        "macOS": "unqualified",
+        "Windows": "unqualified",
+        "Linux": "unqualified"
+      },
+      "evidence_target": "evidence/completion/PARITY-006/"
+    },
+    {
+      "id": "PARITY-007",
+      "title": "Preserve reconstructable nested import structure",
+      "owners": [
+        "B",
+        "D"
+      ],
+      "phases": [
+        "C4"
+      ],
+      "interface_boundary": "Layouts, templates, formula values, migration source identities, capture and automation",
+      "acceptance_scenario": "Supported source structure is reconstructed; unavailable or unsupported semantics retain raw/readable evidence and accurate partial outcomes. Known omissions and unknown completeness stay separate. Do not invent source metadata or claim unavailable comments/transcripts were captured.",
+      "backlog_anchor": "../remaining-work.md#parity-007-preserve-reconstructable-nested-import-structure",
+      "implementation": "implemented",
+      "implementation_commit": "311a902",
+      "verification": {
+        "service_or_interface": "targeted development checks passed; integrated Go suite 416 passed / 14 optional checks skipped; release evidence pending",
+        "candidate": null,
+        "macOS": "unqualified",
+        "Windows": "unqualified",
+        "Linux": "unqualified"
+      },
+      "evidence_target": "evidence/completion/PARITY-007/",
+      "implementation_evidence": [
+        "docs/completion/import-structure.md"
+      ]
+    },
+    {
+      "id": "PARITY-008",
+      "title": "Render usable rich page PDFs",
+      "owners": [
+        "B",
+        "D"
+      ],
+      "phases": [
+        "C4"
+      ],
+      "interface_boundary": "Layouts, templates, formula values, migration source identities, capture and automation",
+      "acceptance_scenario": "Export representative rich pages offline; inspect pagination, clipping, missing glyphs, and attachment handling; retain Unicode and readable fallbacks. Pixel-perfect Notion PDF reproduction is not required. State platform support explicitly.",
+      "backlog_anchor": "../remaining-work.md#parity-008-render-usable-rich-page-pdfs",
+      "implementation": "in progress",
+      "implementation_commit": null,
+      "verification": {
+        "service_or_interface": "pending",
+        "candidate": null,
+        "macOS": "unqualified",
+        "Windows": "unqualified",
+        "Linux": "unqualified"
+      },
+      "evidence_target": "evidence/completion/PARITY-008/"
+    },
+    {
+      "id": "PARITY-009",
+      "title": "Deliver the browser clipper workflow",
+      "owners": [
+        "B",
+        "D"
+      ],
+      "phases": [
+        "C4"
+      ],
+      "interface_boundary": "Layouts, templates, formula values, migration source identities, capture and automation",
+      "acceptance_scenario": "Pairing, source provenance, sanitization, selected destination, explicit resource acquisition, revoked pairing, unavailable app, and offline retained content are tested. No unauthenticated arbitrary-write endpoint is introduced.",
+      "backlog_anchor": "../remaining-work.md#parity-009-deliver-the-browser-clipper-workflow",
+      "implementation": "in progress",
+      "implementation_commit": null,
+      "verification": {
+        "service_or_interface": "pending",
+        "candidate": null,
+        "macOS": "unqualified",
+        "Windows": "unqualified",
+        "Linux": "unqualified"
+      },
+      "evidence_target": "evidence/completion/PARITY-009/"
+    },
+    {
+      "id": "PARITY-010",
+      "title": "Expose usable automation configuration",
+      "owners": [
+        "A",
+        "B"
+      ],
+      "phases": [
+        "C4"
+      ],
+      "interface_boundary": "Layouts, templates, formula values, migration source identities, capture and automation",
+      "acceptance_scenario": "Users can configure the documented subset without hand-authoring internal commands; preview/run history/pause/retry work; origin exclusions, DST, deduplication, sleep/restart, and bounded catch-up remain correct. No always-on service or unrestricted vendor automation parity is required.",
+      "backlog_anchor": "../remaining-work.md#parity-010-expose-usable-automation-configuration",
+      "implementation": "in progress",
+      "implementation_commit": null,
+      "verification": {
+        "service_or_interface": "pending",
+        "candidate": null,
+        "macOS": "unqualified",
+        "Windows": "unqualified",
+        "Linux": "unqualified"
+      },
+      "evidence_target": "evidence/completion/PARITY-010/"
+    },
+    {
+      "id": "AI-001",
+      "title": "Complete reviewed workspace-agent actions",
+      "owners": [
+        "A",
+        "E"
+      ],
+      "phases": [
+        "C4"
+      ],
+      "interface_boundary": "Retrieval evidence, model capabilities, memory freshness and reviewed proposals",
+      "acceptance_scenario": "A representative natural-language task becomes an understandable proposal, is applied only through approved scoped services, and handles cancellation, stale revisions, retries, failure, and partial progress without duplicate effects. Code and arbitrary shell commands are never executed by default.",
+      "backlog_anchor": "../remaining-work.md#ai-001-complete-reviewed-workspace-agent-actions",
+      "implementation": "implemented",
+      "implementation_commit": "c776bee",
+      "verification": {
+        "service_or_interface": "targeted development checks passed; integrated Go suite 416 passed / 14 optional checks skipped; release evidence pending",
+        "candidate": null,
+        "macOS": "unqualified",
+        "Windows": "unqualified",
+        "Linux": "unqualified"
+      },
+      "evidence_target": "evidence/completion/AI-001/",
+      "implementation_evidence": [
+        "docs/completion/reviewed-actions.md"
+      ]
+    },
+    {
+      "id": "AI-002",
+      "title": "Qualify context budgeting and every exposed AI mode",
+      "owners": [
+        "E",
+        "F"
+      ],
+      "phases": [
+        "C2",
+        "C4",
+        "C6"
+      ],
+      "interface_boundary": "Retrieval evidence, model capabilities, memory freshness and reviewed proposals",
+      "acceptance_scenario": "Long inputs have useful bounded behavior and explicit omissions; code replacement cannot drop omitted source; malformed outputs stay drafts; citations resolve to supplied current evidence; no silent cloud fallback. Record correctness, citation validity, latency, memory, and correction effort rather than relying only on schema-valid output.",
+      "backlog_anchor": "../remaining-work.md#ai-002-qualify-context-budgeting-and-every-exposed-ai-mode",
+      "implementation": "in progress",
+      "implementation_commit": "6403b78",
+      "verification": {
+        "service_or_interface": "context/token regressions passed; real-model factual/memory quality rubric has retained failures",
+        "candidate": null,
+        "macOS": "unqualified",
+        "Windows": "unqualified",
+        "Linux": "unqualified"
+      },
+      "evidence_target": "evidence/completion/AI-002/",
+      "implementation_evidence": [
+        "docs/completion/ai-context.md"
+      ]
+    },
+    {
+      "id": "AI-003",
+      "title": "Qualify memory and semantic related-content workflows",
+      "owners": [
+        "E"
+      ],
+      "phases": [
+        "C2",
+        "C4",
+        "C6"
+      ],
+      "interface_boundary": "Retrieval evidence, model capabilities, memory freshness and reviewed proposals",
+      "acceptance_scenario": "Memory improves the declared task set without overriding newer authoritative records; stale/forgotten entries remain excluded during concurrent changes, including entries restored in those states; decisions cite evidence. Explain that restoring an older backup can recover earlier memory states: forgetting does not retroactively erase historical backups. Semantic and lexical suggestions are distinguishable and scope-safe. Existing memory lifecycle services remain the foundation.",
+      "backlog_anchor": "../remaining-work.md#ai-003-qualify-memory-and-semantic-related-content-workflows",
+      "implementation": "in progress",
+      "implementation_commit": "6403b78",
+      "verification": {
+        "service_or_interface": "context/token regressions passed; real-model factual/memory quality rubric has retained failures",
+        "candidate": null,
+        "macOS": "unqualified",
+        "Windows": "unqualified",
+        "Linux": "unqualified"
+      },
+      "evidence_target": "evidence/completion/AI-003/",
+      "implementation_evidence": [
+        "docs/completion/ai-context.md"
+      ]
+    },
+    {
+      "id": "EXT-001",
+      "title": "Complete managed Claude Code execution",
+      "owners": [
+        "A",
+        "F"
+      ],
+      "phases": [
+        "C5"
+      ],
+      "interface_boundary": "Shared proposals, scoped grants, provider lifecycle and owning-kernel bridge",
+      "acceptance_scenario": "A supported real account completes a scoped task; denied tools, interrupted output, process failure, stale changes, revocation, and disconnect are handled correctly. Native filesystem/shell capabilities cannot bypass Trove permissions. Do not copy subscription credentials or enable the mode before containment is enforceable.",
+      "backlog_anchor": "../remaining-work.md#ext-001-complete-managed-claude-code-execution",
+      "implementation": "in progress",
+      "implementation_commit": null,
+      "verification": {
+        "service_or_interface": "pending",
+        "candidate": null,
+        "macOS": "unqualified",
+        "Windows": "unqualified",
+        "Linux": "unqualified"
+      },
+      "evidence_target": "evidence/completion/EXT-001/"
+    },
+    {
+      "id": "EXT-002",
+      "title": "Complete managed Codex execution",
+      "owners": [
+        "A",
+        "F"
+      ],
+      "phases": [
+        "C5"
+      ],
+      "interface_boundary": "Shared proposals, scoped grants, provider lifecycle and owning-kernel bridge",
+      "acceptance_scenario": "A real completed request proves account/model eligibility; refresh/resume, account switching, denied tools, expired/revoked authorization, interrupted streams, and cancellation pass. Credentials remain out of logs/workspace/model prompts. API billing is never an automatic fallback.",
+      "backlog_anchor": "../remaining-work.md#ext-002-complete-managed-codex-execution",
+      "implementation": "open",
+      "implementation_commit": null,
+      "verification": {
+        "service_or_interface": "pending",
+        "candidate": null,
+        "macOS": "unqualified",
+        "Windows": "unqualified",
+        "Linux": "unqualified"
+      },
+      "evidence_target": "evidence/completion/EXT-002/"
+    },
+    {
+      "id": "EXT-003",
+      "title": "Add reviewed MCP page and task creation",
+      "owners": [
+        "A"
+      ],
+      "phases": [
+        "C4",
+        "C5"
+      ],
+      "interface_boundary": "Shared proposals, scoped grants, provider lifecycle and owning-kernel bridge",
+      "acceptance_scenario": "Authorized page/task creation works after review; invalid destinations, repeated requests, revoked grants, stale parents, and disconnected clients cannot create or duplicate content. Delete and arbitrary-file access retain their separate policies.",
+      "backlog_anchor": "../remaining-work.md#ext-003-add-reviewed-mcp-page-and-task-creation",
+      "implementation": "implemented",
+      "implementation_commit": "c776bee",
+      "verification": {
+        "service_or_interface": "targeted development checks passed; integrated Go suite 416 passed / 14 optional checks skipped; release evidence pending",
+        "candidate": null,
+        "macOS": "unqualified",
+        "Windows": "unqualified",
+        "Linux": "unqualified"
+      },
+      "evidence_target": "evidence/completion/EXT-003/",
+      "implementation_evidence": [
+        "docs/completion/reviewed-actions.md"
+      ]
+    },
+    {
+      "id": "EXT-004",
+      "title": "Complete the supported remote MCP route",
+      "owners": [
+        "A",
+        "F"
+      ],
+      "phases": [
+        "C5"
+      ],
+      "interface_boundary": "Shared proposals, scoped grants, provider lifecycle and owning-kernel bridge",
+      "acceptance_scenario": "Supported real-client connectivity, authentication/revocation, scope, approvals, disconnect, failure recovery, and credential handling pass. The bridge still forwards to the one owning kernel; local workflows work with the connection disabled.",
+      "backlog_anchor": "../remaining-work.md#ext-004-complete-the-supported-remote-mcp-route",
+      "implementation": "open",
+      "implementation_commit": null,
+      "verification": {
+        "service_or_interface": "pending",
+        "candidate": null,
+        "macOS": "unqualified",
+        "Windows": "unqualified",
+        "Linux": "unqualified"
+      },
+      "evidence_target": "evidence/completion/EXT-004/"
+    },
+    {
+      "id": "EXT-005",
+      "title": "Qualify provider handoffs and client interoperability",
+      "owners": [
+        "A",
+        "E"
+      ],
+      "phases": [
+        "C5"
+      ],
+      "interface_boundary": "Shared proposals, scoped grants, provider lifecycle and owning-kernel bridge",
+      "acceptance_scenario": "Handoffs exclude secrets, hidden reasoning, unrelated history, and uncommitted changes. Resume remains provider/account/version compatible. One active mutating provider run is enforced; duplicate retries cannot repeat effects. No unannounced provider/billing/context switch occurs.",
+      "backlog_anchor": "../remaining-work.md#ext-005-qualify-provider-handoffs-and-client-interoperability",
+      "implementation": "open",
+      "implementation_commit": null,
+      "verification": {
+        "service_or_interface": "pending",
+        "candidate": null,
+        "macOS": "unqualified",
+        "Windows": "unqualified",
+        "Linux": "unqualified"
+      },
+      "evidence_target": "evidence/completion/EXT-005/"
+    },
+    {
+      "id": "REL-001",
+      "title": "Freeze and identify the final release candidate",
+      "owners": [
+        "A",
+        "F"
+      ],
+      "phases": [
+        "C3",
+        "C5",
+        "C6",
+        "C7",
+        "C8"
+      ],
+      "interface_boundary": "Immutable candidates, platform support and acceptance evidence",
+      "acceptance_scenario": "Source/bundle hashes remain stable through qualification; required checks cannot pass through missing/skipped evidence; candidate-specific limitations and approval state are explicit.",
+      "backlog_anchor": "../remaining-work.md#rel-001-freeze-and-identify-the-final-release-candidate",
+      "implementation": "open",
+      "implementation_commit": null,
+      "verification": {
+        "service_or_interface": "pending",
+        "candidate": null,
+        "macOS": "unqualified",
+        "Windows": "unqualified",
+        "Linux": "unqualified"
+      },
+      "evidence_target": "evidence/completion/REL-001/"
+    },
+    {
+      "id": "REL-002",
+      "title": "Finish native end-to-end acceptance",
+      "owners": [
+        "B",
+        "D",
+        "E"
+      ],
+      "phases": [
+        "C3",
+        "C5",
+        "C6",
+        "C7",
+        "C8"
+      ],
+      "interface_boundary": "Immutable candidates, platform support and acceptance evidence",
+      "acceptance_scenario": "Record actual user-visible behavior on that exact build, including restored content and selected workspace. Mocked-browser/service fixtures cannot substitute for native observations. Resolve the previously interrupted final-candidate checks.",
+      "backlog_anchor": "../remaining-work.md#rel-002-finish-native-end-to-end-acceptance",
+      "implementation": "open",
+      "implementation_commit": null,
+      "verification": {
+        "service_or_interface": "pending",
+        "candidate": null,
+        "macOS": "unqualified",
+        "Windows": "unqualified",
+        "Linux": "unqualified"
+      },
+      "evidence_target": "evidence/completion/REL-002/"
+    },
+    {
+      "id": "REL-003",
+      "title": "Qualify physical audio and screenshot capture",
+      "owners": [
+        "B",
+        "F"
+      ],
+      "phases": [
+        "C3",
+        "C5",
+        "C6",
+        "C7",
+        "C8"
+      ],
+      "interface_boundary": "Immutable candidates, platform support and acceptance evidence",
+      "acceptance_scenario": "Device/user-consent outcomes are visible and recoverable; captured originals survive interruption; no unrelated private audio/screen content is used as a fixture. System-audio capture remains separately platform-qualified and need not block a microphone/upload-first release.",
+      "backlog_anchor": "../remaining-work.md#rel-003-qualify-physical-audio-and-screenshot-capture",
+      "implementation": "open",
+      "implementation_commit": null,
+      "verification": {
+        "service_or_interface": "pending",
+        "candidate": null,
+        "macOS": "unqualified",
+        "Windows": "unqualified",
+        "Linux": "unqualified"
+      },
+      "evidence_target": "evidence/completion/REL-003/"
+    },
+    {
+      "id": "REL-004",
+      "title": "Validate real migration and meeting datasets",
+      "owners": [
+        "D",
+        "E"
+      ],
+      "phases": [
+        "C3",
+        "C5",
+        "C6",
+        "C7",
+        "C8"
+      ],
+      "interface_boundary": "Immutable candidates, platform support and acceptance evidence",
+      "acceptance_scenario": "Reconcile every discovered item, compare meaningful source content and asset bytes, report source omissions, and measure task/transcript quality. Repeated public speech and fixture HTTP servers remain useful regression inputs but do not establish general fidelity or live-account compatibility.",
+      "backlog_anchor": "../remaining-work.md#rel-004-validate-real-migration-and-meeting-datasets",
+      "implementation": "open",
+      "implementation_commit": null,
+      "verification": {
+        "service_or_interface": "pending",
+        "candidate": null,
+        "macOS": "unqualified",
+        "Windows": "unqualified",
+        "Linux": "unqualified"
+      },
+      "evidence_target": "evidence/completion/REL-004/"
+    },
+    {
+      "id": "REL-005",
+      "title": "Qualify complete installation and model-pack paths",
+      "owners": [
+        "F"
+      ],
+      "phases": [
+        "C3",
+        "C5",
+        "C6",
+        "C7",
+        "C8"
+      ],
+      "interface_boundary": "Immutable candidates, platform support and acceptance evidence",
+      "acceptance_scenario": "Core app installation needs no Node, Python, Ollama, Docker, database server, or product account. Installed packs support offline AI/transcription. Backup/restore succeeds on a second clean installation. An empty PATH on the development Mac is not equivalent evidence.",
+      "backlog_anchor": "../remaining-work.md#rel-005-qualify-complete-installation-and-model-pack-paths",
+      "implementation": "open",
+      "implementation_commit": null,
+      "verification": {
+        "service_or_interface": "pending",
+        "candidate": null,
+        "macOS": "unqualified",
+        "Windows": "unqualified",
+        "Linux": "unqualified"
+      },
+      "evidence_target": "evidence/completion/REL-005/"
+    },
+    {
+      "id": "REL-006",
+      "title": "Finish distribution, update, and recovery qualification",
+      "owners": [
+        "F"
+      ],
+      "phases": [
+        "C3",
+        "C5",
+        "C6",
+        "C7",
+        "C8"
+      ],
+      "interface_boundary": "Immutable candidates, platform support and acceptance evidence",
+      "acceptance_scenario": "Published artifacts have verified hashes and reproducible manifests; upgrades and rollback preserve canonical data; failed updates retain recoverable state; uninstall does not delete workspaces without an explicit request. Keep the current ad-hoc build labeled as such until these checks pass.",
+      "backlog_anchor": "../remaining-work.md#rel-006-finish-distribution-update-and-recovery-qualification",
+      "implementation": "open",
+      "implementation_commit": null,
+      "verification": {
+        "service_or_interface": "pending",
+        "candidate": null,
+        "macOS": "unqualified",
+        "Windows": "unqualified",
+        "Linux": "unqualified"
+      },
+      "evidence_target": "evidence/completion/REL-006/"
+    },
+    {
+      "id": "REL-007",
+      "title": "Benchmark realistic end-to-end performance",
+      "owners": [
+        "A",
+        "B",
+        "C",
+        "E"
+      ],
+      "phases": [
+        "C3",
+        "C5",
+        "C6",
+        "C7",
+        "C8"
+      ],
+      "interface_boundary": "Immutable candidates, platform support and acceptance evidence",
+      "acceptance_scenario": "Verify the declared approximately-two-second shell, under-300-ms common keyword search, under-one-second hybrid retrieval excluding optional reranking, and responsive editing against the agreed profiles. Record limits honestly; a 100-page hybrid benchmark or 10,000 simple pages is not evidence for all workloads.",
+      "backlog_anchor": "../remaining-work.md#rel-007-benchmark-realistic-end-to-end-performance",
+      "implementation": "open",
+      "implementation_commit": null,
+      "verification": {
+        "service_or_interface": "pending",
+        "candidate": null,
+        "macOS": "unqualified",
+        "Windows": "unqualified",
+        "Linux": "unqualified"
+      },
+      "evidence_target": "evidence/completion/REL-007/"
+    },
+    {
+      "id": "REL-008",
+      "title": "Add regression coverage for the audit gaps",
+      "owners": [
+        "F"
+      ],
+      "phases": [
+        "C0",
+        "C1",
+        "C2",
+        "C3",
+        "C4",
+        "C5",
+        "C6",
+        "C7",
+        "C8"
+      ],
+      "interface_boundary": "Immutable candidates, platform support and acceptance evidence",
+      "acceptance_scenario": "Tests fail on the audited behavior and pass after the fix. Use independent expected outcomes and archive/content inspection; avoid tests that simply repeat implementation logic. Run affected existing suites and real integration paths before closing an item.",
+      "backlog_anchor": "../remaining-work.md#rel-008-add-regression-coverage-for-the-audit-gaps",
+      "implementation": "in_progress",
+      "implementation_commit": null,
+      "verification": {
+        "service_or_interface": "pending",
+        "candidate": null,
+        "macOS": "unqualified",
+        "Windows": "unqualified",
+        "Linux": "unqualified"
+      },
+      "evidence_target": "evidence/completion/REL-008/"
+    },
+    {
+      "id": "REL-009",
+      "title": "Qualify additional platforms separately",
+      "owners": [
+        "F"
+      ],
+      "phases": [
+        "C7",
+        "C8"
+      ],
+      "interface_boundary": "Immutable candidates, platform support and acceptance evidence",
+      "acceptance_scenario": "Publish platform-specific supported features and evidence. Do not infer cross-platform readiness from Go portability or the macOS build.",
+      "backlog_anchor": "../remaining-work.md#rel-009-qualify-additional-platforms-separately",
+      "implementation": "open",
+      "implementation_commit": null,
+      "verification": {
+        "service_or_interface": "pending",
+        "candidate": null,
+        "macOS": "unqualified",
+        "Windows": "unqualified",
+        "Linux": "unqualified"
+      },
+      "evidence_target": "evidence/completion/REL-009/"
+    },
+    {
+      "id": "GOV-001",
+      "title": "Establish source control and coordinated integration",
+      "owners": [
+        "A"
+      ],
+      "phases": [
+        "C0"
+      ],
+      "interface_boundary": "Source control, pinned tools, ownership, requirements and evidence ledger",
+      "acceptance_scenario": "Changes have reviewable history, shared baseline updates reach dependent workstreams, integrated checks run before promotion, and no user data/secrets enter commits. This documentation task does not itself initialize Git.",
+      "backlog_anchor": "../remaining-work.md#gov-001-establish-source-control-and-coordinated-integration",
+      "implementation": "implemented",
+      "implementation_commit": "632d0cd",
+      "verification": {
+        "service_or_interface": "setup_checks_passed",
+        "candidate": null,
+        "macOS": "unqualified",
+        "Windows": "unqualified",
+        "Linux": "unqualified"
+      },
+      "evidence_target": "evidence/completion/GOV-001/"
+    },
+    {
+      "id": "GOV-002",
+      "title": "Make development and qualification reproducible",
+      "owners": [
+        "A",
+        "F"
+      ],
+      "phases": [
+        "C0"
+      ],
+      "interface_boundary": "Source control, pinned tools, ownership, requirements and evidence ledger",
+      "acceptance_scenario": "A new contributor can provision the pinned toolchain and run checks without another chat's temporary environment. Record exact native build inputs and distinguish build dependencies from end-user runtime requirements.",
+      "backlog_anchor": "../remaining-work.md#gov-002-make-development-and-qualification-reproducible",
+      "implementation": "implemented",
+      "implementation_commit": "630107e",
+      "verification": {
+        "service_or_interface": "setup_checks_passed",
+        "candidate": null,
+        "macOS": "unqualified",
+        "Windows": "unqualified",
+        "Linux": "unqualified"
+      },
+      "evidence_target": "evidence/completion/GOV-002/"
+    },
+    {
+      "id": "GOV-003",
+      "title": "Reconcile the requirements ledger and completion claims",
+      "owners": [
+        "A"
+      ],
+      "phases": [
+        "C0",
+        "C2",
+        "C3",
+        "C5",
+        "C8"
+      ],
+      "interface_boundary": "Source control, pinned tools, ownership, requirements and evidence ledger",
+      "acceptance_scenario": "Native editing, import reconstruction, fallback preservation, and verification are separate claims. A passing verification family does not close unimplemented breadth. Preserve historical reports; publish a new assessment for new evidence.",
+      "backlog_anchor": "../remaining-work.md#gov-003-reconcile-the-requirements-ledger-and-completion-claims",
+      "implementation": "in_progress",
+      "implementation_commit": null,
+      "verification": {
+        "service_or_interface": "pending",
+        "candidate": null,
+        "macOS": "unqualified",
+        "Windows": "unqualified",
+        "Linux": "unqualified"
+      },
+      "evidence_target": "evidence/completion/GOV-003/"
+    },
+    {
+      "id": "GOV-004",
+      "title": "Obtain and reconcile the referenced research evidence",
+      "owners": [
+        "A"
+      ],
+      "phases": [
+        "C0"
+      ],
+      "interface_boundary": "Source control, pinned tools, ownership, requirements and evidence ledger",
+      "acceptance_scenario": "Each accepted behavior has traceable evidence or an explicit unresolved state. Missing source wording is not invented. Research proposals do not become accepted features automatically. The CodeSwitchOS documents are design precedent, not a prerequisite for fixing known product defects.",
+      "backlog_anchor": "../remaining-work.md#gov-004-obtain-and-reconcile-the-referenced-research-evidence",
+      "implementation": "awaiting_external_source",
+      "implementation_commit": null,
+      "verification": {
+        "service_or_interface": "pending",
+        "candidate": null,
+        "macOS": "unqualified",
+        "Windows": "unqualified",
+        "Linux": "unqualified"
+      },
+      "evidence_target": "evidence/completion/GOV-004/"
+    },
+    {
+      "id": "GOV-005",
+      "title": "Resolve selected-stack deviations explicitly",
+      "owners": [
+        "A"
+      ],
+      "phases": [
+        "C0",
+        "C2",
+        "C3",
+        "C5",
+        "C8"
+      ],
+      "interface_boundary": "Source control, pinned tools, ownership, requirements and evidence ledger",
+      "acceptance_scenario": "Implement the selected contract or record an explicitly accepted ADR with behavior, maintenance, security, licensing, offline, and qualification consequences. A different library is not automatically a user-visible bug; silently claiming exact TRD conformance is not acceptable.",
+      "backlog_anchor": "../remaining-work.md#gov-005-resolve-selected-stack-deviations-explicitly",
+      "implementation": "in_progress",
+      "implementation_commit": null,
+      "verification": {
+        "service_or_interface": "pending",
+        "candidate": null,
+        "macOS": "unqualified",
+        "Windows": "unqualified",
+        "Linux": "unqualified"
+      },
+      "evidence_target": "evidence/completion/GOV-005/"
+    },
+    {
+      "id": "OPT-001",
+      "title": "Qualify and optionally expand local image intelligence",
+      "owners": [
+        "E",
+        "F"
+      ],
+      "phases": [
+        "C6"
+      ],
+      "interface_boundary": "Versioned image/review capabilities, jobs, source manifests and reviewed mutations",
+      "acceptance_scenario": "Use representative images and document quality/resource limits. Additional handwriting, scanned-PDF, rotation, or language support is required only when explicitly selected. Images remain local unless the user separately invokes an external integration.",
+      "backlog_anchor": "../remaining-work.md#opt-001-qualify-and-optionally-expand-local-image-intelligence",
+      "implementation": "open",
+      "implementation_commit": null,
+      "verification": {
+        "service_or_interface": "pending",
+        "candidate": null,
+        "macOS": "unqualified",
+        "Windows": "unqualified",
+        "Linux": "unqualified"
+      },
+      "evidence_target": "evidence/completion/OPT-001/"
+    },
+    {
+      "id": "OPT-002",
+      "title": "Decide whether personal review needs generative analysis",
+      "owners": [
+        "A",
+        "E"
+      ],
+      "phases": [
+        "C6"
+      ],
+      "interface_boundary": "Versioned image/review capabilities, jobs, source manifests and reviewed mutations",
+      "acceptance_scenario": "Preserve occurrence deduplication, activation consent, current-source/memory checks, reviewed writes, and failure isolation. Do not rename a digest as autonomous task management or introduce unreviewed knowledge rewriting.",
+      "backlog_anchor": "../remaining-work.md#opt-002-decide-whether-personal-review-needs-generative-analysis",
+      "implementation": "open",
+      "implementation_commit": null,
+      "verification": {
+        "service_or_interface": "pending",
+        "candidate": null,
+        "macOS": "unqualified",
+        "Windows": "unqualified",
+        "Linux": "unqualified"
+      },
+      "evidence_target": "evidence/completion/OPT-002/"
+    },
+    {
+      "id": "OPT-003",
+      "title": "Qualify declared P2 package boundaries",
+      "owners": [
+        "E",
+        "F"
+      ],
+      "phases": [
+        "C6"
+      ],
+      "interface_boundary": "Versioned image/review capabilities, jobs, source manifests and reviewed mutations",
+      "acceptance_scenario": "Conversation fixtures preserve branches/roles/timestamps/provenance; graph associations disclose evidence; calculations and submissions remain canonical; operational settings stay inert on portable import; host authentication/TLS/ownership transfer/recovery remain correct. Arbitrary remote infrastructure, network filesystems, and offline multi-device sync are not implied by the existing host tests.",
+      "backlog_anchor": "../remaining-work.md#opt-003-qualify-declared-p2-package-boundaries",
+      "implementation": "open",
+      "implementation_commit": null,
+      "verification": {
+        "service_or_interface": "pending",
+        "candidate": null,
+        "macOS": "unqualified",
+        "Windows": "unqualified",
+        "Linux": "unqualified"
+      },
+      "evidence_target": "evidence/completion/OPT-003/"
+    }
+  ]
+}

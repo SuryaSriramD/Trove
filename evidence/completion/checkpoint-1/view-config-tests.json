@@ -1,0 +1,233 @@
+{
+  "config": {
+    "argv": [
+      "/opt/homebrew/Cellar/node/25.5.0/bin/node",
+      "/Volumes/HD-B1/HD-Projects/Trove/frontend/node_modules/.pnpm/@playwright+test@1.63.0/node_modules/@playwright/test/cli.js",
+      "test",
+      "--config",
+      "src/database/tests/playwright.config.ts",
+      "--grep",
+      "property order|calendar resizes"
+    ],
+    "configFile": "/Volumes/HD-B1/HD-Projects/Trove/frontend/src/database/tests/playwright.config.ts",
+    "rootDir": "/Volumes/HD-B1/HD-Projects/Trove/frontend/src/database/tests",
+    "failOnFlakyTests": false,
+    "forbidOnly": false,
+    "fullyParallel": false,
+    "globalSetup": null,
+    "globalTeardown": null,
+    "globalTimeout": 0,
+    "grep": {},
+    "grepInvert": null,
+    "maxFailures": 0,
+    "metadata": {
+      "actualWorkers": 1
+    },
+    "preserveOutput": "always",
+    "projects": [
+      {
+        "outputDir": "/Volumes/HD-B1/HD-Projects/Trove/frontend/test-results",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 1
+        },
+        "id": "",
+        "name": "",
+        "testDir": "/Volumes/HD-B1/HD-Projects/Trove/frontend/src/database/tests",
+        "testIgnore": [],
+        "testMatch": [
+          "database.browser.spec.ts"
+        ],
+        "timeout": 30000
+      }
+    ],
+    "quiet": false,
+    "reporter": [
+      [
+        "list",
+        null
+      ],
+      [
+        "json",
+        {
+          "outputFile": "/Volumes/HD-B1/HD-Projects/Trove/evidence/completion/checkpoint-1/view-config-tests.json"
+        }
+      ]
+    ],
+    "reportSlowTests": {
+      "max": 5,
+      "threshold": 300000
+    },
+    "shard": null,
+    "tags": [],
+    "updateSnapshots": "missing",
+    "updateSourceMethod": "patch",
+    "version": "1.63.0",
+    "workers": 1,
+    "webServer": null
+  },
+  "suites": [
+    {
+      "title": "database.browser.spec.ts",
+      "file": "database.browser.spec.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [
+        {
+          "title": "table property order and widths persist through view save and restart",
+          "ok": false,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "timedOut",
+                  "duration": 30026,
+                  "error": {
+                    "message": "\u001b[31mTest timeout of 30000ms exceeded while running \"beforeEach\" hook.\u001b[39m",
+                    "stack": "\u001b[31mTest timeout of 30000ms exceeded while running \"beforeEach\" hook.\u001b[39m\n    at /Volumes/HD-B1/HD-Projects/Trove/frontend/src/database/tests/database.browser.spec.ts:140:6",
+                    "location": {
+                      "file": "/Volumes/HD-B1/HD-Projects/Trove/frontend/src/database/tests/database.browser.spec.ts",
+                      "column": 6,
+                      "line": 140
+                    },
+                    "snippet": "  138 |   taskFacets: [],\n  139 | };\n> 140 | test.beforeEach(async ({ page }) => {\n      |      ^\n  141 |   await page.addInitScript(\n  142 |     ({ fixture }) => {\n  143 |       let state ="
+                  },
+                  "errors": [
+                    {
+                      "location": {
+                        "file": "/Volumes/HD-B1/HD-Projects/Trove/frontend/src/database/tests/database.browser.spec.ts",
+                        "column": 6,
+                        "line": 140
+                      },
+                      "message": "\u001b[31mTest timeout of 30000ms exceeded while running \"beforeEach\" hook.\u001b[39m\n\n  138 |   taskFacets: [],\n  139 | };\n> 140 | test.beforeEach(async ({ page }) => {\n      |      ^\n  141 |   await page.addInitScript(\n  142 |     ({ fixture }) => {\n  143 |       let state =\n    at /Volumes/HD-B1/HD-Projects/Trove/frontend/src/database/tests/database.browser.spec.ts:140:6"
+                    },
+                    {
+                      "location": {
+                        "file": "/Volumes/HD-B1/HD-Projects/Trove/frontend/src/database/tests/database.browser.spec.ts",
+                        "column": 14,
+                        "line": 359
+                      },
+                      "message": "Error: page.goto: Test timeout of 30000ms exceeded.\nCall log:\n\u001b[2m  - navigating to \"http://127.0.0.1:4173/\", waiting until \"load\"\u001b[22m\n\n\n  357 |     { fixture },\n  358 |   );\n> 359 |   await page.goto(\n      |              ^\n  360 |     (globalThis as any).process?.env?.TROVE_TEST_URL ?? \"http://127.0.0.1:4173\",\n  361 |   );\n  362 |   await page\n    at /Volumes/HD-B1/HD-Projects/Trove/frontend/src/database/tests/database.browser.spec.ts:359:14"
+                    }
+                  ],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-04T15:38:28.573Z",
+                  "annotations": [],
+                  "attachments": [
+                    {
+                      "name": "error-context",
+                      "contentType": "text/markdown",
+                      "path": "/Volumes/HD-B1/HD-Projects/Trove/frontend/test-results/database.browser-table-pro-b7dc0-rough-view-save-and-restart/error-context.md"
+                    }
+                  ],
+                  "errorLocation": {
+                    "file": "/Volumes/HD-B1/HD-Projects/Trove/frontend/src/database/tests/database.browser.spec.ts",
+                    "column": 6,
+                    "line": 140
+                  }
+                }
+              ],
+              "status": "unexpected"
+            }
+          ],
+          "id": "a5a10b8aa35116872fcd-6d7945a95846ee1d1b02",
+          "file": "database.browser.spec.ts",
+          "line": 523,
+          "column": 1
+        },
+        {
+          "title": "calendar resizes a range using its end field and drag handle with guarded writes",
+          "ok": false,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 1,
+                  "parallelIndex": 0,
+                  "status": "timedOut",
+                  "duration": 30026,
+                  "error": {
+                    "message": "\u001b[31mTest timeout of 30000ms exceeded while running \"beforeEach\" hook.\u001b[39m",
+                    "stack": "\u001b[31mTest timeout of 30000ms exceeded while running \"beforeEach\" hook.\u001b[39m\n    at /Volumes/HD-B1/HD-Projects/Trove/frontend/src/database/tests/database.browser.spec.ts:140:6",
+                    "location": {
+                      "file": "/Volumes/HD-B1/HD-Projects/Trove/frontend/src/database/tests/database.browser.spec.ts",
+                      "column": 6,
+                      "line": 140
+                    },
+                    "snippet": "  138 |   taskFacets: [],\n  139 | };\n> 140 | test.beforeEach(async ({ page }) => {\n      |      ^\n  141 |   await page.addInitScript(\n  142 |     ({ fixture }) => {\n  143 |       let state ="
+                  },
+                  "errors": [
+                    {
+                      "location": {
+                        "file": "/Volumes/HD-B1/HD-Projects/Trove/frontend/src/database/tests/database.browser.spec.ts",
+                        "column": 6,
+                        "line": 140
+                      },
+                      "message": "\u001b[31mTest timeout of 30000ms exceeded while running \"beforeEach\" hook.\u001b[39m\n\n  138 |   taskFacets: [],\n  139 | };\n> 140 | test.beforeEach(async ({ page }) => {\n      |      ^\n  141 |   await page.addInitScript(\n  142 |     ({ fixture }) => {\n  143 |       let state =\n    at /Volumes/HD-B1/HD-Projects/Trove/frontend/src/database/tests/database.browser.spec.ts:140:6"
+                    },
+                    {
+                      "location": {
+                        "file": "/Volumes/HD-B1/HD-Projects/Trove/frontend/src/database/tests/database.browser.spec.ts",
+                        "column": 14,
+                        "line": 359
+                      },
+                      "message": "Error: page.goto: Test timeout of 30000ms exceeded.\nCall log:\n\u001b[2m  - navigating to \"http://127.0.0.1:4173/\", waiting until \"load\"\u001b[22m\n\n\n  357 |     { fixture },\n  358 |   );\n> 359 |   await page.goto(\n      |              ^\n  360 |     (globalThis as any).process?.env?.TROVE_TEST_URL ?? \"http://127.0.0.1:4173\",\n  361 |   );\n  362 |   await page\n    at /Volumes/HD-B1/HD-Projects/Trove/frontend/src/database/tests/database.browser.spec.ts:359:14"
+                    }
+                  ],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-04T15:39:09.066Z",
+                  "annotations": [],
+                  "attachments": [
+                    {
+                      "name": "error-context",
+                      "contentType": "text/markdown",
+                      "path": "/Volumes/HD-B1/HD-Projects/Trove/frontend/test-results/database.browser-calendar--10474--handle-with-guarded-writes/error-context.md"
+                    }
+                  ],
+                  "errorLocation": {
+                    "file": "/Volumes/HD-B1/HD-Projects/Trove/frontend/src/database/tests/database.browser.spec.ts",
+                    "column": 6,
+                    "line": 140
+                  }
+                }
+              ],
+              "status": "unexpected"
+            }
+          ],
+          "id": "a5a10b8aa35116872fcd-b5c5de23481f28292580",
+          "file": "database.browser.spec.ts",
+          "line": 541,
+          "column": 1
+        }
+      ]
+    }
+  ],
+  "errors": [],
+  "stats": {
+    "startTime": "2026-10-04T15:38:28.116Z",
+    "duration": 73560.12700000001,
+    "expected": 0,
+    "skipped": 0,
+    "unexpected": 2,
+    "flaky": 0
+  }
+}

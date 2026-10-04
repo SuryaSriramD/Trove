@@ -1,0 +1,10 @@
+{"Time":"2026-10-04T21:22:04.330784+05:30","Action":"start","Package":"trove.local/phase0/internal/native"}
+{"Time":"2026-10-04T21:22:04.758731+05:30","Action":"run","Package":"trove.local/phase0/internal/native","Test":"TestRealTokenizerLongInputAndIncompleteOutput"}
+{"Time":"2026-10-04T21:22:04.759266+05:30","Action":"output","Package":"trove.local/phase0/internal/native","Test":"TestRealTokenizerLongInputAndIncompleteOutput","Output":"=== RUN   TestRealTokenizerLongInputAndIncompleteOutput\n","OutputType":"frame"}
+{"Time":"2026-10-04T21:22:06.376361+05:30","Action":"output","Package":"trove.local/phase0/internal/native","Test":"TestRealTokenizerLongInputAndIncompleteOutput","Output":"    token_budget_test.go:34: prompt bytes=18804 tokens=3045 tokenizer duration=1.609198667s\n"}
+{"Time":"2026-10-04T21:22:16.942983+05:30","Action":"output","Package":"trove.local/phase0/internal/native","Test":"TestRealTokenizerLongInputAndIncompleteOutput","Output":"    token_budget_test.go:49: long input fact retained; token exhaustion rejected with partial stream; cancellation honored; total=12.175384125s\n"}
+{"Time":"2026-10-04T21:22:16.962374+05:30","Action":"output","Package":"trove.local/phase0/internal/native","Test":"TestRealTokenizerLongInputAndIncompleteOutput","Output":"--- PASS: TestRealTokenizerLongInputAndIncompleteOutput (12.18s)\n","OutputType":"frame"}
+{"Time":"2026-10-04T21:22:16.962416+05:30","Action":"pass","Package":"trove.local/phase0/internal/native","Test":"TestRealTokenizerLongInputAndIncompleteOutput","Elapsed":12.18}
+{"Time":"2026-10-04T21:22:16.962969+05:30","Action":"output","Package":"trove.local/phase0/internal/native","Output":"PASS\n","OutputType":"frame"}
+{"Time":"2026-10-04T21:22:16.963037+05:30","Action":"output","Package":"trove.local/phase0/internal/native","Output":"ok  \ttrove.local/phase0/internal/native\t12.632s\n"}
+{"Time":"2026-10-04T21:22:16.96306+05:30","Action":"pass","Package":"trove.local/phase0/internal/native","Elapsed":12.632}

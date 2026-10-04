@@ -1,0 +1,6 @@
+{"Time":"2026-10-04T22:30:57.783495+05:30","Action":"start","Package":"trove.local/phase0/internal/workspace"}
+{"Time":"2026-10-04T22:30:58.426243+05:30","Action":"run","Package":"trove.local/phase0/internal/workspace","Test":"TestRealLocalNamedWorkspacePlan"}
+{"Time":"2026-10-04T22:30:58.429653+05:30","Action":"output","Package":"trove.local/phase0/internal/workspace","Test":"TestRealLocalNamedWorkspacePlan","Output":"=== RUN   TestRealLocalNamedWorkspacePlan\n","OutputType":"frame"}
+{"Time":"2026-10-04T22:31:03.377125+05:30","Action":"output","Package":"trove.local/phase0/internal/workspace","Test":"TestRealLocalNamedWorkspacePlan","Output":"signal: interrupt\n"}
+{"Time":"2026-10-04T22:31:03.377257+05:30","Action":"output","Package":"trove.local/phase0/internal/workspace","Output":"FAIL\ttrove.local/phase0/internal/workspace\t5.592s\n","OutputType":"frame"}
+{"Time":"2026-10-04T22:31:03.377298+05:30","Action":"fail","Package":"trove.local/phase0/internal/workspace","Elapsed":5.594}
