@@ -303,6 +303,7 @@ type DerivedValue struct {
 	Diagnostic           string   `json:"diagnostic,omitempty"`
 	ComputedAt           string   `json:"computedAt,omitempty"`
 	Timezone             string   `json:"timezone"`
+	EvaluatorVersion     int      `json:"evaluatorVersion,omitempty"`
 	Dependencies         []string `json:"dependencies,omitempty"`
 }
 type derivedEvaluator struct {
@@ -396,16 +397,12 @@ func (d *derivedEvaluator) value(record, property string) (DerivedValue, error) 
 		if v.TranslatedExpression == "" {
 			err = fmt.Errorf("No supported translated expression; captured evidence is retained")
 		} else {
-			v.Value, err = EvaluateFormula(v.TranslatedExpression, d.clock, func(id string) (any, error) {
-				r, e := d.value(record, id)
-				if e != nil {
-					return nil, e
-				}
-				if r.Status != "computed" {
-					return nil, fmt.Errorf("dependency %s: %s", id, r.Diagnostic)
-				}
-				return r.Value, nil
-			})
+			version := 1
+			if configured, exists := raw["evaluatorVersion"]; exists {
+				version = int(number(configured))
+			}
+			v.EvaluatorVersion = version
+			v.Value, err = EvaluateFormulaVersion(v.TranslatedExpression, version, d.clock, func(id string) (any, error) { return d.formulaInput(record, id, version) })
 		}
 	case "rollup":
 		relation, target, aggregation := str(raw["relationPropertyId"]), str(raw["targetPropertyId"]), str(raw["aggregation"])

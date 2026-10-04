@@ -194,6 +194,8 @@ test.beforeEach(async ({ page }) => {
                     },
                   ],
                 });
+              if (method === "databaseFormulaRegistry") return ok({version:2,functions:[{name:"list",sinceVersion:2,signature:"list(value, …): bounded homogeneous list"}],operators:["+","%"],limits:{listItems:256},differences:["Imported formulas remain v1 until edited."]});
+              if (method === "databaseFormulaPreview") return ok(req.expression === "7 % 3" ? {status:"computed",value:{decimal:"1",format:"decimal"},resultType:"number",dependencies:[],computedAt:req.at,timezone:req.timezone} : {status:"error",value:null,resultType:"null",diagnostic:"unsupported v2 function",dependencies:[],computedAt:req.at,timezone:req.timezone});
               if (method === "databaseStructure") return ok({structure: Object.fromEntries(state.records.map((r: any, i: number) => [r.id, {parentRecordId:null, dependencyRecordIds:i === 0 ? [state.records[1].id] : []}]))});
               if (method === "databaseDerived")
                 return ok({ locked: false, values: {}, structure: {} });
@@ -209,6 +211,11 @@ test.beforeEach(async ({ page }) => {
               const changes = new Set<any>();
               for (const c of req.commands) {
                 commands.push(c);
+                if (c.kind === "property.setFormula") {
+                  const p=state.properties.find((p:any)=>p.id===c.propertyId);
+                  p.config.raw={...p.config.raw,translatedExpression:c.expression,evaluatorVersion:2};
+                  changes.add(p);changes.add(state.collections[0]);changes.add(state.pages[0]);
+                }
                 if (c.kind === "database.p2Configure") {
                   state.p2 = c.config;
                   changes.add(state.collections[0]);
@@ -755,4 +762,86 @@ test("timeline persists meaningful scales, grouping, dependency visibility and g
     "To do",
     "No Status",
   ]);
+});
+
+test("formula editing requires a current successful preview and retains captured evidence", async ({
+  page,
+}) => {
+  await page.evaluate(() => {
+    const state = (window as any).dbState();
+    state.properties.push({
+      id: "019a1234-5678-7000-8000-000000000080",
+      collectionId: state.collections[0].id,
+      name: "Effort",
+      type: "formula",
+      schemaVersion: 1,
+      revision: "1",
+      config: {
+        sourceType: "fixture.formula",
+        sourceVersion: 1,
+        readableText: "source",
+        reason: "unsupported_behavior",
+        raw: {
+          originalExpression: "source(original)",
+          translatedExpression: "1",
+          importedCachedValue: "captured 99",
+        },
+      },
+    });
+    localStorage.setItem("databaseFixture", JSON.stringify(state));
+  });
+  await page.reload();
+  await page
+    .getByRole("navigation", { name: "Workspace", exact: true })
+    .getByRole("button", { name: /Pages$/ })
+    .click();
+  await page
+    .getByText("Formula editor and compatibility", { exact: true })
+    .click();
+  await expect(
+    page.getByRole("button", { name: "Save formula v2", exact: true }),
+  ).toBeDisabled();
+  await page.getByLabel("Formula expression").fill("unknown(1)");
+  await page
+    .getByRole("button", { name: "Preview formula v2", exact: true })
+    .click();
+  await expect(page.getByRole("alert")).toContainText(
+    "unsupported v2 function",
+  );
+  await page.getByLabel("Formula expression").fill("7 % 3");
+  await page
+    .getByRole("button", { name: "Preview formula v2", exact: true })
+    .click();
+  await expect(page.locator(".db-formula-preview")).toContainText(
+    "Computed number",
+  );
+  await page
+    .getByRole("button", { name: "Save formula v2", exact: true })
+    .click();
+  await expect(page.locator(".db-formula-editor")).toContainText(
+    "Stored evaluator: v2",
+  );
+  await page
+    .getByText("Retained source and captured evidence", { exact: true })
+    .click();
+  await expect(page.locator(".db-formula-editor")).toContainText(
+    "source(original)",
+  );
+  await expect(page.locator(".db-formula-editor")).toContainText("captured 99");
+  const request = await page.evaluate(() =>
+    (window as any).dbRequests.find(
+      (r: any) =>
+        r.method === "batch" &&
+        r.commands.some((c: any) => c.kind === "property.setFormula"),
+    ),
+  );
+  expect(
+    request.mutation.expectedRevisions
+      .map((g: any) => g.target.entityType)
+      .sort(),
+  ).toEqual(["collection", "page", "property"]);
+  await page.getByLabel("Formula expression").fill("2");
+  await expect(
+    page.getByRole("button", { name: "Save formula v2", exact: true }),
+  ).toBeDisabled();
 });

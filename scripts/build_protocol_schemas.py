@@ -43,6 +43,7 @@ commands={
 'CreateCollection':tagged('collection.create',{'collectionId':D('Id'),'owningPageId':D('Id'),'titlePropertyId':D('Id'),'title':S}),
 'AddProperty':tagged('collection.addProperty',{'propertyId':D('Id'),'collectionId':D('Id'),'name':S,'type':S,'schemaVersion':{'type':'integer','minimum':1},'config':json_value}),
 'CreateRecord':tagged('record.create',{'recordId':D('Id'),'collectionId':D('Id'),'pageId':D('Id'),'title':S}),
+'SetFormula':tagged('property.setFormula',{'propertyId':D('Id'),'expression':{'type':'string','maxLength':8192},'evaluatorVersion':{'const':2}}),
 'SetValue':tagged('record.setValue',{'recordId':D('Id'),'propertyId':D('Id'),'value':R('ValueInput')}),
 'ClearValue':tagged('record.clearValue',{'recordId':D('Id'),'propertyId':D('Id')}),
 'SaveView':tagged('view.save',{'viewId':D('Id'),'collectionId':D('Id'),'owningPageId':D('Id'),'containerId':D('Id'),'type':S,'schemaVersion':{'type':'integer','minimum':1},'config':json_value,'query':D('ViewQuery'),'name':S},['viewId','collectionId','owningPageId','type','schemaVersion','config','query','name']),
@@ -140,6 +141,8 @@ defs['ReadRecordResult']=obj({'record':D('Record')})
 defs['DatabaseStructureRequest']=obj({**header,'collectionId':D('Id')})
 defs['BookmarkPreviewRequest']=obj({**header,'pageId':D('Id'),'url':{'type':'string','minLength':1,'maxLength':8192},'consent':{'const':'fetch_once'}})
 defs['BookmarkPreviewResult']=obj({'sourceUrl':{'type':'string','maxLength':8192},'title':{'type':'string','maxLength':512},'description':{'type':'string','maxLength':2048},'fetchedAt':D('Timestamp')})
+defs['FormulaRegistryRequest']=obj(header)
+defs['FormulaPreviewRequest']=obj({**header,'propertyId':D('Id'),'recordId':D('Id'),'expression':{'type':'string','maxLength':8192},'evaluatorVersion':{'const':2},'at':D('Timestamp'),'timezone':{'type':'string','minLength':1,'maxLength':128}})
 defs['BacklinksRequest']=obj({**header,'pageId':D('Id')})
 defs['BacklinksResult']=obj({'links':arr(obj({'pageId':D('Id'),'blockId':D('Id')}),10000)})
 defs['JobsListRequest']=obj({**header,'limit':{'type':'integer','minimum':1,'maximum':200},'state':enum('queued','running','retry_wait','cancel_requested','cancelled','succeeded','failed','interrupted')},[*header,'limit'])

@@ -847,6 +847,31 @@
       ],
       "additionalProperties": false
     },
+    "SetFormula": {
+      "type": "object",
+      "properties": {
+        "kind": {
+          "const": "property.setFormula"
+        },
+        "propertyId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "expression": {
+          "type": "string",
+          "maxLength": 8192
+        },
+        "evaluatorVersion": {
+          "const": 2
+        }
+      },
+      "required": [
+        "kind",
+        "propertyId",
+        "expression",
+        "evaluatorVersion"
+      ],
+      "additionalProperties": false
+    },
     "SetValue": {
       "type": "object",
       "properties": {
@@ -1935,6 +1960,9 @@
         },
         {
           "$ref": "#/$defs/CreateRecord"
+        },
+        {
+          "$ref": "#/$defs/SetFormula"
         },
         {
           "$ref": "#/$defs/SetValue"
@@ -3256,6 +3284,73 @@
         "title",
         "description",
         "fetchedAt"
+      ],
+      "additionalProperties": false
+    },
+    "FormulaRegistryRequest": {
+      "type": "object",
+      "properties": {
+        "contractVersion": {
+          "const": 1
+        },
+        "requestId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "workspaceId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        }
+      },
+      "required": [
+        "contractVersion",
+        "requestId",
+        "workspaceId"
+      ],
+      "additionalProperties": false
+    },
+    "FormulaPreviewRequest": {
+      "type": "object",
+      "properties": {
+        "contractVersion": {
+          "const": 1
+        },
+        "requestId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "workspaceId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "propertyId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "recordId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "expression": {
+          "type": "string",
+          "maxLength": 8192
+        },
+        "evaluatorVersion": {
+          "const": 2
+        },
+        "at": {
+          "$ref": "domain.schema.json#/$defs/Timestamp"
+        },
+        "timezone": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        }
+      },
+      "required": [
+        "contractVersion",
+        "requestId",
+        "workspaceId",
+        "propertyId",
+        "recordId",
+        "expression",
+        "evaluatorVersion",
+        "at",
+        "timezone"
       ],
       "additionalProperties": false
     },

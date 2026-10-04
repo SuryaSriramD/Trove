@@ -21,12 +21,20 @@ type FormulaClock struct {
 	Timezone string
 }
 type formulaInterpreter struct {
-	clock  FormulaClock
-	lookup func(string) (any, error)
-	work   int
+	clock         FormulaClock
+	lookup        func(string) (any, error)
+	work          int
+	version       int
+	propertyCache map[string]any
 }
 
 func EvaluateFormula(expression string, clock FormulaClock, lookup func(string) (any, error)) (any, error) {
+	return EvaluateFormulaVersion(expression, 1, clock, lookup)
+}
+func EvaluateFormulaVersion(expression string, version int, clock FormulaClock, lookup func(string) (any, error)) (any, error) {
+	if version != 1 && version != 2 {
+		return nil, fmt.Errorf("unsupported evaluator version %d", version)
+	}
 	if len(expression) > 8192 {
 		return nil, fmt.Errorf("expression exceeds 8192 bytes")
 	}
@@ -36,6 +44,11 @@ func EvaluateFormula(expression string, clock FormulaClock, lookup func(string) 
 	if clock.At.IsZero() {
 		return nil, fmt.Errorf("explicit clock required")
 	}
+	if version == 2 {
+		if _, _, err := formulaCompileV2(expression); err != nil {
+			return nil, err
+		}
+	}
 	tree, err := parser.ParseExpr(expression)
 	if err != nil {
 		return nil, fmt.Errorf("unsupported expression syntax: %s", err)
@@ -43,14 +56,27 @@ func EvaluateFormula(expression string, clock FormulaClock, lookup func(string) 
 	if _, err = formulaTreeDependencies(tree); err != nil {
 		return nil, err
 	}
-	f := formulaInterpreter{clock: clock, lookup: lookup}
+	f := formulaInterpreter{clock: clock, lookup: lookup, version: version, propertyCache: map[string]any{}}
 	v, err := f.eval(tree, 0)
 	if err != nil {
 		return nil, err
 	}
+	if f.work > 1024 {
+		return nil, fmt.Errorf("formula work limit exceeded")
+	}
+	if version == 2 && len(marshal(formulaPublicValue(v))) > 65536 {
+		return nil, fmt.Errorf("result exceeds 65536 bytes")
+	}
 	return formulaPublicValue(v), nil
 }
 func formulaPublicValue(v any) any {
+	if xs, ok := v.([]any); ok {
+		out := make([]any, len(xs))
+		for i, x := range xs {
+			out[i] = formulaPublicValue(x)
+		}
+		return out
+	}
 	if n, ok := v.(*big.Rat); ok {
 		return map[string]any{"decimal": decimalRat(n), "format": "decimal"}
 	}
@@ -133,7 +159,7 @@ func (f *formulaInterpreter) eval(node ast.Expr, depth int) (any, error) {
 			return s, e
 		}
 		if n.Kind == token.INT || n.Kind == token.FLOAT {
-			if len(n.Value) < 128 {
+			if len(n.Value) < 128 || f.version == 2 {
 				return parseFormulaNumber(n.Value)
 			}
 		}
@@ -240,6 +266,14 @@ func (f *formulaInterpreter) eval(node ast.Expr, depth int) (any, error) {
 			out = new(big.Rat).Sub(a, b)
 		case token.MUL:
 			out = new(big.Rat).Mul(a, b)
+		case token.REM:
+			if f.version < 2 {
+				return nil, fmt.Errorf("unsupported operator %% in evaluator v1")
+			}
+			if !a.IsInt() || !b.IsInt() || b.Sign() == 0 {
+				return nil, fmt.Errorf("remainder requires integers and nonzero divisor")
+			}
+			out = new(big.Rat).SetInt(new(big.Int).Rem(a.Num(), b.Num()))
 		case token.QUO:
 			if b.Sign() == 0 {
 				return nil, fmt.Errorf("division by zero")
@@ -290,11 +324,14 @@ func (f *formulaInterpreter) eval(node ast.Expr, depth int) (any, error) {
 			}
 			args = append(args, v)
 		}
-		return f.call(fn.Name, args)
+		if f.version == 2 {
+			return f.callV2(fn.Name, args)
+		}
+		return f.callV1(fn.Name, args)
 	}
 	return nil, fmt.Errorf("unsupported expression node %T", node)
 }
-func (f *formulaInterpreter) call(name string, a []any) (any, error) {
+func (f *formulaInterpreter) callV1(name string, a []any) (any, error) {
 	arity := func(n int) error {
 		if len(a) != n {
 			return fmt.Errorf("%s requires %d arguments", name, n)
@@ -313,7 +350,22 @@ func (f *formulaInterpreter) call(name string, a []any) (any, error) {
 		if f.lookup == nil {
 			return nil, fmt.Errorf("property lookup is unavailable")
 		}
-		v, err := f.lookup(id)
+		v, cached := f.propertyCache[id]
+		var err error
+		if f.version != 2 || !cached {
+			v, err = f.lookup(id)
+			if err == nil && f.version == 2 {
+				f.propertyCache[id] = v
+			}
+		}
+		if f.version == 2 {
+			if xs, ok := v.([]any); ok {
+				f.work += len(xs)
+				if f.work > 1024 {
+					return nil, fmt.Errorf("formula work limit exceeded")
+				}
+			}
+		}
 		if err != nil {
 			return nil, err
 		}

@@ -33,6 +33,7 @@ import {
 import "./database.css";
 import { VirtualRows } from "./VirtualRows";
 import { Timeline } from "./Timeline";
+import { FormulaEditor } from "./FormulaEditor";
 import { calendarDay, resizeDateRange } from "./dateRange";
 import { P2DatabasePanel, P2RowButtons } from "./P2Database";
 import type { P2Button, P2Config } from "./P2Model";
@@ -595,6 +596,12 @@ export default function DatabaseView({
             collection={collection}
             view={view}
             records={w.records.filter((r) => r.collectionId === collection.id)}
+            onCommitted={onCommitted}
+            onError={onError}
+          />
+          <FormulaEditor
+            workspace={w}
+            collection={collection}
             onCommitted={onCommitted}
             onError={onError}
           />

@@ -31,6 +31,11 @@ export function displayValue(
       .join(property?.type === "text" ? "" : ", ");
   if (typeof value === "object") {
     const v = value as Record<string, D.RawValue>;
+    if (
+      (v.kind === "page" || v.kind === "person") &&
+      typeof v.name === "string"
+    )
+      return v.name;
     if (v.decimal !== undefined) return String(v.decimal);
     if (v.start) return `${v.start}${v.end ? ` → ${v.end}` : ""}`;
     for (const k of ["text", "displayName", "label", "readableText"])

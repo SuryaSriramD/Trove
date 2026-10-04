@@ -885,6 +885,12 @@ CollectionId DomainId `json:"collectionId"`
 PageId DomainId `json:"pageId"`
 Title string `json:"title"`
 }
+type ServiceSetFormula struct {
+Kind string `json:"kind"`
+PropertyId DomainId `json:"propertyId"`
+Expression string `json:"expression"`
+EvaluatorVersion int64 `json:"evaluatorVersion"`
+}
 type ServiceSetValue struct {
 Kind string `json:"kind"`
 RecordId DomainId `json:"recordId"`
@@ -1127,6 +1133,7 @@ func (ServiceReorderBlocks) isServiceCommand() {}
 func (ServiceCreateCollection) isServiceCommand() {}
 func (ServiceAddProperty) isServiceCommand() {}
 func (ServiceCreateRecord) isServiceCommand() {}
+func (ServiceSetFormula) isServiceCommand() {}
 func (ServiceSetValue) isServiceCommand() {}
 func (ServiceClearValue) isServiceCommand() {}
 func (ServiceSaveView) isServiceCommand() {}
@@ -1177,6 +1184,7 @@ if matchesVariant(fields,[]string{"kind","pageId","parentBlockId","orderedBlockI
 if matchesVariant(fields,[]string{"kind","collectionId","owningPageId","titlePropertyId","title"},map[string]string{"kind":"\"collection.create\""},map[string][]string{},[]string{"kind","collectionId","owningPageId","titlePropertyId","title"}) { var result ServiceCreateCollection; if err := json.Unmarshal(data,&result); err != nil {return err}; v.Value=result; return nil }
 if matchesVariant(fields,[]string{"kind","propertyId","collectionId","name","type","schemaVersion","config"},map[string]string{"kind":"\"collection.addProperty\""},map[string][]string{},[]string{"kind","propertyId","collectionId","name","type","schemaVersion","config"}) { var result ServiceAddProperty; if err := json.Unmarshal(data,&result); err != nil {return err}; v.Value=result; return nil }
 if matchesVariant(fields,[]string{"kind","recordId","collectionId","pageId","title"},map[string]string{"kind":"\"record.create\""},map[string][]string{},[]string{"kind","recordId","collectionId","pageId","title"}) { var result ServiceCreateRecord; if err := json.Unmarshal(data,&result); err != nil {return err}; v.Value=result; return nil }
+if matchesVariant(fields,[]string{"kind","propertyId","expression","evaluatorVersion"},map[string]string{"kind":"\"property.setFormula\"","evaluatorVersion":"2"},map[string][]string{},[]string{"kind","propertyId","expression","evaluatorVersion"}) { var result ServiceSetFormula; if err := json.Unmarshal(data,&result); err != nil {return err}; v.Value=result; return nil }
 if matchesVariant(fields,[]string{"kind","recordId","propertyId","value"},map[string]string{"kind":"\"record.setValue\""},map[string][]string{},[]string{"kind","recordId","propertyId","value"}) { var result ServiceSetValue; if err := json.Unmarshal(data,&result); err != nil {return err}; v.Value=result; return nil }
 if matchesVariant(fields,[]string{"kind","recordId","propertyId"},map[string]string{"kind":"\"record.clearValue\""},map[string][]string{},[]string{"kind","recordId","propertyId"}) { var result ServiceClearValue; if err := json.Unmarshal(data,&result); err != nil {return err}; v.Value=result; return nil }
 if matchesVariant(fields,[]string{"kind","viewId","collectionId","owningPageId","type","schemaVersion","config","query","name"},map[string]string{"kind":"\"view.save\""},map[string][]string{},[]string{"kind","viewId","collectionId","owningPageId","containerId","type","schemaVersion","config","query","name"}) { var result ServiceSaveView; if err := json.Unmarshal(data,&result); err != nil {return err}; v.Value=result; return nil }
@@ -1495,6 +1503,22 @@ SourceUrl string `json:"sourceUrl"`
 Title string `json:"title"`
 Description string `json:"description"`
 FetchedAt DomainTimestamp `json:"fetchedAt"`
+}
+type ServiceFormulaRegistryRequest struct {
+ContractVersion int64 `json:"contractVersion"`
+RequestId DomainId `json:"requestId"`
+WorkspaceId DomainId `json:"workspaceId"`
+}
+type ServiceFormulaPreviewRequest struct {
+ContractVersion int64 `json:"contractVersion"`
+RequestId DomainId `json:"requestId"`
+WorkspaceId DomainId `json:"workspaceId"`
+PropertyId DomainId `json:"propertyId"`
+RecordId DomainId `json:"recordId"`
+Expression string `json:"expression"`
+EvaluatorVersion int64 `json:"evaluatorVersion"`
+At DomainTimestamp `json:"at"`
+Timezone string `json:"timezone"`
 }
 type ServiceBacklinksRequest struct {
 ContractVersion int64 `json:"contractVersion"`

@@ -454,3 +454,8 @@
 .db-timeline-outside { display:block; padding:17px 12px; color:var(--muted,#666); font-size:12px; }
 .db-timeline-edges { position:absolute; top:0; pointer-events:none; overflow:visible; z-index:3; color:var(--accent,#396b56); }
 .db-timeline-edges>path { stroke:currentColor; stroke-width:1.5; fill:none; opacity:.65; }
+
+.db-formula-editor { margin: 12px 0; padding: 12px; border: 1px solid var(--line); border-radius: 8px; }
+.db-formula-editor textarea { display:block; min-height:100px; width:100%; font-family:monospace; }
+.db-formula-editor pre { white-space:pre-wrap; overflow-wrap:anywhere; max-height:240px; overflow:auto; }
+.db-formula-preview { padding:12px; background:var(--surface); border-radius:6px; }
