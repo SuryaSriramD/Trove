@@ -350,6 +350,13 @@ func (k *Kernel) CaptureNotionStep(ctx context.Context, e contracts.ServiceExecu
 		if len(results) > 100 {
 			return s, Fail("RESOURCE_EXHAUSTED", "Notion returned more than requested 100 blocks")
 		}
+		var sourceBatch struct {
+			Results []json.RawMessage `json:"results"`
+		}
+		if err = json.Unmarshal(raw, &sourceBatch); err != nil {
+			return s, err
+		}
+		p.Items = append(p.Items, ImportItem{Locator: "notion/responses/" + task.ID + "#" + task.Cursor, Kind: "asset", Outcome: "preserved", Reason: "Complete paginated response retained as inert capture evidence", RawFileID: rawID, Hash: importDigest(raw), Size: int64(len(raw)), Provenance: provenance})
 		next := []notionCaptureTask{}
 		for index, rawBlock := range results {
 			block, ok := rawBlock.(map[string]any)
@@ -360,17 +367,41 @@ func (k *Kernel) CaptureNotionStep(ctx context.Context, e contracts.ServiceExecu
 			if !notionID.MatchString(blockID) {
 				return s, Fail("INVALID_REQUEST", "Invalid supplied Notion block identity")
 			}
+			if blockID == task.ID {
+				return s, Fail("INVALID_REQUEST", "Notion block cannot be its own child; source response retained")
+			}
 			if s.Seen["block:"+blockID] {
 				continue
 			}
 			s.Seen["block:"+blockID] = true
 			kind := str(block["type"])
 			data, _ := block[kind].(map[string]any)
-			item := ImportItem{Locator: fmt.Sprintf("notion/blocks/%s#%d", blockID, index), Kind: "notion_block", Outcome: "adapted", Reason: "Supported text and marks reconstructed; full block fields retained in API response evidence", RawFileID: rawID, Hash: importDigest(marshal(block)), PageID: task.PageID, ParentID: task.ParentID, Title: "Notion content", Provenance: provenance, Blocks: []ImportBlock{}}
+			blockRaw := sourceBatch.Results[index]
+			blockRawID, storeErr := k.storeImportBytes(ctx, "notion-block-"+blockID+".json", blockRaw)
+			if storeErr != nil {
+				return s, storeErr
+			}
+			blockEvidence := map[string]any{"response": provenance, "sourceBlockId": blockID, "sourceParentId": task.ID, "sourceType": kind, "sourceData": data}
+			item := ImportItem{Locator: fmt.Sprintf("notion/blocks/%s#%d", blockID, index), Kind: "notion_block", Outcome: "adapted", Reason: "Supported structure, text and marks reconstructed; full block fields retained in API response evidence", RawFileID: blockRawID, Hash: importDigest(blockRaw), PageID: task.PageID, ParentID: task.ParentID, Title: "Notion content", ExternalID: blockID, IdentityKind: "external_id", Provenance: blockEvidence, Blocks: []ImportBlock{}}
 			canonical := ImportBlock{ID: NewID(), Type: kind, Data: map[string]any{"richText": notionRichText(data["rich_text"])}}
 			switch kind {
-			case "paragraph", "heading_1", "heading_2", "heading_3", "quote", "bulleted_list_item", "numbered_list_item":
+			case "paragraph", "heading_1", "heading_2", "heading_3", "quote", "bulleted_list_item", "numbered_list_item", "toggle", "callout":
+				if strings.HasPrefix(kind, "heading_") && data["is_toggleable"] == true {
+					canonical.Type = "toggle_heading"
+					item.Outcome = "partial"
+					item.Reason += "; toggle ownership reconstructed; original heading level remains in source evidence"
+				}
 				item.Blocks = append(item.Blocks, canonical)
+			case "column_list":
+				item.Blocks = append(item.Blocks, ImportBlock{canonical.ID, "columns", map[string]any{"columns": []any{}}})
+			case "column":
+				blockEvidence["groupId"] = NewID()
+			case "synced_block":
+				if data["synced_from"] == nil {
+					item.Blocks = append(item.Blocks, ImportBlock{canonical.ID, "paragraph", map[string]any{"richText": []any{}}})
+				} else {
+					item.Blocks = append(item.Blocks, fallbackImportBlock(&item, "Supplied reusable-content reference: "+string(marshal(data["synced_from"]))))
+				}
 			case "code":
 				text := ""
 				for _, span := range notionRichText(data["rich_text"]) {
@@ -411,12 +442,25 @@ func (k *Kernel) CaptureNotionStep(ctx context.Context, e contracts.ServiceExecu
 			default:
 				item.Outcome = "unsupported_but_retained"
 				item.Reason = "Unsupported block/schema/view behavior retained as readable source evidence; no calculated result or relation was invented"
-				item.Blocks = append(item.Blocks, fallbackImportBlock(&item, string(marshal(block))))
+				item.Blocks = append(item.Blocks, fallbackImportBlock(&item, string(blockRaw)))
+			}
+			for _, field := range []string{"rich_text", "caption"} {
+				spans, _ := data[field].([]any)
+				for _, rawSpan := range spans {
+					span, _ := rawSpan.(map[string]any)
+					if span["type"] == "mention" {
+						item.Outcome = "partial"
+						item.Reason += "; supplied mention/identity semantics remain in source evidence; readable labels preserved"
+						break
+					}
+				}
 			}
 			if block["has_children"] == true && kind != "child_page" {
-				next = append(next, notionCaptureTask{Kind: "children", ID: blockID, PageID: task.PageID, ParentID: task.ParentID, Depth: task.Depth + 1})
-				item.Outcome = "partial"
-				item.Reason += "; nested child content flattened with parent identity retained in API evidence"
+				// A synced reference resolves only to content inside this authorized
+				// capture. It never expands access by fetching a referenced source.
+				if kind != "synced_block" || data["synced_from"] == nil {
+					next = append(next, notionCaptureTask{Kind: "children", ID: blockID, PageID: task.PageID, ParentID: task.ParentID, Depth: task.Depth + 1})
+				}
 			}
 			p.Items = append(p.Items, item)
 		}
@@ -476,30 +520,18 @@ func finishNotionCapture(ctx context.Context, k *Kernel, e contracts.ServiceExec
 		if len(s.Pending) > 0 && r["allowPartial"] != true {
 			return Fail("CONFLICT", "Capture is incomplete; explicitly choose a partial import or resume")
 		}
-		// Collapse content into each canonical page before normal re-import
-		// conflict handling. Per-block evidence remains separately reconciled.
+		// Reconstruct source relationships before normal re-import conflict
+		// handling. Per-block evidence remains separately reconciled.
 		pageItems := map[string]int{}
 		for i := range p.Items {
 			if p.Items[i].Kind == "notion_page" {
 				pageItems[p.Items[i].PageID] = i
 			}
 		}
-		for i := range p.Items {
-			item := &p.Items[i]
-			if item.Kind == "notion_block" {
-				if at, ok := pageItems[item.PageID]; ok {
-					p.Items[at].Blocks = append(p.Items[at].Blocks, item.Blocks...)
-					item.Blocks = nil
-					item.Kind = "asset"
-					item.PageID = ""
-					item.ParentID = ""
-				}
-			}
-		}
+		reconstructNotionStructure(&p, pageItems)
 		remap := map[string]string{}
 		for _, i := range pageItems {
 			item := &p.Items[i]
-			item.Hash = importDigest(marshal(map[string]any{"sourceHash": item.Hash, "blocks": item.Blocks}))
 			var mapping, local, base, revision string
 			er := tx.QueryRowContext(ctx, `SELECT m.id,m.local_id,m.base_content_hash,COALESCE(p.revision,'0') FROM import_mappings m LEFT JOIN pages p ON p.id=m.local_id WHERE m.workspace_id=? AND m.source_system=? AND m.source_namespace=? AND m.external_kind='page' AND m.identity_kind='external_id' AND m.identity_value=?`, k.id, p.SourceSystem, p.Namespace, item.ExternalID).Scan(&mapping, &local, &base, &revision)
 			if er == nil {
@@ -507,7 +539,14 @@ func finishNotionCapture(ctx context.Context, k *Kernel, e contracts.ServiceExec
 				item.PageID = local
 				item.MappingID = mapping
 				item.ExpectedRevision = revision
-				item.Conflict = "Existing Notion page: keep local, replace its captured body, or import a separate copy"
+				var importedRevision string
+				_ = tx.QueryRowContext(ctx, "SELECT local_revision FROM import_mapping_state WHERE mapping_id=?", mapping).Scan(&importedRevision)
+				if base == item.Hash && importedRevision == revision {
+					item.Choice = "keep_local"
+					item.Reason += "; identical supplied source and unchanged local page"
+				} else {
+					item.Conflict = "Existing Notion page: keep local, replace its captured body, or import a separate copy"
+				}
 			} else if er != sql.ErrNoRows {
 				return er
 			}
@@ -519,6 +558,9 @@ func finishNotionCapture(ctx context.Context, k *Kernel, e contracts.ServiceExec
 			}
 			for b := range item.Blocks {
 				rewriteImportBlock(item.Blocks[b].Data, remap)
+			}
+			if err := reconcileImportBlockIDs(ctx, tx, item); err != nil {
+				return err
 			}
 		}
 		for _, task := range s.Pending {

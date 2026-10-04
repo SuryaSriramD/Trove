@@ -66,6 +66,7 @@ type ImportItem struct {
 	Committed          bool                    `json:"committed"`
 	Blocks             []ImportBlock           `json:"blocks,omitempty"`
 	BlockParents       map[string]string       `json:"blockParents,omitempty"`
+	BlockSources       map[string]string       `json:"blockSources,omitempty"`
 	Columns            []ImportColumn          `json:"columns,omitempty"`
 	Cells              []string                `json:"cells,omitempty"`
 	CollectionID       string                  `json:"collectionId,omitempty"`

@@ -58,7 +58,6 @@ func parseImportHTML(source string, item *ImportItem, pages, assets map[string]s
 		item.Reason += "; HTML parser failed"
 		return []ImportBlock{fallbackImportBlock(item, "HTML source retained")}
 	}
-	blocks := []ImportBlock{}
 	omitted, unresolved := 0, 0
 	var spans func(*html.Node, []string, string, string, string) []any
 	spans = func(n *html.Node, marks []string, link, color, highlight string) []any {
@@ -169,83 +168,8 @@ func parseImportHTML(source string, item *ImportItem, pages, assets map[string]s
 		}
 		return out
 	}
-	var walk func(*html.Node)
-	walk = func(n *html.Node) {
-		if len(blocks) >= 10000 {
-			omitted++
-			return
-		}
-		if n.Type == html.ElementNode {
-			kind := ""
-			switch n.Data {
-			case "head", "script", "style", "iframe", "object", "embed", "template":
-				if n.Data != "head" {
-					omitted++
-				}
-				return
-			case "h1", "h2", "h3", "h4":
-				kind = "heading_" + n.Data[1:]
-			case "h5", "h6":
-				kind = "heading_4"
-				omitted++
-			case "p":
-				kind = "paragraph"
-			case "blockquote":
-				kind = "quote"
-			case "li":
-				kind = "bulleted_list_item"
-				if n.Parent != nil && n.Parent.Data == "ol" {
-					kind = "numbered_list_item"
-				}
-			case "pre":
-				blocks = append(blocks, ImportBlock{NewID(), "code", map[string]any{"source": inertHTMLText(n), "language": "text"}})
-				return
-			case "hr":
-				blocks = append(blocks, ImportBlock{NewID(), "divider", map[string]any{}})
-				return
-			case "img", "audio", "video":
-				target, asset, found := resolveImportLink(item.Locator, htmlImportAttr(n, "src"), pages, assets)
-				if found && asset {
-					kind := n.Data
-					if kind == "img" {
-						kind = "image"
-					}
-					blocks = append(blocks, ImportBlock{NewID(), kind, map[string]any{"fileId": target, "caption": richImport(htmlImportAttr(n, "alt"))}})
-				} else {
-					omitted++
-					if text := htmlImportAttr(n, "alt"); text != "" {
-						blocks = append(blocks, ImportBlock{NewID(), "paragraph", map[string]any{"richText": richImport(text)}})
-					}
-				}
-				return
-			case "table":
-				if data, ok := importHTMLTable(n, func(cell *html.Node) []any { return spans(cell, nil, "", "", "") }); ok {
-					blocks = append(blocks, ImportBlock{NewID(), "table", data})
-				} else {
-					blocks = append(blocks, fallbackImportBlock(item, strings.TrimSpace(inertHTMLText(n))))
-					omitted++
-				}
-				return
-			case "input", "button", "form", "canvas", "svg":
-				omitted++
-			}
-			if kind != "" {
-				content := spans(n, nil, "", "", "")
-				if len(content) > 0 {
-					blocks = append(blocks, ImportBlock{NewID(), kind, map[string]any{"richText": content}})
-				}
-				return
-			}
-		}
-		if n.Type == html.TextNode && strings.TrimSpace(n.Data) != "" {
-			blocks = append(blocks, ImportBlock{NewID(), "paragraph", map[string]any{"richText": richImport(n.Data)}})
-			return
-		}
-		for c := n.FirstChild; c != nil; c = c.NextSibling {
-			walk(c)
-		}
-	}
-	walk(root)
+	blocks, structuralOmissions := importHTMLTree(root, item, pages, assets, func(n *html.Node) []any { return spans(n, nil, "", "", "") })
+	omitted += structuralOmissions
 	if omitted > 0 || unresolved > 0 {
 		item.Outcome = "partial"
 		item.Reason += fmt.Sprintf("; %d active/unsupported constructs kept in source evidence, %d unresolved links", omitted, unresolved)

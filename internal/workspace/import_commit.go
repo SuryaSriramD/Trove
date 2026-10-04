@@ -179,6 +179,11 @@ func applyPortableImport(m *Mutation, c map[string]any) error {
 				}
 			}
 			if item.Choice == "duplicate" {
+				blockIDs := map[string]string{}
+				for _, block := range item.Blocks {
+					blockIDs[block.ID] = NewID()
+				}
+				remapImportBlockIDs(item, blockIDs)
 				old := item.PageID
 				item.PageID = NewID()
 				remap[old] = item.PageID
@@ -357,9 +362,25 @@ func commitImportItem(m *Mutation, p *ImportPlan, item *ImportItem) error {
 			ids = append(ids, id)
 		}
 		rows.Close()
-		for _, id := range ids {
+		wanted := map[string]bool{}
+		for _, block := range item.Blocks {
+			wanted[block.ID] = true
+		}
+		var parkingBase int64
+		if err = m.Tx.QueryRowContext(m.Context, "SELECT COALESCE(MAX(CAST(sort_key AS INTEGER)),0) FROM blocks WHERE page_id=?", item.PageID).Scan(&parkingBase); err != nil {
+			return err
+		}
+		for index, id := range ids {
 			if err = guardImport(m, "block", id); err != nil {
 				return err
+			}
+			// Park old ownership/order until the reviewed source graph is rebuilt.
+			// Explicit source identities survive replacement, including linked IDs.
+			if _, err = m.Exec("UPDATE blocks SET parent_block_id=NULL,sort_key=? WHERE id=?", fmt.Sprintf("%012d", parkingBase+int64(index)+1), id); err != nil {
+				return err
+			}
+			if wanted[id] {
+				continue
 			}
 			if err = m.Deleted("block", id); err != nil {
 				return err
@@ -382,8 +403,12 @@ func commitImportItem(m *Mutation, p *ImportPlan, item *ImportItem) error {
 		if transcripts > 0 {
 			return Fail("CONFLICT", "Meeting content cannot be replaced by an import; import a separate copy")
 		}
-		if _, err = m.Exec("DELETE FROM blocks WHERE page_id=?", item.PageID); err != nil {
-			return err
+		for _, id := range ids {
+			if !wanted[id] {
+				if _, err = m.Exec("DELETE FROM blocks WHERE id=?", id); err != nil {
+					return err
+				}
+			}
 		}
 		if _, err = m.Exec("UPDATE pages SET title=? WHERE id=?", item.Title, item.PageID); err != nil {
 			return err
@@ -394,7 +419,7 @@ func commitImportItem(m *Mutation, p *ImportPlan, item *ImportItem) error {
 			return err
 		}
 	}
-	provenance := map[string]any{"sourceSystem": importItemSourceSystem(p, item), "raw": map[string]any{"sourceNamespace": p.Namespace, "sourceLocator": item.Locator, "externalId": item.ExternalID, "rawFileId": item.RawFileID, "importRunId": p.ID, "supplied": item.Provenance}}
+	provenance := map[string]any{"sourceSystem": importItemSourceSystem(p, item), "raw": map[string]any{"sourceNamespace": p.Namespace, "sourceLocator": item.Locator, "externalId": item.ExternalID, "rawFileId": item.RawFileID, "importRunId": p.ID, "supplied": item.Provenance, "sourceBlockIdentities": item.BlockSources}}
 	if _, err := m.Exec("UPDATE pages SET provenance_json=? WHERE id=?", string(marshal(provenance)), item.PageID); err != nil {
 		return err
 	}
@@ -404,6 +429,25 @@ func commitImportItem(m *Mutation, p *ImportPlan, item *ImportItem) error {
 	for _, block := range item.Blocks {
 		if err := guardImport(m, "block", block.ID); err != nil {
 			return err
+		}
+		if item.Choice == "replace" && m.GuardRevision("block", block.ID) != "0" {
+			if err := pageCommand(m, map[string]any{"kind": "block.update", "blockId": block.ID, "type": block.Type, "schemaVersion": float64(1), "data": block.Data}); err != nil {
+				return err
+			}
+			parent := item.BlockParents[block.ID]
+			if parent != "" {
+				if err := m.Require("block", parent); err != nil {
+					return err
+				}
+			}
+			key, err := appendKey(m.Context, m.Tx, item.PageID, parent)
+			if err != nil {
+				return err
+			}
+			if _, err = m.Exec("UPDATE blocks SET parent_block_id=?,sort_key=? WHERE id=?", nullable(parent), key, block.ID); err != nil {
+				return err
+			}
+			continue
 		}
 		if err := pageCommand(m, map[string]any{"kind": "block.insert", "block": map[string]any{"blockId": block.ID, "pageId": item.PageID, "parentBlockId": nullable(item.BlockParents[block.ID]), "type": block.Type, "schemaVersion": float64(1), "data": block.Data}}); err != nil {
 			return err

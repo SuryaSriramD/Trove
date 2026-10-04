@@ -274,7 +274,7 @@ func (k *Kernel) parseImportPlan(ctx context.Context, p *ImportPlan) error {
 		case "document":
 			item.Blocks = k.parseImportDocument(ctx, item)
 		case "markdown":
-			item.Blocks = parseImportMarkdown(string(b), item.Locator, pages, assets, &item.Outcome, &item.Reason)
+			item.Blocks = parseImportMarkdownTree(string(b), item, pages, assets)
 		case "csv":
 			reader := csv.NewReader(strings.NewReader(strings.TrimPrefix(string(b), "\ufeff")))
 			reader.FieldsPerRecord = -1
@@ -383,6 +383,11 @@ func (k *Kernel) parseImportPlan(ctx context.Context, p *ImportPlan) error {
 	p.Items = append(p.Items, rows...)
 	k.restorePortableBlocks(p, manifest)
 	k.restorePortableDatabase(p, manifest)
+	for i := range p.Items {
+		if err := reconcileImportBlockIDs(ctx, k.db, &p.Items[i]); err != nil {
+			return err
+		}
+	}
 	sortImportItems(p.Items)
 	return nil
 }

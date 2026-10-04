@@ -33,7 +33,7 @@ func (k *Kernel) restorePortableBlocks(p *ImportPlan, manifest portableHierarchy
 		}
 	}
 	safe := map[string]bool{}
-	for _, kind := range []string{"paragraph", "heading_1", "heading_2", "heading_3", "heading_4", "quote", "bulleted_list_item", "numbered_list_item", "callout", "toggle", "divider", "code", "mermaid", "equation", "table", "image", "audio", "video", "pdf", "file", "bookmark", "embed", "columns", "synced_block", "breadcrumb", "table_of_contents", "page_mention", "date_mention", "tab_container", "unsupported_external"} {
+	for _, kind := range []string{"paragraph", "heading_1", "heading_2", "heading_3", "heading_4", "quote", "bulleted_list_item", "numbered_list_item", "callout", "toggle", "toggle_heading", "divider", "code", "mermaid", "equation", "table", "image", "audio", "video", "pdf", "file", "bookmark", "embed", "columns", "synced_block", "breadcrumb", "table_of_contents", "page_mention", "date_mention", "tab_container", "unsupported_external"} {
 		safe[kind] = true
 	}
 	for _, page := range manifest.Pages {
@@ -119,6 +119,10 @@ func (k *Kernel) restorePortableBlocks(p *ImportPlan, manifest portableHierarchy
 		}
 		item.Blocks = restored
 		item.BlockParents = parents
+		item.BlockSources = map[string]string{}
+		for _, b := range page.CanonicalBlocks {
+			item.BlockSources[blocks[string(b.Id)]] = "portable-block:" + string(b.Id)
+		}
 		item.Reason += "; validated canonical blocks restored with workspace ID remapping"
 	}
 }
