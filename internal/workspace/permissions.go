@@ -165,6 +165,8 @@ func (k *Kernel) authorizeEntity(ctx context.Context, q querier, e contracts.Ser
 		return Fail("SCOPE_DENIED", "File is outside the granted scope")
 	case "meeting":
 		query = "SELECT page_id FROM meetings WHERE id=?"
+	case "transcript_segment":
+		query = "SELECT m.page_id FROM transcript_segments s JOIN meetings m ON m.id=s.meeting_id WHERE s.id=?"
 	case "memory":
 		query = "SELECT page_id FROM memory_entries WHERE id=?"
 	default:

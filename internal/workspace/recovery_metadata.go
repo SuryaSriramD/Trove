@@ -255,6 +255,12 @@ func restoreRecoveryMeeting(m *Mutation, page string, snap recoverySnapshot) err
 		return err
 	}
 	for _, s := range snap.Segments {
+		// Recreate the already guarded identity before Touch rechecks its scope.
+		// prepareRecoverySegments verified historical ownership before deleting
+		// the current rows; the restored meeting determines authorization here.
+		if _, err := m.Exec("INSERT INTO transcript_segments VALUES(?,?,?,?,?,?,?,1)", s.Id, s.MeetingId, s.BlockId, s.StartMs, s.EndMs, s.Text, s.SpeakerLabel); err != nil {
+			return err
+		}
 		if err := m.Touch("transcript_segment", string(s.Id)); err != nil {
 			return err
 		}
@@ -265,9 +271,6 @@ func restoreRecoveryMeeting(m *Mutation, page string, snap recoverySnapshot) err
 		change.After = m.touched[guardKey("block", string(s.BlockId))].After
 		m.touched[key] = change
 		if _, err := m.Exec("DELETE FROM entity_tombstones WHERE entity_type='transcript_segment' AND entity_id=?", s.Id); err != nil {
-			return err
-		}
-		if _, err := m.Exec("INSERT INTO transcript_segments VALUES(?,?,?,?,?,?,?,1)", s.Id, s.MeetingId, s.BlockId, s.StartMs, s.EndMs, s.Text, s.SpeakerLabel); err != nil {
 			return err
 		}
 	}
