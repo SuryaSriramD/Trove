@@ -15,7 +15,7 @@ import katex from "katex";
 import mermaid from "mermaid";
 import { CodeBlock, ImageBlock } from "./TechnicalBlocks";
 import "katex/dist/katex.min.css";
-import "highlight.js/styles/github.css";
+import { PDFBlock } from "./PDFBlock";
 export const EditorContext = createContext<{
   workspace: WorkspaceSnapshot | null;
   toggleTask: (id: string) => void;
@@ -278,15 +278,7 @@ function AtomView(props: NodeViewProps) {
         ) : kind === "video" ? (
           <video controls src={fileURL(d.fileId)} />
         ) : kind === "pdf" ? (
-          <object
-            type="application/pdf"
-            data={fileURL(d.fileId)}
-            aria-label={file?.originalName ?? "PDF attachment"}
-          >
-            <a href={fileURL(d.fileId)} target="_blank" rel="noreferrer">
-              Open PDF
-            </a>
-          </object>
+          <PDFBlock fileId={d.fileId} title={file?.originalName??"PDF attachment"} previewPage={d.previewPage} readOnly={readOnly} onPageChange={previewPage=>update({previewPage})}/>
         ) : (
           <a
             className="file-card"

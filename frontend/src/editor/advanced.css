@@ -70,3 +70,11 @@
 
 [data-theme="dark"] [data-trove-color="red"] { color: #ffa1a1 !important; }
 [data-theme="dark"] [data-trove-highlight="red"] { background-color: #512a2a !important; }
+
+[data-theme="dark"] .syntax-token { color: var(--syntax-dark) !important; }
+.pdf-controls { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; margin-bottom: 8px; }
+.pdf-controls label { display: flex; align-items: center; gap: 4px; }
+.pdf-controls input { width: 70px; }
+.pdf-canvas-scroll { overflow: auto; max-height: 640px; background: #eee; padding: 8px; }
+.pdf-canvas-scroll canvas { display: block; margin: auto; background: white; }
+.pdf-page-text { white-space: pre-wrap; max-height: 240px; overflow: auto; }

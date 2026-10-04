@@ -2,6 +2,13 @@ import { test, expect, type Page, type Locator } from "@playwright/test";
 
 const id = (n: number) => `019a1234-5678-7000-8000-${String(n).padStart(12, "0")}`;
 const pageId = id(2);
+function pdfFixture() {
+ const first="BT /F1 18 Tf 30 140 Td (First offline PDF page) Tj ET",second="BT /F1 18 Tf 30 140 Td (Second offline PDF page) Tj ET";
+ const objects=["<< /Type /Catalog /Pages 2 0 R /OpenAction 8 0 R >>","<< /Type /Pages /Count 2 /Kids [3 0 R 5 0 R] >>","<< /Type /Page /Parent 2 0 R /MediaBox [0 0 300 200] /Resources << /Font << /F1 7 0 R >> >> /Contents 4 0 R >>",`<< /Length ${first.length} >>\nstream\n${first}\nendstream`,"<< /Type /Page /Parent 2 0 R /MediaBox [0 0 300 200] /Resources << /Font << /F1 7 0 R >> >> /Contents 6 0 R >>",`<< /Length ${second.length} >>\nstream\n${second}\nendstream`,"<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>","<< /S /JavaScript /JS (globalThis.pdfScriptExecuted=true) >>"];
+ let body="%PDF-1.7\n";const offsets=[0];objects.forEach((object,index)=>{offsets.push(Buffer.byteLength(body));body+=`${index+1} 0 obj\n${object}\nendobj\n`;});const xref=Buffer.byteLength(body);body+=`xref\n0 ${objects.length+1}\n0000000000 65535 f \n`+offsets.slice(1).map(offset=>`${String(offset).padStart(10,"0")} 00000 n \n`).join("")+`trailer\n<< /Size ${objects.length+1} /Root 1 0 R >>\nstartxref\n${xref}\n%%EOF`;
+ return Buffer.from(body);
+}
+
 const rich = [{ text: "Keep ", marks: ["bold"], color:"purple", highlight:"yellow" }, { text: "linked", link: "https://example.test/source" }, { text: " tail" }];
 const block = (n: number, type: string, data: unknown, parent: number | null = null) => ({
   id: id(n), pageId, parentBlockId: parent === null ? null : id(parent), sortKey: String(n).padStart(12, "0"), type, data, schemaVersion: 1, revision: "1",
@@ -23,6 +30,7 @@ const initial = {
     block(40,"paragraph",{richText:[{text:"Visible sibling"}]}),
     block(41,"code",{source:'/* Multi\ncomment */\nconst text = "<script>🌱";\n',language:"javascript",filename:"imported.js",wrap:false,lineNumbers:true}),
     block(42,"image",{fileId:id(91),caption:[{text:"Managed image"}],altText:"A retained image",width:320,alignment:"right"}),
+    block(43,"pdf",{fileId:id(92),caption:[{text:"Offline PDF"}],previewPage:1}),
   ],
   collections:[],properties:[],records:[],views:[],files:[],meetings:[],taskFacets:[],containers:[],containerCollections:[],transcriptSegments:[],projectScopes:[],memories:[],importMappings:[],
 };
@@ -73,6 +81,7 @@ test.beforeEach(async ({page}) => {
     }}}};
   },{initial});
   await page.route("**/files/019a1234-5678-7000-8000-000000000091", route=>route.fulfill({contentType:"image/png",body:Buffer.from("iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+a2ioAAAAASUVORK5CYII=","base64")}));
+  await page.route("**/files/019a1234-5678-7000-8000-000000000092", route=>route.fulfill({contentType:"application/pdf",body:pdfFixture()}));
   await page.goto(process.env.TROVE_TEST_URL??"http://127.0.0.1:4173");
   await page.getByRole("button",{name:/Editor integrity/}).first().click();
 });
@@ -183,8 +192,10 @@ test("code controls copy exact source bytes and persist filename, wrapping and l
  await context.grantPermissions(["clipboard-read","clipboard-write"]);
  const code=page.locator(`[data-block-id="${id(41)}"]`),source=initial.blocks.find(b=>b.id===id(41))!.data as any;
  await expect(code.locator(".code-line-number")).toHaveCount(4);
- await expect(code.locator(".code-line").first().locator(".hljs-comment")).toContainText("/* Multi");
- await expect(code.locator(".code-line").nth(1).locator(".hljs-comment")).toContainText("comment */");
+ await expect(code.locator(".technical-code")).toHaveAttribute("data-highlighter","shiki");
+ await expect(code.locator(".code-line").first().locator(".syntax-token")).toContainText("/* Multi");
+ await expect(code.locator(".code-line").nth(1).locator(".syntax-token")).toContainText("comment */");
+ expect(await code.locator(".code-line").first().locator(".syntax-token").first().evaluate(element=>element.getAttribute("style"))).toBeTruthy();
  await code.getByRole("button",{name:"Copy code",exact:true}).click();
  expect(await page.evaluate(()=>navigator.clipboard.readText())).toBe(source.source);
  await code.getByRole("textbox",{name:"Code filename",exact:true}).fill("retained.js");
@@ -232,4 +243,29 @@ test("known pasted styles become finite tokens while unknown CSS remains inert s
  expect(cell.richText.find((run:any)=>run.text.includes("Unknown color"))).not.toHaveProperty("color");
  expect(blocks.find((b:any)=>b.type==="unsupported_external").data.raw.html).toContain(html);
  await page.reload();await page.getByRole("button",{name:/Editor integrity/}).first().click();await expect(field.locator('[data-trove-color="red"]')).toContainText("Known color");
+});
+
+test("PDF.js renders managed pages offline, remembers the page and never executes PDF JavaScript",async({page})=>{
+ const pdf=page.locator(`[data-block-id="${id(43)}"]`);await pdf.scrollIntoViewIfNeeded();
+ await expect(pdf.getByRole("status")).toHaveCount(0);await expect(pdf.getByRole("alert")).toHaveCount(0);
+ await pdf.getByText("PDF page text",{exact:true}).click();await expect(pdf.locator(".pdf-page-text")).toContainText("First offline PDF page");
+ expect(await pdf.locator("canvas").evaluate(element=>{const canvas=element as HTMLCanvasElement;return canvas.getContext("2d")!.getImageData(0,0,canvas.width,canvas.height).data.some((value,index)=>index%4!==3&&value<100);})).toBe(true);
+ await pdf.getByRole("button",{name:"Next PDF page",exact:true}).click();await expect(pdf.locator(".pdf-page-text")).toContainText("Second offline PDF page");
+ await pdf.getByRole("combobox",{name:"PDF zoom",exact:true}).selectOption("1.5");await expect(pdf.locator("canvas")).toHaveCSS("width","450px");
+ await expect(pdf.getByRole("link",{name:"Open original PDF",exact:true})).toHaveAttribute("href",`/files/${id(92)}`);
+ expect(await page.evaluate(()=>(window as any).pdfScriptExecuted)).toBeUndefined();
+ expect(await page.evaluate(()=>performance.getEntriesByType("resource").map(entry=>entry.name).filter(url=>/^https?:/.test(url)&&!url.startsWith(location.origin)))).toEqual([]);
+ await save(page);await page.reload();await page.getByRole("button",{name:/Editor integrity/}).first().click();await pdf.scrollIntoViewIfNeeded();
+ await expect(pdf.getByRole("spinbutton",{name:"PDF page",exact:true})).toHaveValue("2");await pdf.getByText("PDF page text",{exact:true}).click();await expect(pdf.locator(".pdf-page-text")).toContainText("Second offline PDF page");
+});
+
+
+test("a damaged PDF reports a bounded preview error and retains the managed original",async({page})=>{
+ await page.route("**/files/019a1234-5678-7000-8000-000000000092",route=>route.fulfill({contentType:"application/pdf",body:"%PDF-1.7\ncorrupted fixture"}));
+ await page.reload();await page.getByRole("button",{name:/Editor integrity/}).first().click();
+ const pdf=page.locator(`[data-block-id="${id(43)}"]`);await pdf.scrollIntoViewIfNeeded();
+ await expect(pdf.getByRole("alert")).toContainText("PDF preview is unavailable");
+ await expect(pdf.getByRole("status")).toHaveCount(0);
+ await expect(pdf.getByRole("link",{name:"Open original PDF",exact:true})).toHaveAttribute("href",`/files/${id(92)}`);
+ expect(await page.evaluate(()=>(window as any).integrityState().blocks.find((block:any)=>block.id.endsWith("000000000043")).data.fileId)).toBe(id(92));
 });

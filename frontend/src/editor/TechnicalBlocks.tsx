@@ -1,16 +1,24 @@
-import { useState } from "react";
+import { useEffect, useState, type CSSProperties } from "react";
 import type { Editor } from "@tiptap/core";
 import type { D } from "../api";
 import { fileURL } from "../api";
 import { InlineRichEditor } from "./InlineRichEditor";
-import { highlightedLines } from "./codePresentation";
+import type { SyntaxToken } from "./codePresentation";
 
 export function CodeBlock({ data, update, owner, readOnly, onError }: {
   data: D.block_code_v1; update: (patch: Partial<D.block_code_v1>) => void; owner: Editor; readOnly: boolean; onError: (error: unknown) => void;
 }) {
   const [copied,setCopied] = useState(false);
-  const lines = highlightedLines(data.source, data.language);
-  return <div className="technical-code">
+  const [syntax,setSyntax]=useState<{source:string;language:string;lines:SyntaxToken[][]}|null>(null);
+  const [syntaxError,setSyntaxError]=useState(false);
+  useEffect(()=>{
+    let cancelled=false;setSyntaxError(false);
+    void import("./codePresentation").then(module=>module.highlightedLines(data.source,data.language)).then(lines=>{if(!cancelled)setSyntax({source:data.source,language:data.language,lines});}).catch(()=>{if(!cancelled)setSyntaxError(true);});
+    return ()=>{cancelled=true;};
+  },[data.source,data.language]);
+  const highlighted=syntax?.source===data.source&&syntax.language===data.language;
+  const lines:SyntaxToken[][]=highlighted?syntax.lines:data.source.split(/\r?\n/).map(content=>[{content}]);
+  return <div className="technical-code" data-highlighter={highlighted&&!syntaxError&&lines.some(line=>line.some(token=>token.color))?"shiki":"plain"}>
     <div className="code-heading"><label>Language<input aria-label="Code language" disabled={readOnly} value={data.language} onChange={event=>update({language:event.target.value})}/></label>
       <label>Filename<input aria-label="Code filename" disabled={readOnly} placeholder="Optional filename" value={data.filename??""} onChange={event=>update({filename:event.target.value})}/></label>
       <button type="button" aria-label="Copy code" onClick={()=>void navigator.clipboard.writeText(data.source).then(()=>setCopied(true)).catch(onError)}>{copied?"Copied":"Copy code"}</button>
@@ -18,8 +26,9 @@ export function CodeBlock({ data, update, owner, readOnly, onError }: {
       <label><input type="checkbox" aria-label="Code line numbers" disabled={readOnly} checked={data.lineNumbers??false} onChange={event=>update({lineNumbers:event.target.checked})}/>Line numbers</label>
     </div>
     <pre className={`code-preview ${data.wrap?"code-wrap":"code-nowrap"}`} aria-label={data.filename?`Code ${data.filename}`:"Code preview"}>
-      {lines.map((html,index)=><span className="code-line" key={index}>{data.lineNumbers&&<span className="code-line-number" aria-hidden="true">{index+1}</span>}<code dangerouslySetInnerHTML={{__html:html||"&#8203;"}}/>{index<lines.length-1?"\n":null}</span>)}
+      {lines.map((tokens,index)=><span className="code-line" key={index}>{data.lineNumbers&&<span className="code-line-number" aria-hidden="true">{index+1}</span>}<code>{tokens.map((token,i)=><span key={i} className="syntax-token" style={{color:token.color,"--syntax-dark":token.darkColor,fontStyle:(token.fontStyle??0)&1?"italic":undefined,fontWeight:(token.fontStyle??0)&2?"bold":undefined,textDecoration:(token.fontStyle??0)&4?"underline":undefined} as CSSProperties}>{token.content}</span>)}{tokens.every(token=>!token.content)?"\u200b":null}</code>{index<lines.length-1?"\n":null}</span>)}
     </pre>
+    {syntaxError&&<small>Plain text preview; source remains unchanged.</small>}
     <details><summary>Edit source</summary><textarea aria-label="Code source" spellCheck={false} disabled={readOnly} value={data.source} onChange={event=>{setCopied(false);update({source:event.target.value});}}/></details>
     {(data.caption?.length??0)>0&&<InlineRichEditor label="Code caption" value={data.caption??[]} onChange={caption=>update({caption})} owner={owner} readOnly={readOnly}/>}
   </div>;
