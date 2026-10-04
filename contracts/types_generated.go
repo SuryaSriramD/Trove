@@ -2033,6 +2033,59 @@ if matchesVariant(fields,[]string{"ok","result"},map[string]string{"ok":"true"},
 if matchesVariant(fields,[]string{"ok","error"},map[string]string{"ok":"false"},map[string][]string{},[]string{"ok","error"}) { var result ServicePrepareFileResponseVariant2; if err := json.Unmarshal(data,&result); err != nil {return err}; v.Value=result; return nil }
 return fmt.Errorf("unknown or incomplete ServicePrepareFileResponse variant")
 }
+type ServiceProviderAuthIdentity struct {
+RegistrationId DomainId `json:"registrationId"`
+Subject string `json:"subject"`
+ClientId string `json:"clientId"`
+Email string `json:"email"`
+Name string `json:"name"`
+}
+type ServiceProviderAuthRegistration struct {
+Id DomainId `json:"id"`
+Identity ServiceProviderAuthIdentity `json:"identity"`
+State string `json:"state"`
+PlanAuthorized bool `json:"planAuthorized"`
+ExpiresAt string `json:"expiresAt"`
+}
+type ServiceProviderAuthAttempt struct {
+Id DomainId `json:"id"`
+RegistrationId string `json:"registrationId"`
+State string `json:"state"`
+Message string `json:"message"`
+ExpiresAt string `json:"expiresAt"`
+}
+type ServiceProviderAuthListRequest struct {
+ContractVersion int64 `json:"contractVersion"`
+RequestId DomainId `json:"requestId"`
+WorkspaceId DomainId `json:"workspaceId"`
+}
+type ServiceProviderAuthBeginRequest struct {
+ContractVersion int64 `json:"contractVersion"`
+RequestId DomainId `json:"requestId"`
+WorkspaceId DomainId `json:"workspaceId"`
+RegistrationId *DomainId `json:"registrationId,omitempty"`
+}
+type ServiceProviderAuthAttemptRequest struct {
+ContractVersion int64 `json:"contractVersion"`
+RequestId DomainId `json:"requestId"`
+WorkspaceId DomainId `json:"workspaceId"`
+AttemptId DomainId `json:"attemptId"`
+}
+type ServiceProviderAuthSignOutRequest struct {
+ContractVersion int64 `json:"contractVersion"`
+RequestId DomainId `json:"requestId"`
+WorkspaceId DomainId `json:"workspaceId"`
+RegistrationId DomainId `json:"registrationId"`
+}
+type ServiceProviderAuthListResult struct {
+Available bool `json:"available"`
+Reason string `json:"reason"`
+Registrations []ServiceProviderAuthRegistration `json:"registrations"`
+}
+type ServiceProviderAuthSignOutResult struct {
+RemoteRevoked bool `json:"remoteRevoked"`
+LocalCleared bool `json:"localCleared"`
+}
 type JobsJobKind string
 type JobsJobState string
 type JobsProgress struct {
