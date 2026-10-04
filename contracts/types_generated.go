@@ -3038,6 +3038,74 @@ type ServicePersonalReviewControlRequest struct {
 	WorkspaceId     DomainId `json:"workspaceId"`
 	RunId           DomainId `json:"runId"`
 }
+type ServiceRemoteStatusRequest struct {
+	ContractVersion int64    `json:"contractVersion"`
+	RequestId       DomainId `json:"requestId"`
+	WorkspaceId     DomainId `json:"workspaceId"`
+}
+type ServiceRemoteEnableRequest struct {
+	ContractVersion   int64    `json:"contractVersion"`
+	RequestId         DomainId `json:"requestId"`
+	WorkspaceId       DomainId `json:"workspaceId"`
+	CertificateHandle DomainId `json:"certificateHandle"`
+	PublicOrigin      string   `json:"publicOrigin"`
+	BindAddress       string   `json:"bindAddress"`
+	AllowedOrigins    []string `json:"allowedOrigins"`
+}
+type ServiceRemoteConnectionRequest struct {
+	ContractVersion int64      `json:"contractVersion"`
+	RequestId       DomainId   `json:"requestId"`
+	WorkspaceId     DomainId   `json:"workspaceId"`
+	PageIds         []DomainId `json:"pageIds"`
+	Tools           []string   `json:"tools"`
+}
+type ServiceRemoteDisconnectRequest struct {
+	ContractVersion int64    `json:"contractVersion"`
+	RequestId       DomainId `json:"requestId"`
+	WorkspaceId     DomainId `json:"workspaceId"`
+	ConnectionId    DomainId `json:"connectionId"`
+}
+type ServiceRemoteDecisionRequest struct {
+	ContractVersion int64      `json:"contractVersion"`
+	RequestId       DomainId   `json:"requestId"`
+	WorkspaceId     DomainId   `json:"workspaceId"`
+	AuthorizationId string     `json:"authorizationId"`
+	ReviewHash      DomainHash `json:"reviewHash"`
+}
+type ServiceRemoteCertificate struct {
+	Handle    DomainId `json:"handle"`
+	DnsNames  []string `json:"dnsNames"`
+	ExpiresAt string   `json:"expiresAt"`
+}
+type ServiceRemoteConnection struct {
+	Id       DomainId   `json:"id"`
+	Url      string     `json:"url"`
+	PageIds  []DomainId `json:"pageIds"`
+	Tools    []string   `json:"tools"`
+	ClientId string     `json:"clientId"`
+	State    string     `json:"state"`
+}
+type ServiceRemoteAuthorization struct {
+	Id             string     `json:"id"`
+	ConnectionId   DomainId   `json:"connectionId"`
+	ClientId       string     `json:"clientId"`
+	ClientName     string     `json:"clientName"`
+	MetadataUrl    string     `json:"metadataUrl"`
+	RedirectUri    string     `json:"redirectUri"`
+	ComparisonCode string     `json:"comparisonCode"`
+	ReviewHash     DomainHash `json:"reviewHash"`
+	State          string     `json:"state"`
+	ExpiresAt      string     `json:"expiresAt"`
+}
+type ServiceRemoteStatus struct {
+	Enabled              bool                         `json:"enabled"`
+	Origin               string                       `json:"origin"`
+	BindAddress          string                       `json:"bindAddress"`
+	CertificateExpiresAt string                       `json:"certificateExpiresAt"`
+	Connections          []ServiceRemoteConnection    `json:"connections"`
+	Authorizations       []ServiceRemoteAuthorization `json:"authorizations"`
+	Message              string                       `json:"message"`
+}
 type JobsJobKind string
 type JobsJobState string
 type JobsProgress struct {

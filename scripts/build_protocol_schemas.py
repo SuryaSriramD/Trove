@@ -233,6 +233,19 @@ defs.update({
  'PersonalReviewGeneratedDraft':obj({'claims':{**arr(obj({'category':enum('summary','risks','decisions','next_steps'),'text':{'type':'string','minLength':1,'maxLength':2000},'quote':{'type':'string','maxLength':4000}}),12),'minItems':1},'actions':arr({'oneOf':[R('PlanUpdatePage'),R('PlanCreateTask'),R('PlanUpdateTask')]},8)}),
  'PersonalReviewControlRequest':obj({**header,'runId':D('Id')}),
 })
+# Remote HTTPS control is owner-only host IPC. Certificates and tokens never cross it.
+remote_opaque={'type':'string','pattern':'^[A-Za-z0-9_-]{43}$'}
+defs.update({
+'RemoteStatusRequest':obj(header),
+'RemoteEnableRequest':obj({**header,'certificateHandle':D('Id'),'publicOrigin':{'type':'string','minLength':10,'maxLength':2048},'bindAddress':{'type':'string','minLength':3,'maxLength':256},'allowedOrigins':arr({'type':'string','maxLength':2048},8)}),
+'RemoteConnectionRequest':obj({**header,'pageIds':{**arr(D('Id'),100),'minItems':1},'tools':{**arr(enum('readPage','search.query','queryRecords','resolveCitation','allocateIds','proposeChanges','proposeActions'),16),'minItems':1}}),
+'RemoteDisconnectRequest':obj({**header,'connectionId':D('Id')}),
+'RemoteDecisionRequest':obj({**header,'authorizationId':remote_opaque,'reviewHash':D('Hash')}),
+'RemoteCertificate':obj({'handle':D('Id'),'dnsNames':arr(S,1000),'expiresAt':{'type':'string','format':'date-time'}}),
+'RemoteConnection':obj({'id':D('Id'),'url':S,'pageIds':arr(D('Id'),100),'tools':arr(S,16),'clientId':S,'state':enum('awaiting_client','authorized','disconnected')}),
+'RemoteAuthorization':obj({'id':remote_opaque,'connectionId':D('Id'),'clientId':S,'clientName':S,'metadataUrl':S,'redirectUri':S,'comparisonCode':S,'reviewHash':D('Hash'),'state':enum('pending','approved','issued','denied'),'expiresAt':{'type':'string','format':'date-time'}}),
+'RemoteStatus':obj({'enabled':B,'origin':S,'bindAddress':S,'certificateExpiresAt':{'type':'string','format':'date-time'},'connections':arr(R('RemoteConnection'),32),'authorizations':arr(R('RemoteAuthorization'),32),'message':S}),
+})
 save('service',schema('service',defs,'BatchRequest'))
 # Jobs and private worker framing. Domain payloads are referenced instead of re-created.
 j={

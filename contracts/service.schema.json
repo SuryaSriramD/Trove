@@ -6364,6 +6364,342 @@
         "runId"
       ],
       "additionalProperties": false
+    },
+    "RemoteStatusRequest": {
+      "type": "object",
+      "properties": {
+        "contractVersion": {
+          "const": 1
+        },
+        "requestId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "workspaceId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        }
+      },
+      "required": [
+        "contractVersion",
+        "requestId",
+        "workspaceId"
+      ],
+      "additionalProperties": false
+    },
+    "RemoteEnableRequest": {
+      "type": "object",
+      "properties": {
+        "contractVersion": {
+          "const": 1
+        },
+        "requestId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "workspaceId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "certificateHandle": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "publicOrigin": {
+          "type": "string",
+          "minLength": 10,
+          "maxLength": 2048
+        },
+        "bindAddress": {
+          "type": "string",
+          "minLength": 3,
+          "maxLength": 256
+        },
+        "allowedOrigins": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "maxLength": 2048
+          },
+          "maxItems": 8
+        }
+      },
+      "required": [
+        "contractVersion",
+        "requestId",
+        "workspaceId",
+        "certificateHandle",
+        "publicOrigin",
+        "bindAddress",
+        "allowedOrigins"
+      ],
+      "additionalProperties": false
+    },
+    "RemoteConnectionRequest": {
+      "type": "object",
+      "properties": {
+        "contractVersion": {
+          "const": 1
+        },
+        "requestId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "workspaceId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "pageIds": {
+          "type": "array",
+          "items": {
+            "$ref": "domain.schema.json#/$defs/Id"
+          },
+          "maxItems": 100,
+          "minItems": 1
+        },
+        "tools": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": [
+              "readPage",
+              "search.query",
+              "queryRecords",
+              "resolveCitation",
+              "allocateIds",
+              "proposeChanges",
+              "proposeActions"
+            ]
+          },
+          "maxItems": 16,
+          "minItems": 1
+        }
+      },
+      "required": [
+        "contractVersion",
+        "requestId",
+        "workspaceId",
+        "pageIds",
+        "tools"
+      ],
+      "additionalProperties": false
+    },
+    "RemoteDisconnectRequest": {
+      "type": "object",
+      "properties": {
+        "contractVersion": {
+          "const": 1
+        },
+        "requestId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "workspaceId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "connectionId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        }
+      },
+      "required": [
+        "contractVersion",
+        "requestId",
+        "workspaceId",
+        "connectionId"
+      ],
+      "additionalProperties": false
+    },
+    "RemoteDecisionRequest": {
+      "type": "object",
+      "properties": {
+        "contractVersion": {
+          "const": 1
+        },
+        "requestId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "workspaceId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "authorizationId": {
+          "type": "string",
+          "pattern": "^[A-Za-z0-9_-]{43}$"
+        },
+        "reviewHash": {
+          "$ref": "domain.schema.json#/$defs/Hash"
+        }
+      },
+      "required": [
+        "contractVersion",
+        "requestId",
+        "workspaceId",
+        "authorizationId",
+        "reviewHash"
+      ],
+      "additionalProperties": false
+    },
+    "RemoteCertificate": {
+      "type": "object",
+      "properties": {
+        "handle": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "dnsNames": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "maxItems": 1000
+        },
+        "expiresAt": {
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      "required": [
+        "handle",
+        "dnsNames",
+        "expiresAt"
+      ],
+      "additionalProperties": false
+    },
+    "RemoteConnection": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "url": {
+          "type": "string"
+        },
+        "pageIds": {
+          "type": "array",
+          "items": {
+            "$ref": "domain.schema.json#/$defs/Id"
+          },
+          "maxItems": 100
+        },
+        "tools": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "maxItems": 16
+        },
+        "clientId": {
+          "type": "string"
+        },
+        "state": {
+          "type": "string",
+          "enum": [
+            "awaiting_client",
+            "authorized",
+            "disconnected"
+          ]
+        }
+      },
+      "required": [
+        "id",
+        "url",
+        "pageIds",
+        "tools",
+        "clientId",
+        "state"
+      ],
+      "additionalProperties": false
+    },
+    "RemoteAuthorization": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "pattern": "^[A-Za-z0-9_-]{43}$"
+        },
+        "connectionId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "clientId": {
+          "type": "string"
+        },
+        "clientName": {
+          "type": "string"
+        },
+        "metadataUrl": {
+          "type": "string"
+        },
+        "redirectUri": {
+          "type": "string"
+        },
+        "comparisonCode": {
+          "type": "string"
+        },
+        "reviewHash": {
+          "$ref": "domain.schema.json#/$defs/Hash"
+        },
+        "state": {
+          "type": "string",
+          "enum": [
+            "pending",
+            "approved",
+            "issued",
+            "denied"
+          ]
+        },
+        "expiresAt": {
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      "required": [
+        "id",
+        "connectionId",
+        "clientId",
+        "clientName",
+        "metadataUrl",
+        "redirectUri",
+        "comparisonCode",
+        "reviewHash",
+        "state",
+        "expiresAt"
+      ],
+      "additionalProperties": false
+    },
+    "RemoteStatus": {
+      "type": "object",
+      "properties": {
+        "enabled": {
+          "type": "boolean"
+        },
+        "origin": {
+          "type": "string"
+        },
+        "bindAddress": {
+          "type": "string"
+        },
+        "certificateExpiresAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "connections": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/RemoteConnection"
+          },
+          "maxItems": 32
+        },
+        "authorizations": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/RemoteAuthorization"
+          },
+          "maxItems": 32
+        },
+        "message": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "enabled",
+        "origin",
+        "bindAddress",
+        "certificateExpiresAt",
+        "connections",
+        "authorizations",
+        "message"
+      ],
+      "additionalProperties": false
     }
   }
 }

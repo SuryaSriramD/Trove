@@ -3,8 +3,10 @@ package workspace
 import (
 	"context"
 	"encoding/json"
+	mcpauth "github.com/modelcontextprotocol/go-sdk/auth"
 	"github.com/modelcontextprotocol/go-sdk/mcp"
 	"net/http"
+	"net/url"
 	"strings"
 	"time"
 	"trove.local/phase0/contracts"
@@ -13,9 +15,10 @@ import (
 // A paired connection owns its SDK server and transports. Sessions from one
 // connection can never select another connection's tool handlers.
 type providerMCP struct {
-	server          *mcp.Server
-	legacy, current *mcp.StreamableHTTPHandler
-	calls           chan struct{}
+	server                      *mcp.Server
+	legacy, current             *mcp.StreamableHTTPHandler
+	remoteLegacy, remoteCurrent *mcp.StreamableHTTPHandler
+	calls                       chan struct{}
 }
 
 func (p *providerMCP) close() {
@@ -70,6 +73,8 @@ func (b *ProviderBridge) pairedMCP(c *providerConnection) *providerMCP {
 	}
 	p.legacy = mcp.NewStreamableHTTPHandler(get, &mcp.StreamableHTTPOptions{JSONResponse: true, SessionTimeout: 5 * time.Minute, MaxRequestBodyBytes: 1 << 20})
 	p.current = mcp.NewStreamableHTTPHandler(get, &mcp.StreamableHTTPOptions{Stateless: true, JSONResponse: true, MaxRequestBodyBytes: 1 << 20, PropagateRequestCancellation: true})
+	p.remoteLegacy = mcp.NewStreamableHTTPHandler(get, &mcp.StreamableHTTPOptions{JSONResponse: true, SessionTimeout: 5 * time.Minute, MaxRequestBodyBytes: 1 << 20, DisableLocalhostProtection: true})
+	p.remoteCurrent = mcp.NewStreamableHTTPHandler(get, &mcp.StreamableHTTPOptions{Stateless: true, JSONResponse: true, MaxRequestBodyBytes: 1 << 20, PropagateRequestCancellation: true, DisableLocalhostProtection: true})
 	live.mcp = p
 	return p
 }
@@ -79,10 +84,42 @@ func mcpToolError(message string) *mcp.CallToolResult {
 
 // MCPHandler delegates protocol negotiation, validation, sessions and cancellation
 // to the pinned official SDK. The shell alone chooses loopback/TLS listeners.
-func (b *ProviderBridge) MCPHandler() http.Handler {
+func (b *ProviderBridge) MCPHandler() http.Handler { return b.mcpHandler("", nil) }
+
+// RemoteMCPHandler is only for the owning shell's HTTPS OAuth transport. Its
+// caller authenticates OAuth and substitutes the in-process bridge credential.
+// Exact TLS Host and Origin checks remain here as a second transport boundary;
+// this does not weaken the default loopback handler's SDK protections.
+func (b *ProviderBridge) RemoteMCPHandler(origin string, allowedOrigins []string) http.Handler {
+	validOrigin := func(raw string) bool {
+		u, err := url.Parse(raw)
+		return err == nil && u.Scheme == "https" && u.Host != "" && u.Path == "" && u.RawQuery == "" && u.Fragment == "" && u.User == nil && len(raw) <= 2048
+	}
+	valid := validOrigin(origin) && len(allowedOrigins) <= 8
+	for _, allowed := range allowedOrigins {
+		valid = valid && validOrigin(allowed)
+	}
+	if !valid {
+		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) { http.Error(w, "Invalid remote origin", 403) })
+	}
+	return b.mcpHandler(origin, append([]string{}, allowedOrigins...))
+}
+func (b *ProviderBridge) mcpHandler(remoteOrigin string, allowedOrigins []string) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Cache-Control", "no-store")
-		if r.Header.Get("Origin") != "" {
+		allowed := r.Header.Get("Origin") == ""
+		if remoteOrigin != "" {
+			u, _ := url.Parse(remoteOrigin)
+			if r.TLS == nil || r.Host != u.Host || mcpauth.TokenInfoFromContext(r.Context()) == nil {
+				http.Error(w, "Invalid HTTPS host", 403)
+				return
+			}
+			allowed = allowed || r.Header.Get("Origin") == remoteOrigin
+			for _, origin := range allowedOrigins {
+				allowed = allowed || r.Header.Get("Origin") == origin
+			}
+		}
+		if !allowed {
 			http.Error(w, "Browser origins are not permitted", http.StatusForbidden)
 			return
 		}
@@ -99,12 +136,27 @@ func (b *ProviderBridge) MCPHandler() http.Handler {
 			http.Error(w, "Unauthorized", http.StatusUnauthorized)
 			return
 		}
+		if remoteOrigin != "" {
+			identity := mcpauth.TokenInfoFromContext(r.Context())
+			if identity == nil || !strings.HasSuffix(identity.UserID, "|"+c.info.ID) {
+				http.Error(w, "Invalid remote identity", 403)
+				return
+			}
+		}
 		if !validateMCPHTTPIDs(w, r) {
 			return
 		}
 		p := b.pairedMCP(c)
 		if p == nil {
 			http.Error(w, "Unauthorized", http.StatusUnauthorized)
+			return
+		}
+		if remoteOrigin != "" {
+			if r.Header.Get("MCP-Protocol-Version") >= "2026-07-28" {
+				p.remoteCurrent.ServeHTTP(w, r)
+			} else {
+				p.remoteLegacy.ServeHTTP(w, r)
+			}
 			return
 		}
 		if r.Header.Get("MCP-Protocol-Version") >= "2026-07-28" {
