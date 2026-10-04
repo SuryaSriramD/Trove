@@ -675,7 +675,8 @@ test("insert real code, Mermaid and KaTeX rendering", async ({ page }) => {
   await expect(page.getByRole("status")).toHaveText("Saved");
   await expect(page.locator(".block-mermaid svg")).toBeVisible();
   await expect(page.locator(".katex")).toBeVisible();
-  await expect(page.locator(".code-preview .hljs-comment")).toBeVisible();
+  await expect(page.locator(".technical-code")).toHaveAttribute("data-highlighter", "shiki");
+  await expect(page.locator(".code-preview .syntax-token").filter({hasText:"// Your code here"})).toBeVisible();
 });
 test("Markdown shortcuts, duplication, keyboard focus and screen-reader structure", async ({
   page,
@@ -1046,10 +1047,12 @@ test("multi-file clipboard and file drop serialize uploads and preserve media ca
   const editor = page.getByRole("textbox", { name: "Page body" });
   for (const type of ["image", "pdf", "audio", "video", "file"])
     await expect(editor.locator(`.block-${type}`)).toBeVisible();
-  await editor
-    .locator(".block-image")
-    .getByRole("textbox", { name: "Attachment caption", exact: true })
-    .fill("A visual reference");
+  const imageBlock = editor.locator(".block-image");
+  const caption = imageBlock.getByRole("textbox", {name:"Attachment caption", exact:true});
+  await caption.fill("A visual reference");
+  await caption.press("ControlOrMeta+a");
+  await imageBlock.getByRole("button", {name:"Attachment caption bold", exact:true}).click();
+  await expect(caption.locator("strong")).toHaveText("A visual reference");
   await save(page);
   const imageID = await page.evaluate(
     () =>
@@ -1072,13 +1075,13 @@ test("multi-file clipboard and file drop serialize uploads and preserve media ca
     editor
       .locator(".block-image")
       .getByRole("textbox", { name: "Attachment caption", exact: true }),
-  ).toHaveValue("A visual reference");
+  ).toHaveText("A visual reference");
+  await expect(caption.locator("strong")).toHaveText("A visual reference");
   await expect(editor.locator("audio")).toHaveAttribute("controls", "");
   await expect(editor.locator("video")).toHaveAttribute("controls", "");
-  await expect(editor.locator("object")).toHaveAttribute(
-    "type",
-    "application/pdf",
-  );
+  await expect(editor.locator(".block-pdf .pdf-viewer")).toBeVisible();
+  const pdfID = await page.evaluate(() => (window as any).fixtureState().files.find((file:any) => file.mediaType === "application/pdf").id);
+  await expect(editor.locator(".block-pdf").getByRole("link", {name:"Open original PDF",exact:true})).toHaveAttribute("href", `/files/${pdfID}`);
   await expect(editor.locator(".file-card")).toContainText("notes.txt");
   await expect(page.locator(".page-cover img")).toHaveAttribute(
     "src",
