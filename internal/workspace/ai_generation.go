@@ -28,7 +28,21 @@ func GeneratePreparedAI(ctx context.Context, prepared AIPrepared, generate AIGen
 		return AICompletion{Text: text}, err
 	}
 	if len(prepared.Run.Sources) == 0 || !aiRequiresCitations(prepared.Run.Request.Mode) {
-		text, err := generate(ctx, prepared.System, prepared.Prompt, prepared.OutputTokens, "", onToken)
+		mode := prepared.Run.Request.Mode
+		grammar := ""
+		database := mode == "database" || mode == "schema"
+		if database {
+			grammar = aiDatabaseDraftGrammar()
+		}
+		text, err := generate(ctx, prepared.System, prepared.Prompt, prepared.OutputTokens, grammar, onToken)
+		// Code is literal source: even a complete fence can belong to Markdown
+		// being edited, so it must never be stripped from a code-mode draft.
+		if err == nil && (database || mode == "mermaid") {
+			text = unwrapAIWholeCodeFence(text)
+		}
+		if err == nil && database {
+			err = validateAIDatabaseDraftShape(text)
+		}
 		return AICompletion{Text: text}, err
 	}
 	var raw strings.Builder
@@ -312,4 +326,28 @@ func aiQuoteSupportsNumbers(claim, quote string) bool {
 		}
 	}
 	return true
+}
+
+// For database JSON and Mermaid only, a complete enclosing Markdown fence is
+// presentation. Remove only that wrapper, retaining every body byte.
+// Mixed prose, nested/multiple fences and incomplete streams remain unchanged.
+var aiOpeningFence = regexp.MustCompile("^```(?:[A-Za-z][A-Za-z0-9_+.-]*)?[ \t]*\r?$")
+
+func unwrapAIWholeCodeFence(text string) string {
+	trimmed := strings.TrimSpace(text)
+	first := strings.IndexByte(trimmed, '\n')
+	last := strings.LastIndexByte(trimmed, '\n')
+	if first < 0 || last <= first || !aiOpeningFence.MatchString(trimmed[:first]) || strings.TrimSpace(trimmed[last+1:]) != "```" {
+		return text
+	}
+	body := trimmed[first+1 : last+1]
+	if strings.TrimSpace(body) == "" {
+		return text
+	}
+	for _, line := range strings.Split(body, "\n") {
+		if strings.HasPrefix(strings.TrimSpace(line), "```") {
+			return text
+		}
+	}
+	return body
 }

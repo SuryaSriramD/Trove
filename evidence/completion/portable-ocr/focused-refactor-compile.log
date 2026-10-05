@@ -1,0 +1,15 @@
+# trove.local/phase0/internal/native
+internal/native/p2_ocr_portable_test.go:91:36: missing ',' before newline in composite literal
+FAIL	trove.local/phase0/internal/native [setup failed]
+=== RUN   TestP2OCRQualityScopeSearchAndResourceBounds
+--- PASS: TestP2OCRQualityScopeSearchAndResourceBounds (0.24s)
+=== RUN   TestOCRPortableProvenanceAndRevocationBeforePublish
+--- PASS: TestOCRPortableProvenanceAndRevocationBeforePublish (0.05s)
+=== RUN   TestOCRProviderChangeAndCancellationDoNotPublish
+--- PASS: TestOCRProviderChangeAndCancellationDoNotPublish (0.05s)
+PASS
+ok  	trove.local/phase0/internal/workspace	1.906s
+testing: warning: no tests to run
+PASS
+ok  	trove.local/phase0/internal/workers	1.524s [no tests to run]
+FAIL

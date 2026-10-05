@@ -35,7 +35,7 @@ Manifest v2 binds platform and architecture. Helper names remain logical; Window
 
 The normative hello schema adds amd64 alongside arm64; Go/TypeScript consumers are regenerated together. The catalog marks model data portable, while executable architecture stays strict. Model/projector IDs, revisions, hashes and sizes are unchanged. Old arm64 receipts still work on Mac; other hosts must use correctly declared portable packs.
 
-Windows/Linux bundles omit Swift helpers. The portable microphone package adds a pinned miniaudio worker with native target build recipes; device execution remains unqualified. See [microphone-portability.md](microphone-portability.md). OCR and native document/PDF helpers remain unavailable in this worker package. The follow-on audio package adds a pinned restricted static FFmpeg decoder on all three targets; see [audio-decoding.md](audio-decoding.md). Its Mac format fixtures pass; Windows/Linux native compilation and execution remain unqualified. Missing or mismatched capture helpers and unavailable local devices fail closed. OCR remains separately unavailable.
+Windows/Linux bundles omit Swift helpers. The portable microphone package adds a pinned miniaudio worker with native target build recipes; device execution remains unqualified. See [microphone-portability.md](microphone-portability.md). The portable OCR package adds pinned English Tesseract/Leptonica helpers; native target execution remains unqualified (see [portable-ocr.md](portable-ocr.md)). Native document/PDF helpers remain unavailable. The follow-on audio package adds a pinned restricted static FFmpeg decoder on all three targets; see [audio-decoding.md](audio-decoding.md). Its Mac format fixtures pass; Windows/Linux native compilation and execution remain unqualified. Missing or mismatched capture helpers and unavailable local devices fail closed.
 
 ## Build procedure
 
@@ -48,7 +48,7 @@ Actual builds require the target OS/architecture. They reject mismatched hosts a
 
     python3 scripts/bootstrap.py --fetch --components native --cache <native-cache>
 
-Native source archives are platform neutral. The committed Go bootstrap archive remains Darwin arm64 only; install and verify the pinned Go version independently on Windows/Linux.
+Native source archives are platform neutral. Target-specific official Go archive pins and bootstrap/doctor checks are now supplied by the [desktop packaging package](platform-desktop-packaging.md); actual Windows/Linux tool execution remains unqualified.
 
 | Target | Required build environment | Runtime dependencies |
 |---|---|---|

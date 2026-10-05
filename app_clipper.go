@@ -7,6 +7,7 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
+	"runtime"
 	"strings"
 	"sync"
 	"time"
@@ -132,5 +133,9 @@ func (a *App) ShowClipperExtension() error {
 	}
 	ctx, cancel := context.WithTimeout(a.ctx, 5*time.Second)
 	defer cancel()
-	return exec.CommandContext(ctx, "/usr/bin/open", folder).Run()
+	command, args, err := desktopFolderCommand(runtime.GOOS, folder)
+	if err != nil {
+		return err
+	}
+	return exec.CommandContext(ctx, command, args...).Run()
 }

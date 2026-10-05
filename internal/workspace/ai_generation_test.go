@@ -122,3 +122,78 @@ func TestAIExactQuoteGrammarRejectsTotalByteOverflow(t *testing.T) {
 		t.Fatal("large escaped quote grammar was admitted")
 	}
 }
+
+func TestAIStructuredDraftUnwrapsOnlyOneCompleteFence(t *testing.T) {
+	for _, tc := range []struct{ mode, raw, expected string }{
+		{"code_comment", "```go\n// Retain this comment.\nfunc F() int { return 7 }\n```", "```go\n// Retain this comment.\nfunc F() int { return 7 }\n```"},
+		{"database", "```json\n{\"title\":\"A\",\"properties\":[],\"view\":\"table\"}\n```", "{\"title\":\"A\",\"properties\":[],\"view\":\"table\"}\n"},
+		{"mermaid", "```mermaid\r\nflowchart LR\r\n A-->B\r\n```\r\n", "flowchart LR\r\n A-->B\r\n"},
+		{"code_refactor", "func F() int { return 7 }\n", "func F() int { return 7 }\n"},
+	} {
+		p := AIPrepared{Run: AIRun{Request: AIRequest{Mode: tc.mode}}}
+		result, err := GeneratePreparedAI(context.Background(), p, func(context.Context, string, string, int, string, func(string)) (string, error) { return tc.raw, nil }, nil)
+		if err != nil || result.Text != tc.expected {
+			t.Fatalf("%s body changed: %q, %v", tc.mode, result.Text, err)
+		}
+	}
+	for _, raw := range []string{"Before\n```go\nreturn 7\n```", "```go\nreturn 7\n```\nAfter", "```go\nreturn 7", "```go\nreturn 7\n```\n```go\nreturn 8\n```", "```go\n\n```", "````go\nreturn 7\n````"} {
+		if result := unwrapAIWholeCodeFence(raw); result != raw {
+			t.Fatalf("ambiguous content was discarded: %q => %q", raw, result)
+		}
+	}
+	raw := "```go\nreturn 7\n```"
+	for _, tc := range []struct {
+		mode    string
+		failure error
+	}{{"rewrite", nil}, {"code_explain", nil}, {"code_comment", context.Canceled}} {
+		p := AIPrepared{Run: AIRun{Request: AIRequest{Mode: tc.mode}}}
+		result, err := GeneratePreparedAI(context.Background(), p, func(context.Context, string, string, int, string, func(string)) (string, error) {
+			return raw, tc.failure
+		}, nil)
+		if result.Text != raw || err != tc.failure {
+			t.Fatalf("nonliteral or failed draft was changed: %q, %v", result.Text, err)
+		}
+	}
+}
+
+func TestAICodeDraftPreservesActualMarkdownFenceThroughReview(t *testing.T) {
+	for _, mode := range []string{"code_refactor", "code_comment"} {
+		t.Run(mode, func(t *testing.T) {
+			k, e := testKernel(t)
+			ctx := context.Background()
+			page, block := createPage(t, k, e, "Markdown source"), NewID()
+			selected := "```go\nfunc F() int { return 7 }\n```"
+			replacement := "```go\n// F returns the configured constant.\nfunc F() int { return 7 }\n```"
+			original := "Before selection\n" + selected + "\nAfter selection\n"
+			testOK(t, dbBatch(t, k, e, []any{map[string]any{"kind": "block.insert", "block": map[string]any{"blockId": block, "pageId": page, "type": "code", "schemaVersion": 1, "data": map[string]any{"source": original, "language": "markdown"}}}}, "page", page, "block", block))
+			prepared, err := k.PrepareAIWithBudget(ctx, e, AIRequest{Mode: mode, Prompt: "Retain the Markdown snippet and add a useful function comment.", PageID: page, BlockID: block, Selection: selected}, wordBudget())
+			if err != nil {
+				t.Fatal(err)
+			}
+			var streamed strings.Builder
+			completion, err := GeneratePreparedAI(ctx, prepared, func(_ context.Context, _, _ string, _ int, grammar string, stream func(string)) (string, error) {
+				if grammar != "" {
+					t.Fatal("code source was forced into a structured grammar")
+				}
+				for _, piece := range []string{replacement[:4], replacement[4:]} {
+					stream(piece)
+				}
+				return replacement, nil
+			}, func(piece string) { streamed.WriteString(piece) })
+			if err != nil || completion.Text != replacement || streamed.String() != replacement {
+				t.Fatalf("literal streamed/final bytes changed: %q / %q, %v", streamed.String(), completion.Text, err)
+			}
+			run, err := k.FinishAI(ctx, e, prepared.Run.ID, completion.Text, "completed", "")
+			if err != nil || run.Text != replacement {
+				t.Fatal(run, err)
+			}
+			proposal, err := prepareAIAction(ctx, k, e, map[string]any{"runId": run.ID, "kind": "replace_code"})
+			if err != nil {
+				t.Fatal(err)
+			}
+			if got := proposal.(AIProposal).After; got != "Before selection\n"+replacement+"\nAfter selection\n" {
+				t.Fatalf("review discarded source fence or unselected bytes: %q", got)
+			}
+		})
+	}
+}

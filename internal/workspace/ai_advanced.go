@@ -13,14 +13,16 @@ import (
 	"trove.local/phase0/contracts"
 )
 
+const aiDatabaseDraftInstructions = `Return only one JSON object, without Markdown fences or commentary: {"title":"Name","properties":[{"name":"Example","type":"text","config":{}}],"view":"table"}. Do not include a title property; the service creates it. Every property must include name, type and config. Canonical simple types are text, number, checkbox, date, url, email and phone. Use checkbox, never boolean. Number config is {"format":"decimal"}; the other simple types use {}. Do not invent config keys. Supported views are table, list and gallery. Maximum 32 properties. This is a reviewable draft, never an applied change.`
+
 // Structured drafts are data only. Neither validation nor approval executes code.
 var advancedAIInstructions = map[string]string{
-	"database":        `Generate only JSON: {"title":"Name","properties":[{"name":"Name","type":"text","config":{}}],"view":"table"}. Do not include a title property (the service creates it). Supported view: table, list or gallery. Use canonical property configs; number config is {"format":"decimal"}. Maximum 32 properties.`,
-	"schema":          `Suggest a schema as JSON {"title":"Name","properties":[{"name":"Name","type":"text","config":{}}],"view":"table"}. It is a reviewable draft, not an applied change.`,
+	"database":        aiDatabaseDraftInstructions,
+	"schema":          aiDatabaseDraftInstructions,
 	"mermaid":         `Return only Mermaid source, with no Markdown fence. Use flowchart, sequenceDiagram, stateDiagram-v2, classDiagram, erDiagram, gantt, pie, mindmap or timeline. Do not use links, click actions, HTML or init directives.`,
 	"code_explain":    "Explain the selected code and its assumptions. Never execute it. Distinguish observed behavior from suggestions.",
 	"code_refactor":   "Return only replacement code, without Markdown fences. Preserve intended behavior. Never execute code. The user will review a source diff.",
-	"code_comment":    "Return only replacement code with useful comments added, without Markdown fences. Preserve behavior. Never execute code.",
+	"code_comment":    "Your output is inserted directly into a raw source-code editor. Return only the complete replacement source with useful comments added. Do not add a Markdown code fence or any explanation around the replacement. Preserve all source syntax, including any fence bytes that are part of the source itself. Preserve behavior. Never execute code.",
 	"organize":        "Suggest page organization, tags and links using only the approved source context. Each suggestion must explain why and remain unapplied. Never claim a change was made.",
 	"workspace_agent": actionPlanInstructions,
 }
@@ -124,6 +126,9 @@ func prepareAdvancedAI(ctx context.Context, k *Kernel, e contracts.ServiceExecut
 			p.Before = str(data["source"])
 			after := p.Body
 			if p.Kind == "replace_code" {
+				if p.Body == run.Text && aiProgrammingLanguage(str(data["language"])) && unwrapAIWholeCodeFence(p.Body) != p.Body && unwrapAIWholeCodeFence(p.Before) == p.Before {
+					return Fail("INVALID_REQUEST", "The generated draft includes a surrounding Markdown fence. Edit or regenerate the draft before reviewing the code replacement; its source bytes were preserved.")
+				}
 				if selected := run.Request.Selection; selected != "" {
 					if strings.Count(p.Before, selected) != 1 {
 						return Fail("CONFLICT", "Selected code must occur exactly once in the current source block")
@@ -458,4 +463,15 @@ func aiSuggestions(ctx context.Context, k *Kernel, e contracts.ServiceExecutionC
 	}
 	result["omissions"] = omissions
 	return result, nil
+}
+
+// This is a draft-quality check, not a language parser or an execution policy.
+// Unknown/plain/Markdown source is left literal. A user-edited draft is reviewed
+// as supplied; this never strips or executes program text.
+func aiProgrammingLanguage(language string) bool {
+	switch strings.ToLower(strings.TrimSpace(language)) {
+	case "go", "golang", "python", "py", "javascript", "js", "typescript", "ts", "jsx", "tsx", "rust", "rs", "c", "cpp", "c++", "java", "ruby", "rb", "swift", "kotlin", "sql", "json", "yaml", "toml", "bash", "sh", "css", "html", "xml":
+		return true
+	}
+	return false
 }

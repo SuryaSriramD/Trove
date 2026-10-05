@@ -1,0 +1,24 @@
+test_archive_cannot_escape_cache (test_devtools.DeveloperToolsTests.test_archive_cannot_escape_cache) ... ok
+test_archive_symlink_is_rejected (test_devtools.DeveloperToolsTests.test_archive_symlink_is_rejected) ... ok
+test_config_survives_runtime_environment_sanitization (test_devtools.DeveloperToolsTests.test_config_survives_runtime_environment_sanitization) ... ok
+test_desktop_passes_selected_cache_and_python_to_native_children (test_devtools.DeveloperToolsTests.test_desktop_passes_selected_cache_and_python_to_native_children) ... ok
+test_download_hash_failure_preserves_existing_archive (test_devtools.DeveloperToolsTests.test_download_hash_failure_preserves_existing_archive) ... ok
+test_existing_sources_are_never_overwritten_by_setup (test_devtools.DeveloperToolsTests.test_existing_sources_are_never_overwritten_by_setup) ... ok
+test_explicit_cache_overrides_environment (test_devtools.DeveloperToolsTests.test_explicit_cache_overrides_environment) ... ok
+test_explicit_go_cache_overrides_are_preserved (test_devtools.DeveloperToolsTests.test_explicit_go_cache_overrides_are_preserved) ... ok
+test_incomplete_cached_go_is_rejected_instead_of_falling_back (test_devtools.DeveloperToolsTests.test_incomplete_cached_go_is_rejected_instead_of_falling_back) ... ok
+test_invalid_release_identity_fails_before_build_or_filesystem_changes (test_devtools.DeveloperToolsTests.test_invalid_release_identity_fails_before_build_or_filesystem_changes) ... ok
+test_missing_go_reports_bootstrap_action (test_devtools.DeveloperToolsTests.test_missing_go_reports_bootstrap_action) ... ok
+test_models_follow_custom_cache_and_explicit_model_override (test_devtools.DeveloperToolsTests.test_models_follow_custom_cache_and_explicit_model_override) ... ok
+test_offline_bootstrap_never_fetches_missing_archive (test_devtools.DeveloperToolsTests.test_offline_bootstrap_never_fetches_missing_archive) ... ok
+test_online_setup_does_not_force_network_policy (test_devtools.DeveloperToolsTests.test_online_setup_does_not_force_network_policy) ... ok
+test_persistent_platform_defaults (test_devtools.DeveloperToolsTests.test_persistent_platform_defaults) ... ok
+test_print_environment_path_has_no_filesystem_side_effects (test_devtools.DeveloperToolsTests.test_print_environment_path_has_no_filesystem_side_effects) ... ok
+test_seed_archive_must_match_pin (test_devtools.DeveloperToolsTests.test_seed_archive_must_match_pin) ... ok
+test_worktrees_have_distinct_native_build_caches (test_devtools.DeveloperToolsTests.test_worktrees_have_distinct_native_build_caches) ... ok
+test_wrong_go_version_is_rejected (test_devtools.DeveloperToolsTests.test_wrong_go_version_is_rejected) ... ok
+
+----------------------------------------------------------------------
+Ran 19 tests in 0.020s
+
+OK

@@ -1,0 +1,130 @@
+CMake Deprecation Warning at CMakeLists.txt:11 (cmake_minimum_required):
+  Compatibility with CMake < 3.10 will be removed from a future version of
+  CMake.
+
+  Update the VERSION argument <min> value.  Or, use the <min>...<max> syntax
+  to tell CMake that the project requires at least <min> but has been updated
+  to work with policies introduced by <max> or earlier.
+
+
+CMAKE_BUILD_TYPE = Release
+-- 
+-- General configuration for Leptonica 
+-- --------------------------------------------------------
+-- Build type: Release
+-- Compiler: AppleClang
+-- C compiler options:
+   
+-- Linker options: 
+  
+-- Install directory: /private/tmp/trove-ocr-source/build-darwin-arm64/install
+-- 
+-- Build with sw [SW_BUILD]: OFF
+-- Build utility programs [BUILD_PROG]: OFF
+-- Used ZLIB library: 
+-- Used PNG library:  
+-- Used JPEG library: 
+-- Used OpenJPEG library: 
+-- Used TIFF library: 
+-- Used GIF library:  
+-- Used WebP library: 
+-- --------------------------------------------------------
+-- 
+-- Configuring done (0.0s)
+-- Generating done (0.0s)
+-- Build files have been written to: /private/tmp/trove-ocr-source/build-darwin-arm64/lept
+ninja: no work to do.
+-- Install configuration: "Release"
+-- Up-to-date: /private/tmp/trove-ocr-source/build-darwin-arm64/install/lib/pkgconfig/lept_Release.pc
+-- Up-to-date: /private/tmp/trove-ocr-source/build-darwin-arm64/install/lib/cmake/leptonica/LeptonicaConfig.cmake
+-- Up-to-date: /private/tmp/trove-ocr-source/build-darwin-arm64/install/lib/cmake/leptonica/LeptonicaConfig-version.cmake
+-- Installing: /private/tmp/trove-ocr-source/build-darwin-arm64/install/lib/libleptonica.a
+-- Up-to-date: /private/tmp/trove-ocr-source/build-darwin-arm64/install/lib/cmake/leptonica/LeptonicaTargets.cmake
+-- Up-to-date: /private/tmp/trove-ocr-source/build-darwin-arm64/install/lib/cmake/leptonica/LeptonicaTargets-release.cmake
+-- Up-to-date: /private/tmp/trove-ocr-source/build-darwin-arm64/install/include/leptonica/allheaders.h
+-- Up-to-date: /private/tmp/trove-ocr-source/build-darwin-arm64/install/include/leptonica/alltypes.h
+-- Up-to-date: /private/tmp/trove-ocr-source/build-darwin-arm64/install/include/leptonica/array.h
+-- Up-to-date: /private/tmp/trove-ocr-source/build-darwin-arm64/install/include/leptonica/array_internal.h
+-- Up-to-date: /private/tmp/trove-ocr-source/build-darwin-arm64/install/include/leptonica/arrayaccess.h
+-- Up-to-date: /private/tmp/trove-ocr-source/build-darwin-arm64/install/include/leptonica/bbuffer.h
+-- Up-to-date: /private/tmp/trove-ocr-source/build-darwin-arm64/install/include/leptonica/bilateral.h
+-- Up-to-date: /private/tmp/trove-ocr-source/build-darwin-arm64/install/include/leptonica/bmf.h
+-- Up-to-date: /private/tmp/trove-ocr-source/build-darwin-arm64/install/include/leptonica/bmfdata.h
+-- Up-to-date: /private/tmp/trove-ocr-source/build-darwin-arm64/install/include/leptonica/bmp.h
+-- Up-to-date: /private/tmp/trove-ocr-source/build-darwin-arm64/install/include/leptonica/ccbord.h
+-- Up-to-date: /private/tmp/trove-ocr-source/build-darwin-arm64/install/include/leptonica/ccbord_internal.h
+-- Up-to-date: /private/tmp/trove-ocr-source/build-darwin-arm64/install/include/leptonica/colorfill.h
+-- Up-to-date: /private/tmp/trove-ocr-source/build-darwin-arm64/install/include/leptonica/dewarp.h
+-- Up-to-date: /private/tmp/trove-ocr-source/build-darwin-arm64/install/include/leptonica/environ.h
+-- Up-to-date: /private/tmp/trove-ocr-source/build-darwin-arm64/install/include/leptonica/gplot.h
+-- Up-to-date: /private/tmp/trove-ocr-source/build-darwin-arm64/install/include/leptonica/hashmap.h
+-- Up-to-date: /private/tmp/trove-ocr-source/build-darwin-arm64/install/include/leptonica/heap.h
+-- Up-to-date: /private/tmp/trove-ocr-source/build-darwin-arm64/install/include/leptonica/imageio.h
+-- Up-to-date: /private/tmp/trove-ocr-source/build-darwin-arm64/install/include/leptonica/jbclass.h
+-- Up-to-date: /private/tmp/trove-ocr-source/build-darwin-arm64/install/include/leptonica/leptwin.h
+-- Up-to-date: /private/tmp/trove-ocr-source/build-darwin-arm64/install/include/leptonica/list.h
+-- Up-to-date: /private/tmp/trove-ocr-source/build-darwin-arm64/install/include/leptonica/morph.h
+-- Up-to-date: /private/tmp/trove-ocr-source/build-darwin-arm64/install/include/leptonica/pix.h
+-- Up-to-date: /private/tmp/trove-ocr-source/build-darwin-arm64/install/include/leptonica/pix_internal.h
+-- Up-to-date: /private/tmp/trove-ocr-source/build-darwin-arm64/install/include/leptonica/ptra.h
+-- Up-to-date: /private/tmp/trove-ocr-source/build-darwin-arm64/install/include/leptonica/queue.h
+-- Up-to-date: /private/tmp/trove-ocr-source/build-darwin-arm64/install/include/leptonica/rbtree.h
+-- Up-to-date: /private/tmp/trove-ocr-source/build-darwin-arm64/install/include/leptonica/readbarcode.h
+-- Up-to-date: /private/tmp/trove-ocr-source/build-darwin-arm64/install/include/leptonica/recog.h
+-- Up-to-date: /private/tmp/trove-ocr-source/build-darwin-arm64/install/include/leptonica/regutils.h
+-- Up-to-date: /private/tmp/trove-ocr-source/build-darwin-arm64/install/include/leptonica/stack.h
+-- Up-to-date: /private/tmp/trove-ocr-source/build-darwin-arm64/install/include/leptonica/stringcode.h
+-- Up-to-date: /private/tmp/trove-ocr-source/build-darwin-arm64/install/include/leptonica/sudoku.h
+-- Up-to-date: /private/tmp/trove-ocr-source/build-darwin-arm64/install/include/leptonica/watershed.h
+-- Up-to-date: /private/tmp/trove-ocr-source/build-darwin-arm64/install/include/leptonica/endianness.h
+-- Configuring tesseract version 5.5.1...
+-- IPO / LTO supported
+-- CMAKE_SYSTEM_PROCESSOR=<arm64>
+-- LTO build is not supported on arm/RBPi.
+-- Found leptonica version: 1.85.0
+Leptonica was build without TIFF support! Disabling TIFF support...
+-- TIFF support disabled.
+-- LibArchive support disabled.
+-- CURL support disabled.
+ScrollView debugging disabled.
+-- 
+-- General configuration for Tesseract 5.5.1
+-- --------------------------------------------------------
+-- Build type: Release 64 bits
+-- Compiler: AppleClang
+-- Compiler version: 21.0.0.21000334
+-- Used standard: C++20
+-- CXX compiler options:  -O3 -DNDEBUG -Wno-unused-command-line-argument
+-- Compile definitions = CMAKE_BUILD;HAVE_CONFIG_H
+-- Linker options:  
+-- Install directory: /private/tmp/trove-ocr-source/build-darwin-arm64/install
+-- HAVE_AVX: FALSE
+-- HAVE_AVX2: FALSE
+-- HAVE_AVX512F: FALSE
+-- HAVE_FMA: FALSE
+-- HAVE_SSE4_1: FALSE
+-- MARCH_NATIVE_OPT: OFF
+-- HAVE_NEON: TRUE
+-- Link-time optimization: FALSE
+-- --------------------------------------------------------
+-- Build with sw [SW_BUILD]: OFF
+-- Build with openmp support [OPENMP_BUILD]: OFF
+-- Build with libarchive support [HAVE_LIBARCHIVE]: OFF
+-- Build with libcurl support [HAVE_LIBCURL]: OFF
+-- Enable float for LSTM [FAST_FLOAT]: ON
+-- Enable optimization for host CPU (could break HW compatibility) [ENABLE_NATIVE]: OFF
+-- Disable disable graphics (ScrollView) [GRAPHICS_DISABLED]: ON
+-- Disable the legacy OCR engine [DISABLED_LEGACY_ENGINE]: ON
+-- Build training tools [BUILD_TRAINING_TOOLS]: OFF
+-- Build tests [BUILD_TESTS]: OFF
+-- Use system ICU Library [USE_SYSTEM_ICU]: OFF
+-- Install tesseract configs [INSTALL_CONFIGS]: OFF
+-- --------------------------------------------------------
+-- 
+-- Configuring done (0.8s)
+-- Generating done (0.0s)
+-- Build files have been written to: /private/tmp/trove-ocr-source/build-darwin-arm64/tess
+ninja: no work to do.
+-- Install configuration: "Release"
+/private/tmp/trove-portable-ocr-reviewed/ocr-worker: replacing existing signature
+/private/tmp/trove-portable-ocr-reviewed/ocr-worker

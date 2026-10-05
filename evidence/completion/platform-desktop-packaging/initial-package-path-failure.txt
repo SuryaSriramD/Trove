@@ -1,0 +1,20 @@
+test_actual_cross_host_build_refuses_before_mutation (test_desktop_package.DesktopPackageTests) ... ok
+test_copy_detects_changed_bytes_before_publication (test_desktop_package.DesktopPackageTests) ... ok
+test_explicit_target_and_all_required_helper_hashes (test_desktop_package.DesktopPackageTests) ... ok
+test_fixture_and_foreign_platform_refused (test_desktop_package.DesktopPackageTests) ... ok
+test_missing_decoder_and_runtime_drift_refused (test_desktop_package.DesktopPackageTests) ... ok
+test_path_escape_reserved_names_and_checksum_injection (test_desktop_package.DesktopPackageTests) ... test_plan_is_explicitly_unqualified_and_has_no_output_side_effect (test_desktop_package.DesktopPackageTests) ... ok
+test_symlinks_and_case_collisions_refused (test_desktop_package.DesktopPackageTests) ... ok
+
+======================================================================
+FAIL: test_path_escape_reserved_names_and_checksum_injection (test_desktop_package.DesktopPackageTests) (path='.')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/suryasriramduvvuri/.codex/worktrees/completion-desktop-platforms/Trove/scripts/test_desktop_package.py", line 49, in test_path_escape_reserved_names_and_checksum_injection
+    with self.subTest(path=path),self.assertRaises(ValueError):d.safe_relative(path)
+AssertionError: ValueError not raised
+
+----------------------------------------------------------------------
+Ran 8 tests in 0.222s
+
+FAILED (failures=1)

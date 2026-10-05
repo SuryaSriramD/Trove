@@ -1,0 +1,45 @@
+{
+  "target": "linux-amd64",
+  "hostRequired": "Ubuntu 24.04 LTS x64",
+  "prerequisites": {
+    "os": "Ubuntu 24.04 LTS x64",
+    "pkgConfig": {
+      "webkit2gtk-4.1": "2.52.6"
+    },
+    "packages": {
+      "libwebkit2gtk-4.1-dev": "2.52.6-0ubuntu0.24.04.1",
+      "libwebkit2gtk-4.1-0": "2.52.6-0ubuntu0.24.04.1",
+      "libjavascriptcoregtk-4.1-dev": "2.52.6-0ubuntu0.24.04.1",
+      "libjavascriptcoregtk-4.1-0": "2.52.6-0ubuntu0.24.04.1"
+    },
+    "additionalBuildPackages": [
+      "build-essential",
+      "pkg-config",
+      "libgtk-3-dev",
+      "libsoup-3.0-dev"
+    ],
+    "runtime": [
+      "xdg-utils",
+      "desktop-file-utils",
+      "session D-Bus",
+      "Secret Service credential store",
+      "GTK 3",
+      "WebKitGTK 4.1",
+      "libpulse0 (local PulseAudio/PipeWire socket for microphone capture)"
+    ],
+    "source": "https://packages.ubuntu.com/noble-updates/libwebkit2gtk-4.1-dev",
+    "verifiedPublisherMetadataAt": "2026-10-05",
+    "qualification": "Publisher versions pinned; no target build or runtime test yet. Update this lock and rerun the matrix when accepting security updates."
+  },
+  "inputs": [
+    "pinned Go and offline module cache",
+    "pinned Node and installed locked frontend dependencies",
+    "verified native target bundle",
+    "third-party notices"
+  ],
+  "layout": "bin/Trove[.exe], Resources/native, Resources/browser-clipper, Resources/web",
+  "networkAcquisition": false,
+  "platformQualified": false,
+  "signing": "Separate target-specific release gate",
+  "sourceOnly": true
+}

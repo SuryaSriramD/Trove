@@ -102,7 +102,7 @@ func (a *App) providerDispatch(method string, raw json.RawMessage) string {
 				_ = h.bridge.Disconnect(ctx, connection.ID)
 			}
 			exe, _ := os.Executable()
-			result = map[string]any{"connection": connection, "url": url, "relayPath": filepath.Join(filepath.Dir(exe), "trove-mcp")}
+			result = map[string]any{"connection": connection, "url": url, "relayPath": filepath.Join(filepath.Dir(exe), desktopHelperFilename("trove-mcp"))}
 		}
 	case "providers.disconnect":
 		h.stopMatchingManaged(func(run workspace.ManagedRun) bool { return run.ConnectionID == r.ConnectionID })
