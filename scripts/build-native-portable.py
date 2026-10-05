@@ -154,7 +154,8 @@ def main():
         '--cache', str(cache), '--output', str(output)], check=True)
     subprocess.run([sys.executable, str(ROOT / 'scripts/build-ocr-portable.py'), '--target', target,
         '--cache', str(cache / 'ocr'), '--output', str(output)], check=True)
-    subprocess.run([sys.executable, str(ROOT / "scripts/build-document-portable.py"), "--target", target, "--cache", str(cache), "--output", str(output)], check=True)
+    if spec["os"] == "windows":
+        subprocess.run([sys.executable, str(ROOT / "scripts/build-document-portable.py"), "--target", target, "--cache", str(cache), "--output", str(output)], check=True)
     microphone = json.loads((output / 'microphone-worker.json').read_text())
     if microphone['testOnly'] or not microphone['deviceBackendCompiled']:
         raise RuntimeError('A synthetic fixture cannot enter a production native bundle.')
@@ -165,8 +166,8 @@ def main():
     shutil.copyfile(sources['whisper'] / 'samples/jfk.wav', fixtures / 'jfk.wav')
     manifest = {'schemaVersion': 2, 'platform': spec['os'], 'architecture': spec['arch'], 'helpers': helpers,
         'minimumOS': spec['minimumOS'], 'baselineLockSHA256': file_digest(ROOT / 'baseline/baseline.lock.json'),
-        'capabilities': ['generate', 'tokenize', 'embed', 'transcribe', 'image_generate', 'audio_decode', 'record', 'ocr_english', 'document_pdf'],
-        'unavailable': ['system audio capture', 'screenshot capture'],
+        'capabilities': ['generate', 'tokenize', 'embed', 'transcribe', 'image_generate', 'audio_decode', 'record', 'ocr_english'] + (['document_pdf'] if spec['os'] == 'windows' else []),
+        'unavailable': ['system audio capture', 'screenshot capture'] + (['PDF text extraction/export: whole-process containment unavailable'] if spec['os'] == 'linux' else []),
         'executionQualification': 'Not established by build. Run model, protocol, cancellation and packaged desktop checks on this target.'}
     (output / 'manifest.json').write_text(json.dumps(manifest, indent=2) + '\n')
     (output / 'build-provenance.json').write_text(json.dumps({'recordedAt': datetime.now(timezone.utc).isoformat(),

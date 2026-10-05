@@ -6,6 +6,7 @@ import (
 	"database/sql"
 	"encoding/hex"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"image"
 	_ "image/gif"
@@ -48,6 +49,9 @@ func (k *Kernel) ExportPDF(ctx context.Context, e contracts.ServiceExecutionCont
 	}
 	portable, findErr := native.FindDocumentHelper(ctx)
 	if findErr != nil {
+		if errors.Is(findErr, native.ErrDocumentUnavailable) {
+			return result, Fail("WORKER_FAILED", findErr.Error())
+		}
 		return result, Fail("INTEGRITY_ERROR", "Document helper validation failed: "+findErr.Error())
 	}
 	if portable != nil {

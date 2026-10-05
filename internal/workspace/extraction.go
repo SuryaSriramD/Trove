@@ -332,6 +332,9 @@ func extractPDF(ctx context.Context, f *os.File) (out DocumentExtraction, result
 	defer cancel()
 	portable, err := native.FindDocumentHelper(ctx)
 	if err != nil {
+		if errors.Is(err, native.ErrDocumentUnavailable) {
+			return out, Fail("WORKER_FAILED", err.Error())
+		}
 		return out, Fail("INTEGRITY_ERROR", "Document helper validation failed: "+err.Error())
 	}
 	if portable != nil {

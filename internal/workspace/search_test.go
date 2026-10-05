@@ -5,8 +5,10 @@ import (
 	"bytes"
 	"context"
 	"fmt"
+	"io"
 	"os"
 	"path/filepath"
+	"runtime"
 	"strings"
 	"testing"
 	"trove.local/phase0/contracts"
@@ -276,6 +278,20 @@ func TestDocumentPDFTextLayerAndIntegrity(t *testing.T) {
 	f.WriteString(pdf.String())
 	f.Seek(0, 0)
 	result, err := ExtractDocument(context.Background(), f, "fixture.pdf", "application/pdf")
+	if runtime.GOOS == "linux" {
+		if err == nil || !strings.Contains(err.Error(), "whole-process containment") {
+			t.Fatalf("Linux PDF was not explicitly unavailable: %v", err)
+		}
+		offset, seekErr := f.Seek(0, io.SeekCurrent)
+		if seekErr != nil || offset != 0 {
+			t.Fatal("unavailable PDF processing consumed user input", offset, seekErr)
+		}
+		retained, readErr := os.ReadFile(f.Name())
+		if readErr != nil || string(retained) != pdf.String() {
+			t.Fatal("original PDF was changed", readErr)
+		}
+		return
+	}
 	if err != nil {
 		t.Fatal(err)
 	}

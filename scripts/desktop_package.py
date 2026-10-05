@@ -122,7 +122,9 @@ def validate_native(root, target, lock):
         if ocr.get('schemaVersion')!=1 or ocr.get('name')!='ocr-worker' or ocr.get('os')!=target.split('-')[0] or ocr.get('architecture')!='amd64' or ocr.get('runtime')!=pin['runtime'] or ocr.get('testOnly') is not False or ocr.get('sha256')!=digest(helper) or helper.stat().st_size>128<<20 or not binary_target(helper,target) or (target=='linux-amd64' and not helper.stat().st_mode&0o111):raise ValueError('OCR production helper identity/target differs')
         if ocr.get('modelSha256')!=pin['model']['sha256'] or model.stat().st_size>32<<20 or digest(model)!=pin['model']['sha256']:raise ValueError('OCR model identity differs')
     if 'document_pdf' in capabilities or any((root/x).exists() for x in ['document-worker'+suffix,'document-worker.json','document-assets','document-web-extension.so']):
-        from document_bundle import validate
+        from document_bundle import validate, LINUX_UNAVAILABLE
+        if target.startswith("linux"):
+            raise ValueError(LINUX_UNAVAILABLE)
         validate(root,target,json.loads((root/'document-worker.json').read_text()))
     return m
 

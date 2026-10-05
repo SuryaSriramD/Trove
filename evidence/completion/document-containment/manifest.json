@@ -1,0 +1,103 @@
+{
+  "schemaVersion": 1,
+  "recordedAt": "2026-10-05T15:26:58.359617+00:00",
+  "sourceBase": "215012a47d18d5b7efa896c1e7b70dfb45bda7ec",
+  "host": "macOS-27.0.1-arm64-arm-64bit",
+  "sourceSha256": {
+    "docs/completion/platform-desktop-packaging.md": "f5a1daecd02064945d82a0619df113331bd60b8d700550d341439c92b5494948",
+    "docs/completion/portable-documents.md": "ea22119f167617ca934dbb5fcc37d2e0782a32dfcaeebcec967f7738e1feb476",
+    "internal/native/document_availability.go": "d82f67d081a910794b0ac74cadc4e4b60aec99121d5f462ef6052d9678814dc3",
+    "internal/native/document_availability_test.go": "4e9142e54837263a9802009fbcc377043f1cd1dd5954dedaefac5a26c35b1f7f",
+    "internal/native/document_helper.go": "8de25b8007fd863eadec03c3fa4089097972ceceea5a57cfb33cc1192715d2fa",
+    "internal/native/document_helper_test.go": "4e6ee33111364c568e8e2fea210ad747fdeb5310aa1c5d9a484d8d4758cdbe6a",
+    "internal/native/document_process.go": "0a0b7cb91787f2eb89c50e0286df8e8052fa2a24f97795756fa8e3d5d2627877",
+    "internal/native/document_process_unix.go": "30aa178be2c181b666f91d72e347c311bcae267aaae60ed61129c003e361c667",
+    "internal/native/document_process_unix_test.go": "cb0db2c214a946ceabf6b39a754ff81153d605b63dc4092c0808297f12909794",
+    "internal/workspace/export_pdf.go": "73dae4bd802958232370696758036e50f417b0ea02b619e5f27af3ea97d729f6",
+    "internal/workspace/extraction.go": "d504e9a722c08eb9104dbc876946fca52bed64dda5ea79e45d8a12a11a1e524c",
+    "internal/workspace/search_test.go": "e1b91dbf02a31cf1546bdc06ac850d4eea8e7e5ad8e74f51f098cc6218cba55e",
+    "scripts/build-document-portable.py": "cb372be39ff28162c2a378f951742c018452d4ee31cf9b42c15682aa4c73e81c",
+    "scripts/build-native-portable.py": "4d127bda4f5ecb7d5711b78b5675140bca211fd0e98337df71b304345a64486c",
+    "scripts/desktop_package.py": "7b29e1d623ac22cdd0f4d820b2841b52041d5fd155e42373213c1715d17f5d73",
+    "scripts/document_bundle.py": "d36579e517b57406c415885b1c2075ee417dbd203e5f3707ba5be463aa4a788a",
+    "scripts/native_targets.py": "412b29ccdf2bd22e67c909fad94346293a4220ed0059ec699da3e4e84f45b6ad",
+    "tests/test_document_bundle.py": "d055c9fcfad2c1f76d215a168b484c99855471e52a234b9c61a231ad5fb3199a"
+  },
+  "reportSha256": {
+    "affected-race.jsonl": "005ab023dc3b1d45a816cd2f3fd906a488d644acfef32f080d122373bc3f6511",
+    "document-package.log": "e25400b81b57c5339c3e5bc99418652f3e1d57ea1df5ad2af4659530dcbe8df8",
+    "initial-missing-import.jsonl": "bbf974e73c3ce0db714836180191a7a658e9b3b483feed877b25f2bec2a9bca2",
+    "linux-compile.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "native-race.jsonl": "af4314f889fe6b2cbfc6789033ae04fbec280784bf231d4fbcffac930f285252",
+    "native-targets.log": "17777e8b705dfe7d89edb0603360e502c68a73af77420f4b3a3a2d6a88b7848d",
+    "windows-compile.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "commands": {
+    "affected-race.jsonl": "GOTOOLCHAIN=local GOPROXY=off TROVE_NATIVE_BUNDLE=/private/tmp/trove-native-candidate-02eb8c0 go test -mod=readonly -race -tags 'fts5 sqlite_omit_load_extension' ./internal/native ./internal/workspace -run '^Test(Document|RichPDFExportRequiresOwnerAndBundledAssets|SearchExtractionJobPersistsAndIndexesFile|CurrentContentExports)' -count=1 -timeout=3m -json",
+    "document-package.log": "PYTHONDONTWRITEBYTECODE=1 python3 -m unittest discover -s tests -p 'test_document_bundle.py' -v",
+    "native-targets.log": "PYTHONDONTWRITEBYTECODE=1 python3 -m unittest discover -s tests -p 'test_native_targets.py' -v",
+    "windows-compile.log": "CGO_ENABLED=0 GOOS=windows GOARCH=amd64 GOTOOLCHAIN=local GOPROXY=off go test -mod=readonly ./internal/native -run '^TestDocument' -c -o <temporary-native-windows.test.exe>",
+    "linux-compile.log": "CGO_ENABLED=0 GOOS=linux GOARCH=amd64 GOTOOLCHAIN=local GOPROXY=off go test -mod=readonly ./internal/native -run '^TestDocument' -c -o <temporary-native-linux.test>"
+  },
+  "results": {
+    "affectedRace": {
+      "pass": 39,
+      "fail": 0,
+      "skip": 0
+    },
+    "packageAndTooling": {
+      "pass": 29,
+      "fail": 0,
+      "skip": 0
+    },
+    "nativeGoWindowsCompiled": true,
+    "nativeGoLinuxCompiled": true
+  },
+  "developmentFailure": {
+    "report": "initial-missing-import.jsonl",
+    "reason": "Workspace build initially failed because the new errors.Is classification lacked the errors import. Fixed and same affected checks rerun successfully."
+  },
+  "behavior": {
+    "linuxPDFProcessing": "unavailable_containment",
+    "windowsDocumentRoute": "unchanged Windows job containment; target execution unqualified",
+    "macOSPDFRoute": "existing PDFKit extraction and export authority checks passed; no new visual export qualification"
+  },
+  "sourceReview": [
+    {
+      "url": "https://raw.githubusercontent.com/WebKit/WebKit/webkitgtk-2.52.6/Source/WebKit/UIProcess/Launcher/glib/BubblewrapLauncher.cpp",
+      "revision": "webkitgtk-2.52.6",
+      "lines": "591-665;789-847",
+      "finding": "No --new-session argument; sandbox uses a deny list that does not deny setsid/setpgid. Thus process-group membership is not enforced."
+    },
+    {
+      "url": "https://raw.githubusercontent.com/WebKit/WebKit/webkitgtk-2.52.6/Source/WebKit/UIProcess/Launcher/glib/ProcessLauncherGLib.cpp",
+      "revision": "webkitgtk-2.52.6",
+      "lines": "219-227",
+      "finding": "Sandbox may choose Flatpak spawning instead of direct bubblewrap; external process parenting is not covered by a local group check."
+    },
+    {
+      "url": "https://raw.githubusercontent.com/torvalds/linux/v6.8/kernel/fork.c",
+      "revision": "v6.8",
+      "lines": "2673-2678",
+      "finding": "Normal clone inherits the host group/session. PID namespace unsharing alone was not evidence of an automatic group escape."
+    },
+    {
+      "url": "https://raw.githubusercontent.com/containers/bubblewrap/v0.9.0/bubblewrap.c",
+      "revision": "v0.9.0",
+      "lines": "81-89;2845-2846;3300-3302",
+      "finding": "Session creation is conditional on --new-session; not claimed to occur in the inspected WebKit argument path."
+    }
+  ],
+  "independentReview": "finish_vision read-only review found no remaining bypass or monitor cancellation blocker in the narrow correction.",
+  "retainedExtractor": {
+    "path": "/private/tmp/trove-native-candidate-02eb8c0/document-extractor",
+    "sha256": "ef7f2543226846f39283ba325f4699c10b92b22fcf19828b11c1fbcf2b80f75d"
+  },
+  "supersedes": "Previous Linux document availability and process-group aggregate-memory/whole-tree cleanup claims in portable-documents. Historical reports are retained unchanged.",
+  "releaseQualified": false,
+  "limitations": [
+    "No Windows/Linux native helper build or execution on this Mac. Linux document processing is intentionally unavailable; no cgroup implementation or target qualification is claimed.",
+    "Platform-parameter denial tests execute the actual native discovery/staging/job gate on macOS. The actual Linux process-entry and original-PDF source-retention branch are present but not executed on this host.",
+    "Unix memory-snapshot fixtures verify bounded subprocess cancellation/output and independent parser arithmetic; they do not prove complete browser containment. Windows native job limits remain unchanged."
+  ]
+}

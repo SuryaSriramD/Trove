@@ -12,14 +12,16 @@ import sys
 from audio_build import verify_source
 from devtools import ROOT, baseline, cache_dir, file_digest
 from native_targets import require_native_host
-from document_bundle import RUNTIMES, MIN_WEBVIEW2, asset_path, assets, validate
+from document_bundle import RUNTIMES, MIN_WEBVIEW2, LINUX_UNAVAILABLE, asset_path, assets, validate
 from desktop_package import inventory
 
 def main():
     p=argparse.ArgumentParser(description=__doc__)
     p.add_argument('--target',required=True,choices=['windows-amd64','linux-amd64']);p.add_argument('--cache',type=Path,default=cache_dir());p.add_argument('--output',type=Path,required=True);p.add_argument('--plan',action='store_true');a=p.parse_args()
     if a.plan:
-        print(json.dumps({'target':a.target,'runtime':RUNTIMES[a.target.split('-')[0]],'minimumWebView2':MIN_WEBVIEW2 if a.target.startswith('windows') else None,'networkAcquisition':False,'sourceOnly':True,'executionQualified':False,'inputs':['native target toolchain','pinned offline frontend dependencies','pinned WebView runtime and JSON header','Windows: cached official WebView2 SDK1.0.3537.50; Ubuntu: WebKitGTK2.52.6 dev packages']},indent=2));return
+        print(json.dumps({'target':a.target,'runtime':RUNTIMES[a.target.split('-')[0]],'minimumWebView2':MIN_WEBVIEW2 if a.target.startswith('windows') else None,'networkAcquisition':False,'sourceOnly':True,'executionQualified':False,'runtimeAvailable':a.target.startswith('windows'),'unavailableReason':LINUX_UNAVAILABLE if a.target.startswith('linux') else None,'inputs':['native target toolchain','pinned offline frontend dependencies','pinned WebView runtime and JSON header','Windows: cached official WebView2 SDK1.0.3537.50; Ubuntu: WebKitGTK2.52.6 dev packages']},indent=2));return
+    if a.target.startswith("linux"):
+        raise ValueError(LINUX_UNAVAILABLE)
     require_native_host(a.target)
     cache=cache_dir(a.cache);out=a.output.resolve();os_name=a.target.split('-')[0]
     if a.output.is_symlink() or any((out/x).exists() for x in ['document-worker.json','document-assets','document-worker','document-worker.exe','document-web-extension.so']):raise ValueError('Choose unused document output entries')

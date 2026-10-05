@@ -11,6 +11,7 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
+	"runtime"
 	"strings"
 	"testing"
 	"time"
@@ -32,11 +33,15 @@ func documentFixture(t *testing.T) *DocumentHelper {
 	}
 	return &DocumentHelper{path: path, bundle: root, manifest: documentManifest{SHA256: documentDigest([]byte("test executable bytes")), Assets: assets}}
 }
+
+// Fixture staging tests exercise the platform-independent inventory separately
+// from production capability discovery. The explicit Darwin selector cannot
+// enable Linux execution, whose entry point independently refuses it.
 func TestDocumentPrivateStagingHashesModeAndSourceRetention(t *testing.T) {
 	for _, mode := range []string{"extract", "render"} {
 		t.Run(mode, func(t *testing.T) {
 			helper := documentFixture(t)
-			job, err := helper.NewJob(context.Background(), mode)
+			job, err := helper.newJobForPlatform(context.Background(), mode, "darwin")
 			if err != nil {
 				t.Fatal(err)
 			}
@@ -69,12 +74,12 @@ func TestDocumentPrivateStagingHashesModeAndSourceRetention(t *testing.T) {
 func TestDocumentStagingRejectsChangedAssetsBoundsAndCancellation(t *testing.T) {
 	helper := documentFixture(t)
 	os.WriteFile(filepath.Join(helper.bundle, "document-assets", "print.html"), []byte("tampered"), 0600)
-	if job, err := helper.NewJob(context.Background(), "render"); err == nil {
+	if job, err := helper.newJobForPlatform(context.Background(), "render", "darwin"); err == nil {
 		job.Close()
 		t.Fatal("changed asset accepted")
 	}
 	helper = documentFixture(t)
-	job, err := helper.NewJob(context.Background(), "extract")
+	job, err := helper.newJobForPlatform(context.Background(), "extract", "darwin")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -151,6 +156,9 @@ func init() {
 	}
 }
 func TestDocumentProcessCancellationAndOutputBound(t *testing.T) {
+	if runtime.GOOS == "linux" {
+		t.Skip("Linux document execution intentionally unavailable; availability denial has a separate regression")
+	}
 	executable, err := os.Executable()
 	if err != nil {
 		t.Fatal(err)
@@ -205,7 +213,7 @@ func TestDocumentProcessCancellationAndOutputBound(t *testing.T) {
 
 func TestDocumentUnverifiedProcessExitRetainsProfile(t *testing.T) {
 	helper := documentFixture(t)
-	job, err := helper.NewJob(context.Background(), "extract")
+	job, err := helper.newJobForPlatform(context.Background(), "extract", "darwin")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -226,6 +234,9 @@ func TestDocumentUnverifiedProcessExitRetainsProfile(t *testing.T) {
 }
 
 func TestDocumentFailedMemoryMonitorStopsActiveProcess(t *testing.T) {
+	if runtime.GOOS == "linux" {
+		t.Skip("Linux document execution intentionally unavailable; availability denial has a separate regression")
+	}
 	executable, err := os.Executable()
 	if err != nil {
 		t.Fatal(err)
