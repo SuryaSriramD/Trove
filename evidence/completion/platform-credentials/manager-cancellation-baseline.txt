@@ -1,0 +1,8 @@
+=== RUN   TestReviewManagerCancelDuringCredentialPrompt
+    review_cancel_prompt_test.go:41: Cancel could not cancel the active credential prompt
+    review_cancel_prompt_test.go:42: attempt was published after cancellation: completed
+    review_cancel_prompt_test.go:43: account was signed in after Cancel was requested
+--- FAIL: TestReviewManagerCancelDuringCredentialPrompt (0.59s)
+FAIL
+FAIL	trove.local/phase0/internal/providers/auth	1.179s
+FAIL
