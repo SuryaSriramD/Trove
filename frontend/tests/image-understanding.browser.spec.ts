@@ -35,6 +35,7 @@ async function fixture(page: Page) {
     };
     const runs: any[] = [];
     (window as any).imageCalls = [];
+    (window as any).imageRuns = runs;
     (window as any).runtime = { EventsOn: () => () => {} };
     (window as any).go = {
       main: {
@@ -167,4 +168,28 @@ test("image questions are explicit local drafts with source preview and cancella
     ),
   ).toBe(true);
   expect(calls.some((c: any) => c.method === "batch")).toBe(false);
+});
+
+test("source pixel abstention is visibly distinct from model interpretation and keeps original provenance", async ({ page }) => {
+  const vision = await fixture(page);
+  await vision.getByLabel("Image attached to this page").selectOption({ label: "Shapes.png" });
+  await vision.getByRole("button", { name: "Ask about image locally" }).click();
+  await expect(vision.getByRole("heading", { name: "running", exact: true })).toBeVisible();
+  await page.evaluate(() => {
+    Object.assign((window as any).imageRuns[0], {
+      state: "ready", analysisMethod: "pixel_measurement", finishReason: "measurement",
+      text: "Source pixel measurement (256 × 256 decoded pixels, before resizing and alpha composition; encoded orientation): the image is exactly uniform white (blank at decoded-pixel level). No objects or text can be identified from spatial pixel variation. No model interpretation or OCR was attempted.",
+      warning: "Measured from all decoded source pixels before resizing or alpha composition, using encoded orientation. Original bytes are retained; no model interpretation or OCR was performed.",
+    });
+  });
+  await vision.getByRole("button", { name: "Refresh image drafts" }).click();
+  await expect(vision.getByText("Local pixel measurement; model not run.", { exact: true })).toBeVisible();
+  await expect(vision.getByText(/Measured from all decoded source pixels before resizing/)).toBeVisible();
+  await expect(vision.getByText(/the image is exactly uniform white/)).toBeVisible();
+  await vision.getByText("Source and model evidence", { exact: true }).click();
+  await expect(vision.getByText(`Original SHA-256: ${"a".repeat(64)}`, { exact: true })).toBeVisible();
+  await expect(vision.getByText("Page revision 1 · file revision 1", { exact: true })).toBeVisible();
+  await expect(vision.getByText(/Model SHA-256:/)).toHaveCount(0);
+  await expect(vision.getByRole("link", { name: "Open original image" })).toHaveAttribute("href", /files\//);
+  expect(await page.evaluate(() => (window as any).imageCalls.some((c: any) => c.method === "batch"))).toBe(false);
 });

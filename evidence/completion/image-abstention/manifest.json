@@ -1,0 +1,124 @@
+{
+  "schemaVersion": 1,
+  "recordedAt": "2026-10-05T12:41:36.486726+00:00",
+  "sourceBase": "7d7ff75433463765da56e3f2764c6773403e45b9",
+  "scope": "OPT-001 exact source-pixel abstention hardening; development implementation evidence, not a release candidate",
+  "releaseApproved": false,
+  "sourceSha256": {
+    "internal/native/vision.go": "325a17e7bd5b340407a9993a6dc2729c03c32ff15cc84647283810cf83399bc2",
+    "internal/native/vision_pixels.go": "f635a975df4d2b0298c82ae0b3387d68f28ccae4da8a480846510afd8e8c40fb",
+    "internal/native/vision_pixels_test.go": "10575b94b4d8619c38c589e3724ea03e1ed171960e67590d3fbe3f3f9f9ed900",
+    "internal/native/vision_product_rubric_test.go": "65065b0f1e32fce50690d5caebd5cd1c0f9857019dc943b1a8d7f153560ddfd4",
+    "internal/native/vision_test.go": "627872c3f1a4e78cea31649cff77899a88ae2851e7a9cce6c7d3a8877dbfcdf3",
+    "internal/native/supervisor.go": "6fdbeea570f8f3c50444ba00d1cefbd06ef53ab71d7f5d0c33fe45af08d7fcab",
+    "internal/workspace/image_description.go": "c271e5051d63acd693fa47b88ace0e11a465a129653d839ea1df7890f06cb35d",
+    "internal/workspace/image_description_test.go": "57235845f8a7ea53bc4922400e6800fde6000a4f105dddf7528d21f7a1054f69",
+    "internal/workspace/image_measurement_test.go": "0a9c267efa25f29b1c9a5781090b4abbd0a15c882ad562350080595a786ed713",
+    "app_image.go": "bdb870c036c790b5c358c837b9ae665d4ba9fd6d298e746c088bd9e99f0147c1",
+    "frontend/src/ai/ImageUnderstanding.tsx": "82d94606cc6daac88f0e6cda4d96e5ca770faf05de7c1b1f499a9939b94717a3",
+    "frontend/tests/image-understanding.browser.spec.ts": "ed609a88baab18eda08f83d20281c8ccfb4f372241dbf44db8a8f1722cbfd434",
+    "native/vision-worker.cpp": "ac59268b7fc7831be9d0e6d2bb0efc693d770d68672c317114b9b5926d1a4aa8",
+    "native/worker-platform.hpp": "9cbe44ab08eeac34563db2b437554a85b8d8066c21a23917018167c78de66545",
+    "native/worker-projector.hpp": "c6f19bd21dc19efcdae49f7a7835b7e2e378530c3d05b18e02df453c0eb7e7d3",
+    "native/worker.hpp": "fd7bef552ac58050db6b2d1d1cbd3783a1d3c9ef0fd1af0e1490265a21197817",
+    "native/models/catalog.json": "22b59e190d5383283c0c5a1cc6623ba43ad2b0463e0ddafc07ce1dac95990a60",
+    "docs/completion/local-image-understanding.md": "7388b27d2dab12e380690f657db2a49cebc5ac6975ea58681abab498c728343b"
+  },
+  "unchangedRawRubricFileSHA256": "627872c3f1a4e78cea31649cff77899a88ae2851e7a9cce6c7d3a8877dbfcdf3",
+  "host": {
+    "os": "macOS-27.0.1-arm64-arm-64bit",
+    "hardware": "Mac16,12",
+    "memoryBytes": 25769803776
+  },
+  "toolchain": {
+    "go": "go version go1.27.1 darwin/arm64",
+    "node": "v25.5.0"
+  },
+  "nativeBundleManifestSHA256": "2c0c33f2f7aaf184e4dc798484966c87f59241a8926f922de4be0ad3dd1e6e58",
+  "nativeHelper": {
+    "name": "vision-worker",
+    "sha256": "edb38d66cfbc7e8feacdebc422cc55cbd914f7ce32fdabaf251be902c8bb1744",
+    "runtime": "llama.cpp",
+    "runtimeCommit": "d2e54583c7452353eb35d40431281f6ee984332f",
+    "architecture": "arm64"
+  },
+  "artifacts": [
+    {
+      "id": "01990000-0000-7000-8000-000000000107",
+      "sha256": "9d4612de6a42214499e301494a3ecc2be0abdd9de44e663bda63f1152fad1bf4",
+      "sizeBytes": 436806912
+    },
+    {
+      "id": "01990000-0000-7000-8000-000000000108",
+      "sha256": "4b2fca922e549e9b9608f4ba56f93565dd5220e935ba5570a2a864a0fcc988a6",
+      "sizeBytes": 199468800
+    }
+  ],
+  "rawModelRubric": {
+    "passed": false,
+    "casesPassed": 3,
+    "cases": 4,
+    "failure": "blank_uncertainty invents content and ends at length; original predicate/fixture and raw production-guard bypass unchanged"
+  },
+  "productionRubric": {
+    "passed": true,
+    "casesPassed": 4,
+    "cases": 4,
+    "blankMethod": "pixel_measurement",
+    "nonblankMethod": "local_vision_model",
+    "fixtureHashesIdenticalToRaw": true
+  },
+  "policy": {
+    "sourceEqualityTolerance": 0,
+    "sourcePixelPrecision": "16-bit nonpremultiplied RGBA",
+    "transparentRule": "alpha is zero for every decoded source pixel; hidden RGB not interpreted",
+    "sampling": "none for abstention",
+    "normalizationLoss": "source variation plus exactly uniform normalized input is an explicit failure, never a blank-source claim",
+    "orientation": "encoded pixels; EXIF not applied",
+    "limits": {
+      "sourceBytes": 20971520,
+      "sourcePixels": 20000000,
+      "modelInputLongestEdge": 1024,
+      "timeoutSeconds": 300
+    }
+  },
+  "verification": {
+    "nativeGuard": "7 top-level + 11 subcases pass with race detection; stronger final model-admission oracle rerun separately",
+    "workspace": "7 top-level + 12 subcases pass with race detection; no skips",
+    "browser": "2 tests passed on built frontend",
+    "typescript": "passed",
+    "frontendBuild": "passed with existing bundler warnings",
+    "appCompile": "passed after required frontend build"
+  },
+  "retainedFailures": [
+    "Baseline old near-uniform guard suppressed four faint/tiny preservation fixtures and omitted exact color/alpha provenance.",
+    "First revised native test compared lowercase source against capitalized Source in the white measurement; corrected case-insensitive provenance label oracle without changing image classification.",
+    "Fresh-worktree app compile initially lacked required frontend/dist; passed after frontend build.",
+    "Initial development-server browser loads timed out during dependency warm-up; built-frontend runs passed.",
+    "Unchanged raw model blank-image quality failure remains open."
+  ],
+  "limitations": [
+    "Synthetic shape/chart/blank fixtures do not establish representative screenshot, photograph, document, handwriting or multilingual quality.",
+    "Pixel tests with a deliberately absent worker prove guard/admission boundaries only, not model quality.",
+    "Model timings are observed development-run durations, not performance qualification; frontend build activity overlapped parts of evaluation.",
+    "No signed packaged candidate, independent installation, Windows/Linux native execution or actual screenshot acquisition is qualified by this package."
+  ],
+  "evidence": {
+    "app-compile-built.txt": "a9f48d29e89492ed6e4dce8b8f7328c6a5cb604dcb723a9c0fae04599c56fe23",
+    "app-compile.txt": "dbd9c5bfd941fe40751c72d668dea655de02d06920800ee17f34b792f1c80238",
+    "baseline-guard-failures.jsonl": "1295e237b2b164c7a5e797185d43fbc001deb57610ec1062e991d16826f59c93",
+    "browser-production.json": "6fc0e1248dc5e1b6ee8211e25f7359d9f24f58625b387b9b590215e750d4a93c",
+    "browser-production.txt": "58d0425f9ef4d6079a34b49ac511f1ed1154c06ce2fbba55239b6ab380d49506",
+    "browser.json": "a72030838111fa45f4340d66dfc6ef6fb67c8cdbb1ba0992829c59984f6c1a5d",
+    "browser.txt": "3c36d19ad98dadc08961149a5a7fb5dc9ef45a40c9d7f254b391bdf33b99e0fd",
+    "final-pixel-guard-race.jsonl": "9734c16cfd630e9e1a6f0a341ebc52eebbc6f5be932849a1c1247a0ff50babb1",
+    "frontend-build.txt": "e57fed95d731334c1a7513533fbb5bf245d55835cc798321eb2d9fa9df935579",
+    "guard-workspace-race.jsonl": "96286c168b6c96a3cda4656dd21958924be6be566da16e32185adf1fadc6c6a1",
+    "pixel-guard-race.jsonl": "1ef25914e155837a8b7d80a153b8f0bfb7a8d0365b7b0111e018da8fd3a84777",
+    "production-rubric.json": "36305fba779858e97faee0fcf0f8cfb1a5b25c3dff01de8b6c2a802c24048c58",
+    "raw-model-rubric.json": "204ef7663edace674bdce3a99ce08eaa654713389089c5f2e6ac1caad29eb2df",
+    "real-image-rubrics.jsonl": "efd68d2f81bff020fab5e752259dba53fe4490d9029db43435508f11af5c0557",
+    "real-image-rubrics.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "typescript.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  }
+}

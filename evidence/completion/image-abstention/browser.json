@@ -1,0 +1,201 @@
+{
+  "config": {
+    "argv": [
+      "/opt/homebrew/Cellar/node/25.5.0/bin/node",
+      "/Users/suryasriramduvvuri/.codex/worktrees/completion-image-abstention/Trove/frontend/node_modules/@playwright/test/cli.js",
+      "test",
+      "tests/image-understanding.browser.spec.ts"
+    ],
+    "configFile": "/Users/suryasriramduvvuri/.codex/worktrees/completion-image-abstention/Trove/frontend/playwright.config.ts",
+    "rootDir": "/Users/suryasriramduvvuri/.codex/worktrees/completion-image-abstention/Trove/frontend/tests",
+    "failOnFlakyTests": false,
+    "forbidOnly": false,
+    "fullyParallel": false,
+    "globalSetup": null,
+    "globalTeardown": null,
+    "globalTimeout": 0,
+    "grep": {},
+    "grepInvert": null,
+    "maxFailures": 0,
+    "metadata": {
+      "actualWorkers": 1
+    },
+    "preserveOutput": "always",
+    "projects": [
+      {
+        "outputDir": "/Users/suryasriramduvvuri/.codex/worktrees/completion-image-abstention/Trove/frontend/test-results",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 1
+        },
+        "id": "",
+        "name": "",
+        "testDir": "/Users/suryasriramduvvuri/.codex/worktrees/completion-image-abstention/Trove/frontend/tests",
+        "testIgnore": [
+          "**/._*"
+        ],
+        "testMatch": [
+          "browser.spec.ts",
+          "*.browser.spec.ts"
+        ],
+        "timeout": 30000
+      }
+    ],
+    "quiet": false,
+    "reporter": [
+      [
+        "list",
+        null
+      ],
+      [
+        "json",
+        {
+          "outputFile": "/Users/suryasriramduvvuri/.codex/worktrees/completion-image-abstention/Trove/evidence/completion/image-abstention/browser.json"
+        }
+      ]
+    ],
+    "reportSlowTests": {
+      "max": 5,
+      "threshold": 300000
+    },
+    "shard": null,
+    "tags": [],
+    "updateSnapshots": "missing",
+    "updateSourceMethod": "patch",
+    "version": "1.63.0",
+    "workers": 1,
+    "webServer": null
+  },
+  "suites": [
+    {
+      "title": "image-understanding.browser.spec.ts",
+      "file": "image-understanding.browser.spec.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [
+        {
+          "title": "image questions are explicit local drafts with source preview and cancellation",
+          "ok": false,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "timedOut",
+                  "duration": 30048,
+                  "error": {
+                    "message": "\u001b[31mTest timeout of 30000ms exceeded.\u001b[39m",
+                    "stack": "\u001b[31mTest timeout of 30000ms exceeded.\u001b[39m"
+                  },
+                  "errors": [
+                    {
+                      "message": "\u001b[31mTest timeout of 30000ms exceeded.\u001b[39m"
+                    },
+                    {
+                      "location": {
+                        "file": "/Users/suryasriramduvvuri/.codex/worktrees/completion-image-abstention/Trove/frontend/tests/image-understanding.browser.spec.ts",
+                        "column": 14,
+                        "line": 125
+                      },
+                      "message": "Error: page.goto: Test timeout of 30000ms exceeded.\nCall log:\n\u001b[2m  - navigating to \"http://127.0.0.1:4208/\", waiting until \"load\"\u001b[22m\n\n\n  123 |     };\n  124 |   });\n> 125 |   await page.goto(process.env.TROVE_TEST_URL ?? \"http://127.0.0.1:4197\");\n      |              ^\n  126 |   await page.getByRole(\"button\", { name: /Intelligence/ }).click();\n  127 |   const panel = page.getByRole(\"region\", { name: \"P2 intelligence packages\" });\n  128 |   await panel\n    at fixture (/Users/suryasriramduvvuri/.codex/worktrees/completion-image-abstention/Trove/frontend/tests/image-understanding.browser.spec.ts:125:14)\n    at /Users/suryasriramduvvuri/.codex/worktrees/completion-image-abstention/Trove/frontend/tests/image-understanding.browser.spec.ts:136:18"
+                    }
+                  ],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-05T12:34:23.060Z",
+                  "annotations": [],
+                  "attachments": [
+                    {
+                      "name": "error-context",
+                      "contentType": "text/markdown",
+                      "path": "/Users/suryasriramduvvuri/.codex/worktrees/completion-image-abstention/Trove/frontend/test-results/image-understanding.browse-b7a5d-ce-preview-and-cancellation/error-context.md"
+                    }
+                  ]
+                }
+              ],
+              "status": "unexpected"
+            }
+          ],
+          "id": "fb3f8eee43ca22012228-a36c2971b7c4fdcf2ebd",
+          "file": "image-understanding.browser.spec.ts",
+          "line": 133,
+          "column": 1
+        },
+        {
+          "title": "source pixel abstention is visibly distinct from model interpretation and keeps original provenance",
+          "ok": false,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 1,
+                  "parallelIndex": 0,
+                  "status": "timedOut",
+                  "duration": 30029,
+                  "error": {
+                    "message": "\u001b[31mTest timeout of 30000ms exceeded.\u001b[39m",
+                    "stack": "\u001b[31mTest timeout of 30000ms exceeded.\u001b[39m"
+                  },
+                  "errors": [
+                    {
+                      "message": "\u001b[31mTest timeout of 30000ms exceeded.\u001b[39m"
+                    },
+                    {
+                      "location": {
+                        "file": "/Users/suryasriramduvvuri/.codex/worktrees/completion-image-abstention/Trove/frontend/tests/image-understanding.browser.spec.ts",
+                        "column": 14,
+                        "line": 125
+                      },
+                      "message": "Error: page.goto: Test timeout of 30000ms exceeded.\nCall log:\n\u001b[2m  - navigating to \"http://127.0.0.1:4208/\", waiting until \"load\"\u001b[22m\n\n\n  123 |     };\n  124 |   });\n> 125 |   await page.goto(process.env.TROVE_TEST_URL ?? \"http://127.0.0.1:4197\");\n      |              ^\n  126 |   await page.getByRole(\"button\", { name: /Intelligence/ }).click();\n  127 |   const panel = page.getByRole(\"region\", { name: \"P2 intelligence packages\" });\n  128 |   await panel\n    at fixture (/Users/suryasriramduvvuri/.codex/worktrees/completion-image-abstention/Trove/frontend/tests/image-understanding.browser.spec.ts:125:14)\n    at /Users/suryasriramduvvuri/.codex/worktrees/completion-image-abstention/Trove/frontend/tests/image-understanding.browser.spec.ts:174:18"
+                    }
+                  ],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-05T12:35:00.964Z",
+                  "annotations": [],
+                  "attachments": [
+                    {
+                      "name": "error-context",
+                      "contentType": "text/markdown",
+                      "path": "/Users/suryasriramduvvuri/.codex/worktrees/completion-image-abstention/Trove/frontend/test-results/image-understanding.browse-af552-d-keeps-original-provenance/error-context.md"
+                    }
+                  ]
+                }
+              ],
+              "status": "unexpected"
+            }
+          ],
+          "id": "fb3f8eee43ca22012228-609ee460a950fa5475fa",
+          "file": "image-understanding.browser.spec.ts",
+          "line": 173,
+          "column": 1
+        }
+      ]
+    }
+  ],
+  "errors": [],
+  "stats": {
+    "startTime": "2026-10-05T12:34:22.298Z",
+    "duration": 69362.185,
+    "expected": 0,
+    "skipped": 0,
+    "unexpected": 2,
+    "flaky": 0
+  }
+}

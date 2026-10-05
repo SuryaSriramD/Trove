@@ -1448,7 +1448,7 @@
       "implementation": "implemented",
       "implementation_commit": "4e3fe92",
       "verification": {
-        "service_or_interface": "targeted_checks_passed_real_model_rubric_failed_3_of_4",
+        "service_or_interface": "targeted_checks_and_four_original_fixture_product_paths_passed_raw_model_rubric_failed_3_of_4",
         "candidate": null,
         "macOS": "unqualified",
         "Windows": "unqualified",
@@ -1458,7 +1458,8 @@
       "implementation_evidence": [
         "docs/completion/local-image-understanding.md",
         "evidence/completion/c6-vision-manifest.json",
-        "docs/completion/development-candidate-4900d4b.md"
+        "docs/completion/development-candidate-4900d4b.md",
+        "evidence/completion/image-abstention/manifest.json"
       ],
       "followup_commits": [
         "44f7262"

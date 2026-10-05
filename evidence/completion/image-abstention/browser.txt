@@ -1,0 +1,56 @@
+
+Running 2 tests using 1 worker
+
+(node:60215) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✘  1 tests/image-understanding.browser.spec.ts:133:1 › image questions are explicit local drafts with source preview and cancellation (30.0s)
+(node:60430) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✘  2 tests/image-understanding.browser.spec.ts:173:1 › source pixel abstention is visibly distinct from model interpretation and keeps original provenance (30.0s)
+
+
+  1) tests/image-understanding.browser.spec.ts:133:1 › image questions are explicit local drafts with source preview and cancellation 
+
+    Test timeout of 30000ms exceeded.
+
+    Error: page.goto: Test timeout of 30000ms exceeded.
+    Call log:
+      - navigating to "http://127.0.0.1:4208/", waiting until "load"
+
+
+      123 |     };
+      124 |   });
+    > 125 |   await page.goto(process.env.TROVE_TEST_URL ?? "http://127.0.0.1:4197");
+          |              ^
+      126 |   await page.getByRole("button", { name: /Intelligence/ }).click();
+      127 |   const panel = page.getByRole("region", { name: "P2 intelligence packages" });
+      128 |   await panel
+        at fixture (/Users/suryasriramduvvuri/.codex/worktrees/completion-image-abstention/Trove/frontend/tests/image-understanding.browser.spec.ts:125:14)
+        at /Users/suryasriramduvvuri/.codex/worktrees/completion-image-abstention/Trove/frontend/tests/image-understanding.browser.spec.ts:136:18
+
+    Error Context: test-results/image-understanding.browse-b7a5d-ce-preview-and-cancellation/error-context.md
+
+  2) tests/image-understanding.browser.spec.ts:173:1 › source pixel abstention is visibly distinct from model interpretation and keeps original provenance 
+
+    Test timeout of 30000ms exceeded.
+
+    Error: page.goto: Test timeout of 30000ms exceeded.
+    Call log:
+      - navigating to "http://127.0.0.1:4208/", waiting until "load"
+
+
+      123 |     };
+      124 |   });
+    > 125 |   await page.goto(process.env.TROVE_TEST_URL ?? "http://127.0.0.1:4197");
+          |              ^
+      126 |   await page.getByRole("button", { name: /Intelligence/ }).click();
+      127 |   const panel = page.getByRole("region", { name: "P2 intelligence packages" });
+      128 |   await panel
+        at fixture (/Users/suryasriramduvvuri/.codex/worktrees/completion-image-abstention/Trove/frontend/tests/image-understanding.browser.spec.ts:125:14)
+        at /Users/suryasriramduvvuri/.codex/worktrees/completion-image-abstention/Trove/frontend/tests/image-understanding.browser.spec.ts:174:18
+
+    Error Context: test-results/image-understanding.browse-af552-d-keeps-original-provenance/error-context.md
+
+  2 failed
+    tests/image-understanding.browser.spec.ts:133:1 › image questions are explicit local drafts with source preview and cancellation 
+    tests/image-understanding.browser.spec.ts:173:1 › source pixel abstention is visibly distinct from model interpretation and keeps original provenance 
