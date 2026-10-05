@@ -30,6 +30,12 @@ C4 implementation includes rich layout/reusable content, explicitly fetched book
 
 The Codex desktop now connects isolated account authorization, an account-specific model catalog, reviewed context/tool selection, contained execution, cancellation and compatible session controls. Seven provider/account/approval browser fixtures pass; real account inference remains unqualified. Claude contained startup currently fails on the installed runtime and remains gated.
 
+A later isolated development snapshot passed 544 Go tests with 21 explicit skips, frontend checks, and packaged offline P0/P1/native worker journeys. Repeated startup qualification failed because two launches never reported readiness; successful launch timings do not close this finding. Its exact source/application/helper/model identities, evidence and limits are in [development candidate 5d7cdb0](development-candidate-5d7cdb0.md). Temporary binaries were lost after an environment restart, while the durable reports remain.
+
+Remote MCP now has source implementation and real TLS official-SDK fixture coverage, with native consent, scoped authorization, token refresh and revocation. A real hosted client remains unqualified. Optional local generative reviews retain deterministic fallback, cited drafts and separate approval of every proposed page/task change; one real-model review fixture passes, with broader quality evaluation still open.
+
+Local image understanding is implemented with a pinned model/projector pair, bounded offline native execution, source-linked drafts and cancellation. Its unchanged real-model rubric passed three of four cases; blank-image abstention failed and remains unqualified. The app distinguishes pixel measurements from model interpretation and rejects repetitive/incomplete output. A new instrumented startup candidate passed 60 launches, but did not reproduce or explain the earlier missing-readiness events. Typed 10,000-record benchmarks exposed expensive derived queries; the integrated optimization reduces formula/rollup allocations while preserving live permission checks. See [image evidence](local-image-understanding.md), [startup investigation](startup-investigation.md) and [database measurements](database-performance.md).
+
 A native tokenizer stall was traced to unwanted Metal initialization and fixed without increasing the timeout. A real local model passed cancellation/forget-during-stream and a narrow named-page creation task with explicit approval and retry deduplication. This does not override the separate failed factual/memory quality rubrics. No release gate is marked complete.
 
 See [recovery evidence](recovery.md), [retrieval evidence](retrieval.md), and the [machine-readable registry](registry.json). The registry records owners, phases, interface boundaries, independent expected acceptance outcomes, evidence destinations, implementation commits and qualification status for all 51 items. Planned scenarios are not passing tests.
@@ -74,7 +80,7 @@ The research report has not been supplied. Independent clean machines, authorize
 | EXT-001 | A, F | C5 | in progress |
 | EXT-002 | A, F | C5 | in progress |
 | EXT-003 | A | C4, C5 | implemented |
-| EXT-004 | A, F | C5 | in progress |
+| EXT-004 | A, F | C5 | implemented |
 | EXT-005 | A, E | C5 | in progress |
 | REL-001 | A, F | C3, C5, C6, C7, C8 | open |
 | REL-002 | B, D, E | C3, C5, C6, C7, C8 | open |
@@ -82,7 +88,7 @@ The research report has not been supplied. Independent clean machines, authorize
 | REL-004 | D, E | C3, C5, C6, C7, C8 | open |
 | REL-005 | F | C3, C5, C6, C7, C8 | open |
 | REL-006 | F | C3, C5, C6, C7, C8 | open |
-| REL-007 | A, B, C, E | C3, C5, C6, C7, C8 | open |
+| REL-007 | A, B, C, E | C3, C5, C6, C7, C8 | in progress |
 | REL-008 | F | C0, C1, C2, C3, C4, C5, C6, C7, C8 | in_progress |
 | REL-009 | F | C7, C8 | open |
 | GOV-001 | A | C0 | implemented |
@@ -90,8 +96,8 @@ The research report has not been supplied. Independent clean machines, authorize
 | GOV-003 | A | C0, C2, C3, C5, C8 | in_progress |
 | GOV-004 | A | C0 | awaiting_external_source |
 | GOV-005 | A | C0, C2, C3, C5, C8 | in_progress |
-| OPT-001 | E, F | C6 | in progress |
-| OPT-002 | A, E | C6 | in progress |
+| OPT-001 | E, F | C6 | implemented |
+| OPT-002 | A, E | C6 | implemented |
 | OPT-003 | E, F | C6 | open |
 
 ## Evidence policy

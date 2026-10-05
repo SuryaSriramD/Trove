@@ -1,0 +1,28 @@
+{
+  "step": "p1-verify",
+  "passed": true,
+  "recordedAt": "2026-10-04T18:50:51.839974Z",
+  "state": {
+    "workspaceId": "01a10841-288d-7e21-9f81-3cde70f34051",
+    "pageId": "01a10841-29c0-7f06-bb5b-a5c735467b6f",
+    "blockId": "01a10841-29c0-73c8-b3a1-5ec6a9212c03",
+    "collectionId": "01a10841-29c0-7227-9958-94ac90f15bba",
+    "propertyId": "01a10841-29c0-7343-8311-fe979b8ca476",
+    "recordId": "01a10841-29c0-7093-8479-c881a9fc969f",
+    "recordPageId": "01a10841-29c0-7809-8d90-adb533b56c81",
+    "fileId": "01a10841-29d5-722a-99ed-656f61f17f50",
+    "fileBlockId": "01a10841-29c0-733c-8bf3-b97647ea066b",
+    "contentHash": "61cb495898eb4901d8a4ea859ee4cee692bb981cc2474a55f2809e47519fd273"
+  },
+  "checks": [
+    "canonical linked gallery shares edited record identity",
+    "formula computes exact 0.3 separately from captured source 999",
+    "advanced reusable content and inert card survive offline",
+    "keyword search includes retained offline card",
+    "automation receipt prevents duplicate effects across repeated ticks",
+    "managed attachment hash preserved",
+    "separate process restart and native backup restore preserve P1 objects and effects"
+  ],
+  "processExitCode": 0,
+  "installedWeightsAvailable": false
+}

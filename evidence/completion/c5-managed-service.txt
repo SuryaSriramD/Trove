@@ -1,0 +1,4 @@
+ok  	trove.local/phase0/contracts	0.452s [no tests to run]
+FAIL	trove.local/phase0/internal/workspace [build failed]
+ok  	trove.local/phase0/internal/providers	0.397s
+FAIL

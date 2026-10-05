@@ -1,0 +1,2 @@
+ok  	trove.local/phase0/contracts	0.408s [no tests to run]
+ok  	trove.local/phase0/internal/workspace	14.838s

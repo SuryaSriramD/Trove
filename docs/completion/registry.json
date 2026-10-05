@@ -395,7 +395,11 @@
       },
       "evidence_target": "evidence/completion/CORE-007/",
       "implementation_evidence": [
-        "docs/completion/database-query-scaling.md"
+        "docs/completion/database-query-scaling.md",
+        "docs/completion/database-performance.md"
+      ],
+      "followup_commits": [
+        "31ac9fe"
       ]
     },
     {
@@ -842,16 +846,24 @@
       "interface_boundary": "Shared proposals, scoped grants, provider lifecycle and owning-kernel bridge",
       "acceptance_scenario": "A supported real account completes a scoped task; denied tools, interrupted output, process failure, stale changes, revocation, and disconnect are handled correctly. Native filesystem/shell capabilities cannot bypass Trove permissions. Do not copy subscription credentials or enable the mode before containment is enforceable.",
       "backlog_anchor": "../remaining-work.md#ext-001-complete-managed-claude-code-execution",
-      "implementation": "in progress",
-      "implementation_commit": null,
+      "implementation": "in_progress",
+      "implementation_commit": "c6faef8",
       "verification": {
-        "service_or_interface": "pending",
+        "service_or_interface": "targeted_checks_passed_native_startup_failed",
         "candidate": null,
         "macOS": "unqualified",
         "Windows": "unqualified",
         "Linux": "unqualified"
       },
-      "evidence_target": "evidence/completion/EXT-001/"
+      "evidence_target": "evidence/completion/EXT-001/",
+      "implementation_evidence": [
+        "docs/completion/claude-runtime.md",
+        "docs/completion/claude-profiles.md",
+        "docs/completion/managed-runtimes.md"
+      ],
+      "followup_commits": [
+        "b3b44a6"
+      ]
     },
     {
       "id": "EXT-002",
@@ -867,10 +879,7 @@
       "acceptance_scenario": "A real completed request proves account/model eligibility; refresh/resume, account switching, denied tools, expired/revoked authorization, interrupted streams, and cancellation pass. Credentials remain out of logs/workspace/model prompts. API billing is never an automatic fallback.",
       "backlog_anchor": "../remaining-work.md#ext-002-complete-managed-codex-execution",
       "implementation": "in progress",
-      "implementation_commit": [
-        "8e1e89e",
-        "f363aac"
-      ],
+      "implementation_commit": "01830f7",
       "verification": {
         "service_or_interface": "scoped transport/auth and desktop fixtures pass; real account inference remains unqualified",
         "candidate": null,
@@ -880,6 +889,14 @@
       },
       "evidence_target": "evidence/completion/EXT-002/",
       "evidence_documents": [
+        "docs/completion/managed-runtimes.md",
+        "docs/completion/codex-siwc-auth.md"
+      ],
+      "followup_commits": [
+        "f363aac",
+        "b3b44a6"
+      ],
+      "implementation_evidence": [
         "docs/completion/managed-runtimes.md",
         "docs/completion/codex-siwc-auth.md"
       ]
@@ -924,16 +941,23 @@
       "interface_boundary": "Shared proposals, scoped grants, provider lifecycle and owning-kernel bridge",
       "acceptance_scenario": "Supported real-client connectivity, authentication/revocation, scope, approvals, disconnect, failure recovery, and credential handling pass. The bridge still forwards to the one owning kernel; local workflows work with the connection disabled.",
       "backlog_anchor": "../remaining-work.md#ext-004-complete-the-supported-remote-mcp-route",
-      "implementation": "in progress",
-      "implementation_commit": null,
+      "implementation": "implemented",
+      "implementation_commit": "a5ce7f6",
       "verification": {
-        "service_or_interface": "pending",
+        "service_or_interface": "targeted_checks_passed_hosted_client_unqualified",
         "candidate": null,
         "macOS": "unqualified",
         "Windows": "unqualified",
         "Linux": "unqualified"
       },
-      "evidence_target": "evidence/completion/EXT-004/"
+      "evidence_target": "evidence/completion/EXT-004/",
+      "implementation_evidence": [
+        "docs/completion/remote-mcp.md",
+        "docs/completion/managed-runtimes.md"
+      ],
+      "followup_commits": [
+        "b3b44a6"
+      ]
     },
     {
       "id": "EXT-005",
@@ -985,7 +1009,11 @@
         "Windows": "unqualified",
         "Linux": "unqualified"
       },
-      "evidence_target": "evidence/completion/REL-001/"
+      "evidence_target": "evidence/completion/REL-001/",
+      "development_candidate_evidence": [
+        "docs/completion/development-candidate-5d7cdb0.md",
+        "evidence/completion/candidate-5d7cdb0/manifest.json"
+      ]
     },
     {
       "id": "REL-002",
@@ -1014,7 +1042,11 @@
         "Windows": "unqualified",
         "Linux": "unqualified"
       },
-      "evidence_target": "evidence/completion/REL-002/"
+      "evidence_target": "evidence/completion/REL-002/",
+      "development_candidate_evidence": [
+        "docs/completion/development-candidate-5d7cdb0.md",
+        "evidence/completion/candidate-5d7cdb0/manifest.json"
+      ]
     },
     {
       "id": "REL-003",
@@ -1145,16 +1177,25 @@
       "interface_boundary": "Immutable candidates, platform support and acceptance evidence",
       "acceptance_scenario": "Verify the declared approximately-two-second shell, under-300-ms common keyword search, under-one-second hybrid retrieval excluding optional reranking, and responsive editing against the agreed profiles. Record limits honestly; a 100-page hybrid benchmark or 10,000 simple pages is not evidence for all workloads.",
       "backlog_anchor": "../remaining-work.md#rel-007-benchmark-realistic-end-to-end-performance",
-      "implementation": "open",
+      "implementation": "in_progress",
       "implementation_commit": null,
       "verification": {
-        "service_or_interface": "pending",
+        "service_or_interface": "bounded_measurements_recorded_startup_intermittency_unresolved",
         "candidate": null,
         "macOS": "unqualified",
         "Windows": "unqualified",
         "Linux": "unqualified"
       },
-      "evidence_target": "evidence/completion/REL-007/"
+      "evidence_target": "evidence/completion/REL-007/",
+      "development_candidate_evidence": [
+        "docs/completion/development-candidate-5d7cdb0.md",
+        "evidence/completion/candidate-5d7cdb0/manifest.json"
+      ],
+      "implementation_evidence": [
+        "docs/completion/development-candidate-5d7cdb0.md",
+        "docs/completion/database-performance.md",
+        "docs/completion/startup-investigation.md"
+      ]
     },
     {
       "id": "REL-008",
@@ -1185,7 +1226,11 @@
         "Windows": "unqualified",
         "Linux": "unqualified"
       },
-      "evidence_target": "evidence/completion/REL-008/"
+      "evidence_target": "evidence/completion/REL-008/",
+      "development_candidate_evidence": [
+        "docs/completion/development-candidate-5d7cdb0.md",
+        "evidence/completion/candidate-5d7cdb0/manifest.json"
+      ]
     },
     {
       "id": "REL-009",
@@ -1354,16 +1399,20 @@
       "interface_boundary": "Versioned image/review capabilities, jobs, source manifests and reviewed mutations",
       "acceptance_scenario": "Use representative images and document quality/resource limits. Additional handwriting, scanned-PDF, rotation, or language support is required only when explicitly selected. Images remain local unless the user separately invokes an external integration.",
       "backlog_anchor": "../remaining-work.md#opt-001-qualify-and-optionally-expand-local-image-intelligence",
-      "implementation": "in progress",
-      "implementation_commit": null,
+      "implementation": "implemented",
+      "implementation_commit": "4e3fe92",
       "verification": {
-        "service_or_interface": "pending",
+        "service_or_interface": "targeted_checks_passed_real_model_rubric_failed_3_of_4",
         "candidate": null,
         "macOS": "unqualified",
         "Windows": "unqualified",
         "Linux": "unqualified"
       },
-      "evidence_target": "evidence/completion/OPT-001/"
+      "evidence_target": "evidence/completion/OPT-001/",
+      "implementation_evidence": [
+        "docs/completion/local-image-understanding.md",
+        "evidence/completion/c6-vision-manifest.json"
+      ]
     },
     {
       "id": "OPT-002",
@@ -1378,16 +1427,19 @@
       "interface_boundary": "Versioned image/review capabilities, jobs, source manifests and reviewed mutations",
       "acceptance_scenario": "Preserve occurrence deduplication, activation consent, current-source/memory checks, reviewed writes, and failure isolation. Do not rename a digest as autonomous task management or introduce unreviewed knowledge rewriting.",
       "backlog_anchor": "../remaining-work.md#opt-002-decide-whether-personal-review-needs-generative-analysis",
-      "implementation": "in progress",
-      "implementation_commit": null,
+      "implementation": "implemented",
+      "implementation_commit": "5d7cdb0",
       "verification": {
-        "service_or_interface": "pending",
+        "service_or_interface": "targeted_checks_and_one_real_model_fixture_passed",
         "candidate": null,
         "macOS": "unqualified",
         "Windows": "unqualified",
         "Linux": "unqualified"
       },
-      "evidence_target": "evidence/completion/OPT-002/"
+      "evidence_target": "evidence/completion/OPT-002/",
+      "implementation_evidence": [
+        "docs/completion/personal-reviews.md"
+      ]
     },
     {
       "id": "OPT-003",
@@ -1412,6 +1464,16 @@
         "Linux": "unqualified"
       },
       "evidence_target": "evidence/completion/OPT-003/"
+    }
+  ],
+  "developmentCandidates": [
+    {
+      "sourceCommit": "5d7cdb038bde74458df57d511cb949af5a892358",
+      "manifest": "evidence/completion/candidate-5d7cdb0/manifest.json",
+      "releaseApproved": false,
+      "packagedJourneys": "passed_for_recorded_scope",
+      "startupReliability": "failed_missing_readiness_events",
+      "temporaryArtifactAvailability": "lost_after_environment_restart"
     }
   ]
 }

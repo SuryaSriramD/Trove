@@ -1,0 +1,76 @@
+{
+  "recordedAt": "2026-10-04T18:49:57.031108+00:00",
+  "app": "/private/tmp/Trove-completion-5d7cdb0.app",
+  "appBinarySha256": "4d6edbcdc267d2d168e431542ec1fbadb8b6ec78dc47e9b91bed0881e3d0d37b",
+  "fixture": "/var/folders/xc/s78np0812b12p6338l0ndvsm0000gn/T/trove-packaged-6drasv_e",
+  "checks": [
+    {
+      "step": "p0-create",
+      "passed": true,
+      "recordedAt": "2026-10-04T18:49:54.284272Z",
+      "state": {
+        "workspaceId": "01a10840-4bb8-75ce-ba76-afd5fea686c4",
+        "pageId": "01a10840-4d7f-7394-839b-a1ded5f01869",
+        "blockId": "01a10840-4e2b-74e8-a04b-d7ecf2f57286",
+        "collectionId": "",
+        "propertyId": "",
+        "recordId": "01a10840-4dc6-76a3-b128-39e9504e2ea4",
+        "recordPageId": "01a10840-4dc6-7324-88d3-bc0ecef8d862",
+        "fileId": "",
+        "fileBlockId": "",
+        "contentHash": ""
+      },
+      "checks": [
+        "Notion ZIP inventory and five-outcome reconciliation retained",
+        "imported page body and database record edits persisted",
+        "keyword search works without inference",
+        "forgotten and stale memory excluded from retrieval",
+        "durable interrupted recording remains recoverable"
+      ],
+      "processExitCode": 0,
+      "installedWeightsAvailable": false
+    },
+    {
+      "step": "p0-verify",
+      "passed": true,
+      "recordedAt": "2026-10-04T18:49:56.37376Z",
+      "state": {
+        "workspaceId": "01a10840-4bb8-75ce-ba76-afd5fea686c4",
+        "pageId": "01a10840-4d7f-7394-839b-a1ded5f01869",
+        "blockId": "01a10840-4e2b-74e8-a04b-d7ecf2f57286",
+        "collectionId": "",
+        "propertyId": "",
+        "recordId": "01a10840-4dc6-76a3-b128-39e9504e2ea4",
+        "recordPageId": "01a10840-4dc6-7324-88d3-bc0ecef8d862",
+        "fileId": "",
+        "fileBlockId": "",
+        "contentHash": ""
+      },
+      "checks": [
+        "Notion ZIP inventory and five-outcome reconciliation retained",
+        "imported page body and database record edits persisted",
+        "keyword search works without inference",
+        "forgotten and stale memory excluded from retrieval",
+        "durable interrupted recording remains recoverable",
+        "separate desktop restart preserved the complete data fixture",
+        "verified native backup restored to an unused workspace",
+        "restored canonical snapshot equals the source",
+        "restored interrupted recording finalized with its complete audio tail"
+      ],
+      "processExitCode": 0,
+      "installedWeightsAvailable": false,
+      "shell": {
+        "definition": "Go process initialization to canonical snapshot rendered plus two animation frames",
+        "recordedAt": "2026-10-04T18:49:56.730405Z",
+        "usableShellMs": 1531.826
+      }
+    }
+  ],
+  "networkDeniedByOS": true,
+  "passed": true,
+  "limitations": [
+    "Ad-hoc developer signature; not Developer ID or notarized.",
+    "Executed on this Mac with minimal PATH; a separate clean-machine installation is unverified.",
+    "Service integration fixture; interactive editing and accessibility use separate tests."
+  ]
+}

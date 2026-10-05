@@ -1,0 +1,5 @@
+ok  	trove.local/phase0/internal/native	2.223s
+ok  	trove.local/phase0/internal/workspace	4.049s
+ok  	trove.local/phase0/internal/workers	1.516s [no tests to run]
+ok  	trove.local/phase0/contracts	1.419s [no tests to run]
+ok  	trove.local/phase0	2.248s
