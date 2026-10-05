@@ -1,0 +1,538 @@
+{
+  "schemaVersion": 1,
+  "recordedAt": "2026-10-05T13:25:32.028128+00:00",
+  "sourceCommit": "1e12104e09515970cf9c8d2100ad8c8033cefe63",
+  "releaseQualified": false,
+  "scope": "Developer integration through actual local generation, saved drafts and reviewed proposal preparation; no packaged release or broad quality claim. Each result keeps the source revision on which it ran.",
+  "hardware": {
+    "hw.model": "Mac16,12",
+    "hw.memsize": "25769803776",
+    "machdep.cpu.brand_string": "Apple M4"
+  },
+  "operatingSystem": "ProductName:\t\tmacOS\nProductVersion:\t\t27.0.1\nBuildVersion:\t\t26A434",
+  "nativeHelper": {
+    "path": "/private/tmp/trove-completion-native-memory/llama-worker",
+    "sizeBytes": 7110688,
+    "sha256": "e2a14be8524c76491e0b4779604fd33f151905594c1eec96621c79596ca131c3"
+  },
+  "nativeBundleManifest": {
+    "path": "/private/tmp/trove-completion-native-memory/manifest.json",
+    "sizeBytes": 1042,
+    "sha256": "51a01bd8b9e95c65a19a7f86b4f4559bcb046e971652803eeb73bd4657321512"
+  },
+  "model": {
+    "manifest": {
+      "schemaVersion": 1,
+      "id": "01990000-0000-7000-8000-000000000106",
+      "name": "Qwen2.5 7B Instruct Q3",
+      "kind": "chat",
+      "format": "gguf",
+      "sha256": "a96b16179dc6cc9afdf0cf7a96a80c199cbd00b9be207c3465be21cb721cca5e",
+      "sizeBytes": 3808391072,
+      "url": "https://huggingface.co/Qwen/Qwen2.5-7B-Instruct-GGUF/resolve/bb5d59e06d9551d752d08b292a50eb208b07ab1f/qwen2.5-7b-instruct-q3_k_m.gguf",
+      "license": "Apache-2.0",
+      "licenseUrl": "https://huggingface.co/Qwen/Qwen2.5-7B-Instruct-GGUF/blob/bb5d59e06d9551d752d08b292a50eb208b07ab1f/LICENSE",
+      "sourceRevision": "bb5d59e06d9551d752d08b292a50eb208b07ab1f",
+      "runtimeCommit": "d2e54583c7452353eb35d40431281f6ee984332f",
+      "architecture": "portable",
+      "contextTokens": 8192,
+      "estimatedMemoryBytes": 8589934592
+    },
+    "file": {
+      "path": "/Users/suryasriramduvvuri/Library/Caches/Trove/completion/models/01990000-0000-7000-8000-000000000106.model",
+      "sizeBytes": 3808391072,
+      "sha256": "a96b16179dc6cc9afdf0cf7a96a80c199cbd00b9be207c3465be21cb721cca5e"
+    }
+  },
+  "contextWindow": 8192,
+  "outputCap": 512,
+  "network": "Denied by macOS sandbox-exec during actual-model runs",
+  "oracle": {
+    "path": "internal/workspace/ai_local_modes_test.go",
+    "sizeBytes": 10728,
+    "sha256": "5e56a20f7df192bf75cfcac49151ae8f3ab14b897501ad0e5edefba991d8578d"
+  },
+  "sourceFiles": [
+    {
+      "path": "internal/workspace/ai_local_modes_test.go",
+      "sizeBytes": 10728,
+      "sha256": "5e56a20f7df192bf75cfcac49151ae8f3ab14b897501ad0e5edefba991d8578d"
+    },
+    {
+      "path": "internal/workspace/ai_generation.go",
+      "sizeBytes": 12798,
+      "sha256": "daf3053f23c5fd3dd28694f7b816c9b5f0d35c8cc737709262952caaa4698419"
+    },
+    {
+      "path": "internal/workspace/ai_generation_test.go",
+      "sizeBytes": 9572,
+      "sha256": "23be0841775db866103accf0cfc1c55538df793152552a83e2fe563e14e2d75e"
+    },
+    {
+      "path": "internal/workspace/ai_database_generation.go",
+      "sizeBytes": 3807,
+      "sha256": "71a3383677dee8bc8dc23064fa510539435fc1a4be4d49b8a7398dde1ac5cd46"
+    },
+    {
+      "path": "internal/workspace/ai_database_generation_test.go",
+      "sizeBytes": 3929,
+      "sha256": "e2ddee90429132edc9dc5a6e06ab19c513ea16ce7866114b2365c3e581322e16"
+    },
+    {
+      "path": "internal/workspace/ai_advanced.go",
+      "sizeBytes": 19822,
+      "sha256": "cf67a410f21047a5752bf263a47a5698a653b29fc89324bb04ced8d0541213cd"
+    },
+    {
+      "path": "internal/workspace/ai_advanced_test.go",
+      "sizeBytes": 11218,
+      "sha256": "287aecec7f9b7b3d5657fec42e87b3c45444a6b7e317b5ebbcc8d56f65c241e6"
+    }
+  ],
+  "latestApplicableResults": [
+    {
+      "mode": "summarize",
+      "taskPassed": true,
+      "latencyMs": 40335,
+      "canonicalUnchanged": true,
+      "promptTokens": 345,
+      "outputCap": 512,
+      "peakWorkerRSS": null,
+      "log": "initial-modes.txt",
+      "sourceCommit": "5292f6d2a1282ce9543d2c2ed159d230333c9290"
+    },
+    {
+      "mode": "explain",
+      "taskPassed": true,
+      "latencyMs": 36770,
+      "canonicalUnchanged": true,
+      "promptTokens": 342,
+      "outputCap": 512,
+      "peakWorkerRSS": null,
+      "log": "initial-modes.txt",
+      "sourceCommit": "5292f6d2a1282ce9543d2c2ed159d230333c9290"
+    },
+    {
+      "mode": "rewrite",
+      "taskPassed": true,
+      "latencyMs": 22343,
+      "canonicalUnchanged": true,
+      "promptTokens": 135,
+      "outputCap": 512,
+      "peakWorkerRSS": null,
+      "log": "initial-modes.txt",
+      "sourceCommit": "5292f6d2a1282ce9543d2c2ed159d230333c9290"
+    },
+    {
+      "mode": "shorten",
+      "taskPassed": true,
+      "latencyMs": 19911,
+      "canonicalUnchanged": true,
+      "promptTokens": 137,
+      "outputCap": 512,
+      "peakWorkerRSS": null,
+      "log": "initial-modes.txt",
+      "sourceCommit": "5292f6d2a1282ce9543d2c2ed159d230333c9290"
+    },
+    {
+      "mode": "expand",
+      "taskPassed": true,
+      "latencyMs": 23654,
+      "canonicalUnchanged": true,
+      "promptTokens": 154,
+      "outputCap": 512,
+      "peakWorkerRSS": null,
+      "log": "initial-modes.txt",
+      "sourceCommit": "5292f6d2a1282ce9543d2c2ed159d230333c9290"
+    },
+    {
+      "mode": "outline",
+      "taskPassed": true,
+      "latencyMs": 23126,
+      "canonicalUnchanged": true,
+      "promptTokens": 170,
+      "outputCap": 512,
+      "peakWorkerRSS": null,
+      "log": "affected-modes.txt",
+      "sourceCommit": "93c8b664710373cb94db8d494f368ebfa63a6376"
+    },
+    {
+      "mode": "generate",
+      "taskPassed": true,
+      "latencyMs": 30043,
+      "canonicalUnchanged": true,
+      "promptTokens": 152,
+      "outputCap": 512,
+      "peakWorkerRSS": null,
+      "log": "initial-modes.txt",
+      "sourceCommit": "5292f6d2a1282ce9543d2c2ed159d230333c9290"
+    },
+    {
+      "mode": "database",
+      "taskPassed": true,
+      "latencyMs": 15358,
+      "canonicalUnchanged": true,
+      "promptTokens": 233,
+      "outputCap": 512,
+      "peakWorkerRSS": null,
+      "log": "final-affected-modes.txt",
+      "sourceCommit": "005180846ceb9e0f0e08c1c0d8e442af0ce8a91b"
+    },
+    {
+      "mode": "schema",
+      "taskPassed": true,
+      "latencyMs": 13942,
+      "canonicalUnchanged": true,
+      "promptTokens": 234,
+      "outputCap": 512,
+      "peakWorkerRSS": null,
+      "log": "final-affected-modes.txt",
+      "sourceCommit": "005180846ceb9e0f0e08c1c0d8e442af0ce8a91b"
+    },
+    {
+      "mode": "mermaid",
+      "taskPassed": true,
+      "latencyMs": 11365,
+      "canonicalUnchanged": true,
+      "promptTokens": 172,
+      "outputCap": 512,
+      "peakWorkerRSS": null,
+      "log": "final-affected-modes.txt",
+      "sourceCommit": "005180846ceb9e0f0e08c1c0d8e442af0ce8a91b"
+    },
+    {
+      "mode": "code_explain",
+      "taskPassed": true,
+      "latencyMs": 31314,
+      "canonicalUnchanged": true,
+      "promptTokens": 127,
+      "outputCap": 512,
+      "peakWorkerRSS": null,
+      "log": "initial-modes.txt",
+      "sourceCommit": "5292f6d2a1282ce9543d2c2ed159d230333c9290"
+    },
+    {
+      "mode": "code_refactor",
+      "taskPassed": true,
+      "latencyMs": 13012,
+      "canonicalUnchanged": true,
+      "promptTokens": 148,
+      "outputCap": 512,
+      "peakWorkerRSS": null,
+      "log": "final-affected-modes.txt",
+      "sourceCommit": "005180846ceb9e0f0e08c1c0d8e442af0ce8a91b"
+    },
+    {
+      "mode": "code_comment",
+      "taskPassed": false,
+      "latencyMs": 15436,
+      "canonicalUnchanged": true,
+      "promptTokens": 181,
+      "outputCap": 512,
+      "peakWorkerRSS": null,
+      "log": "final-affected-modes.txt",
+      "sourceCommit": "005180846ceb9e0f0e08c1c0d8e442af0ce8a91b"
+    },
+    {
+      "mode": "organize",
+      "taskPassed": true,
+      "latencyMs": 80721,
+      "canonicalUnchanged": true,
+      "promptTokens": 152,
+      "outputCap": 512,
+      "peakWorkerRSS": null,
+      "log": "initial-modes.txt",
+      "sourceCommit": "5292f6d2a1282ce9543d2c2ed159d230333c9290"
+    }
+  ],
+  "summary": {
+    "passed": 13,
+    "failed": 1,
+    "canonicalMutations": 0,
+    "peakWorkerRSS": "not captured",
+    "correctionEffort": "Observed required correction: remove two surrounding Markdown fence lines from code_comment draft. No user correction-time measurement was performed.",
+    "latencyInterpretation": "Single developer observations on synthetic inputs; hardware contention and warm-up were not controlled as a performance benchmark."
+  },
+  "retainedRuns": {
+    "initial-modes.txt": [
+      {
+        "mode": "summarize",
+        "taskPassed": true,
+        "latencyMs": 40335,
+        "canonicalUnchanged": true,
+        "promptTokens": 345,
+        "outputCap": 512,
+        "peakWorkerRSS": null
+      },
+      {
+        "mode": "explain",
+        "taskPassed": true,
+        "latencyMs": 36770,
+        "canonicalUnchanged": true,
+        "promptTokens": 342,
+        "outputCap": 512,
+        "peakWorkerRSS": null
+      },
+      {
+        "mode": "rewrite",
+        "taskPassed": true,
+        "latencyMs": 22343,
+        "canonicalUnchanged": true,
+        "promptTokens": 135,
+        "outputCap": 512,
+        "peakWorkerRSS": null
+      },
+      {
+        "mode": "shorten",
+        "taskPassed": true,
+        "latencyMs": 19911,
+        "canonicalUnchanged": true,
+        "promptTokens": 137,
+        "outputCap": 512,
+        "peakWorkerRSS": null
+      },
+      {
+        "mode": "expand",
+        "taskPassed": true,
+        "latencyMs": 23654,
+        "canonicalUnchanged": true,
+        "promptTokens": 154,
+        "outputCap": 512,
+        "peakWorkerRSS": null
+      },
+      {
+        "mode": "outline",
+        "taskPassed": false,
+        "latencyMs": 24442,
+        "canonicalUnchanged": true,
+        "promptTokens": 147,
+        "outputCap": 512,
+        "peakWorkerRSS": null
+      },
+      {
+        "mode": "generate",
+        "taskPassed": true,
+        "latencyMs": 30043,
+        "canonicalUnchanged": true,
+        "promptTokens": 152,
+        "outputCap": 512,
+        "peakWorkerRSS": null
+      },
+      {
+        "mode": "database",
+        "taskPassed": true,
+        "latencyMs": 21112,
+        "canonicalUnchanged": true,
+        "promptTokens": 172,
+        "outputCap": 512,
+        "peakWorkerRSS": null
+      },
+      {
+        "mode": "schema",
+        "taskPassed": false,
+        "latencyMs": 24497,
+        "canonicalUnchanged": true,
+        "promptTokens": 146,
+        "outputCap": 512,
+        "peakWorkerRSS": null
+      },
+      {
+        "mode": "mermaid",
+        "taskPassed": true,
+        "latencyMs": 15282,
+        "canonicalUnchanged": true,
+        "promptTokens": 172,
+        "outputCap": 512,
+        "peakWorkerRSS": null
+      },
+      {
+        "mode": "code_explain",
+        "taskPassed": true,
+        "latencyMs": 31314,
+        "canonicalUnchanged": true,
+        "promptTokens": 127,
+        "outputCap": 512,
+        "peakWorkerRSS": null
+      },
+      {
+        "mode": "code_refactor",
+        "taskPassed": true,
+        "latencyMs": 17519,
+        "canonicalUnchanged": true,
+        "promptTokens": 148,
+        "outputCap": 512,
+        "peakWorkerRSS": null
+      },
+      {
+        "mode": "code_comment",
+        "taskPassed": false,
+        "latencyMs": 20742,
+        "canonicalUnchanged": true,
+        "promptTokens": 140,
+        "outputCap": 512,
+        "peakWorkerRSS": null
+      },
+      {
+        "mode": "organize",
+        "taskPassed": true,
+        "latencyMs": 80721,
+        "canonicalUnchanged": true,
+        "promptTokens": 152,
+        "outputCap": 512,
+        "peakWorkerRSS": null
+      }
+    ],
+    "affected-modes.txt": [
+      {
+        "mode": "outline",
+        "taskPassed": true,
+        "latencyMs": 23126,
+        "canonicalUnchanged": true,
+        "promptTokens": 170,
+        "outputCap": 512,
+        "peakWorkerRSS": null
+      },
+      {
+        "mode": "database",
+        "taskPassed": true,
+        "latencyMs": 23736,
+        "canonicalUnchanged": true,
+        "promptTokens": 233,
+        "outputCap": 512,
+        "peakWorkerRSS": null
+      },
+      {
+        "mode": "schema",
+        "taskPassed": false,
+        "latencyMs": 22476,
+        "canonicalUnchanged": true,
+        "promptTokens": 234,
+        "outputCap": 512,
+        "peakWorkerRSS": null
+      },
+      {
+        "mode": "mermaid",
+        "taskPassed": true,
+        "latencyMs": 22613,
+        "canonicalUnchanged": true,
+        "promptTokens": 172,
+        "outputCap": 512,
+        "peakWorkerRSS": null
+      },
+      {
+        "mode": "code_refactor",
+        "taskPassed": true,
+        "latencyMs": 19477,
+        "canonicalUnchanged": true,
+        "promptTokens": 148,
+        "outputCap": 512,
+        "peakWorkerRSS": null
+      },
+      {
+        "mode": "code_comment",
+        "taskPassed": true,
+        "latencyMs": 16955,
+        "canonicalUnchanged": true,
+        "promptTokens": 140,
+        "outputCap": 512,
+        "peakWorkerRSS": null
+      }
+    ],
+    "final-affected-modes.txt": [
+      {
+        "mode": "database",
+        "taskPassed": true,
+        "latencyMs": 15358,
+        "canonicalUnchanged": true,
+        "promptTokens": 233,
+        "outputCap": 512,
+        "peakWorkerRSS": null
+      },
+      {
+        "mode": "schema",
+        "taskPassed": true,
+        "latencyMs": 13942,
+        "canonicalUnchanged": true,
+        "promptTokens": 234,
+        "outputCap": 512,
+        "peakWorkerRSS": null
+      },
+      {
+        "mode": "mermaid",
+        "taskPassed": true,
+        "latencyMs": 11365,
+        "canonicalUnchanged": true,
+        "promptTokens": 172,
+        "outputCap": 512,
+        "peakWorkerRSS": null
+      },
+      {
+        "mode": "code_refactor",
+        "taskPassed": true,
+        "latencyMs": 13012,
+        "canonicalUnchanged": true,
+        "promptTokens": 148,
+        "outputCap": 512,
+        "peakWorkerRSS": null
+      },
+      {
+        "mode": "code_comment",
+        "taskPassed": false,
+        "latencyMs": 15436,
+        "canonicalUnchanged": true,
+        "promptTokens": 181,
+        "outputCap": 512,
+        "peakWorkerRSS": null
+      }
+    ]
+  },
+  "raceChecks": {
+    "pass": 43,
+    "fail": 0,
+    "skip": 0,
+    "topLevelPassed": 35,
+    "source": "1e12104",
+    "log": "final-race.jsonl"
+  },
+  "limitations": [
+    "One fixed synthetic task per exposed mode is not a representative quality suite.",
+    "13/14 is the latest applicable result across affected reruns, not a single all-mode pass on the final source.",
+    "The intermediate code_comment pass at93c8b66 used unsafe source-fence removal; it is withdrawn. Exact code bytes are preserved in the final implementation.",
+    "Code commenting remains a quality failure. The final proposal guard refuses an unedited wrapper in known programming languages without changing draft or canonical source. Explicitly corrected drafts can be reviewed.",
+    "The original1.5B memory failure remains in the separate evidence; the optional7B pack is selected explicitly.",
+    "answer and workspace_agent have separate memory/held-out/creation evidence, not part of these14 cases.",
+    "Real user correction time, peak RSS, representative datasets, candidate native UI and platform release qualification remain open."
+  ],
+  "evidenceFiles": [
+    {
+      "path": "evidence/completion/ai-modes/affected-modes.txt",
+      "sizeBytes": 5619,
+      "sha256": "88c8a06dddd720455400dc45bc2417587a207acce074ce10d82be4fc70cd4c6c"
+    },
+    {
+      "path": "evidence/completion/ai-modes/affected-race.jsonl",
+      "sizeBytes": 33751,
+      "sha256": "8cba8eb006785ecec917fd6707b0647a2728a4f7303f6cbb4027e863ce316d09"
+    },
+    {
+      "path": "evidence/completion/ai-modes/final-affected-modes.txt",
+      "sizeBytes": 4664,
+      "sha256": "4b3a26a7f1908406ff0a126f9f6347906b3397eaf3e62c5bf14265b2635e6fe0"
+    },
+    {
+      "path": "evidence/completion/ai-modes/final-race.jsonl",
+      "sizeBytes": 39899,
+      "sha256": "747c34527264bdef16ca9c33948161562279932fde15267d411482994a2fcc4e"
+    },
+    {
+      "path": "evidence/completion/ai-modes/initial-modes.txt",
+      "sizeBytes": 20870,
+      "sha256": "6946f5a78424c4e64f0cb1fbf397c5637f9936076d975c5e063202babf1a41f9"
+    },
+    {
+      "path": "evidence/completion/ai-modes/structured-draft-review.json",
+      "sizeBytes": 28643,
+      "sha256": "71d7974c17a9c35edcdb0f3409df49fe8d8319d9bf9f8c81d7272beec1e22a31"
+    }
+  ]
+}
