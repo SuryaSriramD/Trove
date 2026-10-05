@@ -15,6 +15,7 @@ import (
 	"net/url"
 	"os"
 	"path/filepath"
+	"runtime"
 	"strings"
 	"sync"
 	"sync/atomic"
@@ -85,11 +86,16 @@ func newFixture(t *testing.T) *fixture {
 	if err != nil {
 		t.Fatal(err)
 	}
-	root, err := os.MkdirTemp("/private/tmp", "trove-auth-")
+	base, err := filepath.EvalSymlinks(os.TempDir())
 	if err != nil {
 		t.Fatal(err)
 	}
-	t.Cleanup(func() { os.RemoveAll(root) })
+	temporary, err := os.MkdirTemp(base, "trove-auth-")
+	if err != nil {
+		t.Fatal(err)
+	}
+	t.Cleanup(func() { os.RemoveAll(temporary) })
+	root := filepath.Join(temporary, "accounts")
 	f := &fixture{t: t, key: key, root: root, store: &memoryStore{data: map[string][]byte{}}, scopes: scope}
 	f.clock.Store(time.Now().Unix())
 	m, err := newManager(root, f.store, roundTrip(f.transport), func() time.Time { return time.Unix(f.clock.Load(), 0) })
@@ -534,15 +540,20 @@ func TestSIWCPrivateStorageAndEndpointBoundaries(t *testing.T) {
 	f := newFixture(t)
 	outside := filepath.Join(f.root, "public")
 	os.Mkdir(outside, 0755)
-	if m, err := newManager(outside, f.store, roundTrip(f.transport), time.Now); err == nil {
-		m.Close()
-		t.Fatal("public storage accepted")
+	if runtime.GOOS != "windows" {
+		if m, err := newManager(outside, f.store, roundTrip(f.transport), time.Now); err == nil {
+			m.Close()
+			t.Fatal("public storage accepted")
+		}
 	}
 	link := filepath.Join(f.root, "link")
-	os.Symlink(f.root, link)
-	if m, err := newManager(link, f.store, roundTrip(f.transport), time.Now); err == nil {
-		m.Close()
-		t.Fatal("symlink storage accepted")
+	if err := os.Symlink(f.root, link); err == nil {
+		if m, err := newManager(link, f.store, roundTrip(f.transport), time.Now); err == nil {
+			m.Close()
+			t.Fatal("symlink storage accepted")
+		}
+	} else {
+		t.Log("Symlink creation unavailable; native reparse-point qualification remains required:", err)
 	}
 	req, _ := http.NewRequest("GET", "https://other.invalid/.well-known/jwks.json", nil)
 	if _, err := f.manager.client.Do(req); err == nil {

@@ -1,0 +1,61 @@
+=== RUN   TestSIWCRegistrationPKCEStatePersistenceAndRedaction
+--- PASS: TestSIWCRegistrationPKCEStatePersistenceAndRedaction (0.27s)
+=== RUN   TestSIWCRejectsUnverifiedIDTokens
+=== RUN   TestSIWCRejectsUnverifiedIDTokens/issuer
+=== RUN   TestSIWCRejectsUnverifiedIDTokens/audience
+=== RUN   TestSIWCRejectsUnverifiedIDTokens/nonce
+=== RUN   TestSIWCRejectsUnverifiedIDTokens/expired
+=== RUN   TestSIWCRejectsUnverifiedIDTokens/signature
+=== RUN   TestSIWCRejectsUnverifiedIDTokens/azp
+--- PASS: TestSIWCRejectsUnverifiedIDTokens (1.39s)
+    --- PASS: TestSIWCRejectsUnverifiedIDTokens/issuer (0.19s)
+    --- PASS: TestSIWCRejectsUnverifiedIDTokens/audience (0.10s)
+    --- PASS: TestSIWCRejectsUnverifiedIDTokens/nonce (0.28s)
+    --- PASS: TestSIWCRejectsUnverifiedIDTokens/expired (0.49s)
+    --- PASS: TestSIWCRejectsUnverifiedIDTokens/signature (0.05s)
+    --- PASS: TestSIWCRejectsUnverifiedIDTokens/azp (0.28s)
+=== RUN   TestSIWCAccountsStaySeparateAndReturningIdentityCannotChange
+--- PASS: TestSIWCAccountsStaySeparateAndReturningIdentityCannotChange (0.25s)
+=== RUN   TestSIWCRefreshSerializesAndRetainsScope
+--- PASS: TestSIWCRefreshSerializesAndRetainsScope (0.41s)
+=== RUN   TestSIWCRefreshFailureRecovery
+=== RUN   TestSIWCRefreshFailureRecovery/temporary
+=== RUN   TestSIWCRefreshFailureRecovery/invalid_grant
+=== RUN   TestSIWCRefreshFailureRecovery/invalid_client
+--- PASS: TestSIWCRefreshFailureRecovery (0.79s)
+    --- PASS: TestSIWCRefreshFailureRecovery/temporary (0.29s)
+    --- PASS: TestSIWCRefreshFailureRecovery/invalid_grant (0.24s)
+    --- PASS: TestSIWCRefreshFailureRecovery/invalid_client (0.26s)
+=== RUN   TestSIWCPlanPermissionAndSecureStoreFailures
+--- PASS: TestSIWCPlanPermissionAndSecureStoreFailures (0.58s)
+=== RUN   TestSIWCCancelDuringExchangeCannotSaveTokens
+--- PASS: TestSIWCCancelDuringExchangeCannotSaveTokens (0.09s)
+=== RUN   TestSIWCInvalidGrantRetryReusesIssuedClient
+--- PASS: TestSIWCInvalidGrantRetryReusesIssuedClient (0.28s)
+=== RUN   TestSIWCRevocationRetriesAndReportsUnconfirmed
+=== RUN   TestSIWCRevocationRetriesAndReportsUnconfirmed/1
+=== RUN   TestSIWCRevocationRetriesAndReportsUnconfirmed/3
+--- PASS: TestSIWCRevocationRetriesAndReportsUnconfirmed (0.76s)
+    --- PASS: TestSIWCRevocationRetriesAndReportsUnconfirmed/1 (0.33s)
+    --- PASS: TestSIWCRevocationRetriesAndReportsUnconfirmed/3 (0.43s)
+=== RUN   TestSIWCPrivateStorageAndEndpointBoundaries
+--- PASS: TestSIWCPrivateStorageAndEndpointBoundaries (0.22s)
+=== RUN   TestSIWCFailedCredentialCleanupIsRetryableAndCannotAuthorize
+--- PASS: TestSIWCFailedCredentialCleanupIsRetryableAndCannotAuthorize (0.42s)
+=== RUN   TestSIWCCallbackRejectsDuplicateFieldsAndHandlesDeniedConsent
+--- PASS: TestSIWCCallbackRejectsDuplicateFieldsAndHandlesDeniedConsent (0.40s)
+=== RUN   TestSecretServiceIndependentVectors
+--- PASS: TestSecretServiceIndependentVectors (0.00s)
+=== RUN   TestSecretServiceBoundedRandomizedCiphertext
+--- PASS: TestSecretServiceBoundedRandomizedCiphertext (0.00s)
+=== RUN   TestSecretServicePrivateBusRoundTripAndRotation
+--- PASS: TestSecretServicePrivateBusRoundTripAndRotation (0.38s)
+=== RUN   TestSecretServiceRefusesDuplicatesWrongSessionAndDismissedPrompt
+--- PASS: TestSecretServiceRefusesDuplicatesWrongSessionAndDismissedPrompt (0.36s)
+=== RUN   TestSecretServiceCancellationDismissesOnlyItsPrompt
+--- PASS: TestSecretServiceCancellationDismissesOnlyItsPrompt (0.30s)
+=== RUN   TestSecretServiceCreatesMissingDefaultAndNeverFallsBackToPlain
+    secret_service_test.go:224: Synthetic bus error: "org.freedesktop.DBus.Error.NotSupported" []
+--- PASS: TestSecretServiceCreatesMissingDefaultAndNeverFallsBackToPlain (0.29s)
+PASS
+ok  	trove.local/phase0/internal/providers/auth	8.765s

@@ -3,7 +3,10 @@ package main
 import (
 	"context"
 	"encoding/json"
+	"fmt"
+	"strings"
 	"testing"
+	"trove.local/phase0/internal/providers/auth"
 
 	"trove.local/phase0/contracts"
 	"trove.local/phase0/internal/workspace"
@@ -56,4 +59,14 @@ func TestProviderAuthRejectsUntrustedInputsBeforeCredentialStorage(t *testing.T)
 	app.execution = owner
 	k.RevokeGrant(string(owner.ScopeGrantId))
 	check("providers.auth.list", request(nil), "SCOPE_DENIED")
+}
+
+func TestProviderAuthStorageReasonOnlyExposesTypedPublicMessages(t *testing.T) {
+	safe := &auth.Error{Code: "CREDENTIAL_STORE_UNAVAILABLE", Message: "An encrypted desktop keyring is required"}
+	if got := providerAuthStorageReason(fmt.Errorf("wrapped: %w", safe)); got != safe.Message {
+		t.Fatal(got)
+	}
+	if got := providerAuthStorageReason(fmt.Errorf("raw OS error with synthetic-secret-value")); strings.Contains(got, "synthetic-secret-value") || got != "Protected account storage is unavailable on this host" {
+		t.Fatal(got)
+	}
 }
