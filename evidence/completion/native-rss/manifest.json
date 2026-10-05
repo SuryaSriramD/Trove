@@ -1,0 +1,86 @@
+{
+  "recordedAt": "2026-10-05T13:57:06.349097+00:00",
+  "sourceBase": "503b4f7f27e32eded0e671f4343820355413a63b",
+  "releaseQualified": false,
+  "finding": {
+    "oldSampler": "/bin/ps -o rss= -p <owned process>",
+    "ordinaryResult": "passed",
+    "offlineResult": {
+      "exitCode": 71,
+      "stderr": "sandbox-exec: execvp() of '/bin/ps' failed: Operation not permitted"
+    },
+    "cause": "The installed macOS ps is setuid. Offline sandbox refuses execution. Prior zero collector values mean unavailable, never zero memory."
+  },
+  "newSampler": {
+    "macOS": "proc_pidinfo(PROC_PIDTASKINFO).pti_resident_size through libproc from the pinned local SDK",
+    "Linux": "bounded read of /proc/<owned worker pid>/statm resident pages times OS page size",
+    "Windows": "unchanged GetProcessMemoryInfo/Job Object"
+  },
+  "checks": {
+    "pass": 87,
+    "fail": 0,
+    "skip": 22
+  },
+  "offlineExpectedOutcome": "Owned touched8MiB allocation has at least8MiB resident bytes; direct native test passed with deny network* policy.",
+  "sourceFiles": [
+    {
+      "path": "internal/native/platform_unix.go",
+      "sizeBytes": 1529,
+      "sha256": "cc958938353246cdb57684f5d2cf99406113425b3dfcb601daaeb53efbc5d1e8"
+    },
+    {
+      "path": "internal/native/rss_darwin.go",
+      "sizeBytes": 953,
+      "sha256": "a8126cea0096db897cb612f8b6093acaae06574ed10b52e1fcfd12f989ea8162"
+    },
+    {
+      "path": "internal/native/rss_darwin_nocgo.go",
+      "sizeBytes": 195,
+      "sha256": "453dc5aec833386b215234d46eeb1771ae93f7c88837cecd91e34e7ec0426878"
+    },
+    {
+      "path": "internal/native/rss_linux.go",
+      "sizeBytes": 759,
+      "sha256": "329de8611629b75eff3c0a00c1c547e6f90901f449bc14f8b1cafaaebbd4fb3a"
+    },
+    {
+      "path": "internal/native/rss_unix_test.go",
+      "sizeBytes": 941,
+      "sha256": "9232bcf330a4141d337b163812710ba88a0060f5bff0916f611fe244b41c07d8"
+    }
+  ],
+  "evidence": [
+    {
+      "path": "evidence/completion/native-rss/linux-compile.txt",
+      "sizeBytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "evidence/completion/native-rss/offline.txt",
+      "sizeBytes": 111,
+      "sha256": "b2ef26c0db7bb35e8feb123467fea4a4b11ab5a60c8462d29e7e39297ab13e21"
+    },
+    {
+      "path": "evidence/completion/native-rss/native-race.jsonl",
+      "sizeBytes": 100341,
+      "sha256": "16f7b9584f4318a55d5bac519db5f1356e33c160e82425d8bbf44f9d0caf8d61"
+    }
+  ],
+  "sdkHeaders": [
+    {
+      "path": "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX27.0.sdk/usr/include/libproc.h",
+      "sizeBytes": 7575,
+      "sha256": "246d87709fc6b9157ce5cf3c475656ac48e0e1ae8bbdc46cf45acd34294448cd"
+    },
+    {
+      "path": "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX27.0.sdk/usr/include/sys/proc_info.h",
+      "sizeBytes": 31262,
+      "sha256": "e427fa96b348537b21552b9de71e01039410bcad2cedee5584c5e5fddafd70fc"
+    }
+  ],
+  "limitations": [
+    "Sampled process resident bytes, not an exact peak or total application/system/GPU-driver allocation.",
+    "Linux sampler cross-compiled only; target execution remains open.",
+    "Darwin non-CGO builds report measurement unavailable; production desktop already requires CGO."
+  ]
+}
