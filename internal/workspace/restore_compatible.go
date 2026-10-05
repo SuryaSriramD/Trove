@@ -8,6 +8,8 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
+
+	"trove.local/phase0/internal/platformfs"
 )
 
 // RestoreBackupCompatible is exclusively for a paired application rollback. It
@@ -31,6 +33,9 @@ func RestoreBackupCompatible(ctx context.Context, source, destination string, ex
 	}
 	if actual != expectedFormat {
 		return result, Fail("CONFLICT", "Backup storage format does not match the paired application")
+	}
+	if err = platformfs.RequireRecoveryDurability(); err != nil {
+		return result, err
 	}
 	destination, err = filepath.Abs(destination)
 	if err != nil {

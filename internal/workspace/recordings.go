@@ -18,6 +18,7 @@ import (
 	"sync"
 
 	"trove.local/phase0/contracts"
+	"trove.local/phase0/internal/platformfs"
 )
 
 type RecordingSegment struct {
@@ -81,15 +82,7 @@ func (k *Kernel) writeRecording(d RecordingDraft) error {
 	if err != nil {
 		return err
 	}
-	if err = os.Rename(f.Name(), path); err != nil {
-		return err
-	}
-	directory, err := os.Open(filepath.Dir(path))
-	if err != nil {
-		return err
-	}
-	defer directory.Close()
-	return directory.Sync()
+	return platformfs.PublishFile(f.Name(), path, true)
 }
 func (k *Kernel) readRecording(e contracts.ServiceExecutionContext, id string) (RecordingDraft, error) {
 	var d RecordingDraft

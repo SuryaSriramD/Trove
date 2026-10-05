@@ -15,6 +15,8 @@ import (
 	"sort"
 	"strconv"
 	"strings"
+
+	"trove.local/phase0/internal/platformfs"
 )
 
 const migrationJournalName = "migration-journal.json"
@@ -384,6 +386,9 @@ func copyMigrationObject(ctx context.Context, source, destination string, object
 }
 
 func (k *Kernel) createMigrationSnapshot(ctx context.Context, before CompatibilityDescriptor) (*migrationJournal, error) {
+	if err := platformfs.RequireRecoveryDurability(); err != nil {
+		return nil, err
+	}
 	parent := filepath.Join(k.path, migrationSnapshotRoot)
 	if err := safeDirectory(parent); err != nil {
 		return nil, err
@@ -620,6 +625,9 @@ func RestoreMigrationSnapshotReviewed(ctx context.Context, snapshotDir, newDesti
 }
 
 func restoreMigrationSnapshotVerified(ctx context.Context, snapshotDir, newDestination string, m MigrationSnapshotManifest) (MigrationSnapshotManifest, error) {
+	if err := platformfs.RequireRecoveryDurability(); err != nil {
+		return m, err
+	}
 	destination, err := filepath.Abs(newDestination)
 	if err != nil {
 		return m, err

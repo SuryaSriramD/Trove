@@ -13,6 +13,7 @@ import (
 	"strconv"
 
 	"trove.local/phase0/contracts"
+	"trove.local/phase0/internal/platformfs"
 )
 
 type BackupObject struct {
@@ -48,6 +49,9 @@ func (k *Kernel) CreateBackup(ctx context.Context, e contracts.ServiceExecutionC
 
 func (k *Kernel) createBackup(ctx context.Context, e contracts.ServiceExecutionContext, destination string, afterDatabaseStep func() error) (manifest BackupManifest, err error) {
 	if err = requireOwnerScope(k, e); err != nil {
+		return manifest, err
+	}
+	if err = platformfs.RequireRecoveryDurability(); err != nil {
 		return manifest, err
 	}
 	destination, err = filepath.Abs(destination)

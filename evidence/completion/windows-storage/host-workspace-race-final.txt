@@ -1,0 +1,148 @@
+=== RUN   TestRecoveryAllowsOnlyHistoricalUnavailableSyncedReferences
+--- PASS: TestRecoveryAllowsOnlyHistoricalUnavailableSyncedReferences (0.40s)
+=== RUN   TestMigrationFailureRollsBackWholeSchema
+--- PASS: TestMigrationFailureRollsBackWholeSchema (0.01s)
+=== RUN   TestBackupDestinationJobAndLostAcknowledgement
+--- PASS: TestBackupDestinationJobAndLostAcknowledgement (0.15s)
+=== RUN   TestFileAndMeetingJobsCannotEscapePageScope
+--- PASS: TestFileAndMeetingJobsCannotEscapePageScope (0.10s)
+=== RUN   TestMigrationSnapshotPreservesLegacyDatabaseAssetsAndRawRecording
+--- PASS: TestMigrationSnapshotPreservesLegacyDatabaseAssetsAndRawRecording (0.39s)
+=== RUN   TestMigrationV1FullSnapshotPrecedesKernelAndPackageSchema
+--- PASS: TestMigrationV1FullSnapshotPrecedesKernelAndPackageSchema (0.11s)
+=== RUN   TestMigrationInterruptedBoundariesFenceAndRestoreOriginal
+=== RUN   TestMigrationInterruptedBoundariesFenceAndRestoreOriginal/after_journal
+=== RUN   TestMigrationInterruptedBoundariesFenceAndRestoreOriginal/before_initializers
+=== RUN   TestMigrationInterruptedBoundariesFenceAndRestoreOriginal/after_initializers
+--- PASS: TestMigrationInterruptedBoundariesFenceAndRestoreOriginal (0.59s)
+    --- PASS: TestMigrationInterruptedBoundariesFenceAndRestoreOriginal/after_journal (0.20s)
+    --- PASS: TestMigrationInterruptedBoundariesFenceAndRestoreOriginal/before_initializers (0.19s)
+    --- PASS: TestMigrationInterruptedBoundariesFenceAndRestoreOriginal/after_initializers (0.21s)
+=== RUN   TestMigrationCompletionCrashFinishesOnlyVerifiedIdentity
+=== RUN   TestMigrationCompletionCrashFinishesOnlyVerifiedIdentity/after_stamp
+=== RUN   TestMigrationCompletionCrashFinishesOnlyVerifiedIdentity/after_completion
+--- PASS: TestMigrationCompletionCrashFinishesOnlyVerifiedIdentity (0.35s)
+    --- PASS: TestMigrationCompletionCrashFinishesOnlyVerifiedIdentity/after_stamp (0.17s)
+    --- PASS: TestMigrationCompletionCrashFinishesOnlyVerifiedIdentity/after_completion (0.18s)
+=== RUN   TestMigrationCorruptionCannotBypassRecoveryFence
+=== RUN   TestMigrationCorruptionCannotBypassRecoveryFence/missing_snapshot
+=== RUN   TestMigrationCorruptionCannotBypassRecoveryFence/damaged_asset
+=== RUN   TestMigrationCorruptionCannotBypassRecoveryFence/missing_journal
+=== RUN   TestMigrationCorruptionCannotBypassRecoveryFence/invalid_journal
+=== RUN   TestMigrationCorruptionCannotBypassRecoveryFence/wrong_identity
+=== RUN   TestMigrationCorruptionCannotBypassRecoveryFence/wrong_digest
+=== RUN   TestMigrationCorruptionCannotBypassRecoveryFence/unrelated_marker
+--- PASS: TestMigrationCorruptionCannotBypassRecoveryFence (1.00s)
+    --- PASS: TestMigrationCorruptionCannotBypassRecoveryFence/missing_snapshot (0.14s)
+    --- PASS: TestMigrationCorruptionCannotBypassRecoveryFence/damaged_asset (0.14s)
+    --- PASS: TestMigrationCorruptionCannotBypassRecoveryFence/missing_journal (0.14s)
+    --- PASS: TestMigrationCorruptionCannotBypassRecoveryFence/invalid_journal (0.12s)
+    --- PASS: TestMigrationCorruptionCannotBypassRecoveryFence/wrong_identity (0.16s)
+    --- PASS: TestMigrationCorruptionCannotBypassRecoveryFence/wrong_digest (0.15s)
+    --- PASS: TestMigrationCorruptionCannotBypassRecoveryFence/unrelated_marker (0.14s)
+=== RUN   TestMigrationSnapshotFailureLeavesCanonicalContentUntouched
+--- PASS: TestMigrationSnapshotFailureLeavesCanonicalContentUntouched (0.08s)
+=== RUN   TestMigrationFutureFormatRefusedBeforeStartupMutations
+=== RUN   TestMigrationFutureFormatRefusedBeforeStartupMutations/version
+=== RUN   TestMigrationFutureFormatRefusedBeforeStartupMutations/generation
+--- PASS: TestMigrationFutureFormatRefusedBeforeStartupMutations (0.13s)
+    --- PASS: TestMigrationFutureFormatRefusedBeforeStartupMutations/version (0.06s)
+    --- PASS: TestMigrationFutureFormatRefusedBeforeStartupMutations/generation (0.06s)
+=== RUN   TestMigrationInspectorAndFreshWorkspace
+--- PASS: TestMigrationInspectorAndFreshWorkspace (0.04s)
+=== RUN   TestMigrationSnapshotVerifierRejectsUnlistedObjectsAndCancelledRestore
+--- PASS: TestMigrationSnapshotVerifierRejectsUnlistedObjectsAndCancelledRestore (0.17s)
+=== RUN   TestMigrationAdditiveInitializerFailureRetainsIndependentRestorePoint
+--- PASS: TestMigrationAdditiveInitializerFailureRetainsIndependentRestorePoint (0.18s)
+=== RUN   TestMigrationSnapshotRejectsDatabaseRepeatedAsContent
+--- PASS: TestMigrationSnapshotRejectsDatabaseRepeatedAsContent (0.17s)
+=== RUN   TestMigrationSnapshotRefusesOversizedSparseSourceBeforeMigration
+--- PASS: TestMigrationSnapshotRefusesOversizedSparseSourceBeforeMigration (0.08s)
+=== RUN   TestMigrationRestoreCannotModifySourceByNestedDestination
+--- PASS: TestMigrationRestoreCannotModifySourceByNestedDestination (0.21s)
+=== RUN   TestMigrationReviewedRestoreRejectsSelfConsistentSnapshotReplacement
+--- PASS: TestMigrationReviewedRestoreRejectsSelfConsistentSnapshotReplacement (0.27s)
+=== RUN   TestRecordingCrashRecoveryRetainsFlushedTailAndCanonicalWAV
+--- PASS: TestRecordingCrashRecoveryRetainsFlushedTailAndCanonicalWAV (0.16s)
+=== RUN   TestRecordingDurationReadsOnlyBoundedValidWAVHeaders
+=== RUN   TestRecordingDurationReadsOnlyBoundedValidWAVHeaders/missing_format
+=== RUN   TestRecordingDurationReadsOnlyBoundedValidWAVHeaders/missing_data
+=== RUN   TestRecordingDurationReadsOnlyBoundedValidWAVHeaders/truncated_riff
+=== RUN   TestRecordingDurationReadsOnlyBoundedValidWAVHeaders/oversized_data
+=== RUN   TestRecordingDurationReadsOnlyBoundedValidWAVHeaders/zero_rate
+=== RUN   TestRecordingDurationReadsOnlyBoundedValidWAVHeaders/inconsistent_rate
+=== RUN   TestRecordingDurationReadsOnlyBoundedValidWAVHeaders/inconsistent_alignment
+=== RUN   TestRecordingDurationReadsOnlyBoundedValidWAVHeaders/unsupported_codec
+--- PASS: TestRecordingDurationReadsOnlyBoundedValidWAVHeaders (0.00s)
+    --- PASS: TestRecordingDurationReadsOnlyBoundedValidWAVHeaders/missing_format (0.00s)
+    --- PASS: TestRecordingDurationReadsOnlyBoundedValidWAVHeaders/missing_data (0.00s)
+    --- PASS: TestRecordingDurationReadsOnlyBoundedValidWAVHeaders/truncated_riff (0.00s)
+    --- PASS: TestRecordingDurationReadsOnlyBoundedValidWAVHeaders/oversized_data (0.00s)
+    --- PASS: TestRecordingDurationReadsOnlyBoundedValidWAVHeaders/zero_rate (0.00s)
+    --- PASS: TestRecordingDurationReadsOnlyBoundedValidWAVHeaders/inconsistent_rate (0.00s)
+    --- PASS: TestRecordingDurationReadsOnlyBoundedValidWAVHeaders/inconsistent_alignment (0.00s)
+    --- PASS: TestRecordingDurationReadsOnlyBoundedValidWAVHeaders/unsupported_codec (0.00s)
+=== RUN   TestRecordingRejectsChangedAcknowledgedAudioAndKeepsOriginal
+--- PASS: TestRecordingRejectsChangedAcknowledgedAudioAndKeepsOriginal (0.08s)
+=== RUN   TestAssetDeduplicationScopedReadsAndRestart
+--- PASS: TestAssetDeduplicationScopedReadsAndRestart (0.11s)
+=== RUN   TestFileSelectionsRejectSymlinksAndInvalidHandles
+--- PASS: TestFileSelectionsRejectSymlinksAndInvalidHandles (0.07s)
+=== RUN   TestRestoreDeletedBlockKeepsMonotonicRevision
+--- PASS: TestRestoreDeletedBlockKeepsMonotonicRevision (0.10s)
+=== RUN   TestBackupSnapshotRetentionAndRecoveryPoint
+--- PASS: TestBackupSnapshotRetentionAndRecoveryPoint (0.18s)
+=== RUN   TestRestoreBackupCompatiblePreservesFormatContentAndRevokesPermissions
+--- PASS: TestRestoreBackupCompatiblePreservesFormatContentAndRevokesPermissions (0.28s)
+=== RUN   TestRestoreBackupCompatibleRejectsUnreviewedAndUnsupportedFormats
+=== RUN   TestRestoreBackupCompatibleRejectsUnreviewedAndUnsupportedFormats/manifest
+=== RUN   TestRestoreBackupCompatibleRejectsUnreviewedAndUnsupportedFormats/pair_format
+=== RUN   TestRestoreBackupCompatibleRejectsUnreviewedAndUnsupportedFormats/legacy_source
+=== RUN   TestRestoreBackupCompatibleRejectsUnreviewedAndUnsupportedFormats/future_version
+=== RUN   TestRestoreBackupCompatibleRejectsUnreviewedAndUnsupportedFormats/future_generation
+--- PASS: TestRestoreBackupCompatibleRejectsUnreviewedAndUnsupportedFormats (0.82s)
+    --- PASS: TestRestoreBackupCompatibleRejectsUnreviewedAndUnsupportedFormats/manifest (0.16s)
+    --- PASS: TestRestoreBackupCompatibleRejectsUnreviewedAndUnsupportedFormats/pair_format (0.16s)
+    --- PASS: TestRestoreBackupCompatibleRejectsUnreviewedAndUnsupportedFormats/legacy_source (0.17s)
+    --- PASS: TestRestoreBackupCompatibleRejectsUnreviewedAndUnsupportedFormats/future_version (0.17s)
+    --- PASS: TestRestoreBackupCompatibleRejectsUnreviewedAndUnsupportedFormats/future_generation (0.16s)
+=== RUN   TestRestoreBackupCompatibleRefusesUnsafeCleanupSchema
+=== RUN   TestRestoreBackupCompatibleRefusesUnsafeCleanupSchema/missing_table
+=== RUN   TestRestoreBackupCompatibleRefusesUnsafeCleanupSchema/changed_table
+=== RUN   TestRestoreBackupCompatibleRefusesUnsafeCleanupSchema/trigger
+=== RUN   TestRestoreBackupCompatibleRefusesUnsafeCleanupSchema/cascade
+=== RUN   TestRestoreBackupCompatibleRefusesUnsafeCleanupSchema/cascade_case
+--- PASS: TestRestoreBackupCompatibleRefusesUnsafeCleanupSchema (1.03s)
+    --- PASS: TestRestoreBackupCompatibleRefusesUnsafeCleanupSchema/missing_table (0.21s)
+    --- PASS: TestRestoreBackupCompatibleRefusesUnsafeCleanupSchema/changed_table (0.20s)
+    --- PASS: TestRestoreBackupCompatibleRefusesUnsafeCleanupSchema/trigger (0.19s)
+    --- PASS: TestRestoreBackupCompatibleRefusesUnsafeCleanupSchema/cascade (0.22s)
+    --- PASS: TestRestoreBackupCompatibleRefusesUnsafeCleanupSchema/cascade_case (0.20s)
+=== RUN   TestRestoreBackupCompatibleCannotPublishInsideSource
+--- PASS: TestRestoreBackupCompatibleCannotPublishInsideSource (0.17s)
+=== RUN   TestRestoreSecondInstallationPreservesCanonicalHistoryAndEvidence
+--- PASS: TestRestoreSecondInstallationPreservesCanonicalHistoryAndEvidence (0.77s)
+=== RUN   TestRestoreRejectsCorruptUnsafeAndChangedBackups
+=== RUN   TestRestoreRejectsCorruptUnsafeAndChangedBackups/traversal
+=== RUN   TestRestoreRejectsCorruptUnsafeAndChangedBackups/short_digest
+=== RUN   TestRestoreRejectsCorruptUnsafeAndChangedBackups/negative_size
+=== RUN   TestRestoreRejectsCorruptUnsafeAndChangedBackups/omitted_asset
+=== RUN   TestRestoreRejectsCorruptUnsafeAndChangedBackups/wrong_cursor
+=== RUN   TestRestoreRejectsCorruptUnsafeAndChangedBackups/wrong_workspace
+--- PASS: TestRestoreRejectsCorruptUnsafeAndChangedBackups (0.14s)
+    --- PASS: TestRestoreRejectsCorruptUnsafeAndChangedBackups/traversal (0.00s)
+    --- PASS: TestRestoreRejectsCorruptUnsafeAndChangedBackups/short_digest (0.00s)
+    --- PASS: TestRestoreRejectsCorruptUnsafeAndChangedBackups/negative_size (0.00s)
+    --- PASS: TestRestoreRejectsCorruptUnsafeAndChangedBackups/omitted_asset (0.01s)
+    --- PASS: TestRestoreRejectsCorruptUnsafeAndChangedBackups/wrong_cursor (0.00s)
+    --- PASS: TestRestoreRejectsCorruptUnsafeAndChangedBackups/wrong_workspace (0.01s)
+=== RUN   TestRestoreSubtreeIsAtomicAndPreservesUnrelatedValues
+--- PASS: TestRestoreSubtreeIsAtomicAndPreservesUnrelatedValues (0.23s)
+=== RUN   TestRestoreTranscriptTimingAndForgottenMemory
+--- PASS: TestRestoreTranscriptTimingAndForgottenMemory (0.19s)
+=== RUN   TestBackupRetentionIsExplicitVerifiedAndWorkspaceBound
+--- PASS: TestBackupRetentionIsExplicitVerifiedAndWorkspaceBound (0.21s)
+=== RUN   TestBackupInterruptedRecordingRetainsTailAndActiveCaptureUsesCheckpoint
+--- PASS: TestBackupInterruptedRecordingRetainsTailAndActiveCaptureUsesCheckpoint (0.27s)
+PASS
+ok  	trove.local/phase0/internal/workspace	10.965s

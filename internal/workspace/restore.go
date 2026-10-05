@@ -14,6 +14,7 @@ import (
 	"path/filepath"
 	"strconv"
 	"strings"
+	"trove.local/phase0/internal/platformfs"
 )
 
 func validDigest(s string) bool {
@@ -321,6 +322,9 @@ func RestoreBackupReviewed(ctx context.Context, source, destination string, expe
 	return restoreBackupVerified(ctx, source, destination, current)
 }
 func restoreBackupVerified(ctx context.Context, source, destination string, m BackupManifest) (result RestoreResult, err error) {
+	if err = platformfs.RequireRecoveryDurability(); err != nil {
+		return result, err
+	}
 	destination, err = filepath.Abs(destination)
 	if err != nil {
 		return result, err
@@ -435,12 +439,7 @@ func durableRecoveryFile(path string, raw []byte) error {
 	return err
 }
 func syncRecoveryDirectory(path string) error {
-	dir, err := os.Open(path)
-	if err != nil {
-		return err
-	}
-	defer dir.Close()
-	return dir.Sync()
+	return platformfs.SyncDirectory(path)
 }
 func syncRecoveryTree(root string) error {
 	dirs := []string{}
