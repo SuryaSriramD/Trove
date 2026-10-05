@@ -1,0 +1,23 @@
+{
+  "target": "windows-amd64",
+  "hostRequired": "Windows 11 x64",
+  "prerequisites": {
+    "os": "Windows 11 x64 (build 22000 or newer)",
+    "compiler": "Installed x86_64-w64-mingw32 GCC for Go CGO; exact compiler version recorded in each build manifest",
+    "webview2": "Installed Microsoft Edge WebView2 Runtime; missing/old runtime reports an error and never downloads",
+    "minimumWebView2": "94.0.992.31",
+    "source": "Pinned Wails v2.16.0 internal/wv2installer/wv2installer.go and error.go",
+    "distributionSource": "https://learn.microsoft.com/en-us/microsoft-edge/webview2/concepts/distribution"
+  },
+  "inputs": [
+    "pinned Go and offline module cache",
+    "pinned Node and installed locked frontend dependencies",
+    "verified native target bundle",
+    "third-party notices"
+  ],
+  "layout": "bin/Trove[.exe], Resources/native, Resources/browser-clipper, Resources/web",
+  "networkAcquisition": false,
+  "platformQualified": false,
+  "signing": "Separate target-specific release gate",
+  "sourceOnly": true
+}

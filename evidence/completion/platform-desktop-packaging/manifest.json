@@ -1,0 +1,149 @@
+{
+  "schemaVersion": 1,
+  "scope": "C7/C8 desktop packaging implementation and macOS-host source checks; not Windows/Linux release qualification",
+  "implementationCommit": "910773c2b2d559c9f2cee9bf40e58f6707503b00",
+  "baseCommit": "8a96bdc85766827d45daa883655a36bbe0972f52",
+  "recordedAt": "2026-10-05",
+  "executionHost": "macOS-27.0.1-arm64-arm-64bit",
+  "targets": [
+    "windows-amd64",
+    "linux-amd64"
+  ],
+  "platformQualified": false,
+  "targetDesktopArtifactsBuilt": false,
+  "targetInstallationsExecuted": false,
+  "sourceSHA256": {
+    "app_clipper.go": "db69b3fe3f5b740316dcc01453535afcd24f40837b89b46ae899c251562da8d8",
+    "app_launch.go": "4e2d53fcec390fde9f8ce9094b920aaa74795c024a9c553d406bad090e04aaa3",
+    "app_launch_test.go": "aab65ec1ecdc9d5e26ca86801bf66a0dd467788968428ca4de1b9c1cc05ee8ba",
+    "app_providers.go": "9c655b2b8e480bff118f2209f177e9e2dc939046e02ba7b8324e4719d0d51e1b",
+    "baseline/go-targets.lock.json": "e6286f63e42ca7ed2784b00f381e0861c59ea727e5a8ce9eff1b359953f74ad6",
+    "docs/completion/platform-desktop-packaging.md": "a8c835fbce2245c25f80e0749169c73e8d89c691d3e7a3165395cbf097a7a493",
+    "docs/completion/platform-native-workers.md": "be09ea5f2a8a2003949b94ccece41791fc214eff96ec09b5eba60bf7fa7dfea4",
+    "main.go": "c41916539b8a26228af69ffb9b7e47cccf061e7151cf0b116c9c57bb4ed55710",
+    "packaging/desktop-prerequisites.json": "117db7b906789335fe58c8da171a1dd5cd66e12382f7fa7693e46febb491b4ea",
+    "packaging/portable/install.ps1": "4bb0135fbe803997a8dcfd09c0d17c134dd4b586cd5a0cc636be8e175a39e7a4",
+    "packaging/portable/install.sh": "dba29113728d946782d5af08ffcab241cb2995d9e0a932fa26830292af31c510",
+    "packaging/portable/package.ps1": "0d09c0d8a34eb20636283872cbd1f07332243102cd355d0695c37429b6148853",
+    "packaging/portable/uninstall.ps1": "b55ad93867804f7ee4b6b6d5ede751e8c47b10378fbad4319f098557a14aa7c6",
+    "packaging/portable/uninstall.sh": "5ffd6b923b908ad4969e5e9ff143393013e7352e5c7555bfe4639fbdce5223c9",
+    "scripts/bootstrap.py": "5af17af10d4dc3f3fb51879d1f4d6042e628b6ba2f9e6890a1ed6f81829389e2",
+    "scripts/build-desktop-portable.py": "4ccb88c5022a534055c7304e3cecdfead5cc6161014cb2643300b1a1feb2ba17",
+    "scripts/desktop_package.py": "c4b16ce0f5b6d842d72c0f235561c8c14d5723515eda54f9c2ac6970029d3f42",
+    "scripts/desktop_prerequisites.py": "2bb62b4f5b55fd59f8103b473814ca07212bd07c297315b0d5d3871e3856f49f",
+    "scripts/devtools.py": "d4e0de9cc26ae19d1efecfa5469164bed013bb29e5a5f0c5170af6fb0d97ab0a",
+    "scripts/doctor.py": "3f905d9d026b0acf3004c78200a20c28e062817375456ca545ffb41ff14419ce",
+    "tests/test_desktop_installers.py": "6f05fd4231e4e14f1eb9288fa98e639bb5841a0a5b76760c8acbd4c021265f62",
+    "tests/test_desktop_package.py": "71a984bf4edd22805c1df71b870c6400d5d7cb0537bf12a8acaf3ad1c1fb31f6",
+    "tests/test_desktop_tooling.py": "064cc87a334a4bcde44d831ae5783228e885343f7850be262e0d871564396fad",
+    "tests/test_devtools.py": "1af1e5381cad606cf2cde549350163321f332b7197dcd38ce18d4a76cae3ba69"
+  },
+  "validation": [
+    {
+      "command": "python -m unittest discover -s tests -p test_desktop*.py -v",
+      "passed": 22,
+      "skipped": 0,
+      "report": "source-tests.txt",
+      "boundary": "POSIX installer acceptance uses disposable files with simulated uname/id/os-release/dpkg/xdg commands on macOS, not an actual Ubuntu install"
+    },
+    {
+      "command": "python -m unittest discover -s tests -p test_devtools.py -v",
+      "passed": 19,
+      "skipped": 0,
+      "report": "existing-devtools-tests.txt"
+    },
+    {
+      "command": "GOCACHE=/private/tmp/trove-platform-auth-cache GOMODCACHE=<completion-cache>/go-mod GOTOOLCHAIN=local GOPROXY=off CGO_LDFLAGS='-framework UniformTypeIdentifiers' <pinned-go> test -race -tags 'fts5 sqlite_omit_load_extension' . -run 'TestDesktop|TestDeepLinks' -count=1 -json",
+      "passedTopLevel": 11,
+      "passedSubtests": 2,
+      "report": "desktop-routing-race.jsonl",
+      "boundary": "macOS Go execution; Windows/Linux callbacks exercised as source-level functions, not OS IPC"
+    },
+    {
+      "command": "/bin/sh -n packaging/portable/install.sh; /bin/sh -n packaging/portable/uninstall.sh",
+      "passed": true
+    },
+    {
+      "command": "python -m py_compile scripts/bootstrap.py scripts/devtools.py scripts/doctor.py scripts/desktop_package.py scripts/desktop_prerequisites.py scripts/build-desktop-portable.py",
+      "passed": true
+    },
+    {
+      "command": "python scripts/doctor.py --target <windows-amd64|linux-amd64> --cache <completion-cache> --json",
+      "expectedExitCode": 1,
+      "observedReady": false,
+      "boundary": "read-only target reports correctly refuse the macOS host"
+    },
+    {
+      "command": "python scripts/build-desktop-portable.py --target <windows-amd64|linux-amd64> --plan",
+      "expectedExitCode": 0,
+      "platformQualified": false
+    }
+  ],
+  "retainedDevelopmentFailures": [
+    {
+      "report": "initial-package-path-failure.txt",
+      "cause": "PurePosixPath dot entry normalized to empty parts; validator now rejects empty path parts"
+    },
+    {
+      "report": "initial-zip-path-failure.txt",
+      "cause": "macOS /var temporary directory alias differed from resolved member paths; extractor now canonicalizes staging directory before containment checks"
+    }
+  ],
+  "peerReview": {
+    "reviewer": "finish_vision",
+    "scope": "read-only PowerShell semantic review",
+    "finding": "Partial install registration lacked open-command; uninstaller now permits missing nodes only under exact owned root. Ownership written before other registration values. Interruption before ownership still preserves the ambiguous key for inspection."
+  },
+  "unqualified": [
+    "PowerShell syntax/runtime on Windows",
+    "actual native target desktop/worker build",
+    "real OS URL IPC",
+    "WebView startup",
+    "clean installation",
+    "signed distribution authenticity",
+    "verified platform update and compatible rollback",
+    "interrupted installation and OS registry recovery",
+    "native devices and permissions",
+    "P0/P1/P2 platform matrix",
+    "backup portability",
+    "performance"
+  ],
+  "artifacts": {
+    "source-tests.txt": {
+      "sha256": "052261772831d16f28235257c7e6416f8543ec8a493e1ff1bed9ca7750ecc151",
+      "sizeBytes": 3591
+    },
+    "existing-devtools-tests.txt": {
+      "sha256": "3ccaa4d9d3638a12f0b8cab242ea335b11bc5aa547729d95a518bfef59158040",
+      "sizeBytes": 2766
+    },
+    "desktop-routing-race.jsonl": {
+      "sha256": "31b9ebba158ecb15638a5d9ea7e1147b117442813a364c45cd5617e9f204d4cb",
+      "sizeBytes": 11259
+    },
+    "initial-package-path-failure.txt": {
+      "sha256": "2799d644c3cdf4d6e177230efa7e5ed9525f72fb75284e5e5d0191a84f7f7001",
+      "sizeBytes": 1523
+    },
+    "initial-zip-path-failure.txt": {
+      "sha256": "fe896577f4d263a0491b66715fa43b956f6362078723ef0bde8d7d0cf71bfdd2",
+      "sizeBytes": 3280
+    },
+    "windows-plan.json": {
+      "sha256": "854797ad97e26e69bf9e996e618f4d8c169b34672d5f4b642ee6e4ceb69b2e9f",
+      "sizeBytes": 1032
+    },
+    "linux-plan.json": {
+      "sha256": "cd3142a6d83e54c12239eed5e3884acc67e133f5ccece4bfbcaa8f2cc4f6411f",
+      "sizeBytes": 1539
+    },
+    "windows-doctor-on-mac.json": {
+      "sha256": "39e2ae8f74d062350e1c61c91c20c21eb47a643553466a9f15f37dc8207948c2",
+      "sizeBytes": 4826
+    },
+    "linux-doctor-on-mac.json": {
+      "sha256": "503251180ca5714e0c80d06a0ed96484939799389015276beb1df92bfbc17e01",
+      "sizeBytes": 4600
+    }
+  }
+}

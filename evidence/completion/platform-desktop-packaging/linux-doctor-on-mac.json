@@ -1,0 +1,151 @@
+{
+  "schemaVersion": 1,
+  "scope": "developer prerequisites, not release qualification",
+  "target": "linux-amd64",
+  "platformQualified": false,
+  "cache": "/Users/suryasriramduvvuri/Library/Caches/Trove/completion",
+  "pythonEnvironment": "/Users/suryasriramduvvuri/Library/Caches/Trove/completion/python/requirements-e99394c278ee",
+  "goModuleCache": "/Users/suryasriramduvvuri/Library/Caches/Trove/completion/go-mod",
+  "goBuildCache": "/Users/suryasriramduvvuri/Library/Caches/Trove/completion/go-cache",
+  "ready": false,
+  "checks": [
+    {
+      "name": "python",
+      "passed": true,
+      "required": true,
+      "detail": "3.12.13 at /Users/suryasriramduvvuri/Library/Caches/Trove/completion/python/requirements-e99394c278ee/bin/python"
+    },
+    {
+      "name": "native-target",
+      "passed": false,
+      "required": true,
+      "detail": "darwin-arm64; requested linux-amd64"
+    },
+    {
+      "name": "python:attrs",
+      "passed": true,
+      "required": true,
+      "detail": "26.1.0; expected 26.1.0"
+    },
+    {
+      "name": "python:jsonschema",
+      "passed": true,
+      "required": true,
+      "detail": "4.26.0; expected 4.26.0"
+    },
+    {
+      "name": "python:jsonschema-specifications",
+      "passed": true,
+      "required": true,
+      "detail": "2025.9.1; expected 2025.9.1"
+    },
+    {
+      "name": "python:referencing",
+      "passed": true,
+      "required": true,
+      "detail": "0.37.0; expected 0.37.0"
+    },
+    {
+      "name": "python:rpds-py",
+      "passed": true,
+      "required": true,
+      "detail": "2026.6.3; expected 2026.6.3"
+    },
+    {
+      "name": "python:typing-extensions",
+      "passed": true,
+      "required": true,
+      "detail": "4.16.0; expected 4.16.0"
+    },
+    {
+      "name": "node",
+      "passed": true,
+      "required": true,
+      "detail": "v25.5.0"
+    },
+    {
+      "name": "pnpm",
+      "passed": true,
+      "required": true,
+      "detail": "11.19.0"
+    },
+    {
+      "name": "cmake",
+      "passed": true,
+      "required": true,
+      "detail": "cmake version 4.3.2"
+    },
+    {
+      "name": "desktop platform prerequisites",
+      "passed": false,
+      "required": true,
+      "detail": "Native worker builds must run on the selected OS/architecture; cross-compilation is not qualification: linux-amd64"
+    },
+    {
+      "name": "Ninja",
+      "passed": true,
+      "required": true,
+      "detail": "native worker generator"
+    },
+    {
+      "name": "C++ compiler",
+      "passed": true,
+      "required": true,
+      "detail": "Ubuntu build-essential"
+    },
+    {
+      "name": "go",
+      "passed": true,
+      "required": true,
+      "detail": "/Users/suryasriramduvvuri/Library/Caches/Trove/completion/go/bin/go"
+    },
+    {
+      "name": "frontend dependencies",
+      "passed": false,
+      "required": true,
+      "detail": "/Users/suryasriramduvvuri/.codex/worktrees/completion-desktop-platforms/Trove/frontend/node_modules"
+    },
+    {
+      "name": "baseline/frontend dependencies",
+      "passed": false,
+      "required": true,
+      "detail": "/Users/suryasriramduvvuri/.codex/worktrees/completion-desktop-platforms/Trove/baseline/frontend/node_modules"
+    },
+    {
+      "name": "llama source",
+      "passed": true,
+      "required": true,
+      "detail": "/Users/suryasriramduvvuri/Library/Caches/Trove/completion/llama.cpp-d2e54583c7452353eb35d40431281f6ee984332f; build-native verifies the pinned archive and source hashes"
+    },
+    {
+      "name": "whisper source",
+      "passed": true,
+      "required": true,
+      "detail": "/Users/suryasriramduvvuri/Library/Caches/Trove/completion/whisper.cpp-927cfce34f31707e17f2bff35c349632fb9e2c3a; build-native verifies the pinned archive and source hashes"
+    },
+    {
+      "name": "Go module cache",
+      "passed": true,
+      "required": true,
+      "detail": "/Users/suryasriramduvvuri/Library/Caches/Trove/completion/go-mod; bootstrap verifies modules against go.sum"
+    },
+    {
+      "name": "browser binaries",
+      "passed": false,
+      "required": false,
+      "detail": "/Users/suryasriramduvvuri/Library/Caches/Trove/completion/playwright; install explicitly with bootstrap --browser"
+    },
+    {
+      "name": "native helpers",
+      "passed": false,
+      "required": false,
+      "detail": "Run the selected target native builder after bootstrap"
+    },
+    {
+      "name": "qualification models",
+      "passed": true,
+      "required": false,
+      "detail": "/Users/suryasriramduvvuri/Library/Caches/Trove/completion/models; acquire-test-models.py is explicit and verifies pack hashes"
+    }
+  ]
+}
