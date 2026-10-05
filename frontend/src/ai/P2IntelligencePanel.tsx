@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { ImageUnderstanding } from "./ImageUnderstanding";
 import {
   batch,
@@ -80,12 +80,19 @@ type Reviews = {
 type OCRStatus = {
   available: boolean;
   engine: string;
+  languages?: string[];
+  limitations?: string;
   maxBytes: number;
   maxPixels: number;
   timeoutSeconds: number;
   minimumConfidence: number;
 };
 type OCR = {
+  engine: string;
+  extractorVersion: string;
+  modelSha256?: string;
+  languages?: string[];
+  sourceRevision: string;
   fileId: string;
   text: string;
   warning: string;
@@ -129,6 +136,27 @@ export function P2IntelligencePanel({
   const [ocrStatus, setOCRStatus] = useState<OCRStatus | null>(null),
     [ocr, setOCR] = useState<OCR | null>(null),
     [imageId, setImageId] = useState("");
+  const ocrRequest = useRef(0);
+  useEffect(() => {
+    ocrRequest.current += 1;
+    setOCR(null);
+    return () => {
+      ocrRequest.current += 1;
+    };
+  }, [
+    workspace.workspaceId,
+    workspace.scopeGrantId,
+    workspace.snapshotCursor,
+    imageId,
+  ]);
+  const extractOCR = async () => {
+    const request = ++ocrRequest.current;
+    const result = await dispatch<OCR>("ocr.run", {
+      ...envelope(workspace),
+      fileId: imageId,
+    });
+    if (request === ocrRequest.current) setOCR(result);
+  };
   const page = workspace.pages.find((p) => p.id === focus);
   const imageFiles = workspace.files.filter((f) =>
     ["image/png", "image/jpeg"].includes(f.mediaType),
@@ -161,7 +189,7 @@ export function P2IntelligencePanel({
     return () => {
       active = false;
     };
-  }, [workspace.workspaceId, workspace.snapshotCursor]);
+  }, [workspace.workspaceId, workspace.scopeGrantId, workspace.snapshotCursor]);
   useEffect(() => {
     if (pageId) {
       setFocus(pageId);
@@ -507,11 +535,12 @@ export function P2IntelligencePanel({
         <>
           <p>
             {ocrStatus?.available
-              ? "Local Apple Vision helper ready."
+              ? `${ocrStatus.engine} ready. ${ocrStatus.languages?.join(", ") || "Language support unavailable"}.`
               : "Local OCR helper is unavailable in this bundle."}{" "}
             PNG/JPEG only, up to 20 MiB and 20 megapixels; one operation at a
             time, 60-second deadline.
           </p>
+          {ocrStatus?.limitations && <p>{ocrStatus.limitations}</p>}
           <label>
             Attached image{" "}
             <select
@@ -528,16 +557,7 @@ export function P2IntelligencePanel({
           </label>
           <button
             disabled={busy || !ocrStatus?.available || !imageId}
-            onClick={() =>
-              void run(async () =>
-                setOCR(
-                  await dispatch<OCR>("ocr.run", {
-                    ...envelope(workspace),
-                    fileId: imageId,
-                  }),
-                ),
-              )
-            }
+            onClick={() => void run(extractOCR)}
           >
             Extract image text locally
           </button>
@@ -549,10 +569,14 @@ export function P2IntelligencePanel({
           {ocr && (
             <>
               <p role="status">
-                {ocr.warning} Accepted {ocr.acceptedLines} lines; omitted{" "}
-                {ocr.rejectedLines}.
+                {ocr.engine} · {ocr.languages?.join(", ")}. {ocr.warning}{" "}
+                Accepted {ocr.acceptedLines} lines; omitted {ocr.rejectedLines}.
               </p>
               <pre style={{ whiteSpace: "pre-wrap" }}>{ocr.text}</pre>
+              <p>
+                Source revision: {ocr.sourceRevision}. Extractor:{" "}
+                {ocr.extractorVersion}.
+              </p>
               <p>
                 Extraction is revision bound and searchable with the attached
                 image. The original image remains the source.

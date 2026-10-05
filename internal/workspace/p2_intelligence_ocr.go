@@ -26,25 +26,41 @@ type OCRResult struct {
 	Lines   []OCRLine `json:"lines"`
 	Warning string    `json:"warning,omitempty"`
 }
+type OCRCapability struct {
+	Engine           string   `json:"engine"`
+	ExtractorVersion string   `json:"extractorVersion"`
+	Languages        []string `json:"languages"`
+	Limitations      string   `json:"limitations"`
+	ModelSHA256      string   `json:"modelSha256,omitempty"`
+}
 type OCRProvider func(context.Context, *os.File) (OCRResult, error)
 type ocrRuntime struct {
-	provider OCRProvider
-	active   chan struct{}
+	provider   OCRProvider
+	capability OCRCapability
+	active     chan struct{}
 }
 
 var ocrProviders sync.Map
 
 func (k *Kernel) SetOCRProvider(p OCRProvider) {
+	k.SetOCRProviderWithCapability(p, OCRCapability{Engine: "Apple Vision (local)", ExtractorVersion: OCRExtractorVersion, Languages: []string{"Automatic detection (OS-supported languages)"}})
+}
+func (k *Kernel) SetOCRProviderWithCapability(p OCRProvider, capability OCRCapability) {
 	if p == nil {
 		ocrProviders.Delete(k)
 	} else {
-		ocrProviders.Store(k, &ocrRuntime{provider: p, active: make(chan struct{}, 1)})
+		capability.Languages = append([]string(nil), capability.Languages...)
+		ocrProviders.Store(k, &ocrRuntime{provider: p, capability: capability, active: make(chan struct{}, 1)})
 	}
 }
 func init() {
 	RegisterQuery("ocr.status", func(ctx context.Context, k *Kernel, e contracts.ServiceExecutionContext, r map[string]any) (any, error) {
-		_, ready := ocrProviders.Load(k)
-		return map[string]any{"available": ready, "engine": "Apple Vision (local)", "maxBytes": 20 << 20, "maxPixels": 20000000, "timeoutSeconds": 60, "minimumConfidence": 0.5, "formats": []string{"image/png", "image/jpeg"}, "visionDescriptionAvailable": false}, nil
+		provider, ready := ocrProviders.Load(k)
+		capability := OCRCapability{Engine: "Unavailable"}
+		if ready {
+			capability = provider.(*ocrRuntime).capability
+		}
+		return map[string]any{"available": ready, "engine": capability.Engine, "languages": capability.Languages, "limitations": capability.Limitations, "extractorVersion": capability.ExtractorVersion, "modelSha256": capability.ModelSHA256, "maxBytes": 20 << 20, "maxPixels": 20000000, "timeoutSeconds": 60, "minimumConfidence": 0.5, "formats": []string{"image/png", "image/jpeg"}, "visionDescriptionAvailable": false}, nil
 	})
 	RegisterQuery("ocr.run", runOCR)
 }
@@ -95,6 +111,13 @@ func runOCR(ctx context.Context, k *Kernel, e contracts.ServiceExecutionContext,
 	if err = bounded.Err(); err != nil {
 		return nil, err
 	}
+	current, stillRegistered := ocrProviders.Load(k)
+	if !stillRegistered || current != p {
+		return nil, Fail("CONFLICT", "OCR engine changed during extraction")
+	}
+	if !utf8.ValidString(result.Warning) || len(result.Warning) > 4096 {
+		return nil, Fail("WORKER_FAILED", "OCR returned invalid warning")
+	}
 	if len(result.Lines) > 10000 {
 		return nil, Fail("RESOURCE_EXHAUSTED", "OCR result exceeds 10000 lines")
 	}
@@ -119,10 +142,10 @@ func runOCR(ctx context.Context, k *Kernel, e contracts.ServiceExecutionContext,
 	}
 	warning := result.Warning
 	if rejected > 0 {
-		warning = "Low-confidence lines were omitted. Inspect the source image before using the result."
+		warning = strings.TrimSpace(warning + " Low-confidence lines were omitted. Inspect the source image before using the result.")
 	}
 	if len(lines) == 0 {
-		warning = "No readable text met the 0.5 confidence threshold."
+		warning = strings.TrimSpace(warning + " No readable text met the 0.5 confidence threshold.")
 	}
 	text := strings.Join(lines, "\n")
 	state := "ready"
@@ -143,11 +166,11 @@ func runOCR(ctx context.Context, k *Kernel, e contracts.ServiceExecutionContext,
 		if _, err := tx.ExecContext(ctx, "DELETE FROM document_sections WHERE file_id=?", fileID); err != nil {
 			return err
 		}
-		if _, err := tx.ExecContext(ctx, "INSERT OR REPLACE INTO document_extractions VALUES(?,?,?,?,?,?)", fileID, rev, OCRExtractorVersion, state, warning, now()); err != nil {
+		if _, err := tx.ExecContext(ctx, "INSERT OR REPLACE INTO document_extractions VALUES(?,?,?,?,?,?)", fileID, rev, runtime.capability.ExtractorVersion, state, warning, now()); err != nil {
 			return err
 		}
 		for i, chunk := range structuralText(text, 2400) {
-			if _, err := tx.ExecContext(ctx, "INSERT INTO document_sections VALUES(?,?,?,?,?)", fileID, i, 1, "Local OCR", chunk); err != nil {
+			if _, err := tx.ExecContext(ctx, "INSERT INTO document_sections VALUES(?,?,?,?,?)", fileID, i, 1, "Local OCR — "+runtime.capability.Engine, chunk); err != nil {
 				return err
 			}
 		}
@@ -160,5 +183,5 @@ func runOCR(ctx context.Context, k *Kernel, e contracts.ServiceExecutionContext,
 	if err = k.FlushSearch(ctx); err != nil {
 		return nil, err
 	}
-	return map[string]any{"fileId": fileID, "sourceRevision": meta.Revision, "state": state, "text": text, "warning": warning, "acceptedLines": len(lines), "rejectedLines": rejected, "extractorVersion": OCRExtractorVersion}, nil
+	return map[string]any{"fileId": fileID, "sourceRevision": meta.Revision, "state": state, "text": text, "warning": warning, "acceptedLines": len(lines), "rejectedLines": rejected, "extractorVersion": runtime.capability.ExtractorVersion, "engine": runtime.capability.Engine, "languages": runtime.capability.Languages, "modelSha256": runtime.capability.ModelSHA256}, nil
 }

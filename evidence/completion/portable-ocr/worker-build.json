@@ -1,0 +1,150 @@
+{
+  "schemaVersion": 1,
+  "name": "ocr-worker",
+  "os": "darwin",
+  "architecture": "arm64",
+  "runtime": "tesseract-5.5.1-leptonica-1.85.0-eng-v1",
+  "sha256": "d24610d0ac44350fec03ebced60c5b7e80f490c85706f913574032148e328f5b",
+  "modelSha256": "7d4322bd2a7749724879683fc3912cb542f19906c83bcc1a52132556427170b2",
+  "testOnly": false,
+  "sourceSha256": "7c427e0bf7a9d649818bd252059124d6a4b63994e5756c55d01a45eba6e3429a",
+  "platformSourceSha256": "63c01ffe922631b81805ef18dd9ef562c73505e481d5e3ddc081c023883da8cb",
+  "pins": {
+    "schemaVersion": 1,
+    "runtime": "tesseract-5.5.1-leptonica-1.85.0-eng-v1",
+    "tesseract": {
+      "version": "5.5.1",
+      "url": "https://codeload.github.com/tesseract-ocr/tesseract/tar.gz/refs/tags/5.5.1",
+      "sha256": "a7a3f2a7420cb6a6a94d80c24163e183cf1d2f1bed2df3bbc397c81808a57237",
+      "sourceDirectory": "tesseract-5.5.1",
+      "license": "Apache-2.0"
+    },
+    "leptonica": {
+      "version": "1.85.0",
+      "url": "https://codeload.github.com/DanBloomberg/leptonica/tar.gz/refs/tags/1.85.0",
+      "sha256": "c01376bce0379d4ea4bc2ec5d5cbddaa49e2f06f88242619ab8c059e21adf233",
+      "sourceDirectory": "leptonica-1.85.0",
+      "license": "BSD-2-Clause"
+    },
+    "model": {
+      "language": "eng",
+      "version": "87416418657359cb625c412a48b6e1d6d41c29bd",
+      "url": "https://raw.githubusercontent.com/tesseract-ocr/tessdata_fast/87416418657359cb625c412a48b6e1d6d41c29bd/eng.traineddata",
+      "sha256": "7d4322bd2a7749724879683fc3912cb542f19906c83bcc1a52132556427170b2",
+      "license": "Apache-2.0",
+      "licenseURL": "https://raw.githubusercontent.com/tesseract-ocr/tessdata_fast/87416418657359cb625c412a48b6e1d6d41c29bd/LICENSE"
+    }
+  },
+  "commands": [
+    [
+      "/opt/homebrew/bin/cmake",
+      "-S",
+      "/private/tmp/trove-ocr-source/leptonica-1.85.0",
+      "-B",
+      "/private/tmp/trove-ocr-source/build-darwin-arm64/lept",
+      "-G",
+      "Ninja",
+      "-DCMAKE_BUILD_TYPE=Release",
+      "-DBUILD_SHARED_LIBS=OFF",
+      "-DCMAKE_INSTALL_PREFIX=/private/tmp/trove-ocr-source/build-darwin-arm64/install",
+      "-DCMAKE_MSVC_RUNTIME_LIBRARY=MultiThreaded",
+      "-DCMAKE_OSX_ARCHITECTURES=arm64",
+      "-DCMAKE_OSX_DEPLOYMENT_TARGET=27.0",
+      "-DBUILD_PROG=OFF",
+      "-DSW_BUILD=OFF",
+      "-DENABLE_ZLIB=OFF",
+      "-DENABLE_PNG=OFF",
+      "-DENABLE_GIF=OFF",
+      "-DENABLE_JPEG=OFF",
+      "-DENABLE_TIFF=OFF",
+      "-DENABLE_WEBP=OFF",
+      "-DENABLE_OPENJPEG=OFF"
+    ],
+    [
+      "/opt/homebrew/bin/cmake",
+      "--build",
+      "/private/tmp/trove-ocr-source/build-darwin-arm64/lept",
+      "--parallel",
+      "4"
+    ],
+    [
+      "/opt/homebrew/bin/cmake",
+      "--install",
+      "/private/tmp/trove-ocr-source/build-darwin-arm64/lept"
+    ],
+    [
+      "/opt/homebrew/bin/cmake",
+      "-S",
+      "/private/tmp/trove-ocr-source/tesseract-5.5.1",
+      "-B",
+      "/private/tmp/trove-ocr-source/build-darwin-arm64/tess",
+      "-G",
+      "Ninja",
+      "-DCMAKE_BUILD_TYPE=Release",
+      "-DBUILD_SHARED_LIBS=OFF",
+      "-DCMAKE_INSTALL_PREFIX=/private/tmp/trove-ocr-source/build-darwin-arm64/install",
+      "-DCMAKE_MSVC_RUNTIME_LIBRARY=MultiThreaded",
+      "-DCMAKE_OSX_ARCHITECTURES=arm64",
+      "-DCMAKE_OSX_DEPLOYMENT_TARGET=27.0",
+      "-DLeptonica_DIR=/private/tmp/trove-ocr-source/build-darwin-arm64/install/lib/cmake/leptonica",
+      "-DSW_BUILD=OFF",
+      "-DOPENMP_BUILD=OFF",
+      "-DGRAPHICS_DISABLED=ON",
+      "-DDISABLED_LEGACY_ENGINE=ON",
+      "-DENABLE_NATIVE=OFF",
+      "-DBUILD_TRAINING_TOOLS=OFF",
+      "-DBUILD_TESTS=OFF",
+      "-DDISABLE_TIFF=ON",
+      "-DDISABLE_ARCHIVE=ON",
+      "-DDISABLE_CURL=ON",
+      "-DINSTALL_CONFIGS=OFF",
+      "-DWIN32_MT_BUILD=ON"
+    ],
+    [
+      "/opt/homebrew/bin/cmake",
+      "--build",
+      "/private/tmp/trove-ocr-source/build-darwin-arm64/tess",
+      "--target",
+      "libtesseract",
+      "--parallel",
+      "4"
+    ],
+    [
+      "/opt/homebrew/bin/cmake",
+      "--install",
+      "/private/tmp/trove-ocr-source/build-darwin-arm64/tess",
+      "--component",
+      "Development"
+    ],
+    [
+      "clang++",
+      "-std=c++17",
+      "-O2",
+      "-Wno-deprecated-declarations",
+      "-I/private/tmp/trove-ocr-source/tesseract-5.5.1/include",
+      "-I/private/tmp/trove-ocr-source/build-darwin-arm64/tess/include",
+      "-I/private/tmp/trove-ocr-source/build-darwin-arm64/install/include",
+      "/Users/suryasriramduvvuri/.codex/worktrees/completion-document-platform/Trove/native/ocr-worker.cpp",
+      "/private/tmp/trove-ocr-source/build-darwin-arm64/tess/libtesseract.a",
+      "/private/tmp/trove-ocr-source/build-darwin-arm64/install/lib/libleptonica.a",
+      "-lm",
+      "-lpthread",
+      "-o",
+      "/private/tmp/trove-portable-ocr-reviewed/ocr-worker"
+    ],
+    [
+      "codesign",
+      "--force",
+      "--sign",
+      "-",
+      "/private/tmp/trove-portable-ocr-reviewed/ocr-worker"
+    ],
+    [
+      "codesign",
+      "--verify",
+      "--strict",
+      "/private/tmp/trove-portable-ocr-reviewed/ocr-worker"
+    ]
+  ],
+  "dependencies": "/private/tmp/trove-portable-ocr-reviewed/ocr-worker:\n\t/usr/lib/libSystem.B.dylib (compatibility version 1.0.0, current version 1359.0.0)\n\t/usr/lib/libc++.1.dylib (compatibility version 1.0.0, current version 2200.27.0)\n"
+}

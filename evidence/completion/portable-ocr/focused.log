@@ -1,0 +1,39 @@
+=== RUN   TestPortableOCRFullResolutionAlphaAndOriginal
+--- PASS: TestPortableOCRFullResolutionAlphaAndOriginal (0.01s)
+=== RUN   TestPortableOCRInputBoundsAndCancellation
+--- PASS: TestPortableOCRInputBoundsAndCancellation (0.00s)
+=== RUN   TestPortableOCRManifestRejectsIdentityAndDowngrade
+=== RUN   TestPortableOCRManifestRejectsIdentityAndDowngrade/os
+=== RUN   TestPortableOCRManifestRejectsIdentityAndDowngrade/arch
+=== RUN   TestPortableOCRManifestRejectsIdentityAndDowngrade/runtime
+=== RUN   TestPortableOCRManifestRejectsIdentityAndDowngrade/model
+=== RUN   TestPortableOCRManifestRejectsIdentityAndDowngrade/test-only
+=== RUN   TestPortableOCRManifestRejectsIdentityAndDowngrade/digest
+--- PASS: TestPortableOCRManifestRejectsIdentityAndDowngrade (0.01s)
+    --- PASS: TestPortableOCRManifestRejectsIdentityAndDowngrade/os (0.00s)
+    --- PASS: TestPortableOCRManifestRejectsIdentityAndDowngrade/arch (0.00s)
+    --- PASS: TestPortableOCRManifestRejectsIdentityAndDowngrade/runtime (0.00s)
+    --- PASS: TestPortableOCRManifestRejectsIdentityAndDowngrade/model (0.00s)
+    --- PASS: TestPortableOCRManifestRejectsIdentityAndDowngrade/test-only (0.00s)
+    --- PASS: TestPortableOCRManifestRejectsIdentityAndDowngrade/digest (0.00s)
+=== RUN   TestPortableOCRNativeEnglishProvenanceCancellation
+    p2_ocr_portable_test.go:165: engine=Tesseract 5.5.1 (local) model=7d4322bd2a7749724879683fc3912cb542f19906c83bcc1a52132556427170b2 text="TROVE LOCAL OCR 2026\n\n\nReview sources before approval\n"
+--- PASS: TestPortableOCRNativeEnglishProvenanceCancellation (0.29s)
+=== RUN   TestP2OCRHelperIntegrityAndMissingCapability
+--- PASS: TestP2OCRHelperIntegrityAndMissingCapability (0.00s)
+=== RUN   TestP2OCRNativeFixture
+    p2_ocr_test.go:44: set TROVE_OCR_BUNDLE and TROVE_OCR_FIXTURE for actual Apple Vision qualification
+--- SKIP: TestP2OCRNativeFixture (0.00s)
+PASS
+ok  	trove.local/phase0/internal/native	1.468s
+=== RUN   TestP2OCRQualityScopeSearchAndResourceBounds
+--- PASS: TestP2OCRQualityScopeSearchAndResourceBounds (0.29s)
+=== RUN   TestOCRPortableProvenanceAndRevocationBeforePublish
+--- PASS: TestOCRPortableProvenanceAndRevocationBeforePublish (0.06s)
+=== RUN   TestOCRProviderChangeAndCancellationDoNotPublish
+--- PASS: TestOCRProviderChangeAndCancellationDoNotPublish (0.05s)
+PASS
+ok  	trove.local/phase0/internal/workspace	2.014s
+testing: warning: no tests to run
+PASS
+ok  	trove.local/phase0/internal/workers	1.285s [no tests to run]

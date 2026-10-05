@@ -21,13 +21,14 @@ type OCRLine struct {
 	Confidence float64 `json:"confidence"`
 }
 type OCRResult struct {
-	Lines   []OCRLine `json:"lines"`
-	Warning string    `json:"warning,omitempty"`
+	Capability OCRCapability `json:"-"`
+	Lines      []OCRLine     `json:"lines"`
+	Warning    string        `json:"warning,omitempty"`
 }
 
 // OCRAvailable checks the optional helper independently from model workers.
-func OCRAvailable(bundle string) bool { return verifyOCRHelper(bundle) == nil }
-func verifyOCRHelper(bundle string) error {
+func OCRAvailable(bundle string) bool { _, err := OCRCapabilities(bundle); return err == nil }
+func verifyAppleOCRHelper(bundle string) error {
 	if runtime.GOOS != "darwin" {
 		return errors.New("local OCR helper requires macOS")
 	}
@@ -67,7 +68,10 @@ func (w *ocrOutput) Write(b []byte) (int, error) {
 // query or mutate a workspace. The caller owns input validation and persistence.
 func RunLocalOCR(ctx context.Context, f *os.File, bundle string) (OCRResult, error) {
 	var result OCRResult
-	if err := verifyOCRHelper(bundle); err != nil {
+	if hasPortableOCR(bundle) {
+		return runPortableOCR(ctx, f, bundle)
+	}
+	if err := verifyAppleOCRHelper(bundle); err != nil {
 		return result, err
 	}
 	ctx, cancel := context.WithTimeout(ctx, 60*time.Second)
@@ -85,5 +89,6 @@ func RunLocalOCR(ctx context.Context, f *os.File, bundle string) (OCRResult, err
 	if err := json.Unmarshal(output.Bytes(), &result); err != nil {
 		return result, err
 	}
+	result.Capability = OCRCapability{Engine: "Apple Vision (local)", ExtractorVersion: "trove-local-vision-v1", Languages: []string{"Automatic detection (OS-supported languages)"}, Limitations: "Handwriting, columns, low contrast and rotation may be inaccurate; verify against the original."}
 	return result, nil
 }
