@@ -1,0 +1,117 @@
+{
+  "schemaVersion": 1,
+  "package": "windows-private-storage-and-file-publication",
+  "recordedAtUTC": "2026-10-05T14:20:07.403485+00:00",
+  "baseCommit": "923267505f968a60b90cd704118eaaddf1c50149",
+  "sourceIdentity": "SHA-256 of final package sources below; commit containing this manifest is the package identity",
+  "sourceSHA256": {
+    "internal/platformfs/publication.go": "cce10ce937e21eae19f62ed2e5fbb0d545970721a1f66d1e9fc6ad5777ad7286",
+    "internal/platformfs/publication_darwin.go": "6a19326ac5a79e49c682e6a8bc8ecd9cb42206aa665f06b53167ef096f5a0b41",
+    "internal/platformfs/publication_linux.go": "cae4c0ad7a9fb08d744f1aa531aa1a19832d188e306606441765dab7ffd86db6",
+    "internal/platformfs/publication_other.go": "93fe0eeb353eb6d28f2d5c070d75c7807a96dd7d17e5eda8418f72d74684b27b",
+    "internal/platformfs/publication_test.go": "2c2aa6d39692d0dd6387f3eeb42d8518362161c80e9d09bebd275bdc443f3e70",
+    "internal/platformfs/publication_unix.go": "1e5b1850e7f8c0da342b8fafff29845f04c1ceff277cdaa04fb092f624b1b2ae",
+    "internal/platformfs/publication_windows.go": "38eb7dfe1dbae8ddb95bb24080530a7e40fdee7575157bfe76eb062330e1be65",
+    "internal/platformfs/publication_windows_test.go": "2840e4fdcde79a170128a09ba1b1b19fbcc42b21fdfbe4db4ded99368e415926",
+    "internal/workspace/backup.go": "54d21acc4ce6fc0382a91583eb7db74197d2d155fa947ba1d77b97deb6c977ab",
+    "internal/workspace/files.go": "1d5ac3610e5c543eb92387514f2ae453c9f8395e357f82df4e6746c7ead3090c",
+    "internal/workspace/hosting_transfer.go": "372f67feb4a4772b295d81af25e5c096c636dc101d6852aa0000007eba117454",
+    "internal/workspace/kernel.go": "9311fe568e02ec3638d504ed4890e12b8e79aaa6841cee89caff970ce68afde7",
+    "internal/workspace/migration_snapshot.go": "bcb5117a726013548d030b12b401a4148f55e5a8ddfe881e31c0e30a6a047077",
+    "internal/workspace/recordings.go": "d93c694ffb17a89925632e6434315543d0a065189ff977d336714840bda5fcfe",
+    "internal/workspace/restore.go": "2642b86551ea0635af1e6253bdbd558a18662f654b03f7be113c09f215e0c3dc",
+    "internal/workspace/restore_compatible.go": "20fa88aa11e7a4482d47d3b605c8b1df115fda28cd234d1cc427d204a8f75b27",
+    "docs/completion/windows-storage.md": "886b8fddfe3aa0de52c9e1d64063641577f353cfb86e11d436889bc8e1cd2c08",
+    "docs/completion/platform-filesystem.md": "f304794e645977c20ad164ec20d6d19bd513485ceb2cfb6ff88f70a460f7158d"
+  },
+  "host": {
+    "os": "macOS",
+    "version": "27.0.1",
+    "build": "26A434",
+    "architecture": "arm64",
+    "go": "go1.27.1 darwin/arm64"
+  },
+  "toolchainEnvironment": {
+    "GOTOOLCHAIN": "local",
+    "GOPROXY": "off",
+    "GOMODCACHE": "/Users/suryasriramduvvuri/Library/Caches/Trove/completion/go-mod",
+    "GOCACHE": "/private/tmp/trove-completion-go-cache"
+  },
+  "checks": [
+    {
+      "name": "host platformfs race",
+      "command": "go test -race ./internal/platformfs -count=1 -v",
+      "result": "pass",
+      "topLevelPassed": 12,
+      "log": "host-platformfs-race.txt"
+    },
+    {
+      "name": "host affected workspace race, final recovery capability gates",
+      "command": "go test -race -tags 'fts5 sqlite_omit_load_extension' ./internal/workspace -run 'Test(Recovery|Restore|Backup|Migration|Recording|File|Asset|Transfer)' -count=1 -v",
+      "result": "pass",
+      "topLevelPassed": 35,
+      "log": "host-workspace-race-final.txt"
+    }
+  ],
+  "crossCompilation": [
+    {
+      "command": "CGO_ENABLED=0 GOOS=windows GOARCH=amd64 go test -c -o /private/tmp/trove-windows-storage.test.exe ./internal/platformfs",
+      "result": "pass_compile_only",
+      "executed": false,
+      "testBinary": "/private/tmp/trove-windows-storage.test.exe",
+      "sha256": "651a0e1be4c4c762c96b86031c5771ff5ba87b9bc0b6d7a1bf8f1b65c2ef75cc",
+      "bytes": 5498880
+    },
+    {
+      "command": "CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go test -c -o /private/tmp/trove-windows-storage-linux.test ./internal/platformfs",
+      "result": "pass_compile_only",
+      "executed": false,
+      "testBinary": "/private/tmp/trove-windows-storage-linux.test",
+      "sha256": "a2314009eb5a746094ef3ffcd12a4152394e14e03d2edb1592dac723e958b637",
+      "bytes": 5058555
+    }
+  ],
+  "logs": {
+    "host-platformfs-race.txt": {
+      "sha256": "c3a1ea4611a45cfeb069031db3550dea49bf51c3a3e895d469251197c4ccd0e9",
+      "bytes": 1460
+    },
+    "host-workspace-race-initial.txt": {
+      "sha256": "f379df65b3884bd731de3b50291dd0d12a6ed6a0de9718761e91f2b5f991c470",
+      "bytes": 11841
+    },
+    "host-workspace-race-final.txt": {
+      "sha256": "4c0e19c7baa603cbca52172a1d470648fc29d517b95aa1f0b595dc0a277a6ae1",
+      "bytes": 11384
+    }
+  },
+  "targetExecution": {
+    "windows_amd64": "not_run_no_target_host",
+    "linux_amd64": "not_run_no_target_host"
+  },
+  "openGates": [
+    "Windows native DACL, ownership, inheritance, handle sharing, junction races and simultaneous publication tests",
+    "Linux native renameat2 no-replace and directory flush execution",
+    "Windows recovery directory/marker protocol implementation; new workspace, migration, backup, restore and transfer explicitly unavailable",
+    "Windows full SQLite/native application build and clean installation",
+    "Failure injection, crash/power loss durability and cross-platform backup portability",
+    "Workspace audit performance at 100000-entry bound"
+  ],
+  "primarySources": [
+    "https://learn.microsoft.com/en-us/windows/win32/api/fileapi/nf-fileapi-createdirectoryw",
+    "https://learn.microsoft.com/en-us/windows/win32/api/fileapi/nf-fileapi-flushfilebuffers",
+    "https://learn.microsoft.com/en-us/windows/win32/api/winbase/nf-winbase-movefileexw",
+    "https://learn.microsoft.com/en-us/windows/win32/api/winbase/nf-winbase-replacefilew",
+    "https://learn.microsoft.com/en-us/windows/win32/api/aclapi/nf-aclapi-setnamedsecurityinfow"
+  ],
+  "independentSourceReview": {
+    "reviewer": "startup_reliability",
+    "result": "no_blocking_defect_found_within_documented_single_owner_serialized_publication_boundary",
+    "targetExecution": false,
+    "notes": [
+      "Existing ACLs remain unchanged; protected DACL supplied at new directory creation.",
+      "Path-based MoveFileEx assumes no same-user external process swaps source or target after audit; this is not hostile-owner tamper resistance.",
+      "Windows recovery durability remains explicitly unsupported."
+    ]
+  }
+}

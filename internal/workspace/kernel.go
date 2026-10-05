@@ -145,7 +145,7 @@ func openMigrationObserved(path string, create bool, observe func(string) error)
 		return nil, Fail("INTEGRITY_ERROR", "Workspace restore, creation, or backup is incomplete")
 	}
 	if create {
-		if err = os.MkdirAll(path, 0700); err != nil {
+		if err = platformfs.EnsurePrivateDirectory(path); err != nil {
 			return nil, err
 		}
 	}
@@ -181,6 +181,9 @@ func openMigrationObserved(path string, create bool, observe func(string) error)
 			allocated.Close()
 		}
 	}()
+	if err = platformfs.AuditWorkspace(path); err != nil {
+		return nil, err
+	}
 	// Re-read recovery state under the ownership lock. Another process may have
 	// completed or failed a migration between the initial check and lock acquisition.
 	incomplete, err = markerExists(path)
@@ -215,6 +218,14 @@ func openMigrationObserved(path string, create bool, observe func(string) error)
 	}
 	if journal != nil && (journal.Target.UserVersion > CurrentUserVersion || journal.Target.StorageGeneration > CurrentStorageGeneration) {
 		return nil, Fail("UNSUPPORTED_SCHEMA", "Workspace upgrade requires a newer application")
+	}
+	// Windows regular-file publication is supported independently. Creation,
+	// migration and interrupted recovery still require a qualified directory/
+	// marker protocol; reject before opening SQLite for mutation.
+	if !existingDatabase || before != CurrentCompatibility() || journal != nil {
+		if err = platformfs.RequireRecoveryDurability(); err != nil {
+			return nil, err
+		}
 	}
 	vecOnce.Do(sqlitevec.Auto)
 	dsn := (&url.URL{Scheme: "file", Path: filepath.Join(path, "workspace.db")}).String() + "?_foreign_keys=on&_journal_mode=WAL&_synchronous=FULL&_busy_timeout=5000"

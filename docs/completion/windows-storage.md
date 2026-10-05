@@ -1,0 +1,33 @@
+# Windows workspace privacy and file publication source implementation
+
+This package adds a conservative Windows storage boundary and preserves macOS/Linux directory flushes. It does not qualify Windows execution or recovery. Exact source hashes, host checks and cross-compiled test identities are in [the evidence manifest](../../evidence/completion/windows-storage/manifest.json).
+
+## Implemented boundary
+
+`platformfs.EnsurePrivateDirectory` creates missing Windows directories with a protected DACL at creation, granting the current user and LocalSystem inheritable full access. It never changes an existing directory or file ACL. Existing managed directories must be owned by the current user and have a nonempty, understandable DACL: effective grants to other principals are rejected, except LocalSystem and Administrators. Simple deny ACEs are retained; callback/object/other complex ACEs are unsupported. An inherited existing ACL can pass when all allowed principals satisfy this policy. This is a conservative supported-policy audit, not a general Windows effective-access calculator.
+
+The kernel audits the existing workspace tree while holding its owner lock, including database, asset and recording files. The audit is read-only, bounded to 100,000 entries and rejects reparse points, multiple file links, foreign ownership or broad access. It does not repair an existing workspace. Compatible existing workspaces can proceed only after this audit; performance at the entry limit is unmeasured.
+
+Storage requires a fixed local NTFS volume with persistent ACL support. UNC/network paths, streams, device paths, DOS reserved names, ambiguous trailing dots/spaces and reparse ancestors are refused. Ancestor directory handles deny delete sharing during directory creation or publication, keeping the checked path hierarchy in place. Permissions of pre-existing OS/home/temp ancestors are not rewritten or required to match the private leaf policy. Publication remains a trusted-kernel operation under the workspace owner lock and application serialization; this is not isolation from other processes with the same user authority or administrator access.
+
+`platformfs.PublishFile` flushes staged regular-file bytes, checks same-volume identity and calls `MoveFileExW` with `MOVEFILE_WRITE_THROUGH`. It never enables `MOVEFILE_COPY_ALLOWED`. New asset publication uses the operating system's no-replace behavior; concurrent losing publishers retain their staging bytes. Recording journal replacement additionally requires the existing target and staged source security descriptors to match exactly, refusing a change in existing access policy. The source and target must be regular single-link files. Existing file contents and ACLs are retained on pre-publication refusal.
+
+The Unix implementations use `renamex_np(RENAME_EXCL)` on macOS and `renameat2(RENAME_NOREPLACE)` on Linux for new targets, and sync affected directories after publication. Existing POSIX permission handling remains unchanged. macOS tests exercise exact binary/Unicode/CRLF bytes, replacement, concurrent no-replace publication, unsafe file types, symlinks, owner locking and the affected workspace paths.
+
+## Explicitly unavailable Windows recovery paths
+
+Windows `SyncDirectory` and `RequireRecoveryDurability` return `UNSUPPORTED_DURABILITY`. No failed directory flush is translated to success. New workspace creation, schema migration and interrupted migration recovery stop before opening SQLite for mutation. A new private root and empty owner-lock file may exist after refusal; no workspace database or incomplete marker has been created by that attempt.
+
+Backup creation, snapshot creation, backup restoration (including compatible application rollback), migration-snapshot restoration and workspace transfer stop before destination or staging data writes. Read-only backup verification is still available. Existing metadata validation may report its own error before reaching the unsupported capability gate. These are implementation gaps, not successful Windows workflows.
+
+Regular-file publication does not close the recovery tree/marker protocol, directory creation/deletion barriers, clean-install, rollback, or power-loss requirements. A Windows release remains blocked by those gaps even if the file primitive passes future target tests. FAT/exFAT, ReFS, removable media and network filesystems are outside this initial boundary.
+
+## Evidence and remaining qualification
+
+The recorded macOS run passed all 12 platformfs race tests and 35 selected workspace race tests covering assets, recordings, online backups, restores, migrations, recovery and transfer. These are host regression results, not Windows behavior. Windows amd64 and Linux amd64 platformfs test executables compile; neither was executed. The Windows-only scenarios prepare broad-parent inheritance, unchanged existing ACLs, broad child-file refusal, replacement-policy refusal and ambiguous Win32 names for a target runner.
+
+Windows-native tests still need to establish DACL inheritance/owner behavior, explicit deny and unsupported ACL handling, ancestor/junction races, simultaneous publication, target replacement, long/case-normalized paths, handle-sharing behavior and original-byte preservation. Filesystem failure injection, actual disk/power-loss durability, startup cost, backup portability and candidate-specific clean installation remain unqualified. The Windows recovery protocol needs separate implementation and tests before those paths can be enabled.
+
+## API basis
+
+Microsoft documents [initial directory security attributes and inheritance](https://learn.microsoft.com/en-us/windows/win32/api/fileapi/nf-fileapi-createdirectoryw), [file flushing and its access requirements](https://learn.microsoft.com/en-us/windows/win32/api/fileapi/nf-fileapi-flushfilebuffers), and [MoveFileEx flags](https://learn.microsoft.com/en-us/windows/win32/api/winbase/nf-winbase-movefileexw). The move documentation describes write-through completion and specifically details flushing a copy/delete move; this package records its chosen same-volume API without inferring a stronger empirical crash guarantee. [ReplaceFile's write-through flag is unsupported](https://learn.microsoft.com/en-us/windows/win32/api/winbase/nf-winbase-replacefilew), and administrative volume flushing is not used as a substitute. [Applying inheritable ACL changes can propagate to existing children](https://learn.microsoft.com/en-us/windows/win32/api/aclapi/nf-aclapi-setnamedsecurityinfow), which is why existing workspace access is audited without automatic modification.

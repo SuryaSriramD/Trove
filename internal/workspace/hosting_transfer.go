@@ -6,6 +6,8 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
+
+	"trove.local/phase0/internal/platformfs"
 )
 
 // TransferWorkspace requires the old owner to be stopped. It holds the source
@@ -15,6 +17,9 @@ func TransferWorkspace(ctx context.Context, source, destination string) (Restore
 	return transferWorkspaceWithFence(ctx, source, destination, durableRecoveryFile)
 }
 func transferWorkspaceWithFence(ctx context.Context, source, destination string, writeFence func(string, []byte) error) (result RestoreResult, err error) {
+	if err = platformfs.RequireRecoveryDurability(); err != nil {
+		return result, err
+	}
 	source, err = filepath.EvalSymlinks(source)
 	if err != nil {
 		return result, err

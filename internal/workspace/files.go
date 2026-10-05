@@ -12,6 +12,7 @@ import (
 	"net/http"
 	"os"
 	"path/filepath"
+	"runtime"
 	"strconv"
 	"strings"
 	"sync"
@@ -229,9 +230,9 @@ func (k *Kernel) publishAsset(staged, digest string, size int64) error {
 	}
 	target := filepath.Join(k.path, "files", digest[:2], digest)
 	if _, err := os.Lstat(target); errors.Is(err, os.ErrNotExist) {
-		// Rename is atomic on the workspace volume, including volumes without
-		// hard links. The process lock and publication mutex prevent replacement.
-		if err = os.Rename(staged, target); err != nil {
+		// The OS enforces no replacement; publication flushes the staged bytes
+		// and uses the platform's supported same-volume namespace operation.
+		if err = platformfs.PublishFile(staged, target, false); err != nil {
 			return err
 		}
 	} else if err != nil {
@@ -243,13 +244,13 @@ func (k *Kernel) publishAsset(staged, digest string, size int64) error {
 	if err := os.Chmod(target, 0444); err != nil {
 		return err
 	}
-	if dir, err := os.Open(filepath.Dir(target)); err == nil {
-		err = dir.Sync()
-		dir.Close()
-		return err
-	} else {
-		return err
+	if runtime.GOOS != "windows" {
+		// Preserve POSIX retry behavior if an earlier rename completed but its
+		// directory flush failed. Windows publication already uses write-through
+		// MoveFileEx; there is no fictitious directory-sync fallback here.
+		return platformfs.SyncDirectory(filepath.Dir(target))
 	}
+	return nil
 }
 
 func copyBounded(ctx context.Context, dst io.Writer, src io.Reader, limit int64) (int64, error) {
@@ -282,7 +283,7 @@ func copyBounded(ctx context.Context, dst io.Writer, src io.Reader, limit int64)
 	}
 }
 func safeDirectory(path string) error {
-	if err := os.MkdirAll(path, 0700); err != nil {
+	if err := platformfs.EnsurePrivateDirectory(path); err != nil {
 		return err
 	}
 	st, err := os.Lstat(path)
