@@ -1,0 +1,10 @@
+=== RUN   TestRealLocalExposedModes
+=== RUN   TestRealLocalExposedModes/code_refactor
+    ai_local_modes_test.go:212: {"canonicalUnchanged":true,"displayed":"func Double(x int) int { return x * 2 }","draft":"{\"source\":\"func Double(x int) int { return x * 2 }\"}","finishError":"\u003cnil\u003e","generationError":"\u003cnil\u003e","latencyMs":14692,"mode":"code_refactor","modelPackId":"01990000-0000-7000-8000-000000000106","outputCap":512,"peakWorkerRSS":null,"prompt":"Replace x + x with x * 2 in this Go function. Keep its name, parameter, return type and behavior; return only the complete function.","promptTokens":212,"proposalError":"","releaseQualified":false,"source":"func Double(x int) int { return x + x }","taskPassed":true}
+=== RUN   TestRealLocalExposedModes/code_comment
+    ai_local_modes_test.go:212: {"canonicalUnchanged":true,"displayed":"EVIDENCE\n[1] Evaluation source\n// This function takes an integer x and returns its double value.\nfunc Double(x int) int { return x + x }\n[2] Evaluation source\nEvaluation source\n","draft":"{\"source\":\"EVIDENCE\\n[1] Evaluation source\\n// This function takes an integer x and returns its double value.\\nfunc Double(x int) int { return x + x }\\n[2] Evaluation source\\nEvaluation source\\n\"}","finishError":"\u003cnil\u003e","generationError":"\u003cnil\u003e","latencyMs":14863,"mode":"code_comment","modelPackId":"01990000-0000-7000-8000-000000000106","outputCap":512,"peakWorkerRSS":null,"prompt":"Add a useful Go comment explaining Double. Preserve the exact function logic, name, parameter and return type. Return only the complete commented function.","promptTokens":210,"proposalError":"","releaseQualified":false,"source":"func Double(x int) int { return x + x }","taskPassed":false}
+    ai_local_modes_test.go:214: predefined mode task or unapplied-write boundary failed
+--- FAIL: TestRealLocalExposedModes (29.66s)
+    --- PASS: TestRealLocalExposedModes/code_refactor (14.76s)
+    --- FAIL: TestRealLocalExposedModes/code_comment (14.90s)
+FAIL
