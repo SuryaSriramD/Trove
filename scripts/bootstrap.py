@@ -6,8 +6,7 @@ browser binaries are opt-in; no global Python, Go or Node install is modified.
 """
 import argparse
 import json
-from pathlib import Path
-import platform
+from pathlib import Path, PurePosixPath
 import shutil
 import subprocess
 import sys
@@ -15,12 +14,15 @@ import tarfile
 import tempfile
 from urllib.request import urlopen
 import venv
+import zipfile
+import stat
+from native_targets import host_target, require_native_host
 
-from devtools import ROOT, baseline, build_env, cache_dir, file_digest, go_binary, python_env
+from devtools import ROOT, baseline, build_env, cache_dir, file_digest, go_binary, python_env, go_archive_pin, tool_command
 
 
 def archive(cache, name, pin, fetch, seeds=()):
-    destination = cache / (name + '.tar.gz')
+    destination = cache / (name + ('.zip' if pin['url'].endswith('.zip') else '.tar.gz'))
     if destination.is_file() and file_digest(destination) == pin['sha256']:
         return destination
     # A seed is only trusted after checking the committed baseline digest.
@@ -52,7 +54,29 @@ def extract(path, cache, directory):
             raise RuntimeError('Refusing unsafe source destination: ' + str(destination))
         return  # Existing source changes are checked by native qualification/build.
     with tempfile.TemporaryDirectory(dir=cache, prefix='extract-') as temporary:
-        stage = Path(temporary)
+        stage = Path(temporary).resolve()
+        if zipfile.is_zipfile(path):
+            with zipfile.ZipFile(path) as bundle:
+                members = bundle.infolist()
+                if len(members) > 100000 or sum(x.file_size for x in members) > 2 << 30:
+                    raise RuntimeError('Unsafe archive expansion size')
+                seen = set()
+                for member in members:
+                    target = (stage / member.filename).resolve()
+                    mode = member.external_attr >> 16
+                    name = member.filename.removesuffix('/')
+                    parts = PurePosixPath(name).parts
+                    if (not parts or str(PurePosixPath(name)) != name or any(x in ('.', '..') or x.endswith((' ', '.')) for x in parts)
+                            or any(x.split('.')[0].upper() in {'CON','PRN','AUX','NUL',*[f'COM{i}' for i in range(1,10)],*[f'LPT{i}' for i in range(1,10)]} for x in parts)
+                            or name.lower() in seen or stage not in target.parents or ':' in name or '\\' in name
+                            or stat.S_IFMT(mode) not in (0, stat.S_IFREG, stat.S_IFDIR)):
+                        raise RuntimeError('Unsafe archive member: ' + member.filename)
+                    seen.add(name.lower())
+                    if parts[0] != directory:
+                        raise RuntimeError('Unexpected archive root: ' + member.filename)
+                bundle.extractall(stage)
+            (stage / directory).rename(destination)
+            return
         with tarfile.open(path) as bundle:
             for member in bundle.getmembers():
                 target = (stage / member.name).resolve()
@@ -66,6 +90,7 @@ def extract(path, cache, directory):
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument('--target', choices=('darwin-arm64','windows-amd64','linux-amd64'), help='must match the current host; no cross-host tool installation')
     parser.add_argument('--cache', '--cache-dir', type=Path, default=cache_dir())
     parser.add_argument('--print-venv', action='store_true', help='print the selected Python environment path without changing anything')
     parser.add_argument('--fetch', action='store_true', help='allow downloads of committed dependency pins')
@@ -81,8 +106,8 @@ def main():
         parser.error('Run bootstrap using Python 3.12 or newer; the existing .venv is never changed.')
     if args.browser and not args.fetch:
         parser.error('--browser requires --fetch because Playwright may download Chromium')
-    if 'go' in args.components and (platform.system(), platform.machine()) != ('Darwin', 'arm64'):
-        parser.error('The committed Go toolchain archive targets Darwin arm64; install the pinned Go version independently on Windows/Linux. Native source archives are portable.')
+    target = args.target or host_target()
+    require_native_host(target)
     cache = cache_dir(args.cache)
     cache.mkdir(parents=True, exist_ok=True)
     env = build_env(cache, offline=not args.fetch)
@@ -103,9 +128,9 @@ def main():
             run([interpreter, '-m', 'pip', 'download', '--only-binary=:all:', '--dest', wheels, '-r', ROOT / 'requirements-dev.txt'])
         run([interpreter, '-m', 'pip', 'install', '--no-index', '--find-links', wheels,
              '--require-virtualenv', '-r', ROOT / 'requirements-dev.txt'])
-        print('Activate: source ' + str(location / 'bin/activate'), flush=True)
+        print('Activate: ' + (str(location / 'Scripts/Activate.ps1') if sys.platform == 'win32' else 'source ' + str(location / 'bin/activate')), flush=True)
     if 'go' in args.components:
-        source = archive(cache, 'go', lock['go'], args.fetch, args.seed_cache)
+        source = archive(cache, 'go' if target == 'darwin-arm64' else 'go-' + target, go_archive_pin(target), args.fetch, args.seed_cache)
         extract(source, cache, 'go')
         go = go_binary(cache)
         for directory in (ROOT, ROOT / 'baseline/go'):
@@ -113,7 +138,7 @@ def main():
             run([go, 'mod', 'verify'], directory)
     if 'frontend' in args.components:
         for tool in ('node', 'pnpm'):
-            actual = subprocess.check_output([tool, '--version'], text=True).strip().removeprefix('v')
+            actual = subprocess.check_output(tool_command(tool, '--version'), env=env, text=True).strip().removeprefix('v')
             if actual != lock['toolchain'][tool]:
                 raise RuntimeError(tool + ' differs from the committed toolchain: ' + actual)
         for directory in (ROOT / 'frontend', ROOT / 'baseline/frontend'):
@@ -125,7 +150,7 @@ def main():
             command = ['pnpm', 'install', '--frozen-lockfile', '--ignore-scripts', '--store-dir', cache / 'pnpm-store']
             if not args.fetch:
                 command.append('--offline')
-            run(command, directory)
+            run(tool_command(*command), directory)
     if 'native' in args.components:
         native_pins = dict(lock['workers'], **{'ffmpeg-audio': json.loads((ROOT / 'native/audio-decoder.lock.json').read_text())})
         for name, pin in native_pins.items():
@@ -133,7 +158,7 @@ def main():
             extract(source, cache, pin['sourceDirectory'])
     if args.browser:
         run(['node', ROOT / 'frontend/node_modules/@playwright/test/cli.js', 'install', 'chromium'])
-    print(json.dumps({'scope': 'development setup only', 'cache': str(cache),
+    print(json.dumps({'scope': 'development setup only', 'target': target, 'cache': str(cache),
                       'pythonEnvironment': str(python_env(cache)), 'components': args.components,
                       'browserRequested': args.browser, 'modelDownloads': False,
                       'qualificationEvidenceWritten': False}, indent=2))
@@ -143,6 +168,6 @@ def main():
 if __name__ == '__main__':
     try:
         raise SystemExit(main())
-    except (OSError, RuntimeError, subprocess.SubprocessError) as exc:
+    except (OSError, ValueError, RuntimeError, subprocess.SubprocessError) as exc:
         print('Bootstrap failed: ' + str(exc), file=sys.stderr)
         raise SystemExit(1)

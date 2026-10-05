@@ -66,11 +66,11 @@ class DeveloperToolsTests(unittest.TestCase):
     def test_incomplete_cached_go_is_rejected_instead_of_falling_back(self):
         with tempfile.TemporaryDirectory() as temporary:
             root = Path(temporary)
-            binary = root / 'go/bin/go'
+            binary = root / 'go/bin' / ('go.exe' if os.name == 'nt' else 'go')
             binary.parent.mkdir(parents=True)
             binary.touch()
             with patch('devtools.shutil.which', return_value='/unrelated/go'), patch('devtools.subprocess.check_output', side_effect=[
-                'go version go' + devtools.baseline()['go']['version'] + ' darwin/arm64\n', str(root / 'go') + '\n']):
+                'go version go' + devtools.baseline()['go']['version'] + ' ' + devtools.host_target().replace('-', '/') + '\n', str(root / 'go') + '\n']):
                 with self.assertRaisesRegex(RuntimeError, 'standard-library'):
                     devtools.go_binary(root)
 

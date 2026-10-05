@@ -12,6 +12,7 @@ from pathlib import Path
 import platform
 import shutil
 import subprocess
+from native_targets import host_target
 
 ROOT = Path(__file__).resolve().parents[1]
 
@@ -49,6 +50,27 @@ def python_env(cache=None):
     return cache_dir(cache) / 'python' / ('requirements-' + identity)
 
 
+def go_archive_pin(target=None):
+    target = target or host_target()
+    pins = json.loads((ROOT / 'baseline/go-targets.lock.json').read_text())
+    if pins['version'] != baseline()['go']['version'] or target not in pins['targets']:
+        raise RuntimeError('No reviewed Go archive for target: ' + target)
+    return pins['targets'][target]
+
+
+def tool_command(tool, *args):
+    """Invoke Windows package-manager shims without cmd.exe shell interpolation."""
+    path = shutil.which(tool)
+    if platform.system() != 'Windows' or not path or Path(path).suffix.lower() not in ('.cmd', '.bat'):
+        return [path or tool, *map(str, args)]
+    if tool == 'pnpm':
+        for relative in ('node_modules/pnpm/bin/pnpm.cjs', 'node_modules/corepack/dist/pnpm.js'):
+            entry = Path(path).parent / relative
+            if entry.is_file():
+                return [shutil.which('node') or 'node', str(entry), *map(str, args)]
+    raise RuntimeError('Install a native executable or known Node entry point for ' + tool)
+
+
 def go_binary(cache=None):
     """Prefer the selected pinned cache; reject incomplete or floating tools."""
     cached = cache_dir(cache) / 'go/bin' / ('go.exe' if os.name == 'nt' else 'go')
@@ -57,7 +79,7 @@ def go_binary(cache=None):
         raise RuntimeError('Pinned Go is missing; run scripts/bootstrap.py --fetch with this cache.')
     env = dict(os.environ, GOTOOLCHAIN='local')
     version = subprocess.check_output([candidate, 'version'], env=env, text=True).strip()
-    if not version.startswith('go version go' + baseline()['go']['version'] + ' '):
+    if version != 'go version go' + baseline()['go']['version'] + ' ' + host_target().replace('-', '/'):
         raise RuntimeError('Go version differs from baseline: ' + version)
     goroot = Path(subprocess.check_output([candidate, 'env', 'GOROOT'], env=env, text=True).strip())
     if not (goroot / 'src/runtime/runtime.go').is_file():
@@ -74,6 +96,7 @@ def build_env(cache=None, *, source=None, offline=True):
     env.setdefault('PLAYWRIGHT_BROWSERS_PATH', str(selected / 'playwright'))
     env['GOTOOLCHAIN'] = 'local'
     if offline:
+        env['COREPACK_ENABLE_NETWORK'] = '0'
         env['GOPROXY'] = 'off'
         env['GOSUMDB'] = 'off'
     return env

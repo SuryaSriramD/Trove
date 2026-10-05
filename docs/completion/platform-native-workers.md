@@ -48,7 +48,7 @@ Actual builds require the target OS/architecture. They reject mismatched hosts a
 
     python3 scripts/bootstrap.py --fetch --components native --cache <native-cache>
 
-Native source archives are platform neutral. The committed Go bootstrap archive remains Darwin arm64 only; install and verify the pinned Go version independently on Windows/Linux.
+Native source archives are platform neutral. Target-specific official Go archive pins and bootstrap/doctor checks are now supplied by the [desktop packaging package](platform-desktop-packaging.md); actual Windows/Linux tool execution remains unqualified.
 
 | Target | Required build environment | Runtime dependencies |
 |---|---|---|

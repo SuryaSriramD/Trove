@@ -26,21 +26,24 @@ func main() {
 		os.Exit(providers.RunClaudeLoginHelper(os.Args[2]))
 	}
 	app := NewApp()
-	for _, argument := range os.Args[1:] {
-		app.openURL(argument)
+	if err := app.acceptLaunchArguments(os.Args[1:]); err != nil {
+		fmt.Fprintln(os.Stderr, err)
+		os.Exit(2)
 	}
 	assets, err := fs.Sub(frontendAssets, "frontend/dist")
 	if err != nil {
 		fmt.Fprintln(os.Stderr, err)
 		os.Exit(1)
 	}
-	err = wails.Run(&options.App{Title: "Trove", Width: 1380, Height: 900, MinWidth: 960, MinHeight: 640,
+	desktopOptions := &options.App{Title: "Trove", Width: 1380, Height: 900, MinWidth: 960, MinHeight: 640,
 		BackgroundColour: options.NewRGB(246, 245, 241),
 		AssetServer:      &assetserver.Options{Assets: assets, Handler: http.HandlerFunc(app.serveFile), Middleware: preventAppFraming},
 		OnStartup:        app.startup, OnDomReady: app.domReady, OnShutdown: app.shutdown, Bind: []interface{}{app},
 		DragAndDrop: &options.DragAndDrop{EnableFileDrop: true},
 		Mac:         &mac.Options{TitleBar: mac.TitleBarDefault(), OnUrlOpen: app.openURL},
-	})
+	}
+	configureDesktopPlatform(desktopOptions, app)
+	err = wails.Run(desktopOptions)
 	if err != nil {
 		fmt.Fprintln(os.Stderr, err)
 		os.Exit(1)
