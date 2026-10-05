@@ -29,6 +29,9 @@ func GeneratePreparedAI(ctx context.Context, prepared AIPrepared, generate AIGen
 	}
 	if len(prepared.Run.Sources) == 0 || !aiRequiresCitations(prepared.Run.Request.Mode) {
 		text, err := generate(ctx, prepared.System, prepared.Prompt, prepared.OutputTokens, "", onToken)
+		if err == nil && aiLiteralOutput(prepared.Run.Request.Mode) {
+			text = unwrapAIWholeCodeFence(text)
+		}
 		return AICompletion{Text: text}, err
 	}
 	var raw strings.Builder
@@ -312,4 +315,28 @@ func aiQuoteSupportsNumbers(claim, quote string) bool {
 		}
 	}
 	return true
+}
+
+// A single complete enclosing Markdown fence is presentation, not replacement
+// code or structured JSON. Remove only that wrapper, retaining every body byte.
+// Mixed prose, nested/multiple fences and incomplete streams remain unchanged.
+var aiOpeningFence = regexp.MustCompile("^```(?:[A-Za-z][A-Za-z0-9_+.-]*)?[ \t]*\r?$")
+
+func unwrapAIWholeCodeFence(text string) string {
+	trimmed := strings.TrimSpace(text)
+	first := strings.IndexByte(trimmed, '\n')
+	last := strings.LastIndexByte(trimmed, '\n')
+	if first < 0 || last <= first || !aiOpeningFence.MatchString(trimmed[:first]) || strings.TrimSpace(trimmed[last+1:]) != "```" {
+		return text
+	}
+	body := trimmed[first+1 : last+1]
+	if strings.TrimSpace(body) == "" {
+		return text
+	}
+	for _, line := range strings.Split(body, "\n") {
+		if strings.HasPrefix(strings.TrimSpace(line), "```") {
+			return text
+		}
+	}
+	return body
 }

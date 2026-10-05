@@ -122,3 +122,36 @@ func TestAIExactQuoteGrammarRejectsTotalByteOverflow(t *testing.T) {
 		t.Fatal("large escaped quote grammar was admitted")
 	}
 }
+
+func TestAILiteralDraftUnwrapsOnlyOneCompleteFence(t *testing.T) {
+	for _, tc := range []struct{ mode, raw, expected string }{
+		{"code_comment", "```go\n// Retain this comment.\nfunc F() int { return 7 }\n```", "// Retain this comment.\nfunc F() int { return 7 }\n"},
+		{"database", "```json\n{\"title\":\"A\",\"properties\":[],\"view\":\"table\"}\n```", "{\"title\":\"A\",\"properties\":[],\"view\":\"table\"}\n"},
+		{"mermaid", "```mermaid\r\nflowchart LR\r\n A-->B\r\n```\r\n", "flowchart LR\r\n A-->B\r\n"},
+		{"code_refactor", "func F() int { return 7 }\n", "func F() int { return 7 }\n"},
+	} {
+		p := AIPrepared{Run: AIRun{Request: AIRequest{Mode: tc.mode}}}
+		result, err := GeneratePreparedAI(context.Background(), p, func(context.Context, string, string, int, string, func(string)) (string, error) { return tc.raw, nil }, nil)
+		if err != nil || result.Text != tc.expected {
+			t.Fatalf("%s body changed: %q, %v", tc.mode, result.Text, err)
+		}
+	}
+	for _, raw := range []string{"Before\n```go\nreturn 7\n```", "```go\nreturn 7\n```\nAfter", "```go\nreturn 7", "```go\nreturn 7\n```\n```go\nreturn 8\n```", "```go\n\n```", "````go\nreturn 7\n````"} {
+		if result := unwrapAIWholeCodeFence(raw); result != raw {
+			t.Fatalf("ambiguous content was discarded: %q => %q", raw, result)
+		}
+	}
+	raw := "```go\nreturn 7\n```"
+	for _, tc := range []struct {
+		mode    string
+		failure error
+	}{{"rewrite", nil}, {"code_explain", nil}, {"code_comment", context.Canceled}} {
+		p := AIPrepared{Run: AIRun{Request: AIRequest{Mode: tc.mode}}}
+		result, err := GeneratePreparedAI(context.Background(), p, func(context.Context, string, string, int, string, func(string)) (string, error) {
+			return raw, tc.failure
+		}, nil)
+		if result.Text != raw || err != tc.failure {
+			t.Fatalf("nonliteral or failed draft was changed: %q, %v", result.Text, err)
+		}
+	}
+}

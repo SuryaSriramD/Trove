@@ -13,10 +13,12 @@ import (
 	"trove.local/phase0/contracts"
 )
 
+const aiDatabaseDraftInstructions = `Return only one JSON object, without Markdown fences or commentary: {"title":"Name","properties":[{"name":"Example","type":"text","config":{}}],"view":"table"}. Do not include a title property; the service creates it. Every property must include name, type and config. Canonical simple types are text, number, checkbox, date, url, email and phone. Use checkbox, never boolean. Number config is {"format":"decimal"}; the other simple types use {}. Do not invent config keys. Supported views are table, list and gallery. Maximum 32 properties. This is a reviewable draft, never an applied change.`
+
 // Structured drafts are data only. Neither validation nor approval executes code.
 var advancedAIInstructions = map[string]string{
-	"database":        `Generate only JSON: {"title":"Name","properties":[{"name":"Name","type":"text","config":{}}],"view":"table"}. Do not include a title property (the service creates it). Supported view: table, list or gallery. Use canonical property configs; number config is {"format":"decimal"}. Maximum 32 properties.`,
-	"schema":          `Suggest a schema as JSON {"title":"Name","properties":[{"name":"Name","type":"text","config":{}}],"view":"table"}. It is a reviewable draft, not an applied change.`,
+	"database":        aiDatabaseDraftInstructions,
+	"schema":          aiDatabaseDraftInstructions,
 	"mermaid":         `Return only Mermaid source, with no Markdown fence. Use flowchart, sequenceDiagram, stateDiagram-v2, classDiagram, erDiagram, gantt, pie, mindmap or timeline. Do not use links, click actions, HTML or init directives.`,
 	"code_explain":    "Explain the selected code and its assumptions. Never execute it. Distinguish observed behavior from suggestions.",
 	"code_refactor":   "Return only replacement code, without Markdown fences. Preserve intended behavior. Never execute code. The user will review a source diff.",
