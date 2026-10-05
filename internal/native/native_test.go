@@ -13,10 +13,10 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
+	"runtime"
 	"strconv"
 	"strings"
 	"sync/atomic"
-	"syscall"
 	"testing"
 	"time"
 	"trove.local/phase0/contracts"
@@ -24,7 +24,7 @@ import (
 
 func fixturePack(data []byte) Pack {
 	h := sha256.Sum256(data)
-	return Pack{SchemaVersion: 1, ID: "01990000-0000-7000-8000-000000000101", Name: "Fixture", Kind: "chat", Format: "gguf", SHA256: hex.EncodeToString(h[:]), SizeBytes: int64(len(data)), License: "MIT", LicenseURL: "https://example.test/license", SourceRevision: "fixture", RuntimeCommit: LlamaCommit, Architecture: "arm64", ContextTokens: 128, EstimatedMemoryBytes: 64 << 20}
+	return Pack{SchemaVersion: 1, ID: "01990000-0000-7000-8000-000000000101", Name: "Fixture", Kind: "chat", Format: "gguf", SHA256: hex.EncodeToString(h[:]), SizeBytes: int64(len(data)), License: "MIT", LicenseURL: "https://example.test/license", SourceRevision: "fixture", RuntimeCommit: LlamaCommit, Architecture: runtime.GOARCH, ContextTokens: 128, EstimatedMemoryBytes: 64 << 20}
 }
 func TestFramesRejectMalformed(t *testing.T) {
 	for _, b := range [][]byte{{0, 0, 0, 0}, {0, 16, 0, 1}, {0, 0, 0, 3, '{', '}'}, {0, 0, 0, 3, '"', 255, '"'}, {0, 0, 0, 3, 'N', 'a', 'N'}} {
@@ -192,13 +192,20 @@ func TestRealQualification(t *testing.T) {
 		t.Fatalf("unexpected transcription: %s", speech)
 	}
 	t.Logf("real models: %v", result)
-	encoded, _ := json.MarshalIndent(map[string]any{"recordedAt": time.Now().UTC(), "host": "darwin/arm64", "status": "verified", "checks": result}, "", "  ")
-	if e = os.WriteFile(filepath.Join(root, "evidence/phase1-native-smoke.json"), encoded, 0644); e != nil {
+	encoded, _ := json.MarshalIndent(map[string]any{"recordedAt": time.Now().UTC(), "host": runtime.GOOS + "/" + runtime.GOARCH, "status": "verified", "checks": result}, "", "  ")
+	report := os.Getenv("TROVE_NATIVE_SMOKE_REPORT")
+	if report == "" {
+		report = filepath.Join(root, "evidence/phase1-native-smoke.json")
+	}
+	if e = os.WriteFile(report, encoded, 0644); e != nil {
 		t.Fatal(e)
 	}
 }
 
 func TestRealWorkerCancellationCrashAndMetal(t *testing.T) {
+	if runtime.GOOS != "darwin" {
+		t.Skip("Metal and macOS pgrep qualification; run platform cancellation tests separately")
+	}
 	if os.Getenv("TROVE_NATIVE_INTEGRATION") != "1" {
 		t.Skip("real native pack qualification is opt-in")
 	}
@@ -273,7 +280,10 @@ func TestRealWorkerCancellationCrashAndMetal(t *testing.T) {
 				return
 			}
 			killed = true
-			_ = syscall.Kill(pid, syscall.SIGKILL)
+			process, err := os.FindProcess(pid)
+			if err == nil {
+				_ = process.Kill()
+			}
 		}
 	})
 	if e == nil || !killed {

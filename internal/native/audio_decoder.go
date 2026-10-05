@@ -13,7 +13,6 @@ import (
 	"runtime"
 	"strconv"
 	"strings"
-	"syscall"
 	"time"
 )
 
@@ -149,14 +148,17 @@ func (s *Supervisor) DecodeAudio(ctx context.Context, source, destination *os.Fi
 	cmd := exec.CommandContext(run, filepath.Join(s.bundle, helper.Name))
 	cmd.Dir = dir
 	cmd.Env = []string{"PATH=/usr/bin:/bin", "HOME=" + dir, "TMPDIR=" + dir}
-	cmd.SysProcAttr = &syscall.SysProcAttr{Setpgid: true}
-	cmd.ExtraFiles = []*os.File{snapshot, destination}
+	process, err := prepareWorker(cmd, []*os.File{snapshot, destination}, 512<<20)
+	if err != nil {
+		return result, err
+	}
+	defer process.close()
 	cmd.Stdin = strings.NewReader(`{"schemaVersion":1}`)
 	stdout := &decodeOutput{}
 	cmd.Stdout, cmd.Stderr = stdout, &ringLog{}
-	cmd.Cancel = func() error { return syscall.Kill(-cmd.Process.Pid, syscall.SIGKILL) }
+	cmd.Cancel = func() error { return process.stop(true) }
 	cmd.WaitDelay = 2 * time.Second
-	if err = cmd.Start(); err != nil {
+	if err = process.start(); err != nil {
 		return result, err
 	}
 	stopped := make(chan struct{})

@@ -1,0 +1,29 @@
+{
+  "step": "create",
+  "passed": true,
+  "recordedAt": "2026-10-05T11:50:42.155116Z",
+  "state": {
+    "workspaceId": "01a10be6-dd26-714e-a0b3-9d071f369211",
+    "pageId": "01a10be6-deeb-7224-8be8-2a2ee056893b",
+    "blockId": "01a10be6-deeb-752c-8a7a-2bc3c8770407",
+    "collectionId": "01a10be6-deeb-711e-bc20-c55f28039890",
+    "propertyId": "01a10be6-deeb-7881-a4d4-d5f0c8e3605f",
+    "recordId": "01a10be6-deeb-7d3d-8309-020ece17efa8",
+    "recordPageId": "01a10be6-deeb-7909-982a-2d593b8ec2e7",
+    "fileId": "01a10be6-df0b-7b6c-9c30-50e3ccfcb2c3",
+    "fileBlockId": "01a10be6-deeb-724e-af4b-9d92af3b4b7a",
+    "contentHash": "61cb495898eb4901d8a4ea859ee4cee692bb981cc2474a55f2809e47519fd273"
+  },
+  "checks": [
+    "pages persisted",
+    "blocks persisted",
+    "collections persisted",
+    "records persisted",
+    "files persisted",
+    "page titles, Unicode rich text and attachment references unchanged",
+    "record has canonical page body",
+    "attachment hash and scoped file read verified"
+  ],
+  "processExitCode": 0,
+  "installedWeightsAvailable": false
+}

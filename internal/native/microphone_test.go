@@ -6,6 +6,7 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
+	"runtime"
 	"testing"
 	"time"
 )
@@ -13,6 +14,9 @@ import (
 // These tests launch the actual Swift executable. They use only synthetic PCM,
 // never request microphone permission, and exercise the real control descriptor.
 func TestRealMicrophoneControlCancellationAndParentExit(t *testing.T) {
+	if runtime.GOOS != "darwin" || runtime.GOARCH != "arm64" {
+		t.Skip("unsupported microphone helper on this target")
+	}
 	if os.Getenv("TROVE_NATIVE_INTEGRATION") != "1" {
 		t.Skip("requires bundled native microphone helper")
 	}

@@ -1,0 +1,242 @@
+{
+  "schemaVersion": 1,
+  "sourceBase": "1e38cb8afaadd0a4c7c8214a9186cfc1734b788e",
+  "sourceSha256": {
+    "contracts/generated/jobs.ts": "c0c8f768eb34b9d95245c2bc8e699afbd5e42613b4b32a08948474c9a41ca285",
+    "contracts/jobs.schema.json": "096840a7fda659af9e4169bd93cf1a94cbe423d56abe0baacc380c960052cc0a",
+    "contracts/types_generated.go": "51dfe1c41860dda970f4e5503118a6a7d47d20c1e1f399cd3c5698ad4b290782",
+    "docs/completion/platform-native-workers.md": "f5907566c4158c79b8bdf1d4ed154ca8bc80d91cc463aea61263f79ecf504901",
+    "internal/native/acquisition_test.go": "5d9ea163f07534cfd29a9e43f1a9a305759b28b77116898c6d0529ec06e07878",
+    "internal/native/audio_decoder.go": "ce780852dd5f7d94858bb587bd34a81934837998bfcee5acb425bcc12b91619d",
+    "internal/native/microphone.go": "f8bd85c84e5ce4af0392e69a1c47de307a70365a9962f4b6f164fc165ab96c37",
+    "internal/native/microphone_test.go": "c70bb0d962031c40a4ebea5509dee962613760d7d1a99ab844f6bc7f249fc280",
+    "internal/native/native_test.go": "aaf6c9b3d9ad0f3f27541968a8cbe9cdf08fe399a58023c2ff6c1ef3ebfe2ad1",
+    "internal/native/packs.go": "c3b6784368ecaf18330a072e42bc623f01463aa2acf8f92fb85d672d6f864d7f",
+    "internal/native/platform_darwin.go": "1cde82e45c186663ed793420d4f3f70fb0a34431210ac5f34cce27fd2602b6a8",
+    "internal/native/platform_linux.go": "0c31485ea76fc4c92bb073fb61f2d833ed676ba19f4f88df755349a62876ee09",
+    "internal/native/platform_test.go": "2244287ca1af07d662e038726918c181798cda9272be8dcc0eea01078cdd08a0",
+    "internal/native/platform_unix.go": "16440bbcb276c172bec24c35d2cfeae029115e81b448a69f2255f8938e403503",
+    "internal/native/platform_windows.go": "59f47448d29743fd0668e071f9c18c38f2783d3695eae28d11f3594e6f2830f1",
+    "internal/native/platform_windows_test.go": "1f7b296d326fc2243591175a27b373dffe450b05ecb680a648ede76f9cd28049",
+    "internal/native/supervisor.go": "6fdbeea570f8f3c50444ba00d1cefbd06ef53ab71d7f5d0c33fe45af08d7fcab",
+    "native/CMakeLists.txt": "37ab0fd0ca183cb96c0e79f69b3b5688860a5dca292c893c2f1d38c4a44fe8ba",
+    "native/llama-worker.cpp": "906f756fa79144886c176a5f11f0d4e6607e2268b804ed0dd052bd01164114c1",
+    "native/models/catalog.json": "22b59e190d5383283c0c5a1cc6623ba43ad2b0463e0ddafc07ce1dac95990a60",
+    "native/vision-worker.cpp": "ac59268b7fc7831be9d0e6d2bb0efc693d770d68672c317114b9b5926d1a4aa8",
+    "native/whisper-worker.cpp": "19b2a6a18353ed668eb6d0db115a0330d087de1291a51e8ec85a31d2c015a294",
+    "native/worker-platform.hpp": "9cbe44ab08eeac34563db2b437554a85b8d8066c21a23917018167c78de66545",
+    "native/worker-projector.hpp": "c6f19bd21dc19efcdae49f7a7835b7e2e378530c3d05b18e02df453c0eb7e7d3",
+    "native/worker.hpp": "fd7bef552ac58050db6b2d1d1cbd3783a1d3c9ef0fd1af0e1490265a21197817",
+    "scripts/bootstrap.py": "b92249e343978e4c35c48019dde6dbf790512208d5879a58f77e5e01b48de8ba",
+    "scripts/build-native-portable.py": "16759fea55de1ad07125e54182114f3ac221270d093951ef58bd3f1182ed8a29",
+    "scripts/build-native.py": "f70a67c4f3bc999a14961bd3ceb720d14055524d005d1a1eb25448ee40200c11",
+    "scripts/native_targets.py": "16ad0e30b22bccf5d17f1b828547eb2a1978746d231dbe0a0640a35724beb220",
+    "tests/test_devtools.py": "0392d1b43a27bb981a8de6f9c1cd33332e62026612e63bf0c72075c596d2b5ae",
+    "tests/test_native_targets.py": "73493ca092650cf224e20332beb4e66e7d7868d7f75feb552fd2707a57840320"
+  },
+  "host": {
+    "platform": "macOS-27.0.1-arm64-arm-64bit",
+    "hardware": "Mac16,12",
+    "memoryBytes": 25769803776,
+    "macOS": "ProductName:\t\tmacOS\nProductVersion:\t\t27.0.1\nBuildVersion:\t\t26A434"
+  },
+  "goVersion": "go version go1.27.1 darwin/arm64",
+  "nativeBundle": {
+    "schemaVersion": 2,
+    "helpers": [
+      {
+        "name": "microphone-worker",
+        "sha256": "9940c517026dfad18329843e1bc33ee47d0c67512d5c6f10a819a7753619e448",
+        "runtime": "microphone",
+        "runtimeCommit": "trove-microphone-v1",
+        "architecture": "arm64"
+      },
+      {
+        "name": "llama-worker",
+        "sha256": "92414fc39170d1c74cff37e3ef4da75b0fc333fca1db8f10e6933e9851fda553",
+        "runtime": "llama.cpp",
+        "runtimeCommit": "d2e54583c7452353eb35d40431281f6ee984332f",
+        "architecture": "arm64"
+      },
+      {
+        "name": "whisper-worker",
+        "sha256": "3fea7af4c1e749ceda0e25072aa4b17551f1750c2e823cc2952943b2ab9472fe",
+        "runtime": "whisper.cpp",
+        "runtimeCommit": "927cfce34f31707e17f2bff35c349632fb9e2c3a",
+        "architecture": "arm64"
+      },
+      {
+        "name": "vision-worker",
+        "sha256": "edb38d66cfbc7e8feacdebc422cc55cbd914f7ce32fdabaf251be902c8bb1744",
+        "runtime": "llama.cpp",
+        "runtimeCommit": "d2e54583c7452353eb35d40431281f6ee984332f",
+        "architecture": "arm64"
+      }
+    ],
+    "minimumMacOS": "27.0",
+    "buildFlags": [
+      "arm64",
+      "static",
+      "CPU",
+      "Metal",
+      "embedded Metal shaders",
+      "no model downloads"
+    ],
+    "baselineLockSHA256": "e69e3d2bbfa9ebba6647ccf93185eff693b063468eaba08b14a8f5344771251a",
+    "platform": "darwin",
+    "architecture": "arm64"
+  },
+  "nativeBundleManifestSHA256": "2c0c33f2f7aaf184e4dc798484966c87f59241a8926f922de4be0ad3dd1e6e58",
+  "executables": {
+    "microphone-worker": {
+      "sha256": "9940c517026dfad18329843e1bc33ee47d0c67512d5c6f10a819a7753619e448",
+      "bytes": 86608
+    },
+    "llama-worker": {
+      "sha256": "92414fc39170d1c74cff37e3ef4da75b0fc333fca1db8f10e6933e9851fda553",
+      "bytes": 7111232
+    },
+    "whisper-worker": {
+      "sha256": "3fea7af4c1e749ceda0e25072aa4b17551f1750c2e823cc2952943b2ab9472fe",
+      "bytes": 4105392
+    },
+    "vision-worker": {
+      "sha256": "edb38d66cfbc7e8feacdebc422cc55cbd914f7ce32fdabaf251be902c8bb1744",
+      "bytes": 6217600
+    }
+  },
+  "crossCompiledTests": {
+    "windows/amd64": {
+      "sha256": "60a30c516f143d15a083f9e6fb6a4aac8695a83c754e9a0766427fb7fc881dd9",
+      "bytes": 15372288,
+      "executed": false
+    },
+    "linux/amd64": {
+      "sha256": "9408bc0ce6966f7789978c3edc1501980239b5adedd52b73b8c36013abc43adb",
+      "bytes": 15000348,
+      "executed": false
+    }
+  },
+  "modelsUsedByMacSmoke": [
+    {
+      "schemaVersion": 1,
+      "architecture": "portable",
+      "license": "MIT",
+      "qualificationOnly": true,
+      "estimatedMemoryBytes": 536870912,
+      "id": "01990000-0000-7000-8000-000000000101",
+      "name": "TinyStories 15M Q4 (runtime qualification)",
+      "kind": "chat",
+      "format": "gguf",
+      "sha256": "66967fbece6dbe97886593fdbb73589584927e29119ec31f08090732d1861739",
+      "sizeBytes": 19077344,
+      "url": "https://huggingface.co/ggml-org/models/resolve/499bc8821c6b12b4e53c5bffcb21ec206f212d81/tinyllamas/stories15M-q4_0.gguf",
+      "licenseUrl": "https://huggingface.co/karpathy/tinyllamas/blob/0bd21da7698eaf29a0d7de3992de8a46ef624add/README.md",
+      "sourceRevision": "499bc8821c6b12b4e53c5bffcb21ec206f212d81",
+      "runtimeCommit": "d2e54583c7452353eb35d40431281f6ee984332f",
+      "contextTokens": 128
+    },
+    {
+      "schemaVersion": 1,
+      "architecture": "portable",
+      "license": "MIT",
+      "estimatedMemoryBytes": 536870912,
+      "id": "01990000-0000-7000-8000-000000000102",
+      "name": "BGE small English F16",
+      "kind": "embedding",
+      "format": "gguf",
+      "sha256": "f0b2fef971e8366438bfd2d9aefea1b0115919389448806d290237f638bae999",
+      "sizeBytes": 67308128,
+      "url": "https://huggingface.co/ggml-org/models/resolve/499bc8821c6b12b4e53c5bffcb21ec206f212d81/bert-bge-small/ggml-model-f16.gguf",
+      "licenseUrl": "https://huggingface.co/BAAI/bge-small-en/blob/2275a7bdee235e9b4f01fa73aa60d3311983cfea/README.md",
+      "sourceRevision": "499bc8821c6b12b4e53c5bffcb21ec206f212d81",
+      "runtimeCommit": "d2e54583c7452353eb35d40431281f6ee984332f",
+      "contextTokens": 512,
+      "dimension": 384
+    },
+    {
+      "schemaVersion": 1,
+      "architecture": "portable",
+      "license": "Apache-2.0",
+      "estimatedMemoryBytes": 536870912,
+      "id": "01990000-0000-7000-8000-000000000103",
+      "name": "Whisper tiny English",
+      "kind": "speech",
+      "format": "whisper-ggml",
+      "sha256": "921e4cf8686fdd993dcd081a5da5b6c365bfde1162e72b08d75ac75289920b1f",
+      "sizeBytes": 77704715,
+      "url": "https://huggingface.co/ggerganov/whisper.cpp/resolve/5359861c739e955e79d9a303bcbc70fb988958b1/ggml-tiny.en.bin",
+      "licenseUrl": "https://huggingface.co/openai/whisper-tiny.en/blob/87c7102498dcde7456f24cfd30239ca606ed9063/README.md",
+      "sourceRevision": "5359861c739e955e79d9a303bcbc70fb988958b1",
+      "runtimeCommit": "927cfce34f31707e17f2bff35c349632fb9e2c3a",
+      "contextTokens": 448
+    },
+    {
+      "schemaVersion": 1,
+      "architecture": "portable",
+      "license": "Apache-2.0",
+      "estimatedMemoryBytes": 3221225472,
+      "id": "01990000-0000-7000-8000-000000000105",
+      "name": "Qwen2.5 1.5B Instruct Q5",
+      "kind": "chat",
+      "format": "gguf",
+      "sha256": "b46661073c18e5b56a41fa320975f866a00def1ff08feef4718e013258896f8c",
+      "sizeBytes": 1285494304,
+      "url": "https://huggingface.co/Qwen/Qwen2.5-1.5B-Instruct-GGUF/resolve/91cad51170dc346986eccefdc2dd33a9da36ead9/qwen2.5-1.5b-instruct-q5_k_m.gguf",
+      "licenseUrl": "https://huggingface.co/Qwen/Qwen2.5-1.5B-Instruct-GGUF/blob/91cad51170dc346986eccefdc2dd33a9da36ead9/LICENSE",
+      "sourceRevision": "91cad51170dc346986eccefdc2dd33a9da36ead9",
+      "runtimeCommit": "d2e54583c7452353eb35d40431281f6ee984332f",
+      "contextTokens": 8192
+    },
+    {
+      "schemaVersion": 2,
+      "visionVersion": 1,
+      "architecture": "portable",
+      "license": "Apache-2.0",
+      "estimatedMemoryBytes": 2147483648,
+      "id": "01990000-0000-7000-8000-000000000107",
+      "name": "SmolVLM 500M Q8 (English image descriptions)",
+      "kind": "vision",
+      "format": "gguf",
+      "sha256": "9d4612de6a42214499e301494a3ecc2be0abdd9de44e663bda63f1152fad1bf4",
+      "sizeBytes": 436806912,
+      "url": "https://huggingface.co/ggml-org/SmolVLM-500M-Instruct-GGUF/resolve/72e986006ef53e37cdd3f6d4241c90b0f01df376/SmolVLM-500M-Instruct-Q8_0.gguf",
+      "licenseUrl": "https://huggingface.co/HuggingFaceTB/SmolVLM-500M-Instruct",
+      "sourceRevision": "72e986006ef53e37cdd3f6d4241c90b0f01df376",
+      "runtimeCommit": "d2e54583c7452353eb35d40431281f6ee984332f",
+      "contextTokens": 8192,
+      "projector": {
+        "id": "01990000-0000-7000-8000-000000000108",
+        "sha256": "4b2fca922e549e9b9608f4ba56f93565dd5220e935ba5570a2a864a0fcc988a6",
+        "sizeBytes": 199468800,
+        "url": "https://huggingface.co/ggml-org/SmolVLM-500M-Instruct-GGUF/resolve/72e986006ef53e37cdd3f6d4241c90b0f01df376/mmproj-SmolVLM-500M-Instruct-f16.gguf",
+        "license": "Apache-2.0",
+        "licenseUrl": "https://huggingface.co/HuggingFaceTB/SmolVLM-500M-Instruct",
+        "sourceRevision": "72e986006ef53e37cdd3f6d4241c90b0f01df376"
+      }
+    }
+  ],
+  "modelVerification": "Supervisor leased and verified the selected installed pack bytes. Includes vision projector bound in its pack. No target-platform model execution.",
+  "evidenceSha256": {
+    "evidence/completion/c7-c8-build-tooling-final.txt": "0ca1cc8eccfda8dbb316b5912de8296630c3e49dbe2d3900a59a8350407509f1",
+    "evidence/completion/c7-c8-build-tooling-fixed.txt": "ef3b9d79ce990b0408f6191fb7a465a2cdf28da2fc9d67f1e6d77cf023ba7075",
+    "evidence/completion/c7-c8-build-tooling.txt": "c65f167544c7bb8f5d7b3935081208a4f6b091ef7c4faec30d314835becfb0ed",
+    "evidence/completion/c7-c8-cmake-configure.json": "5d0c250f1fa64126cd9a73112f4d1c579e87cf8cf72898f44f8755a508ae05d9",
+    "evidence/completion/c7-c8-final-checks.json": "094a1975f07a04eb06691abea34b40c015b04500f451bc78523beef87f6b09d1",
+    "evidence/completion/c7-c8-mac-model-smoke.json": "327b81cf0075be24e7b3d481f96d7ab3a52a0b59fc964571517988284ce12256",
+    "evidence/completion/c7-c8-mac-model-smoke.jsonl": "870beae32e640d210c4d256a1f51f163d3d0b05d82a9a6a38a232b7b302ffc27",
+    "evidence/completion/c7-c8-native-regressions.txt": "e72c561344375dbd1b107aded4420bc050815f55cadf11f0ac1f940fd52cee80",
+    "evidence/completion/c7-c8-native-relink.json": "f166cfe34f952e9bc25e3c0410576355ada29691e79fd4415944d087ed999ca4"
+  },
+  "limitations": [
+    "Windows/Linux Go test binaries are cross-compiled, never executed.",
+    "CMake configured on Mac only. Neither MSVC nor Ubuntu native C++ compilation ran.",
+    "Mac helper libraries were reused from previously pinned/verified caches; exact hashes recorded in c7-c8-native-relink.json.",
+    "The copied synthetic microphone helper was not rebuilt. No actual microphone or permission prompt was exercised.",
+    "The full native/contract race suite and real model smoke preceded final additive pipe-close cleanup; final focused process/target race tests cover the final source. C++ helper bytes are unchanged.",
+    "No native Windows/Linux capture/decoding/OCR, desktop package, install/update, signing or release claim.",
+    "CMake configure evidence precedes final BMI2/BLAS OFF build flags; flags are checked by final tooling tests and require target compilation.",
+    "Existing failed image and memory quality rubrics remain unqualified.",
+    "Tooling first run found a stale preexisting three-helper test expectation; retained failure and corrected required five-helper assertion are both recorded."
+  ]
+}

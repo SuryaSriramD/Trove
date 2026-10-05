@@ -1,0 +1,38 @@
+{
+  "type": "trove.credential-cancellation-evidence/v1",
+  "recorded_at": "2026-10-05T11:53:01.056032+00:00",
+  "source_base": "6e4b5324165761b7ec215b7bf61e9c9f45d6c386",
+  "original_auth_commit": "30b62944fdc171fd87def150728c9977411ad534",
+  "go": "go1.27.1 darwin/arm64",
+  "platform": "macOS 27.0.1 (26A434) arm64",
+  "checks": {
+    "baseline_reproduction_exit": 1,
+    "auth_race": {
+      "exit": 0,
+      "top_level": 20,
+      "subcases": 26,
+      "skipped": 0
+    },
+    "windows_amd64": {
+      "compiled": true,
+      "executed": false,
+      "binary_sha256": "e822c59fd5acca96d67a9ac0b3f361f69cf520e5bcc609ee1c911ec70b29b205"
+    },
+    "linux_amd64": {
+      "compiled": true,
+      "executed": false,
+      "binary_sha256": "6c107fee202533068d71a3d73a503f4a9535a88f026972867e899a2990821ed6"
+    }
+  },
+  "sha256": {
+    "internal/providers/auth/manager.go": "360a9fa8ff707bafc9b7f37dfd800d79ffd731d84544e97254fd920e72d7f67f",
+    "internal/providers/auth/manager_prompt_test.go": "2cac1fb603842708356970a81dc26a84b84dedc0b88f48d4d0d6809c428ae2b5",
+    "docs/completion/credential-prompt-cancellation.md": "cde9ddeaa2e0887a15450ca80d4313d866fc1fb73bc22e5828175952062b5e9c",
+    "evidence/completion/platform-credentials/manager-cancellation-auth-race.jsonl": "c37f08c33d9cba115c29dd51b4616a1776ea4fe403ef358ab2595c316a53fe5c",
+    "evidence/completion/platform-credentials/manager-cancellation-baseline-test.txt": "a5d5b76e52168f438ccc20fce039648b2153ab9cb6fb67a6c1e6a237b21b76b4",
+    "evidence/completion/platform-credentials/manager-cancellation-baseline.txt": "b21ad813672589a3f4c9da37d1cb18b563c875b0bf81f18144bb9e5f2a9cd453",
+    "evidence/completion/platform-credentials/manager-cancellation-focused.jsonl": "e0461ec5a67dc4bd0ece679c38ae1d0ff2711ccc51de6fdbefe7862b1bdea3fc",
+    "evidence/completion/platform-credentials/manager-cancellation-linux-compile.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "evidence/completion/platform-credentials/manager-cancellation-windows-compile.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  }
+}

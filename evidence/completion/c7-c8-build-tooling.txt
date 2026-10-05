@@ -1,0 +1,13 @@
+......F..............
+======================================================================
+FAIL: test_desktop_passes_selected_cache_and_python_to_native_children (tests.test_devtools.DeveloperToolsTests)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/suryasriramduvvuri/.codex/worktrees/completion-tooling/Trove/tests/test_devtools.py", line 180, in test_desktop_passes_selected_cache_and_python_to_native_children
+    self.assertEqual(len(children), 3)
+AssertionError: 5 != 3
+
+----------------------------------------------------------------------
+Ran 21 tests in 0.088s
+
+FAILED (failures=1)

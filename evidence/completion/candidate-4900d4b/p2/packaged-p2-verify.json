@@ -1,0 +1,34 @@
+{
+  "step": "p2-verify",
+  "passed": true,
+  "recordedAt": "2026-10-05T11:37:37.771872Z",
+  "state": {
+    "workspaceId": "01a10bda-deac-79c8-bd5e-8ad2e9ae868a",
+    "pageId": "01a10bda-e0b8-7bcc-9e40-896517a46007",
+    "blockId": "01a10bda-e0b9-7ef0-90fe-c29222674fa5",
+    "collectionId": "01a10bda-e0b9-7cce-814f-354053303823",
+    "propertyId": "01a10bda-e0b9-7227-8d7d-083b9430f618",
+    "recordId": "01a10bda-e0b9-7c6e-b808-3d9a2e058f4f",
+    "recordPageId": "01a10bda-e0b9-7cb0-8e32-c670f1009a57",
+    "fileId": "01a10bda-e0d9-7744-b4f6-af96c8ae9399",
+    "fileBlockId": "01a10bda-e0b9-77a6-9889-67f5b34f1161",
+    "contentHash": "61cb495898eb4901d8a4ea859ee4cee692bb981cc2474a55f2809e47519fd273"
+  },
+  "checks": [
+    "exact decimal chart follows canonical form and approved row-action values",
+    "missing required form value and unconfirmed row action commit nothing",
+    "graph link retains source block and resolves at its current revision",
+    "display preferences persist independently of page contents",
+    "conversation branches, roles, timestamps and exact original bytes survive",
+    "personal review schedule requires separate activation",
+    "separate process reopen and verified native restore retain all P2 assertions",
+    "portable conversation and display contents round-trip while operational controls remain inactive"
+  ],
+  "processExitCode": 0,
+  "installedWeightsAvailable": false,
+  "shell": {
+    "definition": "Go process initialization to canonical snapshot rendered plus two animation frames",
+    "recordedAt": "2026-10-05T11:37:38.48486Z",
+    "usableShellMs": 1714.142
+  }
+}

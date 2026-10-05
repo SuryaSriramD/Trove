@@ -1,0 +1,70 @@
+{
+  "recordedAt": "2026-10-05T11:46:12.657472+00:00",
+  "app": "/private/tmp/Trove-completion-4900d4b.app",
+  "appBinarySha256": "ec8b5ed605ef45ef0154eb5be55740048f9534343b780ac20c0dd4a7896c03bd",
+  "fixture": "/var/folders/xc/s78np0812b12p6338l0ndvsm0000gn/T/trove-packaged-52s30g7k",
+  "checks": [
+    {
+      "step": "p1-create",
+      "passed": true,
+      "recordedAt": "2026-10-05T11:46:10.983978Z",
+      "state": {
+        "workspaceId": "01a10be2-ba82-78e4-9c7b-8411f2ac18bd",
+        "pageId": "01a10be2-bba8-7277-9c7f-dc5798db0901",
+        "blockId": "01a10be2-bba8-725e-93b3-438909cb644b",
+        "collectionId": "01a10be2-bba8-7fcb-8b30-c8580d0ee38b",
+        "propertyId": "01a10be2-bba8-77b9-8b76-6694685e7dc8",
+        "recordId": "01a10be2-bba8-7f43-b32c-d011cc6b2ddc",
+        "recordPageId": "01a10be2-bba8-7f74-987b-11c2dd7480b9",
+        "fileId": "01a10be2-bbc4-75eb-9c62-477cc8b09c74",
+        "fileBlockId": "01a10be2-bba8-7114-bc4b-0593a3431de3",
+        "contentHash": "61cb495898eb4901d8a4ea859ee4cee692bb981cc2474a55f2809e47519fd273"
+      },
+      "checks": [
+        "canonical linked gallery shares edited record identity",
+        "formula computes exact 0.3 separately from captured source 999",
+        "advanced reusable content and inert card survive offline",
+        "keyword search includes retained offline card",
+        "automation receipt prevents duplicate effects across repeated ticks",
+        "managed attachment hash preserved"
+      ],
+      "processExitCode": 0,
+      "installedWeightsAvailable": false
+    },
+    {
+      "step": "p1-verify",
+      "passed": true,
+      "recordedAt": "2026-10-05T11:46:12.449575Z",
+      "state": {
+        "workspaceId": "01a10be2-ba82-78e4-9c7b-8411f2ac18bd",
+        "pageId": "01a10be2-bba8-7277-9c7f-dc5798db0901",
+        "blockId": "01a10be2-bba8-725e-93b3-438909cb644b",
+        "collectionId": "01a10be2-bba8-7fcb-8b30-c8580d0ee38b",
+        "propertyId": "01a10be2-bba8-77b9-8b76-6694685e7dc8",
+        "recordId": "01a10be2-bba8-7f43-b32c-d011cc6b2ddc",
+        "recordPageId": "01a10be2-bba8-7f74-987b-11c2dd7480b9",
+        "fileId": "01a10be2-bbc4-75eb-9c62-477cc8b09c74",
+        "fileBlockId": "01a10be2-bba8-7114-bc4b-0593a3431de3",
+        "contentHash": "61cb495898eb4901d8a4ea859ee4cee692bb981cc2474a55f2809e47519fd273"
+      },
+      "checks": [
+        "canonical linked gallery shares edited record identity",
+        "formula computes exact 0.3 separately from captured source 999",
+        "advanced reusable content and inert card survive offline",
+        "keyword search includes retained offline card",
+        "automation receipt prevents duplicate effects across repeated ticks",
+        "managed attachment hash preserved",
+        "separate process restart and native backup restore preserve P1 objects and effects"
+      ],
+      "processExitCode": 0,
+      "installedWeightsAvailable": false
+    }
+  ],
+  "networkDeniedByOS": true,
+  "passed": true,
+  "limitations": [
+    "Ad-hoc developer signature; not Developer ID or notarized.",
+    "Executed on this Mac with minimal PATH; a separate clean-machine installation is unverified.",
+    "Service integration fixture; interactive editing and accessibility use separate tests."
+  ]
+}

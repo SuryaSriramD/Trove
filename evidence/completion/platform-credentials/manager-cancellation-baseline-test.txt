@@ -1,0 +1,44 @@
+package auth
+import (
+ "context"
+ "testing"
+ "time"
+)
+type reviewPromptStore struct {
+ *memoryStore
+ started chan struct{}
+ release chan struct{}
+ cancelled chan struct{}
+}
+func (s *reviewPromptStore) Put(ctx context.Context, id string, data []byte) error {
+ close(s.started)
+ select {
+ case <-ctx.Done(): close(s.cancelled); return ctx.Err()
+ case <-s.release: return s.memoryStore.Put(ctx,id,data)
+ }
+}
+func TestReviewManagerCancelDuringCredentialPrompt(t *testing.T) {
+ f:=newFixture(t)
+ s:=&reviewPromptStore{memoryStore:f.store,started:make(chan struct{}),release:make(chan struct{}),cancelled:make(chan struct{})}
+ f.manager.secrets=s
+ a:=f.begin("")
+ callbackDone:=make(chan struct{})
+ go func(){ f.callback(a,"oaiapp_one",nil); close(callbackDone) }()
+ select { case <-s.started: case <-time.After(3*time.Second): t.Fatal("credential write did not begin") }
+ cancelDone:=make(chan error,1)
+ go func(){cancelDone<-f.manager.Cancel(a.ID)}()
+ blocked:=false
+ select {
+ case <-s.cancelled:
+ case <-time.After(500*time.Millisecond): blocked=true
+ }
+ // Release the synthetic desktop prompt so the original bug cannot hang cleanup.
+ close(s.release)
+ <-callbackDone
+ if err:=<-cancelDone; err!=nil {t.Fatal(err)}
+ got,_:=f.manager.Attempt(a.ID)
+ regs,_:=f.manager.List()
+ if blocked {t.Error("Cancel could not cancel the active credential prompt")}
+ if got.State!="cancelled" {t.Errorf("attempt was published after cancellation: %s",got.State)}
+ for _,r:=range regs {if r.State=="signed_in" {t.Error("account was signed in after Cancel was requested")}}
+}

@@ -137,11 +137,15 @@ func knowledgeGraph(ctx context.Context, k *Kernel, e contracts.ServiceExecution
 		if query == "" {
 			query = nodes[focus].Title
 		}
-		result, searchErr := searchQuery(ctx, k, e, map[string]any{"query": query, "mode": "semantic", "limit": float64(limit)})
+		if live, err := relatedPageCurrent(ctx, k, e, focus, nodes[focus].Revision); err != nil {
+			return nil, err
+		} else if !live {
+			return nil, Fail("CONFLICT", "Graph source changed or became unavailable; refresh the graph")
+		}
+		hits, searchErr := configuredRelatedSearch(ctx, k, e, query, focus, limit)
 		if searchErr != nil {
 			return nil, searchErr
 		}
-		hits := result.(SearchResults)
 		out.Warning = hits.Warning
 		for _, h := range hits.Hits {
 			id := string(h.Location.PageId)
@@ -162,8 +166,46 @@ func knowledgeGraph(ctx context.Context, k *Kernel, e contracts.ServiceExecution
 			out.Edges = append(out.Edges, GraphEdge{Source: focus, Target: id, Kind: kind, Location: h.Location, Evidence: h.Excerpt, Score: h.Score})
 		}
 	}
-	for _, n := range nodes {
+	// Retrieval can outlive the explicit-link snapshot. Never publish stale
+	// titles, evidence, forgotten memories or nodes outside the current grant.
+	if err := k.authorize(e); err != nil {
+		return nil, err
+	}
+	removed := false
+	for id, n := range nodes {
+		live, err := relatedPageCurrent(ctx, k, e, id, n.Revision)
+		if err != nil {
+			return nil, err
+		}
+		if !live {
+			if id == focus {
+				return nil, Fail("CONFLICT", "Graph source changed or became unavailable; refresh the graph")
+			}
+			delete(nodes, id)
+			removed = true
+			continue
+		}
 		out.Nodes = append(out.Nodes, n)
+	}
+	if removed {
+		edges := []GraphEdge{}
+		for _, edge := range out.Edges {
+			if _, ok := nodes[edge.Source]; !ok {
+				continue
+			}
+			if _, ok := nodes[edge.Target]; ok {
+				edges = append(edges, edge)
+			}
+		}
+		out.Edges = edges
+		out.Truncated = true
+		out.Warning = strings.TrimSpace(out.Warning + " Some graph sources changed or became unavailable and were omitted.")
+	}
+	if err := k.authorize(e); err != nil {
+		return nil, err
+	}
+	if err := ctx.Err(); err != nil {
+		return nil, err
 	}
 	sort.Slice(out.Nodes, func(i, j int) bool {
 		return out.Nodes[i].Title < out.Nodes[j].Title || out.Nodes[i].Title == out.Nodes[j].Title && out.Nodes[i].ID < out.Nodes[j].ID

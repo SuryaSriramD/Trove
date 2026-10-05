@@ -3352,7 +3352,7 @@ func (v *JobsWorkerOutput) UnmarshalJSON(data []byte) error {
 	if err := json.Unmarshal(data, &fields); err != nil {
 		return err
 	}
-	if matchesVariant(fields, []string{"kind", "protocolVersion", "runtime", "runtimeCommit", "architecture", "capabilities"}, map[string]string{"kind": "\"hello\"", "protocolVersion": "1", "architecture": "\"arm64\""}, map[string][]string{"runtime": {"\"llama.cpp\"", "\"whisper.cpp\""}}, []string{"kind", "protocolVersion", "runtime", "runtimeCommit", "architecture", "capabilities"}) {
+	if matchesVariant(fields, []string{"kind", "protocolVersion", "runtime", "runtimeCommit", "architecture", "capabilities"}, map[string]string{"kind": "\"hello\"", "protocolVersion": "1"}, map[string][]string{"runtime": {"\"llama.cpp\"", "\"whisper.cpp\""}, "architecture": {"\"arm64\"", "\"amd64\""}}, []string{"kind", "protocolVersion", "runtime", "runtimeCommit", "architecture", "capabilities"}) {
 		var result JobsWorkerOutputVariant1
 		if err := json.Unmarshal(data, &result); err != nil {
 			return err

@@ -1,0 +1,57 @@
+{
+  "recordedDate": "2026-10-05",
+  "goVersion": "go version go1.27.1 darwin/arm64",
+  "sourceSha256": {
+    "app_provider_auth.go": "8aaf170bdf4d0a9d66bf604462b983384372f8decfb64f73f8052c1c09cb54ad",
+    "app_provider_auth_test.go": "fb3327d0082e3f3257ab5908475a17e0c663f7bcb2f2131b854d9ff31b379722",
+    "go.mod": "f2b26c3996937eded0850404e5a55cdcdfef7f7e6953a472b42f19d97da4ace6",
+    "go.sum": "66bfeb212bd7639a91afbf08c451159ffdfcab2a83c60f77563a23c8fb42c4df",
+    "internal/providers/auth/files_other.go": "392591d97b703f21730cb9707f6b61f83b3168c986da5a73c9f968571a082ec9",
+    "internal/providers/auth/files_unix.go": "1d055c0d1a64d664b3af1a3cb060b031a39dfb1d02f5e0f34fc7eba92e16c112",
+    "internal/providers/auth/files_windows.go": "90e8bf5f6675495e9bc747662a6390b826e5db83afe4603145cd48aed2b3f3d6",
+    "internal/providers/auth/http.go": "40f1d8b68e97b6988058c268b7a0d9039da126b164d6dfa03381f83b2bcf600a",
+    "internal/providers/auth/keychain_darwin.go": "251930ec638278c4ac86e1a146d71f124c13bcfc03f085c61735328ded5ebea9",
+    "internal/providers/auth/keychain_linux.go": "8beb3df7051e418c86e33efd6a183a8101a77b8a50535912e272c73b442264d9",
+    "internal/providers/auth/keychain_other.go": "a4ee01e8263b195988ebbb15d8b8aa0df518df8eeb23c94095598373989ca82f",
+    "internal/providers/auth/keychain_windows.go": "e4a8acdd1eb80f516b9fd28ca1951559e5a798121228d3c8ac07da3fb57286e3",
+    "internal/providers/auth/lock_other.go": "0786ffbe87d1d44c939689de85907b4ed1fcb78e146bf13bbfb1a4affd893aa6",
+    "internal/providers/auth/lock_unix.go": "80794c9dcaaa0124eb1fc00cbf745aa1bf35f251f8e457d20cb56265bc2d1ba1",
+    "internal/providers/auth/manager.go": "804d8c5240c70348088fdfd00da9aa3bae460e5c8be4599a4b4585e2a255b9c1",
+    "internal/providers/auth/manager_test.go": "4b9043633619af3d32b40c95de81445b2cbfc591ab4c089f779fb5fb94e16c98",
+    "internal/providers/auth/secret_crypto.go": "35391238d4cd3abe6bdaa2b7814ba301e74ee05eb8ef0b9b4986af7e8cf13ec0",
+    "internal/providers/auth/secret_crypto_test.go": "6423cbec173f5ac4ecd89bef71d43573e48d06f5fa0d66bfc0cae8f91e75d284",
+    "internal/providers/auth/secret_service.go": "8ee10227b05f8a55bd906ec18a7708e33511af915b052429edf36fb8443a89ec",
+    "internal/providers/auth/secret_service_test.go": "47f65ec23969ca60515489a23eef77d3ac0962a10d35141d2405c3faf1a87859",
+    "internal/providers/auth/session.go": "23981ad57fca0dc7b68d88a148df4d54c9057f2c9d1a9ada801d29faed0ddb99",
+    "internal/providers/auth/storage.go": "be96bb0c1205e2e1c8e8aed088dfcea6b43b8b6917ade463f72b7934768391e5",
+    "internal/providers/auth/storage_windows_test.go": "5d2980d60c77ef56aa78b955f23d608a9a1db33707dc98d464208858415f5609",
+    "internal/providers/auth/types.go": "feab837c62fc3f3e26494077588cf54b2f54eb3b3738540ddb140a3e45b5e2ac"
+  },
+  "checks": {
+    "darwinAuthRace": {
+      "passed": true,
+      "topLevelTests": 18,
+      "evidence": "auth-race.txt"
+    },
+    "darwinNativeRoutesRace": {
+      "passed": true,
+      "topLevelTests": 2,
+      "evidence": "native-routes.txt"
+    },
+    "windowsAmd64": {
+      "compiled": true,
+      "executed": false,
+      "sha256": "f4d8cb5bd489fa7cb032981584d67ed4dbcfaf8b41404d1bb751a67af51018e1"
+    },
+    "linuxAmd64": {
+      "compiled": true,
+      "executed": false,
+      "sha256": "fda2a69fbf6cbb613ba21e5d362268e845b7f38f9a966133c0ef9f5393431840"
+    }
+  },
+  "dependencyVersions": {
+    "godbus": "v5.1.0",
+    "golang.org/x/sys": "v0.46.0"
+  },
+  "scope": "Synthetic auth records and a private D-Bus daemon on the development Mac only. No real credential store or account was accessed. Windows/Linux native runtime qualification remains open."
+}

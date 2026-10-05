@@ -1,0 +1,2 @@
+ok  	trove.local/phase0/internal/native	15.116s
+ok  	trove.local/phase0/contracts	3.174s

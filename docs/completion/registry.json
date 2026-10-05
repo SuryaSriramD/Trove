@@ -479,7 +479,11 @@
       },
       "evidence_target": "evidence/completion/CORE-010/",
       "implementation_evidence": [
-        "docs/completion/recovery.md"
+        "docs/completion/recovery.md",
+        "docs/completion/pre-migration-snapshots.md"
+      ],
+      "followup_commits": [
+        "a00d1b5"
       ]
     },
     {
@@ -802,7 +806,13 @@
       },
       "evidence_target": "evidence/completion/AI-002/",
       "implementation_evidence": [
-        "docs/completion/ai-context.md"
+        "docs/completion/ai-context.md",
+        "docs/completion/related-content.md",
+        "docs/completion/development-candidate-4900d4b.md"
+      ],
+      "followup_commits": [
+        "4900d4b",
+        "d74a719"
       ]
     },
     {
@@ -830,8 +840,13 @@
       },
       "evidence_target": "evidence/completion/AI-003/",
       "implementation_evidence": [
-        "docs/completion/ai-context.md"
-      ]
+        "docs/completion/ai-context.md",
+        "docs/completion/development-candidate-4900d4b.md"
+      ],
+      "followup_commits": [
+        "4900d4b"
+      ],
+      "remaining_qualification": "Stricter real-model expected fact/format rubric remains failed: required launch claim omitted. Do not count earlier weak rubric as a pass."
     },
     {
       "id": "EXT-001",
@@ -894,11 +909,15 @@
       ],
       "followup_commits": [
         "f363aac",
-        "b3b44a6"
+        "b3b44a6",
+        "31d5b5c",
+        "9b05e73"
       ],
       "implementation_evidence": [
         "docs/completion/managed-runtimes.md",
-        "docs/completion/codex-siwc-auth.md"
+        "docs/completion/codex-siwc-auth.md",
+        "docs/completion/platform-credentials.md",
+        "docs/completion/credential-prompt-cancellation.md"
       ]
     },
     {
@@ -1147,7 +1166,7 @@
       "interface_boundary": "Immutable candidates, platform support and acceptance evidence",
       "acceptance_scenario": "Published artifacts have verified hashes and reproducible manifests; upgrades and rollback preserve canonical data; failed updates retain recoverable state; uninstall does not delete workspaces without an explicit request. Keep the current ad-hoc build labeled as such until these checks pass.",
       "backlog_anchor": "../remaining-work.md#rel-006-finish-distribution-update-and-recovery-qualification",
-      "implementation": "open",
+      "implementation": "in progress",
       "implementation_commit": null,
       "verification": {
         "service_or_interface": "pending",
@@ -1156,7 +1175,14 @@
         "Windows": "unqualified",
         "Linux": "unqualified"
       },
-      "evidence_target": "evidence/completion/REL-006/"
+      "evidence_target": "evidence/completion/REL-006/",
+      "followup_commits": [
+        "a00d1b5"
+      ],
+      "implementation_evidence": [
+        "docs/completion/pre-migration-snapshots.md"
+      ],
+      "remaining_qualification": "Full DB/managed files/raw recording snapshots, durable migration fencing and compatible restore are implemented. Verified app update/restart UI is being completed separately. Real signed distribution, physical power-loss, clean-machine recovery, update/rollback and uninstall qualification remain open."
     },
     {
       "id": "REL-007",
@@ -1230,6 +1256,15 @@
       "development_candidate_evidence": [
         "docs/completion/development-candidate-5d7cdb0.md",
         "evidence/completion/candidate-5d7cdb0/manifest.json"
+      ],
+      "followup_commits": [
+        "44f7262",
+        "4900d4b",
+        "a00d1b5"
+      ],
+      "implementation_evidence": [
+        "docs/completion/development-candidate-4900d4b.md",
+        "docs/completion/pre-migration-snapshots.md"
       ]
     },
     {
@@ -1245,7 +1280,7 @@
       "interface_boundary": "Immutable candidates, platform support and acceptance evidence",
       "acceptance_scenario": "Publish platform-specific supported features and evidence. Do not infer cross-platform readiness from Go portability or the macOS build.",
       "backlog_anchor": "../remaining-work.md#rel-009-qualify-additional-platforms-separately",
-      "implementation": "open",
+      "implementation": "in progress",
       "implementation_commit": null,
       "verification": {
         "service_or_interface": "pending",
@@ -1254,7 +1289,18 @@
         "Windows": "unqualified",
         "Linux": "unqualified"
       },
-      "evidence_target": "evidence/completion/REL-009/"
+      "evidence_target": "evidence/completion/REL-009/",
+      "followup_commits": [
+        "31d5b5c",
+        "3731433",
+        "9b05e73"
+      ],
+      "implementation_evidence": [
+        "docs/completion/platform-native-workers.md",
+        "docs/completion/platform-credentials.md",
+        "docs/completion/credential-prompt-cancellation.md"
+      ],
+      "remaining_qualification": "Windows/Linux worker and credential foundation implemented; Go binaries cross-compile only. Target native decoder/capture/OCR, C++ execution, packaging, filesystem/permissions, model/provider integration, installation/update/rollback/uninstall and portability remain unqualified."
     },
     {
       "id": "GOV-001",
@@ -1411,7 +1457,11 @@
       "evidence_target": "evidence/completion/OPT-001/",
       "implementation_evidence": [
         "docs/completion/local-image-understanding.md",
-        "evidence/completion/c6-vision-manifest.json"
+        "evidence/completion/c6-vision-manifest.json",
+        "docs/completion/development-candidate-4900d4b.md"
+      ],
+      "followup_commits": [
+        "44f7262"
       ]
     },
     {
@@ -1438,7 +1488,13 @@
       },
       "evidence_target": "evidence/completion/OPT-002/",
       "implementation_evidence": [
-        "docs/completion/personal-reviews.md"
+        "docs/completion/personal-reviews.md",
+        "docs/completion/related-content.md",
+        "docs/completion/development-candidate-4900d4b.md"
+      ],
+      "followup_commits": [
+        "44f7262",
+        "d74a719"
       ]
     },
     {
