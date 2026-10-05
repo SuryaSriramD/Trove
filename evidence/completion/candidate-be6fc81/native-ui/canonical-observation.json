@@ -1,0 +1,53 @@
+{
+  "page": {
+    "id": "01a10c89-555c-7383-9876-baf9ff7e4953",
+    "workspace_id": "01a10c7d-5e6b-7894-865d-32a4db1a7dc9",
+    "parent_page_id": null,
+    "title": "Native verification — café 🦉",
+    "revision": "5",
+    "created_at": "2026-10-05T14:48:09.310867Z",
+    "updated_at": "2026-10-05T14:49:03.265826Z",
+    "deleted_at": null,
+    "provenance_json": null
+  },
+  "blocks": [
+    {
+      "id": "01a10c8a-08d5-70d3-aa51-037510d44e78",
+      "page_id": "01a10c89-555c-7383-9876-baf9ff7e4953",
+      "parent_block_id": null,
+      "sort_key": "000000000001",
+      "type": "paragraph",
+      "schema_version": 1,
+      "data_json": "{\"richText\":[{\"text\":\"Preserve café 🦉 and this imp\"},{\"marks\":[\"bold\"],\"text\":\"ortant phrase.\"}]}",
+      "revision": "2"
+    }
+  ],
+  "searchChunks": [
+    {
+      "id": "01a10c89-555c-7383-9876-baf9ff7e4953:title",
+      "page_id": "01a10c89-555c-7383-9876-baf9ff7e4953",
+      "source_revision": "5",
+      "block_id": null,
+      "kind": "page",
+      "title": "Native verification — café 🦉",
+      "body": "Native verification — café 🦉",
+      "location_json": "{\"pageId\":\"01a10c89-555c-7383-9876-baf9ff7e4953\",\"sourceRevision\":\"5\"}",
+      "content_hash": "db099be209f944cc1d357d6cedad8be7760656ba023d5ae6694c3459e7ff8ef5",
+      "file_id": null,
+      "document_page": 0
+    },
+    {
+      "id": "01a10c8a-08d5-70d3-aa51-037510d44e78:0",
+      "page_id": "01a10c89-555c-7383-9876-baf9ff7e4953",
+      "source_revision": "5",
+      "block_id": "01a10c8a-08d5-70d3-aa51-037510d44e78",
+      "kind": "page",
+      "title": "Native verification — café 🦉",
+      "body": "Preserve café 🦉 and this imp ortant phrase.",
+      "location_json": "{\"blockId\":\"01a10c8a-08d5-70d3-aa51-037510d44e78\",\"pageId\":\"01a10c89-555c-7383-9876-baf9ff7e4953\",\"sourceRevision\":\"5\"}",
+      "content_hash": "858985df7a970933c861834275544cd7be1b96e6076a7d22ee21969f81c25575",
+      "file_id": null,
+      "document_page": 0
+    }
+  ]
+}

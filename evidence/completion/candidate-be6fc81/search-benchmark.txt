@@ -1,0 +1,6 @@
+{
+  "qualifiedMeasurement": true,
+  "exitCode": 0,
+  "metadataErrors": [],
+  "sourceChangedDuringRun": []
+}
