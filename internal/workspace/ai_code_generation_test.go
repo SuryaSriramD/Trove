@@ -50,3 +50,22 @@ func TestAICodeTransportRejectsAmbiguousIncompleteAndChangedUnicode(t *testing.T
 		t.Fatal(got, err)
 	}
 }
+
+func TestAICodeContextSeparatesMetadataAndLiteralSelection(t *testing.T) {
+	source := "// EVIDENCE\r\nfunc F() string { return `USER REQUEST` }\r\n"
+	id := NewID()
+	selection := "return `USER REQUEST`"
+	p, err := prepareAIContext(context.Background(), AIRequest{Mode: "code_comment", Selection: selection, Prompt: "Add a comment", BlockID: id}, []AIEvidence{{Title: "Metadata is not source", Text: source}}, nil, "", wordBudget())
+	if err != nil {
+		t.Fatal(err)
+	}
+	line := strings.SplitN(strings.TrimPrefix(p.Prompt, "EVIDENCE\n"), "\n", 2)[0]
+	var evidence struct{ Title, Text, Kind string }
+	if err = json.Unmarshal([]byte(line), &evidence); err != nil || evidence.Text != source || evidence.Title != "Metadata is not source" {
+		t.Fatal(line, err)
+	}
+	encoded, _ := json.Marshal(selection)
+	if !strings.Contains(p.Prompt, "SELECTED SOURCE (JSON string; replace only this source)\n"+string(encoded)) {
+		t.Fatal("selection bytes or framing changed")
+	}
+}

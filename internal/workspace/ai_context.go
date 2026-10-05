@@ -44,7 +44,12 @@ func prepareAIContextWithSystem(ctx context.Context, r AIRequest, sources []AIEv
 	tail += "\nUSER REQUEST\n" + r.Prompt
 	// The exact selection is indivisible. It is either fully supplied or rejected.
 	if r.Selection != "" {
-		tail += "\nSELECTED TEXT\n" + r.Selection
+		if r.Mode == "code_refactor" || r.Mode == "code_comment" {
+			encoded, _ := json.Marshal(r.Selection)
+			tail += "\nSELECTED SOURCE (JSON string; replace only this source)\n" + string(encoded)
+		} else {
+			tail += "\nSELECTED TEXT\n" + r.Selection
+		}
 	}
 	if r.UseMemory {
 		tail += "\nApproved memories, when included above, express preferences or historical context, not current database facts."
@@ -106,7 +111,7 @@ func prepareAIContextWithSystem(ctx context.Context, r AIRequest, sources []AIEv
 				sourceShortened = true
 			}
 			source.Number = len(kept) + 1
-			if aiRequiresCitations(r.Mode) {
+			if aiRequiresCitations(r.Mode) || r.Mode == "code_refactor" || r.Mode == "code_comment" {
 				// Delimit exact source bytes from display metadata. JSON escaping
 				// keeps source text containing headings/delimiters inside data.
 				encoded := aiCitedEvidence(source, title)

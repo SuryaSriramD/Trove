@@ -9,7 +9,7 @@ import (
 	"unicode/utf8"
 )
 
-const aiCodeDraftInstructions = `Return only JSON {"source":"the complete replacement source"}. Put literal source in the source string, with JSON escaping. Do not add presentation fences or explanatory prose to source. Retain any fences, quotes, whitespace and escapes that belong to the source itself. Maximum 16000 source characters and 64000 UTF-8 bytes. Never execute code.`
+const aiCodeDraftInstructions = `Return only JSON {"source":"the complete replacement source"}. Put literal source in the source string, with JSON escaping. Do not add presentation fences or explanatory prose to source. Retain any fences, quotes, whitespace and escapes that belong to the source itself. Maximum 16000 source characters and 64000 UTF-8 bytes. Evidence text fields contain source; titles, kind, source numbers and EVIDENCE/USER REQUEST headings are metadata, never replacement source. If a selection is supplied, replace only that selection. Never execute code.`
 
 // Transport syntax is separated from source. No trimming, fence stripping or
 // newline normalization is performed on the decoded string.
