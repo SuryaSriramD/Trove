@@ -33,7 +33,9 @@ func TestAITokenBudgetKeepsLongSelectionAndUnselectedCode(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	if !strings.Contains(prepared.Prompt, "SELECTED TEXT\n"+selected) || prepared.OutputTokens != 2048 || prepared.PromptTokens+prepared.OutputTokens > 8192 {
+	_, encodedSelection, present := strings.Cut(prepared.Prompt, "SELECTED SOURCE (JSON string; replace only this source)\n")
+	var decodedSelection string
+	if !present || json.Unmarshal([]byte(encodedSelection), &decodedSelection) != nil || decodedSelection != selected || prepared.OutputTokens != 2048 || prepared.PromptTokens+prepared.OutputTokens > 8192 {
 		t.Fatal("long selection was omitted or budget lost")
 	}
 	run, err := k.FinishAI(ctx, e, prepared.Run.ID, "replacement = 1", "completed", "")

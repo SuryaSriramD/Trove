@@ -183,8 +183,9 @@ func TestRealLocalExposedModes(t *testing.T) {
 				t.Fatal(err)
 			}
 			raw := ""
+			metrics := &native.RunMetrics{}
 			completion, generationErr := GeneratePreparedAI(ctx, prepared, func(ctx context.Context, system, prompt string, tokens int, grammar string, stream func(string)) (string, error) {
-				text, err := supervisor.GenerateTextWithGrammar(ctx, pack, native.ChatPrompt(system, prompt), tokens, grammar, stream)
+				text, err := supervisor.GenerateTextWithGrammarMetrics(ctx, pack, native.ChatPrompt(system, prompt), tokens, grammar, metrics, stream)
 				raw = text
 				return text, err
 			}, nil)
@@ -208,7 +209,7 @@ func TestRealLocalExposedModes(t *testing.T) {
 				t.Fatal(err)
 			}
 			unchanged := before == after
-			report, _ := json.Marshal(map[string]any{"mode": tc.mode, "modelPackId": pack, "taskPassed": taskPass, "canonicalUnchanged": unchanged, "promptTokens": prepared.PromptTokens, "outputCap": prepared.OutputTokens, "latencyMs": time.Since(start).Milliseconds(), "source": tc.source, "prompt": tc.prompt, "draft": raw, "displayed": run.Text, "generationError": fmt.Sprint(generationErr), "finishError": fmt.Sprint(finishErr), "proposalError": proposalError, "peakWorkerRSS": nil, "releaseQualified": false})
+			report, _ := json.Marshal(map[string]any{"mode": tc.mode, "modelPackId": pack, "taskPassed": taskPass, "canonicalUnchanged": unchanged, "promptTokens": prepared.PromptTokens, "outputCap": prepared.OutputTokens, "latencyMs": time.Since(start).Milliseconds(), "source": tc.source, "prompt": tc.prompt, "draft": raw, "displayed": run.Text, "generationError": fmt.Sprint(generationErr), "finishError": fmt.Sprint(finishErr), "proposalError": proposalError, "peakWorkerRSS": metrics.PeakRSSBytes.Load(), "releaseQualified": false})
 			t.Log(string(report))
 			if !taskPass || !unchanged {
 				t.Error("predefined mode task or unapplied-write boundary failed")

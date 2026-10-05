@@ -27,6 +27,12 @@ func (s *Supervisor) GenerateText(ctx context.Context, packID, prompt string, ma
 // grammar while preserving the same local model, budget, cancellation, and
 // streaming boundaries. Callers still validate evidence and reviewed writes.
 func (s *Supervisor) GenerateTextWithGrammar(ctx context.Context, packID, prompt string, maxTokens int, grammar string, onToken func(string)) (string, error) {
+	return s.GenerateTextWithGrammarMetrics(ctx, packID, prompt, maxTokens, grammar, nil, onToken)
+}
+
+// GenerateTextWithGrammarMetrics optionally records sampled worker RSS. A caller
+// owns one fresh collector per run; metrics do not alter admission or generation.
+func (s *Supervisor) GenerateTextWithGrammarMetrics(ctx context.Context, packID, prompt string, maxTokens int, grammar string, metrics *RunMetrics, onToken func(string)) (string, error) {
 	if len(grammar) > 64<<10 {
 		return "", errors.New("INVALID_INPUT: generation grammar exceeds 64 KiB")
 	}
@@ -80,7 +86,7 @@ func (s *Supervisor) GenerateTextWithGrammar(ctx context.Context, packID, prompt
 		Operation: "generate", ModelPackId: contracts.DomainId(packID),
 		Limits: contracts.JobsResourceLimits{Threads: 4, MemoryBytes: s.MemoryBudget(), TimeoutMs: 180000, MaxOutputBytes: 4 << 20, MaxTokens: int64(maxTokens)},
 	}
-	raw, err := s.Run(ctx, Request{Wire: wire, Inputs: []Input{input}, Priority: PriorityChat}, func(event Event) {
+	raw, err := s.Run(ctx, Request{Wire: wire, Inputs: []Input{input}, Priority: PriorityChat, Metrics: metrics}, func(event Event) {
 		if event.Kind == "token" && onToken != nil {
 			onToken(event.Text)
 		}
