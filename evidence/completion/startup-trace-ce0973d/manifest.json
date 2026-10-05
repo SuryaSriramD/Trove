@@ -50,5 +50,11 @@
     "trace-corrected-race.jsonl": "64e262937564387252ed9c9ff3630a5cc831db65bf8defd14e2b994a47d17754",
     "trace-focused-race.jsonl": "5027c94c1bac383ff923e2dfc390200a1434f502f9ab412f5c1df78a87ca6ad3",
     "trace-normal-startup.log": "3e90f943bb042ec2b306828bb923b0d8e8a10acb08753b11446cbd22fffc8632"
+  },
+  "harnessEvidencePreservation": {
+    "sourceCommit": "32c7e59",
+    "testsPassed": 7,
+    "log": "harness-evidence-preservation.log",
+    "sha256": "b944f0418e3b74ff9ca0beab210400b0ba3a0b1fcba5c4e47d7acc1e59b0304e"
   }
 }

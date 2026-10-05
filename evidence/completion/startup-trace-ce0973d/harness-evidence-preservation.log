@@ -1,0 +1,20 @@
+test_complete_fast_samples_pass (test_shell_benchmark.ShellBenchmarkTests.test_complete_fast_samples_pass) ... pages=0: completed=2/2, maximum shell ms=1400
+ok
+test_complete_slow_samples_are_valid_measurements_but_miss_target (test_shell_benchmark.ShellBenchmarkTests.test_complete_slow_samples_are_valid_measurements_but_miss_target) ... pages=0: completed=1/1, maximum shell ms=2700
+ok
+test_existing_evidence_is_never_reused_or_overwritten (test_shell_benchmark.ShellBenchmarkTests.test_existing_evidence_is_never_reused_or_overwritten) ... ok
+test_invalid_report_fails_without_discarding_prior_samples (test_shell_benchmark.ShellBenchmarkTests.test_invalid_report_fails_without_discarding_prior_samples) ... pages=0: completed=1/2, maximum shell ms=1000
+pages=0: completed=1/2, maximum shell ms=1000
+pages=0: completed=1/2, maximum shell ms=1000
+pages=0: completed=1/2, maximum shell ms=1000
+ok
+test_no_requested_samples_is_invalid (test_shell_benchmark.ShellBenchmarkTests.test_no_requested_samples_is_invalid) ... ok
+test_partial_profile_never_claims_two_second_target (test_shell_benchmark.ShellBenchmarkTests.test_partial_profile_never_claims_two_second_target) ... pages=0: completed=1/5, maximum shell ms=1000
+ok
+test_timeout_is_failure_even_with_report_and_clean_exit (test_shell_benchmark.ShellBenchmarkTests.test_timeout_is_failure_even_with_report_and_clean_exit) ... pages=0: completed=0/1, maximum shell ms=FAILED
+ok
+
+----------------------------------------------------------------------
+Ran 7 tests in 0.019s
+
+OK
