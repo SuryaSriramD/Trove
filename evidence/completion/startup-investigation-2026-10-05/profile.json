@@ -1,0 +1,90 @@
+{
+  "fixtureVersion": "p0-pages-v1",
+  "limitations": [
+    "Service timings exclude Wails bridge, browser paint and interaction latency.",
+    "No physical disk cache flush: kernel reopen is warm, not cold application launch.",
+    "Benchmark does not establish recording acoustics or model answer quality.",
+    "Other qualification jobs may run on the same host; no thermal or power isolation is claimed."
+  ],
+  "profiles": [
+    {
+      "canonicalTextUTF8Bytes": 9130000,
+      "idleEditCommit": {
+        "count": 20,
+        "maxMs": 1.687875,
+        "meanMs": 0.9690895000000002,
+        "p50Ms": 0.902417,
+        "p95Ms": 1.351208,
+        "samplesMs": [
+          1.351208,
+          0.916083,
+          0.872541,
+          0.854833,
+          0.902417,
+          0.941167,
+          0.921916,
+          0.900416,
+          0.811708,
+          0.944834,
+          1.687875,
+          1.033792,
+          1.189125,
+          0.963541,
+          0.933375,
+          0.854625,
+          0.8415,
+          0.837125,
+          0.82375,
+          0.799959
+        ]
+      },
+      "initialIndexMs": 3043.848,
+      "keyword": {
+        "count": 5,
+        "maxMs": 38.186625,
+        "meanMs": 20.3518252,
+        "p50Ms": 29.357958,
+        "p95Ms": 38.186625,
+        "queries": [
+          "release",
+          "telescope",
+          "café",
+          "project07",
+          "absenttoken"
+        ],
+        "samplesMs": [
+          38.186625,
+          29.357958,
+          29.565667,
+          4.371834,
+          0.277042
+        ],
+        "scope": "public Go Dispatch, validation + retrieval + response serialization; excludes Wails bridge and paint",
+        "warmupQueries": 5
+      },
+      "keywordModelsInstalled": false,
+      "pages": 10000,
+      "paragraphBlocks": 20000,
+      "setupSeconds": 18.771174125,
+      "warmKernelOpen": {
+        "count": 5,
+        "maxMs": 6.176375,
+        "meanMs": 5.9822168,
+        "p50Ms": 5.994709,
+        "p95Ms": 6.176375,
+        "samplesMs": [
+          6.10475,
+          6.176375,
+          5.994709,
+          5.731042,
+          5.904208
+        ]
+      },
+      "workspaceBytesBeforeSemantic": 141649608,
+      "workspaceBytesFinal": 137637888,
+      "workspacePath": "/var/folders/xc/s78np0812b12p6338l0ndvsm0000gn/T/trove-phase3-benchmark-690715192/pages-10000"
+    }
+  ],
+  "recordedAt": "2026-10-05T10:57:50.599321Z",
+  "schemaVersion": 1
+}

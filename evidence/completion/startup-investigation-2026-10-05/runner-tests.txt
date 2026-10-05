@@ -1,0 +1,13 @@
+pages=0: completed=2/2, maximum shell ms=1400
+.pages=0: completed=1/1, maximum shell ms=2700
+.pages=0: completed=1/2, maximum shell ms=1000
+pages=0: completed=1/2, maximum shell ms=1000
+pages=0: completed=1/2, maximum shell ms=1000
+pages=0: completed=1/2, maximum shell ms=1000
+..pages=0: completed=1/5, maximum shell ms=1000
+.pages=0: completed=0/1, maximum shell ms=FAILED
+.
+----------------------------------------------------------------------
+Ran 6 tests in 0.018s
+
+OK

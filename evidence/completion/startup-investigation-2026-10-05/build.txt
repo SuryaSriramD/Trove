@@ -1,0 +1,23 @@
+/private/tmp/trove-startup-native/document-extractor: replacing existing signature
+/private/tmp/trove-startup-native/audio-decoder: replacing existing signature
+/private/tmp/trove-startup-native/audio-decoder
+/private/tmp/trove-startup-native/pdf-renderer: replacing existing signature
+/private/tmp/trove-startup-native/ocr-worker: replacing existing signature
+/private/tmp/trove-startup-native/ocr-worker
+# trove.local/phase0/internal/sqlitevec
+internal/sqlitevec/register.go:11:12: warning: 'sqlite3_auto_extension' is deprecated: first deprecated in macOS 10.10 - Process-global auto extensions are not supported on Apple platforms [-Wdeprecated-declarations]
+/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/sqlite3.h:7627:16: note: 'sqlite3_auto_extension' has been explicitly marked deprecated here
+# github.com/wailsapp/wails/v2/internal/frontend/desktop/darwin
+WailsContext.m:182:18: warning: 'setShowsBaselineSeparator:' is deprecated: first deprecated in macOS 15.0 - No longer supported [-Wdeprecated-declarations]
+/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/System/Library/Frameworks/AppKit.framework/Headers/NSToolbar.h:299:16: note: property 'showsBaselineSeparator' is declared deprecated here
+/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/System/Library/Frameworks/AppKit.framework/Headers/NSToolbar.h:299:16: note: 'setShowsBaselineSeparator:' has been explicitly marked deprecated here
+/private/tmp/Trove-startup-trace.app/Contents/MacOS/trove-mcp: replacing existing signature
+/private/tmp/Trove-startup-trace.app/Contents/MacOS/trove-host: replacing existing signature
+/private/tmp/Trove-startup-trace.app: replacing existing signature
+--prepared:/private/tmp/Trove-startup-trace.app/Contents/MacOS/trove-mcp
+--validated:/private/tmp/Trove-startup-trace.app/Contents/MacOS/trove-mcp
+--prepared:/private/tmp/Trove-startup-trace.app/Contents/MacOS/trove-host
+--validated:/private/tmp/Trove-startup-trace.app/Contents/MacOS/trove-host
+/private/tmp/Trove-startup-trace.app: valid on disk
+/private/tmp/Trove-startup-trace.app: satisfies its Designated Requirement
+/private/tmp/Trove-startup-trace.app

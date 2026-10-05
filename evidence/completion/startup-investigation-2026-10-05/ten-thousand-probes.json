@@ -1,0 +1,245 @@
+{
+  "binarySha256": "731fc85ed84986c09a99858ffb7909e46120243bc5650123da018c428b6501d2",
+  "results": [
+    {
+      "iteration": 0,
+      "elapsedMs": 1094.4202089999999,
+      "timeout": false,
+      "exitCode": 0,
+      "report": {
+        "definition": "Go process initialization to canonical snapshot rendered plus two animation frames",
+        "recordedAt": "2026-10-05T10:59:55.975571Z",
+        "usableShellMs": 982.867
+      },
+      "trace": "104.294 native.startup.begin\n132.941 native.startup.end\n295.399 native.domReady\n534.313 renderer.snapshot.begin\n534.720 native.snapshot.begin\n591.184 native.snapshot.end\n609.457 renderer.snapshot.end\n936.514 renderer.shell.visible\n966.438 renderer.frame1.visible\n982.983 renderer.frame2.visible\n"
+    },
+    {
+      "iteration": 1,
+      "elapsedMs": 880.1288329999999,
+      "timeout": false,
+      "exitCode": 0,
+      "report": {
+        "definition": "Go process initialization to canonical snapshot rendered plus two animation frames",
+        "recordedAt": "2026-10-05T10:59:56.899623Z",
+        "usableShellMs": 817.594
+      },
+      "trace": "99.233 native.startup.begin\n116.357 native.startup.end\n285.451 native.domReady\n397.106 renderer.snapshot.begin\n397.172 native.snapshot.begin\n446.837 native.snapshot.end\n464.972 renderer.snapshot.end\n776.627 renderer.shell.visible\n802.163 renderer.frame1.visible\n817.603 renderer.frame2.visible\n"
+    },
+    {
+      "iteration": 2,
+      "elapsedMs": 828.1459999999998,
+      "timeout": false,
+      "exitCode": 0,
+      "report": {
+        "definition": "Go process initialization to canonical snapshot rendered plus two animation frames",
+        "recordedAt": "2026-10-05T10:59:57.768139Z",
+        "usableShellMs": 775.73
+      },
+      "trace": "102.327 native.startup.begin\n119.119 native.startup.end\n244.260 native.domReady\n364.450 renderer.snapshot.begin\n364.566 native.snapshot.begin\n409.339 native.snapshot.end\n426.654 renderer.snapshot.end\n736.531 renderer.shell.visible\n758.122 renderer.frame1.visible\n775.748 renderer.frame2.visible\n"
+    },
+    {
+      "iteration": 3,
+      "elapsedMs": 833.4140839999998,
+      "timeout": false,
+      "exitCode": 0,
+      "report": {
+        "definition": "Go process initialization to canonical snapshot rendered plus two animation frames",
+        "recordedAt": "2026-10-05T10:59:58.625537Z",
+        "usableShellMs": 764.623
+      },
+      "trace": "95.261 native.startup.begin\n111.773 native.startup.end\n242.150 native.domReady\n351.595 renderer.snapshot.begin\n351.698 native.snapshot.begin\n394.872 native.snapshot.end\n413.766 renderer.snapshot.end\n724.600 renderer.shell.visible\n748.115 renderer.frame1.visible\n764.633 renderer.frame2.visible\n"
+    },
+    {
+      "iteration": 4,
+      "elapsedMs": 838.1364999999996,
+      "timeout": false,
+      "exitCode": 0,
+      "report": {
+        "definition": "Go process initialization to canonical snapshot rendered plus two animation frames",
+        "recordedAt": "2026-10-05T10:59:59.491891Z",
+        "usableShellMs": 766.395
+      },
+      "trace": "98.287 native.startup.begin\n114.482 native.startup.end\n239.731 native.domReady\n350.094 renderer.snapshot.begin\n350.151 native.snapshot.begin\n401.172 native.snapshot.end\n419.507 renderer.snapshot.end\n728.037 renderer.shell.visible\n749.963 renderer.frame1.visible\n766.400 renderer.frame2.visible\n"
+    },
+    {
+      "iteration": 5,
+      "elapsedMs": 778.9047500000006,
+      "timeout": false,
+      "exitCode": 0,
+      "report": {
+        "definition": "Go process initialization to canonical snapshot rendered plus two animation frames",
+        "recordedAt": "2026-10-05T11:00:00.35051Z",
+        "usableShellMs": 756.492
+      },
+      "trace": "103.856 native.startup.begin\n120.257 native.startup.end\n273.647 native.domReady\n336.609 renderer.snapshot.begin\n336.703 native.snapshot.begin\n386.174 native.snapshot.end\n403.748 renderer.snapshot.end\n716.421 renderer.shell.visible\n740.053 renderer.frame1.visible\n756.626 renderer.frame2.visible\n"
+    },
+    {
+      "iteration": 6,
+      "elapsedMs": 831.6473750000002,
+      "timeout": false,
+      "exitCode": 0,
+      "report": {
+        "definition": "Go process initialization to canonical snapshot rendered plus two animation frames",
+        "recordedAt": "2026-10-05T11:00:01.191858Z",
+        "usableShellMs": 771.057
+      },
+      "trace": "99.944 native.startup.begin\n116.434 native.startup.end\n235.452 native.domReady\n354.422 renderer.snapshot.begin\n354.575 native.snapshot.begin\n399.746 native.snapshot.end\n419.531 renderer.snapshot.end\n736.225 renderer.shell.visible\n754.441 renderer.frame1.visible\n771.027 renderer.frame2.visible\n"
+    },
+    {
+      "iteration": 7,
+      "elapsedMs": 825.9764589999996,
+      "timeout": false,
+      "exitCode": 0,
+      "report": {
+        "definition": "Go process initialization to canonical snapshot rendered plus two animation frames",
+        "recordedAt": "2026-10-05T11:00:02.058965Z",
+        "usableShellMs": 777.792
+      },
+      "trace": "99.965 native.startup.begin\n116.954 native.startup.end\n268.956 native.domReady\n334.915 renderer.snapshot.begin\n334.971 native.snapshot.begin\n386.811 native.snapshot.end\n407.540 renderer.snapshot.end\n741.042 renderer.shell.visible\n760.849 renderer.frame1.visible\n777.932 renderer.frame2.visible\n"
+    },
+    {
+      "iteration": 8,
+      "elapsedMs": 1041.1952090000004,
+      "timeout": false,
+      "exitCode": 0,
+      "report": {
+        "definition": "Go process initialization to canonical snapshot rendered plus two animation frames",
+        "recordedAt": "2026-10-05T11:00:03.117224Z",
+        "usableShellMs": 971.008
+      },
+      "trace": "118.981 native.startup.begin\n136.612 native.startup.end\n292.415 native.domReady\n429.882 renderer.snapshot.begin\n430.040 native.snapshot.begin\n492.557 native.snapshot.end\n516.191 renderer.snapshot.end\n928.843 renderer.shell.visible\n954.614 renderer.frame1.visible\n971.114 renderer.frame2.visible\n"
+    },
+    {
+      "iteration": 9,
+      "elapsedMs": 1210.3579999999993,
+      "timeout": false,
+      "exitCode": 0,
+      "report": {
+        "definition": "Go process initialization to canonical snapshot rendered plus two animation frames",
+        "recordedAt": "2026-10-05T11:00:04.358942Z",
+        "usableShellMs": 1132.667
+      },
+      "trace": "140.716 native.startup.begin\n158.201 native.startup.end\n389.624 native.domReady\n485.585 renderer.snapshot.begin\n485.796 native.snapshot.begin\n561.122 native.snapshot.end\n590.140 renderer.snapshot.end\n1082.897 renderer.shell.visible\n1115.746 renderer.frame1.visible\n1132.751 renderer.frame2.visible\n"
+    },
+    {
+      "iteration": 10,
+      "elapsedMs": 1425.109417,
+      "timeout": false,
+      "exitCode": 0,
+      "report": {
+        "definition": "Go process initialization to canonical snapshot rendered plus two animation frames",
+        "recordedAt": "2026-10-05T11:00:05.850605Z",
+        "usableShellMs": 1355.195
+      },
+      "trace": "178.316 native.startup.begin\n198.119 native.startup.end\n422.825 native.domReady\n633.018 renderer.snapshot.begin\n633.242 native.snapshot.begin\n720.107 native.snapshot.end\n752.787 renderer.snapshot.end\n1308.272 renderer.shell.visible\n1338.810 renderer.frame1.visible\n1355.250 renderer.frame2.visible\n"
+    },
+    {
+      "iteration": 11,
+      "elapsedMs": 1319.1711250000005,
+      "timeout": false,
+      "exitCode": 0,
+      "report": {
+        "definition": "Go process initialization to canonical snapshot rendered plus two animation frames",
+        "recordedAt": "2026-10-05T11:00:07.234195Z",
+        "usableShellMs": 1262.894
+      },
+      "trace": "169.337 native.startup.begin\n187.642 native.startup.end\n392.368 native.domReady\n588.799 native.snapshot.begin\n588.955 renderer.snapshot.begin\n674.861 native.snapshot.end\n707.219 renderer.snapshot.end\n1213.743 renderer.shell.visible\n1245.319 renderer.frame1.visible\n1262.938 renderer.frame2.visible\n"
+    },
+    {
+      "iteration": 12,
+      "elapsedMs": 1270.344625,
+      "timeout": false,
+      "exitCode": 0,
+      "report": {
+        "definition": "Go process initialization to canonical snapshot rendered plus two animation frames",
+        "recordedAt": "2026-10-05T11:00:08.558895Z",
+        "usableShellMs": 1220.774
+      },
+      "trace": "148.763 native.startup.begin\n167.493 native.startup.end\n370.471 native.domReady\n573.944 renderer.snapshot.begin\n574.157 native.snapshot.begin\n652.305 native.snapshot.end\n681.786 renderer.snapshot.end\n1175.637 renderer.shell.visible\n1204.458 renderer.frame1.visible\n1220.863 renderer.frame2.visible\n"
+    },
+    {
+      "iteration": 13,
+      "elapsedMs": 1258.1779169999993,
+      "timeout": false,
+      "exitCode": 0,
+      "report": {
+        "definition": "Go process initialization to canonical snapshot rendered plus two animation frames",
+        "recordedAt": "2026-10-05T11:00:09.833201Z",
+        "usableShellMs": 1175.642
+      },
+      "trace": "153.153 native.startup.begin\n169.275 native.startup.end\n418.124 native.domReady\n538.179 renderer.snapshot.begin\n538.380 native.snapshot.begin\n611.303 native.snapshot.end\n639.761 renderer.snapshot.end\n1135.373 renderer.shell.visible\n1159.726 renderer.frame1.visible\n1175.632 renderer.frame2.visible\n"
+    },
+    {
+      "iteration": 14,
+      "elapsedMs": 1261.6730000000018,
+      "timeout": false,
+      "exitCode": 0,
+      "report": {
+        "definition": "Go process initialization to canonical snapshot rendered plus two animation frames",
+        "recordedAt": "2026-10-05T11:00:11.167229Z",
+        "usableShellMs": 1215.322
+      },
+      "trace": "151.504 native.startup.begin\n168.754 native.startup.end\n366.537 native.domReady\n549.287 renderer.snapshot.begin\n549.421 native.snapshot.begin\n635.973 native.snapshot.end\n667.413 renderer.snapshot.end\n1169.958 renderer.shell.visible\n1198.978 renderer.frame1.visible\n1215.422 renderer.frame2.visible\n"
+    },
+    {
+      "iteration": 15,
+      "elapsedMs": 1371.9138750000006,
+      "timeout": false,
+      "exitCode": 0,
+      "report": {
+        "definition": "Go process initialization to canonical snapshot rendered plus two animation frames",
+        "recordedAt": "2026-10-05T11:00:12.567284Z",
+        "usableShellMs": 1293.175
+      },
+      "trace": "153.944 native.startup.begin\n172.916 native.startup.end\n376.324 native.domReady\n573.739 native.snapshot.begin\n573.892 renderer.snapshot.begin\n658.464 native.snapshot.end\n690.878 renderer.snapshot.end\n1245.182 renderer.shell.visible\n1276.718 renderer.frame1.visible\n1293.220 renderer.frame2.visible\n"
+    },
+    {
+      "iteration": 16,
+      "elapsedMs": 1470.635999999999,
+      "timeout": false,
+      "exitCode": 0,
+      "report": {
+        "definition": "Go process initialization to canonical snapshot rendered plus two animation frames",
+        "recordedAt": "2026-10-05T11:00:14.075625Z",
+        "usableShellMs": 1386.634
+      },
+      "trace": "156.756 native.startup.begin\n176.244 native.startup.end\n392.142 native.domReady\n604.717 renderer.snapshot.begin\n604.895 native.snapshot.begin\n719.148 native.snapshot.end\n756.804 renderer.snapshot.end\n1334.529 renderer.shell.visible\n1370.233 renderer.frame1.visible\n1386.737 renderer.frame2.visible\n"
+    },
+    {
+      "iteration": 17,
+      "elapsedMs": 1518.112375000001,
+      "timeout": false,
+      "exitCode": 0,
+      "report": {
+        "definition": "Go process initialization to canonical snapshot rendered plus two animation frames",
+        "recordedAt": "2026-10-05T11:00:15.684812Z",
+        "usableShellMs": 1458.83
+      },
+      "trace": "214.990 native.startup.begin\n234.917 native.startup.end\n494.654 native.domReady\n720.558 renderer.snapshot.begin\n720.829 native.snapshot.begin\n816.450 native.snapshot.end\n850.456 renderer.snapshot.end\n1419.648 renderer.shell.visible\n1441.203 renderer.frame1.visible\n1458.880 renderer.frame2.visible\n"
+    },
+    {
+      "iteration": 18,
+      "elapsedMs": 1412.4841669999987,
+      "timeout": false,
+      "exitCode": 0,
+      "report": {
+        "definition": "Go process initialization to canonical snapshot rendered plus two animation frames",
+        "recordedAt": "2026-10-05T11:00:17.134111Z",
+        "usableShellMs": 1337.757
+      },
+      "trace": "195.140 native.startup.begin\n216.432 native.startup.end\n442.631 native.domReady\n650.337 renderer.snapshot.begin\n650.554 native.snapshot.begin\n740.939 native.snapshot.end\n773.468 renderer.snapshot.end\n1295.104 renderer.shell.visible\n1321.624 renderer.frame1.visible\n1337.858 renderer.frame2.visible\n"
+    },
+    {
+      "iteration": 19,
+      "elapsedMs": 1846.4957089999991,
+      "timeout": false,
+      "exitCode": 0,
+      "report": {
+        "definition": "Go process initialization to canonical snapshot rendered plus two animation frames",
+        "recordedAt": "2026-10-05T11:00:19.033562Z",
+        "usableShellMs": 1782.518
+      },
+      "trace": "180.669 native.startup.begin\n198.919 native.startup.end\n409.606 native.domReady\n606.536 renderer.snapshot.begin\n606.737 native.snapshot.begin\n695.013 native.snapshot.end\n729.888 renderer.snapshot.end\n1263.852 renderer.shell.hidden\n1766.397 renderer.frame1.visible\n1782.606 renderer.frame2.visible\n"
+    }
+  ]
+}

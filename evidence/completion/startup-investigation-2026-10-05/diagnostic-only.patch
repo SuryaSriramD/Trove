@@ -1,0 +1,94 @@
+--- a/app.go
++++ b/app.go
+@@ -57,6 +57,7 @@
+ 	return filepath.Join(base, "Trove", "workspaces", "default"), nil
+ }
+ func (a *App) startup(ctx context.Context) {
++ startupTrace("native.startup.begin"); defer startupTrace("native.startup.end")
+ 	a.initializeStartup(ctx, func() error {
+ 		a.initNative()
+ 		runtime.OnFileDrop(ctx, func(x, y int, paths []string) {
+@@ -222,6 +223,7 @@
+ 	return string(b)
+ }
+ func (a *App) Dispatch(method, raw string) string {
++ if method=="workspace.snapshot" {startupTrace("native.snapshot.begin"); defer startupTrace("native.snapshot.end")}
+ 	if len(raw) > 4*1024*1024 {
+ 		return errorEnvelope("RESOURCE_EXHAUSTED", "Request exceeds 4 MiB")
+ 	}
+--- a/app_integration.go
++++ b/app_integration.go
+@@ -12,6 +12,7 @@
+ )
+ 
+ func (a *App) domReady(ctx context.Context) {
++ startupTrace("native.domReady")
+ 	step := os.Getenv("TROVE_INTEGRATION_STEP")
+ 	if step == "" {
+ 		return
+--- a/frontend/src/api.ts
++++ b/frontend/src/api.ts
+@@ -17,6 +17,7 @@
+           PickModelPack?(packId: string): Promise<void>;
+           SetEditing?(active: boolean): Promise<void>;
+           ShellReady?(): Promise<void>;
++ ShellDiagnostic?(stage:string): Promise<void>;
+           PendingDeepLink?(): Promise<string>;
+           StageUpload?(
+             name: string,
+--- a/frontend/src/App.tsx
++++ b/frontend/src/App.tsx
+@@ -80,6 +80,7 @@
+   new Intl.DateTimeFormat(undefined, { month: "short", day: "numeric" }).format(
+     new Date(date),
+   );
++function trace(stage:string) {void window.go?.main.App.ShellDiagnostic?.(stage);}
+ export default function App() {
+   const [shell, setW] = useState<WorkspaceSnapshot | null>(null);
+   const [pageContent, setPageContent] = useState<{
+@@ -153,7 +154,9 @@
+   );
+   const refresh = useCallback(async () => {
+     try {
++      trace("renderer.snapshot.begin");
+       const next = await snapshot();
++      trace("renderer.snapshot.end");
+       for (const key of [
+         "pages",
+         "blocks",
+@@ -169,6 +172,7 @@
+       setW(next);
+       setError("");
+     } catch (e) {
++      trace("renderer.snapshot.error");
+       errorHandler(e);
+     } finally {
+       setLoading(false);
+@@ -199,13 +203,19 @@
+   }, [refresh]);
+   useEffect(() => {
+     if (loading || !w) return;
++    trace("renderer.shell."+document.visibilityState);
++    const timer=window.setInterval(()=>trace("renderer.wait."+document.visibilityState),2000);
+     let second = 0;
+     const first = requestAnimationFrame(() => {
++      trace("renderer.frame1."+document.visibilityState);
+       second = requestAnimationFrame(() => {
++        trace("renderer.frame2."+document.visibilityState);
++        clearInterval(timer);
+         void window.go?.main.App.ShellReady?.();
+       });
+     });
+     return () => {
++      clearInterval(timer);
+       cancelAnimationFrame(first);
+       cancelAnimationFrame(second);
+     };
+--- /dev/null
++++ b/app_startup_trace.go
+@@ -0,0 +1,5 @@
++package main
++import("os"; "fmt"; "time"; "sync")
++var startupTraceMu sync.Mutex
++func startupTrace(stage string) { if path:=os.Getenv("TROVE_STARTUP_TRACE"); path!="" { startupTraceMu.Lock(); defer startupTraceMu.Unlock(); f,e:=os.OpenFile(path,os.O_APPEND|os.O_CREATE|os.O_WRONLY,0600); if e==nil {defer f.Close();fmt.Fprintf(f,"%0.3f %s\n",float64(time.Since(processStarted).Microseconds())/1000,stage)} } }
++func (a *App) ShellDiagnostic(stage string) { if len(stage)<=100 {startupTrace(stage)} }

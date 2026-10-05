@@ -1,0 +1,105 @@
+{
+  "recordedAt": "2026-10-05T11:01:30.058645+00:00",
+  "app": "/private/tmp/Trove-startup-trace.app",
+  "appBinarySha256": "731fc85ed84986c09a99858ffb7909e46120243bc5650123da018c428b6501d2",
+  "appUnchanged": true,
+  "networkDeniedByOS": true,
+  "modelPacks": [],
+  "fixture": "/var/folders/xc/s78np0812b12p6338l0ndvsm0000gn/T/trove-shell-benchmark-a3ejvbv7",
+  "profiles": [
+    {
+      "pages": 0,
+      "paragraphBlocks": 0,
+      "samples": [
+        {
+          "definition": "Go process initialization to canonical snapshot rendered plus two animation frames",
+          "recordedAt": "2026-10-05T11:01:18.753728Z",
+          "usableShellMs": 513.278,
+          "launchThroughShutdownMs": 707.389625
+        },
+        {
+          "definition": "Go process initialization to canonical snapshot rendered plus two animation frames",
+          "recordedAt": "2026-10-05T11:01:19.965816Z",
+          "usableShellMs": 958.561,
+          "launchThroughShutdownMs": 1050.756791
+        },
+        {
+          "definition": "Go process initialization to canonical snapshot rendered plus two animation frames",
+          "recordedAt": "2026-10-05T11:01:20.937296Z",
+          "usableShellMs": 887.415,
+          "launchThroughShutdownMs": 993.8691250000003
+        },
+        {
+          "definition": "Go process initialization to canonical snapshot rendered plus two animation frames",
+          "recordedAt": "2026-10-05T11:01:21.966323Z",
+          "usableShellMs": 902.022,
+          "launchThroughShutdownMs": 996.4482499999998
+        },
+        {
+          "definition": "Go process initialization to canonical snapshot rendered plus two animation frames",
+          "recordedAt": "2026-10-05T11:01:22.865682Z",
+          "usableShellMs": 830.104,
+          "launchThroughShutdownMs": 928.6465000000002
+        }
+      ],
+      "requestedIterations": 5,
+      "attemptedIterations": 5,
+      "completedIterations": 5,
+      "complete": true,
+      "medianMs": 887.415,
+      "maximumMs": 958.561,
+      "approximatelyTwoSeconds": true
+    },
+    {
+      "pages": 10000,
+      "paragraphBlocks": 20000,
+      "samples": [
+        {
+          "definition": "Go process initialization to canonical snapshot rendered plus two animation frames",
+          "recordedAt": "2026-10-05T11:01:24.475787Z",
+          "usableShellMs": 1418.158,
+          "launchThroughShutdownMs": 1476.3417080000006
+        },
+        {
+          "definition": "Go process initialization to canonical snapshot rendered plus two animation frames",
+          "recordedAt": "2026-10-05T11:01:25.741724Z",
+          "usableShellMs": 1192.068,
+          "launchThroughShutdownMs": 1271.9771250000003
+        },
+        {
+          "definition": "Go process initialization to canonical snapshot rendered plus two animation frames",
+          "recordedAt": "2026-10-05T11:01:27.00831Z",
+          "usableShellMs": 1194.484,
+          "launchThroughShutdownMs": 1255.3401250000009
+        },
+        {
+          "definition": "Go process initialization to canonical snapshot rendered plus two animation frames",
+          "recordedAt": "2026-10-05T11:01:28.574006Z",
+          "usableShellMs": 1503.615,
+          "launchThroughShutdownMs": 1605.5199590000004
+        },
+        {
+          "definition": "Go process initialization to canonical snapshot rendered plus two animation frames",
+          "recordedAt": "2026-10-05T11:01:29.958436Z",
+          "usableShellMs": 1279.084,
+          "launchThroughShutdownMs": 1373.0287500000013
+        }
+      ],
+      "requestedIterations": 5,
+      "attemptedIterations": 5,
+      "completedIterations": 5,
+      "complete": true,
+      "medianMs": 1279.084,
+      "maximumMs": 1503.615,
+      "approximatelyTwoSeconds": true
+    }
+  ],
+  "failures": [],
+  "measurementPassed": true,
+  "definition": "Go process initialization to canonical workspace snapshot rendered and two animation frames. Startup includes native validation and Wails initialization. Each sample uses a new app process; OS disk caches are not flushed. The approximate two-second threshold is explicitly interpreted as at most 2.5 seconds, requires every requested iteration to finish, and exact values are retained.",
+  "limitations": [
+    "Developer Mac only; hardware and synthetic workspace definitions are in benchmark-environment.json.",
+    "Does not measure installer/Gatekeeper time or guarantee editor responsiveness during background work.",
+    "A missing readiness report is a failed measurement; it does not by itself distinguish a workspace, bridge, renderer, or visibility problem."
+  ]
+}

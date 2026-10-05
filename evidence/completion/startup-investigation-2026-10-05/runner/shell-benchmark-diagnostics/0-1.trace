@@ -1,0 +1,10 @@
+208.820 native.startup.begin
+229.337 native.startup.end
+635.874 native.domReady
+873.215 renderer.snapshot.begin
+873.446 native.snapshot.begin
+874.647 native.snapshot.end
+892.830 renderer.snapshot.end
+912.864 renderer.shell.visible
+934.692 renderer.frame1.visible
+958.604 renderer.frame2.visible

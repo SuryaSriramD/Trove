@@ -1,0 +1,29 @@
+{
+  "sourceCommit": "5d7cdb038bde74458df57d511cb949af5a892358",
+  "instrumentationPatchSha256": "fe007dfe7b52ac601cd24f686d0acf5ff439e2570d83509e8646554ca01e6071",
+  "sourceArchiveSha256": "79d8174a1568d5af770a65e462eb8160fefce91629f1a0be58bf4bf0b087e73d",
+  "app": "/private/tmp/Trove-startup-trace.app",
+  "appBinarySha256": "731fc85ed84986c09a99858ffb7909e46120243bc5650123da018c428b6501d2",
+  "nativeResourceSha256": {
+    "audio-decoder": "ec8366d8b36c11b21af592dd581b36ce8425fa9b492ff6efb8d6d9ee6f13b7ee",
+    "audio-decoder.json": "e421ca594782c15389f8cf92455b93f8ff830a9d514fab82f4b7d1d222d9018d",
+    "document-extractor": "ef7f2543226846f39283ba325f4699c10b92b22fcf19828b11c1fbcf2b80f75d",
+    "document-extractor.json": "fae8680d007214f5e6769aa6205a2f88941f4287474d34b00adcd205695e2425",
+    "fixtures/jfk.wav": "59dfb9a4acb36fe2a2affc14bacbee2920ff435cb13cc314a08c13f66ba7860e",
+    "llama-worker": "94fa1694c96f7c39fa44226b7801cb8227f4528cad143392a2ceec2d6eb98982",
+    "manifest.json": "eb58cdd9aa22f2911a3a84d73f9ca311f60f8bb78123d17d32c3b681f54c4714",
+    "microphone-worker": "9940c517026dfad18329843e1bc33ee47d0c67512d5c6f10a819a7753619e448",
+    "models/catalog.json": "64f86eddccfd2c84372f52fd42702a7d05c6c9f8813e290123a01cb5a2857478",
+    "models/provenance.json": "70fba6c9d33726f3cb90093a4f65c9db4ee097ca4634108a31de7ef935eb4294",
+    "notices/llama-LICENSE.txt": "94f29bbed6a22c35b992c5c6ebf0e7c92f13b836b90f36f461c9cf2f0f1d010d",
+    "notices/whisper-LICENSE.txt": "94f29bbed6a22c35b992c5c6ebf0e7c92f13b836b90f36f461c9cf2f0f1d010d",
+    "ocr-worker": "dcb2bccae9ee1de6d3502d60b8017ee345edafd882edcff98b4a9ac7057650bd",
+    "ocr-worker.sha256": "5a7ae8c15473176bf44a622eb3236cfd439971b74b1b21a2ea7df600ea249602",
+    "pdf-renderer": "6329e8e63df8cb3cb2c4043e490a8f1a0007d5c704c7bbf4034d8722745b9964",
+    "pdf-renderer.json": "2d7c6a0ea0de7b38d4d05e33f056fd7e206308f39a98727c2722e07ac5a0708b",
+    "whisper-worker": "6da645519bda5262de0f6ab5709d52894f2dba8380bda26660113cd316e22eca"
+  },
+  "os": "ProductName:\t\tmacOS\nProductVersion:\t\t27.0.1\nBuildVersion:\t\t26A434\n",
+  "hardware": "Mac16,12\n25769803776\n10\nApple M4\n",
+  "scope": "Diagnostic developer build only. No real microphone, account or model inference. Previous failed candidate evidence remains open."
+}
