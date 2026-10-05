@@ -225,15 +225,14 @@ func privateSecretFixture(t *testing.T) (*secretServiceStore, *fakeSecretService
 			}
 		}))
 	}
-	server, err := connect(ctx)
+	// Populate the immutable fixture exports before Auth starts godbus's inbound
+	// worker. Its subtree lookup can otherwise race with ExportSubtree's map
+	// writes even before the test client makes its first request.
+	server, err := dbus.Dial(address)
 	if err != nil {
 		t.Fatal(err)
 	}
 	t.Cleanup(func() { _ = server.Close() })
-	reply, err := server.RequestName(secretServiceName, dbus.NameFlagDoNotQueue)
-	if err != nil || reply != dbus.RequestNameReplyPrimaryOwner {
-		t.Fatal(reply, err)
-	}
 	fake := &fakeSecretService{conn: server, keys: map[dbus.ObjectPath][]byte{}}
 	for path, intf := range map[dbus.ObjectPath]string{secretRoot: "Service", fakeCollection: "Collection", fakeItem: "Item", fakePrompt: "Prompt"} {
 		if err = server.Export(fake, path, secretInterface+intf); err != nil {
@@ -242,6 +241,16 @@ func privateSecretFixture(t *testing.T) (*secretServiceStore, *fakeSecretService
 	}
 	if err = server.ExportSubtree(fake, "/org/freedesktop/secrets/session", secretInterface+"Session"); err != nil {
 		t.Fatal(err)
+	}
+	if err = server.Auth([]dbus.Auth{dbus.AuthExternal(strconv.Itoa(os.Geteuid()))}); err != nil {
+		t.Fatal(err)
+	}
+	if err = server.Hello(); err != nil {
+		t.Fatal(err)
+	}
+	reply, err := server.RequestName(secretServiceName, dbus.NameFlagDoNotQueue)
+	if err != nil || reply != dbus.RequestNameReplyPrimaryOwner {
+		t.Fatal(reply, err)
 	}
 	return newSecretServiceStore(temp, connect), fake
 }
