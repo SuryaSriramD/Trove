@@ -142,6 +142,7 @@ func (a *App) waitForStartup(ctx context.Context) error {
 
 func (a *App) shutdown(context.Context) {
 	a.shutdownOnce.Do(func() { close(a.shutdownDone) })
+	a.CancelUpdateOperation()
 	a.lifecycle.Lock()
 	defer a.lifecycle.Unlock()
 	a.stopClipper()

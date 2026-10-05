@@ -1,0 +1,71 @@
+{
+  "schemaVersion": 1,
+  "recordedAt": "2026-10-05T12:22:36.697962+00:00",
+  "baseCommit": "92a1084a0c5333344f5fb0a9bfd8a1b4cdd9441b",
+  "releaseApproved": false,
+  "sourceSHA256": {
+    "app.go": "8ef16ef8c012c5eac151b1303ef7dd921e57df2eb0b7998b2e2bbc19f6ad0ae8",
+    "app_updates.go": "36837caefcd039dad3fc25a8fea725f4115d7f573e565c58250c323835e81fa2",
+    "app_updates_test.go": "3b65ae7d83aeb85d675392916b85f6db9bcb144a0db3355a4e6500f3fa6a04a7",
+    "app_update_launch.go": "9d69dfebdd43eab2006c033040e4dd4219dd35bbcd58af2e96d68210e0f89dc2",
+    "app_update_launch_test.go": "805660ccd3c9645da9bcec9d9a4b080c8678e94e8fc881e375f94335e0baa91b",
+    "scripts/build-desktop.py": "16850a3771e290c1f4ed04712d2ba32c28a659473d02383f5da7e2b79a1b4a33",
+    "tests/test_devtools.py": "10a37143c75056fb5e4f2d6d9aef44770218d76d695841433f676b1849d79403",
+    "frontend/src/App.tsx": "dd362abaf192967df197549bd64f09de5df728aa61d4579c78e9695f105c1259",
+    "frontend/src/recovery/UpdateRecoveryControls.tsx": "d85165ae20c3cccb46928c58bd7fc0c2da4f7e8bc36952b2b240572329e81152",
+    "frontend/tests/update-fixture.html": "eebbae822275843b7b81ba86c24bd0722dbd2fb44c7183976dfa4589e290b332",
+    "frontend/tests/update-fixture.tsx": "2649dee0eb2766617d3a68e35f3fbb80f1409872f1307afdef50be6a3f1fa454",
+    "frontend/tests/update.browser.spec.ts": "15e6e9701f29c899bf5894ce14aaa885114b93eac3d2f2fea8b1463577481375",
+    "internal/updates/identity.go": "29bd149306424316553c7613274d11edfd8b834c71b7ee27f84f8782e3bea8c0",
+    "internal/updates/kit.go": "ad9983751420c697d9bfdaa86b5a3ba10057331d52dfe1f959498bafa79ee768",
+    "internal/updates/launch_darwin.go": "d4bc221a1c41d1698837981b7d2bc2b33d7c046832142a3bddede7912d201cce",
+    "internal/updates/launch_other.go": "4d1b1d84095d2a36e5dc341d35068e55aeb8529d74a5930fadee4518a9c82883",
+    "internal/updates/reveal_darwin.go": "69d333f33ed5d7b596182d6301dc5544966abc92797093b57c6f6aee14fba948",
+    "internal/updates/reveal_other.go": "c3be3c44f9e399ba049c846d356f23dd65505af12c8986c236d88b5840d11343",
+    "internal/updates/tree.go": "df5aff5cbd5b2f8df606196f64be393cbccf8005cab33e26bf628320c07544ad",
+    "internal/updates/updates_test.go": "6c3a02a24259dae24b66e245d37ad5347e1db5052818522813b69b21718d2d1e",
+    "internal/updates/verify_darwin.go": "a73fbfb402bfadfa4302d02f1a995c75e3abd119c7952c3cea8fbb97114b81c4",
+    "internal/updates/verify_darwin_test.go": "3631261bec6441cf66e5b20795e5ae5339ed7b507673b3bcb5cd1c8606804e49",
+    "internal/updates/verify_other.go": "563723d25db6fe317649f91965c2d58b2993197057a58a40317998b42c4d2e09"
+  },
+  "reportsSHA256": {
+    "adapter-build-initial.jsonl": "94e22f95bbaabff05a2176795564dd921eaf5cfeda8ac27c204fd815e97ed0b7",
+    "adapter-race.jsonl": "c7098641aeebf2e47f2bab27306f817eeaa02e956b453af1e4a736b0de804bc3",
+    "boundary-initial.jsonl": "a38ebca6830d1f9fd26321d59a32fa39d5b658b493af8cb2ec1cde66dd73337d",
+    "boundary-race.jsonl": "3c93deee317b10099a4c769343b3e7f0a6a8fb3e83ba10a99454749fa351b02a",
+    "browser-final.json": "255640122fd4c122854926b0161c7cf184fdacbfc52712d66eff53e89544d650",
+    "browser-final.txt": "b5cb425bbe47b6ac01778002e0ae5a1647f6a292e5f49f5b9340ece9cb7769b6",
+    "browser-initial.json": "63597c7f13930509c933d972ed3b188e7bbd9b7e77fc2724838f950a38ff6304",
+    "browser-initial.txt": "cc4c1a86e59427fef1ceb11a45dd41c9be467c20a2e5762c9397003385b31028",
+    "frontend-build-final.txt": "a0cbaf6548480adacc8c1bd39e590e4f658ace160426c8af645422643809299c",
+    "frontend-build.txt": "b30e6c51d7328621cbfe094b5b0a6f2ef47efd7fcc2786337c1ba1008aa7f423",
+    "launch-safety-race.jsonl": "96e72ace19d4352892d6fd233647a133bf4dc322a0518ea21a8299db68d16b36",
+    "launch-safety-source-manifest.json": "ffcaf513801dc2775e63b397d59228c908299e073d26f1a73864df214ce17a01",
+    "tooling.txt": "eeaebfc97b3f2c425b1f541d62d87d61d9f5f60590eae516603c7bd6e2e360bc",
+    "typescript.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "adapter-all-race.jsonl": "2da08c10379ad7df117b8a0f1fbedd9f568df4e76a1ae1ee0853c760aa5cb162"
+  },
+  "testAndSubtestCounts": {
+    "adapter-race.jsonl": {
+      "pass": 37
+    },
+    "boundary-race.jsonl": {
+      "pass": 29
+    },
+    "adapter-all-race.jsonl": {
+      "skip": 1,
+      "pass": 56
+    }
+  },
+  "browserCases": 5,
+  "toolingCases": 19,
+  "adHocCandidateRejected": "4900d4b / ec8b5ed605ef45ef0154eb5be55740048f9534343b780ac20c0dd4a7896c03bd",
+  "limitations": [
+    "No Developer ID signed update/install/restart or notarization qualification.",
+    "Application signature substitutes exist only in test-injected unexported dependencies; production uses Apple signature requirements and Gatekeeper.",
+    "Launcher regression checks process spawn and explicit first-workspace routing, not startup-ready acknowledgement.",
+    "The earlier adapter-build attempt failed due to absent frontend/dist; retained as initial evidence, then built and rerun.",
+    "Independent clean Mac, real signed paired rollback, external volume, power-loss and uninstall qualification remain open.",
+    "Windows/Linux verified application updates and release qualification remain open."
+  ]
+}

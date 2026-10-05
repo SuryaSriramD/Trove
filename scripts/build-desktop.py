@@ -10,6 +10,7 @@ import json
 import os
 from pathlib import Path
 import plistlib
+import re
 import shutil
 import subprocess
 import sys
@@ -26,7 +27,13 @@ parser.add_argument('--phase6', action='store_true', help='Build optional P2 pac
 parser.add_argument('--phase5', action='store_true', help='Build the P1 personal-use release candidate and paired MCP relay')
 parser.add_argument('--output', type=Path, default=ROOT / 'build' / 'Trove.app')
 parser.add_argument('--release-notices', type=Path, help='Directory with provenance.json and THIRD-PARTY-NOTICES.txt for distribution')
+parser.add_argument('--version', help='Signed three-component release version; phase default if omitted')
+parser.add_argument('--build-number', type=int, help='Signed monotonically increasing build number; phase default if omitted')
 args = parser.parse_args()
+if args.version is not None and not re.fullmatch(r'[0-9]+\.[0-9]+\.[0-9]+', args.version):
+    parser.error('--version must contain three numeric components')
+if args.build_number is not None and not 0 < args.build_number < 2**64:
+    parser.error('--build-number must be a positive 64-bit integer')
 if sum([args.phase4, args.phase5, args.phase6]) > 1:
     parser.error('Choose one release phase')
 if (args.phase5 or args.phase6) and args.output.exists():
@@ -92,11 +99,20 @@ if args.release_notices:
         shutil.copyfile(args.release_notices / name, notices / name)
     shutil.copytree(args.release_notices / 'notices', notices / 'notices', dirs_exist_ok=True,
                     ignore=shutil.ignore_patterns('._*', '.DS_Store'))
+compatibility = json.loads(subprocess.check_output(
+    [str(go), 'run', '-mod=readonly', '-tags', 'fts5 sqlite_omit_load_extension', './cmd/trove-format'],
+    cwd=ROOT, env=env, text=True))
+if set(compatibility) != {'userVersion', 'storageGeneration'} or any(type(value) is not int or value < 1 for value in compatibility.values()):
+    raise SystemExit('Workspace compatibility metadata is invalid')
+phase = 6 if args.phase6 else 5 if args.phase5 else 4 if args.phase4 else 3
 info = {
     'CFBundleName': 'Trove', 'CFBundleDisplayName': 'Trove',
     'CFBundleExecutable': 'Trove', 'CFBundleIdentifier': 'local.trove.desktop',
-    'CFBundlePackageType': 'APPL', 'CFBundleShortVersionString': '0.6.0' if args.phase6 else '0.5.0' if args.phase5 else ('0.4.0' if args.phase4 else '0.3.0'),
-    'CFBundleVersion': '6' if args.phase6 else '5' if args.phase5 else ('4' if args.phase4 else '3'), 'LSMinimumSystemVersion': '27.0',
+    'CFBundlePackageType': 'APPL', 'CFBundleShortVersionString': args.version or f'0.{phase}.0',
+    'CFBundleVersion': str(args.build_number or phase), 'LSMinimumSystemVersion': '27.0',
+    'TroveWorkspaceUserVersion': compatibility['userVersion'],
+    'TroveWorkspaceStorageGeneration': compatibility['storageGeneration'],
+    'TroveArchitecture': env['GOARCH'],
     'TroveReleaseChannel': 'P2 development preview' if args.phase6 else 'P1 personal-use candidate' if args.phase5 else ('P1 development preview' if args.phase4 else 'P0 release candidate'),
     'NSHighResolutionCapable': True,
     'NSMicrophoneUsageDescription': 'Trove records meetings locally when you start a recording.',

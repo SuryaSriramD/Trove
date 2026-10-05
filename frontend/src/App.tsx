@@ -22,6 +22,7 @@ import {
   setTaskDone,
 } from "./database/service";
 import RecoveryPanel from "./recovery/RecoveryPanel";
+import UpdateRecoveryControls from "./recovery/UpdateRecoveryControls";
 import { PageEditor } from "./editor/Editor";
 import { readable } from "./editor/codec";
 import { focusSourceLocation } from "./sourceNavigation";
@@ -1040,6 +1041,7 @@ export default function App() {
                   Open workspace
                 </button>
               </div>
+              <UpdateRecoveryControls onError={errorHandler} />
             </div>
           ) : page ? (
             <article
@@ -1504,6 +1506,7 @@ export default function App() {
                       ))}
                   </div>
                   <ModelSettings onError={errorHandler} />
+                  <UpdateRecoveryControls key={w.workspaceId} workspaceId={w.workspaceId} onError={errorHandler} />
                   <RecoveryPanel
                     workspace={w}
 

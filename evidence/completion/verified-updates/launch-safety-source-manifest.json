@@ -1,0 +1,29 @@
+{
+  "recordedAt": "2026-10-05T12:16:01.860791+00:00",
+  "sourceBase": "92a1084a0c5333344f5fb0a9bfd8a1b4cdd9441b",
+  "workingTree": "Launch files and parent update/recovery package were uncommitted. Exact inputs below bind this test result; this is not a release candidate.",
+  "platform": "macOS-27.0.1-arm64-arm-64bit",
+  "command": "GOCACHE=/private/tmp/trove-completion-go-cache GOMODCACHE=/Users/suryasriramduvvuri/Library/Caches/Trove/completion/go-mod GOTOOLCHAIN=local GOPROXY=off CGO_LDFLAGS='-framework UniformTypeIdentifiers' /Users/suryasriramduvvuri/Library/Caches/Trove/completion/go/bin/go test -race -json -tags 'fts5 sqlite_omit_load_extension' . ./internal/updates -run 'Test(Rollback|Update|ReviewedUpdate)' -count=1 -timeout=120s",
+  "sources": {
+    "app_update_launch.go": "9d69dfebdd43eab2006c033040e4dd4219dd35bbcd58af2e96d68210e0f89dc2",
+    "app_update_launch_test.go": "805660ccd3c9645da9bcec9d9a4b080c8678e94e8fc881e375f94335e0baa91b",
+    "internal/updates/launch_darwin.go": "d4bc221a1c41d1698837981b7d2bc2b33d7c046832142a3bddede7912d201cce",
+    "internal/updates/launch_other.go": "4d1b1d84095d2a36e5dc341d35068e55aeb8529d74a5930fadee4518a9c82883",
+    "app_updates.go": "36837caefcd039dad3fc25a8fea725f4115d7f573e565c58250c323835e81fa2",
+    "app_updates_test.go": "3b65ae7d83aeb85d675392916b85f6db9bcb144a0db3355a4e6500f3fa6a04a7",
+    "app_preferences.go": "3b595deca217fa284dcd49249b8d6d907e6464be234d46f2e6d64eba86111b21",
+    "internal/updates/tree.go": "df5aff5cbd5b2f8df606196f64be393cbccf8005cab33e26bf628320c07544ad",
+    "internal/updates/identity.go": "29bd149306424316553c7613274d11edfd8b834c71b7ee27f84f8782e3bea8c0",
+    "internal/workspace/compatibility.go": "7493ebd7bc3a12e15f552b537babbc22e9b9c6e5b49ea66e181b56248dcb812d",
+    "internal/workspace/restore_compatible.go": "eda71daee0af63a153a6b6a69717826ed0372f03e235709a1d4d5b40ed171766"
+  },
+  "evidence": {
+    "launch-safety-race.jsonl": "96e72ace19d4352892d6fd233647a133bf4dc322a0518ea21a8299db68d16b36"
+  },
+  "limits": [
+    "Injected verifier/process start/quit exercise only the private native adapter test seam; production uses MacVerifier without a bypass.",
+    "No signed application launch, clean installation, app readiness handshake, independent machine, or distribution qualification was performed.",
+    "The successful process Start boundary precedes current-app Quit; it does not prove the child completed startup.",
+    "Full restored inventory is bounded at 100000 objects and 1 TiB, with a 30 minute operation timeout."
+  ]
+}

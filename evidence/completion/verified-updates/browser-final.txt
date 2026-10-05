@@ -1,0 +1,12 @@
+
+Running 5 tests using 1 worker
+
+(node:54053) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓  1 tests/update.browser.spec.ts:3:1 › requires review, then reveals only the prepared native kit (468ms)
+  ✓  2 tests/update.browser.spec.ts:14:1 › workspace changes invalidate preparation and source failures do not report success (376ms)
+  ✓  3 tests/update.browser.spec.ts:25:1 › cancellation is reachable during preparation (400ms)
+  ✓  4 tests/update.browser.spec.ts:36:1 › rollback uses a reviewed backup and explains preserved newer data (429ms)
+  ✓  5 tests/update.browser.spec.ts:47:1 › migration recovery remains available when startup has no workspace (438ms)
+
+  5 passed (3.3s)
