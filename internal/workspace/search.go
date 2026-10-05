@@ -89,8 +89,29 @@ func (k *Kernel) InitSearch(ctx context.Context) error {
 		if err != nil {
 			return err
 		}
-		_, err = tx.ExecContext(ctx, "INSERT OR IGNORE INTO search_meta VALUES('generation',?)", NewID())
-		return err
+		if _, err = tx.ExecContext(ctx, "INSERT OR IGNORE INTO search_meta VALUES('generation',?)", NewID()); err != nil {
+			return err
+		}
+		// Readable bytes are derived data. A projection change invalidates every
+		// page once, including existing/restored workspaces whose source revision
+		// has not changed. FlushSearch replaces chunks and removes their old vec0
+		// coordinates before retrieval; canonical content and history stay intact.
+		var projection string
+		err = tx.QueryRowContext(ctx, "SELECT value FROM search_meta WHERE key='readable_projection'").Scan(&projection)
+		if err != nil && !errors.Is(err, sql.ErrNoRows) {
+			return err
+		}
+		if projection != "rich-text-contiguous-v2" {
+			if _, err = tx.ExecContext(ctx, "INSERT OR IGNORE INTO search_dirty SELECT id FROM pages; DELETE FROM semantic_auto_attempts;"); err != nil {
+				return err
+			}
+			if _, err = tx.ExecContext(ctx, "UPDATE search_meta SET value=? WHERE key='generation'", NewID()); err != nil {
+				return err
+			}
+			_, err = tx.ExecContext(ctx, "INSERT INTO search_meta VALUES('readable_projection','rich-text-contiguous-v2') ON CONFLICT(key) DO UPDATE SET value=excluded.value")
+			return err
+		}
+		return nil
 	})
 }
 func searchChangedPages(m *Mutation) error {
@@ -160,6 +181,37 @@ func (k *Kernel) FlushSearch(ctx context.Context) error {
 	}
 }
 func searchDigest(s string) string { h := sha256.Sum256([]byte(s)); return hex.EncodeToString(h[:]) }
+
+// Rich-text run boundaries carry formatting, not whitespace. Only use this
+// for declared rich-text fields; independent cells/tabs/list items still need
+// structural separators. Link targets and presentation metadata are not text.
+func searchRichText(v any) (string, bool) {
+	runs, ok := v.([]any)
+	if !ok {
+		return "", false
+	}
+	var text strings.Builder
+	for _, value := range runs {
+		run, ok := value.(map[string]any)
+		if !ok {
+			return "", false
+		}
+		part, ok := run["text"].(string)
+		if !ok {
+			return "", false
+		}
+		text.WriteString(part)
+	}
+	return text.String(), true
+}
+func searchPropertyText(kind string, value any) string {
+	if kind == "text" {
+		if text, rich := searchRichText(value); rich {
+			return text
+		}
+	}
+	return searchReadable(value)
+}
 func searchReadable(v any) string {
 	switch x := v.(type) {
 	case string:
@@ -178,8 +230,14 @@ func searchReadable(v any) string {
 		parts := []string{}
 		for _, key := range []string{"text", "richText", "caption", "readable", "readableText", "plainText", "code", "source", "latex", "cells", "label", "displayName", "displayValue", "language", "url", "title", "description", "offlineText", "displaySnapshot", "tabs", "start", "end", "timezone"} {
 			if v, ok := x[key]; ok {
-				if s := searchReadable(v); s != "" {
-					parts = append(parts, s)
+				text := searchReadable(v)
+				if key == "richText" || key == "caption" {
+					if joined, rich := searchRichText(v); rich {
+						text = joined
+					}
+				}
+				if text != "" {
+					parts = append(parts, text)
 				}
 			}
 		}
@@ -257,7 +315,7 @@ func indexSearchPage(ctx context.Context, tx *sql.Tx, page string) error {
 				if json.Unmarshal([]byte(raw), &value) != nil {
 					continue
 				}
-				text := searchReadable(value)
+				text := searchPropertyText(typ, value)
 				if label != "" {
 					text = label
 				}
