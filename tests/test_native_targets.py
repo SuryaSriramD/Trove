@@ -23,15 +23,28 @@ class NativeTargets(unittest.TestCase):
         with self.assertRaises(ValueError):
             host_target('Linux', 'aarch64')
 
-    def test_plans_do_not_claim_unimplemented_capture_or_qualification(self):
+    def test_plans_keep_target_execution_unqualified(self):
         for target in ('windows-amd64', 'linux-amd64'):
             result = subprocess.run([sys.executable, str(ROOT / 'scripts/build-native-portable.py'),
                 '--target', target, '--plan'], check=True, capture_output=True, text=True)
             body = json.loads(result.stdout)
-            self.assertFalse(body['capture'])
+            self.assertIn('device execution unqualified', body['capture'])
             self.assertIn('target execution unqualified', body['audioDecoding'])
             self.assertFalse(body['ocr'])
             self.assertIn('No platform execution', body['qualification'])
+
+    def test_microphone_plans_keep_fixture_device_boundary(self):
+        for target in ('windows-amd64', 'linux-amd64', 'darwin-arm64'):
+            for fixture in (False, True):
+                command = [sys.executable, str(ROOT / 'scripts/build-microphone.py'),
+                    '--target', target, '--output', 'unused-plan-output', '--plan']
+                if fixture:
+                    command.append('--fixture-only')
+                result = subprocess.run(command, check=True, capture_output=True, text=True)
+                body = json.loads(result.stdout)
+                self.assertEqual(fixture, body['fixtureOnly'])
+                self.assertIn('Unqualified', body['deviceExecution'])
+                self.assertEqual('0.11.25', body['pin']['version'])
 
     def test_portable_isa_and_pinned_sources(self):
         for flag in ('GGML_NATIVE', 'GGML_AVX', 'GGML_AVX2', 'GGML_BMI2', 'GGML_FMA', 'GGML_F16C', 'GGML_METAL'):
