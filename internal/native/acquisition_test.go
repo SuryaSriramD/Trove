@@ -62,7 +62,7 @@ func TestModelDownloadRejectsHTTPSDowngrade(t *testing.T) {
 func TestAcquisitionRejectsIncompatiblePacksBeforeIO(t *testing.T) {
 	data := []byte("GGUFfixture")
 	for name, change := range map[string]func(*Pack){
-		"architecture": func(p *Pack) { p.Architecture = "amd64" },
+		"architecture": func(p *Pack) { p.Architecture = "unsupported-isa" },
 		"runtime":      func(p *Pack) { p.RuntimeCommit = "unqualified-runtime" },
 		"format":       func(p *Pack) { p.Format = "pickle" },
 		"identity":     func(p *Pack) { p.ID = "../../outside" },

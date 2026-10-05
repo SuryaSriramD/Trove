@@ -19,7 +19,6 @@ import (
 	"strconv"
 	"strings"
 	"sync"
-	"syscall"
 	"time"
 )
 
@@ -81,14 +80,6 @@ func NewManager(root string) (*Manager, error) {
 
 const modelDiskReserve int64 = 16 << 20
 
-func availableModelBytes(path string) (uint64, error) {
-	var stat syscall.Statfs_t
-	if err := syscall.Statfs(path, &stat); err != nil {
-		return 0, err
-	}
-	return stat.Bavail * uint64(stat.Bsize), nil
-}
-
 func (m *Manager) requireDisk(bytes int64) error {
 	available, err := m.availableBytes(m.root)
 	if err != nil {
@@ -117,7 +108,7 @@ func (w *modelWriter) Write(b []byte) (int, error) {
 	}
 	n, err := w.file.Write(b)
 	w.sinceCheck += int64(n)
-	if errors.Is(err, syscall.ENOSPC) || errors.Is(err, syscall.EDQUOT) {
+	if isDiskFull(err) {
 		err = fmt.Errorf("RESOURCE_EXHAUSTED: model storage is full: %w", err)
 	}
 	return n, err
@@ -129,7 +120,7 @@ func (p Pack) Validate() error {
 	if err := p.validateVisionManifest(); err != nil {
 		return err
 	}
-	if p.Architecture != "arm64" || runtime.GOARCH != "arm64" {
+	if !supportedNativeTarget(runtime.GOOS, runtime.GOARCH) || (p.Architecture != "portable" && p.Architecture != runtime.GOARCH) {
 		return errors.New("MODEL_INCOMPATIBLE: architecture")
 	}
 	if p.EstimatedMemoryBytes < p.SizeBytes || p.EstimatedMemoryBytes > 16<<30 {
@@ -188,12 +179,7 @@ func atomicJSON(path string, v any) error {
 	if e = os.Rename(path+".tmp", path); e != nil {
 		return e
 	}
-	d, e := os.Open(filepath.Dir(path))
-	if e == nil {
-		e = d.Sync()
-		d.Close()
-	}
-	return e
+	return syncModelDirectory(filepath.Dir(path))
 }
 func (m *Manager) begin(p Pack) error {
 	if e := p.Validate(); e != nil {

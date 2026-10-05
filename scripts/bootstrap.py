@@ -81,8 +81,8 @@ def main():
         parser.error('Run bootstrap using Python 3.12 or newer; the existing .venv is never changed.')
     if args.browser and not args.fetch:
         parser.error('--browser requires --fetch because Playwright may download Chromium')
-    if {'go', 'native'}.intersection(args.components) and (platform.system(), platform.machine()) != ('Darwin', 'arm64'):
-        parser.error('The committed Go/native archives target Darwin arm64; Windows/Linux qualification is separate.')
+    if 'go' in args.components and (platform.system(), platform.machine()) != ('Darwin', 'arm64'):
+        parser.error('The committed Go toolchain archive targets Darwin arm64; install the pinned Go version independently on Windows/Linux. Native source archives are portable.')
     cache = cache_dir(args.cache)
     cache.mkdir(parents=True, exist_ok=True)
     env = build_env(cache, offline=not args.fetch)

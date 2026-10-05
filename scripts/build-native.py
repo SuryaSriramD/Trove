@@ -1,9 +1,17 @@
 #!/usr/bin/env python3
 """Build the pinned arm64 worker helpers; no source pin is resolved dynamically."""
 import argparse,hashlib,json,pathlib,shutil,subprocess,sys,tarfile
+from native_targets import host_target, require_native_host
 from devtools import cache_dir, workspace_cache
 
 ROOT=pathlib.Path(__file__).resolve().parents[1]
+# Other targets use their own native-host builder; macOS behavior stays pinned.
+routing=argparse.ArgumentParser(add_help=False);routing.add_argument('--target');routing.add_argument('--plan',action='store_true')
+route,remaining=routing.parse_known_args()
+if route.plan or (route.target or host_target()) != 'darwin-arm64':
+ raise SystemExit(subprocess.call([sys.executable,str(ROOT/'scripts/build-native-portable.py')]+sys.argv[1:]))
+require_native_host('darwin-arm64')
+sys.argv=[sys.argv[0]]+remaining
 p=argparse.ArgumentParser();p.add_argument('--cache',type=pathlib.Path,default=cache_dir());p.add_argument('--output',type=pathlib.Path,default=ROOT/'build/native');a=p.parse_args();a.cache=cache_dir(a.cache)
 lock=json.loads((ROOT/'baseline/baseline.lock.json').read_text());a.output.mkdir(parents=True,exist_ok=True);helpers=[]
 for name in ('llama','whisper'):

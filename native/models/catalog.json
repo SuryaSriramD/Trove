@@ -1,7 +1,7 @@
 [
   {
     "schemaVersion": 1,
-    "architecture": "arm64",
+    "architecture": "portable",
     "license": "MIT",
     "qualificationOnly": true,
     "estimatedMemoryBytes": 536870912,
@@ -19,7 +19,7 @@
   },
   {
     "schemaVersion": 1,
-    "architecture": "arm64",
+    "architecture": "portable",
     "license": "MIT",
     "estimatedMemoryBytes": 536870912,
     "id": "01990000-0000-7000-8000-000000000102",
@@ -37,7 +37,7 @@
   },
   {
     "schemaVersion": 1,
-    "architecture": "arm64",
+    "architecture": "portable",
     "license": "Apache-2.0",
     "estimatedMemoryBytes": 536870912,
     "id": "01990000-0000-7000-8000-000000000103",
@@ -54,7 +54,7 @@
   },
   {
     "schemaVersion": 1,
-    "architecture": "arm64",
+    "architecture": "portable",
     "license": "Apache-2.0",
     "estimatedMemoryBytes": 2147483648,
     "id": "01990000-0000-7000-8000-000000000104",
@@ -71,7 +71,7 @@
   },
   {
     "schemaVersion": 1,
-    "architecture": "arm64",
+    "architecture": "portable",
     "license": "Apache-2.0",
     "estimatedMemoryBytes": 3221225472,
     "id": "01990000-0000-7000-8000-000000000105",
@@ -89,7 +89,7 @@
   {
     "schemaVersion": 2,
     "visionVersion": 1,
-    "architecture": "arm64",
+    "architecture": "portable",
     "license": "Apache-2.0",
     "estimatedMemoryBytes": 2147483648,
     "id": "01990000-0000-7000-8000-000000000107",
