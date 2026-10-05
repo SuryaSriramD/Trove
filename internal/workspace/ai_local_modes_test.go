@@ -209,7 +209,11 @@ func TestRealLocalExposedModes(t *testing.T) {
 				t.Fatal(err)
 			}
 			unchanged := before == after
-			report, _ := json.Marshal(map[string]any{"mode": tc.mode, "modelPackId": pack, "taskPassed": taskPass, "canonicalUnchanged": unchanged, "promptTokens": prepared.PromptTokens, "outputCap": prepared.OutputTokens, "latencyMs": time.Since(start).Milliseconds(), "source": tc.source, "prompt": tc.prompt, "draft": raw, "displayed": run.Text, "generationError": fmt.Sprint(generationErr), "finishError": fmt.Sprint(finishErr), "proposalError": proposalError, "peakWorkerRSS": metrics.PeakRSSBytes.Load(), "releaseQualified": false})
+			var peakRSS any
+			if rss := metrics.PeakRSSBytes.Load(); rss > 0 {
+				peakRSS = rss
+			}
+			report, _ := json.Marshal(map[string]any{"mode": tc.mode, "modelPackId": pack, "taskPassed": taskPass, "canonicalUnchanged": unchanged, "promptTokens": prepared.PromptTokens, "outputCap": prepared.OutputTokens, "latencyMs": time.Since(start).Milliseconds(), "source": tc.source, "prompt": tc.prompt, "draft": raw, "displayed": run.Text, "generationError": fmt.Sprint(generationErr), "finishError": fmt.Sprint(finishErr), "proposalError": proposalError, "peakWorkerRSS": peakRSS, "rssMeasurementAvailable": peakRSS != nil, "releaseQualified": false})
 			t.Log(string(report))
 			if !taskPass || !unchanged {
 				t.Error("predefined mode task or unapplied-write boundary failed")
