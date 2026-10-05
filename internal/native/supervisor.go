@@ -97,6 +97,9 @@ func NewSupervisor(bundle string, manager *Manager) (*Supervisor, error) {
 		if h.Name != "llama-worker" && h.Name != "whisper-worker" && h.Name != "microphone-worker" && h.Name != "vision-worker" {
 			return nil, errors.New("unknown helper")
 		}
+		if h.Name == "microphone-worker" && !validMicrophoneIdentity(h, runtime.GOOS) {
+			return nil, errors.New("invalid production microphone identity")
+		}
 		if h.Architecture != runtime.GOARCH || !digestPattern.MatchString(h.SHA256) {
 			return nil, errors.New("invalid helper manifest")
 		}

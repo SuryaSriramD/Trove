@@ -1,0 +1,12 @@
+{
+  "schemaVersion": 1,
+  "runtimeCommit": "miniaudio-0.11.25-trove-microphone-v1",
+  "version": "0.11.25",
+  "source": "llama.cpp-d2e54583c7452353eb35d40431281f6ee984332f/vendor/miniaudio/miniaudio.h",
+  "headerSha256": "ac7af4de748b7e26b777f37e01cee313a308a7296a3eb080e2906b320cc55c89",
+  "upstream": "https://github.com/mackron/miniaudio",
+  "licenseChoice": "MIT-0",
+  "backends": {"windows-amd64": "WASAPI shared capture", "linux-amd64": "local per-user PulseAudio/PipeWire compatibility socket", "darwin-arm64": "synthetic reference only; existing Swift capture preserved"},
+  "boundedRingFrames": 32768,
+  "output": {"sampleRate": 16000, "channels": 1, "format": "f32le"}
+}

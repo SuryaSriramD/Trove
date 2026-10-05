@@ -35,7 +35,7 @@ Manifest v2 binds platform and architecture. Helper names remain logical; Window
 
 The normative hello schema adds amd64 alongside arm64; Go/TypeScript consumers are regenerated together. The catalog marks model data portable, while executable architecture stays strict. Model/projector IDs, revisions, hashes and sizes are unchanged. Old arm64 receipts still work on Mac; other hosts must use correctly declared portable packs.
 
-Windows/Linux bundles omit Swift helpers. Microphone capture, OCR and native document/PDF helpers remain unavailable. The follow-on audio package adds a pinned restricted static FFmpeg decoder on all three targets; see [audio-decoding.md](audio-decoding.md). Its Mac format fixtures pass; Windows/Linux native compilation and execution remain unqualified. Capture and OCR still fail closed on those targets.
+Windows/Linux bundles omit Swift helpers. The portable microphone package adds a pinned miniaudio worker with native target build recipes; device execution remains unqualified. See [microphone-portability.md](microphone-portability.md). OCR and native document/PDF helpers remain unavailable in this worker package. The follow-on audio package adds a pinned restricted static FFmpeg decoder on all three targets; see [audio-decoding.md](audio-decoding.md). Its Mac format fixtures pass; Windows/Linux native compilation and execution remain unqualified. Missing or mismatched capture helpers and unavailable local devices fail closed. OCR remains separately unavailable.
 
 ## Build procedure
 
@@ -53,7 +53,7 @@ Native source archives are platform neutral. The committed Go bootstrap archive 
 | Target | Required build environment | Runtime dependencies |
 |---|---|---|
 | Windows 11 x64 | Python 3.12+, CMake 4.3.2, Ninja, x64 MSVC v143 or newer developer prompt, Windows SDK, MSYS2 bash/GNU make, local NTFS cache | Windows system DLLs; static MSVC runtime requested and imports inspected |
-| Ubuntu 24.04 x64 | Python 3.12, CMake 4.3.2, Ninja, GCC/G++ 13, libssl-dev, procps | glibc, libstdc++, libgcc, libcrypto.so.3 and mounted /proc |
+| Ubuntu 24.04 x64 | Python 3.12, CMake 4.3.2, Ninja, GCC/G++ 13, libssl-dev, libpulse-dev, procps | glibc, libstdc++, libgcc, libcrypto.so.3, libpulse0, a local per-user PulseAudio/PipeWire socket and mounted /proc |
 | macOS arm64 | Existing macOS 27 SDK / Apple clang / Swift setup | Existing Apple frameworks and signed helpers |
 
 On the selected host:
@@ -63,7 +63,7 @@ On the selected host:
 
 Windows/Linux use CPU baseline flags: native host ISA detection, AVX/AVX2/BMI2/FMA/F16C/SSE4.2, GPU backends and OpenMP disabled. llama and whisper use separate CMake trees because their ggml targets differ. mtmd subprocess/video support is off. The existing Mac Metal/Swift path remains available, including --target darwin-arm64.
 
-Outputs: three model workers, restricted audio decoder/sidecar/relink kit, manifest v2, catalog, dependency reports, notices, JFK fixture, build provenance. These are **worker bundles**, not installers. Actual compiler/SDK/Ubuntu package versions are recorded; an exact Windows compiler image and validated Ubuntu dependency snapshot are not frozen. These recipes do not establish reproducible target binaries or release qualification.
+Outputs: three model workers, restricted audio decoder/sidecar/relink kit, production microphone worker/sidecar, manifest v2, catalog, dependency reports, notices, JFK fixture, build provenance. These are **worker bundles**, not installers. Actual compiler/SDK/Ubuntu package versions are recorded; an exact Windows compiler image and validated Ubuntu dependency snapshot are not frozen. These recipes do not establish reproducible target binaries or release qualification.
 
 ## Evidence and open gates
 
@@ -83,6 +83,6 @@ Evidence prefix: evidence/completion/c7-c8-*. Exact sources, outputs and hashes 
 | Windows job membership, cleanup, ACL, handles, projector reparse/tamper scenarios | Implementation/tests prepared; target execution pending |
 | Desktop/WebView, capture/OCR, target decoder execution, installers, signing, updates, backup portability | Open in owning platform packages |
 
-TestRealQualification includes synthetic microphone capture. Windows/Linux must retain that unsupported failure; it is not a passed complete smoke. Portable descriptor/process tests can run independently.
+TestRealQualification includes legacy Mac synthetic microphone capture. Windows/Linux production helpers reject synthetic requests; the separate fixture-only executable exercises the portable protocol without device code. Neither path substitutes for explicit real-device qualification. Portable descriptor/process tests can run independently.
 
 Before closing C7/C8: execute platform tests; build target C++ workers; run real models and hostile-input/cancellation cases; qualify permissions, crash cleanup and power-loss recovery; supply install/update/rollback/uninstall and backup-portability evidence; freeze full platform candidates. Existing AI quality failures and research/account/device/signing prerequisites remain unchanged.

@@ -41,7 +41,7 @@ def verified_source(cache, name, pin):
 
 def retain_notices(output, sources):
     notices = output / 'notices'
-    notices.mkdir()
+    notices.mkdir(exist_ok=True)
     for name, source in sources.items():
         shutil.copyfile(source / 'LICENSE', notices / (name + '-LICENSE.txt'))
     source = sources['llama']
@@ -94,7 +94,7 @@ def main():
     dependencies = {}
     if spec['os'] == 'linux':
         dependencies['systemPackages'] = subprocess.check_output(['dpkg-query', '-W',
-            'gcc', 'g++', 'libc6', 'libstdc++6', 'libssl-dev', 'libssl3t64'], text=True)
+            'gcc', 'g++', 'libc6', 'libstdc++6', 'libssl-dev', 'libssl3t64', 'libpulse-dev', 'libpulse0'], text=True)
     else:
         dependencies['VCToolsVersion'] = os.environ.get('VCToolsVersion')
         dependencies['WindowsSDKVersion'] = os.environ.get('WindowsSDKVersion')
@@ -150,14 +150,20 @@ def main():
             (output / (filename + '.dependencies.txt')).write_text(deps)
     subprocess.run([sys.executable, str(ROOT / 'scripts/build-audio-decoder.py'), '--target', target,
         '--cache', str(cache), '--output', str(output)], check=True)
+    subprocess.run([sys.executable, str(ROOT / 'scripts/build-microphone.py'), '--target', target,
+        '--cache', str(cache), '--output', str(output)], check=True)
+    microphone = json.loads((output / 'microphone-worker.json').read_text())
+    if microphone['testOnly'] or not microphone['deviceBackendCompiled']:
+        raise RuntimeError('A synthetic fixture cannot enter a production native bundle.')
+    helpers.append(microphone['helper'])
     shutil.copytree(ROOT / 'native/models', output / 'models')
     retain_notices(output, sources)
     fixtures = output / 'fixtures'; fixtures.mkdir()
     shutil.copyfile(sources['whisper'] / 'samples/jfk.wav', fixtures / 'jfk.wav')
     manifest = {'schemaVersion': 2, 'platform': spec['os'], 'architecture': spec['arch'], 'helpers': helpers,
         'minimumOS': spec['minimumOS'], 'baselineLockSHA256': file_digest(ROOT / 'baseline/baseline.lock.json'),
-        'capabilities': ['generate', 'tokenize', 'embed', 'transcribe', 'image_generate', 'audio_decode'],
-        'unavailable': ['microphone capture', 'OCR', 'native document/PDF helpers'],
+        'capabilities': ['generate', 'tokenize', 'embed', 'transcribe', 'image_generate', 'audio_decode', 'record'],
+        'unavailable': ['system audio capture', 'OCR', 'native document/PDF helpers'],
         'executionQualification': 'Not established by build. Run model, protocol, cancellation and packaged desktop checks on this target.'}
     (output / 'manifest.json').write_text(json.dumps(manifest, indent=2) + '\n')
     (output / 'build-provenance.json').write_text(json.dumps({'recordedAt': datetime.now(timezone.utc).isoformat(),
