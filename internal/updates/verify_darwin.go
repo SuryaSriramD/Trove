@@ -64,6 +64,7 @@ func (MacVerifier) Inspect(ctx context.Context, path string) (Application, error
 		Version           string `json:"CFBundleShortVersionString"`
 		Build             string `json:"CFBundleVersion"`
 		UserVersion       int    `json:"TroveWorkspaceUserVersion"`
+		RollbackHandshake int    `json:"TroveRollbackHandshakeVersion"`
 		StorageGeneration int    `json:"TroveWorkspaceStorageGeneration"`
 		Architecture      string `json:"TroveArchitecture"`
 		MinimumOS         string `json:"LSMinimumSystemVersion"`
@@ -74,6 +75,7 @@ func (MacVerifier) Inspect(ctx context.Context, path string) (Application, error
 	out.Identity.BundleID = info.BundleID
 	out.Identity.Version = info.Version
 	out.Identity.UserVersion = info.UserVersion
+	out.Identity.RollbackHandshake = info.RollbackHandshake
 	out.Identity.StorageGeneration = info.StorageGeneration
 	out.Identity.Architecture = info.Architecture
 	out.Identity.MinimumOS = info.MinimumOS

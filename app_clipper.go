@@ -26,6 +26,10 @@ var clippers sync.Map
 // Bound native UI method. Starting an HTTP listener always requires this
 // explicit owner action; no listener is created at app startup or by a web page.
 func (a *App) BeginClipperPairing(extensionID string, destinationIDs []string) (string, error) {
+	if err := a.requireRollbackCommitted(); err != nil {
+		return "", err
+	}
+
 	a.lifecycle.Lock()
 	defer a.lifecycle.Unlock()
 	a.stopClipper()
@@ -73,7 +77,14 @@ func (a *App) stopClipper() {
 		state.(*appClipper).bridge.Close()
 	}
 }
-func (a *App) RevokeClipperPairing() { a.lifecycle.Lock(); defer a.lifecycle.Unlock(); a.stopClipper() }
+func (a *App) RevokeClipperPairing() {
+	if err := a.requireRollbackCommitted(); err != nil {
+		return
+	}
+	a.lifecycle.Lock()
+	defer a.lifecycle.Unlock()
+	a.stopClipper()
+}
 func (a *App) ClipperStatus() (string, error) {
 	state := map[string]any{"listening": false, "paired": false, "sessionOnly": true}
 	if value, ok := clippers.Load(a); ok {
@@ -100,6 +111,10 @@ func (a *App) ClipperReviewPlans() (string, error) {
 }
 
 func (a *App) RefreshClipperDestination(planID, planHash string) (string, error) {
+	if err := a.requireRollbackCommitted(); err != nil {
+		return "", err
+	}
+
 	a.mu.RLock()
 	defer a.mu.RUnlock()
 	if a.kernel == nil {
@@ -113,6 +128,10 @@ func (a *App) RefreshClipperDestination(planID, planHash string) (string, error)
 	return string(raw), err
 }
 func (a *App) ShowClipperExtension() error {
+	if err := a.requireRollbackCommitted(); err != nil {
+		return err
+	}
+
 	executable, err := os.Executable()
 	if err != nil {
 		return err

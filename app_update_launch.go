@@ -1,14 +1,12 @@
 package main
 
 import (
-	"bytes"
 	"context"
 	"crypto/sha256"
 	"database/sql"
 	"encoding/hex"
 	"encoding/json"
 	"errors"
-	"fmt"
 	"io"
 	"io/fs"
 	"net/url"
@@ -117,7 +115,7 @@ type rollbackLaunchDependencies struct {
 	verifier    updates.Verifier
 	preference  string
 	environment []string
-	start       func(context.Context, string, []string) error
+	start       func(context.Context, string, []string, updates.RollbackTarget) error
 	quit        func()
 }
 
@@ -180,6 +178,9 @@ func (a *App) launchApplicationRollbackLocked(ctx context.Context, id string, de
 	if err != nil {
 		return err
 	}
+	if application.Identity.RollbackHandshake != updates.RollbackHandshakeVersion {
+		return errors.New("saved application does not support verified rollback startup; keep the restored copy and current app open")
+	}
 	if !reflect.DeepEqual(application, review.application) {
 		return errors.New("saved previous application changed after review")
 	}
@@ -202,23 +203,21 @@ func (a *App) launchApplicationRollbackLocked(ctx context.Context, id string, de
 	if !reflect.DeepEqual(inventory, review.application.Inventory) {
 		return errors.New("saved previous application changed during workspace verification")
 	}
-	previous, existed, err := readRollbackPreference(deps.preference)
+	selected, previous, existed, err := selectWorkspaceForRollback(ctx, deps.preference, review.destination)
 	if err != nil {
+		if selected != nil {
+			return errors.Join(err, restoreRollbackPreference(deps.preference, selected, previous, existed))
+		}
 		return err
 	}
-	selected, _ := json.Marshal(workspaceSelection{Path: review.destination})
-	if err = ctx.Err(); err != nil {
-		return err
-	}
-	if err = saveWorkspaceSelection(deps.preference, review.destination); err != nil {
-		return errors.Join(err, restoreRollbackPreference(deps.preference, selected, previous, existed))
-	}
-	// Cancellation before process creation is reversible. Once Start succeeds the
-	// handoff has committed; cancellation must not kill the newly selected app.
+	target := updates.RollbackTarget{WorkspacePath: review.destination, WorkspaceID: snapshot.ID, UserVersion: snapshot.Format.UserVersion, StorageGeneration: snapshot.Format.StorageGeneration}
 	if err = ctx.Err(); err == nil {
-		err = deps.start(ctx, review.source, rollbackEnvironment(deps.environment, review.destination))
+		err = deps.start(ctx, review.source, rollbackEnvironment(deps.environment, review.destination), target)
 	}
 	if err != nil {
+		if errors.Is(err, updates.ErrRollbackCleanupUnverified) {
+			return err
+		}
 		return errors.Join(err, restoreRollbackPreference(deps.preference, selected, previous, existed))
 	}
 	return nil
@@ -403,44 +402,4 @@ func readRollbackPreference(path string) ([]byte, bool, error) {
 		return nil, false, errors.New("workspace selection preference exceeds bounds")
 	}
 	return raw, true, nil
-}
-func restoreRollbackPreference(path string, selected, previous []byte, existed bool) error {
-	current, present, err := readRollbackPreference(path)
-	if err != nil {
-		return fmt.Errorf("could not restore previous workspace selection: %w", err)
-	}
-	if present == existed && bytes.Equal(current, previous) {
-		return nil
-	}
-	if !present || !bytes.Equal(current, selected) {
-		return errors.New("workspace selection changed during failed launch; its newer selection was preserved")
-	}
-	if existed {
-		file, err := os.CreateTemp(filepath.Dir(path), ".selection-rollback-")
-		if err != nil {
-			return err
-		}
-		defer os.Remove(file.Name())
-		if _, err = file.Write(previous); err == nil {
-			err = file.Sync()
-		}
-		closeErr := file.Close()
-		if err == nil {
-			err = closeErr
-		}
-		if err != nil {
-			return err
-		}
-		if err = os.Rename(file.Name(), path); err != nil {
-			return err
-		}
-	} else if err = os.Remove(path); err != nil {
-		return err
-	}
-	dir, err := os.Open(filepath.Dir(path))
-	if err != nil {
-		return err
-	}
-	defer dir.Close()
-	return dir.Sync()
 }

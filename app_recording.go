@@ -31,6 +31,10 @@ func (a *App) recordingState() *appRecordingState {
 // StartMeetingRecording is a trusted explicit microphone gesture. It creates a
 // durable workspace destination before launching native capture asynchronously.
 func (a *App) StartMeetingRecording(title string) (workspace.RecordingDraft, error) {
+	if err := a.requireRollbackCommitted(); err != nil {
+		return workspace.RecordingDraft{}, err
+	}
+
 	a.lifecycle.Lock()
 	defer a.lifecycle.Unlock()
 	a.mu.RLock()
@@ -83,6 +87,10 @@ func (a *App) StartMeetingRecording(title string) (workspace.RecordingDraft, err
 	return draft, nil
 }
 func (a *App) StopMeetingRecording(id string) (workspace.RecordingDraft, error) {
+	if err := a.requireRollbackCommitted(); err != nil {
+		return workspace.RecordingDraft{}, err
+	}
+
 	state := a.recordingState()
 	state.Lock()
 	active := state.active[id]
@@ -98,6 +106,10 @@ func (a *App) StopMeetingRecording(id string) (workspace.RecordingDraft, error) 
 	return a.SaveMeetingRecording(id)
 }
 func (a *App) SaveMeetingRecording(id string) (workspace.RecordingDraft, error) {
+	if err := a.requireRollbackCommitted(); err != nil {
+		return workspace.RecordingDraft{}, err
+	}
+
 	state := a.recordingState()
 	state.Lock()
 	active := state.active[id]
@@ -133,6 +145,10 @@ func (a *App) MeetingRecordings() ([]workspace.RecordingDraft, error) {
 	return drafts, nil
 }
 func (a *App) PickMeetingAudio(title string) (workspace.RecordingDraft, error) {
+	if err := a.requireRollbackCommitted(); err != nil {
+		return workspace.RecordingDraft{}, err
+	}
+
 	// Wails maps filters through UTType; wildcard/unknown raw PCM extensions
 	// are not portable UTTypes. Validate the selected bytes in the audio service.
 	path, err := runtime.OpenFileDialog(a.ctx, runtime.OpenDialogOptions{Title: "Choose a local recording (WAV, MP3, AAC or M4A)"})

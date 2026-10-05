@@ -38,6 +38,7 @@ type App struct {
 	startupOnce     sync.Once
 	shutdownDone    chan struct{}
 	shutdownOnce    sync.Once
+	rollback        *rollbackChildState
 }
 
 func NewApp() *App {
@@ -77,6 +78,17 @@ func (a *App) startup(ctx context.Context) {
 		case <-a.shutdownDone:
 			return fmt.Errorf("application shut down during workspace startup")
 		default:
+		}
+		if a.rollback != nil {
+			target := a.rollback.child.Target()
+			if path != target.WorkspacePath {
+				return fmt.Errorf("rollback startup preference differs from reviewed destination")
+			}
+			k, err := workspace.OpenCompatibleReviewed(ctx, target.WorkspacePath, target.WorkspaceID, workspace.CompatibilityDescriptor{UserVersion: target.UserVersion, StorageGeneration: target.StorageGeneration})
+			if err != nil {
+				return err
+			}
+			return a.installKernelLocked(k)
 		}
 		return a.openLocked(path, true)
 	})
@@ -176,6 +188,9 @@ func (a *App) shutdown(context.Context) {
 	}
 }
 func (a *App) open(path string, create bool) error {
+	if err := a.requireRollbackCommitted(); err != nil {
+		return err
+	}
 	a.lifecycle.Lock()
 	defer a.lifecycle.Unlock()
 	return a.openLocked(path, create)
@@ -200,6 +215,9 @@ func (a *App) openLocked(path string, create bool) error {
 	if err != nil {
 		return err
 	}
+	return a.installKernelLocked(k)
+}
+func (a *App) installKernelLocked(k *workspace.Kernel) error {
 	a.mu.Lock()
 	old := a.kernel
 	cancel, done := a.jobCancel, a.jobDone
@@ -219,7 +237,9 @@ func (a *App) openLocked(path string, create bool) error {
 		old.Close()
 	}
 	a.subscribe(k)
-	a.startJobs(k)
+	if a.requireRollbackCommitted() == nil {
+		a.startJobs(k)
+	}
 	return nil
 }
 func errorEnvelope(code, message string) string {
@@ -227,6 +247,9 @@ func errorEnvelope(code, message string) string {
 	return string(b)
 }
 func (a *App) Dispatch(method, raw string) string {
+	if err := a.requireRollbackCommitted(); err != nil && method != "workspace.snapshot" {
+		return errorEnvelope("WORKSPACE_LOCKED", err.Error())
+	}
 	if len(raw) > 4*1024*1024 {
 		return errorEnvelope("RESOURCE_EXHAUSTED", "Request exceeds 4 MiB")
 	}
@@ -296,6 +319,9 @@ func (a *App) WorkspaceInfo() map[string]any {
 	return out
 }
 func (a *App) ChooseWorkspace(create bool) error {
+	if err := a.requireRollbackCommitted(); err != nil {
+		return err
+	}
 	path, err := runtime.OpenDirectoryDialog(a.ctx, runtime.OpenDialogOptions{Title: "Choose a Trove workspace", CanCreateDirectories: create, ResolvesAliases: true, TreatPackagesAsDirectories: true})
 	if err != nil || path == "" {
 		return err
@@ -318,6 +344,9 @@ func (a *App) ChooseWorkspace(create bool) error {
 func (a *App) OpenWorkspace() error   { return a.ChooseWorkspace(false) }
 func (a *App) CreateWorkspace() error { return a.ChooseWorkspace(true) }
 func (a *App) selectFile(path string) (string, error) {
+	if err := a.requireRollbackCommitted(); err != nil {
+		return "", err
+	}
 	a.mu.RLock()
 	defer a.mu.RUnlock()
 	if a.kernel == nil {
@@ -326,6 +355,9 @@ func (a *App) selectFile(path string) (string, error) {
 	return a.kernel.RegisterSelection(path)
 }
 func (a *App) PickFile() (string, error) {
+	if err := a.requireRollbackCommitted(); err != nil {
+		return "", err
+	}
 	path, err := runtime.OpenFileDialog(a.ctx, runtime.OpenDialogOptions{Title: "Attach a file"})
 	if err != nil || path == "" {
 		return "", err
@@ -333,6 +365,9 @@ func (a *App) PickFile() (string, error) {
 	return a.selectFile(path)
 }
 func (a *App) StageUpload(name, mediaType, encoded string) (string, error) {
+	if err := a.requireRollbackCommitted(); err != nil {
+		return "", err
+	}
 	// This is a byte upload capability, never a renderer-supplied filesystem path.
 	select {
 	case a.uploadGate <- struct{}{}:

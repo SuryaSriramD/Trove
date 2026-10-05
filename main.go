@@ -8,6 +8,7 @@ import (
 	"os"
 
 	"trove.local/phase0/internal/providers"
+	"trove.local/phase0/internal/updates"
 
 	"github.com/wailsapp/wails/v2"
 	"github.com/wailsapp/wails/v2/pkg/options"
@@ -19,6 +20,11 @@ import (
 var frontendAssets embed.FS
 
 func main() {
+	child, err := updates.ReceiveRollbackChild()
+	if err != nil || child != nil && len(os.Args) != 1 {
+		fmt.Fprintln(os.Stderr, "invalid rollback startup")
+		os.Exit(3)
+	}
 	if len(os.Args) > 1 && os.Args[1] == "--trove-claude-login" {
 		if len(os.Args) != 3 {
 			os.Exit(1)
@@ -26,6 +32,9 @@ func main() {
 		os.Exit(providers.RunClaudeLoginHelper(os.Args[2]))
 	}
 	app := NewApp()
+	if child != nil {
+		app.attachRollbackChild(child, func() { os.Exit(3) })
+	}
 	if err := app.acceptLaunchArguments(os.Args[1:]); err != nil {
 		fmt.Fprintln(os.Stderr, err)
 		os.Exit(2)

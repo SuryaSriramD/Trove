@@ -11,6 +11,10 @@ import (
 // CreateBackup accepts only a native-selected directory and always creates a
 // new destination. Renderer input cannot select arbitrary filesystem paths.
 func (a *App) CreateBackup() (string, error) {
+	if err := a.requireRollbackCommitted(); err != nil {
+		return "", err
+	}
+
 	parent, err := runtime.OpenDirectoryDialog(a.ctx, runtime.OpenDialogOptions{Title: "Save a Trove backup", CanCreateDirectories: true})
 	if err != nil || parent == "" {
 		return "", err

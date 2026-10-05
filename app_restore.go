@@ -56,6 +56,10 @@ func (a *App) takeRestorePreview(id string) (nativeRestorePreview, error) {
 // Only native dialogs supply filesystem locations; the renderer receives a
 // short-lived, one-use review token and cannot request arbitrary restore paths.
 func (a *App) PreviewNativeRestore() (string, error) {
+	if err := a.requireRollbackCommitted(); err != nil {
+		return "", err
+	}
+
 	source, err := runtime.OpenDirectoryDialog(a.ctx, runtime.OpenDialogOptions{Title: "Choose a completed Trove backup"})
 	if err != nil || source == "" {
 		return "", err
@@ -73,6 +77,10 @@ func (a *App) PreviewNativeRestore() (string, error) {
 	return string(raw), err
 }
 func (a *App) RestoreNativeBackup(previewID string) (string, error) {
+	if err := a.requireRollbackCommitted(); err != nil {
+		return "", err
+	}
+
 	p, err := a.takeRestorePreview(previewID)
 	if err != nil {
 		return "", err
@@ -93,6 +101,10 @@ func (a *App) RestoreNativeBackup(previewID string) (string, error) {
 	return string(raw), err
 }
 func (a *App) PreviewBackupCleanup() (string, error) {
+	if err := a.requireRollbackCommitted(); err != nil {
+		return "", err
+	}
+
 	parent, err := runtime.OpenDirectoryDialog(a.ctx, runtime.OpenDialogOptions{Title: "Choose your external backup folder"})
 	if err != nil || parent == "" {
 		return "", err
@@ -111,6 +123,10 @@ func (a *App) PreviewBackupCleanup() (string, error) {
 	return string(raw), err
 }
 func (a *App) ApplyBackupCleanup(previewID string) (int, error) {
+	if err := a.requireRollbackCommitted(); err != nil {
+		return 0, err
+	}
+
 	p, err := a.takeRestorePreview(previewID)
 	if err != nil {
 		return 0, err

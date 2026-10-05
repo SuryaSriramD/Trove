@@ -116,6 +116,7 @@ info = {
     'CFBundlePackageType': 'APPL', 'CFBundleShortVersionString': args.version or f'0.{phase}.0',
     'CFBundleVersion': str(args.build_number or phase), 'LSMinimumSystemVersion': '27.0',
     'TroveWorkspaceUserVersion': compatibility['userVersion'],
+    'TroveRollbackHandshakeVersion': 1,
     'TroveWorkspaceStorageGeneration': compatibility['storageGeneration'],
     'TroveArchitecture': env['GOARCH'],
     'TroveReleaseChannel': 'P2 development preview' if args.phase6 else 'P1 personal-use candidate' if args.phase5 else ('P1 development preview' if args.phase4 else 'P0 release candidate'),

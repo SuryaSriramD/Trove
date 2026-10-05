@@ -11,6 +11,10 @@ import (
 )
 
 func (a *App) PickImportFolder() (string, error) {
+	if err := a.requireRollbackCommitted(); err != nil {
+		return "", err
+	}
+
 	selected, err := runtime.OpenDirectoryDialog(a.ctx, runtime.OpenDialogOptions{Title: "Import a folder as canonical copies"})
 	if err != nil || selected == "" {
 		return "", err
@@ -23,6 +27,10 @@ func (a *App) PickImportFolder() (string, error) {
 	return a.kernel.RegisterImportFolder(a.ctx, a.execution, selected)
 }
 func (a *App) PickIndexRoot(repository bool) (string, error) {
+	if err := a.requireRollbackCommitted(); err != nil {
+		return "", err
+	}
+
 	selected, err := runtime.OpenDirectoryDialog(a.ctx, runtime.OpenDialogOptions{Title: "Approve a folder for reference-only indexing"})
 	if err != nil || selected == "" {
 		return "", err
@@ -43,6 +51,10 @@ func (a *App) PickIndexRoot(repository bool) (string, error) {
 // The OS interactive picker is invoked only by this explicit desktop action.
 // Screenshots become managed files only after the normal import review.
 func (a *App) CaptureScreenshot() (string, error) {
+	if err := a.requireRollbackCommitted(); err != nil {
+		return "", err
+	}
+
 	if goruntime.GOOS != "darwin" {
 		return "", fmt.Errorf("Interactive screenshot capture is supported on macOS; import an OS screenshot on this platform")
 	}
