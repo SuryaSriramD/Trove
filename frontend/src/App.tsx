@@ -1,3 +1,4 @@
+import SupportBundlePanel from "./SupportBundlePanel";
 import { useEffect, useState, useCallback, useMemo, useRef } from "react";
 import {
   snapshot,
@@ -1507,6 +1508,7 @@ export default function App() {
                   </div>
                   <ModelSettings onError={errorHandler} />
                   <UpdateRecoveryControls key={w.workspaceId} workspaceId={w.workspaceId} onError={errorHandler} />
+                  <SupportBundlePanel key={w.workspaceId} workspaceId={w.workspaceId} pages={w.pages} onError={errorHandler} />
                   <RecoveryPanel
                     workspace={w}
 
