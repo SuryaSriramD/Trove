@@ -338,6 +338,12 @@ func queryRecordIDs(ctx context.Context, tx *sql.Tx, statement string, args ...a
 
 // Hydration is bounded by one page/batch and uses two queries, not N+1 reads.
 func hydrateRecordPage(ctx context.Context, tx *sql.Tx, ids []string) ([]contracts.DomainRecord, map[string]string, error) {
+	return hydrateRecordProjection(ctx, tx, ids, nil)
+}
+
+// A derived ordering scan needs only filter/sort cells, not every visible cell.
+// A nil projection retains full response hydration; an empty one needs metadata only.
+func hydrateRecordProjection(ctx context.Context, tx *sql.Tx, ids []string, needed map[string]bool) ([]contracts.DomainRecord, map[string]string, error) {
 	result := []contracts.DomainRecord{}
 	titles := map[string]string{}
 	if len(ids) == 0 {
@@ -370,7 +376,23 @@ func hydrateRecordPage(ctx context.Context, tx *sql.Tx, ids []string) ([]contrac
 	if err != nil {
 		return nil, nil, err
 	}
-	rows, err = tx.QueryContext(ctx, "SELECT record_id,property_id,schema_version,value_json FROM property_values WHERE record_id IN ("+placeholders+") ORDER BY record_id,property_id", args...)
+	valueCondition := ""
+	if needed != nil {
+		propertyIDs := make([]string, 0, len(needed))
+		for id := range needed {
+			propertyIDs = append(propertyIDs, id)
+		}
+		sort.Strings(propertyIDs)
+		if len(propertyIDs) == 0 {
+			valueCondition = " AND 0"
+		} else {
+			valueCondition = " AND property_id IN (" + strings.TrimSuffix(strings.Repeat("?,", len(propertyIDs)), ",") + ")"
+			for _, id := range propertyIDs {
+				args = append(args, id)
+			}
+		}
+	}
+	rows, err = tx.QueryContext(ctx, "SELECT record_id,property_id,schema_version,value_json FROM property_values WHERE record_id IN ("+placeholders+")"+valueCondition+" ORDER BY record_id,property_id", args...)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -421,7 +443,7 @@ func buildRecordQuerySnapshot(ctx context.Context, tx *sql.Tx, plan *recordSQL, 
 		if scanned > querySnapshotRows {
 			return nil, Fail("RESOURCE_EXHAUSTED", "Derived query exceeds 100000 scanned records; narrow the view")
 		}
-		records, titles, err := hydrateRecordPage(ctx, tx, ids)
+		records, titles, err := hydrateRecordProjection(ctx, tx, ids, plan.needed)
 		if err != nil {
 			return nil, err
 		}

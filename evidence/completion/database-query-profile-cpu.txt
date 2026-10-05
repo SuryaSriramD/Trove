@@ -1,0 +1,33 @@
+File: trove-database-profile.test
+Type: cpu
+Time: 2026-10-05 16:23:14 IST
+Duration: 64.55s, Total samples = 82.49s (127.79%)
+Showing nodes accounting for 54.46s, 66.02% of 82.49s total
+Dropped 711 nodes (cum <= 0.41s)
+Showing top 25 nodes out of 114
+      flat  flat%   sum%        cum   cum%
+         0     0%     0%     35.39s 42.90%  testing.tRunner
+         0     0%     0%     35.39s 42.90%  trove.local/phase0/internal/workspace.TestDatabasePerformance10K
+       34s 41.22% 41.22%     34.79s 42.17%  runtime.cgocall
+         0     0% 41.22%     34.23s 41.50%  trove.local/phase0/internal/workspace.(*Kernel).Dispatch
+         0     0% 41.22%     34.20s 41.46%  trove.local/phase0/internal/workspace.dbBenchMeasure
+         0     0% 41.22%     33.76s 40.93%  trove.local/phase0/internal/workspace.queryRecords
+         0     0% 41.22%     33.61s 40.74%  trove.local/phase0/internal/workspace.TestDatabasePerformance10K.func21.2
+         0     0% 41.22%     30.86s 37.41%  database/sql.(*Rows).Next
+         0     0% 41.22%     30.84s 37.39%  database/sql.(*Rows).Next.func1
+     0.02s 0.024% 41.24%     30.84s 37.39%  database/sql.(*Rows).nextLocked
+         0     0% 41.24%     30.77s 37.30%  github.com/mattn/go-sqlite3.(*SQLiteRows).Next
+         0     0% 41.24%     30.53s 37.01%  github.com/mattn/go-sqlite3._Cfunc__sqlite3_step_internal
+         0     0% 41.24%     30.25s 36.67%  github.com/mattn/go-sqlite3.(*SQLiteRows).stepCancellableLocked
+         0     0% 41.24%     30.24s 36.66%  github.com/mattn/go-sqlite3.(*SQLiteRows).stepCancellableLocked.func1 (inline)
+     0.02s 0.024% 41.27%     24.81s 30.08%  runtime.systemstack
+         0     0% 41.27%     20.46s 24.80%  runtime.semawakeup
+     0.02s 0.024% 41.29%     20.43s 24.77%  runtime.wakep
+         0     0% 41.29%     20.42s 24.75%  runtime.notewakeup
+         0     0% 41.29%     20.40s 24.73%  runtime.startm
+    20.38s 24.71% 66.00%     20.39s 24.72%  runtime.pthread_cond_signal
+         0     0% 66.00%     18.93s 22.95%  runtime.schedule
+         0     0% 66.00%     18.91s 22.92%  runtime.mcall
+     0.01s 0.012% 66.01%     18.28s 22.16%  trove.local/phase0/internal/workspace.(*derivedEvaluator).value
+         0     0% 66.01%     16.39s 19.87%  trove.local/phase0/internal/workspace.buildRecordQuerySnapshot
+     0.01s 0.012% 66.02%     16.10s 19.52%  runtime.findRunnable
