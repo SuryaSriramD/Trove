@@ -1,0 +1,441 @@
+{
+  "schemaVersion": 1,
+  "recordedAt": "2026-10-05T13:39:42.031911+00:00",
+  "scope": [
+    "GOV-005",
+    "CORE-005",
+    "REL-002",
+    "REL-003",
+    "REL-009",
+    "C3",
+    "C7",
+    "C8"
+  ],
+  "conclusion": "Mac production capture now uses pinned miniaudio CoreAudio by default. Compile, pre-consent rejection and separate device-free protocol checks pass; actual device and release qualification remain open.",
+  "sourceBase": "f0771236b4d444e9a6fbcb75e9c9702ffe43887e",
+  "sourceSha256": {
+    "native/microphone-worker.cpp": "a48a0fd6fae8c2884a8ee9ffc01d6fd60bcbca3516dad0ad612b4493c70d4256",
+    "native/capture-buffer.hpp": "82a4fee85f0a7656c41f93299340942efcd890c18982d129a124be89d33eea77",
+    "native/capture-startup.hpp": "ff2af2818f029ce26364ea54b0898ffdfdca2d818f7431d4c44871c4a19c191b",
+    "native/microphone.lock.json": "4685e52b419fd2871240c6e53dc2424fe2de40b7c9da4a1844884ec007562da3",
+    "native/worker-platform.hpp": "63c01ffe922631b81805ef18dd9ef562c73505e481d5e3ddc081c023883da8cb",
+    "internal/native/microphone.go": "dfda0795be2898c7b4d384f3722a0c8a371dc0b7908f69af0d163c3281e5ae73",
+    "internal/native/microphone_test.go": "8dc3979fec3a4277d1eec2349d83e1f68836d3396babfed34007d96a73b13648",
+    "internal/native/microphone_portable_test.go": "54239344cca5ef4b81647a235f4a6da2bc4eece3fbd3681e5e8be91443b01f31",
+    "internal/native/microphone_production_test.go": "5faf695b3ba28a7162939cbf1af7b6843ff4463c34692e597d35236d893c1b34",
+    "internal/native/qualification.go": "98ed8eb8f2a0dec0eda4643ec228e627c9b0614cca2704ffa3e406cbd3d43258",
+    "scripts/build-microphone.py": "d7027d8b098d5210dc5911c47cbed9b5c991f15781605d91ca8a57845217b662",
+    "scripts/microphone_bundle.py": "8f964411bbfd5c89d26b7da32012ddef0ae77319019817f3a0ed5a47f5f97abb",
+    "scripts/build-native.py": "345c99c9e82c232554167137e764c1ee4cab9e4bb4329921c2dcb65b14d2a9cb",
+    "scripts/build-desktop.py": "2e9e055e6cb5d92d5662283cb1cf8789cfa563b76a54598d4ff251c73d506f41",
+    "scripts/record-release-provenance.py": "2ac82eefc42861378a2eefe31bb5783a008b5e83502f807da0c10758d3503a0e",
+    "packaging/microphone-info.plist": "f5f81c02960e1cc7e20ac02584da7b26ef48e6cfe62100db7d48e6cc2d8f51f8",
+    "packaging/microphone.entitlements.plist": "9140d2a5939149f3e1c510fbfcdc05317d5c57d8c3cae0c13d57c4f6e87f4993",
+    "tests/test_microphone_bundle.py": "dae034169b6074e9ac0eccda8750eb549b839498fba2fc5d0ff6d59af8f6611c",
+    "tests/test_native_targets.py": "1f12c150d4753b805dcecd22fe2394fc0a088c8ca50e1a51b2f73ef6cdd565a0",
+    "docs/completion/macos-miniaudio.md": "d124b4ad275ea82f4491acc2fcd5c7d1c0f69809464fd90da4c0067dbf720676",
+    "docs/completion/microphone-portability.md": "8ef16e4e50e61cf6aafe3493fb67c04819a32c83e50e66d1092446efad2df1f6",
+    "docs/completion/platform-native-workers.md": "1372c58a36caac204b8a62a5358a2240f1c71f0ea8cf2a46c11c98ad3844af99"
+  },
+  "host": "macOS-27.0.1-arm64-arm-64bit",
+  "goVersion": "go1.27.1 darwin/arm64",
+  "microphoneActivated": false,
+  "productionDeviceCaptureExecuted": false,
+  "productionHelper": {
+    "schemaVersion": 1,
+    "platform": "darwin",
+    "helper": {
+      "name": "microphone-worker",
+      "sha256": "93d5fe87857f503b0fe8656643b0b220562640cff7e777118da77d903bef32fd",
+      "runtime": "microphone",
+      "runtimeCommit": "miniaudio-0.11.25-trove-microphone-v1",
+      "architecture": "arm64"
+    },
+    "testOnly": false,
+    "deviceBackendCompiled": true,
+    "startupStallFixture": false,
+    "capabilities": [
+      "record"
+    ],
+    "permissionState": "not_requested",
+    "deviceState": "not_probed",
+    "deviceQualification": "Unqualified",
+    "runtimeSystemLibraries": [],
+    "sourcePin": {
+      "schemaVersion": 1,
+      "runtimeCommit": "miniaudio-0.11.25-trove-microphone-v1",
+      "version": "0.11.25",
+      "source": "llama.cpp-d2e54583c7452353eb35d40431281f6ee984332f/vendor/miniaudio/miniaudio.h",
+      "headerSha256": "ac7af4de748b7e26b777f37e01cee313a308a7296a3eb080e2906b320cc55c89",
+      "upstream": "https://github.com/mackron/miniaudio",
+      "licenseChoice": "MIT-0",
+      "backends": {
+        "windows-amd64": "WASAPI shared capture",
+        "linux-amd64": "local per-user PulseAudio/PipeWire compatibility socket",
+        "darwin-arm64": "CoreAudio capture after explicit AVCaptureDevice microphone authorization"
+      },
+      "boundedRingFrames": 32768,
+      "output": {
+        "sampleRate": 16000,
+        "channels": 1,
+        "format": "f32le"
+      },
+      "permissionWaitSeconds": 20,
+      "parentStartupDeadlineSeconds": 30
+    },
+    "sourceSha256": {
+      "microphone-worker.cpp": "a48a0fd6fae8c2884a8ee9ffc01d6fd60bcbca3516dad0ad612b4493c70d4256",
+      "capture-buffer.hpp": "82a4fee85f0a7656c41f93299340942efcd890c18982d129a124be89d33eea77",
+      "capture-startup.hpp": "ff2af2818f029ce26364ea54b0898ffdfdca2d818f7431d4c44871c4a19c191b",
+      "worker-platform.hpp": "63c01ffe922631b81805ef18dd9ef562c73505e481d5e3ddc081c023883da8cb"
+    },
+    "macOSConsent": {
+      "implementation": "AVCaptureDevice status/requestAccess before CoreAudio initialization",
+      "permissionWaitSeconds": 20,
+      "deviceQualification": "Unqualified",
+      "embeddedPlistSha256": "f5f81c02960e1cc7e20ac02584da7b26ef48e6cfe62100db7d48e6cc2d8f51f8",
+      "entitlementsSha256": "9140d2a5939149f3e1c510fbfcdc05317d5c57d8c3cae0c13d57c4f6e87f4993"
+    },
+    "commands": [
+      [
+        "clang++",
+        "-x",
+        "objective-c++",
+        "-fobjc-arc",
+        "-fblocks",
+        "-std=c++17",
+        "-O2",
+        "-Wno-deprecated-declarations",
+        "-I/Users/suryasriramduvvuri/Library/Caches/Trove/completion/llama.cpp-d2e54583c7452353eb35d40431281f6ee984332f/vendor",
+        "/Users/suryasriramduvvuri/.codex/worktrees/completion-mac-capture/Trove/native/microphone-worker.cpp",
+        "-lpthread",
+        "-lm",
+        "-o",
+        "/private/tmp/trove-mac-miniaudio-production/microphone-worker",
+        "-arch",
+        "arm64",
+        "-mmacosx-version-min=27.0",
+        "-framework",
+        "CoreFoundation",
+        "-framework",
+        "CoreAudio",
+        "-framework",
+        "AudioToolbox",
+        "-framework",
+        "AVFoundation",
+        "-framework",
+        "Foundation",
+        "-Wl,-sectcreate,__TEXT,__info_plist,/Users/suryasriramduvvuri/.codex/worktrees/completion-mac-capture/Trove/packaging/microphone-info.plist"
+      ]
+    ],
+    "toolchain": {
+      "python": "3.9.6",
+      "compiler": "Apple clang version 21.0.0 (clang-2100.3.34.2)\nTarget: arm64-apple-darwin27.0.0\nThread model: posix\nInstalledDir: /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin\n",
+      "sdk": "27.0"
+    },
+    "dependencies": "/private/tmp/trove-mac-miniaudio-production/microphone-worker:\n\t/usr/lib/libSystem.B.dylib (compatibility version 1.0.0, current version 1359.0.0)\n\t/System/Library/Frameworks/CoreFoundation.framework/Versions/A/CoreFoundation (compatibility version 150.0.0, current version 5027.0.69)\n\t/System/Library/Frameworks/CoreAudio.framework/Versions/A/CoreAudio (compatibility version 1.0.0, current version 1.0.0)\n\t/System/Library/Frameworks/AudioToolbox.framework/Versions/A/AudioToolbox (compatibility version 1.0.0, current version 1000.0.0)\n\t/System/Library/Frameworks/AVFoundation.framework/Versions/A/AVFoundation (compatibility version 1.0.0, current version 2.0.0)\n\t/System/Library/Frameworks/Foundation.framework/Versions/C/Foundation (compatibility version 300.0.0, current version 5027.0.69)\n\t/usr/lib/libobjc.A.dylib (compatibility version 1.0.0, current version 228.0.0)\n\t/usr/lib/libc++.1.dylib (compatibility version 1.0.0, current version 2200.27.0)\n",
+    "host": "macOS-27.0.1-arm64-arm-64bit",
+    "recordedAt": "2026-10-05T13:30:00.441584+00:00"
+  },
+  "deviceFreeFixture": {
+    "schemaVersion": 1,
+    "platform": "darwin",
+    "helper": {
+      "name": "microphone-worker",
+      "sha256": "4748c1e34528cb0ba353b2938c24f4cbe03ee165319a09e3975b25734fe16360",
+      "runtime": "microphone",
+      "runtimeCommit": "miniaudio-0.11.25-trove-microphone-v1-fixture",
+      "architecture": "arm64"
+    },
+    "testOnly": true,
+    "deviceBackendCompiled": false,
+    "startupStallFixture": false,
+    "capabilities": [
+      "record_synthetic"
+    ],
+    "permissionState": "not_requested",
+    "deviceState": "not_probed",
+    "deviceQualification": "Unqualified",
+    "runtimeSystemLibraries": [],
+    "sourcePin": {
+      "schemaVersion": 1,
+      "runtimeCommit": "miniaudio-0.11.25-trove-microphone-v1",
+      "version": "0.11.25",
+      "source": "llama.cpp-d2e54583c7452353eb35d40431281f6ee984332f/vendor/miniaudio/miniaudio.h",
+      "headerSha256": "ac7af4de748b7e26b777f37e01cee313a308a7296a3eb080e2906b320cc55c89",
+      "upstream": "https://github.com/mackron/miniaudio",
+      "licenseChoice": "MIT-0",
+      "backends": {
+        "windows-amd64": "WASAPI shared capture",
+        "linux-amd64": "local per-user PulseAudio/PipeWire compatibility socket",
+        "darwin-arm64": "CoreAudio capture after explicit AVCaptureDevice microphone authorization"
+      },
+      "boundedRingFrames": 32768,
+      "output": {
+        "sampleRate": 16000,
+        "channels": 1,
+        "format": "f32le"
+      },
+      "permissionWaitSeconds": 20,
+      "parentStartupDeadlineSeconds": 30
+    },
+    "sourceSha256": {
+      "microphone-worker.cpp": "a48a0fd6fae8c2884a8ee9ffc01d6fd60bcbca3516dad0ad612b4493c70d4256",
+      "capture-buffer.hpp": "82a4fee85f0a7656c41f93299340942efcd890c18982d129a124be89d33eea77",
+      "capture-startup.hpp": "ff2af2818f029ce26364ea54b0898ffdfdca2d818f7431d4c44871c4a19c191b",
+      "worker-platform.hpp": "63c01ffe922631b81805ef18dd9ef562c73505e481d5e3ddc081c023883da8cb"
+    },
+    "macOSConsent": null,
+    "commands": [
+      [
+        "clang++",
+        "-std=c++17",
+        "-O2",
+        "-Wno-deprecated-declarations",
+        "-I/Users/suryasriramduvvuri/Library/Caches/Trove/completion/llama.cpp-d2e54583c7452353eb35d40431281f6ee984332f/vendor",
+        "/Users/suryasriramduvvuri/.codex/worktrees/completion-mac-capture/Trove/native/microphone-worker.cpp",
+        "-lpthread",
+        "-lm",
+        "-o",
+        "/private/tmp/trove-mac-capture-fixture/microphone-worker",
+        "-DTROVE_CAPTURE_FIXTURE_ONLY",
+        "-arch",
+        "arm64",
+        "-mmacosx-version-min=27.0"
+      ]
+    ],
+    "toolchain": {
+      "python": "3.9.6",
+      "compiler": "Apple clang version 21.0.0 (clang-2100.3.34.2)\nTarget: arm64-apple-darwin27.0.0\nThread model: posix\nInstalledDir: /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin\n",
+      "sdk": "27.0"
+    },
+    "dependencies": "/private/tmp/trove-mac-capture-fixture/microphone-worker:\n\t/usr/lib/libSystem.B.dylib (compatibility version 1.0.0, current version 1359.0.0)\n\t/usr/lib/libc++.1.dylib (compatibility version 1.0.0, current version 2200.27.0)\n",
+    "host": "macOS-27.0.1-arm64-arm-64bit",
+    "recordedAt": "2026-10-05T13:28:08.703814+00:00"
+  },
+  "startupStallFixture": {
+    "schemaVersion": 1,
+    "platform": "darwin",
+    "helper": {
+      "name": "microphone-worker",
+      "sha256": "8ac4539929f8e8b78c78d6b8e665a9a46aa97210517ffd9ef516a91dddb448b7",
+      "runtime": "microphone",
+      "runtimeCommit": "miniaudio-0.11.25-trove-microphone-v1-fixture",
+      "architecture": "arm64"
+    },
+    "testOnly": true,
+    "deviceBackendCompiled": false,
+    "startupStallFixture": true,
+    "capabilities": [
+      "record_synthetic"
+    ],
+    "permissionState": "not_requested",
+    "deviceState": "not_probed",
+    "deviceQualification": "Unqualified",
+    "runtimeSystemLibraries": [],
+    "sourcePin": {
+      "schemaVersion": 1,
+      "runtimeCommit": "miniaudio-0.11.25-trove-microphone-v1",
+      "version": "0.11.25",
+      "source": "llama.cpp-d2e54583c7452353eb35d40431281f6ee984332f/vendor/miniaudio/miniaudio.h",
+      "headerSha256": "ac7af4de748b7e26b777f37e01cee313a308a7296a3eb080e2906b320cc55c89",
+      "upstream": "https://github.com/mackron/miniaudio",
+      "licenseChoice": "MIT-0",
+      "backends": {
+        "windows-amd64": "WASAPI shared capture",
+        "linux-amd64": "local per-user PulseAudio/PipeWire compatibility socket",
+        "darwin-arm64": "CoreAudio capture after explicit AVCaptureDevice microphone authorization"
+      },
+      "boundedRingFrames": 32768,
+      "output": {
+        "sampleRate": 16000,
+        "channels": 1,
+        "format": "f32le"
+      },
+      "permissionWaitSeconds": 20,
+      "parentStartupDeadlineSeconds": 30
+    },
+    "sourceSha256": {
+      "microphone-worker.cpp": "a48a0fd6fae8c2884a8ee9ffc01d6fd60bcbca3516dad0ad612b4493c70d4256",
+      "capture-buffer.hpp": "82a4fee85f0a7656c41f93299340942efcd890c18982d129a124be89d33eea77",
+      "capture-startup.hpp": "ff2af2818f029ce26364ea54b0898ffdfdca2d818f7431d4c44871c4a19c191b",
+      "worker-platform.hpp": "63c01ffe922631b81805ef18dd9ef562c73505e481d5e3ddc081c023883da8cb"
+    },
+    "macOSConsent": null,
+    "commands": [
+      [
+        "clang++",
+        "-std=c++17",
+        "-O2",
+        "-Wno-deprecated-declarations",
+        "-I/Users/suryasriramduvvuri/Library/Caches/Trove/completion/llama.cpp-d2e54583c7452353eb35d40431281f6ee984332f/vendor",
+        "/Users/suryasriramduvvuri/.codex/worktrees/completion-mac-capture/Trove/native/microphone-worker.cpp",
+        "-lpthread",
+        "-lm",
+        "-o",
+        "/private/tmp/trove-mac-capture-stall/microphone-worker",
+        "-DTROVE_CAPTURE_FIXTURE_ONLY",
+        "-DTROVE_CAPTURE_FIXTURE_STARTUP_STALL",
+        "-arch",
+        "arm64",
+        "-mmacosx-version-min=27.0"
+      ]
+    ],
+    "toolchain": {
+      "python": "3.9.6",
+      "compiler": "Apple clang version 21.0.0 (clang-2100.3.34.2)\nTarget: arm64-apple-darwin27.0.0\nThread model: posix\nInstalledDir: /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin\n",
+      "sdk": "27.0"
+    },
+    "dependencies": "/private/tmp/trove-mac-capture-stall/microphone-worker:\n\t/usr/lib/libSystem.B.dylib (compatibility version 1.0.0, current version 1359.0.0)\n\t/usr/lib/libc++.1.dylib (compatibility version 1.0.0, current version 2200.27.0)\n",
+    "host": "macOS-27.0.1-arm64-arm-64bit",
+    "recordedAt": "2026-10-05T13:28:11.955236+00:00"
+  },
+  "legacyMacHelper": {
+    "helper": {
+      "name": "microphone-worker",
+      "sha256": "9940c517026dfad18329843e1bc33ee47d0c67512d5c6f10a819a7753619e448",
+      "runtime": "microphone",
+      "runtimeCommit": "trove-microphone-v1",
+      "architecture": "arm64"
+    },
+    "manifestSha256": "2c0c33f2f7aaf184e4dc798484966c87f59241a8926f922de4be0ad3dd1e6e58",
+    "mode": "synthetic only"
+  },
+  "checks": [
+    {
+      "check": "Mac production CoreAudio helper build and ad-hoc signature/dependency inspection",
+      "result": "PASS",
+      "deviceActivated": false
+    },
+    {
+      "check": "Embedded usage description equals checked-in plist; audio-input entitlement present",
+      "result": "PASS",
+      "embeddedPlistSha256": "f5f81c02960e1cc7e20ac02584da7b26ef48e6cfe62100db7d48e6cc2d8f51f8",
+      "bundleIdentifier": "local.trove.microphone"
+    },
+    {
+      "check": "Production hello and unapproved/synthetic rejection before authorization/device access",
+      "result": "PASS",
+      "assertions": [
+        "APPROVAL_REQUIRED for unapproved recording",
+        "INVALID_INPUT for synthetic recording",
+        "permissionState=not_requested, deviceState=not_accessed, bytes=0"
+      ]
+    },
+    {
+      "check": "Focused native race checks with device-free and pre-consent production paths",
+      "result": "PASS",
+      "topLevelTests": 11,
+      "assertions": [
+        "100 ms fixture writes exactly 6400 bytes",
+        "cancellation retains flushed nonempty PCM smaller than full budget",
+        "parent EOF stops and retains bytes",
+        "startup fixture remains pending until independent deadline or user cancellation",
+        "consent wait supports granted, denied, cancellation and deadline",
+        "production runtime rejects fixture identity",
+        "legacy Swift synthetic helper remains readable"
+      ]
+    },
+    {
+      "check": "Ordinary internal/native race suite",
+      "result": "PASS",
+      "limitations": "Opt-in native/model/device tests skipped by their normal gates"
+    },
+    {
+      "check": "Target/bundle Python tests",
+      "result": "PASS",
+      "tests": 7
+    },
+    {
+      "check": "Modified Python scripts compile",
+      "result": "PASS"
+    },
+    {
+      "check": "Windows amd64 Go native test executable",
+      "result": "CROSS_COMPILED_NOT_EXECUTED",
+      "sha256": "916f10e25727c8405c5edcdd38ad05247760d9dedca8cb74798a9705d40bd146"
+    },
+    {
+      "check": "Linux amd64 Go native test executable",
+      "result": "CROSS_COMPILED_NOT_EXECUTED",
+      "sha256": "12fde5148235cd2724a1227aea1966836246c2ecd96a455b13f459a622e3daa8"
+    },
+    {
+      "check": "Actual microphone/TCC/signed-app/device journeys on all targets",
+      "result": "UNQUALIFIED",
+      "reason": "No microphone authorization/device activation performed; Windows/Linux execution hosts unavailable"
+    }
+  ],
+  "commands": {
+    "production": "python3 scripts/build-microphone.py --target darwin-arm64 --cache <verified-cache> --output <production>",
+    "fixture": "python3 scripts/build-microphone.py --fixture-only --cache <verified-cache> --output <fixture>",
+    "stall": "python3 scripts/build-microphone.py --fixture-only --fixture-startup-stall --cache <verified-cache> --output <stall>",
+    "focused": "TROVE_NATIVE_INTEGRATION=1 TROVE_MICROPHONE_FIXTURE=<fixture> TROVE_MICROPHONE_STARTUP_FIXTURE=<stall> TROVE_MICROPHONE_PRODUCTION=<production> TROVE_MICROPHONE_LEGACY_BUNDLE=<legacy> go test -race ./internal/native -run 'Test(PortableMicrophone|MicrophoneProduction|ProductionMicrophone|RealMicrophone|LegacyMacMicrophone)' -count=1 -v",
+    "ordinary": "go test -race ./internal/native -count=1",
+    "crossCompile": "CGO_ENABLED=0 GOOS=<windows|linux> GOARCH=amd64 go test -c ./internal/native -o <output>",
+    "python": "python3 -m unittest discover -s tests -p <test_microphone_bundle.py|test_native_targets.py> -v"
+  },
+  "logs": [
+    {
+      "path": "evidence/completion/macos-miniaudio-logs/trove-mac-miniaudio-build.log",
+      "sha256": "44ee49d7c3cc8b590ecd6818e8534e717e4b896f840a35af632f766f5c8ee875"
+    },
+    {
+      "path": "evidence/completion/macos-miniaudio-logs/trove-mac-capture-fixture-build.log",
+      "sha256": "f63bc25a331c6d94faf7a584a3a8dd98fdb4562e969dd73a5d79915f398f0ba8"
+    },
+    {
+      "path": "evidence/completion/macos-miniaudio-logs/trove-mac-capture-stall-build.log",
+      "sha256": "07cbea9f0a9fb34475ac61d0d66c0c5e3dfa2a112e2bb6c8922a9043eae13bed"
+    },
+    {
+      "path": "evidence/completion/macos-miniaudio-logs/trove-mac-capture-tests.log",
+      "sha256": "5db3b0ea34e611d00475bab8fe7e4894b11f998c784b1465ac54494543157f73"
+    },
+    {
+      "path": "evidence/completion/macos-miniaudio-logs/trove-mac-capture-native-race.log",
+      "sha256": "075e0dc43814d4de554e0b72f62fe5d8530309b0a9b2b1495359983612dd0c58"
+    },
+    {
+      "path": "evidence/completion/macos-miniaudio-logs/trove-mac-capture-bundle-tests.log",
+      "sha256": "559f2eeb476f9691266783eb9df87de08d173bd8dcc8cf4d8a56732b1bd5f1cb"
+    },
+    {
+      "path": "evidence/completion/macos-miniaudio-logs/trove-mac-capture-target-tests.log",
+      "sha256": "3dae99503227076afaa58652f6b6b9b16b96e4f2fb639d1e18f4cdc530ef2c53"
+    },
+    {
+      "path": "evidence/completion/macos-miniaudio-logs/trove-mac-capture-entitlements.log",
+      "sha256": "c7a170aa2dc6ddb74f5378586f29cf4b809eae8479f219ddae97ccaa694b83ae"
+    },
+    {
+      "path": "evidence/completion/macos-miniaudio-logs/trove-mac-capture-info-plist.json",
+      "sha256": "cfa7b3c283bc820ad0967c4d24df7334662b5cea2372c6c62bb0200f3754a966",
+      "encoding": "JSON rawOutput preserves exact tool output including trailing spaces",
+      "rawOutputSha256": "9ed84dfb0e6c7aff798560ed202764867f2e69119deda406a76265db6637ba36"
+    }
+  ],
+  "notices": [
+    {
+      "name": "microphone-nlohmann-LICENSE.MIT",
+      "sha256": "46a65cffd1ea955132d95a8dd921640714a8d6b537d2e4e482d31145ae95b603"
+    },
+    {
+      "name": "miniaudio-LICENSE.txt",
+      "sha256": "3a0fd41237bf8341d1e4cdd89a52ff4a96228c4fad26e272840ed0ee03efcaf7"
+    }
+  ],
+  "sources": [
+    "https://developer.apple.com/documentation/bundleresources/requesting-authorization-for-media-capture-on-macos",
+    "https://developer.apple.com/documentation/avfoundation/avcapturedevice/requestaccess(for:completionhandler:)",
+    "https://miniaud.io/docs/manual/index.html"
+  ],
+  "open": [
+    "Actual macOS TCC first-use grant, denial/restriction and pending-dialog cancellation",
+    "Signed desktop app/helper authorization attribution on exact packaged candidate",
+    "Real device absence, silence, interruption, long recording and retained recording after app reopen",
+    "Windows/Linux native compilation and execution, device/permission/containment qualification",
+    "Candidate-specific full provenance generation and bundled microphone hash after desktop rebuild",
+    "Performance and power-loss recovery; no benchmark claims from concurrent builds"
+  ]
+}

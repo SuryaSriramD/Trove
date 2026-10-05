@@ -21,18 +21,19 @@ def main():
     parser.add_argument('--cache', type=Path, default=cache_dir())
     parser.add_argument('--output', type=Path, required=True)
     parser.add_argument('--fixture-only', action='store_true', help='compile synthetic fixture with no device backend; never adds a production bundle manifest')
+    parser.add_argument('--fixture-startup-stall', action='store_true', help='test-only stalled startup; requires --fixture-only')
     parser.add_argument('--plan', action='store_true')
     args = parser.parse_args()
+    if args.fixture_startup_stall and not args.fixture_only:
+        parser.error('--fixture-startup-stall requires --fixture-only')
     target = args.target or host_target()
     pin = json.loads((ROOT / 'native/microphone.lock.json').read_text())
     if args.plan:
-        print(json.dumps({'target': target, 'pin': pin, 'fixtureOnly': args.fixture_only,
+        print(json.dumps({'target': target, 'pin': pin, 'fixtureOnly': args.fixture_only, 'startupStallFixture': args.fixture_startup_stall,
             'deviceExecution': 'Unqualified; fixture output never proves device/permission behavior.',
-            'requires': 'Windows x64 MSVC/SDK, or Ubuntu 24.04 GCC/libpulse-dev. Mac builds fixtures only.'}, indent=2))
+            'requires': 'macOS arm64 Xcode/macOS 27 SDK, Windows x64 MSVC/SDK, or Ubuntu 24.04 GCC/libpulse-dev.'}, indent=2))
         return 0
     require_native_host(target)
-    if target == 'darwin-arm64' and not args.fixture_only:
-        raise RuntimeError('Mac production capture keeps its Swift v1 helper; use --fixture-only for this C++ reference.')
     if target == 'linux-amd64':
         release = Path('/etc/os-release').read_text()
         if not re.search(r'^ID=ubuntu$', release, re.M) or not re.search(r'^VERSION_ID="24\.04"$', release, re.M):
@@ -51,6 +52,8 @@ def main():
     filename = 'microphone-worker' + ('.exe' if target == 'windows-amd64' else '')
     binary = output / filename
     flags = [('/D' if target == 'windows-amd64' else '-D') + 'TROVE_CAPTURE_FIXTURE_ONLY'] if args.fixture_only else []
+    if args.fixture_startup_stall:
+        flags += [('/D' if target == 'windows-amd64' else '-D') + 'TROVE_CAPTURE_FIXTURE_STARTUP_STALL']
     toolchain = {'python': platform.python_version()}
     if target == 'windows-amd64':
         toolchain.update({name: os.environ.get(name) for name in ('VCToolsVersion', 'WindowsSDKVersion')})
@@ -72,11 +75,18 @@ def main():
         command = ['clang++' if target == 'darwin-arm64' else 'g++', '-std=c++17', '-O2',
             '-Wno-deprecated-declarations', '-I' + str(source / 'vendor'), str(cpp),
             '-lpthread', '-lm', '-o', str(binary), *flags]
+        if target == 'darwin-arm64':
+            command += ['-arch', 'arm64', '-mmacosx-version-min=27.0']
+            if not args.fixture_only:
+                command[1:1] = ['-x', 'objective-c++', '-fobjc-arc', '-fblocks']
+                command += ['-framework', 'CoreFoundation', '-framework', 'CoreAudio', '-framework', 'AudioToolbox',
+                    '-framework', 'AVFoundation', '-framework', 'Foundation',
+                    '-Wl,-sectcreate,__TEXT,__info_plist,' + str(ROOT / 'packaging/microphone-info.plist')]
         if target == 'linux-amd64' and not args.fixture_only:
             command += ['-lpulse']
     subprocess.run(command, cwd=build, check=True)
     if target == 'darwin-arm64':
-        subprocess.run(['codesign', '--force', '--sign', '-', str(binary)], check=True)
+        subprocess.run(['codesign', '--force', '--sign', '-', *([] if args.fixture_only else ['--entitlements', str(ROOT / 'packaging/microphone.entitlements.plist')]), str(binary)], check=True)
         subprocess.run(['codesign', '--verify', '--strict', str(binary)], check=True)
         dependencies = subprocess.check_output(['otool', '-L', str(binary)], text=True)
         for line in dependencies.splitlines()[1:]:
@@ -98,12 +108,16 @@ def main():
         'runtimeCommit': pin['runtimeCommit'] + ('-fixture' if args.fixture_only else ''),
         'architecture': TARGETS[target]['arch']}
     sidecar = {'schemaVersion': 1, 'platform': TARGETS[target]['os'], 'helper': record,
-        'testOnly': args.fixture_only, 'deviceBackendCompiled': not args.fixture_only,
+        'testOnly': args.fixture_only, 'deviceBackendCompiled': not args.fixture_only, 'startupStallFixture': args.fixture_startup_stall,
         'capabilities': ['record_synthetic'] if args.fixture_only else ['record'],
         'permissionState': 'not_requested', 'deviceState': 'not_probed', 'deviceQualification': 'Unqualified',
         'runtimeSystemLibraries': ['kernel32.dll', 'user32.dll', 'advapi32.dll', 'ole32.dll', 'avrt.dll', 'mmdevapi.dll'] if target == 'windows-amd64' else [],
         'sourcePin': pin, 'sourceSha256': {p.name: file_digest(p) for p in (
-            cpp, ROOT / 'native/capture-buffer.hpp', ROOT / 'native/worker-platform.hpp')},
+            cpp, ROOT / 'native/capture-buffer.hpp', ROOT / 'native/capture-startup.hpp', ROOT / 'native/worker-platform.hpp')},
+        'macOSConsent': {'implementation': 'AVCaptureDevice status/requestAccess before CoreAudio initialization',
+            'permissionWaitSeconds': 20, 'deviceQualification': 'Unqualified',
+            'embeddedPlistSha256': file_digest(ROOT / 'packaging/microphone-info.plist'),
+            'entitlementsSha256': file_digest(ROOT / 'packaging/microphone.entitlements.plist')} if target == 'darwin-arm64' and not args.fixture_only else None,
         'commands': [command], 'toolchain': toolchain, 'dependencies': dependencies, 'host': platform.platform(),
         'recordedAt': datetime.now(timezone.utc).isoformat()}
     (output / ('microphone-fixture.json' if args.fixture_only else 'microphone-worker.json')).write_text(json.dumps(sidecar, indent=2) + '\n')

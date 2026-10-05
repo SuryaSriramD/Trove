@@ -1,0 +1,9 @@
+test_microphone_plans_keep_fixture_device_boundary (test_native_targets.NativeTargets) ... ok
+test_plans_keep_target_execution_unqualified (test_native_targets.NativeTargets) ... ok
+test_portable_isa_and_pinned_sources (test_native_targets.NativeTargets) ... ok
+test_target_builds_require_matching_host (test_native_targets.NativeTargets) ... ok
+
+----------------------------------------------------------------------
+Ran 4 tests in 0.262s
+
+OK
