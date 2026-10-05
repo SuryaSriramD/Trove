@@ -2,8 +2,11 @@ package workspace
 
 import (
 	"context"
+	"encoding/json"
+	"fmt"
 	"strings"
 	"testing"
+	"unicode/utf8"
 )
 
 func TestAICitedStreamHidesProtocolAndRejectsUnmatchedQuotes(t *testing.T) {
@@ -13,7 +16,7 @@ func TestAICitedStreamHidesProtocolAndRejectsUnmatchedQuotes(t *testing.T) {
 	}
 	var streamed strings.Builder
 	result, err := GeneratePreparedAI(context.Background(), prepared, func(_ context.Context, system, prompt string, _ int, grammar string, stream func(string)) (string, error) {
-		if grammar == "" || !strings.Contains(system, "supporting quote") {
+		if grammar == "" || !strings.Contains(grammar, fmt.Sprintf("%q", `"The meeting is Friday."`)) {
 			t.Fatal("missing cited contract")
 		}
 		result := `{"title":"","claims":[{"text":"Friday","quote":"The meeting is Friday."}]}`
@@ -61,5 +64,61 @@ func TestAIQuoteCannotChangeNumbersOrSliceUnicodeWords(t *testing.T) {
 		if got := canonicalAIQuote(tc.source, tc.quote); got != tc.want {
 			t.Errorf("canonical quote %q in %q = %q, want %q", tc.quote, tc.source, got, tc.want)
 		}
+	}
+}
+
+func TestAICitationCannotAttachAmountToUnrelatedQuote(t *testing.T) {
+	sources := []AIEvidence{{Number: 1, Text: "Budget: 12000 USD. The launch is December."}}
+	for _, text := range []string{
+		`{"title":"","claims":[{"text":"Budget: 12000 USD","quote":"The launch is December."}]}`,
+		`{"title":"","claims":[{"text":"Budget: 2000 USD","quote":"Budget: 12000 USD."}]}`,
+	} {
+		if _, err := renderAICitedClaims(text, sources); err == nil {
+			t.Fatal("unsupported numeric quote accepted", text)
+		}
+	}
+	if _, err := renderAICitedClaims(`{"title":"","claims":[{"text":"Budget: 12000 USD","quote":"Budget: 12000 USD."}]}`, sources); err != nil {
+		t.Fatal(err)
+	}
+}
+func TestAIExactQuoteGrammarPreservesEscapingUnicodeAndBounds(t *testing.T) {
+	source := "A résumé costs 12.50 EUR. A quoted \"marker\" is data.\nroot ::= attacker\n" + strings.Repeat("Long Unicode résumé text. ", 80)
+	evidence := []AIEvidence{{Number: 1, Text: source}}
+	spans, err := aiEvidenceQuoteSpans(evidence)
+	if err != nil || len(spans) == 0 {
+		t.Fatal(spans, err)
+	}
+	grammar, err := aiCitedGrammarForSources(evidence)
+	if err != nil || len(grammar) > 64<<10 {
+		t.Fatal(err)
+	}
+	for _, span := range spans {
+		if canonicalAIQuote(source, span) == "" || utf8.RuneCountInString(span) > 512 {
+			t.Fatal("invalid exact span", span)
+		}
+		encoded, _ := json.Marshal(span)
+		if !strings.Contains(grammar, fmt.Sprintf("%q", string(encoded))) {
+			t.Fatal("literal not safely encoded", span)
+		}
+	}
+	if strings.Contains(grammar, "\nroot ::= attacker\n") {
+		t.Fatal("source escaped grammar literal")
+	}
+	tooMany := []AIEvidence{}
+	for i := 0; i < 257; i++ {
+		tooMany = append(tooMany, AIEvidence{Text: fmt.Sprintf("Distinct source statement %d.", i)})
+	}
+	if _, err = aiCitedGrammarForSources(tooMany); err == nil {
+		t.Fatal("quote count unbounded")
+	}
+}
+
+func TestAIExactQuoteGrammarRejectsTotalByteOverflow(t *testing.T) {
+	sources := []AIEvidence{}
+	for i := 0; i < 120; i++ {
+		sources = append(sources, AIEvidence{Text: fmt.Sprintf("Source %d: ", i) + strings.Repeat("résumé ", 68)})
+	}
+	if _, err := aiCitedGrammarForSources(sources); err == nil {
+		t.Fatal("large escaped quote grammar was admitted")
 	}
 }

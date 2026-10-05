@@ -1,0 +1,122 @@
+{
+  "schemaVersion": 1,
+  "recordedAt": "2026-10-05T11:18:40.839737+00:00",
+  "scope": "Bounded AI-002/003 memory/current-authority investigation, not release qualification",
+  "sourceBaseCommit": "573a4770e8e06f7205d65f7e3a26309bcdea33e7",
+  "finalSourceSha256": {
+    "internal/workspace/ai_context.go": "c386ce973aa1c9e0f9ef00de6a8e768bd571787d9c5b6bc9fe7551fa4a2615e1",
+    "internal/workspace/ai_context_test.go": "343e6971b085e0794407366b8bc15ce5b683ce038e1a260cf3feca83fcdcc926",
+    "internal/workspace/ai_generation.go": "9443b3da5d3b832bcb4caa579a9ea2531e439042698990f39a6fc9f7863e37b3",
+    "internal/workspace/ai_generation_test.go": "e1c1a3fcc9110eea53c7ac21763e5b4d1717fd296b82f8aa47d43a21e633006c",
+    "internal/workspace/ai_local_evaluation_test.go": "5a3ffb1d960b58dc3d6c8856fa93af781efed0d063c3413008a7d7ba501f69c1"
+  },
+  "helper": {
+    "command": [
+      "clang++",
+      "-std=c++17",
+      "-O2",
+      "-arch",
+      "arm64",
+      "-mmacosx-version-min=27.0",
+      "-I",
+      "/Users/suryasriramduvvuri/Library/Caches/Trove/completion/llama.cpp-d2e54583c7452353eb35d40431281f6ee984332f/include",
+      "-I",
+      "/Users/suryasriramduvvuri/Library/Caches/Trove/completion/llama.cpp-d2e54583c7452353eb35d40431281f6ee984332f/ggml/include",
+      "-I",
+      "/Users/suryasriramduvvuri/Library/Caches/Trove/completion/llama.cpp-d2e54583c7452353eb35d40431281f6ee984332f/vendor/nlohmann",
+      "/Users/suryasriramduvvuri/.codex/worktrees/completion-tooling/Trove/native/llama-worker.cpp",
+      "/Users/suryasriramduvvuri/Library/Caches/Trove/completion/workspaces/f5e2f63b3b309383/llama-native-build/src/libllama.a",
+      "/Users/suryasriramduvvuri/Library/Caches/Trove/completion/workspaces/f5e2f63b3b309383/llama-native-build/ggml/src/ggml-blas/libggml-blas.a",
+      "/Users/suryasriramduvvuri/Library/Caches/Trove/completion/workspaces/f5e2f63b3b309383/llama-native-build/ggml/src/ggml-metal/libggml-metal.a",
+      "/Users/suryasriramduvvuri/Library/Caches/Trove/completion/workspaces/f5e2f63b3b309383/llama-native-build/ggml/src/libggml-base.a",
+      "/Users/suryasriramduvvuri/Library/Caches/Trove/completion/workspaces/f5e2f63b3b309383/llama-native-build/ggml/src/libggml-cpu.a",
+      "/Users/suryasriramduvvuri/Library/Caches/Trove/completion/workspaces/f5e2f63b3b309383/llama-native-build/ggml/src/libggml.a",
+      "-framework",
+      "Accelerate",
+      "-framework",
+      "Metal",
+      "-framework",
+      "Foundation",
+      "-o",
+      "/private/tmp/trove-completion-native-memory/llama-worker"
+    ],
+    "helperSha256": "e2a14be8524c76491e0b4779604fd33f151905594c1eec96621c79596ca131c3",
+    "sourceSha256": {
+      "native/llama-worker.cpp": "8344aa8a9a1dfc402b84a02eb7c878f8398bc6f176b79c4aa710140539e97beb",
+      "native/worker.hpp": "905771002045a4ec14b56b81ea54c970b5ddc0b18f21d7fbb672c73b2f91d55a"
+    },
+    "librarySha256": {
+      "/Users/suryasriramduvvuri/Library/Caches/Trove/completion/workspaces/f5e2f63b3b309383/llama-native-build/src/libllama.a": "8d3cb0ac894ceef9348439e87166f6aeea65bae2da3a9c8777619b4b9c45fa68",
+      "/Users/suryasriramduvvuri/Library/Caches/Trove/completion/workspaces/f5e2f63b3b309383/llama-native-build/ggml/src/ggml-blas/libggml-blas.a": "093a4475580a142794af309012983f19fa93237bfce1f305883c8e05e844bc4f",
+      "/Users/suryasriramduvvuri/Library/Caches/Trove/completion/workspaces/f5e2f63b3b309383/llama-native-build/ggml/src/ggml-metal/libggml-metal.a": "22e7de6ca2d4b60bb94539acebd6c5d578caa667e70bd22ae232b85190b7f804",
+      "/Users/suryasriramduvvuri/Library/Caches/Trove/completion/workspaces/f5e2f63b3b309383/llama-native-build/ggml/src/libggml-base.a": "6765a5a209e585523f50e75696ca13bd9214d4c758b2aff18b9d0a07cd7cba98",
+      "/Users/suryasriramduvvuri/Library/Caches/Trove/completion/workspaces/f5e2f63b3b309383/llama-native-build/ggml/src/libggml-cpu.a": "6872bbafb6d9aff8d852a0ef1949995e66c6b1860578ca135590e63c6d7c0a79",
+      "/Users/suryasriramduvvuri/Library/Caches/Trove/completion/workspaces/f5e2f63b3b309383/llama-native-build/ggml/src/libggml.a": "ca5274803765eb88e74cf8125fa3b2ce2f188cc110c664ec8882815d271d7c1d"
+    }
+  },
+  "model": {
+    "schemaVersion": 1,
+    "architecture": "arm64",
+    "license": "Apache-2.0",
+    "estimatedMemoryBytes": 3221225472,
+    "id": "01990000-0000-7000-8000-000000000105",
+    "name": "Qwen2.5 1.5B Instruct Q5",
+    "kind": "chat",
+    "format": "gguf",
+    "sha256": "b46661073c18e5b56a41fa320975f866a00def1ff08feef4718e013258896f8c",
+    "sizeBytes": 1285494304,
+    "url": "https://huggingface.co/Qwen/Qwen2.5-1.5B-Instruct-GGUF/resolve/91cad51170dc346986eccefdc2dd33a9da36ead9/qwen2.5-1.5b-instruct-q5_k_m.gguf",
+    "licenseUrl": "https://huggingface.co/Qwen/Qwen2.5-1.5B-Instruct-GGUF/blob/91cad51170dc346986eccefdc2dd33a9da36ead9/LICENSE",
+    "sourceRevision": "91cad51170dc346986eccefdc2dd33a9da36ead9",
+    "runtimeCommit": "d2e54583c7452353eb35d40431281f6ee984332f",
+    "contextTokens": 8192
+  },
+  "installedModelSha256": "b46661073c18e5b56a41fa320975f866a00def1ff08feef4718e013258896f8c",
+  "hardware": {
+    "hw.model": "Mac16,12",
+    "hw.memsize": "25769803776",
+    "machdep.cpu.brand_string": "Apple M4"
+  },
+  "releaseApproved": false,
+  "realModelQualityQualified": false,
+  "realModelAttempts": {
+    "explicitEvidence": "both quality cases fail",
+    "evidenceFirst": "without memory fails; with memory passes earlier incomplete rubric",
+    "exactSpan": "nominal earlier pass invalidated by wrong displayed quote and requested format",
+    "finalStrictRubric": "both quality cases fail; omitted launch in claims. Forget during stream passes."
+  },
+  "finalStrictRubricFactsUnchanged": true,
+  "strengthenedOracle": [
+    "Exact requested/default heading",
+    "Two fact claims plus one heading",
+    "Displayed quote contains the known fact asserted in its claim"
+  ],
+  "productionIntegrityImprovements": [
+    "JSON data boundaries",
+    "Substantive current sources before page titles",
+    "Bounded exact evidence-span quote grammar",
+    "Numeric literal must occur in the displayed supporting quote"
+  ],
+  "limitations": [
+    "Completeness and requested format remain failed on the same Qwen1.5B fixture.",
+    "Matching quotes/numbers does not establish general semantic entailment.",
+    "Peak worker RSS was not captured in this memory rubric.",
+    "All exposed modes, representative corpus and packaged candidate quality remain unqualified.",
+    "Final numeric guard and word-boundary hardening were verified by deterministic regressions after the final model run; no additional quality pass is claimed."
+  ],
+  "evidenceSha256": {
+    "c6-memory-evidence-first.jsonl": "acadad42e987f611f007926c43cc0fcdc6d5124c4ae20ade15359508b8003d95",
+    "c6-memory-exact-span.jsonl": "c8c9fd32fa2b375fdd6c3ece7ef28a4a2051a6c2d79046d05d7c48cdb9d1ec70",
+    "c6-memory-explicit-evidence.jsonl": "d2cde34a7b0b332752710939ec3b82d4602784b4fee5d31a06e0fde45f855368",
+    "c6-memory-final-regressions-fixed.txt": "052e247ddaf4682aa38ec713a062c344fc9069e1fb204b0d82507a96300dbe23",
+    "c6-memory-final-regressions.txt": "41c5c64c31f696210c733686f4de0b99b73d639b619d0e32d75fd8c0462598e9",
+    "c6-memory-final-strict-rubric.jsonl": "20cbca2b655efb5098abb30b59078dbeef9b3c2370fdaed380171eccfc4ff888",
+    "c6-memory-helper.json": "06296e0a41f4b618317626e84d810078590f27eec9da881537cd51a21a6f2919"
+  },
+  "regressions": {
+    "passedTopLevelTests": 32,
+    "failedTests": 0,
+    "race": true,
+    "durationSeconds": 8.458
+  }
+}

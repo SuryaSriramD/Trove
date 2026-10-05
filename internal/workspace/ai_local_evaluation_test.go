@@ -59,8 +59,10 @@ func TestRealLocalMemoryPreferenceAndCurrentAuthority(t *testing.T) {
 			if err != nil {
 				t.Fatal(err)
 			}
+			rawDraft := ""
 			completion, err := GeneratePreparedAI(ctx, prepared, func(ctx context.Context, system, prompt string, tokens int, grammar string, stream func(string)) (string, error) {
 				text, err := s.GenerateTextWithGrammar(ctx, pack, native.ChatPrompt(system, prompt), tokens, grammar, stream)
+				rawDraft = text
 				t.Logf("synthetic fixture generated claims: %s", text)
 				return text, err
 			}, nil)
@@ -109,8 +111,33 @@ func TestRealLocalMemoryPreferenceAndCurrentAuthority(t *testing.T) {
 				}
 			}
 
-			passed := support && current && len(run.Citations) > 0 && run.State == "completed" && preferenceUsed == useMemory
-			report, _ := json.Marshal(map[string]any{"modelPackId": pack, "useMemory": useMemory, "passed": passed, "currentFactsCorrect": current, "fixtureCitationSupportCorrect": support, "preferredHeadingUsed": preferenceUsed, "validCitations": len(run.Citations), "promptTokens": prepared.PromptTokens, "outputTokenCap": prepared.OutputTokens, "citationStrategy": "exact supporting quote", "latencyMs": time.Since(start).Milliseconds(), "answer": run.Text, "peakWorkerRSS": nil, "releaseQualified": false})
+			var draft struct {
+				Title  string `json:"title"`
+				Claims []struct {
+					Text  string `json:"text"`
+					Quote string `json:"quote"`
+				} `json:"claims"`
+			}
+			if err := json.Unmarshal([]byte(rawDraft), &draft); err != nil {
+				t.Fatal(err)
+			}
+			expectedHeading := "Update"
+			if useMemory {
+				expectedHeading = "Status for review"
+			}
+			formatCorrect := draft.Title == expectedHeading && len(draft.Claims) == 2 && len(strings.Split(run.Text, "\n")) == 3
+			quoteSupport := true
+			for _, claim := range draft.Claims {
+				claimText := strings.ToLower(strings.ReplaceAll(claim.Text, ",", ""))
+				quote := strings.ToLower(strings.ReplaceAll(claim.Quote, ",", ""))
+				for _, fact := range []string{"12000", "december"} {
+					if strings.Contains(claimText, fact) && !strings.Contains(quote, fact) {
+						quoteSupport = false
+					}
+				}
+			}
+			passed := quoteSupport && formatCorrect && support && current && len(run.Citations) > 0 && run.State == "completed" && preferenceUsed == useMemory
+			report, _ := json.Marshal(map[string]any{"modelPackId": pack, "useMemory": useMemory, "passed": passed, "currentFactsCorrect": current, "fixtureCitationSupportCorrect": support, "displayedQuoteSupportCorrect": quoteSupport, "requestedFormatCorrect": formatCorrect, "preferredHeadingUsed": preferenceUsed, "validCitations": len(run.Citations), "promptTokens": prepared.PromptTokens, "outputTokenCap": prepared.OutputTokens, "citationStrategy": "exact supporting quote", "latencyMs": time.Since(start).Milliseconds(), "answer": run.Text, "peakWorkerRSS": nil, "releaseQualified": false})
 			t.Log(string(report))
 			if !passed {
 				t.Errorf("fixed memory/current-authority rubric failed: %s", report)

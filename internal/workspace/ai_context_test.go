@@ -2,6 +2,7 @@ package workspace
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"strings"
 	"testing"
@@ -99,5 +100,32 @@ func TestAITruncatedGenerationCannotProduceMutationProposal(t *testing.T) {
 	}
 	if _, err = prepareAIAction(ctx, k, e, map[string]any{"runId": run.ID, "kind": "append"}); err == nil {
 		t.Fatal("partial generation became an approved write")
+	}
+}
+
+func TestAICitedContextDelimitsMetadataAndPrioritizesContent(t *testing.T) {
+	sources := []AIEvidence{{Title: "Misleading title", Text: "Misleading title"}, {Title: "Misleading title", Text: "The delivery is Thursday."}, {Title: "Approved preference", Text: "Use the heading Weekly review.", MemoryID: NewID()}}
+	for _, mode := range []string{"answer", "summarize", "explain"} {
+		prepared, err := prepareAIContext(context.Background(), AIRequest{Mode: mode, Prompt: "Review the delivery"}, sources, nil, "", wordBudget())
+		if err != nil {
+			t.Fatal(err)
+		}
+		if prepared.Run.Sources[0].Text != "The delivery is Thursday." || sources[0].Text != "Misleading title" {
+			t.Fatal("source order or caller mutated")
+		}
+		body, _, _ := strings.Cut(strings.TrimPrefix(prepared.Prompt, "EVIDENCE\n"), "\nUSER REQUEST")
+		lines := strings.Split(strings.TrimSpace(body), "\n")
+		if len(lines) != 3 {
+			t.Fatal(body)
+		}
+		for i, line := range lines {
+			var row map[string]any
+			if json.Unmarshal([]byte(line), &row) != nil || row["text"] != prepared.Run.Sources[i].Text {
+				t.Fatal("evidence text mixed with metadata", line)
+			}
+		}
+		if prepared.PromptTokens+prepared.OutputTokens+16 > wordBudget().ContextTokens {
+			t.Fatal("context budget")
+		}
 	}
 }
