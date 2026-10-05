@@ -417,6 +417,11 @@ func searchQuery(ctx context.Context, k *Kernel, e contracts.ServiceExecutionCon
 	if len(query) > 4096 {
 		return nil, Fail("INVALID_REQUEST", "Search query exceeds 4096 bytes")
 	}
+	if excluded, present := r["excludePageId"]; present {
+		if err := contracts.Validate("domain", "Id", marshal(excluded)); err != nil {
+			return nil, Fail("INVALID_REQUEST", "Invalid internal page exclusion")
+		}
+	}
 	limit := number(r["limit"])
 	if limit == 0 {
 		limit = 30
@@ -478,6 +483,10 @@ func searchQuery(ctx context.Context, k *Kernel, e contracts.ServiceExecutionCon
 	if page := str(r["pageId"]); page != "" {
 		sqlQuery += " AND c.page_id=?"
 		args = append(args, page)
+	}
+	if excluded := str(r["excludePageId"]); excluded != "" {
+		sqlQuery += " AND c.page_id<>?"
+		args = append(args, excluded)
 	}
 	if len(kinds) > 0 {
 		marks := []string{}

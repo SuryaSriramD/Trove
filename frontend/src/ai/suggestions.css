@@ -1,0 +1,35 @@
+.related-suggestions {
+  margin-block: 1rem;
+}
+.related-suggestions section {
+  margin-block: 1rem;
+}
+.related-suggestions h3 {
+  font-size: 1rem;
+  margin-bottom: 0.4rem;
+}
+.related-suggestions .related-source {
+  color: var(--muted, #65717e);
+  font-size: 0.85rem;
+}
+.related-card {
+  border: 1px solid var(--border, #cbd1d7);
+  border-radius: 0.5rem;
+  margin-block: 0.6rem;
+  padding: 0.85rem;
+  overflow-wrap: anywhere;
+}
+.related-card h4 {
+  margin: 0 0 0.3rem;
+}
+.related-card h4 button {
+  font: inherit;
+  font-weight: 600;
+  text-align: left;
+}
+.related-card blockquote {
+  margin: 0.6rem 0;
+  padding-left: 0.75rem;
+  border-left: 3px solid var(--border, #cbd1d7);
+  white-space: pre-wrap;
+}

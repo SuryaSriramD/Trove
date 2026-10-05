@@ -225,6 +225,10 @@ func (k *Kernel) semanticSearch(ctx context.Context, tx *sql.Tx, e contracts.Ser
 		allowed += " AND c.page_id=?"
 		args = append(args, page)
 	}
+	if excluded := str(r["excludePageId"]); excluded != "" {
+		allowed += " AND c.page_id<>?"
+		args = append(args, excluded)
+	}
 	if len(kinds) > 0 {
 		marks := []string{}
 		for _, kind := range []string{"page", "task", "file", "transcript"} {

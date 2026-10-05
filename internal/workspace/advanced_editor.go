@@ -343,12 +343,12 @@ func editorReferences(ctx context.Context, k *Kernel, e contracts.ServiceExecuti
 			}
 		}
 		if title != "" && !linked && strings.Contains(strings.ToLower(text.String()), strings.ToLower(title)) {
-			out = append(out, map[string]any{"pageId": p.id, "title": p.title, "kind": "unlinked", "reason": "Page title occurs in visible text"})
+			out = append(out, map[string]any{"pageId": p.id, "title": p.title, "kind": "unlinked", "sourceRevision": string(result.Page.Revision), "reason": "Page title occurs in visible text"})
 			continue
 		}
 		for _, word := range strings.Fields(strings.ToLower(title)) {
 			if len(word) >= 4 && strings.Contains(strings.ToLower(p.title+" "+text.String()), word) {
-				out = append(out, map[string]any{"pageId": p.id, "title": p.title, "kind": "related", "reason": "Shared term: " + word})
+				out = append(out, map[string]any{"pageId": p.id, "title": p.title, "kind": "related", "sourceRevision": string(result.Page.Revision), "reason": "Shared term: " + word})
 				break
 			}
 		}
