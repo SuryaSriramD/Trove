@@ -5,7 +5,7 @@ export const setLock=(w:WorkspaceSnapshot,p:D.Page,lock:PageLock)=>dispatch<Page
 export type Template={id:string;name:string;sourcePageId:string};
 export const templates=(w:WorkspaceSnapshot)=>dispatch<{templates:Template[]}>('editor.templates',envelope(w));
 export const saveTemplate=(w:WorkspaceSnapshot,p:D.Page,name:string)=>dispatch('editor.saveTemplate',{...envelope(w),pageId:p.id,name,expectedPageRevision:p.revision});
-export type Reference={pageId:string;title:string;kind:'unlinked'|'related';reason:string};
+export type Reference={pageId:string;title:string;kind:'unlinked'|'related';sourceRevision:string;reason:string};
 export const references=(w:WorkspaceSnapshot,pageId:string)=>dispatch<{references:Reference[]}>('editor.references',{...envelope(w),pageId});
 
 export const previewTemplate=(w:WorkspaceSnapshot,templateId:string,title:string,collectionId?:string,propertyDecisions:S.TemplatePropertyDecision[]=[])=>dispatch<S.TemplatePreviewResult>('template.preview',{...envelope(w),templateId,title,...(collectionId?{collectionId}:{}),propertyDecisions});

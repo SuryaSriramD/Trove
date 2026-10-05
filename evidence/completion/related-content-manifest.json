@@ -1,0 +1,55 @@
+{
+  "type": "trove.related-content-evidence/v1",
+  "recorded_at": "2026-10-05T11:37:36.386930+00:00",
+  "source_base": "ce56f122d6970b745108fe51dcf012d462f117a7",
+  "platform": "macOS 27.0.1 (26A434) arm64",
+  "go": "go1.27.1 darwin/arm64",
+  "node": "v25.5.0",
+  "claims": {
+    "race": {
+      "top_level": 25,
+      "subcases": 24,
+      "exit": 0
+    },
+    "browser": {
+      "tests": 7,
+      "exit": 0,
+      "bridge": "controlled fixture"
+    },
+    "typescript_exit": 0,
+    "production_frontend_build_exit": 0,
+    "native_candidate_qualified": false,
+    "real_model_quality_qualified": false
+  },
+  "sha256": {
+    "internal/workspace/ai_advanced.go": "f7e022ab8671d5c0d43eda1df0891e34204eeee0a3f71800f0d3d77d5f322afa",
+    "internal/workspace/search.go": "62586aab00d06c083beb63b7a479455635e65b8a4a413074752f18dff2991e7c",
+    "internal/workspace/search_semantic.go": "cc3af34a43fb2567a691c8cd349c7b0c0e3493c97ca46b0bb5073c5183dedc45",
+    "internal/workspace/advanced_editor.go": "342959203a0d2fa85c07e52d17e24deeaca23b3eeb6f6e4d8419eedec6978dd3",
+    "internal/workspace/p2_intelligence_graph.go": "a4aa08843a6b3c644f03aad8e4e88bcf9a70e092f53e4230b242ee92c1c7c51f",
+    "internal/workspace/related_search.go": "4605de8badf1eea0978f4ec1d420ad253dda9d5612971072df32ae2b0c01e814",
+    "internal/workspace/ai_suggestions_test.go": "43f0a0a9c20a660d0c3123dcf8edf1b1ef7e77465d478d5298ba1e26aaa397c4",
+    "internal/workspace/related_graph_test.go": "c64713ac395cd976c370efb0b3e1e7918c01a184b0eb11dec60d21df2c27d6d3",
+    "frontend/src/ai/Suggestions.tsx": "2da05a8b1c2fdc430070445db79b9ebd369be56f9abbba58517e3645261a800b",
+    "frontend/src/ai/suggestions.css": "c16e81e431d8040abcbc8c799e8c4c5189dadf643da9ba1682078d8e4c013bdd",
+    "frontend/src/advanced/AdvancedPanel.tsx": "7841d4b5ab6e3782c0055f778fd0504c5d0b3767ff55cca58ce1532da944e4b5",
+    "frontend/src/advanced/service.ts": "e42029506bd775462287f34e79bd76d7daad1e998015e845ac3f63d33ea595e7",
+    "frontend/tests/related-fixture.html": "7f66728211fb5df38c0af0e9175967854f80ec8cd99c2fd2376bba7fb5969222",
+    "frontend/tests/related-fixture.tsx": "33c1fedb95e9e84698717cbcb5a0337feea1cda61516f5c4eabd99ef7d3b5792",
+    "frontend/tests/related.browser.spec.ts": "6d07776bf233cbb3dfceb36c20bc408a97829d668ae1e88845b6f9635732a9d1",
+    "evidence/completion/related-content-browser-cold-start.json": "1dddb89b240464d900d013f66bafa58a37e491cfb92d1fe1e44763fcc43dc75b",
+    "evidence/completion/related-content-browser-cold-start.txt": "8a3ffb4dc6b8c4242268fad18472b2f20146379ce676d10f725fa546a957c50c",
+    "evidence/completion/related-content-browser.json": "1022c546613b79d29b71ab1126b600835f54f980bbde244d40c057ecd7de5caf",
+    "evidence/completion/related-content-browser.txt": "3f908f866850a9c32c0f8234155493149e4adf4ddf55ae31fe9eff5610370c75",
+    "evidence/completion/related-content-build.txt": "00d5a42a5a4b3246f5dd31af66979fa09331c4cc314c35a366058f57178f2462",
+    "evidence/completion/related-content-cards.png": "5e37f475970c59ebc0cffed37f40d34d36e93f51b130e9c86ff10b4c4baae467",
+    "evidence/completion/related-content-final-race.jsonl": "966b593893221d05555be95d8a9c94350c8e2218d27c9854b68a6298356daf67",
+    "evidence/completion/related-content-go-initial.jsonl": "0f51db1f752ecfa1303808a0431c202b121ec4379b8a85978dbddc7a4a7225c4",
+    "evidence/completion/related-content-go.jsonl": "1fe8a5d7b7b3cb72e1c7a1c0a2fc07d501e61a45a6467e2dcae83d16dfa2c01f",
+    "evidence/completion/related-content-graph.jsonl": "09d457ea28cfd2f877501b44ef0c4fcccb6b12223c60650511529c26f5463404",
+    "evidence/completion/related-content-race-before-memory-filter.jsonl": "86746ccf964b769c878563bf6cb98a1dd27f7b05b6902d3072bc753e79728f41",
+    "evidence/completion/related-content-race.jsonl": "5ed6f974afb6c2429294f61608a3f2064adb72a13e7ce1be8aecadc8346b195e",
+    "evidence/completion/related-content-typescript.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "docs/completion/related-content.md": "495b5d87294a83a41a722481ca56b8348098e99ebc1520c8bf2ace01461dc811"
+  }
+}

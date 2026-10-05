@@ -1,0 +1,48 @@
+
+Running 7 tests using 1 worker
+
+(node:94501) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✘  1 tests/related.browser.spec.ts:14:1 › editor exposes readable semantic cards only after Find, deduplicates, and resolves before opening (30.5s)
+(node:94686) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓  2 tests/related.browser.spec.ts:65:1 › keyword fallback is labeled and stale sources cannot open (11.5s)
+  ✓  3 tests/related.browser.spec.ts:97:3 › pending suggestions are discarded after Switch page (4.1s)
+  ✓  4 tests/related.browser.spec.ts:97:3 › pending suggestions are discarded after Switch workspace (3.9s)
+  ✓  5 tests/related.browser.spec.ts:97:3 › pending suggestions are discarded after Change grant (4.0s)
+  ✓  6 tests/related.browser.spec.ts:97:3 › pending suggestions are discarded after Edit source (3.4s)
+  ✓  7 tests/related.browser.spec.ts:120:1 › pending citation resolution cannot navigate a replacement page (2.8s)
+
+
+  1) tests/related.browser.spec.ts:14:1 › editor exposes readable semantic cards only after Find, deduplicates, and resolves before opening 
+
+    Test timeout of 30000ms exceeded while running "beforeEach" hook.
+
+       6 |     .click();
+       7 | }
+    >  8 | test.beforeEach(async ({ page }) => {
+         |      ^
+       9 |   await page.goto(
+      10 |     `${process.env.TROVE_TEST_URL ?? "http://127.0.0.1:4173"}/tests/related-fixture.html`,
+      11 |   );
+        at /Users/suryasriramduvvuri/.codex/worktrees/completion-recovery/Trove/frontend/tests/related.browser.spec.ts:8:6
+
+    Error: page.goto: Test timeout of 30000ms exceeded.
+    Call log:
+      - navigating to "http://127.0.0.1:4187/tests/related-fixture.html", waiting until "load"
+
+
+       7 | }
+       8 | test.beforeEach(async ({ page }) => {
+    >  9 |   await page.goto(
+         |              ^
+      10 |     `${process.env.TROVE_TEST_URL ?? "http://127.0.0.1:4173"}/tests/related-fixture.html`,
+      11 |   );
+      12 |   await showRelated(page);
+        at /Users/suryasriramduvvuri/.codex/worktrees/completion-recovery/Trove/frontend/tests/related.browser.spec.ts:9:14
+
+    Error Context: test-results/related.browser-editor-exp-1fb9e-and-resolves-before-opening/error-context.md
+
+  1 failed
+    tests/related.browser.spec.ts:14:1 › editor exposes readable semantic cards only after Find, deduplicates, and resolves before opening 
+  6 passed (1.7m)

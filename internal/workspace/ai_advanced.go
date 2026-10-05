@@ -244,6 +244,8 @@ func prepareAdvancedAI(ctx context.Context, k *Kernel, e contracts.ServiceExecut
 	return Fail("INVALID_REQUEST", "Unknown advanced AI action")
 }
 
+const relatedEligiblePageSQL = `p.deleted_at IS NULL AND NOT EXISTS(SELECT 1 FROM memory_entries m WHERE m.page_id=p.id AND (m.status<>'active' OR EXISTS(SELECT 1 FROM memory_sources ms LEFT JOIN pages evidence ON evidence.id=ms.page_id WHERE ms.memory_id=m.id AND (evidence.id IS NULL OR evidence.deleted_at IS NOT NULL OR evidence.revision<>ms.source_revision))))`
+
 func init() { RegisterQuery("ai.suggestions", aiSuggestions) }
 func aiSuggestions(ctx context.Context, k *Kernel, e contracts.ServiceExecutionContext, r map[string]any) (any, error) {
 	page := str(r["pageId"])
@@ -253,7 +255,7 @@ func aiSuggestions(ctx context.Context, k *Kernel, e contracts.ServiceExecutionC
 	if err := k.FlushSearch(ctx); err != nil {
 		return nil, err
 	}
-	query := `SELECT p.id,p.title,p.revision,COALESCE(group_concat(c.body,' '),'') FROM pages p LEFT JOIN search_chunks c ON c.page_id=p.id AND c.source_revision=p.revision WHERE p.deleted_at IS NULL GROUP BY p.id ORDER BY p.id`
+	query := `SELECT p.id,p.title,p.revision,COALESCE(group_concat(c.body,' '),'') FROM pages p LEFT JOIN search_chunks c ON c.page_id=p.id AND c.source_revision=p.revision WHERE ` + relatedEligiblePageSQL + ` GROUP BY p.id ORDER BY p.id`
 	if _, unrestricted := e.Scope.Value.(contracts.DomainScopeVariant1); unrestricted {
 		query += " LIMIT 1001"
 	}
@@ -294,7 +296,7 @@ func aiSuggestions(ctx context.Context, k *Kernel, e contracts.ServiceExecutionC
 		return nil, err
 	}
 	if source.id == "" {
-		err = k.db.QueryRowContext(ctx, `SELECT p.id,p.title,p.revision,COALESCE(group_concat(c.body,' '),'') FROM pages p LEFT JOIN search_chunks c ON c.page_id=p.id AND c.source_revision=p.revision WHERE p.id=? AND p.deleted_at IS NULL GROUP BY p.id`, page).Scan(&source.id, &source.title, &source.revision, &source.body)
+		err = k.db.QueryRowContext(ctx, `SELECT p.id,p.title,p.revision,COALESCE(group_concat(c.body,' '),'') FROM pages p LEFT JOIN search_chunks c ON c.page_id=p.id AND c.source_revision=p.revision WHERE p.id=? AND `+relatedEligiblePageSQL+` GROUP BY p.id`, page).Scan(&source.id, &source.title, &source.revision, &source.body)
 		if err != nil {
 			return nil, err
 		}
@@ -346,14 +348,114 @@ func aiSuggestions(ctx context.Context, k *Kernel, e contracts.ServiceExecutionC
 	if len(suggestions) > 20 {
 		suggestions = suggestions[:20]
 	}
-	result := map[string]any{"suggestions": suggestions, "method": "deterministic vocabulary and exact duplicate comparison", "partial": partial, "applied": false}
+	omissions := []string{}
+	if partial {
+		omissions = append(omissions, "Vocabulary comparison covers the first 1,000 accessible pages.")
+	}
+	shortened := source.shortened
+	for _, d := range docs {
+		shortened = shortened || d.shortened
+	}
+	if shortened {
+		omissions = append(omissions, "Long page text is limited to 16,000 bytes for vocabulary comparison; shortened pages are not called exact duplicates.")
+	}
+	if live, err := relatedPageCurrent(ctx, k, e, page, source.revision); err != nil {
+		return nil, err
+	} else if !live {
+		return nil, Fail("CONFLICT", "The source page changed or became unavailable. Find related content again.")
+	}
+	result := map[string]any{"suggestions": suggestions, "method": "deterministic vocabulary and exact duplicate comparison", "partial": partial, "applied": false, "sourceRevision": source.revision}
 	if r["semantic"] == true {
-		search, err := searchQuery(ctx, k, e, map[string]any{"query": truncateAI(source.title, 200), "mode": "semantic", "limit": 20})
+		text := strings.TrimSpace(source.title + "\n" + source.body)
+		if len(text) > 4093 {
+			omissions = append(omissions, "Related-content query uses at most 4,096 UTF-8 bytes of the current title and indexed body.")
+		}
+		text = truncateAI(text, 4093) // Leave room for the UTF-8 omission marker.
+		search, err := configuredRelatedSearch(ctx, k, e, text, page, 200)
 		if err != nil {
-			result["semanticDiagnostic"] = err.Error()
+			return nil, err
+		}
+		var currentCursor string
+		if err := k.db.QueryRowContext(ctx, "SELECT COALESCE(MAX(cursor),'0') FROM committed_events").Scan(&currentCursor); err != nil {
+			return nil, err
+		}
+		if search.SnapshotCursor != currentCursor {
+			search.Partial = true
+			omissions = append(omissions, "Workspace content changed during retrieval; results were rechecked and may omit updated sources.")
+		}
+		if len(search.Hits) == 200 {
+			search.Partial = true
+			omissions = append(omissions, "Related-content candidates are limited to the top 200 matching chunks before combining pages.")
+		}
+		seen := map[string]bool{page: true}
+		hits := []SearchHit{}
+		for _, hit := range search.Hits {
+			id := string(hit.Location.PageId)
+			if seen[id] {
+				continue
+			}
+			seen[id] = true
+			if len(hits) == 20 {
+				search.Partial = true
+				omissions = append(omissions, "Showing the first 20 distinct related pages.")
+				break
+			}
+			hit.Excerpt = truncateAI(hit.Excerpt, 600)
+			hits = append(hits, hit)
+		}
+		search.Hits = hits
+		result["semanticBacklinks"] = search
+	}
+	// An embedding call can outlive its input and the lexical candidate scan.
+	// Recheck all outputs using fresh canonical reads and the live grant.
+	if err := k.authorize(e); err != nil {
+		return nil, err
+	}
+
+	if live, err := relatedPageCurrent(ctx, k, e, page, source.revision); err != nil {
+		return nil, err
+	} else if !live {
+		return nil, Fail("CONFLICT", "The source page changed or became unavailable during retrieval. Find related content again.")
+	}
+	removed := false
+	fresh := []map[string]any{}
+	for _, suggestion := range suggestions {
+		live, err := relatedPageCurrent(ctx, k, e, str(suggestion["pageId"]), str(suggestion["sourceRevision"]))
+		if err != nil {
+			return nil, err
+		}
+		if live {
+			fresh = append(fresh, suggestion)
 		} else {
-			result["semanticBacklinks"] = search
+			removed = true
 		}
 	}
+	result["suggestions"] = fresh
+	if search, ok := result["semanticBacklinks"].(SearchResults); ok {
+		fresh := []SearchHit{}
+		for _, hit := range search.Hits {
+			live, err := relatedPageCurrent(ctx, k, e, string(hit.Location.PageId), string(hit.Location.SourceRevision))
+			if err != nil {
+				return nil, err
+			}
+			if live {
+				fresh = append(fresh, hit)
+			} else {
+				removed = true
+			}
+		}
+		search.Hits = fresh
+		result["semanticBacklinks"] = search
+	}
+	if removed {
+		omissions = append(omissions, "Some candidates changed or became unavailable while searching and were omitted.")
+	}
+	if err := k.authorize(e); err != nil {
+		return nil, err
+	}
+	if err := ctx.Err(); err != nil {
+		return nil, err
+	}
+	result["omissions"] = omissions
 	return result, nil
 }
