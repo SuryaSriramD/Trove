@@ -106,3 +106,30 @@ func TestWindowsUnsupportedNativeAdaptersFailBeforeDescriptors(t *testing.T) {
 		t.Fatal("OCR advertised on Windows")
 	}
 }
+
+func TestWindowsPrivateStagingFileOnlyGrantsCurrentUser(t *testing.T) {
+	file, cleanup, err := NewPrivateStagingFile()
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer cleanup()
+	sd, err := windows.GetNamedSecurityInfo(file.Name(), windows.SE_FILE_OBJECT, windows.DACL_SECURITY_INFORMATION)
+	if err != nil {
+		t.Fatal(err)
+	}
+	acl, _, err := sd.DACL()
+	if err != nil || acl == nil || acl.AceCount != 1 {
+		t.Fatalf("derived file inherited unexpected grants: %v", err)
+	}
+	var ace *windows.ACCESS_ALLOWED_ACE
+	if err = windows.GetAce(acl, 0, &ace); err != nil {
+		t.Fatal(err)
+	}
+	user, err := windows.GetCurrentProcessToken().GetTokenUser()
+	if err != nil {
+		t.Fatal(err)
+	}
+	if ace.Header.AceType != windows.ACCESS_ALLOWED_ACE_TYPE || !(*windows.SID)(unsafe.Pointer(&ace.SidStart)).Equals(user.User.Sid) {
+		t.Fatal("derived file accessible by another principal")
+	}
+}

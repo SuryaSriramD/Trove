@@ -1,0 +1,22 @@
+{
+  "target": "windows-amd64",
+  "os": "windows",
+  "arch": "amd64",
+  "host": "Windows",
+  "minimumOS": "Windows 11 x64",
+  "requirements": [
+    "x64 Native Tools command prompt for Visual Studio 2022 or later (MSVC v143 or newer)",
+    "Windows 11 SDK",
+    "Python 3.12+",
+    "CMake 4.3.2",
+    "Ninja",
+    "MSYS2 bash and GNU make on PATH",
+    "NTFS local staging/cache"
+  ],
+  "capture": false,
+  "audioDecoding": "restricted FFmpeg build; target execution unqualified",
+  "ocr": false,
+  "mode": "native host only",
+  "models": "separate portable hash-pinned packs",
+  "qualification": "No platform execution is established by this plan."
+}

@@ -14,6 +14,7 @@ import platform
 import re
 import shutil
 import subprocess
+import sys
 import tarfile
 
 from devtools import cache_dir, file_digest, workspace_cache
@@ -147,14 +148,16 @@ def main():
             helpers.append({'name': name, 'sha256': file_digest(output / filename), 'runtime': runtime + '.cpp',
                 'runtimeCommit': lock['workers'][runtime]['commit'], 'architecture': spec['arch']})
             (output / (filename + '.dependencies.txt')).write_text(deps)
+    subprocess.run([sys.executable, str(ROOT / 'scripts/build-audio-decoder.py'), '--target', target,
+        '--cache', str(cache), '--output', str(output)], check=True)
     shutil.copytree(ROOT / 'native/models', output / 'models')
     retain_notices(output, sources)
     fixtures = output / 'fixtures'; fixtures.mkdir()
     shutil.copyfile(sources['whisper'] / 'samples/jfk.wav', fixtures / 'jfk.wav')
     manifest = {'schemaVersion': 2, 'platform': spec['os'], 'architecture': spec['arch'], 'helpers': helpers,
         'minimumOS': spec['minimumOS'], 'baselineLockSHA256': file_digest(ROOT / 'baseline/baseline.lock.json'),
-        'capabilities': ['generate', 'tokenize', 'embed', 'transcribe', 'image_generate'],
-        'unavailable': ['microphone capture', 'common-format audio decoding', 'OCR', 'native document/PDF helpers'],
+        'capabilities': ['generate', 'tokenize', 'embed', 'transcribe', 'image_generate', 'audio_decode'],
+        'unavailable': ['microphone capture', 'OCR', 'native document/PDF helpers'],
         'executionQualification': 'Not established by build. Run model, protocol, cancellation and packaged desktop checks on this target.'}
     (output / 'manifest.json').write_text(json.dumps(manifest, indent=2) + '\n')
     (output / 'build-provenance.json').write_text(json.dumps({'recordedAt': datetime.now(timezone.utc).isoformat(),

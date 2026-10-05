@@ -1,0 +1,321 @@
+{
+  "schemaVersion": 1,
+  "recordedAt": "2026-10-05T12:25:50.950694+00:00",
+  "scope": "CORE-005/GOV-005 restricted bundled decoder; C7/C8 implementation and Mac reference evidence only",
+  "baseSourceCommit": "05478e8178956f6683f5617127b151254823c897",
+  "sourceIdentity": "Base commit plus the exact file hashes below; package commit reported separately. This is not a frozen public release candidate.",
+  "sourceFileSha256": {
+    "internal/native/audio_decoder.go": "eaac6d77bf6654b9cd420cb1bdcd1e45544cdaef81a0f76e564d63e21efec6cf",
+    "internal/native/audio_decoder_test.go": "21694a1708a5f7ab02604c7eb90ae543b5ee0c12861b751babbf30289486d4d5",
+    "internal/native/audio_protocol_test.go": "8828c764ce6d010836671e19aab28e984c892f513e05ea429a970b9b366fc9fb",
+    "internal/native/platform_windows_test.go": "fc2662e53ca3549511460a3f3432c4acb5bdef58f38e1f0d74c017ed5dc1cdf7",
+    "internal/native/staging.go": "d1b3dbb1320e3fe8169b567290e0da787f98bcd1e0104c3e2ba7eea9a7dbf0db",
+    "internal/native/staging_test.go": "1a19c4043c1899536a349e9d6ec80195fe3b49aea9a891de7895716a01ceeba5",
+    "internal/workers/audio.go": "810ddacee1323d9e4721daf65a73b72356656bfcccb23db61bb815613401ac95",
+    "internal/workers/audio_normalization_test.go": "f086cc63a6bb840663e7201f3ecfab25470429b2b75502293e62a69536598bc0",
+    "native/audio-decoder.cpp": "2dc1bd859dfd4019419cfc58d2b03dfb78db206272b494f6b7a02748b28426ec",
+    "native/audio-decoder.lock.json": "4024bb279c032d8e732fbf48ddb77da9c7c847b1378725da84f126d641c00806",
+    "native/worker-platform.hpp": "63c01ffe922631b81805ef18dd9ef562c73505e481d5e3ddc081c023883da8cb",
+    "scripts/audio_build.py": "2b0e138eb217c4f0ac08d10c163f27f5c9b97c66d7d7b3236f2624ef79ff6253",
+    "scripts/bootstrap.py": "fc0c30525d50800b90aa2ed4752eb66c22f12c97b51bb00256057d3a281b9dc1",
+    "scripts/build-audio-decoder.py": "6a3c67bea1e61c7593171aff4f7f8f426787e9fe1a101e319d4a02e608feff53",
+    "scripts/build-native-portable.py": "79792a678dee2a5aa22ef1d90dd5dfcd2ae395fc40a4c31636e180bd70834f08",
+    "scripts/native_targets.py": "aa6acac61fcb2ed3da780510a59c6ed0f8b7c9d969f76ed8689851bb47713ec1",
+    "scripts/record-release-provenance.py": "85fb1036d4f1b49352a4efa5a503485db996c27df6d96e7d4b2178fc841d38c7",
+    "tests/test_audio_build.py": "e4ce2caf25bd76129a3a37944d1fba21ab2b11a6eef0bc9960e89299dd59c5d9",
+    "tests/test_native_targets.py": "d23788c70b61c43868052df0986da8f1a75af3d97e7d0509fcd5e5e66982f495"
+  },
+  "host": {
+    "system": "ProductName:\t\tmacOS\nProductVersion:\t\t27.0.1\nBuildVersion:\t\t26A434",
+    "model": "Mac16,12",
+    "memoryBytes": 25769803776
+  },
+  "runtimePin": {
+    "schemaVersion": 1,
+    "version": "9.0.2",
+    "runtimeCommit": "ffmpeg-9.0.2-trove-restricted-v1",
+    "url": "https://ffmpeg.org/releases/ffmpeg-9.0.2.tar.gz",
+    "sha256": "84960df915059e8754fef2cd7c9afeb614062b1b5458ec471eecee619ee04e98",
+    "sourceDirectory": "ffmpeg-9.0.2",
+    "signature": "https://ffmpeg.org/releases/ffmpeg-9.0.2.tar.gz.asc",
+    "signingKeyFingerprint": "FCF986EA15E6E293A5644F10B4322F04D67658D8",
+    "demuxers": [
+      "wav",
+      "mp3",
+      "aac",
+      "mov"
+    ],
+    "parsers": [
+      "aac",
+      "mpegaudio"
+    ],
+    "decoders": [
+      "aac",
+      "mp3float",
+      "pcm_u8",
+      "pcm_s16le",
+      "pcm_s24le",
+      "pcm_s32le",
+      "pcm_f32le",
+      "pcm_f64le"
+    ]
+  },
+  "helper": {
+    "schemaVersion": 1,
+    "name": "audio-decoder",
+    "sha256": "8e582101947184849b89596568f89394ba5c88a654511d8f5b2974f290e70719",
+    "sourceSha256": "2dc1bd859dfd4019419cfc58d2b03dfb78db206272b494f6b7a02748b28426ec",
+    "runtime": "FFmpeg",
+    "runtimeCommit": "ffmpeg-9.0.2-trove-restricted-v1",
+    "architecture": "arm64",
+    "platform": "darwin",
+    "capabilities": {
+      "containers": [
+        "WAV",
+        "MP3",
+        "AAC",
+        "M4A"
+      ],
+      "inputChannels": [
+        1,
+        2
+      ],
+      "minimumSampleRate": 8000,
+      "maximumSampleRate": 192000,
+      "outputSampleRate": 16000,
+      "outputChannels": 1,
+      "outputFormat": "f32le",
+      "maximumDurationMs": 7200000,
+      "maximumInputBytes": 536870912,
+      "originalBytesRemainCanonical": true,
+      "networkProtocols": [],
+      "decoders": [
+        "aac",
+        "mp3float",
+        "pcm_u8",
+        "pcm_s16le",
+        "pcm_s24le",
+        "pcm_s32le",
+        "pcm_f32le",
+        "pcm_f64le"
+      ]
+    }
+  },
+  "fixtureManifest": {
+    "path": "internal/native/testdata/audio/manifest.json",
+    "sha256": "9d0d0b86cb3e9cc6a159c3d647bf93304a52d56cecd9608b2e27e1ec15f91004",
+    "files": {
+      "schemaVersion": 1,
+      "source": "Generated one-second 48 kHz stereo sine tones (330 and 660 Hz), no human audio",
+      "authoringTool": "ffmpeg version 9.0.1 Copyright (c) 2000-2026 the FFmpeg developers",
+      "recipe": "scripts/generate-audio-fixtures.py",
+      "commands": [
+        [
+          "ffmpeg",
+          "-nostdin",
+          "-hide_banner",
+          "-loglevel",
+          "error",
+          "-y",
+          "-i",
+          "tones.wav",
+          "-map_metadata",
+          "-1",
+          "-fflags",
+          "+bitexact",
+          "-flags:a",
+          "+bitexact",
+          "-c:a",
+          "libmp3lame",
+          "-b:a",
+          "96k",
+          "tones.mp3"
+        ],
+        [
+          "ffmpeg",
+          "-nostdin",
+          "-hide_banner",
+          "-loglevel",
+          "error",
+          "-y",
+          "-i",
+          "tones.wav",
+          "-map_metadata",
+          "-1",
+          "-fflags",
+          "+bitexact",
+          "-flags:a",
+          "+bitexact",
+          "-c:a",
+          "aac",
+          "-b:a",
+          "96k",
+          "tones.aac"
+        ],
+        [
+          "ffmpeg",
+          "-nostdin",
+          "-hide_banner",
+          "-loglevel",
+          "error",
+          "-y",
+          "-i",
+          "tones.wav",
+          "-map_metadata",
+          "-1",
+          "-fflags",
+          "+bitexact",
+          "-flags:a",
+          "+bitexact",
+          "-c:a",
+          "aac",
+          "-b:a",
+          "96k",
+          "tones.m4a"
+        ]
+      ],
+      "files": [
+        {
+          "name": "tones.aac",
+          "sha256": "45f5712356a5c51b38ffa5fd21a17db7324ab0487052c44dfb6cd39a9af404d2",
+          "bytes": 12429
+        },
+        {
+          "name": "tones.m4a",
+          "sha256": "e56513758c77e88b358283668909c5427d3601b6944c78e167aa6f8941f23d06",
+          "bytes": 13055
+        },
+        {
+          "name": "tones.mp3",
+          "sha256": "a3302a95ec563dc27c869bb54d91e84f2fc52035e92c68670c4113f615492fce",
+          "bytes": 12692
+        },
+        {
+          "name": "tones.wav",
+          "sha256": "a65d70f01669f0a1d53974ee4e3d1a84b25382b1503bb12238df46af968bdf8f",
+          "bytes": 192044
+        }
+      ],
+      "scope": "Codec and normalization behavior; does not establish speech recognition quality"
+    }
+  },
+  "checks": {
+    "native-final": {
+      "status": "PASS",
+      "topLevelTests": 13
+    },
+    "workers-final": {
+      "status": "PASS",
+      "topLevelTests": 7
+    }
+  },
+  "macReference": {
+    "formats": "WAV/MP3/AAC/M4A actual restricted decoder PASS; 48 kHz stereo to finite non-silent mono 16 kHz; original hashes preserved",
+    "hostileInput": "Truncated RIFF, unsupported profile/input, NaN/infinity/over-range source, unknown request properties/version and >4096-byte request rejected",
+    "cancellation": "Actual decoding cancelled after observing output, under two seconds; separate process transport/reap checks passed",
+    "persistence": "Private derived staging success/failure/cancellation cleanup; canonical job original identity and failed-job retry passed",
+    "configuration": "Exact demuxer/parser/decoder allowlist; zero protocols/network/encoders/muxers/filters/devices/hwaccels; static libs and only Apple system dynamic imports",
+    "relink": "Provided object/static libraries successfully relinked; proof binary retained outside distributable kit",
+    "legacy": "CoreAudio sidecars remain accepted only on macOS arm64; new builds use FFmpeg"
+  },
+  "targetCompileOnly": {
+    "windows-amd64": {
+      "path": "/private/tmp/trove-audio-native-windows.test.exe",
+      "sha256": "cea53c5e0d4a39f3a47be4f270a1f70ca9e26777d77d6f510fe7d42cd305bfd7",
+      "format": "/private/tmp/trove-audio-native-windows.test.exe: PE32+ executable (console) x86-64, for MS Windows",
+      "executed": false
+    },
+    "linux-amd64": {
+      "path": "/private/tmp/trove-audio-native-linux.test",
+      "sha256": "c2968918a0a6a92d9456ff5cb8dc6bfe19481c0df402d492ef76d3e8b77bfcc4",
+      "format": "/private/tmp/trove-audio-native-linux.test: ELF 64-bit LSB executable, x86-64, version 1 (SYSV), statically linked, Go BuildID=5O11VCfQOS350DDGThpd/AzYorFc_ZRZM0pofAOlH/VITmOiiCmRgAIH0erzO9/GoKrNDleiPYzlula1ucX, BuildID[sha1]=4f512ff6e16aa5040b6a746816908c69bb15db26, with debug_info, not stripped",
+      "executed": false
+    }
+  },
+  "relinkProof": {
+    "path": "/private/tmp/trove-audio-relinked-proof",
+    "sha256": "91d4048e547f04921aacf4db85df836e05f8d40296de6e1ac1f3df339bf1b7e6"
+  },
+  "retainedEvidence": {
+    "native-final": {
+      "path": "evidence/completion/c7-c8-audio-native-final.log",
+      "sha256": "966f8967c7f4edb24248aa37a02503d2f626da6e89e152d74f1f68b0f3dd59a4"
+    },
+    "workers-final": {
+      "path": "evidence/completion/c7-c8-audio-workers-final.log",
+      "sha256": "05438d7ae63e73da96532c3ee093fccc0afb5fa9f64648fbc77e4da5de7546e0"
+    },
+    "tooling-final": {
+      "path": "evidence/completion/c7-c8-audio-tooling-final.log",
+      "sha256": "551533727839549461ce4d31a2c3a57131966adc3a5f80bbc4247d480f998516"
+    },
+    "build-policy-final": {
+      "path": "evidence/completion/c7-c8-audio-build-policy-final.log",
+      "sha256": "5657c0a4a5dbaed5f32fab2cb0e7f0a40b5d1bdcb126011981b53a3c6b745459"
+    },
+    "build-final": {
+      "path": "evidence/completion/c7-c8-audio-build-final.log",
+      "sha256": "f73ac629b7f057b965d5839c08236e912355e427f7e940afa77686754fd8f219"
+    },
+    "signature": {
+      "path": "evidence/completion/c7-c8-audio-signature.log",
+      "sha256": "22701fca146ead53f39b64162e66e353b1e2c609ff1e2a441e03623065dc5bb1"
+    },
+    "relink": {
+      "path": "evidence/completion/c7-c8-audio-relink.log",
+      "sha256": "cc4cc998a87c1141fd15ab46db4b5dac922d0a0bfe7f3b0c3064d52552a0e0c0"
+    },
+    "initial-build-diagnostics": {
+      "path": "evidence/completion/c7-c8-audio-initial-build-diagnostics.log",
+      "sha256": "fe1ee7640647b1e876f04a8b12c8b89562235715b6fd03131770812337450e68",
+      "originalSHA256": "cfa83d4107f76dc302723b8472398939faffcca8b77b6ec2733e6f2c73244b62",
+      "normalization": "Trailing whitespace stripped; diagnostic text preserved."
+    },
+    "second-build-diagnostics": {
+      "path": "evidence/completion/c7-c8-audio-second-build-diagnostics.log",
+      "sha256": "4a05c398089f1361b508366f00982ec529bcb39c96a248d2084495adeb964c28"
+    },
+    "initial-go-diagnostics": {
+      "path": "evidence/completion/c7-c8-audio-initial-go-diagnostics.log",
+      "sha256": "7892916db106f8a98e6c337ebfd55c77b8404d3784413b0c91da0c84f2cf7c6d"
+    },
+    "windows-plan": {
+      "path": "evidence/completion/c7-c8-audio-windows-plan.json",
+      "sha256": "905ab0c966d42b9ed87f0751d52bbb7a2c412952bfc67106cc18bf7d8b25e218"
+    },
+    "linux-plan": {
+      "path": "evidence/completion/c7-c8-audio-linux-plan.json",
+      "sha256": "5d60bd4ec6c671034ba034ed5fb7a6933a60f3bb0b979105751cf72e4146eb08"
+    },
+    "windows-bundle-plan": {
+      "path": "evidence/completion/c7-c8-audio-windows-bundle-plan.json",
+      "sha256": "4a3226b49ffc0ac886ea23db6aa4224819ac5512545cd126ac8b4ec77991a766"
+    },
+    "linux-bundle-plan": {
+      "path": "evidence/completion/c7-c8-audio-linux-bundle-plan.json",
+      "sha256": "2e0166b862554b1d574ecb88f912895fb53dcaa941f6dd0d0bdc07e1c98a5b20"
+    },
+    "audio-decoder.json": {
+      "path": "evidence/completion/c7-c8-audio-audio-decoder.json",
+      "sha256": "82b73182fd7f973903cb08219e8b64b6c1a53dabedac6ab45b5817af4a87a5cb"
+    },
+    "audio-relink/build-provenance.json": {
+      "path": "evidence/completion/c7-c8-audio-build-provenance.json",
+      "sha256": "add871ddf12dfe231eec52e555ba234b192f7b54b639804452d262bd66bf6f76"
+    },
+    "audio-relink/ffmpeg-configuration.txt": {
+      "path": "evidence/completion/c7-c8-audio-ffmpeg-configuration.txt",
+      "sha256": "6696336c23f9c14251ddb4214c0e82de2ef6b01569145ef23e73463e4be465d6"
+    }
+  },
+  "unqualified": [
+    "Windows/Linux C++ build and real helper execution on target hosts",
+    "Windows Job, inherited-handle and ACL tests executed on Windows",
+    "Independent clean Mac and full packaged workflow qualification",
+    "Actual microphones and representative long/speech datasets",
+    "Platform crash cleanup, full installers/updates and backup portability",
+    "Public signing/notarization and final codec/license distribution review",
+    "No change to failed local model memory or image-quality rubrics"
+  ],
+  "diagnostics": "Initial header-lookup/MAX_INPUT compiler errors and a Go call-signature error are retained. Corrected before final passing checks; no acceptance criteria relaxed."
+}

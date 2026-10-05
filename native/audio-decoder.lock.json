@@ -1,0 +1,13 @@
+{
+  "schemaVersion": 1,
+  "version": "9.0.2",
+  "runtimeCommit": "ffmpeg-9.0.2-trove-restricted-v1",
+  "url": "https://ffmpeg.org/releases/ffmpeg-9.0.2.tar.gz",
+  "sha256": "84960df915059e8754fef2cd7c9afeb614062b1b5458ec471eecee619ee04e98",
+  "sourceDirectory": "ffmpeg-9.0.2",
+  "signature": "https://ffmpeg.org/releases/ffmpeg-9.0.2.tar.gz.asc",
+  "signingKeyFingerprint": "FCF986EA15E6E293A5644F10B4322F04D67658D8",
+  "demuxers": ["wav", "mp3", "aac", "mov"],
+  "parsers": ["aac", "mpegaudio"],
+  "decoders": ["aac", "mp3float", "pcm_u8", "pcm_s16le", "pcm_s24le", "pcm_s32le", "pcm_f32le", "pcm_f64le"]
+}

@@ -1,0 +1,39 @@
+test_archive_cannot_escape_cache (test_devtools.DeveloperToolsTests) ... ok
+test_archive_symlink_is_rejected (test_devtools.DeveloperToolsTests) ... ok
+test_config_survives_runtime_environment_sanitization (test_devtools.DeveloperToolsTests) ... ok
+test_desktop_passes_selected_cache_and_python_to_native_children (test_devtools.DeveloperToolsTests) ... ok
+test_download_hash_failure_preserves_existing_archive (test_devtools.DeveloperToolsTests) ... ok
+test_existing_sources_are_never_overwritten_by_setup (test_devtools.DeveloperToolsTests) ... ok
+test_explicit_cache_overrides_environment (test_devtools.DeveloperToolsTests) ... ok
+test_explicit_go_cache_overrides_are_preserved (test_devtools.DeveloperToolsTests) ... ok
+test_incomplete_cached_go_is_rejected_instead_of_falling_back (test_devtools.DeveloperToolsTests) ... ok
+test_missing_go_reports_bootstrap_action (test_devtools.DeveloperToolsTests) ... ok
+test_models_follow_custom_cache_and_explicit_model_override (test_devtools.DeveloperToolsTests) ... ok
+test_offline_bootstrap_never_fetches_missing_archive (test_devtools.DeveloperToolsTests) ... ok
+test_online_setup_does_not_force_network_policy (test_devtools.DeveloperToolsTests) ... ok
+test_persistent_platform_defaults (test_devtools.DeveloperToolsTests) ... ok
+test_print_environment_path_has_no_filesystem_side_effects (test_devtools.DeveloperToolsTests) ... ok
+test_seed_archive_must_match_pin (test_devtools.DeveloperToolsTests) ... ok
+test_worktrees_have_distinct_native_build_caches (test_devtools.DeveloperToolsTests) ... ok
+test_wrong_go_version_is_rejected (test_devtools.DeveloperToolsTests) ... ok
+
+----------------------------------------------------------------------
+Ran 18 tests in 0.030s
+
+OK
+test_build_policy_excludes_ambient_libraries_and_network (test_audio_build.RestrictedAudioBuild) ... ok
+test_missing_verified_source_fails_offline (test_audio_build.RestrictedAudioBuild) ... ok
+test_unapproved_configuration_is_rejected (test_audio_build.RestrictedAudioBuild) ... ok
+
+----------------------------------------------------------------------
+Ran 3 tests in 0.005s
+
+OK
+test_plans_do_not_claim_unimplemented_capture_or_qualification (test_native_targets.NativeTargets) ... ok
+test_portable_isa_and_pinned_sources (test_native_targets.NativeTargets) ... ok
+test_target_builds_require_matching_host (test_native_targets.NativeTargets) ... ok
+
+----------------------------------------------------------------------
+Ran 3 tests in 0.124s
+
+OK

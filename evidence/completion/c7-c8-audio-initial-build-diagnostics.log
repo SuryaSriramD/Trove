@@ -1,0 +1,547 @@
+install prefix            /usr/local
+source path               /Users/suryasriramduvvuri/Library/Caches/Trove/completion/ffmpeg-9.0.2
+C compiler                clang
+C library
+ARCH                      c (generic)
+big-endian                no
+runtime cpu detection     yes
+debug symbols             no
+strip symbols             yes
+optimize for size         no
+optimizations             yes
+static                    yes
+shared                    no
+network support           no
+threading support         pthreads
+safe bitstream reader     yes
+texi2html enabled         no
+perl enabled              yes
+pod2man enabled           yes
+makeinfo enabled          no
+makeinfo supports HTML    no
+experimental features     yes
+xmllint enabled           yes
+
+External libraries:
+
+External libraries providing hardware acceleration:
+
+Libraries:
+avcodec                 avutil
+avformat                swresample
+
+Programs:
+
+Enabled decoders:
+aac                     pcm_f64le               pcm_s32le
+mp3float                pcm_s16le               pcm_u8
+pcm_f32le               pcm_s24le
+
+Enabled encoders:
+
+Enabled hwaccels:
+
+Enabled parsers:
+aac                     mpegaudio
+
+Enabled demuxers:
+aac                     mp3
+mov                     wav
+
+Enabled muxers:
+
+Enabled protocols:
+
+Enabled filters:
+
+Enabled bsfs:
+
+Enabled indevs:
+
+Enabled outdevs:
+
+License: LGPL version 2.1 or later
+GEN	libavutil/libavutil.version
+GEN	libavcodec/libavcodec.version
+GEN	libavformat/libavformat.version
+GEN	libswresample/libswresample.version
+CC	libavformat/aacdec.o
+CC	libavformat/allformats.o
+CC	libavformat/apetag.o
+CC	libavformat/av1.o
+CC	libavformat/avformat.o
+CC	libavformat/avio.o
+CC	libavformat/aviobuf.o
+CC	libavformat/codecstring.o
+CC	libavformat/demux.o
+CC	libavformat/demux_utils.o
+CC	libavformat/dovi_isom.o
+CC	libavformat/dump.o
+CC	libavformat/dv.o
+CC	libavformat/dvdclut.o
+CC	libavformat/format.o
+CC	libavformat/iamf.o
+CC	libavformat/iamf_parse.o
+CC	libavformat/iamf_reader.o
+CC	libavformat/id3v1.o
+CC	libavformat/id3v2.o
+CC	libavformat/img2.o
+CC	libavformat/isom.o
+CC	libavformat/isom_tags.o
+CC	libavformat/lcevc.o
+CC	libavformat/metadata.o
+CC	libavformat/mov.o
+CC	libavformat/mov_chan.o
+CC	libavformat/mov_esds.o
+CC	libavformat/mp3dec.o
+CC	libavformat/mux.o
+CC	libavformat/mux_utils.o
+CC	libavformat/nal.o
+CC	libavformat/options.o
+CC	libavformat/os_support.o
+CC	libavformat/packet_list.o
+CC	libavformat/pcm.o
+CC	libavformat/protocols.o
+CC	libavformat/qtpalette.o
+CC	libavformat/rawdec.o
+CC	libavformat/replaygain.o
+CC	libavformat/riff.o
+src/libavformat/rawdec.c:106:12: warning: unused function 'raw_data_read_header' [-Wunused-function]
+  106 | static int raw_data_read_header(AVFormatContext *s)
+      |            ^~~~~~~~~~~~~~~~~~~~
+1 warning generated.
+CC	libavformat/riffdec.o
+CC	libavformat/sdp.o
+CC	libavformat/seek.o
+CC	libavformat/url.o
+CC	libavformat/urldecode.o
+CC	libavformat/utils.o
+CC	libavformat/version.o
+CC	libavformat/vpcc.o
+CC	libavformat/wavdec.o
+GEN	libavformat/libavformat.pc
+CC	libavcodec/ac3_channel_layout_tab.o
+CC	libavcodec/h2645_parse.o
+CC	libavcodec/lcevctab.o
+CC	libavcodec/to_upper4.o
+GEN	libavcodec/libavcodec.pc
+CC	libswresample/audioconvert.o
+CC	libswresample/dither.o
+CC	libswresample/options.o
+CC	libswresample/rematrix.o
+CC	libswresample/resample.o
+CC	libswresample/resample_dsp.o
+CC	libswresample/swresample.o
+CC	libswresample/swresample_frame.o
+CC	libswresample/version.o
+GEN	libswresample/libswresample.pc
+CC	libavutil/adler32.o
+CC	libavutil/aes.o
+CC	libavutil/aes_ctr.o
+CC	libavutil/ambient_viewing_environment.o
+CC	libavutil/audio_fifo.o
+CC	libavutil/avsscanf.o
+CC	libavutil/avstring.o
+CC	libavutil/base64.o
+CC	libavutil/blowfish.o
+CC	libavutil/bprint.o
+CC	libavutil/buffer.o
+CC	libavutil/camellia.o
+CC	libavutil/cast5.o
+CC	libavutil/channel_layout.o
+CC	libavutil/container_fifo.o
+CC	libavutil/cpu.o
+CC	libavutil/crc.o
+CC	libavutil/csp.o
+CC	libavutil/des.o
+CC	libavutil/detection_bbox.o
+CC	libavutil/dict.o
+CC	libavutil/display.o
+CC	libavutil/dovi_meta.o
+CC	libavutil/downmix_info.o
+CC	libavutil/encryption_info.o
+CC	libavutil/error.o
+CC	libavutil/eval.o
+CC	libavutil/executor.o
+CC	libavutil/fifo.o
+CC	libavutil/file.o
+CC	libavutil/file_open.o
+CC	libavutil/film_grain_params.o
+CC	libavutil/fixed_dsp.o
+CC	libavutil/float_dsp.o
+CC	libavutil/float_scalarproduct.o
+CC	libavutil/frame.o
+CC	libavutil/hash.o
+CC	libavutil/hdr_dynamic_metadata.o
+CC	libavutil/hdr_dynamic_vivid_metadata.o
+CC	libavutil/hmac.o
+CC	libavutil/hwcontext.o
+CC	libavutil/hwcontext_stub.o
+CC	libavutil/iamf.o
+CC	libavutil/imgutils.o
+CC	libavutil/integer.o
+CC	libavutil/intmath.o
+CC	libavutil/lfg.o
+CC	libavutil/lls.o
+CC	libavutil/log.o
+CC	libavutil/log2_tab.o
+CC	libavutil/lzo.o
+CC	libavutil/mastering_display_metadata.o
+CC	libavutil/mathematics.o
+CC	libavutil/md5.o
+CC	libavutil/mem.o
+CC	libavutil/murmur3.o
+CC	libavutil/opt.o
+CC	libavutil/parseutils.o
+CC	libavutil/pixdesc.o
+CC	libavutil/pixelutils.o
+CC	libavutil/random_seed.o
+CC	libavutil/rational.o
+CC	libavutil/raw_color_params.o
+CC	libavutil/rc4.o
+CC	libavutil/refstruct.o
+CC	libavutil/reverse.o
+CC	libavutil/ripemd.o
+CC	libavutil/samplefmt.o
+CC	libavutil/sha.o
+CC	libavutil/sha512.o
+CC	libavutil/side_data.o
+CC	libavutil/slicethread.o
+CC	libavutil/spherical.o
+CC	libavutil/stereo3d.o
+CC	libavutil/tdrdi.o
+CC	libavutil/tea.o
+CC	libavutil/threadmessage.o
+CC	libavutil/time.o
+CC	libavutil/timecode.o
+CC	libavutil/timecode_internal.o
+CC	libavutil/timestamp.o
+CC	libavutil/tree.o
+CC	libavutil/twofish.o
+CC	libavutil/tx.o
+CC	libavutil/tx_double.o
+CC	libavutil/tx_float.o
+CC	libavutil/tx_int32.o
+CC	libavutil/utils.o
+CC	libavutil/uuid.o
+CC	libavutil/version.o
+CC	libavutil/video_enc_params.o
+CC	libavutil/video_hint.o
+CC	libavutil/xga_font_data.o
+CC	libavutil/xtea.o
+GEN	libavutil/libavutil.pc
+AR	libavformat/libavformat.a
+CC	libavcodec/aac/aacdec.o
+CC	libavcodec/aac/aacdec_ac.o
+CC	libavcodec/aac/aacdec_float.o
+CC	libavcodec/aac/aacdec_lpd.o
+CC	libavcodec/aac/aacdec_tab.o
+CC	libavcodec/aac/aacdec_usac.o
+CC	libavcodec/aac/aacdec_usac_mps212.o
+CC	libavcodec/aac_ac3_parser.o
+src/libavcodec/aac_ac3_parser.c:99:13: warning: variable 'bit_rate' is used uninitialized whenever 'if' condition is true [-Wsometimes-uninitialized]
+   99 |         if (avctx->codec_id != AV_CODEC_ID_AAC) {
+      |             ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+src/libavcodec/aac_ac3_parser.c:167:18: note: uninitialized use occurs here
+  167 |                 (bit_rate - avctx->bit_rate) / s->frame_number;
+      |                  ^~~~~~~~
+src/libavcodec/aac_ac3_parser.c:99:9: note: remove the 'if' if its condition is always false
+   99 |         if (avctx->codec_id != AV_CODEC_ID_AAC) {
+      |         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  100 | #if CONFIG_AC3_PARSER
+      | ~~~~~~~~~~~~~~~~~~~~~
+  101 |             AC3HeaderInfo hdr, *phrd = &hdr;
+      |             ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  102 |             int offset = ff_ac3_find_syncword(buf, buf_size);
+      |             ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  103 |
+  104 |             if (offset < 0)
+      |             ~~~~~~~~~~~~~~~
+  105 |                 return i;
+      |                 ~~~~~~~~~
+  106 |
+  107 |             buf += offset;
+      |             ~~~~~~~~~~~~~~
+  108 |             buf_size -= offset;
+      |             ~~~~~~~~~~~~~~~~~~~
+  109 |             while (buf_size > 0) {
+      |             ~~~~~~~~~~~~~~~~~~~~~~
+  110 |                 int ret = avpriv_ac3_parse_header(&phrd, buf, buf_size);
+      |                 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  111 |
+  112 |                 if (ret < 0 || hdr.frame_size > buf_size)
+      |                 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  113 |                     return i;
+      |                     ~~~~~~~~~
+  114 |
+src/libavcodec/aac_ac3_parser.c:92:21: note: initialize the variable 'bit_rate' to silence this warning
+   92 |         int bit_rate;
+      |                     ^
+      |                      = 0
+1 warning generated.
+CC	libavcodec/aac_parser.o
+CC	libavcodec/aacps_common.o
+CC	libavcodec/aacps_float.o
+CC	libavcodec/aacpsdsp_float.o
+CC	libavcodec/aacsbr.o
+CC	libavcodec/aactab.o
+CC	libavcodec/ac3_parser.o
+CC	libavcodec/adts_header.o
+CC	libavcodec/adts_parser.o
+CC	libavcodec/allcodecs.o
+CC	libavcodec/avcodec.o
+CC	libavcodec/avdct.o
+CC	libavcodec/bitstream.o
+CC	libavcodec/bitstream_filters.o
+CC	libavcodec/bsf.o
+CC	libavcodec/cbrt_data.o
+CC	libavcodec/cbrt_tablegen_common.o
+CC	libavcodec/codec_desc.o
+CC	libavcodec/codec_par.o
+CC	libavcodec/d3d11va.o
+CC	libavcodec/dct32_fixed.o
+CC	libavcodec/dct32_float.o
+CC	libavcodec/decode.o
+CC	libavcodec/dirac.o
+CC	libavcodec/dv_profile.o
+CC	libavcodec/encode.o
+CC	libavcodec/exif.o
+CC	libavcodec/faandct.o
+CC	libavcodec/faanidct.o
+CC	libavcodec/fdctdsp.o
+CC	libavcodec/get_buffer.o
+CC	libavcodec/idctdsp.o
+CC	libavcodec/imgconvert.o
+CC	libavcodec/jfdctfst.o
+CC	libavcodec/jfdctint.o
+CC	libavcodec/jni.o
+CC	libavcodec/jrevdct.o
+CC	libavcodec/kbdwin.o
+CC	libavcodec/mathtables.o
+CC	libavcodec/mediacodec.o
+CC	libavcodec/mpeg12framerate.o
+CC	libavcodec/mpeg4audio.o
+CC	libavcodec/mpeg4audio_sample_rates.o
+CC	libavcodec/mpegaudio.o
+CC	libavcodec/mpegaudio_parser.o
+CC	libavcodec/mpegaudiodata.o
+CC	libavcodec/mpegaudiodec_common.o
+CC	libavcodec/mpegaudiodec_float.o
+CC	libavcodec/mpegaudiodecheader.o
+CC	libavcodec/mpegaudiodsp.o
+CC	libavcodec/mpegaudiodsp_data.o
+CC	libavcodec/mpegaudiodsp_fixed.o
+CC	libavcodec/mpegaudiodsp_float.o
+CC	libavcodec/mpegaudiotabs.o
+CC	libavcodec/options.o
+CC	libavcodec/packet.o
+CC	libavcodec/parser.o
+CC	libavcodec/parsers.o
+CC	libavcodec/pcm.o
+CC	libavcodec/profiles.o
+CC	libavcodec/pthread.o
+CC	libavcodec/pthread_frame.o
+CC	libavcodec/pthread_slice.o
+CC	libavcodec/qsv_api.o
+CC	libavcodec/raw.o
+CC	libavcodec/sbrdsp.o
+CC	libavcodec/simple_idct.o
+CC	libavcodec/sinewin.o
+CC	libavcodec/threadprogress.o
+CC	libavcodec/tiff_common.o
+CC	libavcodec/utils.o
+CC	libavcodec/version.o
+CC	libavcodec/vlc.o
+CC	libavcodec/vorbis_parser.o
+CC	libavcodec/xiph.o
+AR	libswresample/libswresample.a
+AR	libavutil/libavutil.a
+AR	libavcodec/libavcodec.a
+In file included from /Users/suryasriramduvvuri/.codex/worktrees/completion-tooling/Trove/native/audio-decoder.cpp:3:
+In file included from /Users/suryasriramduvvuri/.codex/worktrees/completion-tooling/Trove/native/worker-platform.hpp:2:
+In file included from /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/c++/v1/algorithm:1845:
+In file included from /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/c++/v1/__algorithm/binary_search.h:14:
+In file included from /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/c++/v1/__algorithm/lower_bound.h:14:
+In file included from /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/c++/v1/__algorithm/iterator_operations.h:16:
+In file included from /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/c++/v1/__iterator/advance.h:26:
+In file included from /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/c++/v1/limits:118:
+/Users/suryasriramduvvuri/Library/Caches/Trove/completion/ffmpeg-9.0.2/version:1:1: error: expected unqualified-id
+    1 | 9.0.2
+      | ^
+In file included from /Users/suryasriramduvvuri/.codex/worktrees/completion-tooling/Trove/native/audio-decoder.cpp:3:
+In file included from /Users/suryasriramduvvuri/.codex/worktrees/completion-tooling/Trove/native/worker-platform.hpp:2:
+In file included from /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/c++/v1/algorithm:1845:
+In file included from /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/c++/v1/__algorithm/binary_search.h:14:
+In file included from /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/c++/v1/__algorithm/lower_bound.h:14:
+In file included from /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/c++/v1/__algorithm/iterator_operations.h:16:
+In file included from /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/c++/v1/__iterator/advance.h:26:
+In file included from /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/c++/v1/limits:524:
+In file included from /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/c++/v1/type_traits:568:
+/Users/suryasriramduvvuri/Library/Caches/Trove/completion/ffmpeg-9.0.2/version:1:1: error: expected unqualified-id
+    1 | 9.0.2
+      | ^
+In file included from /Users/suryasriramduvvuri/.codex/worktrees/completion-tooling/Trove/native/audio-decoder.cpp:3:
+In file included from /Users/suryasriramduvvuri/.codex/worktrees/completion-tooling/Trove/native/worker-platform.hpp:2:
+In file included from /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/c++/v1/algorithm:1845:
+In file included from /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/c++/v1/__algorithm/binary_search.h:14:
+In file included from /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/c++/v1/__algorithm/lower_bound.h:14:
+In file included from /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/c++/v1/__algorithm/iterator_operations.h:17:
+In file included from /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/c++/v1/__iterator/distance.h:21:
+In file included from /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/c++/v1/__ranges/concepts.h:36:
+In file included from /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/c++/v1/initializer_list:50:
+/Users/suryasriramduvvuri/Library/Caches/Trove/completion/ffmpeg-9.0.2/version:1:1: error: expected unqualified-id
+    1 | 9.0.2
+      | ^
+In file included from /Users/suryasriramduvvuri/.codex/worktrees/completion-tooling/Trove/native/audio-decoder.cpp:3:
+In file included from /Users/suryasriramduvvuri/.codex/worktrees/completion-tooling/Trove/native/worker-platform.hpp:2:
+In file included from /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/c++/v1/algorithm:1845:
+In file included from /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/c++/v1/__algorithm/binary_search.h:14:
+In file included from /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/c++/v1/__algorithm/lower_bound.h:14:
+In file included from /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/c++/v1/__algorithm/iterator_operations.h:17:
+In file included from /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/c++/v1/__iterator/distance.h:21:
+In file included from /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/c++/v1/__ranges/concepts.h:36:
+In file included from /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/c++/v1/initializer_list:109:
+In file included from /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/c++/v1/cstddef:40:
+/Users/suryasriramduvvuri/Library/Caches/Trove/completion/ffmpeg-9.0.2/version:1:1: error: expected unqualified-id
+    1 | 9.0.2
+      | ^
+In file included from /Users/suryasriramduvvuri/.codex/worktrees/completion-tooling/Trove/native/audio-decoder.cpp:3:
+In file included from /Users/suryasriramduvvuri/.codex/worktrees/completion-tooling/Trove/native/worker-platform.hpp:2:
+In file included from /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/c++/v1/algorithm:1915:
+In file included from /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/c++/v1/__algorithm/shuffle.h:16:
+In file included from /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/c++/v1/__random/uniform_int_distribution.h:20:
+In file included from /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/c++/v1/iosfwd:121:
+/Users/suryasriramduvvuri/Library/Caches/Trove/completion/ffmpeg-9.0.2/version:1:1: error: expected unqualified-id
+    1 | 9.0.2
+      | ^
+In file included from /Users/suryasriramduvvuri/.codex/worktrees/completion-tooling/Trove/native/audio-decoder.cpp:3:
+In file included from /Users/suryasriramduvvuri/.codex/worktrees/completion-tooling/Trove/native/worker-platform.hpp:2:
+In file included from /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/c++/v1/algorithm:2041:
+/Users/suryasriramduvvuri/Library/Caches/Trove/completion/ffmpeg-9.0.2/version:1:1: error: expected unqualified-id
+    1 | 9.0.2
+      | ^
+In file included from /Users/suryasriramduvvuri/.codex/worktrees/completion-tooling/Trove/native/audio-decoder.cpp:3:
+In file included from /Users/suryasriramduvvuri/.codex/worktrees/completion-tooling/Trove/native/worker-platform.hpp:2:
+In file included from /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/c++/v1/algorithm:2057:
+In file included from /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/c++/v1/atomic:605:
+In file included from /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/c++/v1/__atomic/aliases.h:12:
+In file included from /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/c++/v1/__atomic/atomic.h:12:
+In file included from /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/c++/v1/__atomic/atomic_sync.h:16:
+In file included from /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/c++/v1/__chrono/duration.h:23:
+In file included from /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/c++/v1/ratio:91:
+/Users/suryasriramduvvuri/Library/Caches/Trove/completion/ffmpeg-9.0.2/version:1:1: error: expected unqualified-id
+    1 | 9.0.2
+      | ^
+In file included from /Users/suryasriramduvvuri/.codex/worktrees/completion-tooling/Trove/native/audio-decoder.cpp:3:
+In file included from /Users/suryasriramduvvuri/.codex/worktrees/completion-tooling/Trove/native/worker-platform.hpp:2:
+In file included from /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/c++/v1/algorithm:2057:
+In file included from /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/c++/v1/atomic:619:
+/Users/suryasriramduvvuri/Library/Caches/Trove/completion/ffmpeg-9.0.2/version:1:1: error: expected unqualified-id
+    1 | 9.0.2
+      | ^
+In file included from /Users/suryasriramduvvuri/.codex/worktrees/completion-tooling/Trove/native/audio-decoder.cpp:3:
+In file included from /Users/suryasriramduvvuri/.codex/worktrees/completion-tooling/Trove/native/worker-platform.hpp:2:
+In file included from /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/c++/v1/algorithm:2057:
+In file included from /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/c++/v1/atomic:634:
+In file included from /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/c++/v1/cmath:328:
+/Users/suryasriramduvvuri/Library/Caches/Trove/completion/ffmpeg-9.0.2/version:1:1: error: expected unqualified-id
+    1 | 9.0.2
+      | ^
+In file included from /Users/suryasriramduvvuri/.codex/worktrees/completion-tooling/Trove/native/audio-decoder.cpp:3:
+In file included from /Users/suryasriramduvvuri/.codex/worktrees/completion-tooling/Trove/native/worker-platform.hpp:2:
+In file included from /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/c++/v1/algorithm:2057:
+In file included from /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/c++/v1/atomic:635:
+In file included from /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/c++/v1/compare:164:
+/Users/suryasriramduvvuri/Library/Caches/Trove/completion/ffmpeg-9.0.2/version:1:1: error: expected unqualified-id
+    1 | 9.0.2
+      | ^
+In file included from /Users/suryasriramduvvuri/.codex/worktrees/completion-tooling/Trove/native/audio-decoder.cpp:3:
+In file included from /Users/suryasriramduvvuri/.codex/worktrees/completion-tooling/Trove/native/worker-platform.hpp:2:
+In file included from /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/c++/v1/algorithm:2058:
+In file included from /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/c++/v1/bit:87:
+/Users/suryasriramduvvuri/Library/Caches/Trove/completion/ffmpeg-9.0.2/version:1:1: error: expected unqualified-id
+    1 | 9.0.2
+      | ^
+In file included from /Users/suryasriramduvvuri/.codex/worktrees/completion-tooling/Trove/native/audio-decoder.cpp:3:
+In file included from /Users/suryasriramduvvuri/.codex/worktrees/completion-tooling/Trove/native/worker-platform.hpp:2:
+In file included from /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/c++/v1/algorithm:2062:
+In file included from /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/c++/v1/iterator:732:
+/Users/suryasriramduvvuri/Library/Caches/Trove/completion/ffmpeg-9.0.2/version:1:1: error: expected unqualified-id
+    1 | 9.0.2
+      | ^
+In file included from /Users/suryasriramduvvuri/.codex/worktrees/completion-tooling/Trove/native/audio-decoder.cpp:3:
+In file included from /Users/suryasriramduvvuri/.codex/worktrees/completion-tooling/Trove/native/worker-platform.hpp:2:
+In file included from /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/c++/v1/algorithm:2062:
+In file included from /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/c++/v1/iterator:755:
+In file included from /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/c++/v1/variant:274:
+/Users/suryasriramduvvuri/Library/Caches/Trove/completion/ffmpeg-9.0.2/version:1:1: error: expected unqualified-id
+    1 | 9.0.2
+      | ^
+In file included from /Users/suryasriramduvvuri/.codex/worktrees/completion-tooling/Trove/native/audio-decoder.cpp:3:
+In file included from /Users/suryasriramduvvuri/.codex/worktrees/completion-tooling/Trove/native/worker-platform.hpp:2:
+In file included from /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/c++/v1/algorithm:2062:
+In file included from /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/c++/v1/iterator:755:
+In file included from /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/c++/v1/variant:1648:
+In file included from /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/c++/v1/exception:84:
+In file included from /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/c++/v1/__exception/exception_ptr.h:23:
+In file included from /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/c++/v1/typeinfo:69:
+/Users/suryasriramduvvuri/Library/Caches/Trove/completion/ffmpeg-9.0.2/version:1:1: error: expected unqualified-id
+    1 | 9.0.2
+      | ^
+In file included from /Users/suryasriramduvvuri/.codex/worktrees/completion-tooling/Trove/native/audio-decoder.cpp:3:
+In file included from /Users/suryasriramduvvuri/.codex/worktrees/completion-tooling/Trove/native/worker-platform.hpp:2:
+In file included from /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/c++/v1/algorithm:2062:
+In file included from /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/c++/v1/iterator:755:
+In file included from /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/c++/v1/variant:1648:
+In file included from /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/c++/v1/exception:88:
+/Users/suryasriramduvvuri/Library/Caches/Trove/completion/ffmpeg-9.0.2/version:1:1: error: expected unqualified-id
+    1 | 9.0.2
+      | ^
+In file included from /Users/suryasriramduvvuri/.codex/worktrees/completion-tooling/Trove/native/audio-decoder.cpp:3:
+In file included from /Users/suryasriramduvvuri/.codex/worktrees/completion-tooling/Trove/native/worker-platform.hpp:2:
+In file included from /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/c++/v1/algorithm:2062:
+In file included from /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/c++/v1/iterator:755:
+In file included from /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/c++/v1/variant:1648:
+In file included from /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/c++/v1/exception:96:
+In file included from /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/c++/v1/new:112:
+/Users/suryasriramduvvuri/Library/Caches/Trove/completion/ffmpeg-9.0.2/version:1:1: error: expected unqualified-id
+    1 | 9.0.2
+      | ^
+In file included from /Users/suryasriramduvvuri/.codex/worktrees/completion-tooling/Trove/native/audio-decoder.cpp:3:
+In file included from /Users/suryasriramduvvuri/.codex/worktrees/completion-tooling/Trove/native/worker-platform.hpp:2:
+In file included from /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/c++/v1/algorithm:2062:
+In file included from /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/c++/v1/iterator:755:
+In file included from /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/c++/v1/variant:1649:
+In file included from /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/c++/v1/tuple:274:
+/Users/suryasriramduvvuri/Library/Caches/Trove/completion/ffmpeg-9.0.2/version:1:1: error: expected unqualified-id
+    1 | 9.0.2
+      | ^
+In file included from /Users/suryasriramduvvuri/.codex/worktrees/completion-tooling/Trove/native/audio-decoder.cpp:3:
+In file included from /Users/suryasriramduvvuri/.codex/worktrees/completion-tooling/Trove/native/worker-platform.hpp:2:
+In file included from /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/c++/v1/algorithm:2062:
+In file included from /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/c++/v1/iterator:755:
+In file included from /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/c++/v1/variant:1649:
+In file included from /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/c++/v1/tuple:1470:
+In file included from /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/c++/v1/utility:298:
+/Users/suryasriramduvvuri/Library/Caches/Trove/completion/ffmpeg-9.0.2/version:1:1: error: expected unqualified-id
+    1 | 9.0.2
+      | ^
+In file included from /Users/suryasriramduvvuri/.codex/worktrees/completion-tooling/Trove/native/audio-decoder.cpp:3:
+In file included from /Users/suryasriramduvvuri/.codex/worktrees/completion-tooling/Trove/native/worker-platform.hpp:2:
+In file included from /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/c++/v1/algorithm:2063:
+In file included from /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/c++/v1/memory:981:
+/Users/suryasriramduvvuri/Library/Caches/Trove/completion/ffmpeg-9.0.2/version:1:1: error: expected unqualified-id
+    1 | 9.0.2
+      | ^
+fatal error: too many errors emitted, stopping now [-ferror-limit=]
+20 errors generated.
+Traceback (most recent call last):
+  File "/Users/suryasriramduvvuri/.codex/worktrees/completion-tooling/Trove/scripts/build-audio-decoder.py", line 146, in <module>
+    raise SystemExit(main())
+  File "/Users/suryasriramduvvuri/.codex/worktrees/completion-tooling/Trove/scripts/build-audio-decoder.py", line 80, in main
+    run(compile_command); run(link_command)
+  File "/Users/suryasriramduvvuri/.codex/worktrees/completion-tooling/Trove/scripts/build-audio-decoder.py", line 54, in run
+    subprocess.run(commands[-1], cwd=cwd, env=env, check=True)
+  File "/Applications/Xcode.app/Contents/Developer/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/subprocess.py", line 528, in run
+    raise CalledProcessError(retcode, process.args,
+subprocess.CalledProcessError: Command '['clang++', '-std=c++17', '-O2', '-Wno-deprecated-declarations', '-I/Users/suryasriramduvvuri/Library/Caches/Trove/completion/ffmpeg-9.0.2', '-I/Users/suryasriramduvvuri/Library/Caches/Trove/completion/workspaces/57cf2b22a4db9a56/ffmpeg-audio-darwin-arm64', '-I/Users/suryasriramduvvuri/Library/Caches/Trove/completion/llama.cpp-d2e54583c7452353eb35d40431281f6ee984332f/vendor', '-c', '/Users/suryasriramduvvuri/.codex/worktrees/completion-tooling/Trove/native/audio-decoder.cpp', '-o', '/Users/suryasriramduvvuri/Library/Caches/Trove/completion/workspaces/57cf2b22a4db9a56/ffmpeg-audio-darwin-arm64/audio-decoder.o']' returned non-zero exit status 1.

@@ -7,6 +7,8 @@ import (
 	"math"
 	"os"
 	"path/filepath"
+	"runtime"
+	"strings"
 	"testing"
 
 	"trove.local/phase0/contracts"
@@ -36,6 +38,7 @@ func TestNormalizedAudioUsesPrivateOutputAndPreservesOriginal(t *testing.T) {
 			t.Fatal("decoder was not given a separate derived destination")
 		}
 		temporary = out.Name()
+		assertPrivateAudioStaging(t, temporary)
 		var sample [4]byte
 		binary.LittleEndian.PutUint32(sample[:], math.Float32bits(.25))
 		_, err := out.Write(sample[:])
@@ -46,7 +49,7 @@ func TestNormalizedAudioUsesPrivateOutputAndPreservesOriginal(t *testing.T) {
 		t.Fatal(err)
 	}
 	cleanup()
-	if _, err = os.Stat(temporary); !os.IsNotExist(err) {
+	if _, err = os.Stat(filepath.Dir(temporary)); !os.IsNotExist(err) {
 		t.Fatal("normalized file was not removed")
 	}
 	actual, _ := os.ReadFile(source.Name())
@@ -67,6 +70,7 @@ func TestNormalizedAudioFailureAndInvalidSamplesRemovePartialOutput(t *testing.T
 			var temporary string
 			decoder := normalizerFunc(func(ctx context.Context, in, out *os.File) (native.AudioDecodeResult, error) {
 				temporary = out.Name()
+				assertPrivateAudioStaging(t, temporary)
 				var sample [4]byte
 				binary.LittleEndian.PutUint32(sample[:], math.Float32bits(float32(math.NaN())))
 				out.Write(sample[:])
@@ -76,7 +80,7 @@ func TestNormalizedAudioFailureAndInvalidSamplesRemovePartialOutput(t *testing.T
 			if err == nil || (failure != nil && !errors.Is(err, failure)) {
 				t.Fatalf("failed normalization was accepted: %v", err)
 			}
-			if _, err = os.Stat(temporary); !os.IsNotExist(err) {
+			if _, err = os.Stat(filepath.Dir(temporary)); !os.IsNotExist(err) {
 				t.Fatal("failed normalization leaked a partial output")
 			}
 			actual, _ := os.ReadFile(source.Name())
@@ -177,5 +181,71 @@ func TestNormalizedAudioCanonicalJobRetainsOriginalThroughFailureAndRetry(t *tes
 	meeting, _, err := k.ReadMeetingForJob(ctx, owner, draft.MeetingID)
 	if err != nil || meeting.RecordingFileId == nil || string(*meeting.RecordingFileId) != draft.FileID || speech.calls != 1 {
 		t.Fatalf("transcription replaced source identity: %+v %v", meeting, err)
+	}
+}
+
+func assertPrivateAudioStaging(t *testing.T, path string) {
+	t.Helper()
+	dir := filepath.Dir(path)
+	if dir == os.TempDir() || !strings.HasPrefix(filepath.Base(dir), "trove-staging-") {
+		t.Fatal("PCM exposed directly in ambient temp")
+	}
+	info, err := os.Stat(dir)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if runtime.GOOS != "windows" && info.Mode().Perm() != 0700 {
+		t.Fatal("PCM directory is not owner-only")
+	}
+}
+
+func TestNormalizedAudioPCMStagingLifecycle(t *testing.T) {
+	for _, invalid := range []bool{false, true} {
+		t.Run(map[bool]string{false: "success", true: "invalid-float"}[invalid], func(t *testing.T) {
+			parent := t.TempDir()
+			t.Setenv("TMPDIR", parent)
+			t.Setenv("TMP", parent)
+			t.Setenv("TEMP", parent)
+			source, err := os.CreateTemp(t.TempDir(), "source-")
+			if err != nil {
+				t.Fatal(err)
+			}
+			defer source.Close()
+			header := make([]byte, 48)
+			copy(header, "RIFF")
+			binary.LittleEndian.PutUint32(header[4:], 40)
+			copy(header[8:], "WAVEfmt ")
+			binary.LittleEndian.PutUint32(header[16:], 16)
+			binary.LittleEndian.PutUint16(header[20:], 3)
+			binary.LittleEndian.PutUint16(header[22:], 1)
+			binary.LittleEndian.PutUint32(header[24:], 16000)
+			binary.LittleEndian.PutUint32(header[28:], 64000)
+			binary.LittleEndian.PutUint16(header[32:], 4)
+			binary.LittleEndian.PutUint16(header[34:], 32)
+			copy(header[36:], "data")
+			binary.LittleEndian.PutUint32(header[40:], 4)
+			sample := float32(.25)
+			if invalid {
+				sample = float32(math.NaN())
+			}
+			binary.LittleEndian.PutUint32(header[44:], math.Float32bits(sample))
+			source.Write(header)
+			output, cleanup, err := pcmInputContext(context.Background(), source, contracts.DomainFile{OriginalName: "sample.wav"})
+			if (err != nil) != invalid {
+				t.Fatalf("PCM result: %v", err)
+			}
+			if !invalid {
+				assertPrivateAudioStaging(t, output.Name())
+			}
+			cleanup()
+			paths, _ := filepath.Glob(filepath.Join(parent, "trove-staging-*"))
+			if len(paths) != 0 {
+				t.Fatalf("PCM staging leaked: %v", paths)
+			}
+			data, _ := os.ReadFile(source.Name())
+			if string(data) != string(header) {
+				t.Fatal("source PCM changed")
+			}
+		})
 	}
 }

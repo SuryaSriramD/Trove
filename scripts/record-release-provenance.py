@@ -131,7 +131,8 @@ def main():
                 warnings.append('Missing declared license or integrity for installed frontend package: ' + key)
     lock = json.loads((ROOT / 'baseline/baseline.lock.json').read_text())
     native = []
-    for name, pin in lock['workers'].items():
+    native_pins = dict(lock['workers'], **{'ffmpeg-audio': json.loads((ROOT / 'native/audio-decoder.lock.json').read_text())})
+    for name, pin in native_pins.items():
         archive = args.cache / (name + '.tar.gz')
         native.append({'name': name, **pin, 'localArchiveSha256': digest(archive) if archive.exists() else None,
                        'archiveVerified': archive.exists() and digest(archive) == pin['sha256'],
@@ -177,6 +178,7 @@ def main():
     inputs = ['go.mod', 'go.sum', 'frontend/package.json', 'frontend/pnpm-lock.yaml', 'baseline/baseline.lock.json',
               'native/models/catalog.json', 'native/models/provenance.json', 'scripts/record-release-provenance.py',
               'internal/sqlitevec/register.go', 'internal/sqlitevec/upstream.json', 'docs/phase-3/licenses/sources.json',
+              'native/audio-decoder.cpp', 'native/audio-decoder.lock.json', 'scripts/build-audio-decoder.py', 'scripts/audio_build.py',
               'native/vision-worker.cpp', 'scripts/build-vision.py', 'internal/native/vision.go',
               'internal/native/vision_packs.go', 'internal/workspace/image_description.go']
     sources = [p for p in (ROOT / 'schemas').glob('*.sql')]

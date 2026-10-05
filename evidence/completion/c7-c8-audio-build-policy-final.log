@@ -1,0 +1,8 @@
+test_build_policy_excludes_ambient_libraries_and_network (test_audio_build.RestrictedAudioBuild) ... ok
+test_missing_verified_source_fails_offline (test_audio_build.RestrictedAudioBuild) ... ok
+test_unapproved_configuration_is_rejected (test_audio_build.RestrictedAudioBuild) ... ok
+
+----------------------------------------------------------------------
+Ran 3 tests in 0.011s
+
+OK

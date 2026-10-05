@@ -1,6 +1,7 @@
 package native
 
 import (
+	"bytes"
 	"context"
 	"crypto/sha256"
 	"encoding/binary"
@@ -193,4 +194,95 @@ func TestRealAudioDecoderCommonFormats(t *testing.T) {
 			t.Fatalf("unsupported valid WAV profile was not classified correctly: %v", err)
 		}
 	})
+}
+
+func TestAudioDecoderRejectsMalformedDerivedSamples(t *testing.T) {
+	s := audioTestBundle(t, "#!/bin/sh\nprintf '\\000\\000\\300\\177' >&4\nprintf '%s' '{\"schemaVersion\":1,\"bytes\":4,\"frames\":1,\"sampleRate\":16000,\"channels\":1,\"format\":\"f32le\",\"container\":\"WAV\",\"sourceSampleRate\":16000,\"sourceChannels\":1}'\n")
+	if _, err := s.DecodeAudio(context.Background(), audioTestFile(t, []byte("original")), audioTestFile(t, nil)); !errors.Is(err, ErrAudioCorrupt) {
+		t.Fatalf("helper's nonfinite output was accepted: %v", err)
+	}
+}
+
+func TestAudioDecoderBindsRuntimeAndTarget(t *testing.T) {
+	s := audioTestBundle(t, "#!/bin/sh\nexit 0\n")
+	raw, _ := os.ReadFile(filepath.Join(s.bundle, "audio-decoder.json"))
+	var record map[string]any
+	json.Unmarshal(raw, &record)
+	for _, field := range []string{"platform", "architecture", "runtimeCommit", "name"} {
+		t.Run(field, func(t *testing.T) {
+			changed := map[string]any{}
+			for k, v := range record {
+				changed[k] = v
+			}
+			changed[field] = "wrong"
+			data, _ := json.Marshal(changed)
+			os.WriteFile(filepath.Join(s.bundle, "audio-decoder.json"), data, 0600)
+			if _, err := s.audioDecoder(); err == nil {
+				t.Fatal("mismatched helper accepted")
+			}
+		})
+	}
+}
+
+func TestRealAudioDecoderCancellationDuringOutput(t *testing.T) {
+	if os.Getenv("TROVE_NATIVE_INTEGRATION") != "1" {
+		t.Skip("requires real bundled decoder")
+	}
+	s := &Supervisor{bundle: os.Getenv("TROVE_NATIVE_BUNDLE")}
+	// A sparse, valid 192 kHz stereo PCM WAV keeps test RAM bounded while providing
+	// enough decoding work to cancel after observing actual derived output.
+	const dataBytes = 128 << 20
+	header := make([]byte, 44)
+	copy(header, "RIFF")
+	binary.LittleEndian.PutUint32(header[4:], dataBytes+36)
+	copy(header[8:], "WAVEfmt ")
+	binary.LittleEndian.PutUint32(header[16:], 16)
+	binary.LittleEndian.PutUint16(header[20:], 1)
+	binary.LittleEndian.PutUint16(header[22:], 2)
+	binary.LittleEndian.PutUint32(header[24:], 192000)
+	binary.LittleEndian.PutUint32(header[28:], 192000*4)
+	binary.LittleEndian.PutUint16(header[32:], 4)
+	binary.LittleEndian.PutUint16(header[34:], 16)
+	copy(header[36:], "data")
+	binary.LittleEndian.PutUint32(header[40:], dataBytes)
+	input, output := audioTestFile(t, header), audioTestFile(t, nil)
+	if err := input.Truncate(dataBytes + 44); err != nil {
+		t.Fatal(err)
+	}
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+	done := make(chan error, 1)
+	go func() { _, err := s.DecodeAudio(ctx, input, output); done <- err }()
+	ticker := time.NewTicker(time.Millisecond)
+	defer ticker.Stop()
+	observed := false
+	for !observed {
+		select {
+		case err := <-done:
+			t.Fatalf("decode ended before live-output cancellation: %v", err)
+		case <-ctx.Done():
+			t.Fatal("no decoded output observed")
+		case <-ticker.C:
+			stat, _ := output.Stat()
+			if stat.Size() > 0 {
+				observed = true
+			}
+		}
+	}
+	started := time.Now()
+	cancel()
+	select {
+	case err := <-done:
+		if !errors.Is(err, context.Canceled) || time.Since(started) > 2*time.Second {
+			t.Fatalf("actual decoder cancellation: %v", err)
+		}
+	case <-time.After(3 * time.Second):
+		t.Fatal("actual decoder was not reaped")
+	}
+	stat, _ := input.Stat()
+	after := make([]byte, 44)
+	input.ReadAt(after, 0)
+	if stat.Size() != dataBytes+44 || !bytes.Equal(header, after) {
+		t.Fatal("canonical audio changed")
+	}
 }
