@@ -1,0 +1,34 @@
+
+Running 4 tests using 1 worker
+
+(node:34415) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✘  1 tests/document.browser.spec.ts:37:1 › isolated PDF.js extraction preserves physical pages and never executes actions or external requests (1.6s)
+(node:34440) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓  2 tests/document.browser.spec.ts:77:1 › PDF validation counts physical pages without publishing extracted content (1.8s)
+  ✓  3 tests/document.browser.spec.ts:96:1 › malformed and over-limit page catalogues fail without a successful result (2.1s)
+  ✓  4 tests/print.browser.spec.ts:19:1 › isolated rich print document resolves supported content without external requests (2.5s)
+
+
+  1) tests/document.browser.spec.ts:37:1 › isolated PDF.js extraction preserves physical pages and never executes actions or external requests 
+
+    Error: page.goto: net::ERR_CONNECTION_REFUSED at http://127.0.0.1:4214/extract.html
+    Call log:
+      - navigating to "http://127.0.0.1:4214/extract.html", waiting until "load"
+
+
+      58 |     }),
+      59 |   );
+    > 60 |   await page.goto(base + "/extract.html");
+         |              ^
+      61 |   await page.waitForFunction(
+      62 |     () =>
+      63 |       window.troveDocumentStatus?.ready || window.troveDocumentStatus?.error,
+        at /Users/suryasriramduvvuri/.codex/worktrees/completion-pdf-platform/Trove/frontend/tests/document.browser.spec.ts:60:14
+
+    Error Context: test-results/document.browser-isolated--6dafb-ctions-or-external-requests/error-context.md
+
+  1 failed
+    tests/document.browser.spec.ts:37:1 › isolated PDF.js extraction preserves physical pages and never executes actions or external requests 
+  3 passed (17.1s)

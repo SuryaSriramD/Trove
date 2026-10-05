@@ -1,0 +1,51 @@
+# trove.local/phase0/internal/sqlitevec
+internal/sqlitevec/register.go:11:12: warning: 'sqlite3_auto_extension' is deprecated: first deprecated in macOS 10.10 - Process-global auto extensions are not supported on Apple platforms [-Wdeprecated-declarations]
+/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/sqlite3.h:7627:16: note: 'sqlite3_auto_extension' has been explicitly marked deprecated here
+=== RUN   TestDocumentPrivateStagingHashesModeAndSourceRetention
+=== RUN   TestDocumentPrivateStagingHashesModeAndSourceRetention/extract
+=== RUN   TestDocumentPrivateStagingHashesModeAndSourceRetention/render
+--- PASS: TestDocumentPrivateStagingHashesModeAndSourceRetention (0.01s)
+    --- PASS: TestDocumentPrivateStagingHashesModeAndSourceRetention/extract (0.01s)
+    --- PASS: TestDocumentPrivateStagingHashesModeAndSourceRetention/render (0.01s)
+=== RUN   TestDocumentStagingRejectsChangedAssetsBoundsAndCancellation
+--- PASS: TestDocumentStagingRejectsChangedAssetsBoundsAndCancellation (0.01s)
+=== RUN   TestDocumentManifestBindsTargetAndPolicy
+=== RUN   TestDocumentManifestBindsTargetAndPolicy/valid
+=== RUN   TestDocumentManifestBindsTargetAndPolicy/test
+=== RUN   TestDocumentManifestBindsTargetAndPolicy/runtime
+=== RUN   TestDocumentManifestBindsTargetAndPolicy/extension
+=== RUN   TestDocumentManifestBindsTargetAndPolicy/os
+=== RUN   TestDocumentManifestBindsTargetAndPolicy/missing
+=== RUN   TestDocumentManifestBindsTargetAndPolicy/escape
+=== RUN   TestDocumentManifestBindsTargetAndPolicy/collision
+--- PASS: TestDocumentManifestBindsTargetAndPolicy (0.01s)
+    --- PASS: TestDocumentManifestBindsTargetAndPolicy/valid (0.00s)
+    --- PASS: TestDocumentManifestBindsTargetAndPolicy/test (0.00s)
+    --- PASS: TestDocumentManifestBindsTargetAndPolicy/runtime (0.00s)
+    --- PASS: TestDocumentManifestBindsTargetAndPolicy/extension (0.00s)
+    --- PASS: TestDocumentManifestBindsTargetAndPolicy/os (0.00s)
+    --- PASS: TestDocumentManifestBindsTargetAndPolicy/missing (0.00s)
+    --- PASS: TestDocumentManifestBindsTargetAndPolicy/escape (0.00s)
+    --- PASS: TestDocumentManifestBindsTargetAndPolicy/collision (0.00s)
+=== RUN   TestDocumentProcessCancellationAndOutputBound
+--- PASS: TestDocumentProcessCancellationAndOutputBound (0.08s)
+=== RUN   TestDocumentUnverifiedProcessExitRetainsProfile
+--- PASS: TestDocumentUnverifiedProcessExitRetainsProfile (0.01s)
+PASS
+ok  	trove.local/phase0/internal/native	1.801s
+=== RUN   TestRichPDFExportRequiresOwnerAndBundledAssets
+--- PASS: TestRichPDFExportRequiresOwnerAndBundledAssets (0.29s)
+=== RUN   TestSearchExtractionJobPersistsAndIndexesFile
+--- PASS: TestSearchExtractionJobPersistsAndIndexesFile (0.11s)
+=== RUN   TestDocumentAllowlistAndReadableExtraction
+=== RUN   TestDocumentAllowlistAndReadableExtraction/a.md
+=== RUN   TestDocumentAllowlistAndReadableExtraction/a.csv
+=== RUN   TestDocumentAllowlistAndReadableExtraction/a.html
+--- PASS: TestDocumentAllowlistAndReadableExtraction (0.01s)
+    --- PASS: TestDocumentAllowlistAndReadableExtraction/a.md (0.00s)
+    --- PASS: TestDocumentAllowlistAndReadableExtraction/a.csv (0.00s)
+    --- PASS: TestDocumentAllowlistAndReadableExtraction/a.html (0.00s)
+=== RUN   TestDocumentPDFTextLayerAndIntegrity
+--- PASS: TestDocumentPDFTextLayerAndIntegrity (0.43s)
+PASS
+ok  	trove.local/phase0/internal/workspace	2.574s

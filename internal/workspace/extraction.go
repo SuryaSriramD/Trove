@@ -10,6 +10,7 @@ import (
 	"encoding/hex"
 	"encoding/json"
 	"encoding/xml"
+	"errors"
 	"fmt"
 	"golang.org/x/net/html"
 	"io"
@@ -19,6 +20,7 @@ import (
 	"strings"
 	"time"
 	"trove.local/phase0/contracts"
+	"trove.local/phase0/internal/native"
 	"unicode/utf8"
 )
 
@@ -324,8 +326,33 @@ func (w *limitedDocumentOutput) Write(p []byte) (int, error) {
 	}
 	return w.Buffer.Write(p)
 }
-func extractPDF(ctx context.Context, f *os.File) (DocumentExtraction, error) {
-	out := DocumentExtraction{Sections: []DocumentSection{}}
+func extractPDF(ctx context.Context, f *os.File) (out DocumentExtraction, resultErr error) {
+	out = DocumentExtraction{Sections: []DocumentSection{}}
+	ctx, cancel := context.WithTimeout(ctx, 2*time.Minute)
+	defer cancel()
+	portable, err := native.FindDocumentHelper(ctx)
+	if err != nil {
+		return out, Fail("INTEGRITY_ERROR", "Document helper validation failed: "+err.Error())
+	}
+	if portable != nil {
+		job, err := portable.NewJob(ctx, "extract")
+		if err != nil {
+			return out, err
+		}
+		defer func() { resultErr = errors.Join(resultErr, job.Close()) }()
+		if _, err = f.Seek(0, io.SeekStart); err != nil {
+			return out, err
+		}
+		if err = job.AddFile(ctx, "input.pdf", f, maxDocumentBytes, ""); err != nil {
+			return out, err
+		}
+		stdout := &limitedDocumentOutput{limit: maxExtractedBytes}
+		if err = job.Run(ctx, stdout); err != nil {
+			return out, err
+		}
+		return parsePDFText(stdout.Bytes())
+	}
+
 	executable, _ := os.Executable()
 	candidates := []string{os.Getenv("TROVE_DOCUMENT_EXTRACTOR")}
 	if bundle := os.Getenv("TROVE_NATIVE_BUNDLE"); bundle != "" {
@@ -379,16 +406,8 @@ func extractPDF(ctx context.Context, f *os.File) (DocumentExtraction, error) {
 		}
 	}
 	if tool == "" {
-		if candidate, err := exec.LookPath("pdftotext"); err == nil {
-			tool = candidate
-			args = []string{"-layout", "-enc", "UTF-8", "-", "-"}
-		}
-	}
-	if tool == "" {
 		return out, Fail("WORKER_FAILED", "PDF extractor is unavailable. Install the complete Trove application and retry; the original PDF is retained.")
 	}
-	ctx, cancel := context.WithTimeout(ctx, 2*time.Minute)
-	defer cancel()
 	command := exec.CommandContext(ctx, tool, args...)
 	command.Stdin = f
 	stdout := &limitedDocumentOutput{limit: maxExtractedBytes}
@@ -401,11 +420,22 @@ func extractPDF(ctx context.Context, f *os.File) (DocumentExtraction, error) {
 		}
 		return out, Fail("WORKER_FAILED", "PDF extraction failed; encrypted, damaged, or unsupported PDF. Original retained. "+strings.TrimSpace(stderr.String()))
 	}
-	if !utf8.Valid(stdout.Bytes()) {
+	return parsePDFText(stdout.Bytes())
+}
+func parsePDFText(raw []byte) (DocumentExtraction, error) {
+	out := DocumentExtraction{Sections: []DocumentSection{}}
+	if len(raw) > maxExtractedBytes {
+		return out, Fail("RESOURCE_EXHAUSTED", "PDF text exceeds output limit")
+	}
+	if !utf8.Valid(raw) {
 		return out, Fail("WORKER_FAILED", "PDF extractor returned invalid UTF-8")
 	}
 	count := 0
-	for page, text := range strings.Split(stdout.String(), "\f") {
+	pages := strings.Split(string(raw), "\f")
+	if len(pages) > 10000 {
+		return out, Fail("RESOURCE_EXHAUSTED", "PDF exceeds 10000 pages")
+	}
+	for page, text := range pages {
 		if strings.TrimSpace(text) != "" {
 			out.Sections = append(out.Sections, DocumentSection{Page: page + 1, Text: text})
 			count++

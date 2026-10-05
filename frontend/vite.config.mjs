@@ -13,7 +13,7 @@ for(const folder of ["cmaps","standard_fonts","wasm","iccs"]){
   }
 }
 export default defineConfig({
-  build:{rollupOptions:{input:{main:join(root,"index.html"),print:join(root,"print.html")}}},
+  build:{rollupOptions:{input:{main:join(root,"index.html"),print:join(root,"print.html"),extract:join(root,"extract.html"),validate:join(root,"validate.html")}}},
   plugins:[{
     name:"local-pdfjs-assets",
     configureServer(server){server.middlewares.use((request,response,next)=>{

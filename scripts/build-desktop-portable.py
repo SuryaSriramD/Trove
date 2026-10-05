@@ -17,7 +17,7 @@ import sys
 import tempfile
 
 from devtools import baseline, build_env, cache_dir, go_binary
-from desktop_package import APP_ID, TARGETS, binary_target, copy_verified, digest, inventory, no_link, validate_native
+from desktop_package import APP_ID, TARGETS, binary_target, copy_verified, copy_verified_native, digest, inventory, no_link, validate_native
 from desktop_prerequisites import command, prerequisites
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -72,7 +72,7 @@ def main():
     stage=Path(tempfile.mkdtemp(prefix='.trove-desktop-',dir=output.parent))
     try:
         (stage/'bin').mkdir();(stage/'Resources').mkdir()
-        copy_verified(a.native_bundle,stage/'Resources/native')
+        copy_verified_native(a.native_bundle,stage/'Resources/native',a.target,lock)
         # Current reviewed catalogue is authoritative; workers never acquire packs.
         shutil.rmtree(stage/'Resources/native/models')
         copy_verified(ROOT/'native/models',stage/'Resources/native/models')

@@ -116,4 +116,21 @@ def validate_native(root, target, lock):
     audio_pin=json.loads((ROOT/'native/audio-decoder.lock.json').read_text())
     if audio.get('schemaVersion')!=1 or audio.get('platform')!=target.split('-')[0] or audio.get('architecture')!='amd64' or audio.get('runtime')!='FFmpeg' or audio.get('runtimeCommit')!=audio_pin['runtimeCommit'] or name!='audio-decoder' or audio.get('sha256')!=digest(root/(name+suffix)) or not binary_target(root/(name+suffix),target) or (target=='linux-amd64' and not (root/(name+suffix)).stat().st_mode & 0o111):
         raise ValueError('Audio decoder hash/target mismatch')
+    capabilities=m.get('capabilities',[])
+    if 'ocr_english' in capabilities or any((root/x).exists() for x in ['ocr-worker'+suffix,'ocr-worker.json','eng.traineddata']):
+        ocr=json.loads((root/'ocr-worker.json').read_text());pin=json.loads((ROOT/'native/ocr.lock.json').read_text());helper=root/('ocr-worker'+suffix);model=root/'eng.traineddata'
+        if ocr.get('schemaVersion')!=1 or ocr.get('name')!='ocr-worker' or ocr.get('os')!=target.split('-')[0] or ocr.get('architecture')!='amd64' or ocr.get('runtime')!=pin['runtime'] or ocr.get('testOnly') is not False or ocr.get('sha256')!=digest(helper) or helper.stat().st_size>128<<20 or not binary_target(helper,target) or (target=='linux-amd64' and not helper.stat().st_mode&0o111):raise ValueError('OCR production helper identity/target differs')
+        if ocr.get('modelSha256')!=pin['model']['sha256'] or model.stat().st_size>32<<20 or digest(model)!=pin['model']['sha256']:raise ValueError('OCR model identity differs')
+    if 'document_pdf' in capabilities or any((root/x).exists() for x in ['document-worker'+suffix,'document-worker.json','document-assets','document-web-extension.so']):
+        from document_bundle import validate
+        validate(root,target,json.loads((root/'document-worker.json').read_text()))
     return m
+
+
+def copy_verified_native(source, destination, target, lock):
+    # Input validation can precede a slow frontend build. Bind the actual copied
+    # candidate to its sidecars again so changed input cannot become a package.
+    validate_native(source,target,lock)
+    entries=copy_verified(source,destination)
+    validate_native(destination,target,lock)
+    return entries

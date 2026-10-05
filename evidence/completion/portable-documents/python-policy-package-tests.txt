@@ -1,0 +1,43 @@
+test_actual_cross_host_build_refuses_before_mutation (test_desktop_package.DesktopPackageTests) ... ok
+test_copy_detects_changed_bytes_before_publication (test_desktop_package.DesktopPackageTests) ... ok
+test_explicit_target_and_all_required_helper_hashes (test_desktop_package.DesktopPackageTests) ... ok
+test_fixture_and_foreign_platform_refused (test_desktop_package.DesktopPackageTests) ... ok
+test_microphone_sidecar_must_match_production_record (test_desktop_package.DesktopPackageTests) ... ok
+test_missing_decoder_and_runtime_drift_refused (test_desktop_package.DesktopPackageTests) ... ok
+test_path_escape_reserved_names_and_checksum_injection (test_desktop_package.DesktopPackageTests) ... ok
+test_plan_is_explicitly_unqualified_and_has_no_output_side_effect (test_desktop_package.DesktopPackageTests) ... ok
+test_symlinks_and_case_collisions_refused (test_desktop_package.DesktopPackageTests) ... ok
+test_actual_cross_host_build_refuses_before_mutation (test_document_bundle.DocumentPackageTests) ... ok
+test_common_builder_plan_has_no_side_effects (test_document_bundle.DocumentPackageTests) ... ok
+test_copied_candidate_revalidates_sidecar_after_input_changes (test_document_bundle.DocumentPackageTests) ... ok
+test_copy_detects_changed_bytes_before_publication (test_document_bundle.DocumentPackageTests) ... ok
+test_document_bundle_requires_target_policy_and_exact_asset_bytes (test_document_bundle.DocumentPackageTests) ... ok
+test_explicit_target_and_all_required_helper_hashes (test_document_bundle.DocumentPackageTests) ... ok
+test_fixture_and_foreign_platform_refused (test_document_bundle.DocumentPackageTests) ... ok
+test_microphone_sidecar_must_match_production_record (test_document_bundle.DocumentPackageTests) ... ok
+test_missing_declared_document_or_ocr_is_rejected (test_document_bundle.DocumentPackageTests) ... ok
+test_missing_decoder_and_runtime_drift_refused (test_document_bundle.DocumentPackageTests) ... ok
+test_ocr_target_model_and_production_manifest_are_all_bound (test_document_bundle.DocumentPackageTests) ... ok
+test_path_escape_reserved_names_and_checksum_injection (test_document_bundle.DocumentPackageTests) ... ok
+test_plan_is_explicitly_unqualified_and_has_no_output_side_effect (test_document_bundle.DocumentPackageTests) ... ok
+test_symlinks_and_case_collisions_refused (test_document_bundle.DocumentPackageTests) ... ok
+test_unlisted_and_unsafe_assets_are_refused (test_document_bundle.DocumentPackageTests) ... ok
+test_cross_host_build_refuses_before_output (test_document_windows.DocumentWindowsTests) ... ok
+test_duplicate_sdk_member_is_rejected (test_document_windows.DocumentWindowsTests) ... ok
+test_pinned_resource_and_status_policy_on_host (test_document_windows.DocumentWindowsTests) ... ok
+test_plan_is_unqualified_and_does_not_create_output (test_document_windows.DocumentWindowsTests) ... ok
+test_sdk_members_are_exact_and_archive_is_verified (test_document_windows.DocumentWindowsTests) ... ok
+
+----------------------------------------------------------------------
+Ran 29 tests in 5.151s
+
+OK
+test_microphone_plans_keep_fixture_device_boundary (test_native_targets.NativeTargets) ... ok
+test_plans_keep_target_execution_unqualified (test_native_targets.NativeTargets) ... ok
+test_portable_isa_and_pinned_sources (test_native_targets.NativeTargets) ... ok
+test_target_builds_require_matching_host (test_native_targets.NativeTargets) ... ok
+
+----------------------------------------------------------------------
+Ran 4 tests in 0.677s
+
+OK
