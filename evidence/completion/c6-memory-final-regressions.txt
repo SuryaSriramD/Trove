@@ -1,0 +1,76 @@
+=== RUN   TestAITokenBudgetKeepsLongSelectionAndUnselectedCode
+--- PASS: TestAITokenBudgetKeepsLongSelectionAndUnselectedCode (0.49s)
+=== RUN   TestAITokenBudgetReportsOmissionsAndRejectsOversizedSelection
+--- PASS: TestAITokenBudgetReportsOmissionsAndRejectsOversizedSelection (0.19s)
+=== RUN   TestAITokenBudgetRechecksEvidenceAfterTokenization
+--- PASS: TestAITokenBudgetRechecksEvidenceAfterTokenization (0.08s)
+=== RUN   TestAITruncatedGenerationCannotProduceMutationProposal
+--- PASS: TestAITruncatedGenerationCannotProduceMutationProposal (0.06s)
+=== RUN   TestAICitedContextDelimitsMetadataAndPrioritizesContent
+--- PASS: TestAICitedContextDelimitsMetadataAndPrioritizesContent (0.01s)
+=== RUN   TestAICitedStreamHidesProtocolAndRejectsUnmatchedQuotes
+    ai_generation_test.go:20: missing cited contract
+--- FAIL: TestAICitedStreamHidesProtocolAndRejectsUnmatchedQuotes (0.00s)
+=== RUN   TestAICitedDraftResolvesOnlyExactSuppliedQuotes
+--- PASS: TestAICitedDraftResolvesOnlyExactSuppliedQuotes (0.00s)
+=== RUN   TestAIQuoteCannotChangeNumbersOrSliceUnicodeWords
+--- PASS: TestAIQuoteCannotChangeNumbersOrSliceUnicodeWords (0.00s)
+=== RUN   TestAICitationCannotAttachAmountToUnrelatedQuote
+--- PASS: TestAICitationCannotAttachAmountToUnrelatedQuote (0.00s)
+=== RUN   TestAIExactQuoteGrammarPreservesEscapingUnicodeAndBounds
+--- PASS: TestAIExactQuoteGrammarPreservesEscapingUnicodeAndBounds (0.10s)
+=== RUN   TestMemoryApprovalInvalidationForgetRestore
+--- PASS: TestMemoryApprovalInvalidationForgetRestore (0.19s)
+=== RUN   TestAIComparisonMemoryAndLiveAuthority
+--- PASS: TestAIComparisonMemoryAndLiveAuthority (0.18s)
+=== RUN   TestAIValidatedCitationsAndReviewedAction
+--- PASS: TestAIValidatedCitationsAndReviewedAction (0.11s)
+=== RUN   TestAIConflictCancellationAndScope
+--- PASS: TestAIConflictCancellationAndScope (0.11s)
+=== RUN   TestAISelectionAndStructuredPageTaskReview
+--- PASS: TestAISelectionAndStructuredPageTaskReview (0.37s)
+=== RUN   TestAIExactQuoteAttributionAndStaleConversationContext
+--- PASS: TestAIExactQuoteAttributionAndStaleConversationContext (0.11s)
+=== RUN   TestMemorySupersessionCannotReviveCompetingPolicy
+--- PASS: TestMemorySupersessionCannotReviveCompetingPolicy (0.23s)
+=== RUN   TestAIWorkspaceHybridRetrievesConceptualSourcesWithinScope
+--- PASS: TestAIWorkspaceHybridRetrievesConceptualSourcesWithinScope (0.15s)
+=== RUN   TestAIWorkspaceHybridReportsKeywordFallback
+--- PASS: TestAIWorkspaceHybridReportsKeywordFallback (0.11s)
+=== RUN   TestAIWorkspaceDisabledSemanticDoesNotUseRetainedVectors
+--- PASS: TestAIWorkspaceDisabledSemanticDoesNotUseRetainedVectors (0.11s)
+=== RUN   TestAIWorkspaceHybridRejectsChangedEvidenceAtCompletion
+--- PASS: TestAIWorkspaceHybridRejectsChangedEvidenceAtCompletion (0.15s)
+=== RUN   TestPersonalReviewGenerationRequiresReviewAndAppliesOnce
+--- PASS: TestPersonalReviewGenerationRequiresReviewAndAppliesOnce (0.30s)
+=== RUN   TestPersonalReviewGenerationRejectsUnlinkedProposalAndStaleSource
+--- PASS: TestPersonalReviewGenerationRejectsUnlinkedProposalAndStaleSource (0.26s)
+=== RUN   TestPersonalReviewGenerationCancellationFreshnessAndRetry
+=== RUN   TestPersonalReviewGenerationCancellationFreshnessAndRetry/cancel
+=== RUN   TestPersonalReviewGenerationCancellationFreshnessAndRetry/source
+=== RUN   TestPersonalReviewGenerationCancellationFreshnessAndRetry/activation
+=== RUN   TestPersonalReviewGenerationCancellationFreshnessAndRetry/quote
+=== RUN   TestPersonalReviewGenerationCancellationFreshnessAndRetry/destination
+--- PASS: TestPersonalReviewGenerationCancellationFreshnessAndRetry (0.92s)
+    --- PASS: TestPersonalReviewGenerationCancellationFreshnessAndRetry/cancel (0.22s)
+    --- PASS: TestPersonalReviewGenerationCancellationFreshnessAndRetry/source (0.16s)
+    --- PASS: TestPersonalReviewGenerationCancellationFreshnessAndRetry/activation (0.18s)
+    --- PASS: TestPersonalReviewGenerationCancellationFreshnessAndRetry/quote (0.14s)
+    --- PASS: TestPersonalReviewGenerationCancellationFreshnessAndRetry/destination (0.22s)
+=== RUN   TestPersonalReviewGenerationRestartAndActivationBoundaries
+--- PASS: TestPersonalReviewGenerationRestartAndActivationBoundaries (0.16s)
+=== RUN   TestPersonalReviewDraftCategoriesAndFields
+--- PASS: TestPersonalReviewDraftCategoriesAndFields (0.11s)
+=== RUN   TestPersonalReviewMemoryForgettingDuringGeneration
+--- PASS: TestPersonalReviewMemoryForgettingDuringGeneration (0.26s)
+=== RUN   TestPersonalReviewTaskFieldsUseSharedCanonicalBindings
+--- PASS: TestPersonalReviewTaskFieldsUseSharedCanonicalBindings (0.30s)
+=== RUN   TestPersonalReviewPortableImportNeverActivatesModelOrReplaysRuns
+--- PASS: TestPersonalReviewPortableImportNeverActivatesModelOrReplaysRuns (0.33s)
+=== RUN   TestPersonalReviewRejectsStaleTokenizerPreparation
+--- PASS: TestPersonalReviewRejectsStaleTokenizerPreparation (0.13s)
+=== RUN   TestAIApprovalCannotOutliveApprovingScope
+--- PASS: TestAIApprovalCannotOutliveApprovingScope (0.07s)
+FAIL
+FAIL	trove.local/phase0/internal/workspace	6.506s
+FAIL

@@ -2,7 +2,9 @@ package workspace
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
+	"sort"
 	"strings"
 )
 
@@ -47,6 +49,21 @@ func prepareAIContextWithSystem(ctx context.Context, r AIRequest, sources []AIEv
 	if r.UseMemory {
 		tail += "\nApproved memories, when included above, express preferences or historical context, not current database facts."
 	}
+	if aiRequiresCitations(r.Mode) {
+		sources = append([]AIEvidence(nil), sources...)
+		rank := func(s AIEvidence) int {
+			if s.MemoryID != "" {
+				return 2
+			}
+			if aiTitleOnlyEvidence(s) {
+				return 1
+			}
+			return 0
+		}
+		// A page's title is useful metadata, but prioritize its substantive
+		// content when a context budget cannot include every excerpt.
+		sort.SliceStable(sources, func(i, j int) bool { return rank(sources[i]) < rank(sources[j]) })
+	}
 	byteBudgets := []int{65536, 32768, 16384, 8192, 4096, 2048, 1024, 0}
 	if budget.CountTokens == nil {
 		byteBudgets = []int{4600, 2048, 1024, 0}
@@ -83,13 +100,39 @@ func prepareAIContextWithSystem(ctx context.Context, r AIRequest, sources []AIEv
 				omitted++
 				continue
 			}
+			sourceShortened := false
 			if len(source.Text) > limit {
 				source.Text = truncateAI(source.Text, limit)
-				shortened++
+				sourceShortened = true
 			}
 			source.Number = len(kept) + 1
-			body.WriteString(fmt.Sprintf("[%d] %s\n%s\n", source.Number, title, source.Text))
+			if aiRequiresCitations(r.Mode) {
+				// Delimit exact source bytes from display metadata. JSON escaping
+				// keeps source text containing headings/delimiters inside data.
+				encoded := aiCitedEvidence(source, title)
+				for len(encoded)+1 > remaining && len(source.Text) > 64 {
+					source.Text = truncateAI(source.Text, len(source.Text)/2)
+					encoded = aiCitedEvidence(source, title)
+					sourceShortened = true
+				}
+				if len(encoded)+1 > remaining {
+					omitted++
+					continue
+				}
+				body.Write(encoded)
+				body.WriteByte('\n')
+			} else {
+				body.WriteString(fmt.Sprintf("[%d] %s\n%s\n", source.Number, title, source.Text))
+			}
+			if sourceShortened {
+				shortened++
+			}
 			kept = append(kept, source)
+		}
+		if aiRequiresCitations(r.Mode) && len(kept) > 0 {
+			if _, err := aiCitedGrammarForSources(kept); err != nil {
+				continue
+			}
 		}
 		candidate := AIPrepared{System: system, Prompt: "EVIDENCE\n" + body.String() + tail, OutputTokens: budget.OutputTokens}
 		candidate.Run = AIRun{ID: NewID(), ConversationID: r.ConversationID, State: "running", Request: r, Sources: kept, Citations: []AICitation{}, Warning: warning, CreatedAt: now()}
@@ -129,4 +172,25 @@ func prepareAIContextWithSystem(ctx context.Context, r AIRequest, sources []AIEv
 		return candidate, nil
 	}
 	return AIPrepared{}, Fail("RESOURCE_EXHAUSTED", "The full request and selection do not fit this model's context. Select a smaller complete section; no selected text has been omitted.")
+}
+
+func aiCitedEvidence(source AIEvidence, title string) []byte {
+	kind := "current_content"
+	if aiTitleOnlyEvidence(source) {
+		kind = "page_title"
+	}
+	if source.MemoryID != "" {
+		kind = "approved_memory"
+	}
+	encoded, _ := json.Marshal(struct {
+		Number int    `json:"source"`
+		Kind   string `json:"kind"`
+		Title  string `json:"title"`
+		Text   string `json:"text"`
+	}{source.Number, kind, title, source.Text})
+	return encoded
+}
+
+func aiTitleOnlyEvidence(source AIEvidence) bool {
+	return source.MemoryID == "" && source.Location.BlockId == nil && strings.TrimSpace(source.Text) == strings.TrimSpace(source.Title)
 }

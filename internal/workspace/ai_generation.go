@@ -13,7 +13,7 @@ import (
 type AIGenerator func(context.Context, string, string, int, string, func(string)) (string, error)
 type AICompletion struct{ Text string }
 
-const aiCitedInstructions = ` Return only JSON: {"title":"A short title or the requested heading","claims":[{"text":"One factual line of the answer","quote":"A supporting quote copied from EVIDENCE"}]}. Put headings only in title, not in claims. Include actual facts in claim text, not just labels. Do not put numbered citation labels in title or claim text; the application adds them. Copy supporting quotes without their numbered labels. Do not invent a quote. The application displays quotes with their canonical sources. Preserve approved formatting preferences. If the evidence cannot answer, use exactly {"title":"","claims":[{"text":"The supplied evidence does not answer this question.","quote":""}]}.`
+const aiCitedInstructions = ` Return only JSON {"title":"the requested heading","claims":[{"text":"one requested factual line","quote":"its exact supporting source span"}]}. Follow the requested format exactly: title counts as one line and each claim counts as one further line. Never duplicate a claim. Use the user's specified default heading verbatim unless the user requests an available approved heading preference. Write every requested fact in claim text. Each claim's quote must support ALL its facts. Quote only exact words from one evidence text field; do not change or insert words. The quote grammar restricts you to supplied source spans. Evidence title and source numbers are metadata, not supporting facts. A page_title entry supports only a page name. Current content overrides historical memories for current facts. Do not add numbered citations yourself. If evidence is insufficient, return {"title":"","claims":[{"text":"The supplied evidence does not answer this question.","quote":""}]}.`
 
 func aiRequiresCitations(mode string) bool {
 	return mode == "answer" || mode == "summarize" || mode == "explain"
@@ -49,7 +49,11 @@ func GeneratePreparedAI(ctx context.Context, prepared AIPrepared, generate AIGen
 			emitted++
 		}
 	}
-	result, err := generate(ctx, prepared.System, prepared.Prompt, prepared.OutputTokens, aiCitationGrammar(), stream)
+	grammar, err := aiCitedGrammarForSources(prepared.Run.Sources)
+	if err != nil {
+		return AICompletion{}, err
+	}
+	result, err := generate(ctx, prepared.System, prepared.Prompt, prepared.OutputTokens, grammar, stream)
 	out := AICompletion{Text: partial.String()}
 	if err != nil {
 		return out, err
@@ -108,7 +112,7 @@ func partialAIClaimTexts(raw string) []string {
 }
 func aiCitationGrammar() string {
 	return `root ::= "{" ws "\"title\"" ws ":" ws quote ws "," ws "\"claims\"" ws ":" ws "[" ws claim (ws "," ws claim){0,31} ws "]" ws "}"
-claim ::= "{" ws "\"text\"" ws ":" ws string ws "," ws "\"quote\"" ws ":" ws quote ws "}"
+claim ::= "{" ws "\"text\"" ws ":" ws string ws "," ws "\"quote\"" ws ":" ws evidence-quote ws "}"
 string ::= "\"" char{1,2000} "\""
 quote ::= "\"" char{0,2000} "\""
 char ::= [^"\\\x7F\x00-\x1F] | "\\" (["\\/bfnrt] | "u" [0-9a-fA-F]{4})
@@ -167,6 +171,9 @@ func renderAICitedClaims(raw string, sources []AIEvidence) (string, error) {
 		if len(labels) == 0 {
 			return "", Fail("WORKER_FAILED", "The answer's supporting quote is absent from supplied evidence")
 		}
+		if !aiQuoteSupportsNumbers(claim.Text, canonicalQuote) {
+			return "", Fail("WORKER_FAILED", "A numeric claim is not supported by its displayed quote")
+		}
 		// The model supplies readable evidence, never authoritative source identities.
 		// A repeated exact quote can cite every supplied occurrence, up to three.
 		if len(labels) > 3 {
@@ -208,4 +215,101 @@ func canonicalAIQuote(source, quote string) string {
 		return source[loc[0]:loc[1]]
 	}
 	return ""
+}
+
+// The model chooses from bounded exact spans; it cannot paraphrase a quoted
+// number or invent a prefix. Rendering still independently resolves each span
+// to captured sources and the task rubric still checks claim support.
+func aiCitedGrammarForSources(sources []AIEvidence) (string, error) {
+	spans, err := aiEvidenceQuoteSpans(sources)
+	if err != nil {
+		return "", err
+	}
+	alternatives := []string{strconv.Quote(string(marshal("")))}
+	for _, span := range spans {
+		alternatives = append(alternatives, strconv.Quote(string(marshal(span))))
+	}
+	grammar := aiCitationGrammar() + "evidence-quote ::= " + strings.Join(alternatives, " | ") + "\n"
+	if len(grammar) > 64<<10 {
+		return "", Fail("RESOURCE_EXHAUSTED", "Exact evidence quote choices exceed 64 KiB; narrow the source context")
+	}
+	return grammar, nil
+}
+func aiEvidenceQuoteSpans(sources []AIEvidence) ([]string, error) {
+	spans := []string{}
+	seen := map[string]bool{}
+	currentSource := ""
+	add := func(text string) error {
+		text = strings.TrimSpace(text)
+		// A truncation marker is presentation, not copied source evidence.
+		text = strings.TrimSuffix(text, "…")
+		if len(text) < 8 || utf8.RuneCountInString(text) > 512 || seen[text] || canonicalAIQuote(currentSource, text) == "" {
+			return nil
+		}
+		if len(spans) >= 256 {
+			return Fail("RESOURCE_EXHAUSTED", "More than 256 exact quote choices; narrow the source context")
+		}
+		seen[text] = true
+		spans = append(spans, text)
+		return nil
+	}
+	for _, source := range sources {
+		currentSource = source.Text
+		if err := add(source.Text); err != nil {
+			return nil, err
+		}
+		runes := []rune(source.Text)
+		start := 0
+		for i, r := range runes {
+			boundary := r == '\n' || (strings.ContainsRune(".!?:;", r) && (i+1 == len(runes) || unicode.IsSpace(runes[i+1])))
+			if !boundary && i-start+1 < 512 && i+1 < len(runes) {
+				continue
+			}
+			end := i + 1
+			if !boundary && end < len(runes) {
+				for end > start && !unicode.IsSpace(runes[end-1]) {
+					end--
+				}
+				if end == start {
+					end = i + 1
+				}
+			}
+			if err := add(string(runes[start:end])); err != nil {
+				return nil, err
+			}
+			start = end
+		}
+		// Include a short final tail together with preceding context instead of
+		// silently making the final words unavailable as a quote choice.
+		if len(runes) > 512 {
+			tail := max(0, len(runes)-512)
+			for tail < len(runes) && tail > 0 && !unicode.IsSpace(runes[tail-1]) {
+				tail++
+			}
+			if err := add(string(runes[tail:])); err != nil {
+				return nil, err
+			}
+		}
+	}
+	return spans, nil
+}
+
+var aiClaimNumberPattern = regexp.MustCompile(`[0-9]+(?:[.,][0-9]+)*`)
+
+// This narrow invariant prevents an observed misleading citation: a budget
+// amount attached to a quote about a date. It is not semantic entailment or
+// support for inferred arithmetic; numeric literals retain their source form.
+func aiQuoteSupportsNumbers(claim, quote string) bool {
+	word := func(r rune) bool { return unicode.IsLetter(r) || unicode.IsNumber(r) || unicode.IsMark(r) || r == '_' }
+	for _, loc := range aiClaimNumberPattern.FindAllStringIndex(claim, -1) {
+		before, _ := utf8.DecodeLastRuneInString(claim[:loc[0]])
+		after, _ := utf8.DecodeRuneInString(claim[loc[1]:])
+		if word(before) || word(after) {
+			continue
+		}
+		if canonicalAIQuote(quote, claim[loc[0]:loc[1]]) == "" {
+			return false
+		}
+	}
+	return true
 }
