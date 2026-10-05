@@ -1,0 +1,40 @@
+=== RUN   TestMicrophoneProductionIdentityExcludesFixtures
+--- PASS: TestMicrophoneProductionIdentityExcludesFixtures (0.00s)
+=== RUN   TestMicrophoneProductionManifestRejectsFixture
+--- PASS: TestMicrophoneProductionManifestRejectsFixture (0.00s)
+=== RUN   TestPortableMicrophoneSyntheticBoundsAndRetainedCancellation
+=== RUN   TestPortableMicrophoneSyntheticBoundsAndRetainedCancellation/exact_byte_limit
+=== RUN   TestPortableMicrophoneSyntheticBoundsAndRetainedCancellation/cancel_retains_flushed_bytes
+--- PASS: TestPortableMicrophoneSyntheticBoundsAndRetainedCancellation (0.55s)
+    --- PASS: TestPortableMicrophoneSyntheticBoundsAndRetainedCancellation/exact_byte_limit (0.48s)
+    --- PASS: TestPortableMicrophoneSyntheticBoundsAndRetainedCancellation/cancel_retains_flushed_bytes (0.07s)
+=== RUN   TestPortableMicrophoneRejectsUnsafeRequestsBeforeCapture
+--- PASS: TestPortableMicrophoneRejectsUnsafeRequestsBeforeCapture (0.00s)
+=== RUN   TestPortableMicrophoneBufferSelfTest
+--- PASS: TestPortableMicrophoneBufferSelfTest (0.01s)
+=== RUN   TestPortableMicrophoneRejectsUnknownWireOptions
+--- PASS: TestPortableMicrophoneRejectsUnknownWireOptions (0.01s)
+=== RUN   TestLegacyMacMicrophoneSupervisor
+--- PASS: TestLegacyMacMicrophoneSupervisor (0.12s)
+=== RUN   TestProductionMicrophoneSmokeCannotClaimSyntheticQualification
+--- PASS: TestProductionMicrophoneSmokeCannotClaimSyntheticQualification (0.00s)
+=== RUN   TestPortableMicrophoneStartupDeadlineAndCancellation
+=== RUN   TestPortableMicrophoneStartupDeadlineAndCancellation/deadline
+=== RUN   TestPortableMicrophoneStartupDeadlineAndCancellation/user_cancel
+--- PASS: TestPortableMicrophoneStartupDeadlineAndCancellation (0.42s)
+    --- PASS: TestPortableMicrophoneStartupDeadlineAndCancellation/deadline (0.36s)
+    --- PASS: TestPortableMicrophoneStartupDeadlineAndCancellation/user_cancel (0.06s)
+=== RUN   TestProductionMicrophoneRejectsBeforePermissionOrDevice
+=== RUN   TestProductionMicrophoneRejectsBeforePermissionOrDevice/unapproved
+=== RUN   TestProductionMicrophoneRejectsBeforePermissionOrDevice/synthetic_forbidden
+--- PASS: TestProductionMicrophoneRejectsBeforePermissionOrDevice (0.40s)
+    --- PASS: TestProductionMicrophoneRejectsBeforePermissionOrDevice/unapproved (0.38s)
+    --- PASS: TestProductionMicrophoneRejectsBeforePermissionOrDevice/synthetic_forbidden (0.01s)
+=== RUN   TestRealMicrophoneControlCancellationAndParentExit
+=== RUN   TestRealMicrophoneControlCancellationAndParentExit/cancel
+=== RUN   TestRealMicrophoneControlCancellationAndParentExit/parent_exit
+--- PASS: TestRealMicrophoneControlCancellationAndParentExit (0.12s)
+    --- PASS: TestRealMicrophoneControlCancellationAndParentExit/cancel (0.06s)
+    --- PASS: TestRealMicrophoneControlCancellationAndParentExit/parent_exit (0.06s)
+PASS
+ok  	trove.local/phase0/internal/native	3.131s

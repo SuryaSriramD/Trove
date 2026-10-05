@@ -61,7 +61,7 @@ On the selected host:
     python3 scripts/build-native.py --target windows-amd64 --cache <native-cache> --output <empty-output>
     python3 scripts/build-native.py --target linux-amd64 --cache <native-cache> --output <empty-output>
 
-Windows/Linux use CPU baseline flags: native host ISA detection, AVX/AVX2/BMI2/FMA/F16C/SSE4.2, GPU backends and OpenMP disabled. llama and whisper use separate CMake trees because their ggml targets differ. mtmd subprocess/video support is off. The existing Mac Metal/Swift path remains available, including --target darwin-arm64.
+Windows/Linux use CPU baseline flags: native host ISA detection, AVX/AVX2/BMI2/FMA/F16C/SSE4.2, GPU backends and OpenMP disabled. llama and whisper use separate CMake trees because their ggml targets differ. mtmd subprocess/video support is off. The Mac Metal path remains available, including --target darwin-arm64. New Mac capture builds now use miniaudio CoreAudio with explicit AVCaptureDevice consent; legacy Swift capture bundles remain readable. See [macos-miniaudio.md](macos-miniaudio.md).
 
 Outputs: three model workers, restricted audio decoder/sidecar/relink kit, production microphone worker/sidecar, manifest v2, catalog, dependency reports, notices, JFK fixture, build provenance. These are **worker bundles**, not installers. Actual compiler/SDK/Ubuntu package versions are recorded; an exact Windows compiler image and validated Ubuntu dependency snapshot are not frozen. These recipes do not establish reproducible target binaries or release qualification.
 
@@ -83,6 +83,6 @@ Evidence prefix: evidence/completion/c7-c8-*. Exact sources, outputs and hashes 
 | Windows job membership, cleanup, ACL, handles, projector reparse/tamper scenarios | Implementation/tests prepared; target execution pending |
 | Desktop/WebView, capture/OCR, target decoder execution, installers, signing, updates, backup portability | Open in owning platform packages |
 
-TestRealQualification includes legacy Mac synthetic microphone capture. Windows/Linux production helpers reject synthetic requests; the separate fixture-only executable exercises the portable protocol without device code. Neither path substitutes for explicit real-device qualification. Portable descriptor/process tests can run independently.
+TestRealQualification includes legacy Mac synthetic microphone capture when that legacy runtime is supplied. All miniaudio production helpers reject synthetic requests and qualification smoke explicitly reports this check not_run; the separate fixture-only executable exercises the portable protocol without device code. Neither path substitutes for explicit real-device qualification. Portable descriptor/process tests can run independently.
 
 Before closing C7/C8: execute platform tests; build target C++ workers; run real models and hostile-input/cancellation cases; qualify permissions, crash cleanup and power-loss recovery; supply install/update/rollback/uninstall and backup-portability evidence; freeze full platform candidates. Existing AI quality failures and research/account/device/signing prerequisites remain unchanged.

@@ -139,6 +139,23 @@ def main():
                        'notices': retain(name + '.cpp', args.cache / pin['sourceDirectory'], recursive=True)})
         if not native[-1]['archiveVerified']:
             warnings.append('Native archive absent or invalid: ' + name)
+    capture_pin = json.loads((ROOT / 'native/microphone.lock.json').read_text())
+    capture_header = args.cache / capture_pin['source']
+    capture_verified = capture_header.is_file() and digest(capture_header) == capture_pin['headerSha256']
+    capture_notices = []
+    if capture_verified:
+        header_text = capture_header.read_text()
+        notice = notices / 'miniaudio' / 'miniaudio-LICENSE.txt'
+        notice.parent.mkdir(parents=True, exist_ok=True)
+        notice.write_text(header_text[header_text.rfind('/*'):])
+        capture_notices.append({'sourceRelativePath': capture_pin['source'] + ' (final license block)',
+            'retainedPath': str(notice.relative_to(args.output)), 'sha256': digest(notice),
+            'familyFromText': 'MIT-0 or public domain; MIT-0 selected'})
+    native.append({'name': 'miniaudio', **capture_pin, 'sourceVerified': capture_verified,
+        'localHeaderSha256': digest(capture_header) if capture_header.is_file() else None,
+        'notices': capture_notices, 'deviceQualification': 'Unqualified; build/source alignment does not establish capture, TCC or signed-app attribution.'})
+    if not capture_verified:
+        warnings.append('Pinned miniaudio capture header absent or invalid')
     vector_root = ROOT / 'internal/sqlitevec'
     vector_pin = json.loads((vector_root / 'upstream.json').read_text())
     vector_hashes = {name: digest(vector_root / name) for name in vector_pin['sourceSha256']}
@@ -178,6 +195,9 @@ def main():
     inputs = ['go.mod', 'go.sum', 'frontend/package.json', 'frontend/pnpm-lock.yaml', 'baseline/baseline.lock.json',
               'native/models/catalog.json', 'native/models/provenance.json', 'scripts/record-release-provenance.py',
               'internal/sqlitevec/register.go', 'internal/sqlitevec/upstream.json', 'docs/phase-3/licenses/sources.json',
+              'native/microphone-worker.cpp', 'native/capture-buffer.hpp', 'native/capture-startup.hpp', 'native/microphone.lock.json',
+              'scripts/build-microphone.py', 'scripts/microphone_bundle.py', 'scripts/build-native.py', 'scripts/build-desktop.py',
+              'packaging/microphone-info.plist', 'packaging/microphone.entitlements.plist', 'internal/native/microphone.go',
               'native/audio-decoder.cpp', 'native/audio-decoder.lock.json', 'scripts/build-audio-decoder.py', 'scripts/audio_build.py',
               'native/vision-worker.cpp', 'scripts/build-vision.py', 'internal/native/vision.go',
               'internal/native/vision_packs.go', 'internal/workspace/image_description.go']

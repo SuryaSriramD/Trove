@@ -42,7 +42,7 @@ func TestMicrophoneProductionIdentityExcludesFixtures(t *testing.T) {
 			t.Fatal("synthetic worker accepted as production")
 		}
 		h.RuntimeCommit = MicrophoneCommit
-		if validMicrophoneIdentity(h, platform) != (platform != "darwin") {
+		if !validMicrophoneIdentity(h, platform) {
 			t.Fatal("portable production identity target mismatch")
 		}
 		h.RuntimeCommit = "trove-microphone-v1"
@@ -195,7 +195,7 @@ func TestPortableMicrophoneBufferSelfTest(t *testing.T) {
 	}
 	data := response.Bytes()
 	frame, err := ReadFrame(bytes.NewReader(data))
-	if err != nil || !strings.Contains(string(frame), "PASS") || !strings.Contains(string(frame), "5") {
+	if err != nil || !strings.Contains(string(frame), "PASS") || !strings.Contains(string(frame), "9") {
 		t.Fatalf("buffer/permission classification self-test: %s %v", frame, err)
 	}
 }
@@ -300,5 +300,65 @@ func TestLegacyMacMicrophoneSupervisor(t *testing.T) {
 	result, err := s.Capture(context.Background(), CaptureRequest{RequestID: NewID(), DurationMS: 100, MaxBytes: 6400, Synthetic: true}, file, nil)
 	if err != nil || result.Bytes != 6400 || !result.Synthetic || result.Cancelled {
 		t.Fatalf("legacy Mac capture changed: %+v %v", result, err)
+	}
+}
+
+func TestProductionMicrophoneSmokeCannotClaimSyntheticQualification(t *testing.T) {
+	s := &Supervisor{helpers: map[string]Helper{"microphone-worker": {RuntimeCommit: MicrophoneCommit}}}
+	value, err := s.qualificationMicrophone(context.Background(), t.TempDir())
+	if err != nil {
+		t.Fatal(err)
+	}
+	result, ok := value.(map[string]any)
+	if !ok || result["state"] != "not_run" || result["releaseQualified"] != false {
+		t.Fatalf("production smoke claimed a fixture pass: %#v", value)
+	}
+}
+
+func TestPortableMicrophoneStartupDeadlineAndCancellation(t *testing.T) {
+	path := os.Getenv("TROVE_MICROPHONE_STARTUP_FIXTURE")
+	if path == "" {
+		t.Skip("requires compile-time device-free stalled-startup fixture")
+	}
+	data, err := os.ReadFile(filepath.Join(path, "microphone-fixture.json"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	var sidecar struct{ StartupStallFixture bool }
+	if json.Unmarshal(data, &sidecar) != nil || !sidecar.StartupStallFixture {
+		t.Fatal("not a stalled startup fixture")
+	}
+	t.Setenv("TROVE_MICROPHONE_FIXTURE", path)
+	s := portableMicrophoneFixture(t)
+	for _, explicitCancel := range []bool{false, true} {
+		t.Run(map[bool]string{false: "deadline", true: "user_cancel"}[explicitCancel], func(t *testing.T) {
+			file, cleanup, err := NewPrivateStagingFile()
+			if err != nil {
+				t.Fatal(err)
+			}
+			defer cleanup()
+			ctx, stop := context.WithTimeout(context.Background(), 3*time.Second)
+			defer stop()
+			startup := 50 * time.Millisecond
+			if explicitCancel {
+				startup = 30 * time.Second
+				time.AfterFunc(50*time.Millisecond, stop)
+			}
+			began := time.Now()
+			result, err := s.captureWithStartupLimit(ctx, CaptureRequest{RequestID: NewID(), DurationMS: 7200000, MaxBytes: 512 << 20, Synthetic: true}, file, nil, startup)
+			if !explicitCancel && !errors.Is(err, errCaptureStartup) {
+				t.Fatalf("two-hour request startup was not bounded: %+v %v", result, err)
+			}
+			if explicitCancel && err != nil && !errors.Is(err, context.Canceled) {
+				t.Fatalf("startup cancellation: %v", err)
+			}
+			if time.Since(began) > time.Second {
+				t.Fatal("startup shutdown was not prompt")
+			}
+			stat, _ := file.Stat()
+			if result.Bytes != 0 || stat.Size() != 0 {
+				t.Fatal("stalled startup fabricated audio")
+			}
+		})
 	}
 }

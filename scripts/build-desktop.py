@@ -16,6 +16,7 @@ import subprocess
 import sys
 
 from devtools import build_env, cache_dir, go_binary
+from microphone_bundle import install_microphone_record
 
 ROOT = Path(__file__).resolve().parents[1]
 parser = argparse.ArgumentParser()
@@ -59,6 +60,10 @@ if not args.skip_frontend:
 native = args.native_bundle.resolve()
 if not (native / 'manifest.json').exists():
     raise SystemExit('Build native helpers first: python scripts/build-native.py')
+# New candidates always contain the pinned miniaudio production helper. A
+# caller-provided legacy Swift bundle is rebuilt and rebound explicitly.
+run([sys.executable, ROOT / 'scripts/build-microphone.py', '--cache', args.cache, '--output', native])
+install_microphone_record(native, 'darwin-arm64')
 run([sys.executable, ROOT / 'scripts/build-document-extractor.py', '--cache', args.cache, '--output', native])
 run([sys.executable, ROOT / 'scripts/build-audio-decoder.py', '--cache', args.cache, '--output', native])
 run([sys.executable, ROOT / 'scripts/build-pdf-renderer.py', '--cache', args.cache, '--output', native])

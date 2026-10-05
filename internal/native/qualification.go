@@ -126,18 +126,29 @@ func (s *Supervisor) QualificationSmoke(ctx context.Context) (map[string]any, er
 			results["speech"] = b
 		}
 	}
+	capture, e := s.qualificationMicrophone(ctx, dir)
+	if e != nil {
+		return nil, e
+	}
+	results["microphoneSynthetic"] = capture
+	results["microphoneDeviceQualification"] = "Unqualified; an explicitly authorized real-device check is required."
+	return results, nil
+}
+
+// Runtime smoke never records a real input. Production miniaudio intentionally
+// contains no synthetic backend, so its skipped fixture cannot be called a pass.
+func (s *Supervisor) qualificationMicrophone(ctx context.Context, dir string) (any, error) {
+	if helper, ok := s.helpers["microphone-worker"]; ok && helper.RuntimeCommit == MicrophoneCommit {
+		return map[string]any{"state": "not_run", "reason": "Production miniaudio has no synthetic mode; run the separate device-free fixture.", "releaseQualified": false}, nil
+	}
 	f, e := os.CreateTemp(dir, "synthetic-audio-")
 	if e != nil {
 		return nil, e
 	}
 	defer f.Close()
-	capture, e := s.Capture(ctx, CaptureRequest{RequestID: NewID(), DurationMS: 100, MaxBytes: 6400, Synthetic: true}, f, nil)
-	if e != nil {
-		return nil, e
-	}
-	results["microphoneSynthetic"] = capture
-	return results, nil
+	return s.Capture(ctx, CaptureRequest{RequestID: NewID(), DurationMS: 100, MaxBytes: 6400, Synthetic: true}, f, nil)
 }
+
 func wavPCM(wav []byte) ([]byte, error) {
 	if len(wav) < 44 || string(wav[:4]) != "RIFF" || string(wav[8:12]) != "WAVE" {
 		return nil, fmt.Errorf("invalid WAV fixture")

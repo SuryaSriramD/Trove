@@ -1,5 +1,10 @@
 #include "worker-platform.hpp"
 #include "capture-buffer.hpp"
+#include "capture-startup.hpp"
+#if defined(__APPLE__) && !defined(TROVE_CAPTURE_FIXTURE_ONLY)
+#import <AVFoundation/AVFoundation.h>
+#import <Foundation/Foundation.h>
+#endif
 #include <nlohmann/json.hpp>
 #include <chrono>
 #include <thread>
@@ -34,8 +39,10 @@ static HMODULE capture_system_library(const char *name) {
 #define MA_ENABLE_WASAPI
 #elif defined(__linux__)
 #define MA_ENABLE_PULSEAUDIO
+#elif defined(__APPLE__)
+#define MA_ENABLE_COREAUDIO
 #else
-#error The portable microphone device backend is only enabled on Windows/Linux.
+#error Unsupported microphone device backend.
 #endif
 #include <miniaudio/miniaudio.h>
 #ifdef _WIN32
@@ -108,7 +115,7 @@ const char *error_code(ma_result result){
 void device_error(ma_result result){
  if(result==MA_SUCCESS)return;
  if(result==MA_ACCESS_DENIED)permission="denied";
- else permission="unknown";
+ else if(std::strcmp(permission,"authorized")!=0)permission="unknown";
  device_state="unavailable";
  throw CaptureFailure(error_code(result),"default microphone could not be opened; check device and OS microphone settings");
 }
@@ -132,6 +139,38 @@ void drain(){
   event({{"kind","progress"},{"sampleRate",16000}});
  }
 }
+#if defined(__APPLE__) && !defined(TROVE_CAPTURE_FIXTURE_ONLY)
+void request_mac_consent() {
+ @autoreleasepool {
+  if(cancelled.load())throw CaptureFailure("CANCELLED","microphone startup cancelled");
+  AVAuthorizationStatus status=[AVCaptureDevice authorizationStatusForMediaType:AVMediaTypeAudio];
+  if(status==AVAuthorizationStatusAuthorized){permission="authorized";return;}
+  if(status==AVAuthorizationStatusDenied||status==AVAuthorizationStatusRestricted) {
+   permission=status==AVAuthorizationStatusDenied?"denied":"restricted";
+   throw CaptureFailure("PERMISSION_DENIED","microphone permission is denied or restricted in macOS settings");
+  }
+  if(status!=AVAuthorizationStatusNotDetermined){permission="unknown";throw CaptureFailure("PERMISSION_DENIED","microphone authorization status is unknown");}
+  if(cancelled.load())throw CaptureFailure("CANCELLED","microphone startup cancelled");
+  permission="prompt_pending";device_state="awaiting_permission";
+  event({{"kind","progress"},{"sampleRate",16000}});
+  auto response=std::make_shared<CaptureConsent>();
+  [AVCaptureDevice requestAccessForMediaType:AVMediaTypeAudio completionHandler:^(BOOL granted) {
+   response->answer.store(granted?1:2);
+  }];
+  switch(wait_capture_consent(response,cancelled,std::chrono::steady_clock::now()+std::chrono::seconds(20))) {
+   case CaptureConsentResult::granted:permission="authorized";return;
+   case CaptureConsentResult::denied:
+    status=[AVCaptureDevice authorizationStatusForMediaType:AVMediaTypeAudio];
+    permission=status==AVAuthorizationStatusDenied?"denied":status==AVAuthorizationStatusRestricted?"restricted":"unknown";
+    throw CaptureFailure("PERMISSION_DENIED","microphone permission was not granted");
+   case CaptureConsentResult::cancelled:
+    throw CaptureFailure("CANCELLED","microphone permission request cancelled");
+   case CaptureConsentResult::timed_out:
+    permission="unknown";throw CaptureFailure("PERMISSION_TIMEOUT","microphone permission request timed out; retry after reviewing macOS settings");
+  }
+ }
+}
+#endif
 #ifndef TROVE_CAPTURE_FIXTURE_ONLY
 struct Device {
  ma_context context{};ma_device device{};bool context_ready=false,device_ready=false;
@@ -145,6 +184,9 @@ struct Device {
   ma_context_config context_config=ma_context_config_init();
 #ifdef _WIN32
   backend="wasapi";ma_backend selected=ma_backend_wasapi;
+#elif defined(__APPLE__)
+  backend="coreaudio";ma_backend selected=ma_backend_coreaudio;
+  request_mac_consent();
 #else
   backend="pulseaudio";ma_backend selected=ma_backend_pulseaudio;
   // Initial Ubuntu support is the current user's local desktop audio server.
@@ -162,7 +204,9 @@ struct Device {
   context_config.pulse.pApplicationName="Trove microphone";
   context_config.pulse.tryAutoSpawn=MA_FALSE;
 #endif
-  permission="unknown";
+  if(cancelled.load())throw CaptureFailure("CANCELLED","microphone startup cancelled");
+  if(std::strcmp(permission,"authorized")!=0)permission="unknown";
+  device_state="starting";
   device_error(ma_context_init(&selected,1,&context_config,&context));context_ready=true;
   ma_device_config config=ma_device_config_init(ma_device_type_capture);
   config.capture.format=ma_format_f32;config.capture.channels=1;config.sampleRate=16000;
@@ -175,7 +219,7 @@ struct Device {
   };
   device_error(ma_device_init(&context,&config,&device));device_ready=true;
   if(cancelled.load()){buffer.accepting.store(false);return;}
-  device_error(ma_device_start(&device));permission="access_opened";device_state="opened";
+  device_error(ma_device_start(&device));if(std::strcmp(permission,"authorized")!=0)permission="access_opened";device_state="opened";
  }
 };
 #endif
@@ -199,6 +243,11 @@ void record(const json &request){
  validate_destination();buffer.maximum=std::min<uint64_t>(uint64_t(duration)*16,uint64_t(maximum)/4);
  // EOF from a crashed/exited parent stops capture and flushes queued audio.
  Control control;
+#ifdef TROVE_CAPTURE_FIXTURE_STARTUP_STALL
+ // Compile-time test mode only. No device APIs exist in this fixture binary.
+ auto pending=std::make_shared<CaptureConsent>();
+ wait_capture_consent(pending,cancelled,std::chrono::steady_clock::now()+std::chrono::hours(1));
+#endif
 #ifndef TROVE_CAPTURE_FIXTURE_ONLY
  Device device;
  if(!synthetic)device.start();
@@ -253,7 +302,13 @@ int self_test(){
  CaptureBuffer bounded;bounded.maximum=3;bounded.push(input.data(),10);
  if(bounded.written.load()!=3||bounded.accepting.load())return 4;
  if(std::string(error_code(MA_ACCESS_DENIED))!="PERMISSION_DENIED"||std::string(error_code(MA_NO_DEVICE))!="DEVICE_UNAVAILABLE")return 5;
- frame({{"selfTest","PASS"},{"cases",5}});return 0;
+ auto consent=std::make_shared<CaptureConsent>();std::atomic<bool> stop{false};
+ auto deadline=std::chrono::steady_clock::now()+std::chrono::seconds(1);
+ consent->answer.store(1);if(wait_capture_consent(consent,stop,deadline)!=CaptureConsentResult::granted)return 6;
+ consent->answer.store(2);if(wait_capture_consent(consent,stop,deadline)!=CaptureConsentResult::denied)return 7;
+ consent->answer.store(0);stop.store(true);if(wait_capture_consent(consent,stop,deadline)!=CaptureConsentResult::cancelled)return 8;
+ stop.store(false);if(wait_capture_consent(consent,stop,std::chrono::steady_clock::now())!=CaptureConsentResult::timed_out)return 9;
+ frame({{"selfTest","PASS"},{"cases",9}});return 0;
 }
 #endif
 int main(int argc,char **argv){
