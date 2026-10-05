@@ -9,7 +9,9 @@ import (
 )
 
 // Optional qualification tracing contains fixed lifecycle names and elapsed
-// durations only. Existing files are never overwritten or appended to.
+// durations only. Existing files are never overwritten or appended to. Ordinary
+// bounded writes avoid adding synchronous durability work to measured startup.
+// The trace is diagnostic evidence; it makes no power-loss durability guarantee.
 type startupStageTrace struct {
 	mu      sync.Mutex
 	started time.Time
@@ -40,6 +42,15 @@ func newStartupStageTrace(path string, started time.Time) *startupStageTrace {
 	trace.file = file
 	return trace
 }
+func startupTracePending(stage string) bool {
+	startupTraceOnce.Do(func() { processStartupTrace = newStartupStageTrace(os.Getenv("TROVE_STARTUP_TRACE"), processStarted) })
+	return processStartupTrace.pending(stage)
+}
+func (t *startupStageTrace) pending(stage string) bool {
+	t.mu.Lock()
+	defer t.mu.Unlock()
+	return t.file != nil && startupStages[stage] && !t.seen[stage]
+}
 func markStartupStage(stage string) {
 	startupTraceOnce.Do(func() { processStartupTrace = newStartupStageTrace(os.Getenv("TROVE_STARTUP_TRACE"), processStarted) })
 	processStartupTrace.mark(stage)
@@ -62,7 +73,7 @@ func (t *startupStageTrace) mark(stage string) {
 	raw = append(raw, '\n')
 	n, err := t.file.Write(raw)
 	t.bytes += n
-	if err != nil || n != len(raw) || t.file.Sync() != nil || stage == "shutdown_complete" {
+	if err != nil || n != len(raw) || stage == "shutdown_complete" {
 		t.closeLocked()
 	}
 }
