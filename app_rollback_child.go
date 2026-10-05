@@ -70,6 +70,7 @@ func (a *App) confirmRollbackShellReady() {
 				state.child.Abort()
 				return
 			}
+			markStartupStage("rollback_committed")
 			state.pending.Store(false)
 			a.startJobs(k)
 			if a.ctx != nil {

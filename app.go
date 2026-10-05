@@ -58,8 +58,10 @@ func defaultWorkspacePath() (string, error) {
 	return filepath.Join(base, "Trove", "workspaces", "default"), nil
 }
 func (a *App) startup(ctx context.Context) {
+	markStartupStage("native_startup_enter")
 	a.initializeStartup(ctx, func() error {
 		a.initNative()
+		markStartupStage("native_runtime_ready")
 		runtime.OnFileDrop(ctx, func(x, y int, paths []string) {
 			for _, path := range paths {
 				handle, err := a.selectFile(path)
@@ -79,6 +81,7 @@ func (a *App) startup(ctx context.Context) {
 			return fmt.Errorf("application shut down during workspace startup")
 		default:
 		}
+		markStartupStage("workspace_open_start")
 		if a.rollback != nil {
 			target := a.rollback.child.Target()
 			if path != target.WorkspacePath {
@@ -112,6 +115,9 @@ func (a *App) initializeStartup(ctx context.Context, initialize func() error) {
 }
 
 func (a *App) completeStartup(err error) {
+	if err == nil {
+		markStartupStage("startup_complete")
+	}
 	a.mu.Lock()
 	if err != nil {
 		a.startupError = err.Error()
@@ -153,6 +159,8 @@ func (a *App) waitForStartup(ctx context.Context) error {
 }
 
 func (a *App) shutdown(context.Context) {
+	markStartupStage("shutdown_begin")
+	defer markStartupStage("shutdown_complete")
 	a.shutdownOnce.Do(func() { close(a.shutdownDone) })
 	a.CancelUpdateOperation()
 	a.lifecycle.Lock()
@@ -218,6 +226,7 @@ func (a *App) openLocked(path string, create bool) error {
 	return a.installKernelLocked(k)
 }
 func (a *App) installKernelLocked(k *workspace.Kernel) error {
+	markStartupStage("workspace_open_complete")
 	a.mu.Lock()
 	old := a.kernel
 	cancel, done := a.jobCancel, a.jobDone
@@ -306,7 +315,16 @@ func (a *App) Dispatch(method, raw string) string {
 			raw = string(payload)
 		}
 	}
-	return string(a.kernel.Dispatch(a.ctx, a.execution, method, json.RawMessage(raw)))
+	result := a.kernel.Dispatch(a.ctx, a.execution, method, json.RawMessage(raw))
+	if method == "workspace.snapshot" {
+		var envelope struct {
+			OK bool `json:"ok"`
+		}
+		if json.Unmarshal(result, &envelope) == nil && envelope.OK {
+			markStartupStage("snapshot_ready")
+		}
+	}
+	return string(result)
 }
 func (a *App) WorkspaceInfo() map[string]any {
 	a.mu.RLock()
