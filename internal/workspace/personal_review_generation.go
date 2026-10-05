@@ -271,7 +271,7 @@ func personalReviewRecordFields(ctx context.Context, q querier, page string) (st
 		if err = json.Unmarshal([]byte(raw), &value); err != nil {
 			return "", err
 		}
-		text := searchReadable(value)
+		text := searchPropertyText(kind, value)
 		if kind == "checkbox" {
 			text = fmt.Sprint(value)
 		}
