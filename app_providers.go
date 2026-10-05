@@ -35,12 +35,18 @@ func (a *App) stopProviders() {
 		h := v.(*providerHost)
 		h.stopManaged()
 		h.bridge.Close()
+		if h.listener != nil {
+			_ = h.listener.Close()
+		}
 		if h.server != nil {
 			_ = h.server.Close()
 		}
 	}
 }
 func (a *App) providerDispatch(method string, raw json.RawMessage) string {
+	if strings.HasPrefix(method, "providers.remote.") {
+		return a.providerRemoteDispatch(method, raw)
+	}
 	if strings.HasPrefix(method, "providers.claude.") {
 		return a.providerClaudeDispatch(method, raw)
 	}
@@ -83,7 +89,7 @@ func (a *App) providerDispatch(method string, raw json.RawMessage) string {
 		h.mu.Lock()
 		url := h.url
 		h.mu.Unlock()
-		result = map[string]any{"connections": h.bridge.Status(), "capabilities": []providers.Capabilities{providers.NewClaudeCode().ProbeCapabilities(), providers.NewCodex().ProbeCapabilities()}, "url": url, "remoteEnabled": false}
+		result = map[string]any{"connections": h.bridge.Status(), "capabilities": []providers.Capabilities{providers.NewClaudeCode().ProbeCapabilities(), providers.NewCodex().ProbeCapabilities()}, "url": url}
 	case "providers.preview":
 		result, err = h.bridge.PreviewContext(ctx, r.PageIDs)
 	case "providers.connect":

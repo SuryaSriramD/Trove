@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { dispatch, envelope, type WorkspaceSnapshot } from "../api";
 import "./providers.css";
+import { RemoteMCPPanel } from "./RemoteMCPPanel";
 import { ManagedProviderPanel } from "./ManagedProviderPanel";
 type ContextPreview = {
   pages: { pageId: string; title: string; revision: string; blocks?: number }[];
@@ -38,13 +39,6 @@ type Proposal = {
   }[];
   result?: unknown;
 };
-type Capability = {
-  provider: string;
-  authOwner: string;
-  route: string;
-  enabled: boolean;
-  reason: string;
-};
 export function ProviderPanel({
   workspace,
   onCommitted,
@@ -55,7 +49,6 @@ export function ProviderPanel({
   const [pages, setPages] = useState<string[]>([]),
     [tools, setTools] = useState(["readPage", "search.query"]),
     [connections, setConnections] = useState<Connection[]>([]),
-    [caps, setCaps] = useState<Capability[]>([]),
     [proposals, setProposals] = useState<Proposal[]>([]),
     [preview, setPreview] = useState<ContextPreview | null>(null),
     [pair, setPair] = useState<{
@@ -70,14 +63,13 @@ export function ProviderPanel({
     [objective, setObjective] = useState("");
   async function load() {
     const [s, p] = await Promise.all([
-      dispatch<{ connections: Connection[]; capabilities: Capability[] }>(
+      dispatch<{ connections: Connection[] }>(
         "providers.status",
         envelope(workspace),
       ),
       dispatch<Proposal[]>("providers.proposals", envelope(workspace)),
     ]);
     setConnections(s.connections);
-    setCaps(s.capabilities);
     setProposals(p);
   }
   useEffect(() => {
@@ -110,6 +102,7 @@ export function ProviderPanel({
         Local AI remains the default. Connect a client to selected pages, then
         review every proposed change here. Connections expire when Trove closes.
       </p>
+      <RemoteMCPPanel workspace={workspace} />
       <label>
         Provider{" "}
         <select
@@ -125,26 +118,12 @@ export function ProviderPanel({
           <option value="codex">Codex</option>
         </select>
       </label>
-      {provider === "codex" ? (
+      {provider !== "mcp" ? (
         <ManagedProviderPanel
-          key={workspace.workspaceId}
+          key={workspace.workspaceId + provider}
           workspace={workspace}
+          provider={provider as "codex" | "claude_code"}
         />
-      ) : provider !== "mcp" ? (
-        caps
-          .filter((c) => c.provider === provider)
-          .map((c) => (
-            <article key={c.provider}>
-              <h3>{c.provider === "codex" ? "Codex" : "Claude Code"}</h3>
-              <p>
-                Authentication owner: {c.authOwner}. {c.route}.
-              </p>
-              <p role="status">
-                Unavailable in this build. {c.reason}. No account credentials
-                are requested and no billing mode changes.
-              </p>
-            </article>
-          ))
       ) : (
         <>
           <fieldset>

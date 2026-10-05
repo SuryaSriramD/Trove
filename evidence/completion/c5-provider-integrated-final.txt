@@ -1,0 +1,6 @@
+ok  	trove.local/phase0/internal/clipper	1.484s
+ok  	trove.local/phase0/internal/providers	(cached)
+ok  	trove.local/phase0/internal/providers/auth	(cached)
+ok  	trove.local/phase0/internal/providers/remote	1.569s
+ok  	trove.local/phase0/contracts	(cached)
+ok  	trove.local/phase0	2.814s

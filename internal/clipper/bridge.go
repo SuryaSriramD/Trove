@@ -115,6 +115,9 @@ func (b *Bridge) Close() {
 	b.tokenHash = [32]byte{}
 	b.mu.Unlock()
 	b.cancel()
+	// Serve starts asynchronously and may not have registered this listener
+	// with http.Server yet. Revocation closes the owned socket synchronously.
+	_ = b.listener.Close()
 	_ = b.server.Close()
 }
 func (b *Bridge) Paired() bool { b.mu.Lock(); defer b.mu.Unlock(); return b.paired && !b.closed }

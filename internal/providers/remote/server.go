@@ -131,12 +131,17 @@ func (s *Server) Close() error {
 		}
 	}
 	server := s.http
+	listener := s.listener
 	s.pending = map[string]*pending{}
 	s.codes = map[[32]byte]*code{}
 	s.access = map[[32]byte]*token{}
 	s.refresh = map[[32]byte]*token{}
 	s.clients = map[string]client{}
 	s.mu.Unlock()
+	// Close also owns the interval before ServeTLS registers the listener.
+	if listener != nil {
+		_ = listener.Close()
+	}
 	if server != nil {
 		_ = server.Close()
 	}

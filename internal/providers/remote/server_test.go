@@ -32,6 +32,23 @@ import (
 	"golang.org/x/time/rate"
 )
 
+func TestCloseBeforeServeTLSRejectsConnections(t *testing.T) {
+	listener, err := net.Listen("tcp4", "127.0.0.1:0")
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer listener.Close()
+	server := &Server{listener: listener, http: &http.Server{}}
+	if err := server.Close(); err != nil {
+		t.Fatal(err)
+	}
+	connection, err := net.DialTimeout("tcp", listener.Addr().String(), time.Second)
+	if err == nil {
+		connection.Close()
+		t.Fatal("disabled remote listener still accepts connections before ServeTLS starts")
+	}
+}
+
 func certificate(t *testing.T) tls.Certificate {
 	t.Helper()
 	key, err := ecdsa.GenerateKey(elliptic.P256(), rand.Reader)

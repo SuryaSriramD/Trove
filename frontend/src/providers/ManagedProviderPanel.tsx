@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { dispatch, envelope, type WorkspaceSnapshot } from "../api";
 import { ProviderAccounts } from "./ProviderAccounts";
+import { ClaudeAccounts } from "./ClaudeAccounts";
 
 type Runtime = {
   provider: string;
@@ -43,14 +44,20 @@ const allowedTools: Record<string, string> = {
 
 export function ManagedProviderPanel({
   workspace,
+  provider = "codex",
 }: {
   workspace: WorkspaceSnapshot;
+  provider?: "codex" | "claude_code";
 }) {
   const [status, setStatus] = useState<Status>({
     runs: [],
     activeRunId: "",
     runtimes: [],
   });
+  const name = provider === "codex" ? "Codex" : "Claude Code";
+  const [billing, setBilling] = useState(
+    provider === "codex" ? "chatgpt_plan" : "",
+  );
   const [registration, setRegistration] = useState("");
   const [models, setModels] = useState<{ id: string; name: string }[]>([]);
   const [model, setModel] = useState("");
@@ -101,7 +108,7 @@ export function ManagedProviderPanel({
     setModel("");
     setPreview(null);
   }
-  const runtime = status.runtimes.find((r) => r.provider === "codex");
+  const runtime = status.runtimes.find((r) => r.provider === provider);
   const running = !!status.activeRunId;
   const ready =
     !busy &&
@@ -109,15 +116,18 @@ export function ManagedProviderPanel({
     !!runtime?.available &&
     !!registration &&
     !!model &&
+    !!billing &&
+    (provider === "codex" ||
+      /^claude-[A-Za-z0-9][A-Za-z0-9._-]{1,120}$/.test(model)) &&
     !!preview &&
     prompt.trim().length > 0;
   async function start(resumeRunId?: string) {
     if (!preview) return;
     await dispatch("providers.start", {
       ...envelope(workspace),
-      provider: "codex",
+      provider,
       registrationId: registration,
-      billingMode: "chatgpt_plan",
+      billingMode: billing,
       model,
       prompt,
       pageIds: pages,
@@ -128,12 +138,13 @@ export function ManagedProviderPanel({
     setPreview(null);
   }
   return (
-    <section aria-label="Managed Codex">
-      <h3>Run Codex with selected workspace access</h3>
+    <section aria-label={`Managed ${name}`}>
+      <h3>Run {name} with selected workspace access</h3>
       <p>
-        Uses the installed Codex runtime and your explicitly selected ChatGPT
-        account. Requests use that account’s ChatGPT plan. Every proposed
-        workspace change still requires your approval below.
+        {provider === "codex"
+          ? "Uses the installed Codex runtime and your explicitly selected ChatGPT account. Requests use that account’s ChatGPT plan."
+          : "Uses the unchanged installed Claude Code runtime and the vendor account signed in to your selected private profile. The profile fixes the billing route."}{" "}
+        Every proposed workspace change still requires your approval below.
       </p>
       <fieldset disabled={busy || running}>
         <legend>Account, model and shared context</legend>
@@ -142,67 +153,99 @@ export function ManagedProviderPanel({
             act(async () => {
               await dispatch("providers.discover", {
                 ...envelope(workspace),
-                provider: "codex",
+                provider,
               });
             })
           }
         >
-          Check installed Codex
+          Check installed {name}
         </button>
         {runtime && (
           <p role="status">
             {runtime.available
-              ? `Found Codex ${runtime.version}.`
+              ? `Found ${name} ${runtime.version}.`
               : runtime.reason}
           </p>
         )}
-        <ProviderAccounts
-          workspace={workspace}
-          selectedRegistrationId={registration}
-          onSelect={selectAccount}
-        />
-        <button
-          disabled={!registration}
-          onClick={() =>
-            act(async () => {
-              setModels([]);
-              setModel("");
-              const catalog = await dispatch<{
-                registrationId: string;
-                models: { id: string; name: string }[];
-              }>("providers.models", {
-                ...envelope(workspace),
-                registrationId: registration,
-              });
-              if (catalog.registrationId !== registration)
-                throw new Error("Account changed; load its model list again");
-              setModels(catalog.models);
-              if (!catalog.models.length)
-                throw new Error(
-                  "This account currently lists no available models",
-                );
-            })
-          }
-        >
-          Load models for selected account
-        </button>
-        <label>
-          Model{" "}
-          <select
-            aria-label="Account model"
-            value={model}
-            onChange={(e) => setModel(e.target.value)}
-          >
-            <option value="">Choose a model</option>
-            {models.map((m) => (
-              <option key={m.id} value={m.id}>
-                {m.name} ({m.id})
-              </option>
-            ))}
-          </select>
-        </label>
+        {provider === "codex" ? (
+          <>
+            {" "}
+            <ProviderAccounts
+              workspace={workspace}
+              selectedRegistrationId={registration}
+              onSelect={selectAccount}
+            />
+            <button
+              disabled={!registration}
+              onClick={() =>
+                act(async () => {
+                  setModels([]);
+                  setModel("");
+                  const catalog = await dispatch<{
+                    registrationId: string;
+                    models: { id: string; name: string }[];
+                  }>("providers.models", {
+                    ...envelope(workspace),
+                    registrationId: registration,
+                  });
+                  if (catalog.registrationId !== registration)
+                    throw new Error(
+                      "Account changed; load its model list again",
+                    );
+                  setModels(catalog.models);
+                  if (!catalog.models.length)
+                    throw new Error(
+                      "This account currently lists no available models",
+                    );
+                })
+              }
+            >
+              Load models for selected account
+            </button>
+            <label>
+              Model{" "}
+              <select
+                aria-label="Account model"
+                value={model}
+                onChange={(e) => setModel(e.target.value)}
+              >
+                <option value="">Choose a model</option>
+                {models.map((m) => (
+                  <option key={m.id} value={m.id}>
+                    {m.name} ({m.id})
+                  </option>
+                ))}
+              </select>
+            </label>
+          </>
+        ) : (
+          <>
+            <ClaudeAccounts
+              workspace={workspace}
+              runtimeAvailable={!!runtime?.available}
+              selectedProfileId={registration}
+              onSelect={(id, mode) => {
+                selectAccount(id);
+                setBilling(mode);
+              }}
+            />
+            <label>
+              Full Claude model identifier
+              <input
+                aria-label="Full Claude model identifier"
+                maxLength={128}
+                value={model}
+                onChange={(e) => setModel(e.target.value)}
+              />
+            </label>
+            <p>
+              Choose the full model identifier supported by your Claude account.
+              The selected billing route will not change automatically.
+            </p>
+          </>
+        )}
         <fieldset>
-          <legend>Pages shared with Codex</legend>
+          <legend>Pages shared with {name}</legend>
           {workspace.pages
             .filter((p) => !p.deletedAt)
             .map((p) => (
@@ -224,7 +267,7 @@ export function ManagedProviderPanel({
             ))}
         </fieldset>
         <fieldset>
-          <legend>Tools available to Codex</legend>
+          <legend>Tools available to {name}</legend>
           {Object.entries(allowedTools).map(([id, label]) => (
             <label key={id} style={{ display: "block" }}>
               <input
@@ -273,9 +316,9 @@ export function ManagedProviderPanel({
           </div>
         )}
         <label>
-          Request to Codex
+          Request to {name}
           <textarea
-            aria-label="Request to Codex"
+            aria-label={`Request to ${name}`}
             maxLength={65536}
             value={prompt}
             onChange={(e) => setPrompt(e.target.value)}
@@ -303,15 +346,20 @@ export function ManagedProviderPanel({
       {error && <p role="alert">{error}</p>}
       <h4>Provider runs</h4>
       {status.runs
-        .filter((r) => r.provider === "codex")
+        .filter((r) => r.provider === provider)
         .map((run) => (
           <article key={run.id}>
             <h4>
               {run.state} · {run.model}
             </h4>
             <p>
-              {run.accountLabel} · ChatGPT plan ·{" "}
-              {new Date(run.createdAt).toLocaleString()}
+              {run.accountLabel} ·{" "}
+              {run.billingMode === "chatgpt_plan"
+                ? "ChatGPT plan"
+                : run.billingMode === "claude_subscription"
+                  ? "Claude subscription"
+                  : "Anthropic API"}{" "}
+              · {new Date(run.createdAt).toLocaleString()}
             </p>
             <p>{run.prompt}</p>
             {run.text && (
@@ -321,7 +369,10 @@ export function ManagedProviderPanel({
             {!!run.checkpoint && (
               <button
                 disabled={
-                  !ready || run.account !== registration || run.model !== model
+                  !ready ||
+                  run.account !== registration ||
+                  run.model !== model ||
+                  run.billingMode !== billing
                 }
                 onClick={() => act(() => start(run.id))}
               >

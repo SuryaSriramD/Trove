@@ -78,3 +78,43 @@ func TestInvalidSignOutCannotCancelProviderRun(t *testing.T) {
 		t.Fatal("malformed sign-out cancelled an active run")
 	}
 }
+
+func TestManagedProviderRejectsMixedBillingBeforeAccountAccess(t *testing.T) {
+	k, err := workspace.Create(t.TempDir())
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer k.Close()
+	a := NewApp()
+	a.kernel, a.ctx, a.execution = k, context.Background(), k.OwnerContext()
+	defer a.stopProviders()
+	for _, choice := range []struct{ provider, billing, model string }{
+		{"codex", "anthropic_api", "account-model"},
+		{"codex", "claude_subscription", "account-model"},
+		{"claude_code", "chatgpt_plan", "claude-test-model"},
+		{"claude_code", "claude_subscription", "default"},
+	} {
+		raw, _ := json.Marshal(map[string]any{
+			"contractVersion": 1, "requestId": workspace.NewID(), "workspaceId": k.ID(),
+			"provider": choice.provider, "billingMode": choice.billing, "model": choice.model,
+			"registrationId": workspace.NewID(), "prompt": "Read this selected page",
+			"pageIds": []string{workspace.NewID()}, "tools": []string{"readPage"},
+			"previewHash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+		})
+		var out struct {
+			OK    bool `json:"ok"`
+			Error struct {
+				Code string `json:"code"`
+			} `json:"error"`
+		}
+		if err := json.Unmarshal([]byte(a.providerDispatch("providers.start", raw)), &out); err != nil {
+			t.Fatal(err)
+		}
+		if out.OK || out.Error.Code != "INVALID_REQUEST" {
+			t.Fatalf("mixed provider selection reached runtime/account lookup: %+v %+v", choice, out)
+		}
+		if _, ok := providerAuthStates.Load(a); ok {
+			t.Fatal("invalid provider selection opened credential storage")
+		}
+	}
+}

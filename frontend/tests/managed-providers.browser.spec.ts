@@ -99,3 +99,102 @@ test("account switching clears models and context; stale preview failure is visi
   await expect(page.getByRole("option", { name: /model-a/ })).toHaveCount(0);
   await expect(page.getByRole("option", { name: /model-b/ })).toHaveCount(1);
 });
+
+test("Claude preserves explicit profile billing and requires model plus reviewed context", async ({
+  page,
+}) => {
+  await page.goto(
+    `${process.env.TROVE_TEST_URL ?? "http://127.0.0.1:4173"}/tests/managed-providers-fixture.html?provider=claude_code`,
+  );
+  const start = page.getByRole("button", {
+    name: "Start with selected account and context",
+  });
+  await expect(start).toBeDisabled();
+  await page
+    .getByRole("button", { name: "Check installed Claude Code" })
+    .click();
+  await page
+    .getByRole("button", { name: "Use API Claude", exact: true })
+    .click();
+  await page.getByLabel("Full Claude model identifier").fill("default");
+  await page.getByLabel("Launch", { exact: true }).check();
+  await page
+    .getByRole("button", { name: "Review context for this run" })
+    .click();
+  await page
+    .getByLabel("Request to Claude Code", { exact: true })
+    .fill("Summarize the selected launch page.");
+  await expect(start).toBeDisabled();
+  await page
+    .getByLabel("Full Claude model identifier")
+    .fill("claude-fixture-model");
+  await start.click();
+  await expect(
+    page.getByText("Partial response", { exact: true }),
+  ).toBeVisible();
+  await expect(
+    page.getByRole("button", { name: "Use Personal Claude", exact: true }),
+  ).toBeDisabled();
+  const calls = await page.evaluate(() => (window as any).managedCalls);
+  const request = calls.find(
+    (c: any) => c.method === "providers.start",
+  ).request;
+  expect(request.provider).toBe("claude_code");
+  expect(request.billingMode).toBe("anthropic_api");
+  expect(request.model).toBe("claude-fixture-model");
+  expect(request.pageIds).toHaveLength(1);
+  expect(request.tools).toEqual(["readPage", "search.query"]);
+  expect(
+    calls.some(
+      (c: any) =>
+        c.method === "providers.models" ||
+        c.method.startsWith("providers.auth."),
+    ),
+  ).toBe(false);
+  await page.getByRole("button", { name: "Cancel provider run" }).click();
+  await page
+    .getByRole("button", { name: "Use Personal Claude", exact: true })
+    .click();
+  await expect(page.getByLabel("Full Claude model identifier")).toHaveValue("");
+  await expect(
+    page.getByRole("button", {
+      name: "Continue this session with reviewed context",
+    }),
+  ).toBeDisabled();
+});
+
+test("failed Claude native startup cannot sign in or start a run", async ({
+  page,
+}) => {
+  await page.goto(
+    `${process.env.TROVE_TEST_URL ?? "http://127.0.0.1:4173"}/tests/managed-providers-fixture.html?provider=claude_code`,
+  );
+  await page.evaluate(() => ((window as any).runtimeUnavailable = true));
+  await page
+    .getByRole("button", { name: "Check installed Claude Code" })
+    .click();
+  await expect(
+    page.getByText("Contained Claude startup failed", { exact: true }),
+  ).toBeVisible();
+  await expect(
+    page.getByRole("button", { name: "Use Personal Claude", exact: true }),
+  ).toBeDisabled();
+  await expect(
+    page.getByRole("button", {
+      name: "Sign in to Personal Claude in Terminal",
+      exact: true,
+    }),
+  ).toBeDisabled();
+  await expect(
+    page.getByRole("button", {
+      name: "Start with selected account and context",
+    }),
+  ).toBeDisabled();
+  const calls = await page.evaluate(() => (window as any).managedCalls);
+  expect(
+    calls.some(
+      (c: any) =>
+        c.method === "providers.start" || c.method === "providers.claude.login",
+    ),
+  ).toBe(false);
+});

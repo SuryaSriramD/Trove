@@ -94,3 +94,33 @@ account was used. The rerun permits isolated synthetic loopback fixtures.
 The final affected service check also covers current scope metadata and strict
 stream turn binding. `c5-provider-frontend-build.txt` records the production
 frontend build after the seven browser passes.
+
+
+## Integrated account controls and listener shutdown
+
+The desktop managed-run panel now selects Codex or Claude with an explicit
+account/profile, billing route, model and reviewed page/tool context. Claude
+uses the shared panel and its native profile manager; a failed runtime startup
+probe disables login and execution. Mixed provider/billing requests fail before
+account lookup, oversized context fails before a run is created, and resume binds
+the original account, vendor identity, billing, model, runtime and scope.
+Remote MCP controls share the same owning kernel and proposal review interface.
+Remote mutations, login/logout and account sign-out use lifecycle exclusion;
+workspace close stops remote access before the bridge/kernel closes.
+
+Integrated race checks pass for the clipper, providers, credential manager,
+remote TLS transport, contracts and native host. A shutdown regression first
+caught a listener that could remain briefly open when HTTP Serve had not yet
+registered it. Closing each owned listener directly fixes this ordering race;
+new tests assert connection refusal before HTTP serving begins. The failing
+attempt is retained in `evidence/completion/c5-provider-integrated-listener-failure.txt`;
+passing checks are in `c5-provider-integrated-final.txt`.
+
+Frontend type checking passes. The combined browser run passed twelve of
+thirteen cases; its first cold Vite navigation timed out before loading the
+Claude fixture. Rerunning all three Claude account cases on the ready server
+passed. The reports are `c5-provider-browser-cold-transform.json` and
+`c5-claude-browser-ready.json`; the earlier connection-refused attempt while
+Vite was starting is retained separately. These fixtures cover four managed-run,
+three Claude account, three ChatGPT account, two approval and one remote-consent
+scenario. They do not establish real vendor account or hosted client behavior.

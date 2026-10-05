@@ -5,6 +5,7 @@ import (
 	"context"
 	"encoding/json"
 	"io"
+	"net"
 	"net/http"
 	"strings"
 	"testing"
@@ -12,6 +13,23 @@ import (
 )
 
 const testExtension = "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+
+func TestCloseBeforeHTTPServeClosesOwnedListener(t *testing.T) {
+	listener, err := net.Listen("tcp4", "127.0.0.1:0")
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer listener.Close()
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+	bridge := &Bridge{listener: listener, server: &http.Server{}, ctx: ctx, cancel: cancel}
+	bridge.Close()
+	connection, err := net.DialTimeout("tcp", listener.Addr().String(), time.Second)
+	if err == nil {
+		connection.Close()
+		t.Fatal("revocation returned while the unserved socket still accepted connections")
+	}
+}
 
 func TestPairedBridgeOriginScopeIdempotencyAndRevocation(t *testing.T) {
 	calls := 0

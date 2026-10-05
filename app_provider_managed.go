@@ -8,6 +8,7 @@ import (
 	"errors"
 	"os"
 	"path/filepath"
+	"regexp"
 	"sort"
 	"strings"
 	"time"
@@ -86,7 +87,7 @@ func (a *App) managedProviderDispatch(method string, raw json.RawMessage) string
 	// Lifecycle is held by Dispatch. Validate the requesting workspace and owner
 	// before opening protected storage or refreshing any selected account token.
 	a.mu.RLock()
-	k, execution := a.kernel, a.execution
+	k, execution, ctx := a.kernel, a.execution, a.ctx
 	a.mu.RUnlock()
 	if k == nil || req.WorkspaceID != k.ID() {
 		return errorEnvelope("WORKSPACE_LOCKED", "No matching workspace is open")
@@ -94,20 +95,55 @@ func (a *App) managedProviderDispatch(method string, raw json.RawMessage) string
 	if k.AuthorizeProviderAuth(execution) != nil {
 		return errorEnvelope("SCOPE_DENIED", "Only the workspace owner can run providers")
 	}
-	// Authentication manager lookup briefly reads App.mu itself.
-	var accessToken string
-	var identity providers.Identity
-	var accountLabel string
-	if method == "providers.start" || method == "providers.models" {
-		if method == "providers.start" && (req.Provider != "codex" || req.BillingMode != "chatgpt_plan") {
-			return errorEnvelope("UNSUPPORTED_VERSION", "Select the supported Codex ChatGPT-plan route")
+	if ctx == nil {
+		ctx = context.Background()
+	}
+	v, _ := providerHosts.LoadOrStore(a, &providerHost{bridge: workspace.NewProviderBridge(k, execution)})
+	h := v.(*providerHost)
+	var selectedRuntime providers.Runtime
+	if method == "providers.start" {
+		if req.Provider == "codex" && req.BillingMode != "chatgpt_plan" {
+			return errorEnvelope("INVALID_REQUEST", "Choose ChatGPT plan billing for Codex")
 		}
+		if req.Provider == "claude_code" && (req.BillingMode != "claude_subscription" && req.BillingMode != "anthropic_api" || !regexp.MustCompile(`^claude-[A-Za-z0-9][A-Za-z0-9._-]{1,120}$`).MatchString(req.Model)) {
+			return errorEnvelope("INVALID_REQUEST", "Choose the Claude profile billing route and an explicit full Claude model identifier")
+		}
+		h.mu.Lock()
+		if h.managed != nil || h.starting {
+			h.mu.Unlock()
+			return errorEnvelope("CONFLICT", "Another provider run is active; cancel or finish it first")
+		}
+		h.starting = true
+		selectedRuntime = h.runtimes[req.Provider]
+		catalog := h.models[req.RegistrationID]
+		h.mu.Unlock()
+		defer func() { h.mu.Lock(); h.starting = false; h.mu.Unlock() }()
+		if !selectedRuntime.Available {
+			return errorEnvelope("RUNTIME_UNAVAILABLE", "Discover a supported native runtime first")
+		}
+		if req.Provider == "codex" {
+			selected := false
+			for _, model := range catalog.models {
+				if model.ID == req.Model {
+					selected = true
+				}
+			}
+			if !selected || !time.Now().Before(catalog.expires) {
+				return errorEnvelope("CONFLICT", "Load this account’s model list and explicitly select an available model")
+			}
+		}
+	}
+	// Host credential/profile lookup may briefly acquire App.mu itself.
+	var accessToken, accountLabel string
+	var identity providers.Identity
+	var claudeConfiguration providers.ClaudeConfig
+	if method == "providers.models" || method == "providers.start" && req.Provider == "codex" {
 		manager, err := a.getProviderAuth()
 		if err != nil {
 			return errorEnvelope("AUTH_REQUIRED", err.Error())
 		}
-		ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
-		token, err := manager.AccessToken(ctx, req.RegistrationID)
+		authCtx, cancel := context.WithTimeout(ctx, 30*time.Second)
+		token, err := manager.AccessToken(authCtx, req.RegistrationID)
 		cancel()
 		if err != nil {
 			return errorEnvelope("AUTH_REQUIRED", err.Error())
@@ -118,21 +154,14 @@ func (a *App) managedProviderDispatch(method string, raw json.RawMessage) string
 		if accountLabel == "" {
 			accountLabel = token.Identity.RegistrationID
 		}
+	} else if method == "providers.start" && req.Provider == "claude_code" {
+		var err error
+		claudeConfiguration, accountLabel, err = a.resolveClaudeProfile(ctx, req.RegistrationID, req.BillingMode, selectedRuntime)
+		if err != nil {
+			return errorEnvelope("AUTH_REQUIRED", err.Error())
+		}
+		identity = claudeConfiguration.Identity
 	}
-	a.mu.RLock()
-	defer a.mu.RUnlock()
-	if a.kernel == nil || req.WorkspaceID != a.kernel.ID() {
-		return errorEnvelope("WORKSPACE_LOCKED", "No matching workspace is open")
-	}
-	if err := a.kernel.AuthorizeProviderAuth(a.execution); err != nil {
-		return errorEnvelope("SCOPE_DENIED", err.Error())
-	}
-	ctx := a.ctx
-	if ctx == nil {
-		ctx = context.Background()
-	}
-	v, _ := providerHosts.LoadOrStore(a, &providerHost{bridge: workspace.NewProviderBridge(a.kernel, a.execution)})
-	h := v.(*providerHost)
 	result := any(nil)
 	var err error
 	switch method {
@@ -150,6 +179,9 @@ func (a *App) managedProviderDispatch(method string, raw json.RawMessage) string
 		}
 	case "providers.discover":
 		r := providers.Discover(ctx, req.Provider)
+		if req.Provider == "claude_code" {
+			r = providers.QualifyClaudeRuntime(ctx, r)
+		}
 		h.mu.Lock()
 		if h.runtimes == nil {
 			h.runtimes = map[string]providers.Runtime{}
@@ -159,7 +191,7 @@ func (a *App) managedProviderDispatch(method string, raw json.RawMessage) string
 		result = r
 	case "providers.runs":
 		var runs []workspace.ManagedRun
-		runs, err = a.kernel.ManagedRuns(ctx, a.execution)
+		runs, err = k.ManagedRuns(ctx, execution)
 		h.mu.Lock()
 		for i := range runs {
 			if saved, ok := h.unsaved[runs[i].ID]; ok {
@@ -191,28 +223,7 @@ func (a *App) managedProviderDispatch(method string, raw json.RawMessage) string
 		h.mu.Unlock()
 		result = map[string]string{"state": "cancellation_requested"}
 	case "providers.start":
-		h.mu.Lock()
-		if h.managed != nil || h.starting {
-			h.mu.Unlock()
-			return errorEnvelope("CONFLICT", "Another provider run is active; cancel or finish it first")
-		}
-		h.starting = true
-		r := h.runtimes[req.Provider]
-		catalog := h.models[req.RegistrationID]
-		h.mu.Unlock()
-		defer func() { h.mu.Lock(); h.starting = false; h.mu.Unlock() }()
-		modelAllowed := false
-		for _, model := range catalog.models {
-			if model.ID == req.Model {
-				modelAllowed = true
-			}
-		}
-		if !modelAllowed || !time.Now().Before(catalog.expires) {
-			return errorEnvelope("CONFLICT", "Load this account’s model list and explicitly select an available model")
-		}
-		if !r.Available {
-			return errorEnvelope("RUNTIME_UNAVAILABLE", "Discover a supported native runtime first")
-		}
+		r := selectedRuntime
 		identity.RuntimeVersion = r.Version
 		var manifest any
 		manifest, err = h.bridge.PreviewContext(ctx, req.PageIDs)
@@ -223,17 +234,25 @@ func (a *App) managedProviderDispatch(method string, raw json.RawMessage) string
 		if manifestMap["hash"] != req.PreviewHash {
 			return errorEnvelope("REVISION_CONFLICT", "Selected content changed; preview the shared context again")
 		}
-		scopeHash := providerScopeHash(a.kernel.ID(), req.PageIDs, req.Tools)
+		manifestJSON, marshalErr := json.Marshal(manifest)
+		limit := 256 << 10
+		if req.Provider == "claude_code" {
+			limit = 64 << 10
+		}
+		if marshalErr != nil || len(manifestJSON) > limit {
+			return errorEnvelope("RESOURCE_EXHAUSTED", "Selected context exceeds this provider’s input limit; select fewer pages and review again")
+		}
+		scopeHash := providerScopeHash(k.ID(), req.PageIDs, req.Tools)
 		var checkpoint *providers.ManagedCheckpoint
 		sessionID := workspace.NewID()
 		if req.ResumeRunID != "" {
 			var previous []workspace.ManagedRun
-			previous, err = a.kernel.ManagedRuns(ctx, a.execution)
+			previous, err = k.ManagedRuns(ctx, execution)
 			if err != nil {
 				break
 			}
 			for _, old := range previous {
-				if old.ID == req.ResumeRunID {
+				if old.ID == req.ResumeRunID && old.Account == req.RegistrationID && old.Provider == req.Provider {
 					checkpoint = old.Checkpoint
 					sessionID = old.SessionID
 					break
@@ -253,7 +272,7 @@ func (a *App) managedProviderDispatch(method string, raw json.RawMessage) string
 			break
 		}
 		managedRoot := filepath.Join(base, "Trove", "providers", "managed")
-		if pathsOverlap(managedRoot, a.kernel.Path()) {
+		if pathsOverlap(managedRoot, k.Path()) {
 			return errorEnvelope("SCOPE_DENIED", "Provider runtime state must be outside the workspace")
 		}
 		var connection workspace.ProviderConnection
@@ -267,11 +286,21 @@ func (a *App) managedProviderDispatch(method string, raw json.RawMessage) string
 			_ = h.bridge.Disconnect(ctx, connection.ID)
 			break
 		}
-		configuration := providers.CodexConfig{Runtime: r, StateDirectory: filepath.Join(managedRoot, a.kernel.ID(), sessionID), Identity: identity, ScopeHash: scopeHash, Model: req.Model, AccessToken: accessToken, Tools: specs}
-		manifestJSON, _ := json.Marshal(manifest)
+		configuration := providers.CodexConfig{Runtime: r, StateDirectory: filepath.Join(managedRoot, k.ID(), sessionID), Identity: identity, ScopeHash: scopeHash, Model: req.Model, AccessToken: accessToken, Tools: specs}
 		configuration.ContextManifest = manifestJSON
-		run := workspace.ManagedRun{ID: workspace.NewID(), SessionID: sessionID, ConnectionID: connection.ID, Provider: req.Provider, Account: identity.Account, AccountLabel: accountLabel, BillingMode: identity.BillingMode, Model: req.Model, State: "starting", Prompt: req.Prompt, PageIDs: req.PageIDs, Tools: req.Tools, Manifest: manifestJSON, CreatedAt: time.Now().UTC().Format(time.RFC3339Nano)}
-		if err = a.kernel.SaveManagedRun(ctx, a.execution, run); err != nil {
+		if req.Provider == "claude_code" {
+			claudeConfiguration.SessionDirectory = filepath.Join(claudeConfiguration.StateDirectory, "sessions", sessionID)
+			claudeConfiguration.ScopeHash, claudeConfiguration.Model = scopeHash, req.Model
+			claudeConfiguration.ConnectionID, claudeConfiguration.Token = connection.ID, connection.Token
+			claudeConfiguration.Tools, claudeConfiguration.ContextManifest = specs, manifestJSON
+			claudeConfiguration.BridgeURL, err = h.ensureLocalServer()
+			if err != nil {
+				_ = h.bridge.Disconnect(ctx, connection.ID)
+				break
+			}
+		}
+		run := workspace.ManagedRun{ID: workspace.NewID(), SessionID: sessionID, ConnectionID: connection.ID, Provider: req.Provider, Account: req.RegistrationID, AccountLabel: accountLabel, BillingMode: identity.BillingMode, Model: req.Model, State: "starting", Prompt: req.Prompt, PageIDs: req.PageIDs, Tools: req.Tools, Manifest: manifestJSON, CreatedAt: time.Now().UTC().Format(time.RFC3339Nano)}
+		if err = k.SaveManagedRun(ctx, execution, run); err != nil {
 			_ = h.bridge.Disconnect(ctx, connection.ID)
 			break
 		}
@@ -286,16 +315,13 @@ func (a *App) managedProviderDispatch(method string, raw json.RawMessage) string
 		}
 		h.managed = active
 		h.mu.Unlock()
-		k, execution := a.kernel, a.execution
 		go func() {
 			defer close(active.done)
 			defer cancel()
 			h.mu.Lock()
 			active.run.State = "running"
 			h.mu.Unlock()
-			finalCheckpoint, runErr := providers.RunCodex(runCtx, configuration, req.Prompt, checkpoint, func(callCtx context.Context, tool string, args map[string]any) (json.RawMessage, error) {
-				return h.bridge.Call(callCtx, connection.ID, connection.Token, tool, args)
-			}, func(event providers.Event) error {
+			emit := func(event providers.Event) error {
 				h.mu.Lock()
 				defer h.mu.Unlock()
 				switch event.Kind {
@@ -311,7 +337,16 @@ func (a *App) managedProviderDispatch(method string, raw json.RawMessage) string
 					active.run.Text = event.Text
 				}
 				return nil
-			})
+			}
+			var finalCheckpoint providers.ManagedCheckpoint
+			var runErr error
+			if req.Provider == "claude_code" {
+				finalCheckpoint, runErr = providers.RunClaude(runCtx, claudeConfiguration, req.Prompt, checkpoint, emit)
+			} else {
+				finalCheckpoint, runErr = providers.RunCodex(runCtx, configuration, req.Prompt, checkpoint, func(callCtx context.Context, tool string, args map[string]any) (json.RawMessage, error) {
+					return h.bridge.Call(callCtx, connection.ID, connection.Token, tool, args)
+				}, emit)
+			}
 			h.mu.Lock()
 			if finalCheckpoint.ThreadID != "" {
 				active.run.Checkpoint = &finalCheckpoint

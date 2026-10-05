@@ -15,6 +15,10 @@ const workspace = {
 } as WorkspaceSnapshot;
 const calls: any[] = [];
 (window as any).managedCalls = calls;
+const provider =
+  new URLSearchParams(location.search).get("provider") === "claude_code"
+    ? "claude_code"
+    : "codex";
 const status: any = { runs: [], activeRunId: "", runtimes: [] };
 window.go = {
   main: {
@@ -24,6 +28,25 @@ window.go = {
         const request = JSON.parse(raw);
         calls.push({ method, request });
         const ok = (result: unknown) => JSON.stringify({ ok: true, result });
+        if (method === "providers.claude.list")
+          return ok({
+            available: true,
+            reason: "",
+            profiles: [5, 6].map((n) => ({
+              id: id(n),
+              label: n === 5 ? "Personal Claude" : "API Claude",
+              billingMode: n === 5 ? "claude_subscription" : "anthropic_api",
+              createdAt: "2026-10-05T00:00:00Z",
+              auth: {
+                loggedIn: true,
+                account: `vendor-${n}`,
+                accountLabel: `account-${n}@example.test`,
+                method: "oauth",
+                billingMode: n === 5 ? "claude_subscription" : "anthropic_api",
+                reason: "",
+              },
+            })),
+          });
         if (method === "providers.auth.list")
           return ok({
             available: true,
@@ -46,11 +69,13 @@ window.go = {
         if (method === "providers.discover") {
           status.runtimes = [
             {
-              provider: "codex",
-              version: "0.153.4",
+              provider: request.provider,
+              version: request.provider === "codex" ? "0.153.4" : "2.1.283",
               sha256: "a".repeat(64),
-              available: true,
-              reason: "",
+              available: !(window as any).runtimeUnavailable,
+              reason: (window as any).runtimeUnavailable
+                ? "Contained Claude startup failed"
+                : "",
             },
           ];
           return ok(status.runtimes[0]);
@@ -89,10 +114,10 @@ window.go = {
             });
           const run = {
             id: id(7),
-            provider: "codex",
+            provider: request.provider,
             account: request.registrationId,
             accountLabel: "account-5@example.test",
-            billingMode: "chatgpt_plan",
+            billingMode: request.billingMode,
             model: request.model,
             state: "running",
             prompt: request.prompt,
@@ -120,5 +145,5 @@ window.go = {
   },
 };
 createRoot(document.getElementById("root")!).render(
-  <ManagedProviderPanel workspace={workspace} />,
+  <ManagedProviderPanel workspace={workspace} provider={provider} />,
 );

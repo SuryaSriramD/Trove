@@ -147,6 +147,7 @@ func (a *App) shutdown(context.Context) {
 	a.stopClipper()
 	a.stopRecordings()
 	a.stopAI()
+	a.stopProviderRemote()
 	a.stopProviders()
 	a.stopProviderClaude()
 	a.stopProviderAuth()
@@ -182,6 +183,7 @@ func (a *App) openLocked(path string, create bool) error {
 	a.stopClipper()
 	a.stopRecordings()
 	a.stopAI()
+	a.stopProviderRemote()
 	a.stopProviders()
 	a.stopProviderClaude()
 	a.stopProviderAuth()
@@ -237,7 +239,7 @@ func (a *App) Dispatch(method, raw string) string {
 		return a.nativeDispatch(method, json.RawMessage(raw))
 	}
 	if strings.HasPrefix(method, "providers.") {
-		if method == "providers.auth.signOut" || method == "providers.claude.login" || method == "providers.claude.logout" {
+		if method == "providers.auth.signOut" || method == "providers.claude.login" || method == "providers.claude.logout" || strings.HasPrefix(method, "providers.remote.") && method != "providers.remote.status" {
 			a.lifecycle.Lock()
 			defer a.lifecycle.Unlock()
 			return a.providerDispatch(method, json.RawMessage(raw))

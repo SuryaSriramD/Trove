@@ -1,0 +1,751 @@
+{
+  "config": {
+    "argv": [
+      "/opt/homebrew/Cellar/node/25.5.0/bin/node",
+      "/Volumes/HD-B1/HD-Projects/Trove/frontend/node_modules/@playwright/test/cli.js",
+      "test",
+      "tests/managed-providers.browser.spec.ts",
+      "tests/claude-accounts.browser.spec.ts",
+      "tests/remote-mcp.browser.spec.ts",
+      "tests/proposals.browser.spec.ts",
+      "tests/provider-auth.browser.spec.ts",
+      "--reporter=json"
+    ],
+    "configFile": "/Volumes/HD-B1/HD-Projects/Trove/frontend/playwright.config.ts",
+    "rootDir": "/Volumes/HD-B1/HD-Projects/Trove/frontend/tests",
+    "failOnFlakyTests": false,
+    "forbidOnly": false,
+    "fullyParallel": false,
+    "globalSetup": null,
+    "globalTeardown": null,
+    "globalTimeout": 0,
+    "grep": {},
+    "grepInvert": null,
+    "maxFailures": 0,
+    "metadata": {
+      "actualWorkers": 1
+    },
+    "preserveOutput": "always",
+    "projects": [
+      {
+        "outputDir": "/Volumes/HD-B1/HD-Projects/Trove/frontend/test-results",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 1
+        },
+        "id": "",
+        "name": "",
+        "testDir": "/Volumes/HD-B1/HD-Projects/Trove/frontend/tests",
+        "testIgnore": [
+          "**/._*"
+        ],
+        "testMatch": [
+          "browser.spec.ts",
+          "*.browser.spec.ts"
+        ],
+        "timeout": 30000
+      }
+    ],
+    "quiet": false,
+    "reporter": [
+      [
+        "json"
+      ]
+    ],
+    "reportSlowTests": {
+      "max": 5,
+      "threshold": 300000
+    },
+    "shard": null,
+    "tags": [],
+    "updateSnapshots": "missing",
+    "updateSourceMethod": "patch",
+    "version": "1.63.0",
+    "workers": 1,
+    "webServer": null
+  },
+  "suites": [
+    {
+      "title": "claude-accounts.browser.spec.ts",
+      "file": "claude-accounts.browser.spec.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [
+        {
+          "title": "Claude profiles retain explicit billing and never start sign-in or inference automatically",
+          "ok": false,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "failed",
+                  "duration": 195,
+                  "error": {
+                    "message": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://127.0.0.1:4173/tests/claude-accounts-fixture.html\nCall log:\n\u001b[2m  - navigating to \"http://127.0.0.1:4173/tests/claude-accounts-fixture.html\", waiting until \"load\"\u001b[22m\n",
+                    "stack": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://127.0.0.1:4173/tests/claude-accounts-fixture.html\nCall log:\n\u001b[2m  - navigating to \"http://127.0.0.1:4173/tests/claude-accounts-fixture.html\", waiting until \"load\"\u001b[22m\n\n    at /Volumes/HD-B1/HD-Projects/Trove/frontend/tests/claude-accounts.browser.spec.ts:6:14",
+                    "location": {
+                      "file": "/Volumes/HD-B1/HD-Projects/Trove/frontend/tests/claude-accounts.browser.spec.ts",
+                      "column": 14,
+                      "line": 6
+                    },
+                    "snippet": "  4 |   page,\n  5 | }) => {\n> 6 |   await page.goto(`${base}/tests/claude-accounts-fixture.html`);\n    |              ^\n  7 |   await page.getByRole(\"button\", { name: \"Use Work\", exact: true }).click();\n  8 |   await expect(page.getByLabel(\"Selected Claude profile\")).toHaveText(\n  9 |     \"019a1234-5678-7000-8000-000000000003|claude_subscription\","
+                  },
+                  "errors": [
+                    {
+                      "location": {
+                        "file": "/Volumes/HD-B1/HD-Projects/Trove/frontend/tests/claude-accounts.browser.spec.ts",
+                        "column": 14,
+                        "line": 6
+                      },
+                      "message": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://127.0.0.1:4173/tests/claude-accounts-fixture.html\nCall log:\n\u001b[2m  - navigating to \"http://127.0.0.1:4173/tests/claude-accounts-fixture.html\", waiting until \"load\"\u001b[22m\n\n\n  4 |   page,\n  5 | }) => {\n> 6 |   await page.goto(`${base}/tests/claude-accounts-fixture.html`);\n    |              ^\n  7 |   await page.getByRole(\"button\", { name: \"Use Work\", exact: true }).click();\n  8 |   await expect(page.getByLabel(\"Selected Claude profile\")).toHaveText(\n  9 |     \"019a1234-5678-7000-8000-000000000003|claude_subscription\",\n    at /Volumes/HD-B1/HD-Projects/Trove/frontend/tests/claude-accounts.browser.spec.ts:6:14"
+                    }
+                  ],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-05T10:50:54.133Z",
+                  "annotations": [],
+                  "attachments": [
+                    {
+                      "name": "error-context",
+                      "contentType": "text/markdown",
+                      "path": "/Volumes/HD-B1/HD-Projects/Trove/frontend/test-results/claude-accounts.browser-Cl-a962c--or-inference-automatically/error-context.md"
+                    }
+                  ],
+                  "errorLocation": {
+                    "file": "/Volumes/HD-B1/HD-Projects/Trove/frontend/tests/claude-accounts.browser.spec.ts",
+                    "column": 14,
+                    "line": 6
+                  }
+                }
+              ],
+              "status": "unexpected"
+            }
+          ],
+          "id": "29f39681ebe90ff8f592-bbac80e5108eba190a0b",
+          "file": "claude-accounts.browser.spec.ts",
+          "line": 3,
+          "column": 1
+        },
+        {
+          "title": "Claude terminal login cancellation and failed logout disable selection",
+          "ok": false,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 1,
+                  "parallelIndex": 0,
+                  "status": "failed",
+                  "duration": 279,
+                  "error": {
+                    "message": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://127.0.0.1:4173/tests/claude-accounts-fixture.html\nCall log:\n\u001b[2m  - navigating to \"http://127.0.0.1:4173/tests/claude-accounts-fixture.html\", waiting until \"load\"\u001b[22m\n",
+                    "stack": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://127.0.0.1:4173/tests/claude-accounts-fixture.html\nCall log:\n\u001b[2m  - navigating to \"http://127.0.0.1:4173/tests/claude-accounts-fixture.html\", waiting until \"load\"\u001b[22m\n\n    at /Volumes/HD-B1/HD-Projects/Trove/frontend/tests/claude-accounts.browser.spec.ts:43:14",
+                    "location": {
+                      "file": "/Volumes/HD-B1/HD-Projects/Trove/frontend/tests/claude-accounts.browser.spec.ts",
+                      "column": 14,
+                      "line": 43
+                    },
+                    "snippet": "  41 |   page,\n  42 | }) => {\n> 43 |   await page.goto(`${base}/tests/claude-accounts-fixture.html`);\n     |              ^\n  44 |   await page.getByRole(\"button\", { name: \"Use Work\", exact: true }).click();\n  45 |   await page\n  46 |     .getByRole(\"button\", { name: \"Sign in to Work in Terminal\", exact: true })"
+                  },
+                  "errors": [
+                    {
+                      "location": {
+                        "file": "/Volumes/HD-B1/HD-Projects/Trove/frontend/tests/claude-accounts.browser.spec.ts",
+                        "column": 14,
+                        "line": 43
+                      },
+                      "message": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://127.0.0.1:4173/tests/claude-accounts-fixture.html\nCall log:\n\u001b[2m  - navigating to \"http://127.0.0.1:4173/tests/claude-accounts-fixture.html\", waiting until \"load\"\u001b[22m\n\n\n  41 |   page,\n  42 | }) => {\n> 43 |   await page.goto(`${base}/tests/claude-accounts-fixture.html`);\n     |              ^\n  44 |   await page.getByRole(\"button\", { name: \"Use Work\", exact: true }).click();\n  45 |   await page\n  46 |     .getByRole(\"button\", { name: \"Sign in to Work in Terminal\", exact: true })\n    at /Volumes/HD-B1/HD-Projects/Trove/frontend/tests/claude-accounts.browser.spec.ts:43:14"
+                    }
+                  ],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-05T10:50:59.361Z",
+                  "annotations": [],
+                  "attachments": [
+                    {
+                      "name": "error-context",
+                      "contentType": "text/markdown",
+                      "path": "/Volumes/HD-B1/HD-Projects/Trove/frontend/test-results/claude-accounts.browser-Cl-72f61-ed-logout-disable-selection/error-context.md"
+                    }
+                  ],
+                  "errorLocation": {
+                    "file": "/Volumes/HD-B1/HD-Projects/Trove/frontend/tests/claude-accounts.browser.spec.ts",
+                    "column": 14,
+                    "line": 43
+                  }
+                }
+              ],
+              "status": "unexpected"
+            }
+          ],
+          "id": "29f39681ebe90ff8f592-f15af399351f47e111cb",
+          "file": "claude-accounts.browser.spec.ts",
+          "line": 40,
+          "column": 1
+        },
+        {
+          "title": "Unqualified native startup leaves saved Claude profiles read-only",
+          "ok": false,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 2,
+                  "parallelIndex": 0,
+                  "status": "failed",
+                  "duration": 200,
+                  "error": {
+                    "message": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://127.0.0.1:4173/tests/claude-accounts-fixture.html?unavailable\nCall log:\n\u001b[2m  - navigating to \"http://127.0.0.1:4173/tests/claude-accounts-fixture.html?unavailable\", waiting until \"load\"\u001b[22m\n",
+                    "stack": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://127.0.0.1:4173/tests/claude-accounts-fixture.html?unavailable\nCall log:\n\u001b[2m  - navigating to \"http://127.0.0.1:4173/tests/claude-accounts-fixture.html?unavailable\", waiting until \"load\"\u001b[22m\n\n    at /Volumes/HD-B1/HD-Projects/Trove/frontend/tests/claude-accounts.browser.spec.ts:102:14",
+                    "location": {
+                      "file": "/Volumes/HD-B1/HD-Projects/Trove/frontend/tests/claude-accounts.browser.spec.ts",
+                      "column": 14,
+                      "line": 102
+                    },
+                    "snippet": "  100 |   page,\n  101 | }) => {\n> 102 |   await page.goto(`${base}/tests/claude-accounts-fixture.html?unavailable`);\n      |              ^\n  103 |   await expect(page.getByRole(\"article\")).toHaveCount(2);\n  104 |   await expect(page.getByText(/Existing profiles are read-only/)).toBeVisible();\n  105 |   for (const button of await page.getByRole(\"button\").all())"
+                  },
+                  "errors": [
+                    {
+                      "location": {
+                        "file": "/Volumes/HD-B1/HD-Projects/Trove/frontend/tests/claude-accounts.browser.spec.ts",
+                        "column": 14,
+                        "line": 102
+                      },
+                      "message": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://127.0.0.1:4173/tests/claude-accounts-fixture.html?unavailable\nCall log:\n\u001b[2m  - navigating to \"http://127.0.0.1:4173/tests/claude-accounts-fixture.html?unavailable\", waiting until \"load\"\u001b[22m\n\n\n  100 |   page,\n  101 | }) => {\n> 102 |   await page.goto(`${base}/tests/claude-accounts-fixture.html?unavailable`);\n      |              ^\n  103 |   await expect(page.getByRole(\"article\")).toHaveCount(2);\n  104 |   await expect(page.getByText(/Existing profiles are read-only/)).toBeVisible();\n  105 |   for (const button of await page.getByRole(\"button\").all())\n    at /Volumes/HD-B1/HD-Projects/Trove/frontend/tests/claude-accounts.browser.spec.ts:102:14"
+                    }
+                  ],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-05T10:51:06.586Z",
+                  "annotations": [],
+                  "attachments": [
+                    {
+                      "name": "error-context",
+                      "contentType": "text/markdown",
+                      "path": "/Volumes/HD-B1/HD-Projects/Trove/frontend/test-results/claude-accounts.browser-Un-8b8e6-d-Claude-profiles-read-only/error-context.md"
+                    }
+                  ],
+                  "errorLocation": {
+                    "file": "/Volumes/HD-B1/HD-Projects/Trove/frontend/tests/claude-accounts.browser.spec.ts",
+                    "column": 14,
+                    "line": 102
+                  }
+                }
+              ],
+              "status": "unexpected"
+            }
+          ],
+          "id": "29f39681ebe90ff8f592-ef2e782d809ab6dfbd2d",
+          "file": "claude-accounts.browser.spec.ts",
+          "line": 99,
+          "column": 1
+        }
+      ]
+    },
+    {
+      "title": "managed-providers.browser.spec.ts",
+      "file": "managed-providers.browser.spec.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [
+        {
+          "title": "account/model/context require explicit choices; cancellation retains partial output",
+          "ok": false,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 3,
+                  "parallelIndex": 0,
+                  "status": "failed",
+                  "duration": 234,
+                  "error": {
+                    "message": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://127.0.0.1:4173/tests/managed-providers-fixture.html\nCall log:\n\u001b[2m  - navigating to \"http://127.0.0.1:4173/tests/managed-providers-fixture.html\", waiting until \"load\"\u001b[22m\n",
+                    "stack": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://127.0.0.1:4173/tests/managed-providers-fixture.html\nCall log:\n\u001b[2m  - navigating to \"http://127.0.0.1:4173/tests/managed-providers-fixture.html\", waiting until \"load\"\u001b[22m\n\n    at /Volumes/HD-B1/HD-Projects/Trove/frontend/tests/managed-providers.browser.spec.ts:3:14",
+                    "location": {
+                      "file": "/Volumes/HD-B1/HD-Projects/Trove/frontend/tests/managed-providers.browser.spec.ts",
+                      "column": 14,
+                      "line": 3
+                    },
+                    "snippet": "  1 | import { test, expect } from \"@playwright/test\";\n  2 | test.beforeEach(async ({ page }) => {\n> 3 |   await page.goto(\n    |              ^\n  4 |     `${process.env.TROVE_TEST_URL ?? \"http://127.0.0.1:4173\"}/tests/managed-providers-fixture.html`,\n  5 |   );\n  6 | });"
+                  },
+                  "errors": [
+                    {
+                      "location": {
+                        "file": "/Volumes/HD-B1/HD-Projects/Trove/frontend/tests/managed-providers.browser.spec.ts",
+                        "column": 14,
+                        "line": 3
+                      },
+                      "message": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://127.0.0.1:4173/tests/managed-providers-fixture.html\nCall log:\n\u001b[2m  - navigating to \"http://127.0.0.1:4173/tests/managed-providers-fixture.html\", waiting until \"load\"\u001b[22m\n\n\n  1 | import { test, expect } from \"@playwright/test\";\n  2 | test.beforeEach(async ({ page }) => {\n> 3 |   await page.goto(\n    |              ^\n  4 |     `${process.env.TROVE_TEST_URL ?? \"http://127.0.0.1:4173\"}/tests/managed-providers-fixture.html`,\n  5 |   );\n  6 | });\n    at /Volumes/HD-B1/HD-Projects/Trove/frontend/tests/managed-providers.browser.spec.ts:3:14"
+                    }
+                  ],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-05T10:51:14.399Z",
+                  "annotations": [],
+                  "attachments": [
+                    {
+                      "name": "error-context",
+                      "contentType": "text/markdown",
+                      "path": "/Volumes/HD-B1/HD-Projects/Trove/frontend/test-results/managed-providers.browser--22134-tion-retains-partial-output/error-context.md"
+                    }
+                  ],
+                  "errorLocation": {
+                    "file": "/Volumes/HD-B1/HD-Projects/Trove/frontend/tests/managed-providers.browser.spec.ts",
+                    "column": 14,
+                    "line": 3
+                  }
+                }
+              ],
+              "status": "unexpected"
+            }
+          ],
+          "id": "769fd91a5affd5ed9c60-951669e72856265dfc7b",
+          "file": "managed-providers.browser.spec.ts",
+          "line": 22,
+          "column": 1
+        },
+        {
+          "title": "account switching clears models and context; stale preview failure is visible",
+          "ok": false,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 4,
+                  "parallelIndex": 0,
+                  "status": "failed",
+                  "duration": 255,
+                  "error": {
+                    "message": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://127.0.0.1:4173/tests/managed-providers-fixture.html\nCall log:\n\u001b[2m  - navigating to \"http://127.0.0.1:4173/tests/managed-providers-fixture.html\", waiting until \"load\"\u001b[22m\n",
+                    "stack": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://127.0.0.1:4173/tests/managed-providers-fixture.html\nCall log:\n\u001b[2m  - navigating to \"http://127.0.0.1:4173/tests/managed-providers-fixture.html\", waiting until \"load\"\u001b[22m\n\n    at /Volumes/HD-B1/HD-Projects/Trove/frontend/tests/managed-providers.browser.spec.ts:3:14",
+                    "location": {
+                      "file": "/Volumes/HD-B1/HD-Projects/Trove/frontend/tests/managed-providers.browser.spec.ts",
+                      "column": 14,
+                      "line": 3
+                    },
+                    "snippet": "  1 | import { test, expect } from \"@playwright/test\";\n  2 | test.beforeEach(async ({ page }) => {\n> 3 |   await page.goto(\n    |              ^\n  4 |     `${process.env.TROVE_TEST_URL ?? \"http://127.0.0.1:4173\"}/tests/managed-providers-fixture.html`,\n  5 |   );\n  6 | });"
+                  },
+                  "errors": [
+                    {
+                      "location": {
+                        "file": "/Volumes/HD-B1/HD-Projects/Trove/frontend/tests/managed-providers.browser.spec.ts",
+                        "column": 14,
+                        "line": 3
+                      },
+                      "message": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://127.0.0.1:4173/tests/managed-providers-fixture.html\nCall log:\n\u001b[2m  - navigating to \"http://127.0.0.1:4173/tests/managed-providers-fixture.html\", waiting until \"load\"\u001b[22m\n\n\n  1 | import { test, expect } from \"@playwright/test\";\n  2 | test.beforeEach(async ({ page }) => {\n> 3 |   await page.goto(\n    |              ^\n  4 |     `${process.env.TROVE_TEST_URL ?? \"http://127.0.0.1:4173\"}/tests/managed-providers-fixture.html`,\n  5 |   );\n  6 | });\n    at /Volumes/HD-B1/HD-Projects/Trove/frontend/tests/managed-providers.browser.spec.ts:3:14"
+                    }
+                  ],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-05T10:51:24.438Z",
+                  "annotations": [],
+                  "attachments": [
+                    {
+                      "name": "error-context",
+                      "contentType": "text/markdown",
+                      "path": "/Volumes/HD-B1/HD-Projects/Trove/frontend/test-results/managed-providers.browser--8a4cc--preview-failure-is-visible/error-context.md"
+                    }
+                  ],
+                  "errorLocation": {
+                    "file": "/Volumes/HD-B1/HD-Projects/Trove/frontend/tests/managed-providers.browser.spec.ts",
+                    "column": 14,
+                    "line": 3
+                  }
+                }
+              ],
+              "status": "unexpected"
+            }
+          ],
+          "id": "769fd91a5affd5ed9c60-b222c727677588814dfb",
+          "file": "managed-providers.browser.spec.ts",
+          "line": 75,
+          "column": 1
+        },
+        {
+          "title": "Claude preserves explicit profile billing and requires model plus reviewed context",
+          "ok": false,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 5,
+                  "parallelIndex": 0,
+                  "status": "failed",
+                  "duration": 208,
+                  "error": {
+                    "message": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://127.0.0.1:4173/tests/managed-providers-fixture.html\nCall log:\n\u001b[2m  - navigating to \"http://127.0.0.1:4173/tests/managed-providers-fixture.html\", waiting until \"load\"\u001b[22m\n",
+                    "stack": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://127.0.0.1:4173/tests/managed-providers-fixture.html\nCall log:\n\u001b[2m  - navigating to \"http://127.0.0.1:4173/tests/managed-providers-fixture.html\", waiting until \"load\"\u001b[22m\n\n    at /Volumes/HD-B1/HD-Projects/Trove/frontend/tests/managed-providers.browser.spec.ts:3:14",
+                    "location": {
+                      "file": "/Volumes/HD-B1/HD-Projects/Trove/frontend/tests/managed-providers.browser.spec.ts",
+                      "column": 14,
+                      "line": 3
+                    },
+                    "snippet": "  1 | import { test, expect } from \"@playwright/test\";\n  2 | test.beforeEach(async ({ page }) => {\n> 3 |   await page.goto(\n    |              ^\n  4 |     `${process.env.TROVE_TEST_URL ?? \"http://127.0.0.1:4173\"}/tests/managed-providers-fixture.html`,\n  5 |   );\n  6 | });"
+                  },
+                  "errors": [
+                    {
+                      "location": {
+                        "file": "/Volumes/HD-B1/HD-Projects/Trove/frontend/tests/managed-providers.browser.spec.ts",
+                        "column": 14,
+                        "line": 3
+                      },
+                      "message": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://127.0.0.1:4173/tests/managed-providers-fixture.html\nCall log:\n\u001b[2m  - navigating to \"http://127.0.0.1:4173/tests/managed-providers-fixture.html\", waiting until \"load\"\u001b[22m\n\n\n  1 | import { test, expect } from \"@playwright/test\";\n  2 | test.beforeEach(async ({ page }) => {\n> 3 |   await page.goto(\n    |              ^\n  4 |     `${process.env.TROVE_TEST_URL ?? \"http://127.0.0.1:4173\"}/tests/managed-providers-fixture.html`,\n  5 |   );\n  6 | });\n    at /Volumes/HD-B1/HD-Projects/Trove/frontend/tests/managed-providers.browser.spec.ts:3:14"
+                    }
+                  ],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-05T10:51:32.720Z",
+                  "annotations": [],
+                  "attachments": [
+                    {
+                      "name": "error-context",
+                      "contentType": "text/markdown",
+                      "path": "/Volumes/HD-B1/HD-Projects/Trove/frontend/test-results/managed-providers.browser--e7944-model-plus-reviewed-context/error-context.md"
+                    }
+                  ],
+                  "errorLocation": {
+                    "file": "/Volumes/HD-B1/HD-Projects/Trove/frontend/tests/managed-providers.browser.spec.ts",
+                    "column": 14,
+                    "line": 3
+                  }
+                }
+              ],
+              "status": "unexpected"
+            }
+          ],
+          "id": "769fd91a5affd5ed9c60-14de71d9c88a717e69e0",
+          "file": "managed-providers.browser.spec.ts",
+          "line": 103,
+          "column": 1
+        },
+        {
+          "title": "failed Claude native startup cannot sign in or start a run",
+          "ok": false,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 6,
+                  "parallelIndex": 0,
+                  "status": "failed",
+                  "duration": 204,
+                  "error": {
+                    "message": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://127.0.0.1:4173/tests/managed-providers-fixture.html\nCall log:\n\u001b[2m  - navigating to \"http://127.0.0.1:4173/tests/managed-providers-fixture.html\", waiting until \"load\"\u001b[22m\n",
+                    "stack": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://127.0.0.1:4173/tests/managed-providers-fixture.html\nCall log:\n\u001b[2m  - navigating to \"http://127.0.0.1:4173/tests/managed-providers-fixture.html\", waiting until \"load\"\u001b[22m\n\n    at /Volumes/HD-B1/HD-Projects/Trove/frontend/tests/managed-providers.browser.spec.ts:3:14",
+                    "location": {
+                      "file": "/Volumes/HD-B1/HD-Projects/Trove/frontend/tests/managed-providers.browser.spec.ts",
+                      "column": 14,
+                      "line": 3
+                    },
+                    "snippet": "  1 | import { test, expect } from \"@playwright/test\";\n  2 | test.beforeEach(async ({ page }) => {\n> 3 |   await page.goto(\n    |              ^\n  4 |     `${process.env.TROVE_TEST_URL ?? \"http://127.0.0.1:4173\"}/tests/managed-providers-fixture.html`,\n  5 |   );\n  6 | });"
+                  },
+                  "errors": [
+                    {
+                      "location": {
+                        "file": "/Volumes/HD-B1/HD-Projects/Trove/frontend/tests/managed-providers.browser.spec.ts",
+                        "column": 14,
+                        "line": 3
+                      },
+                      "message": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://127.0.0.1:4173/tests/managed-providers-fixture.html\nCall log:\n\u001b[2m  - navigating to \"http://127.0.0.1:4173/tests/managed-providers-fixture.html\", waiting until \"load\"\u001b[22m\n\n\n  1 | import { test, expect } from \"@playwright/test\";\n  2 | test.beforeEach(async ({ page }) => {\n> 3 |   await page.goto(\n    |              ^\n  4 |     `${process.env.TROVE_TEST_URL ?? \"http://127.0.0.1:4173\"}/tests/managed-providers-fixture.html`,\n  5 |   );\n  6 | });\n    at /Volumes/HD-B1/HD-Projects/Trove/frontend/tests/managed-providers.browser.spec.ts:3:14"
+                    }
+                  ],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-05T10:51:42.037Z",
+                  "annotations": [],
+                  "attachments": [
+                    {
+                      "name": "error-context",
+                      "contentType": "text/markdown",
+                      "path": "/Volumes/HD-B1/HD-Projects/Trove/frontend/test-results/managed-providers.browser--fea90-nnot-sign-in-or-start-a-run/error-context.md"
+                    }
+                  ],
+                  "errorLocation": {
+                    "file": "/Volumes/HD-B1/HD-Projects/Trove/frontend/tests/managed-providers.browser.spec.ts",
+                    "column": 14,
+                    "line": 3
+                  }
+                }
+              ],
+              "status": "unexpected"
+            }
+          ],
+          "id": "769fd91a5affd5ed9c60-93e113fd4a9aaf3cae85",
+          "file": "managed-providers.browser.spec.ts",
+          "line": 166,
+          "column": 1
+        }
+      ]
+    },
+    {
+      "title": "proposals.browser.spec.ts",
+      "file": "proposals.browser.spec.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [
+        {
+          "title": "named local plan has readable review without internal command entry and requires approval",
+          "ok": false,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 7,
+                  "parallelIndex": 0,
+                  "status": "failed",
+                  "duration": 240,
+                  "error": {
+                    "message": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://127.0.0.1:4173/tests/proposals-fixture.html\nCall log:\n\u001b[2m  - navigating to \"http://127.0.0.1:4173/tests/proposals-fixture.html\", waiting until \"load\"\u001b[22m\n",
+                    "stack": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://127.0.0.1:4173/tests/proposals-fixture.html\nCall log:\n\u001b[2m  - navigating to \"http://127.0.0.1:4173/tests/proposals-fixture.html\", waiting until \"load\"\u001b[22m\n\n    at /Volumes/HD-B1/HD-Projects/Trove/frontend/tests/proposals.browser.spec.ts:3:14",
+                    "location": {
+                      "file": "/Volumes/HD-B1/HD-Projects/Trove/frontend/tests/proposals.browser.spec.ts",
+                      "column": 14,
+                      "line": 3
+                    },
+                    "snippet": "  1 | import { test, expect } from \"@playwright/test\";\n  2 | test.beforeEach(async ({ page }) => {\n> 3 |   await page.goto(\n    |              ^\n  4 |     `${process.env.TROVE_TEST_URL ?? \"http://127.0.0.1:4173\"}/tests/proposals-fixture.html`,\n  5 |   );\n  6 | });"
+                  },
+                  "errors": [
+                    {
+                      "location": {
+                        "file": "/Volumes/HD-B1/HD-Projects/Trove/frontend/tests/proposals.browser.spec.ts",
+                        "column": 14,
+                        "line": 3
+                      },
+                      "message": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://127.0.0.1:4173/tests/proposals-fixture.html\nCall log:\n\u001b[2m  - navigating to \"http://127.0.0.1:4173/tests/proposals-fixture.html\", waiting until \"load\"\u001b[22m\n\n\n  1 | import { test, expect } from \"@playwright/test\";\n  2 | test.beforeEach(async ({ page }) => {\n> 3 |   await page.goto(\n    |              ^\n  4 |     `${process.env.TROVE_TEST_URL ?? \"http://127.0.0.1:4173\"}/tests/proposals-fixture.html`,\n  5 |   );\n  6 | });\n    at /Volumes/HD-B1/HD-Projects/Trove/frontend/tests/proposals.browser.spec.ts:3:14"
+                    }
+                  ],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-05T10:51:48.488Z",
+                  "annotations": [],
+                  "attachments": [
+                    {
+                      "name": "error-context",
+                      "contentType": "text/markdown",
+                      "path": "/Volumes/HD-B1/HD-Projects/Trove/frontend/test-results/proposals.browser-named-lo-f138f-entry-and-requires-approval/error-context.md"
+                    }
+                  ],
+                  "errorLocation": {
+                    "file": "/Volumes/HD-B1/HD-Projects/Trove/frontend/tests/proposals.browser.spec.ts",
+                    "column": 14,
+                    "line": 3
+                  }
+                }
+              ],
+              "status": "unexpected"
+            }
+          ],
+          "id": "c5909b61e3a4eb13ca18-0d337a6dd9e816ef815b",
+          "file": "proposals.browser.spec.ts",
+          "line": 7,
+          "column": 1
+        },
+        {
+          "title": "paired client changes show destinations and remain unapplied until review",
+          "ok": false,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 8,
+                  "parallelIndex": 0,
+                  "status": "failed",
+                  "duration": 212,
+                  "error": {
+                    "message": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://127.0.0.1:4173/tests/proposals-fixture.html\nCall log:\n\u001b[2m  - navigating to \"http://127.0.0.1:4173/tests/proposals-fixture.html\", waiting until \"load\"\u001b[22m\n",
+                    "stack": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://127.0.0.1:4173/tests/proposals-fixture.html\nCall log:\n\u001b[2m  - navigating to \"http://127.0.0.1:4173/tests/proposals-fixture.html\", waiting until \"load\"\u001b[22m\n\n    at /Volumes/HD-B1/HD-Projects/Trove/frontend/tests/proposals.browser.spec.ts:3:14",
+                    "location": {
+                      "file": "/Volumes/HD-B1/HD-Projects/Trove/frontend/tests/proposals.browser.spec.ts",
+                      "column": 14,
+                      "line": 3
+                    },
+                    "snippet": "  1 | import { test, expect } from \"@playwright/test\";\n  2 | test.beforeEach(async ({ page }) => {\n> 3 |   await page.goto(\n    |              ^\n  4 |     `${process.env.TROVE_TEST_URL ?? \"http://127.0.0.1:4173\"}/tests/proposals-fixture.html`,\n  5 |   );\n  6 | });"
+                  },
+                  "errors": [
+                    {
+                      "location": {
+                        "file": "/Volumes/HD-B1/HD-Projects/Trove/frontend/tests/proposals.browser.spec.ts",
+                        "column": 14,
+                        "line": 3
+                      },
+                      "message": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://127.0.0.1:4173/tests/proposals-fixture.html\nCall log:\n\u001b[2m  - navigating to \"http://127.0.0.1:4173/tests/proposals-fixture.html\", waiting until \"load\"\u001b[22m\n\n\n  1 | import { test, expect } from \"@playwright/test\";\n  2 | test.beforeEach(async ({ page }) => {\n> 3 |   await page.goto(\n    |              ^\n  4 |     `${process.env.TROVE_TEST_URL ?? \"http://127.0.0.1:4173\"}/tests/proposals-fixture.html`,\n  5 |   );\n  6 | });\n    at /Volumes/HD-B1/HD-Projects/Trove/frontend/tests/proposals.browser.spec.ts:3:14"
+                    }
+                  ],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-05T10:51:54.278Z",
+                  "annotations": [],
+                  "attachments": [
+                    {
+                      "name": "error-context",
+                      "contentType": "text/markdown",
+                      "path": "/Volumes/HD-B1/HD-Projects/Trove/frontend/test-results/proposals.browser-paired-c-70735-main-unapplied-until-review/error-context.md"
+                    }
+                  ],
+                  "errorLocation": {
+                    "file": "/Volumes/HD-B1/HD-Projects/Trove/frontend/tests/proposals.browser.spec.ts",
+                    "column": 14,
+                    "line": 3
+                  }
+                }
+              ],
+              "status": "unexpected"
+            }
+          ],
+          "id": "c5909b61e3a4eb13ca18-aaec6d6a9a66916439e6",
+          "file": "proposals.browser.spec.ts",
+          "line": 45,
+          "column": 1
+        }
+      ]
+    },
+    {
+      "title": "remote-mcp.browser.spec.ts",
+      "file": "remote-mcp.browser.spec.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [
+        {
+          "title": "native certificate handle and explicit scoped consent precede remote access",
+          "ok": false,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 9,
+                  "parallelIndex": 0,
+                  "status": "failed",
+                  "duration": 212,
+                  "error": {
+                    "message": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://127.0.0.1:4173/tests/remote-mcp-fixture.html\nCall log:\n\u001b[2m  - navigating to \"http://127.0.0.1:4173/tests/remote-mcp-fixture.html\", waiting until \"load\"\u001b[22m\n",
+                    "stack": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://127.0.0.1:4173/tests/remote-mcp-fixture.html\nCall log:\n\u001b[2m  - navigating to \"http://127.0.0.1:4173/tests/remote-mcp-fixture.html\", waiting until \"load\"\u001b[22m\n\n    at /Volumes/HD-B1/HD-Projects/Trove/frontend/tests/remote-mcp.browser.spec.ts:3:14",
+                    "location": {
+                      "file": "/Volumes/HD-B1/HD-Projects/Trove/frontend/tests/remote-mcp.browser.spec.ts",
+                      "column": 14,
+                      "line": 3
+                    },
+                    "snippet": "  1 | import { test, expect } from \"@playwright/test\";\n  2 | test.beforeEach(async ({ page }) => {\n> 3 |   await page.goto(\n    |              ^\n  4 |     `${process.env.TROVE_REMOTE_TEST_URL ?? process.env.TROVE_TEST_URL ?? \"http://127.0.0.1:4173\"}/tests/remote-mcp-fixture.html`,\n  5 |   );\n  6 | });"
+                  },
+                  "errors": [
+                    {
+                      "location": {
+                        "file": "/Volumes/HD-B1/HD-Projects/Trove/frontend/tests/remote-mcp.browser.spec.ts",
+                        "column": 14,
+                        "line": 3
+                      },
+                      "message": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://127.0.0.1:4173/tests/remote-mcp-fixture.html\nCall log:\n\u001b[2m  - navigating to \"http://127.0.0.1:4173/tests/remote-mcp-fixture.html\", waiting until \"load\"\u001b[22m\n\n\n  1 | import { test, expect } from \"@playwright/test\";\n  2 | test.beforeEach(async ({ page }) => {\n> 3 |   await page.goto(\n    |              ^\n  4 |     `${process.env.TROVE_REMOTE_TEST_URL ?? process.env.TROVE_TEST_URL ?? \"http://127.0.0.1:4173\"}/tests/remote-mcp-fixture.html`,\n  5 |   );\n  6 | });\n    at /Volumes/HD-B1/HD-Projects/Trove/frontend/tests/remote-mcp.browser.spec.ts:3:14"
+                    }
+                  ],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-05T10:52:01.300Z",
+                  "annotations": [],
+                  "attachments": [
+                    {
+                      "name": "error-context",
+                      "contentType": "text/markdown",
+                      "path": "/Volumes/HD-B1/HD-Projects/Trove/frontend/test-results/remote-mcp.browser-native--827ff-nsent-precede-remote-access/error-context.md"
+                    }
+                  ],
+                  "errorLocation": {
+                    "file": "/Volumes/HD-B1/HD-Projects/Trove/frontend/tests/remote-mcp.browser.spec.ts",
+                    "column": 14,
+                    "line": 3
+                  }
+                }
+              ],
+              "status": "unexpected"
+            }
+          ],
+          "id": "57e812f578c82d2fb590-bd2cbb86460e648d71b3",
+          "file": "remote-mcp.browser.spec.ts",
+          "line": 7,
+          "column": 1
+        }
+      ]
+    }
+  ],
+  "errors": [],
+  "stats": {
+    "startTime": "2026-10-05T10:50:41.568Z",
+    "duration": 83167.677,
+    "expected": 0,
+    "skipped": 0,
+    "unexpected": 10,
+    "flaky": 0
+  }
+}

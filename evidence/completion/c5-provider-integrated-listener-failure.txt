@@ -1,0 +1,12 @@
+ok  	trove.local/phase0/internal/providers	2.281s
+# trove.local/phase0/internal/sqlitevec
+internal/sqlitevec/register.go:11:12: warning: 'sqlite3_auto_extension' is deprecated: first deprecated in macOS 10.10 - Process-global auto extensions are not supported on Apple platforms [-Wdeprecated-declarations]
+/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/sqlite3.h:7627:16: note: 'sqlite3_auto_extension' has been explicitly marked deprecated here
+ok  	trove.local/phase0/internal/providers/auth	3.647s
+ok  	trove.local/phase0/internal/providers/remote	1.899s
+ok  	trove.local/phase0/contracts	6.472s
+--- FAIL: TestDesktopClipperExplicitSessionRevocationAndShutdown (1.21s)
+    app_clipper_test.go:60: revoked listener still open
+FAIL
+FAIL	trove.local/phase0	6.035s
+FAIL

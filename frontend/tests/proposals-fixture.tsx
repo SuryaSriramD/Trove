@@ -74,6 +74,16 @@ const change = {
           });
         if (method === "ai.applyAction")
           return ok({ pageId: "", state: "applied" });
+        if (method === "providers.remote.status")
+          return ok({
+            enabled: false,
+            origin: "",
+            bindAddress: "",
+            certificateExpiresAt: "",
+            connections: [],
+            authorizations: [],
+            message: "",
+          });
         if (method === "providers.status")
           return ok({ connections: [], capabilities: [] });
         if (method === "providers.proposals")
