@@ -1,0 +1,216 @@
+{
+  "recordedAt": "2026-10-05T12:42:26.529443+00:00",
+  "sourceCommit": "636462c78cb61c57fa1033afaed752994567b6cf",
+  "releaseQualified": false,
+  "scope": "Synthetic developer integration: original strict memory/authority, additional cited evidence and reviewed creation; no packaged/platform release claim.",
+  "hardware": {
+    "hw.model": "Mac16,12",
+    "hw.memsize": "25769803776",
+    "machdep.cpu.brand_string": "Apple M4"
+  },
+  "operatingSystem": "ProductName:\t\tmacOS\nProductVersion:\t\t27.0.1\nBuildVersion:\t\t26A434",
+  "nativeHelper": {
+    "path": "/private/tmp/trove-completion-native-memory/llama-worker",
+    "sizeBytes": 7110688,
+    "sha256": "e2a14be8524c76491e0b4779604fd33f151905594c1eec96621c79596ca131c3"
+  },
+  "nativeBundleManifest": {
+    "path": "/private/tmp/trove-completion-native-memory/manifest.json",
+    "sizeBytes": 1042,
+    "sha256": "51a01bd8b9e95c65a19a7f86b4f4559bcb046e971652803eeb73bd4657321512"
+  },
+  "models": [
+    {
+      "manifest": {
+        "schemaVersion": 1,
+        "architecture": "arm64",
+        "license": "Apache-2.0",
+        "estimatedMemoryBytes": 3221225472,
+        "id": "01990000-0000-7000-8000-000000000105",
+        "name": "Qwen2.5 1.5B Instruct Q5",
+        "kind": "chat",
+        "format": "gguf",
+        "sha256": "b46661073c18e5b56a41fa320975f866a00def1ff08feef4718e013258896f8c",
+        "sizeBytes": 1285494304,
+        "url": "https://huggingface.co/Qwen/Qwen2.5-1.5B-Instruct-GGUF/resolve/91cad51170dc346986eccefdc2dd33a9da36ead9/qwen2.5-1.5b-instruct-q5_k_m.gguf",
+        "licenseUrl": "https://huggingface.co/Qwen/Qwen2.5-1.5B-Instruct-GGUF/blob/91cad51170dc346986eccefdc2dd33a9da36ead9/LICENSE",
+        "sourceRevision": "91cad51170dc346986eccefdc2dd33a9da36ead9",
+        "runtimeCommit": "d2e54583c7452353eb35d40431281f6ee984332f",
+        "contextTokens": 8192
+      },
+      "file": {
+        "path": "/Users/suryasriramduvvuri/Library/Caches/Trove/completion/models/01990000-0000-7000-8000-000000000105.model",
+        "sizeBytes": 1285494304,
+        "sha256": "b46661073c18e5b56a41fa320975f866a00def1ff08feef4718e013258896f8c"
+      }
+    },
+    {
+      "manifest": {
+        "schemaVersion": 1,
+        "id": "01990000-0000-7000-8000-000000000106",
+        "name": "Qwen2.5 7B Instruct Q3",
+        "kind": "chat",
+        "format": "gguf",
+        "sha256": "a96b16179dc6cc9afdf0cf7a96a80c199cbd00b9be207c3465be21cb721cca5e",
+        "sizeBytes": 3808391072,
+        "url": "https://huggingface.co/Qwen/Qwen2.5-7B-Instruct-GGUF/resolve/bb5d59e06d9551d752d08b292a50eb208b07ab1f/qwen2.5-7b-instruct-q3_k_m.gguf",
+        "license": "Apache-2.0",
+        "licenseUrl": "https://huggingface.co/Qwen/Qwen2.5-7B-Instruct-GGUF/blob/bb5d59e06d9551d752d08b292a50eb208b07ab1f/LICENSE",
+        "sourceRevision": "bb5d59e06d9551d752d08b292a50eb208b07ab1f",
+        "runtimeCommit": "d2e54583c7452353eb35d40431281f6ee984332f",
+        "architecture": "portable",
+        "contextTokens": 8192,
+        "estimatedMemoryBytes": 8589934592
+      },
+      "file": {
+        "path": "/Users/suryasriramduvvuri/Library/Caches/Trove/completion/models/01990000-0000-7000-8000-000000000106.model",
+        "sizeBytes": 3808391072,
+        "sha256": "a96b16179dc6cc9afdf0cf7a96a80c199cbd00b9be207c3465be21cb721cca5e"
+      }
+    }
+  ],
+  "sourceFiles": [
+    {
+      "path": "native/models/catalog.json",
+      "sizeBytes": 6221,
+      "sha256": "009cbd0c777c5c5bc5cba5212f07b47b93f5ab6ae568f2a5ad3e1f229fd22a2e"
+    },
+    {
+      "path": "native/models/provenance.json",
+      "sizeBytes": 2590,
+      "sha256": "feed01f33d03b8d26b563fdf76a376ff0bea5ed5adae8cc0e7998a39d436d2fb"
+    },
+    {
+      "path": "frontend/src/ai/AIPanel.tsx",
+      "sizeBytes": 29148,
+      "sha256": "3ed05e778488f368d5456b5a4269cd8d433522209aec78c1f787f2e5b14c3056"
+    },
+    {
+      "path": "internal/workspace/ai_local_evaluation_test.go",
+      "sizeBytes": 11526,
+      "sha256": "a4a3bfff7f1b4ab46653174906ea2842e9d9abfee4629e7a68b90e98a6b36159"
+    },
+    {
+      "path": "internal/workspace/ai_local_heldout_test.go",
+      "sizeBytes": 6564,
+      "sha256": "09c5885c585f1d5f79f847551b45383a33ff089cd455101ff8adf38f52f0c72c"
+    },
+    {
+      "path": "internal/workspace/ai_generation.go",
+      "sizeBytes": 11440,
+      "sha256": "9443b3da5d3b832bcb4caa579a9ea2531e439042698990f39a6fc9f7863e37b3"
+    },
+    {
+      "path": "internal/workspace/ai_context.go",
+      "sizeBytes": 7879,
+      "sha256": "c386ce973aa1c9e0f9ef00de6a8e768bd571787d9c5b6bc9fe7551fa4a2615e1"
+    },
+    {
+      "path": "internal/native/generation.go",
+      "sizeBytes": 6286,
+      "sha256": "88b7bf60a242177150244a0cbfbbf17b93f2157c25061ae62260276dbec7feac"
+    },
+    {
+      "path": "native/llama-worker.cpp",
+      "sizeBytes": 6529,
+      "sha256": "906f756fa79144886c176a5f11f0d4e6607e2268b804ed0dd052bd01164114c1"
+    },
+    {
+      "path": "native/worker.hpp",
+      "sizeBytes": 3015,
+      "sha256": "fd7bef552ac58050db6b2d1d1cbd3783a1d3c9ef0fd1af0e1490265a21197817"
+    }
+  ],
+  "peakWorkerRSSBytes": null,
+  "reports": [
+    {
+      "path": "evidence/completion/memory-capacity/affected-race.jsonl",
+      "sizeBytes": 29255,
+      "sha256": "de32125284150c7e5dff73d242bac07f9d1a22a6f9f2bf55f2929a26cf8daef5",
+      "testEvents": {
+        "pass": 27,
+        "fail": 0,
+        "skip": 4
+      }
+    },
+    {
+      "path": "evidence/completion/memory-capacity/negative-oracle-v1.go.txt",
+      "sizeBytes": 5932,
+      "sha256": "da38f8f72f623fd8fa14eac72c358d14d581bd6ef437b9f9dc45b14af6588124"
+    },
+    {
+      "path": "evidence/completion/memory-capacity/official-model-source.json",
+      "sizeBytes": 806,
+      "sha256": "d63221a0925153485e0696152754e292ed044b8a8a7640bd40a7c798edfc10ba"
+    },
+    {
+      "path": "evidence/completion/memory-capacity/qwen-1.5b-original-strict.jsonl",
+      "sizeBytes": 9135,
+      "sha256": "c5368f835206840328b5dc4b7c075e1c8945e7652b122c10fb6daca43ef819af",
+      "testEvents": {
+        "pass": 1,
+        "fail": 3,
+        "skip": 0
+      }
+    },
+    {
+      "path": "evidence/completion/memory-capacity/qwen-7b-heldout-final.jsonl",
+      "sizeBytes": 8967,
+      "sha256": "6c441bb7935076325c1efb7c3aa1c018a791bd294b38b994f088af57be6768a8",
+      "testEvents": {
+        "pass": 5,
+        "fail": 0,
+        "skip": 0
+      }
+    },
+    {
+      "path": "evidence/completion/memory-capacity/qwen-7b-heldout-interrupted.jsonl",
+      "sizeBytes": 120266,
+      "sha256": "0bef71968b1c306e018497b057e3a6f88f76d958dee849cf3bbc4f40edda5931",
+      "testEvents": {
+        "pass": 3,
+        "fail": 0,
+        "skip": 0
+      }
+    },
+    {
+      "path": "evidence/completion/memory-capacity/qwen-7b-negative-oracle-v1.jsonl",
+      "sizeBytes": 3519,
+      "sha256": "09bb2cab32f472e6eff5e248e4afc0a1de980ee06723f7bf015b770f045e0450",
+      "testEvents": {
+        "pass": 0,
+        "fail": 2,
+        "skip": 0
+      }
+    },
+    {
+      "path": "evidence/completion/memory-capacity/qwen-7b-original-strict.jsonl",
+      "sizeBytes": 10461,
+      "sha256": "ab741154c8f1c9025745dd6b446d71b53f84da1939ad3f2c237f9fec3fbacd7b",
+      "testEvents": {
+        "pass": 4,
+        "fail": 0,
+        "skip": 0
+      }
+    },
+    {
+      "path": "evidence/completion/memory-capacity/typecheck-stale-dependencies.txt",
+      "sizeBytes": 805,
+      "sha256": "4551531b4312bece9f6263ad4ad5ea6884b9e04db2e92ca908d38feaaecac074"
+    },
+    {
+      "path": "evidence/completion/memory-capacity/typecheck.txt",
+      "sizeBytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  ],
+  "notes": [
+    "Original persisted-memory fixture and strict claim/quote/format assertions unchanged; only explicit environment model selection added.",
+    "Initial held-out aggregate was investigator-interrupted; successful named action and two cases remain per-case evidence, not aggregate qualification.",
+    "Initial extra negative-evidence oracle required a refusal despite an explicit unassigned-owner source. Review accepted correction to supported-negative semantics; original source/log retained and genuinely absent-owner case keeps exact abstention.",
+    "Ordinary race run skipped four opt-in real-model tests; separate reports cover three test families. Personal reviews are outside this package.",
+    "8 GiB new-pack admission is conservative metadata, not measured peak RSS. Existing runtime budget unchanged.",
+    "Model acquisition used Manager.Acquire, verified full SHA and GGUF magic; public pinned weights remain untracked.",
+    "Production prompt, quote grammar, numeric guard, approval service, native helper and workspace schema unchanged."
+  ]
+}

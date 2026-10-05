@@ -1,0 +1,27 @@
+{
+  "url": "https://huggingface.co/api/models/Qwen/Qwen2.5-7B-Instruct-GGUF/revision/bb5d59e06d9551d752d08b292a50eb208b07ab1f?blobs=true",
+  "revision": "bb5d59e06d9551d752d08b292a50eb208b07ab1f",
+  "license": "apache-2.0",
+  "files": [
+    {
+      "rfilename": "LICENSE",
+      "blobId": "6634c8cc3133b3848ec74b9f275acaaa1ea618ab",
+      "size": 11343
+    },
+    {
+      "rfilename": "README.md",
+      "blobId": "ca2c9f96fd63f24198dfafd7facbfef1366d6a99",
+      "size": 5633
+    },
+    {
+      "rfilename": "qwen2.5-7b-instruct-q3_k_m.gguf",
+      "blobId": "5b08bf3a3c60bea552dc2be230bf99455a856ea7",
+      "size": 3808391072,
+      "lfs": {
+        "sha256": "a96b16179dc6cc9afdf0cf7a96a80c199cbd00b9be207c3465be21cb721cca5e",
+        "size": 3808391072,
+        "pointerSize": 135
+      }
+    }
+  ]
+}
