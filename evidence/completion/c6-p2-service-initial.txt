@@ -1,0 +1,6 @@
+=== RUN   TestP2PublicServiceJourney
+    p2_test.go:20: create: {Step:p2-create Passed:false RecordedAt:2026-10-05T11:18:15.529588Z Error:conversation import did not expose source identities State:{WorkspaceID:01a10bc9-2aae-75ed-8294-c44167f4fca3 PageID:01a10bc9-2ae9-7940-8c1c-31bd01e25382 BlockID:01a10bc9-2ae9-73cb-8c1a-7c7f3654b6fe CollectionID:01a10bc9-2ae9-7119-ba4c-f1bfc0e70fcf PropertyID:01a10bc9-2ae9-7ce6-a1c0-614c3157ee7a RecordID:01a10bc9-2ae9-77a6-8283-b680d84f1e99 RecordPageID:01a10bc9-2ae9-79d5-bd67-5debcf52209e FileID:01a10bc9-2fe9-702b-bab1-d6d8476e964d FileBlockID:01a10bc9-2ae9-785f-a899-c0dcb24d1d03 ContentHash:61cb495898eb4901d8a4ea859ee4cee692bb981cc2474a55f2809e47519fd273} Checks:[]}
+--- FAIL: TestP2PublicServiceJourney (2.49s)
+FAIL
+FAIL	trove.local/phase0/internal/integration	3.372s
+FAIL

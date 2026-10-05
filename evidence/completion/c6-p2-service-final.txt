@@ -1,0 +1,4 @@
+=== RUN   TestP2PublicServiceJourney
+--- PASS: TestP2PublicServiceJourney (11.62s)
+PASS
+ok  	trove.local/phase0/internal/integration	14.144s

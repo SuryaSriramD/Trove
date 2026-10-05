@@ -21,10 +21,11 @@ p.add_argument('--models', type=Path)
 p.add_argument('--native', action='store_true')
 p.add_argument('--p0', action='store_true', help='Run the full P0 data journey in the packaged process')
 p.add_argument('--p1', action='store_true', help='Run the P1 linked-view/formula/automation/recovery journey')
+p.add_argument('--p2', action='store_true', help='Run the P2 charts/forms/actions/graph/conversation/portability journey')
 p.add_argument('--offline', action='store_true', help='Deny all network operations in the app and every child process')
 p.add_argument('--evidence', type=Path, default=ROOT / 'evidence/phase1')
 args = p.parse_args()
-if args.p0 and args.p1:
+if sum([args.p0, args.p1, args.p2]) > 1:
     p.error('Choose one data journey per invocation')
 evidence = args.evidence
 evidence.mkdir(parents=True, exist_ok=True)
@@ -37,7 +38,8 @@ for name in list(env):
 env.update(PATH='/usr/bin:/bin:/usr/sbin:/sbin',
            TROVE_WORKSPACE=str(fixture / 'workspace'),
            TROVE_INTEGRATION_QUIT='1')
-steps = (['p1-create', 'p1-verify'] if args.p1 else (['p0-create', 'p0-verify'] if args.p0 else ['create', 'verify'])) + (['native'] if args.native else [])
+journey = 'p2-' if args.p2 else 'p1-' if args.p1 else 'p0-' if args.p0 else ''
+steps = [journey + 'create', journey + 'verify'] + (['native'] if args.native else [])
 wrapper = ['/usr/bin/sandbox-exec', '-p', '(version 1)(allow default)(deny network*)'] if args.offline else []
 if args.offline:
     # A negative control confirms OS enforcement before accepting offline evidence.
@@ -72,5 +74,5 @@ result = {'recordedAt': datetime.now(timezone.utc).isoformat(),
           'limitations': ['Ad-hoc developer signature; not Developer ID or notarized.',
                           'Executed on this Mac with minimal PATH; a separate clean-machine installation is unverified.',
                           'Service integration fixture; interactive editing and accessibility use separate tests.']}
-(evidence / ('packaged-p1-integration.json' if args.p1 else 'packaged-integration.json')).write_text(json.dumps(result, indent=2) + '\n')
+(evidence / ('packaged-p2-integration.json' if args.p2 else 'packaged-p1-integration.json' if args.p1 else 'packaged-integration.json')).write_text(json.dumps(result, indent=2) + '\n')
 raise SystemExit(0 if result['passed'] else 1)

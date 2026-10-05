@@ -55,6 +55,9 @@ func (a *App) runIntegration(ctx context.Context, step, state string) integratio
 	if strings.HasPrefix(step, "p1-") {
 		return integration.RunP1(ctx, a.kernel, a.execution, step, state+".p1")
 	}
+	if strings.HasPrefix(step, "p2-") {
+		return integration.RunP2(ctx, a.kernel, a.execution, step, state+".p2")
+	}
 	if strings.HasPrefix(step, "p0-") {
 		return integration.RunP0(ctx, a.kernel, a.execution, step, state)
 	}

@@ -1,0 +1,6 @@
+=== RUN   TestP2PublicServiceJourney
+    p2_test.go:20: create: {Step:p2-create Passed:false RecordedAt:2026-10-05T11:19:29.74472Z Error:review.list: {"error":{"code":"INVALID_REQUEST","message":"jsonschema validation failed with 'https://trove.local/contracts/service.schema.json#/$defs/ReviewListRequest'\n- at '': additional properties 'pageId' not allowed","requestId":"01a10bca-5dc1-754b-b33b-5ca13d582ee8","retryable":false},"ok":false} State:{WorkspaceID:01a10bca-4b76-739f-9f80-1586b65678f5 PageID:01a10bca-4cd0-79b4-a436-c61dc02dbe7c BlockID:01a10bca-4cd0-74ff-a765-2b1cd03278b8 CollectionID:01a10bca-4cd0-7591-b73f-18618430b935 PropertyID:01a10bca-4cd0-7892-9ade-b86e5a23967c RecordID:01a10bca-4cd0-799a-bb55-094e7fb41e0e RecordPageID:01a10bca-4cd0-7e7b-b3f5-fd8441daca8b FileID:01a10bca-5500-72b9-b7ac-4c1a37535e66 FileBlockID:01a10bca-4cd1-7f00-be92-9d59f5a48136 ContentHash:61cb495898eb4901d8a4ea859ee4cee692bb981cc2474a55f2809e47519fd273} Checks:[]}
+--- FAIL: TestP2PublicServiceJourney (4.73s)
+FAIL
+FAIL	trove.local/phase0/internal/integration	5.926s
+FAIL
