@@ -1,6 +1,8 @@
 # 10,000-record database service measurement
 
-The October 5, 2026 local measurement completed all nine correctness profiles. It is diagnostic evidence for REL-007, not release qualification. Ordinary first pages took 35.7–186.6 ms at the median on this host. First-page formula and rollup ordering remained substantially more expensive: 1,185.9 ms and 763.5 ms respectively. Cached second pages were much cheaper.
+The latest optimization passes all nine independent profiles and cuts formula first-page median time from 1,186 ms to 716 ms, with 56% lower cumulative Go allocation. Rollup allocation falls 52%. See the follow-up section for implementation and test evidence.
+
+The October 5, 2026 baseline measurement completed all nine correctness profiles. It is diagnostic evidence for REL-007, not release qualification. Ordinary first pages took 35.7–186.6 ms at the median on this host. First-page formula and rollup ordering remained substantially more expensive: 1,185.9 ms and 763.5 ms respectively. Cached second pages were much cheaper.
 
 ## Source, workload, and boundary
 
@@ -39,3 +41,31 @@ No database-specific time threshold was invented for this measurement. The roadm
 Run `python3 scripts/benchmark-database.py --cache <pinned-development-cache> --iterations 3 --output <new-evidence-directory>`. Iterations are bounded to 3–30 (default 7), the Go test has a six-minute timeout, and the fixture is disposable. The runner records hardware, storage, power, source hashes, raw samples, and source-change detection. `localMeasurementComplete` only establishes that this local scenario completed with unchanged inputs; `releaseQualified` is deliberately false.
 
 The [initial attempt](../../evidence/completion/database-10k-initial/environment.json) failed before measurement because the new fixture's filter values omitted required number/date fields. Its [failure log](../../evidence/completion/database-10k-initial/go-test.jsonl) is retained. The fixture was corrected and all stored typed values now undergo contract validation; the successful run above is the measured baseline.
+
+## Follow-up optimization
+
+The [optimized environment/source binding](../../evidence/completion/database-10k-optimized/environment.json) and [unchanged-oracle results](../../evidence/completion/database-10k-optimized/results.json) identify revision `7a2e75a` plus the three production files whose complete hashes are recorded in the report. The benchmark source is identical to the baseline. Every expected row-count and ordered record-ID digest matches the baseline; the full paging, exact values, scoped rollup denial, cursor invalidation, and disconnect assertions still pass. No measured source changed during the run.
+
+The implementation avoids hydrating unrelated cells while scanning a derived sort/filter, caches immutable property definitions/configuration only within the current read transaction, and bounds that metadata cache to 256 entries / 512 KiB of encoded definitions (also charged to the existing working-data budget). Response pages still hydrate all canonical properties.
+
+Repeated execution-context schema validation is now performed once on an evaluator-owned deep copy. Every value lookup, including a cached result, still compares the current kernel grant's canonical bytes to that copy and rechecks the record's page, deletion, and the existing page/project scope policy. Scope membership is not cached. Revocation or a changed policy/context therefore stops cached reads. The ordinary public authorization method retains its full validation; its existing scope switch is shared without changing its semantics. Formula interpretation, exact comparisons, snapshot/cursor identities, revisions, and clock binding are unchanged.
+
+| Profile | Optimized first page median / max | Optimized second page median / max |
+| --- | ---: | ---: |
+| All live, default order | 25.48 / 26.44 ms | 25.54 / 25.55 ms |
+| Exact decimal and status | 113.43 / 115.35 ms | 121.56 / 122.43 ms |
+| Timed date and checkbox | 117.07 / 117.17 ms | 126.39 / 126.70 ms |
+| Unicode contains | 38.63 / 38.73 ms | 42.50 / 42.84 ms |
+| SQL-looking literal | 103.86 / 104.96 ms | — |
+| Multi-select and missing number | 80.25 / 80.51 ms | — |
+| Formula filter/sort | 715.63 / 820.87 ms | 28.58 / 30.93 ms |
+| Relation rollup filter/sort | 512.54 / 518.89 ms | 25.14 / 26.09 ms |
+| Provider bridge, 99 selected records | 27.93 / 29.81 ms | — |
+
+Mean first-page Go allocations fall from 457,382,091 to 199,475,016 bytes for formulas (56.4%) and from 277,700,981 to 132,722,317 bytes for rollups (52.2%). Formula second-page time rises from 22.24 to 28.58 ms in this small sample because cached values now also check current grant/page scope. These observations do not establish improvements for every machine or workload; the literal-text sample also varied upward. The remaining first-page cost and allocations are still meaningful, and visible interaction has not been measured.
+
+The [focused test log](../../evidence/completion/database-query-optimization-tests.jsonl) records 106 passing tests/subtests covering derived queries, exact semantics, cache limits, formulas, advanced databases, and related cases. The [race run](../../evidence/completion/database-query-optimization-race.jsonl) records 15 passing tests/subtests, including forged contexts, revocation, changed policy, mutated caller scope, moved record page, deletion, removed project membership, scoped relations, and stale proposals. The new mixed-filter regression combines title/status/number filtering with derived values, checks both pages, then edits the formula and requires old-cursor refusal plus fresh results.
+
+A separate profiler run of baseline `7a2e75a` completed successfully. Its [allocation report](../../evidence/completion/database-query-profile-alloc.txt) and [CPU report](../../evidence/completion/database-query-profile-cpu.txt) identify repeated authorization/schema validation, property reads, and hydration as major costs. Profiler timing is excluded from the comparison because instrumentation changes scheduling and overhead. The [intermediate projection-only run](../../evidence/completion/database-10k-projection/results.json) is retained; it reduced allocations but left context validation as the dominant avoidable cost. An [initial regression-fixture failure](../../evidence/completion/database-query-optimization-fixture-failure.jsonl) is also retained: the fixture needed the existing project-scope command and formula evaluator-version field. The corrected fixtures pass.
+
+The final source/fixture/log hashes and comparison checks are in [optimization verification](../../evidence/completion/database-query-optimization-verification.json). All native-frame, keyboard/scrolling, concurrent recording/indexing/AI, representative import, clean-device, and platform gates listed above remain open. This package supplies implementation and local evidence for REL-007; it does not close that release item.

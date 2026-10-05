@@ -1,0 +1,32 @@
+File: trove-database-profile.test
+Type: alloc_space
+Time: 2026-10-05 16:24:18 IST
+Showing nodes accounting for 6900.70MB, 74.26% of 9292.32MB total
+Dropped 223 nodes (cum <= 46.46MB)
+Showing top 25 nodes out of 190
+      flat  flat%   sum%        cum   cum%
+  833.73MB  8.97%  8.97%   833.73MB  8.97%  reflect.mapassign_faststr0
+  645.58MB  6.95% 15.92%   645.58MB  6.95%  github.com/mattn/go-sqlite3._Cfunc_GoStringN (inline)
+  640.92MB  6.90% 22.82%   640.92MB  6.90%  bytes.Clone (inline)
+  637.53MB  6.86% 29.68%   637.53MB  6.86%  reflect.unsafe_New
+  573.62MB  6.17% 35.85%   933.25MB 10.04%  trove.local/phase0/internal/workspace.hydrateRecordPage
+  369.05MB  3.97% 39.82%  1262.70MB 13.59%  github.com/santhosh-tekuri/jsonschema/v6.(*validator).validateVal
+  365.05MB  3.93% 43.75%   961.17MB 10.34%  github.com/santhosh-tekuri/jsonschema/v6.(*validator).validateSelf
+  287.51MB  3.09% 46.85%   287.51MB  3.09%  math/big.nat.make (inline)
+  258.01MB  2.78% 49.62%   258.01MB  2.78%  github.com/santhosh-tekuri/jsonschema/v6.(*scope).child (inline)
+  229.41MB  2.47% 52.09%  4806.81MB 51.73%  trove.local/phase0/internal/workspace.(*derivedEvaluator).value
+  192.03MB  2.07% 54.16%   725.17MB  7.80%  database/sql.(*DB).queryDC
+  190.52MB  2.05% 56.21%   970.17MB 10.44%  trove.local/phase0/internal/workspace.recordQueryConnection.func1.1
+  181.51MB  1.95% 58.16%   424.04MB  4.56%  github.com/mattn/go-sqlite3.callbackConvertArgs
+  153.01MB  1.65% 59.81%   153.01MB  1.65%  reflect.makemap
+  138.51MB  1.49% 61.30%   138.51MB  1.49%  github.com/mattn/go-sqlite3.(*SQLiteStmt).query
+  135.51MB  1.46% 62.76%   135.51MB  1.46%  github.com/mattn/go-sqlite3.(*SQLiteConn).prepare
+  134.50MB  1.45% 64.20%   684.06MB  7.36%  github.com/mattn/go-sqlite3.(*SQLiteRows).readStepResultLocked
+  131.01MB  1.41% 65.61%   131.01MB  1.41%  context.AfterFunc
+  126.56MB  1.36% 66.98%  1894.70MB 20.39%  trove.local/phase0/internal/workspace.enrichDerivedRecord
+  122.42MB  1.32% 68.29%   201.14MB  2.16%  encoding/json/jsontext.(*encoderState).reformatValue
+  120.51MB  1.30% 69.59%  1400.22MB 15.07%  github.com/santhosh-tekuri/jsonschema/v6.(*Schema).validate
+  116.03MB  1.25% 70.84%   116.03MB  1.25%  encoding/json/v2.makeString
+  111.01MB  1.19% 72.03%   111.01MB  1.19%  github.com/santhosh-tekuri/jsonschema/v6.(*validator).strValidate
+  108.13MB  1.16% 73.20%   108.13MB  1.16%  slices.Grow[go.shape.[]uint8,go.shape.uint8]
+      99MB  1.07% 74.26%       99MB  1.07%  github.com/santhosh-tekuri/jsonschema/v6.unevalFrom

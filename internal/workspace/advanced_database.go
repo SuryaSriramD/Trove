@@ -306,6 +306,14 @@ type DerivedValue struct {
 	EvaluatorVersion     int      `json:"evaluatorVersion,omitempty"`
 	Dependencies         []string `json:"dependencies,omitempty"`
 }
+
+// Metadata is immutable for the evaluator's read transaction. Its cache is
+// deliberately small; exceeding it falls back to ordinary reads.
+type derivedPropertyMetadata struct {
+	definition contracts.DomainPropertyDefinition
+	raw        map[string]any
+}
+
 type derivedEvaluator struct {
 	ctx       context.Context
 	k         *Kernel
@@ -316,16 +324,75 @@ type derivedEvaluator struct {
 	cache     map[string]DerivedValue
 	work      int
 	// Query paging can reuse an immutable memo without sharing mutable maps.
-	baseCache map[string]DerivedValue
-	workLimit int
-	byteLimit int
-	memoBytes int
-	exhausted bool
+	baseCache          map[string]DerivedValue
+	workLimit          int
+	byteLimit          int
+	memoBytes          int
+	exhausted          bool
+	properties         map[string]derivedPropertyMetadata
+	propertyBytes      int
+	executionJSON      string
+	executionValidated bool
+}
+
+func (d *derivedEvaluator) property(id string) (derivedPropertyMetadata, error) {
+	if p, ok := d.properties[id]; ok {
+		return p, nil
+	}
+	definition, err := propertyDefinition(d.ctx, d.tx, id)
+	if err != nil {
+		return derivedPropertyMetadata{}, err
+	}
+	var config map[string]any
+	if err = json.Unmarshal(definition.Config, &config); err != nil {
+		return derivedPropertyMetadata{}, err
+	}
+	raw, _ := config["raw"].(map[string]any)
+	p := derivedPropertyMetadata{definition: definition, raw: raw}
+	size := len(marshal(definition))
+	if len(d.properties) < 256 && d.propertyBytes+size <= 512*1024 {
+		d.properties[id] = p
+		d.propertyBytes += size
+		// Count cached schema bytes against the same conservative working budget.
+		d.memoBytes += size
+	}
+	return p, nil
+}
+
+// The evaluator owns a deep copy of its context. Schema validation can be
+// reused only while its canonical bytes still match the live kernel grant.
+// Revocation/policy changes and page/project scope are checked for every value,
+// including memo hits; only immutable property definitions are cached.
+func (d *derivedEvaluator) authorizeRecord(record string) error {
+	if !d.executionValidated {
+		if err := d.k.authorize(d.execution); err != nil {
+			return err
+		}
+		d.executionValidated = true
+	}
+	d.k.mu.Lock()
+	grant, live := d.k.grants[string(d.execution.ScopeGrantId)]
+	d.k.mu.Unlock()
+	if !live || string(marshal(grant)) != d.executionJSON {
+		return Fail("SCOPE_DENIED", "Scope grant is absent or changed during evaluation")
+	}
+	var page string
+	var deleted sql.NullString
+	if err := d.tx.QueryRowContext(d.ctx, "SELECT r.page_id,p.deleted_at FROM records r JOIN pages p ON p.id=r.page_id WHERE r.id=?", record).Scan(&page, &deleted); err != nil {
+		return err
+	}
+	if deleted.Valid {
+		return fmt.Errorf("related record is unavailable")
+	}
+	return d.k.authorizePageScope(d.ctx, d.tx, d.execution, page)
 }
 
 func (d *derivedEvaluator) value(record, property string) (DerivedValue, error) {
 	if err := d.ctx.Err(); err != nil {
 		return DerivedValue{}, err
+	}
+	if err := d.authorizeRecord(record); err != nil {
+		return DerivedValue{}, fmt.Errorf("related record is unavailable in this scope")
 	}
 	key := record + ":" + property
 	if v, ok := d.cache[key]; ok {
@@ -349,13 +416,11 @@ func (d *derivedEvaluator) value(record, property string) (DerivedValue, error) 
 	}
 	d.active[key] = true
 	defer delete(d.active, key)
-	if err := d.k.authorizeEntity(d.ctx, d.tx, d.execution, "record", record); err != nil {
-		return v, fmt.Errorf("related record is unavailable in this scope")
-	}
-	p, err := propertyDefinition(d.ctx, d.tx, property)
+	metadata, err := d.property(property)
 	if err != nil {
 		return v, err
 	}
+	p := metadata.definition
 	var col, page, title, created, edited string
 	var deleted sql.NullString
 	if err = d.tx.QueryRowContext(d.ctx, "SELECT r.collection_id,r.page_id,p.title,p.created_at,p.updated_at,p.deleted_at FROM records r JOIN pages p ON p.id=r.page_id WHERE r.id=?", record).Scan(&col, &page, &title, &created, &edited, &deleted); err != nil {
@@ -364,9 +429,7 @@ func (d *derivedEvaluator) value(record, property string) (DerivedValue, error) 
 	if col != string(p.CollectionId) || deleted.Valid {
 		return v, fmt.Errorf("related record is unavailable")
 	}
-	var cfg map[string]any
-	json.Unmarshal(p.Config, &cfg)
-	raw, _ := cfg["raw"].(map[string]any)
+	raw := metadata.raw
 	switch p.Type {
 	case "created_time":
 		v.Value = created
@@ -526,7 +589,12 @@ func aggregateRollup(op string, values []any) (any, error) {
 	return nil, fmt.Errorf("unsupported rollup aggregation %q", op)
 }
 func newDerivedEvaluator(ctx context.Context, k *Kernel, tx *sql.Tx, e contracts.ServiceExecutionContext, at time.Time, zone string) *derivedEvaluator {
-	return &derivedEvaluator{ctx: ctx, k: k, tx: tx, execution: e, clock: FormulaClock{at, zone}, active: map[string]bool{}, cache: map[string]DerivedValue{}}
+	raw := marshal(e)
+	var execution contracts.ServiceExecutionContext
+	// Both types are the same generated contract. A decode failure remains an
+	// invalid context and is rejected on the first authorization check.
+	_ = json.Unmarshal(raw, &execution)
+	return &derivedEvaluator{ctx: ctx, k: k, tx: tx, execution: execution, executionJSON: string(raw), clock: FormulaClock{at, zone}, active: map[string]bool{}, cache: map[string]DerivedValue{}, properties: map[string]derivedPropertyMetadata{}}
 }
 func databaseDerived(ctx context.Context, k *Kernel, e contracts.ServiceExecutionContext, req map[string]any) (any, error) {
 	collection := str(req["collectionId"])

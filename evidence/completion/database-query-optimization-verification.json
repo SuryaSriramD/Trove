@@ -1,0 +1,46 @@
+{
+  "schemaVersion": 1,
+  "verifiedAt": "2026-10-05T11:07:01.911912+00:00",
+  "productionBaseCommit": "7a2e75a",
+  "sourceAndEvidenceSha256": {
+    "internal/workspace/advanced_database.go": "4edadbc12015bfd50fe12cfe488a753efe3afe35871ee254619cc7d6f32458f7",
+    "internal/workspace/database_query.go": "7789cbc635c170eb36547b55747cd68fc3f18749259094eac4a1aa21942ba9fb",
+    "internal/workspace/permissions.go": "a7697429fb119f17cc50b3a095524b2dbf7b386866a95a60715efbde48b22911",
+    "internal/workspace/database_query_optimization_test.go": "f702cae2b5d0bd9a77d8c10553bc01f5e586498a42456c1035abf65c3f0d45a9",
+    "internal/workspace/database_benchmark_test.go": "a6fdbb1d3423fe9dc70430eb41cd6514bbab48002d879d4769284cb5ca4a7aa5",
+    "scripts/benchmark-database.py": "6406643923a3fde840203c2e407479435e5f1878388e13af4497716fafe4a5a2",
+    "evidence/completion/database-query-optimization-tests.jsonl": "721941ae156e0d3b27480ff66616d32c316a52c760c2f4618a353d365d8900bd",
+    "evidence/completion/database-query-optimization-race.jsonl": "c0734c5394dc4d0058c7354707f44c9bb99688a10ef1158edae3e8d283a13461",
+    "evidence/completion/database-query-profile-alloc.txt": "c0d5c9ef86e6e188e4053bc5076d5e2993d67041fe6167e94534b6cd57d35475",
+    "evidence/completion/database-query-profile-cpu.txt": "5ad63e9639810f0a010c6d5aadf7f5a0a59bbaaf7a3b5df28473922f71145b6f"
+  },
+  "baselineAndOptimizedExpectedOutcomesMatch": [
+    "all_live_default_order",
+    "exact_decimal_and_status",
+    "timed_date_and_checkbox",
+    "unicode_text_contains",
+    "bound_literal_not_sql",
+    "multi_select_and_missing_number",
+    "formula_filter_sort",
+    "relation_rollup_filter_sort",
+    "provider_bridge_99_selected_rows"
+  ],
+  "testEvents": {
+    "focusedPass": 106,
+    "racePass": 15,
+    "failed": 0,
+    "skipped": 0
+  },
+  "profileBaselineCommit": "7a2e75a",
+  "profilerCommand": "go test -mod=readonly -tags \"fts5 sqlite_omit_load_extension\" ./internal/workspace -run ^TestDatabasePerformance10K$ -count=1 -timeout=6m -o /private/tmp/trove-database-profile.test -cpuprofile /private/tmp/trove-database-cpu.pprof -memprofile /private/tmp/trove-database-memory.pprof",
+  "profilerRawSha256": {
+    "trove-database-cpu.pprof": "d5eef1c3c415c86e0df19ae926b4d564935ced95b012356b724c447c2a550eb2",
+    "trove-database-memory.pprof": "1de7683c637f1d33102a92a2a51320a110f1301d93ae5c488879f87375208072"
+  },
+  "releaseQualified": false,
+  "notes": [
+    "Source hashes bind uncommitted implementation to actual measurements; subsequent commit identifies the saved change.",
+    "The fixture oracle was unchanged; no wall-clock threshold was relaxed or introduced.",
+    "All timings are developer service boundaries and exclude native UI/paint and concurrent recording."
+  ]
+}

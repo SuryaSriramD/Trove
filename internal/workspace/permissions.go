@@ -93,6 +93,12 @@ func (k *Kernel) authorizePage(ctx context.Context, q querier, e contracts.Servi
 	if err := k.authorize(e); err != nil {
 		return err
 	}
+	return k.authorizePageScope(ctx, q, e, page)
+}
+
+// Caller must first validate the execution context against the current grant.
+// Keep membership checks in the caller's transaction, never in a scope cache.
+func (k *Kernel) authorizePageScope(ctx context.Context, q querier, e contracts.ServiceExecutionContext, page string) error {
 	switch s := e.Scope.Value.(type) {
 	case contracts.DomainScopeVariant1:
 		if string(s.WorkspaceId) == k.id {
