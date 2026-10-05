@@ -1,0 +1,106 @@
+{
+  "schemaVersion": 1,
+  "implementationCommit": "74f885302779a9c983b3d7d7e37ef056bcca1fba",
+  "baseCommit": "5a79a78",
+  "recordedAt": "2026-10-05",
+  "host": "macOS-27.0.1-arm64-arm-64bit",
+  "compiler": "Apple clang version 21.0.0 (clang-2100.3.34.2)\nTarget: arm64-apple-darwin27.0.0\nThread model: posix\nInstalledDir: /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin\n",
+  "target": "windows-amd64",
+  "targetCompiled": false,
+  "targetExecuted": false,
+  "releaseQualified": false,
+  "scope": "Windows document helper source and host policy/recipe validation only; parent portable document workstream owns integration",
+  "sourceSHA256": {
+    "docs/completion/windows-document-helper.md": "98b25cc51144254f4d859661b4caee5de3873e2b0d282aa2b7452f358cd0219c",
+    "native/document-policy.hpp": "9765bdbad7f7c4efa9f5eee4c42b3ba30b06173beac8f142fcd574bdd77ca21e",
+    "native/document-windows.lock.json": "9cf77af790025f6900aa902cefb6e78184f02ad5477d2bba1bb7a3782c24602b",
+    "native/document-worker-windows.cpp": "e886659ceab4391288688bf41af6f61294b8b5a8b58c1a9fabd51e3f82339745",
+    "scripts/build-document-windows.py": "bef11dabcd41e8185e4ad699a9bfaeb87b5197bf27a4eb884f7acd78d8678546",
+    "tests/native/document_policy_test.cpp": "cba2c773b2c104e99c2ecabc7a76eaa2ee900cd75835f06471922d5b3033538a",
+    "tests/test_document_windows.py": "bc6496255ebc9baa1e5f0b40b7a8f5c374f87d8b99d40d489e202e512ac1226f"
+  },
+  "checks": [
+    {
+      "command": "TROVE_CACHE_DIR=<verified-completion-cache> <pinned-python> -m unittest discover -s tests -p test_document_windows.py -v",
+      "passed": 5,
+      "skipped": 0,
+      "report": "host-tests.txt",
+      "detail": "Host clang++ compiles/executes only document-policy.hpp plus hostile input/status tests; no Windows headers, COM, WebView runtime or PDF execution"
+    },
+    {
+      "command": "python scripts/build-document-windows.py --output <unused-output> --plan",
+      "passed": true,
+      "report": "plan.json",
+      "targetCompiled": false
+    },
+    {
+      "command": "sdk_files on official cached NuGet package using native/document-windows.lock.json",
+      "passed": true,
+      "report": "sdk-verification.json",
+      "detail": "Entire package digest/size and exact two headers, x64 static loader and redistribution notice checked"
+    },
+    {
+      "command": "python -m py_compile scripts/build-document-windows.py tests/test_document_windows.py",
+      "passed": true
+    }
+  ],
+  "review": {
+    "reviewer": "finish_vision",
+    "scope": "independent Windows source and exact SDK header inspection",
+    "findings": [
+      {
+        "issue": "Environment variables were rejected but WebView2 registry policy could replace profile/runtime path or append browser flags",
+        "resolution": "Reject applicable HKLM/HKCU 32/64-bit policy value existence before and after environment creation; verify environment7 actual profile; restrict stable runtime channel",
+        "status": "addressed in implementation source; Windows policy tests remain open"
+      },
+      {
+        "issue": "Parent must wait for the whole Job Object to exit before removing browser profile",
+        "resolution": "Sent to database_performance, who owns parent job drain/cleanup",
+        "status": "integration dependency"
+      },
+      {
+        "issue": "PrintToPdf overwrite documentation does not specify compatibility with reserved open output handle",
+        "resolution": "Retain safe reservation and require actual target check; no lock relaxation",
+        "status": "unqualified"
+      }
+    ],
+    "finalSourceReview": "No further source findings after policy override correction"
+  },
+  "publicAcquisition": {
+    "url": "https://api.nuget.org/v3-flatcontainer/microsoft.web.webview2/1.0.3537.50/microsoft.web.webview2.1.0.3537.50.nupkg",
+    "sizeBytes": 8957746,
+    "sha256": "5ea526bbd728adda0da4d31219267e96460494a427e4894c4e09d9f320f4b9aa",
+    "purpose": "SDK/header/static loader/license inspection; public official package only",
+    "runtimeInstalled": false,
+    "reportingEndpointsCalled": false
+  },
+  "unqualified": [
+    "MSVC/Windows SDK/WRL compilation",
+    "Windows PE imports",
+    "actual141+ stable WebView selection",
+    "NTFS ACL/reparse/hardlink denial",
+    "registry override denial",
+    "start barrier/Job Object cancellation and process drain",
+    "browser navigation/worker/network denial",
+    "reserved output handle compatibility",
+    "PDF.js physical-page and text results",
+    "visual multipage export",
+    "bounded stdout and deadlines on Windows",
+    "offline clean-host installation",
+    "signing and platform release"
+  ],
+  "artifacts": {
+    "host-tests.txt": {
+      "sha256": "f753faa96e08c77a6a11a74a5bba4c4aa6a032bfe7e48d036874cd8d48dee47e",
+      "sizeBytes": 823
+    },
+    "plan.json": {
+      "sha256": "d7bae6594897b328c44b1f86f75d792330411959804c3da75223edd3c12012d9",
+      "sizeBytes": 2612
+    },
+    "sdk-verification.json": {
+      "sha256": "7c598f6f39b6f98e6ece3c8ba47f5b7d6e5f026d239cc1db2d9bd002711a9b2b",
+      "sizeBytes": 338
+    }
+  }
+}

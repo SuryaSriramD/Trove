@@ -1,0 +1,10 @@
+test_cross_host_build_refuses_before_output (test_document_windows.DocumentWindowsTests.test_cross_host_build_refuses_before_output) ... ok
+test_duplicate_sdk_member_is_rejected (test_document_windows.DocumentWindowsTests.test_duplicate_sdk_member_is_rejected) ... ok
+test_pinned_resource_and_status_policy_on_host (test_document_windows.DocumentWindowsTests.test_pinned_resource_and_status_policy_on_host) ... ok
+test_plan_is_unqualified_and_does_not_create_output (test_document_windows.DocumentWindowsTests.test_plan_is_unqualified_and_does_not_create_output) ... ok
+test_sdk_members_are_exact_and_archive_is_verified (test_document_windows.DocumentWindowsTests.test_sdk_members_are_exact_and_archive_is_verified) ... ok
+
+----------------------------------------------------------------------
+Ran 5 tests in 13.826s
+
+OK

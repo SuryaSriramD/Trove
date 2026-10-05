@@ -1,0 +1,10 @@
+{
+  "packageSHA256": "5ea526bbd728adda0da4d31219267e96460494a427e4894c4e09d9f320f4b9aa",
+  "verifiedFiles": {
+    "build/native/include/WebView2.h": 2723081,
+    "build/native/include/WebView2EnvironmentOptions.h": 19067,
+    "build/native/x64/WebView2LoaderStatic.lib": 10490014,
+    "LICENSE.txt": 1487
+  },
+  "targetCompiled": false
+}
