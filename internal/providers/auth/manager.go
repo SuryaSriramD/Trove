@@ -31,6 +31,11 @@ type pendingAttempt struct {
 	retryClientID                              string
 }
 type Manager struct {
+	// Cancellation must remain reachable while mu serializes a prompting store
+	// operation. cancelMu is never held while waiting for mu or a native prompt.
+	cancelMu sync.Mutex
+	cancels  map[string]context.CancelFunc
+	closing  bool
 	mu       sync.Mutex
 	root     string
 	lock     *os.File
@@ -62,7 +67,7 @@ func newManager(root string, secret SecretStore, transport http.RoundTripper, no
 	if err != nil {
 		return nil, err
 	}
-	m := &Manager{root: root, lock: lock, secrets: secret, now: now, attempts: map[string]*pendingAttempt{}, client: &http.Client{Transport: safeTransport{transport}, Timeout: 15 * time.Second, CheckRedirect: func(*http.Request, []*http.Request) error {
+	m := &Manager{root: root, lock: lock, secrets: secret, now: now, cancels: map[string]context.CancelFunc{}, attempts: map[string]*pendingAttempt{}, client: &http.Client{Transport: safeTransport{transport}, Timeout: 15 * time.Second, CheckRedirect: func(*http.Request, []*http.Request) error {
 		return fail("AUTH_ENDPOINT_INVALID", "Authentication redirects are not allowed")
 	}}}
 	if err = m.load(); err != nil {
@@ -187,6 +192,16 @@ func (m *Manager) begin(ctx context.Context, id, retryClient string, openURL fun
 	}
 	attemptCtx, cancel := context.WithTimeout(ctx, 10*time.Minute)
 	a := &pendingAttempt{public: Attempt{ID: uuid.NewString(), RegistrationID: id, State: "waiting", Message: "Complete sign-in in your browser", ExpiresAt: m.now().Add(10 * time.Minute)}, ctx: attemptCtx, cancel: cancel, state: randomSecret(), nonce: randomSecret(), verifier: randomSecret(), redirect: "http://" + listener.Addr().String() + "/auth/callback", clientID: clientID, selected: selected}
+	m.cancelMu.Lock()
+	if m.closing {
+		m.cancelMu.Unlock()
+		cancel()
+		listener.Close()
+		m.mu.Unlock()
+		return Attempt{}, fail("AUTH_CLOSED", "Sign-in is unavailable")
+	}
+	m.cancels[a.public.ID] = cancel
+	m.cancelMu.Unlock()
 	sum := sha256.Sum256([]byte(a.verifier))
 	query := url.Values{"client_id": {clientID}, "ext_agent_host_id": {m.meta.HostID}, "response_type": {"code"}, "redirect_uri": {a.redirect}, "scope": {scope}, "resource": {resource}, "state": {a.state}, "nonce": {a.nonce}, "code_challenge_method": {"S256"}, "code_challenge": {base64.RawURLEncoding.EncodeToString(sum[:])}}
 	if clientID == dynamicClient {
@@ -204,6 +219,9 @@ func (m *Manager) begin(ctx context.Context, id, retryClient string, openURL fun
 	for key, p := range m.attempts {
 		if len(m.attempts) >= 16 && p.public.State != "waiting" && p.public.State != "exchanging" {
 			delete(m.attempts, key)
+			m.cancelMu.Lock()
+			delete(m.cancels, key)
+			m.cancelMu.Unlock()
 		}
 	}
 	m.attempts[a.public.ID] = a
@@ -211,6 +229,9 @@ func (m *Manager) begin(ctx context.Context, id, retryClient string, openURL fun
 	go a.server.Serve(listener)
 	go func() {
 		<-attemptCtx.Done()
+		m.cancelMu.Lock()
+		delete(m.cancels, a.public.ID)
+		m.cancelMu.Unlock()
 		m.mu.Lock()
 		if a.public.State == "waiting" || a.public.State == "exchanging" {
 			a.public.State = "cancelled"
@@ -237,6 +258,12 @@ func (m *Manager) Attempt(id string) (Attempt, error) {
 	return a.public, nil
 }
 func (m *Manager) Cancel(id string) error {
+	// Signal the operation before waiting for its serialized write/cleanup.
+	m.cancelMu.Lock()
+	if cancel := m.cancels[id]; cancel != nil {
+		cancel()
+	}
+	m.cancelMu.Unlock()
 	m.mu.Lock()
 	defer m.mu.Unlock()
 	a := m.attempts[id]
@@ -251,6 +278,12 @@ func (m *Manager) Cancel(id string) error {
 	return nil
 }
 func (m *Manager) Close() error {
+	m.cancelMu.Lock()
+	m.closing = true
+	for _, cancel := range m.cancels {
+		cancel()
+	}
+	m.cancelMu.Unlock()
 	m.mu.Lock()
 	defer m.mu.Unlock()
 	if m.closed {
@@ -366,6 +399,7 @@ func (m *Manager) callback(a *pendingAttempt, w http.ResponseWriter, r *http.Req
 	}
 	identity.RegistrationID = id
 	c, err := makeCredentials(token, identity, m.meta.HostID, nil, m.now())
+	writeAttempted := false
 	if err == nil {
 		// Persist the validated identity before tokens. A failed Keychain write leaves
 		// a reauthorizable signed-out mapping, never a half-authenticated account.
@@ -380,16 +414,61 @@ func (m *Manager) callback(a *pendingAttempt, w http.ResponseWriter, r *http.Req
 			var data []byte
 			data, err = json.Marshal(c)
 			if err == nil {
+				writeAttempted = true
 				err = m.secrets.Put(a.ctx, id, data)
+				clear(data)
 			}
 		}
-		if err == nil {
-			reg.State = "signed_in"
-			reg.PlanAuthorized = planScope(c)
-			reg.ExpiresAt = c.ExpiresAt
-			*m.find(id) = reg
-			err = m.save()
+	}
+	// Final publication and an explicit Cancel have one ordering point. The
+	// cancellation lock is held only across the small local metadata commit,
+	// never across a native credential prompt or its bounded cleanup.
+	m.cancelMu.Lock()
+	cancelled := a.ctx.Err() != nil || m.closing
+	if !cancelled && err == nil {
+		reg := m.find(id)
+		reg.State = "signed_in"
+		reg.PlanAuthorized = planScope(c)
+		reg.ExpiresAt = c.ExpiresAt
+		err = m.save()
+		cancelled = a.ctx.Err() != nil || m.closing
+	}
+	if !cancelled && err == nil {
+		a.public.RegistrationID = id
+		a.public.State = "completed"
+		a.public.Message = "Signed in. Select this account in Trove"
+		delete(m.cancels, a.public.ID)
+	}
+	m.cancelMu.Unlock()
+	if cancelled {
+		// Store writes may complete before acknowledging cancellation. The
+		// registration mutex still excludes new sign-ins, refresh and sign-out,
+		// so removing this attempt's record cannot delete a newer credential.
+		var clearErr error
+		if writeAttempted {
+			clearCtx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+			clearErr = m.secrets.Delete(clearCtx, id)
+			cancel()
 		}
+		if reg := m.find(id); reg != nil {
+			reg.State = "signed_out"
+			reg.PlanAuthorized = false
+			reg.ExpiresAt = time.Time{}
+			if clearErr != nil {
+				reg.State = "sign_out_incomplete"
+			}
+			if saveErr := m.save(); saveErr != nil {
+				clearErr = saveErr
+			}
+		}
+		a.public.RegistrationID = id
+		a.public.State = "cancelled"
+		a.public.Message = "Sign-in cancelled"
+		if clearErr != nil {
+			a.public.Message = "Sign-in cancelled; account access is disabled, but protected credential cleanup needs attention"
+		}
+		http.Error(w, "Sign-in cancelled. Return to Trove.", 400)
+		return
 	}
 	if err != nil {
 		a.public.State = "failed"
@@ -403,9 +482,6 @@ func (m *Manager) callback(a *pendingAttempt, w http.ResponseWriter, r *http.Req
 		http.Error(w, "Sign-in could not be saved. Return to Trove.", 500)
 		return
 	}
-	a.public.RegistrationID = id
-	a.public.State = "completed"
-	a.public.Message = "Signed in. Select this account in Trove"
 	io.WriteString(w, "Sign-in complete. You may close this window and return to Trove.")
 }
 func (m *Manager) finishAttempt(a *pendingAttempt, state, message string) {
