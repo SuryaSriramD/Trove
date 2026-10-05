@@ -126,6 +126,9 @@ func prepareAdvancedAI(ctx context.Context, k *Kernel, e contracts.ServiceExecut
 			p.Before = str(data["source"])
 			after := p.Body
 			if p.Kind == "replace_code" {
+				if p.Body == run.Text && aiProgrammingLanguage(str(data["language"])) && unwrapAIWholeCodeFence(p.Body) != p.Body && unwrapAIWholeCodeFence(p.Before) == p.Before {
+					return Fail("INVALID_REQUEST", "The generated draft includes a surrounding Markdown fence. Edit or regenerate the draft before reviewing the code replacement; its source bytes were preserved.")
+				}
 				if selected := run.Request.Selection; selected != "" {
 					if strings.Count(p.Before, selected) != 1 {
 						return Fail("CONFLICT", "Selected code must occur exactly once in the current source block")
@@ -460,4 +463,15 @@ func aiSuggestions(ctx context.Context, k *Kernel, e contracts.ServiceExecutionC
 	}
 	result["omissions"] = omissions
 	return result, nil
+}
+
+// This is a draft-quality check, not a language parser or an execution policy.
+// Unknown/plain/Markdown source is left literal. A user-edited draft is reviewed
+// as supplied; this never strips or executes program text.
+func aiProgrammingLanguage(language string) bool {
+	switch strings.ToLower(strings.TrimSpace(language)) {
+	case "go", "golang", "python", "py", "javascript", "js", "typescript", "ts", "jsx", "tsx", "rust", "rs", "c", "cpp", "c++", "java", "ruby", "rb", "swift", "kotlin", "sql", "json", "yaml", "toml", "bash", "sh", "css", "html", "xml":
+		return true
+	}
+	return false
 }
