@@ -33,6 +33,9 @@ func generateAICodeDraft(ctx context.Context, prepared AIPrepared, generate AIGe
 	if err != nil {
 		return AICompletion{}, err
 	}
+	if err = ctx.Err(); err != nil {
+		return AICompletion{}, err
+	}
 	if onToken != nil {
 		onToken(source)
 	}
