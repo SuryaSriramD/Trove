@@ -1,0 +1,6 @@
+{"ImportPath":"trove.local/phase0","Action":"build-output","Output":"# trove.local/phase0\n"}
+{"ImportPath":"trove.local/phase0","Action":"build-output","Output":"main.go:18:12: pattern all:frontend/dist: no matching files found\n"}
+{"ImportPath":"trove.local/phase0","Action":"build-fail"}
+{"Time":"2026-10-05T17:35:54.312962+05:30","Action":"start","Package":"trove.local/phase0"}
+{"Time":"2026-10-05T17:35:54.312993+05:30","Action":"output","Package":"trove.local/phase0","Output":"FAIL\ttrove.local/phase0 [setup failed]\n","OutputType":"frame"}
+{"Time":"2026-10-05T17:35:54.313003+05:30","Action":"fail","Package":"trove.local/phase0","Elapsed":0,"FailedBuild":"trove.local/phase0"}

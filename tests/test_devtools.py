@@ -1,6 +1,7 @@
 """Development setup must be portable, explicit about network use and non-destructive."""
 import io
 import os
+import plistlib
 from pathlib import Path
 import sys
 import runpy
@@ -169,11 +170,11 @@ class DeveloperToolsTests(unittest.TestCase):
                     Path(argv[argv.index('-o') + 1]).write_bytes(b'fixture binary')
 
             with patch.object(sys, 'argv', ['build-desktop.py', '--skip-frontend', '--phase6',
-                     '--cache', str(root / 'custom cache'), '--native-bundle', str(native), '--output', str(root / 'Trove.app')]), \
+                     '--cache', str(root / 'custom cache'), '--native-bundle', str(native), '--output', str(root / 'Trove.app'), '--version', '1.2.3', '--build-number', '42']), \
                     patch('devtools.go_binary', return_value='/pinned/go'), \
                     patch('shutil.copytree', side_effect=copy_tree), \
                     patch('subprocess.run', side_effect=command), \
-                    patch('subprocess.check_output', return_value='fixture:\n'), \
+                    patch('subprocess.check_output', side_effect=lambda argv, **kwargs: '{"userVersion":3,"storageGeneration":1}' if './cmd/trove-format' in argv else 'fixture:\n'), \
                     patch('sys.stdout', new_callable=io.StringIO):
                 runpy.run_path(str(SCRIPTS / 'build-desktop.py'), run_name='__main__')
             children = [argv for argv, _ in commands if argv[0] == sys.executable]
@@ -185,6 +186,21 @@ class DeveloperToolsTests(unittest.TestCase):
                 self.assertEqual(argv[argv.index('--output') + 1], str(native))
             for _, env in commands:
                 self.assertEqual(env['TROVE_CACHE_DIR'], str(root / 'custom cache'))
+            with (root / 'Trove.app/Contents/Info.plist').open('rb') as f:
+                info = plistlib.load(f)
+            self.assertEqual(info['CFBundleShortVersionString'], '1.2.3')
+            self.assertEqual(info['CFBundleVersion'], '42')
+            self.assertEqual(info['TroveWorkspaceUserVersion'], 3)
+            self.assertEqual(info['TroveWorkspaceStorageGeneration'], 1)
+            self.assertEqual(info['TroveArchitecture'], 'arm64')
+
+    def test_invalid_release_identity_fails_before_build_or_filesystem_changes(self):
+        for flags in [['--version', 'latest'], ['--build-number', '0'], ['--build-number', '-1'], ['--build-number', str(2**64)]]:
+            with self.subTest(flags=flags), patch.object(sys, 'argv', ['build-desktop.py'] + flags), patch('subprocess.run') as run, patch('sys.stderr', new_callable=io.StringIO):
+                with self.assertRaises(SystemExit) as error:
+                    runpy.run_path(str(SCRIPTS / 'build-desktop.py'), run_name='__main__')
+                self.assertEqual(error.exception.code, 2)
+                run.assert_not_called()
 
 
 if __name__ == '__main__':
