@@ -1,0 +1,9 @@
+{"Time":"2026-10-05T20:47:58.454272+05:30","Action":"start","Package":"trove.local/phase0/internal/updates"}
+{"Time":"2026-10-05T20:47:58.69778+05:30","Action":"run","Package":"trove.local/phase0/internal/updates","Test":"TestRollbackNativeDevelopmentChild"}
+{"Time":"2026-10-05T20:47:58.697861+05:30","Action":"output","Package":"trove.local/phase0/internal/updates","Test":"TestRollbackNativeDevelopmentChild","Output":"=== RUN   TestRollbackNativeDevelopmentChild\n","OutputType":"frame"}
+{"Time":"2026-10-05T20:48:00.25257+05:30","Action":"output","Package":"trove.local/phase0/internal/updates","Test":"TestRollbackNativeDevelopmentChild","Output":"    rollback_native_darwin_test.go:52: Actual Wails child PID 28408 acknowledged rendered workspace and committed initialization after 1.278233666s\n"}
+{"Time":"2026-10-05T20:48:00.282505+05:30","Action":"output","Package":"trove.local/phase0/internal/updates","Test":"TestRollbackNativeDevelopmentChild","Output":"--- PASS: TestRollbackNativeDevelopmentChild (1.58s)\n","OutputType":"frame"}
+{"Time":"2026-10-05T20:48:00.282556+05:30","Action":"pass","Package":"trove.local/phase0/internal/updates","Test":"TestRollbackNativeDevelopmentChild","Elapsed":1.58}
+{"Time":"2026-10-05T20:48:00.282604+05:30","Action":"output","Package":"trove.local/phase0/internal/updates","Output":"PASS\n","OutputType":"frame"}
+{"Time":"2026-10-05T20:48:01.288987+05:30","Action":"output","Package":"trove.local/phase0/internal/updates","Output":"ok  \ttrove.local/phase0/internal/updates\t2.834s\n"}
+{"Time":"2026-10-05T20:48:01.289038+05:30","Action":"pass","Package":"trove.local/phase0/internal/updates","Elapsed":2.835}
