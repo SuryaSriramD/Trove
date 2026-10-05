@@ -1,5 +1,7 @@
 """Development setup must be portable, explicit about network use and non-destructive."""
+import hashlib
 import io
+import json
 import os
 import plistlib
 from pathlib import Path
@@ -154,7 +156,7 @@ class DeveloperToolsTests(unittest.TestCase):
             root = Path(temporary).resolve()
             native = root / 'native'
             native.mkdir()
-            (native / 'manifest.json').write_text('{"helpers": []}')
+            (native / 'manifest.json').write_text(json.dumps({'schemaVersion': 1, 'architecture': 'arm64', 'helpers': [{'name': 'microphone-worker', 'runtime': 'microphone', 'runtimeCommit': 'trove-microphone-v1', 'architecture': 'arm64', 'sha256': '0'*64}]}))
             commands = []
             copytree = shutil.copytree
 
@@ -166,6 +168,12 @@ class DeveloperToolsTests(unittest.TestCase):
 
             def command(argv, **kwargs):
                 commands.append((argv, kwargs.get('env', {})))
+                if len(argv) > 1 and Path(argv[1]).name == 'build-microphone.py':
+                    content = b'synthetic capture artifact'
+                    (native / 'microphone-worker').write_bytes(content)
+                    pin = json.loads((SCRIPTS.parent / 'native/microphone.lock.json').read_text())
+                    helper = {'name': 'microphone-worker', 'runtime': 'microphone', 'runtimeCommit': pin['runtimeCommit'], 'architecture': 'arm64', 'sha256': hashlib.sha256(content).hexdigest()}
+                    (native / 'microphone-worker.json').write_text(json.dumps({'schemaVersion': 1, 'platform': 'darwin', 'testOnly': False, 'deviceBackendCompiled': True, 'capabilities': ['record'], 'helper': helper}))
                 if argv[0] == '/pinned/go' and '-o' in argv:
                     Path(argv[argv.index('-o') + 1]).write_bytes(b'fixture binary')
 
@@ -179,7 +187,7 @@ class DeveloperToolsTests(unittest.TestCase):
                 runpy.run_path(str(SCRIPTS / 'build-desktop.py'), run_name='__main__')
             children = [argv for argv, _ in commands if argv[0] == sys.executable]
             self.assertEqual({Path(argv[1]).name for argv in children}, {
-                'build-document-extractor.py', 'build-audio-decoder.py', 'build-pdf-renderer.py',
+                'build-microphone.py', 'build-document-extractor.py', 'build-audio-decoder.py', 'build-pdf-renderer.py',
                 'build-vision.py', 'build-ocr-worker.py'})
             for argv in children:
                 self.assertEqual(argv[argv.index('--cache') + 1], str(root / 'custom cache'))
@@ -193,6 +201,10 @@ class DeveloperToolsTests(unittest.TestCase):
             self.assertEqual(info['TroveWorkspaceUserVersion'], 3)
             self.assertEqual(info['TroveWorkspaceStorageGeneration'], 1)
             self.assertEqual(info['TroveArchitecture'], 'arm64')
+            bundled = json.loads((root / 'Trove.app/Contents/Resources/native/manifest.json').read_text())
+            self.assertEqual(bundled['schemaVersion'], 2)
+            self.assertEqual(bundled['helpers'][0]['runtimeCommit'], json.loads((SCRIPTS.parent / 'native/microphone.lock.json').read_text())['runtimeCommit'])
+            self.assertEqual(len(bundled['helpers']), 1)
 
     def test_invalid_release_identity_fails_before_build_or_filesystem_changes(self):
         for flags in [['--version', 'latest'], ['--build-number', '0'], ['--build-number', '-1'], ['--build-number', str(2**64)]]:
