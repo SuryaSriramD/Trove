@@ -23,12 +23,12 @@ class ContractTests(unittest.TestCase):
  def test_generator_has_no_drift(self):
   paths=[ROOT/'contracts/types_generated.go',*(ROOT/'contracts/generated'/f'{m}.ts' for m in SCHEMAS)]
   before={p:p.read_bytes() for p in paths}
-  subprocess.run([sys.executable,str(ROOT/'scripts/generate_types.py')],check=True)
+  subprocess.run([sys.executable,str(ROOT/'scripts/generate_types.py'),'--check'],check=True)
   self.assertEqual(before,{p:p.read_bytes() for p in paths})
  def test_protocol_authoring_has_no_drift(self):
   paths=[ROOT/'contracts/service.schema.json',ROOT/'contracts/jobs.schema.json']
   before={p:p.read_bytes() for p in paths}
-  subprocess.run([sys.executable,str(ROOT/'scripts/build_protocol_schemas.py')],check=True)
+  subprocess.run([sys.executable,str(ROOT/'scripts/build_protocol_schemas.py'),'--check'],check=True)
   self.assertEqual(before,{p:p.read_bytes() for p in paths})
  def test_wire_rejects_actor_injection_unsafe_revision_unknown_command_and_empty_batch(self):
   base=json.loads((ROOT/'contracts/examples/service-batch.json').read_text())

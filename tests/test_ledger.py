@@ -4,6 +4,8 @@ import hashlib
 import json
 from pathlib import Path
 import re
+import subprocess
+import sys
 import unittest
 import xml.etree.ElementTree as ET
 import zipfile
@@ -16,6 +18,8 @@ LEDGER_PATH = ROOT / 'docs/phase-0/requirements-ledger.json'
 class LedgerTests(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
+        # Ignored extracts are reproducible inputs, never a pre-existing-worktree requirement.
+        subprocess.run([sys.executable, str(ROOT / 'scripts/extract_requirements.py')], check=True)
         cls.ledger = json.loads(LEDGER_PATH.read_text())
         cls.rows = cls.ledger['requirements']
         cls.by_id = {row['id']: row for row in cls.rows}

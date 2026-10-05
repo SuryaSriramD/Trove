@@ -1,0 +1,91 @@
+.....FF....................................................E..EEE......................pages=0: completed=2/2, maximum shell ms=1400
+.pages=0: completed=1/1, maximum shell ms=2700
+.pages=0: completed=1/2, maximum shell ms=1000
+pages=0: completed=1/2, maximum shell ms=1000
+pages=0: completed=1/2, maximum shell ms=1000
+pages=0: completed=1/2, maximum shell ms=1000
+..pages=0: completed=1/5, maximum shell ms=1000
+.pages=0: completed=0/1, maximum shell ms=FAILED
+.
+======================================================================
+ERROR: test_all_release_labelled_matrix_rows_are_mapped (test_ledger.LedgerTests.test_all_release_labelled_matrix_rows_are_mapped)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/suryasriramduvvuri/.codex/worktrees/completion-candidate/Trove/tests/test_ledger.py", line 97, in test_all_release_labelled_matrix_rows_are_mapped
+    lines = (ROOT / self.ledger['sources'][doc]['textPath']).read_text().splitlines()
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/homebrew/Cellar/python@3.12/3.12.13_1/Frameworks/Python.framework/Versions/3.12/lib/python3.12/pathlib.py", line 1027, in read_text
+    with self.open(mode='r', encoding=encoding, errors=errors) as f:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/homebrew/Cellar/python@3.12/3.12.13_1/Frameworks/Python.framework/Versions/3.12/lib/python3.12/pathlib.py", line 1013, in open
+    return io.open(self, mode, buffering, encoding, errors, newline)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+FileNotFoundError: [Errno 2] No such file or directory: '/Users/suryasriramduvvuri/.codex/worktrees/completion-candidate/Trove/.phase0-source/Trove_PRD.txt'
+
+======================================================================
+ERROR: test_source_anchors_and_numbered_requirements_are_preserved (test_ledger.LedgerTests.test_source_anchors_and_numbered_requirements_are_preserved)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/suryasriramduvvuri/.codex/worktrees/completion-candidate/Trove/tests/test_ledger.py", line 64, in test_source_anchors_and_numbered_requirements_are_preserved
+    source_lines = {name: (ROOT / source['textPath']).read_text().splitlines()
+                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/homebrew/Cellar/python@3.12/3.12.13_1/Frameworks/Python.framework/Versions/3.12/lib/python3.12/pathlib.py", line 1027, in read_text
+    with self.open(mode='r', encoding=encoding, errors=errors) as f:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/homebrew/Cellar/python@3.12/3.12.13_1/Frameworks/Python.framework/Versions/3.12/lib/python3.12/pathlib.py", line 1013, in open
+    return io.open(self, mode, buffering, encoding, errors, newline)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+FileNotFoundError: [Errno 2] No such file or directory: '/Users/suryasriramduvvuri/.codex/worktrees/completion-candidate/Trove/.phase0-source/Trove_PRD.txt'
+
+======================================================================
+ERROR: test_source_text_is_complete_and_matches_supplied_docx (test_ledger.LedgerTests.test_source_text_is_complete_and_matches_supplied_docx) (source='PRD')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/suryasriramduvvuri/.codex/worktrees/completion-candidate/Trove/tests/test_ledger.py", line 56, in test_source_text_is_complete_and_matches_supplied_docx
+    self.assertEqual(hashlib.sha256(text_path.read_bytes()).hexdigest(), source['textSha256'])
+                                    ^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/homebrew/Cellar/python@3.12/3.12.13_1/Frameworks/Python.framework/Versions/3.12/lib/python3.12/pathlib.py", line 1019, in read_bytes
+    with self.open(mode='rb') as f:
+         ^^^^^^^^^^^^^^^^^^^^
+  File "/opt/homebrew/Cellar/python@3.12/3.12.13_1/Frameworks/Python.framework/Versions/3.12/lib/python3.12/pathlib.py", line 1013, in open
+    return io.open(self, mode, buffering, encoding, errors, newline)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+FileNotFoundError: [Errno 2] No such file or directory: '/Users/suryasriramduvvuri/.codex/worktrees/completion-candidate/Trove/.phase0-source/Trove_PRD.txt'
+
+======================================================================
+ERROR: test_source_text_is_complete_and_matches_supplied_docx (test_ledger.LedgerTests.test_source_text_is_complete_and_matches_supplied_docx) (source='TRD')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/suryasriramduvvuri/.codex/worktrees/completion-candidate/Trove/tests/test_ledger.py", line 56, in test_source_text_is_complete_and_matches_supplied_docx
+    self.assertEqual(hashlib.sha256(text_path.read_bytes()).hexdigest(), source['textSha256'])
+                                    ^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/homebrew/Cellar/python@3.12/3.12.13_1/Frameworks/Python.framework/Versions/3.12/lib/python3.12/pathlib.py", line 1019, in read_bytes
+    with self.open(mode='rb') as f:
+         ^^^^^^^^^^^^^^^^^^^^
+  File "/opt/homebrew/Cellar/python@3.12/3.12.13_1/Frameworks/Python.framework/Versions/3.12/lib/python3.12/pathlib.py", line 1013, in open
+    return io.open(self, mode, buffering, encoding, errors, newline)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+FileNotFoundError: [Errno 2] No such file or directory: '/Users/suryasriramduvvuri/.codex/worktrees/completion-candidate/Trove/.phase0-source/Trove_TRD.txt'
+
+======================================================================
+FAIL: test_generator_has_no_drift (test_contracts.ContractTests.test_generator_has_no_drift)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/suryasriramduvvuri/.codex/worktrees/completion-candidate/Trove/tests/test_contracts.py", line 27, in test_generator_has_no_drift
+    self.assertEqual(before,{p:p.read_bytes() for p in paths})
+AssertionError: {Posi[187 chars]cts\n\nimport (\n\t"encoding/json"\n\t"fmt"\n)[231168 chars];\n'} != {Posi[187 chars]cts\nimport ("encoding/json"; "fmt")\nfunc mat[205026 chars];\n'}
+Diff is 12499032 characters long. Set self.maxDiff to None to see it.
+
+======================================================================
+FAIL: test_protocol_authoring_has_no_drift (test_contracts.ContractTests.test_protocol_authoring_has_no_drift)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/suryasriramduvvuri/.codex/worktrees/completion-candidate/Trove/tests/test_contracts.py", line 32, in test_protocol_authoring_has_no_drift
+    self.assertEqual(before,{p:p.read_bytes() for p in paths})
+AssertionError: {Posi[178246 chars]    "type": "string",\n              "enum": [[12955 chars]}\n'} != {Posi[178246 chars]    "const": "arm64"\n            },\n        [12912 chars]}\n'}
+Diff is 6060476 characters long. Set self.maxDiff to None to see it.
+
+----------------------------------------------------------------------
+Ran 92 tests in 30.972s
+
+FAILED (failures=2, errors=4)

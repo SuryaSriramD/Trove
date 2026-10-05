@@ -1,7 +1,12 @@
 """Authoring source for service and worker JSON Schemas. Run after contract edits."""
-import json
+import argparse, json
+from codegen_output import publish
 from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
+parser = argparse.ArgumentParser(description=__doc__)
+parser.add_argument('--check', action='store_true', help='Report drift without changing generated files')
+args = parser.parse_args()
+outputs = {}
 D = lambda name: {'$ref': f'domain.schema.json#/$defs/{name}'}
 R = lambda name: {'$ref': f'#/$defs/{name}'}
 S = {'type':'string'}
@@ -14,7 +19,7 @@ def tagged(tag, props, required=None):
     props = {'kind':{'const':tag}, **props}
     return obj(props, ['kind', *([key for key in props if key != 'kind'] if required is None else required)])
 def schema(name,defs,root): return {'$schema':'https://json-schema.org/draft/2020-12/schema','$id':f'https://trove.local/contracts/{name}.schema.json','title':name,'$ref':f'#/$defs/{root}','$defs':defs}
-def save(name,value): (ROOT/'contracts'/f'{name}.schema.json').write_text(json.dumps(value,indent=2)+'\n')
+def save(name,value): outputs[ROOT/'contracts'/f'{name}.schema.json'] = (json.dumps(value,indent=2)+'\n').encode()
 # The JSON value boundary is deliberately restricted to registry-validated data only.
 json_value={'type':['object','array','string','number','integer','boolean','null']}
 error_codes=['INVALID_REQUEST','UNSUPPORTED_VERSION','NOT_FOUND','CONFLICT','SCOPE_DENIED','APPROVAL_REQUIRED','APPROVAL_EXPIRED','IDEMPOTENCY_CONFLICT','CANCELLED','ALREADY_COMMITTED','RESOURCE_EXHAUSTED','WORKSPACE_LOCKED','UNSUPPORTED_SCHEMA','IMPORT_CONFLICT','INTEGRITY_ERROR','WORKER_FAILED','INTERNAL']
@@ -282,7 +287,7 @@ j={
 'JobProgressEvent':obj({'contractVersion':{'const':1},'jobId':D('Id'),'jobRevision':D('Revision'),'attempt':{'type':'integer','minimum':0,'maximum':5},'state':R('JobState'),'progress':R('Progress')}),
 'WorkerRequest':obj({'protocolVersion':{'const':1},'requestId':D('Id'),'jobId':D('Id'),'leaseToken':D('Id'),'cancellationId':D('Id'),'operation':enum('generate','embed','transcribe','tokenize','image_generate'),'modelPackId':D('Id'),'limits':R('ResourceLimits'),'inputs':arr(R('InputHandle'),32)}),
 'WorkerOutput':{'oneOf':[
- tagged('hello',{'protocolVersion':{'const':1},'runtime':enum('llama.cpp','whisper.cpp'),'runtimeCommit':{'type':'string','pattern':'^[0-9a-f]{40}$'},'architecture':{'const':'arm64'},'capabilities':arr(enum('generate','embed','transcribe','tokenize','image_generate'),5)}),
+ tagged('hello',{'protocolVersion':{'const':1},'runtime':enum('llama.cpp','whisper.cpp'),'runtimeCommit':{'type':'string','pattern':'^[0-9a-f]{40}$'},'architecture':enum('arm64','amd64'),'capabilities':arr(enum('generate','embed','transcribe','tokenize','image_generate'),5)}),
  tagged('progress',{'requestId':D('Id'),'sequence':N,'progress':R('Progress')}),
  tagged('token',{'requestId':D('Id'),'sequence':N,'text':{'type':'string','maxLength':16384}}),
  tagged('result',{'requestId':D('Id'),'leaseToken':D('Id'),'sequence':N,'resultHandle':R('InputHandle')}),
@@ -301,3 +306,5 @@ j={
 'JobResponse':{'oneOf':[obj({'ok':{'const':True},'result':R('Job')}),obj({'ok':{'const':False},'error':{'$ref':'service.schema.json#/$defs/Error'}})]}
 }
 save('jobs',schema('jobs',j,'Job'))
+
+publish(outputs, check=args.check)

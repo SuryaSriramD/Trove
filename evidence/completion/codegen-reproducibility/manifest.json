@@ -1,0 +1,35 @@
+{
+  "schemaVersion": 1,
+  "baseCommit": "02eb8c005772071501052bd38f0361fbb56bc5bf",
+  "changes": [
+    "Authoring source retains arm64/amd64 worker architecture",
+    "Go consumers use pinned gofmt",
+    "Check mode detects drift without publishing",
+    "Fresh ledger tests reproduce exact verified source bytes/blank paragraph anchors"
+  ],
+  "sourceSha256": {
+    "scripts/codegen_output.py": "44b1d2cda1c10911b176a753d8b91e51c878d459b5394a1ee78cb3cdc6d496a9",
+    "scripts/build_protocol_schemas.py": "bc011fc60a58e2bc19b19ed04930c732e9205f7e06b995d6146d0b662c6ee551",
+    "scripts/generate_types.py": "1677b25fb0023e032eebd8b62fa9a3cbf114a85adc4d80853dea99e09fc32354",
+    "scripts/extract_requirements.py": "e9dc4d6fb65faf18f4937c42dfa2e991d253e7cf507d1d9a9310177a3bba0ad0",
+    "tests/test_codegen_output.py": "2caa9d88dd6080411a5c58d68f9f5d5a1591fda42d2b329b22b0e9f16c6505eb",
+    "tests/test_contracts.py": "d573c0c5b4c592ae005761822ad7e0968beca1ae3793d56d361999f666e1a433",
+    "tests/test_ledger.py": "a29bf46bfff033ee29f6ef1bd4f27054af07733a98de02647e078aa778ecb580",
+    "contracts/jobs.schema.json": "2eaaea765ee7e68b72b6905bf0ea48a8e94bfb854e2bc31003c71e6ce33bec1d",
+    "contracts/types_generated.go": "a1cfd4ab5ea380dee3add0272063ac5eebe0e52eb6d012cef748881076c88047",
+    "contracts/generated/jobs.ts": "c0c8f768eb34b9d95245c2bc8e699afbd5e42613b4b32a08948474c9a41ca285"
+  },
+  "verification": {
+    "command": "TROVE_CACHE_DIR=<pinned cache> <pinned python> -m unittest discover -s tests",
+    "passedTests": 93,
+    "exitCode": 0,
+    "sourceChecksNonMutating": true,
+    "finalLogSha256": "dc2092878710be942858cd294e470284d412b11933dc1d7bc65829c9b49acf58"
+  },
+  "history": [
+    "First run: generator/format drift and missing ignored extracts",
+    "Second run: original extractor dropped blank paragraphs and added a final newline",
+    "Final run: exact original source hashes and all 93 tests pass"
+  ],
+  "releaseQualified": false
+}
