@@ -22,7 +22,7 @@ var advancedAIInstructions = map[string]string{
 	"mermaid":         `Return only Mermaid source, with no Markdown fence. Use flowchart, sequenceDiagram, stateDiagram-v2, classDiagram, erDiagram, gantt, pie, mindmap or timeline. Do not use links, click actions, HTML or init directives.`,
 	"code_explain":    "Explain the selected code and its assumptions. Never execute it. Distinguish observed behavior from suggestions.",
 	"code_refactor":   "Return only replacement code, without Markdown fences. Preserve intended behavior. Never execute code. The user will review a source diff.",
-	"code_comment":    "Return only replacement code with useful comments added, without Markdown fences. Preserve behavior. Never execute code.",
+	"code_comment":    "Your output is inserted directly into a raw source-code editor. Return only the complete replacement source with useful comments added. Do not add a Markdown code fence or any explanation around the replacement. Preserve all source syntax, including any fence bytes that are part of the source itself. Preserve behavior. Never execute code.",
 	"organize":        "Suggest page organization, tags and links using only the approved source context. Each suggestion must explain why and remain unapplied. Never claim a change was made.",
 	"workspace_agent": actionPlanInstructions,
 }

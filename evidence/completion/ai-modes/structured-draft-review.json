@@ -1,0 +1,170 @@
+{
+  "schemaVersion": 1,
+  "recordedAt": "2026-10-05T13:10:10.158083+00:00",
+  "sourceBase": "93c8b664710373cb94db8d494f368ebfa63a6376",
+  "sourceSha256": {
+    "internal/workspace/ai_generation.go": "daf3053f23c5fd3dd28694f7b816c9b5f0d35c8cc737709262952caaa4698419",
+    "internal/workspace/ai_advanced.go": "5679120c91138cfb1ebe4013395d0b8954535ffbc6dc144d20c6d163407c85a6",
+    "internal/workspace/ai_generation_test.go": "23be0841775db866103accf0cfc1c55538df793152552a83e2fe563e14e2d75e",
+    "internal/workspace/ai_database_generation.go": "71a3383677dee8bc8dc23064fa510539435fc1a4be4d49b8a7398dde1ac5cd46",
+    "internal/workspace/ai_database_generation_test.go": "e2ddee90429132edc9dc5a6e06ab19c513ea16ce7866114b2365c3e581322e16"
+  },
+  "conclusion": "Code modes retain exact streamed/final/reviewed bytes. Database/schema have bounded required-field grammar and adapter-independent shape validation; canonical config validation remains in the proposal service. Actual model rerun pending and no broader quality qualification is claimed.",
+  "reviewFinding": "Generic fence stripping changed valid Markdown source in code_refactor/code_comment. It now applies only to database/schema/Mermaid drafts.",
+  "originalModelEvidenceSha256": {
+    "initial-modes.txt": "6946f5a78424c4e64f0cb1fbf397c5637f9936076d975c5e063202babf1a41f9",
+    "affected-modes.txt": "88c8a06dddd720455400dc45bc2417587a207acce074ce10d82be4fc70cd4c6c",
+    "affected-race.jsonl": "8cba8eb006785ecec917fd6707b0647a2728a4f7303f6cbb4027e863ce316d09"
+  },
+  "independentOracleSha256": "5e56a20f7df192bf75cfcac49151ae8f3ab14b897501ad0e5edefba991d8578d",
+  "grammarBounds": {
+    "properties": 32,
+    "configContainerDepth": 6,
+    "configMembersOrElements": 32,
+    "configStringCharacters": 4000,
+    "keyCharacters": 128,
+    "titleCharacters": 512,
+    "nameCharacters": 128,
+    "typeCharacters": 64,
+    "totalDraftBytes": 64000,
+    "whitespacePerGrammarNode": 8,
+    "propertyTypes": "Generic strings; existing canonical schemas remain authoritative"
+  },
+  "checks": {
+    "focusedGoRaceInitial": {
+      "result": "13 passed, 1 test fixture failed",
+      "log": "=== RUN   TestAdvancedAIDatabaseDraftReviewAndIdempotency\n=== RUN   TestAdvancedAIDatabaseDraftReviewAndIdempotency/table\n=== RUN   TestAdvancedAIDatabaseDraftReviewAndIdempotency/list\n=== RUN   TestAdvancedAIDatabaseDraftReviewAndIdempotency/gallery\n--- PASS: TestAdvancedAIDatabaseDraftReviewAndIdempotency (0.45s)\n    --- PASS: TestAdvancedAIDatabaseDraftReviewAndIdempotency/table (0.31s)\n    --- PASS: TestAdvancedAIDatabaseDraftReviewAndIdempotency/list (0.07s)\n    --- PASS: TestAdvancedAIDatabaseDraftReviewAndIdempotency/gallery (0.07s)\n=== RUN   TestAdvancedAICodeLiteralAndStaleReview\n--- PASS: TestAdvancedAICodeLiteralAndStaleReview (0.08s)\n=== RUN   TestAdvancedAIStructureValidation\n--- PASS: TestAdvancedAIStructureValidation (0.04s)\n=== RUN   TestAdvancedAICodeSelectionPreservesUnselectedFunctions\n--- PASS: TestAdvancedAICodeSelectionPreservesUnselectedFunctions (0.08s)\n=== RUN   TestAdvancedAICodeRejectsAmbiguousSelectionsAndTruncatedWholeBlock\n=== RUN   TestAdvancedAICodeRejectsAmbiguousSelectionsAndTruncatedWholeBlock/ambiguous\n=== RUN   TestAdvancedAICodeRejectsAmbiguousSelectionsAndTruncatedWholeBlock/truncated\n=== RUN   TestAdvancedAICodeRejectsAmbiguousSelectionsAndTruncatedWholeBlock/missing_evidence\n--- PASS: TestAdvancedAICodeRejectsAmbiguousSelectionsAndTruncatedWholeBlock (0.19s)\n    --- PASS: TestAdvancedAICodeRejectsAmbiguousSelectionsAndTruncatedWholeBlock/ambiguous (0.07s)\n    --- PASS: TestAdvancedAICodeRejectsAmbiguousSelectionsAndTruncatedWholeBlock/truncated (0.07s)\n    --- PASS: TestAdvancedAICodeRejectsAmbiguousSelectionsAndTruncatedWholeBlock/missing_evidence (0.06s)\n=== RUN   TestAdvancedAISuggestionsScopeFilteringPrecedesCandidateLimit\n--- PASS: TestAdvancedAISuggestionsScopeFilteringPrecedesCandidateLimit (10.40s)\n=== RUN   TestAITokenBudgetKeepsLongSelectionAndUnselectedCode\n--- PASS: TestAITokenBudgetKeepsLongSelectionAndUnselectedCode (0.12s)\n=== RUN   TestAITokenBudgetReportsOmissionsAndRejectsOversizedSelection\n--- PASS: TestAITokenBudgetReportsOmissionsAndRejectsOversizedSelection (0.13s)\n=== RUN   TestAITokenBudgetRechecksEvidenceAfterTokenization\n--- PASS: TestAITokenBudgetRechecksEvidenceAfterTokenization (0.07s)\n=== RUN   TestAIDatabaseModesRequireGrammarAndCompleteShape\n--- PASS: TestAIDatabaseModesRequireGrammarAndCompleteShape (0.00s)\n=== RUN   TestAIDatabaseGrammarAllowsAdvancedConfigButKernelRejectsInvalidSemantics\n    ai_database_generation_test.go:67: canonical select config gate valid=true: INVALID_REQUEST: Invalid select property config: jsonschema validation failed with 'https://trove.local/contracts/domain.schema.json#/$defs/property_select_config_v1'\n        - at '/options/0/id': '3b88f280-e606-4d20-8dfb-01faab99acb4' does not match pattern '^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$'\n--- FAIL: TestAIDatabaseGrammarAllowsAdvancedConfigButKernelRejectsInvalidSemantics (0.06s)\n=== RUN   TestAIDatabaseGeneratedShapeBounds\n--- PASS: TestAIDatabaseGeneratedShapeBounds (0.00s)\n=== RUN   TestAIStructuredDraftUnwrapsOnlyOneCompleteFence\n--- PASS: TestAIStructuredDraftUnwrapsOnlyOneCompleteFence (0.00s)\n=== RUN   TestAICodeDraftPreservesActualMarkdownFenceThroughReview\n=== RUN   TestAICodeDraftPreservesActualMarkdownFenceThroughReview/code_refactor\n=== RUN   TestAICodeDraftPreservesActualMarkdownFenceThroughReview/code_comment\n--- PASS: TestAICodeDraftPreservesActualMarkdownFenceThroughReview (0.16s)\n    --- PASS: TestAICodeDraftPreservesActualMarkdownFenceThroughReview/code_refactor (0.08s)\n    --- PASS: TestAICodeDraftPreservesActualMarkdownFenceThroughReview/code_comment (0.08s)\nFAIL\nFAIL\ttrove.local/phase0/internal/workspace\t12.459s\nFAIL\n",
+      "failureExplanation": "The select configuration fixture supplied a UUIDv4 option ID; the canonical domain ID contract correctly rejected it. Only fixture ID version changed to UUIDv7; no production validator or independent model oracle was weakened."
+    },
+    "affectedDatabaseGoRace": {
+      "result": "3 PASS after fixture correction",
+      "log": "=== RUN   TestAIDatabaseModesRequireGrammarAndCompleteShape\n--- PASS: TestAIDatabaseModesRequireGrammarAndCompleteShape (0.00s)\n=== RUN   TestAIDatabaseGrammarAllowsAdvancedConfigButKernelRejectsInvalidSemantics\n--- PASS: TestAIDatabaseGrammarAllowsAdvancedConfigButKernelRejectsInvalidSemantics (0.18s)\n=== RUN   TestAIDatabaseGeneratedShapeBounds\n--- PASS: TestAIDatabaseGeneratedShapeBounds (0.00s)\nPASS\nok  \ttrove.local/phase0/internal/workspace\t1.780s\n"
+    },
+    "pinnedNativeGrammarParser": {
+      "result": "18 PASS, model-free",
+      "runtimeCommit": "d2e54583c7452353eb35d40431281f6ee984332f",
+      "grammar": "root ::= \"{\" ws \"\\\"title\\\"\" ws \":\" ws title ws \",\" ws \"\\\"properties\\\"\" ws \":\" ws \"[\" ws (property (ws \",\" ws property){0,31})? ws \"]\" ws \",\" ws \"\\\"view\\\"\" ws \":\" ws (\"\\\"table\\\"\" | \"\\\"list\\\"\" | \"\\\"gallery\\\"\") ws \"}\" ws\nproperty ::= \"{\" ws \"\\\"name\\\"\" ws \":\" ws name ws \",\" ws \"\\\"type\\\"\" ws \":\" ws type ws \",\" ws \"\\\"config\\\"\" ws \":\" ws config-object-0 ws \"}\"\ntitle ::= \"\\\"\" char{1,512} \"\\\"\"\nname ::= \"\\\"\" char{1,128} \"\\\"\"\ntype ::= \"\\\"\" char{1,64} \"\\\"\"\nkey ::= \"\\\"\" char{0,128} \"\\\"\"\ntext ::= \"\\\"\" char{0,4000} \"\\\"\"\nscalar ::= text | number | \"true\" | \"false\" | \"null\"\nnumber ::= \"-\"? (\"0\" | [1-9] [0-9]{0,18}) (\".\" [0-9]{1,18})? ([eE] [+-]? [0-9]{1,3})?\nchar ::= [^\"\\\\\\x7F\\x00-\\x1F] | \"\\\\\" ([\"\\\\/bfnrt] | \"u\" [0-9a-fA-F]{4})\nws ::= [ \\t\\n\\r]{0,8}\nconfig-object-0 ::= \"{\" ws (key ws \":\" ws config-value-0 (ws \",\" ws key ws \":\" ws config-value-0){0,31})? ws \"}\"\nconfig-array-0 ::= \"[\" ws (config-value-0 (ws \",\" ws config-value-0){0,31})? ws \"]\"\nconfig-value-0 ::= scalar | config-object-1 | config-array-1\nconfig-object-1 ::= \"{\" ws (key ws \":\" ws config-value-1 (ws \",\" ws key ws \":\" ws config-value-1){0,31})? ws \"}\"\nconfig-array-1 ::= \"[\" ws (config-value-1 (ws \",\" ws config-value-1){0,31})? ws \"]\"\nconfig-value-1 ::= scalar | config-object-2 | config-array-2\nconfig-object-2 ::= \"{\" ws (key ws \":\" ws config-value-2 (ws \",\" ws key ws \":\" ws config-value-2){0,31})? ws \"}\"\nconfig-array-2 ::= \"[\" ws (config-value-2 (ws \",\" ws config-value-2){0,31})? ws \"]\"\nconfig-value-2 ::= scalar | config-object-3 | config-array-3\nconfig-object-3 ::= \"{\" ws (key ws \":\" ws config-value-3 (ws \",\" ws key ws \":\" ws config-value-3){0,31})? ws \"}\"\nconfig-array-3 ::= \"[\" ws (config-value-3 (ws \",\" ws config-value-3){0,31})? ws \"]\"\nconfig-value-3 ::= scalar | config-object-4 | config-array-4\nconfig-object-4 ::= \"{\" ws (key ws \":\" ws config-value-4 (ws \",\" ws key ws \":\" ws config-value-4){0,31})? ws \"}\"\nconfig-array-4 ::= \"[\" ws (config-value-4 (ws \",\" ws config-value-4){0,31})? ws \"]\"\nconfig-value-4 ::= scalar | config-object-5 | config-array-5\nconfig-object-5 ::= \"{\" ws (key ws \":\" ws config-value-5 (ws \",\" ws key ws \":\" ws config-value-5){0,31})? ws \"}\"\nconfig-array-5 ::= \"[\" ws (config-value-5 (ws \",\" ws config-value-5){0,31})? ws \"]\"\nconfig-value-5 ::= scalar\n",
+      "grammarSha256": "4907983784e88999fc1feed6389b2cb3fac35b7edfa5ed5642dd800edf0e349b",
+      "verifierSource": "\n#include \"llama-grammar.h\"\n#include <nlohmann/json.hpp>\n#include <fstream>\n#include <iostream>\n#include <sstream>\nstatic std::string read(const char *p){std::ifstream f(p);std::stringstream s;s<<f.rdbuf();return s.str();}\nbool accepts(const std::string &rules,const std::string &text){\n auto *grammar=llama_grammar_init_impl(nullptr,rules.c_str(),\"root\",false,nullptr,0,nullptr,0);\n if(!grammar)throw std::runtime_error(\"grammar rejected by pinned parser\");\n for(unsigned char c:text){if(llama_grammar_get_stacks(grammar).empty()){llama_grammar_free_impl(grammar);return false;}llama_grammar_accept(grammar,c);}\n bool complete=false;for(const auto &stack:llama_grammar_get_stacks(grammar))if(stack.empty())complete=true;\n llama_grammar_free_impl(grammar);return complete;\n}\nint main(int argc,char **argv){\n if(argc!=3)return 2;std::string grammar=read(argv[1]);auto cases=nlohmann::json::parse(read(argv[2]));\n int failed=0;for(const auto &item:cases){bool got=accepts(grammar,item[\"input\"]);bool expected=item[\"accepted\"];std::cout<<item[\"name\"]<<\": \"<<(got==expected?\"PASS\":\"FAIL\")<<\"\\n\";if(got!=expected)failed++;}\n return failed?1:0;\n}\n",
+      "compileCommand": [
+        "clang++",
+        "-std=c++17",
+        "-O2",
+        "-I/Users/suryasriramduvvuri/Library/Caches/Trove/completion/llama.cpp-d2e54583c7452353eb35d40431281f6ee984332f/src",
+        "-I/Users/suryasriramduvvuri/Library/Caches/Trove/completion/llama.cpp-d2e54583c7452353eb35d40431281f6ee984332f/include",
+        "-I/Users/suryasriramduvvuri/Library/Caches/Trove/completion/llama.cpp-d2e54583c7452353eb35d40431281f6ee984332f/ggml/include",
+        "-I/Users/suryasriramduvvuri/Library/Caches/Trove/completion/llama.cpp-d2e54583c7452353eb35d40431281f6ee984332f/vendor",
+        "/private/tmp/trove-ai-database-grammar-check.cpp",
+        "/Users/suryasriramduvvuri/Library/Caches/Trove/completion/workspaces/f5e2f63b3b309383/vision-native-build/src/libllama.a",
+        "/Users/suryasriramduvvuri/Library/Caches/Trove/completion/workspaces/f5e2f63b3b309383/vision-native-build/ggml/src/libggml.a",
+        "/Users/suryasriramduvvuri/Library/Caches/Trove/completion/workspaces/f5e2f63b3b309383/vision-native-build/ggml/src/libggml-cpu.a",
+        "/Users/suryasriramduvvuri/Library/Caches/Trove/completion/workspaces/f5e2f63b3b309383/vision-native-build/ggml/src/ggml-blas/libggml-blas.a",
+        "/Users/suryasriramduvvuri/Library/Caches/Trove/completion/workspaces/f5e2f63b3b309383/vision-native-build/ggml/src/libggml-base.a",
+        "-framework",
+        "Accelerate",
+        "-o",
+        "/private/tmp/trove-ai-database-grammar-check"
+      ],
+      "cases": [
+        {
+          "name": "advanced select and escaped Unicode",
+          "input": "{\"title\":\"Advanced\",\"properties\":[{\"name\":\"Stage\",\"type\":\"select\",\"config\":{\"options\":[{\"id\":\"3b88f280-e606-4d20-8dfb-01faab99acb4\",\"label\":\"Pr\\u00e9vu \\\"quoted\\\"\"}]}}],\"view\":\"table\"}",
+          "accepted": true
+        },
+        {
+          "name": "missing title",
+          "input": "{\"properties\":[{\"name\":\"Stage\",\"type\":\"select\",\"config\":{\"options\":[{\"id\":\"3b88f280-e606-4d20-8dfb-01faab99acb4\",\"label\":\"Pr\\u00e9vu \\\"quoted\\\"\"}]}}],\"view\":\"table\"}",
+          "accepted": false
+        },
+        {
+          "name": "missing properties",
+          "input": "{\"title\":\"Advanced\",\"view\":\"table\"}",
+          "accepted": false
+        },
+        {
+          "name": "missing view",
+          "input": "{\"title\":\"Advanced\",\"properties\":[{\"name\":\"Stage\",\"type\":\"select\",\"config\":{\"options\":[{\"id\":\"3b88f280-e606-4d20-8dfb-01faab99acb4\",\"label\":\"Pr\\u00e9vu \\\"quoted\\\"\"}]}}]}",
+          "accepted": false
+        },
+        {
+          "name": "missing property name",
+          "input": "{\"title\":\"Advanced\",\"properties\":[{\"type\":\"select\",\"config\":{\"options\":[{\"id\":\"3b88f280-e606-4d20-8dfb-01faab99acb4\",\"label\":\"Pr\\u00e9vu \\\"quoted\\\"\"}]}}],\"view\":\"table\"}",
+          "accepted": false
+        },
+        {
+          "name": "missing property type",
+          "input": "{\"title\":\"Advanced\",\"properties\":[{\"name\":\"Stage\",\"config\":{\"options\":[{\"id\":\"3b88f280-e606-4d20-8dfb-01faab99acb4\",\"label\":\"Pr\\u00e9vu \\\"quoted\\\"\"}]}}],\"view\":\"table\"}",
+          "accepted": false
+        },
+        {
+          "name": "missing property config",
+          "input": "{\"title\":\"Advanced\",\"properties\":[{\"name\":\"Stage\",\"type\":\"select\"}],\"view\":\"table\"}",
+          "accepted": false
+        },
+        {
+          "name": "32 properties",
+          "input": "{\"title\":\"Advanced\",\"properties\":[{\"name\":\"Stage\",\"type\":\"select\",\"config\":{\"options\":[{\"id\":\"3b88f280-e606-4d20-8dfb-01faab99acb4\",\"label\":\"Pr\\u00e9vu \\\"quoted\\\"\"}]}},{\"name\":\"Stage\",\"type\":\"select\",\"config\":{\"options\":[{\"id\":\"3b88f280-e606-4d20-8dfb-01faab99acb4\",\"label\":\"Pr\\u00e9vu \\\"quoted\\\"\"}]}},{\"name\":\"Stage\",\"type\":\"select\",\"config\":{\"options\":[{\"id\":\"3b88f280-e606-4d20-8dfb-01faab99acb4\",\"label\":\"Pr\\u00e9vu \\\"quoted\\\"\"}]}},{\"name\":\"Stage\",\"type\":\"select\",\"config\":{\"options\":[{\"id\":\"3b88f280-e606-4d20-8dfb-01faab99acb4\",\"label\":\"Pr\\u00e9vu \\\"quoted\\\"\"}]}},{\"name\":\"Stage\",\"type\":\"select\",\"config\":{\"options\":[{\"id\":\"3b88f280-e606-4d20-8dfb-01faab99acb4\",\"label\":\"Pr\\u00e9vu \\\"quoted\\\"\"}]}},{\"name\":\"Stage\",\"type\":\"select\",\"config\":{\"options\":[{\"id\":\"3b88f280-e606-4d20-8dfb-01faab99acb4\",\"label\":\"Pr\\u00e9vu \\\"quoted\\\"\"}]}},{\"name\":\"Stage\",\"type\":\"select\",\"config\":{\"options\":[{\"id\":\"3b88f280-e606-4d20-8dfb-01faab99acb4\",\"label\":\"Pr\\u00e9vu \\\"quoted\\\"\"}]}},{\"name\":\"Stage\",\"type\":\"select\",\"config\":{\"options\":[{\"id\":\"3b88f280-e606-4d20-8dfb-01faab99acb4\",\"label\":\"Pr\\u00e9vu \\\"quoted\\\"\"}]}},{\"name\":\"Stage\",\"type\":\"select\",\"config\":{\"options\":[{\"id\":\"3b88f280-e606-4d20-8dfb-01faab99acb4\",\"label\":\"Pr\\u00e9vu \\\"quoted\\\"\"}]}},{\"name\":\"Stage\",\"type\":\"select\",\"config\":{\"options\":[{\"id\":\"3b88f280-e606-4d20-8dfb-01faab99acb4\",\"label\":\"Pr\\u00e9vu \\\"quoted\\\"\"}]}},{\"name\":\"Stage\",\"type\":\"select\",\"config\":{\"options\":[{\"id\":\"3b88f280-e606-4d20-8dfb-01faab99acb4\",\"label\":\"Pr\\u00e9vu \\\"quoted\\\"\"}]}},{\"name\":\"Stage\",\"type\":\"select\",\"config\":{\"options\":[{\"id\":\"3b88f280-e606-4d20-8dfb-01faab99acb4\",\"label\":\"Pr\\u00e9vu \\\"quoted\\\"\"}]}},{\"name\":\"Stage\",\"type\":\"select\",\"config\":{\"options\":[{\"id\":\"3b88f280-e606-4d20-8dfb-01faab99acb4\",\"label\":\"Pr\\u00e9vu \\\"quoted\\\"\"}]}},{\"name\":\"Stage\",\"type\":\"select\",\"config\":{\"options\":[{\"id\":\"3b88f280-e606-4d20-8dfb-01faab99acb4\",\"label\":\"Pr\\u00e9vu \\\"quoted\\\"\"}]}},{\"name\":\"Stage\",\"type\":\"select\",\"config\":{\"options\":[{\"id\":\"3b88f280-e606-4d20-8dfb-01faab99acb4\",\"label\":\"Pr\\u00e9vu \\\"quoted\\\"\"}]}},{\"name\":\"Stage\",\"type\":\"select\",\"config\":{\"options\":[{\"id\":\"3b88f280-e606-4d20-8dfb-01faab99acb4\",\"label\":\"Pr\\u00e9vu \\\"quoted\\\"\"}]}},{\"name\":\"Stage\",\"type\":\"select\",\"config\":{\"options\":[{\"id\":\"3b88f280-e606-4d20-8dfb-01faab99acb4\",\"label\":\"Pr\\u00e9vu \\\"quoted\\\"\"}]}},{\"name\":\"Stage\",\"type\":\"select\",\"config\":{\"options\":[{\"id\":\"3b88f280-e606-4d20-8dfb-01faab99acb4\",\"label\":\"Pr\\u00e9vu \\\"quoted\\\"\"}]}},{\"name\":\"Stage\",\"type\":\"select\",\"config\":{\"options\":[{\"id\":\"3b88f280-e606-4d20-8dfb-01faab99acb4\",\"label\":\"Pr\\u00e9vu \\\"quoted\\\"\"}]}},{\"name\":\"Stage\",\"type\":\"select\",\"config\":{\"options\":[{\"id\":\"3b88f280-e606-4d20-8dfb-01faab99acb4\",\"label\":\"Pr\\u00e9vu \\\"quoted\\\"\"}]}},{\"name\":\"Stage\",\"type\":\"select\",\"config\":{\"options\":[{\"id\":\"3b88f280-e606-4d20-8dfb-01faab99acb4\",\"label\":\"Pr\\u00e9vu \\\"quoted\\\"\"}]}},{\"name\":\"Stage\",\"type\":\"select\",\"config\":{\"options\":[{\"id\":\"3b88f280-e606-4d20-8dfb-01faab99acb4\",\"label\":\"Pr\\u00e9vu \\\"quoted\\\"\"}]}},{\"name\":\"Stage\",\"type\":\"select\",\"config\":{\"options\":[{\"id\":\"3b88f280-e606-4d20-8dfb-01faab99acb4\",\"label\":\"Pr\\u00e9vu \\\"quoted\\\"\"}]}},{\"name\":\"Stage\",\"type\":\"select\",\"config\":{\"options\":[{\"id\":\"3b88f280-e606-4d20-8dfb-01faab99acb4\",\"label\":\"Pr\\u00e9vu \\\"quoted\\\"\"}]}},{\"name\":\"Stage\",\"type\":\"select\",\"config\":{\"options\":[{\"id\":\"3b88f280-e606-4d20-8dfb-01faab99acb4\",\"label\":\"Pr\\u00e9vu \\\"quoted\\\"\"}]}},{\"name\":\"Stage\",\"type\":\"select\",\"config\":{\"options\":[{\"id\":\"3b88f280-e606-4d20-8dfb-01faab99acb4\",\"label\":\"Pr\\u00e9vu \\\"quoted\\\"\"}]}},{\"name\":\"Stage\",\"type\":\"select\",\"config\":{\"options\":[{\"id\":\"3b88f280-e606-4d20-8dfb-01faab99acb4\",\"label\":\"Pr\\u00e9vu \\\"quoted\\\"\"}]}},{\"name\":\"Stage\",\"type\":\"select\",\"config\":{\"options\":[{\"id\":\"3b88f280-e606-4d20-8dfb-01faab99acb4\",\"label\":\"Pr\\u00e9vu \\\"quoted\\\"\"}]}},{\"name\":\"Stage\",\"type\":\"select\",\"config\":{\"options\":[{\"id\":\"3b88f280-e606-4d20-8dfb-01faab99acb4\",\"label\":\"Pr\\u00e9vu \\\"quoted\\\"\"}]}},{\"name\":\"Stage\",\"type\":\"select\",\"config\":{\"options\":[{\"id\":\"3b88f280-e606-4d20-8dfb-01faab99acb4\",\"label\":\"Pr\\u00e9vu \\\"quoted\\\"\"}]}},{\"name\":\"Stage\",\"type\":\"select\",\"config\":{\"options\":[{\"id\":\"3b88f280-e606-4d20-8dfb-01faab99acb4\",\"label\":\"Pr\\u00e9vu \\\"quoted\\\"\"}]}},{\"name\":\"Stage\",\"type\":\"select\",\"config\":{\"options\":[{\"id\":\"3b88f280-e606-4d20-8dfb-01faab99acb4\",\"label\":\"Pr\\u00e9vu \\\"quoted\\\"\"}]}}],\"view\":\"table\"}",
+          "accepted": true
+        },
+        {
+          "name": "33 properties",
+          "input": "{\"title\":\"Advanced\",\"properties\":[{\"name\":\"Stage\",\"type\":\"select\",\"config\":{\"options\":[{\"id\":\"3b88f280-e606-4d20-8dfb-01faab99acb4\",\"label\":\"Pr\\u00e9vu \\\"quoted\\\"\"}]}},{\"name\":\"Stage\",\"type\":\"select\",\"config\":{\"options\":[{\"id\":\"3b88f280-e606-4d20-8dfb-01faab99acb4\",\"label\":\"Pr\\u00e9vu \\\"quoted\\\"\"}]}},{\"name\":\"Stage\",\"type\":\"select\",\"config\":{\"options\":[{\"id\":\"3b88f280-e606-4d20-8dfb-01faab99acb4\",\"label\":\"Pr\\u00e9vu \\\"quoted\\\"\"}]}},{\"name\":\"Stage\",\"type\":\"select\",\"config\":{\"options\":[{\"id\":\"3b88f280-e606-4d20-8dfb-01faab99acb4\",\"label\":\"Pr\\u00e9vu \\\"quoted\\\"\"}]}},{\"name\":\"Stage\",\"type\":\"select\",\"config\":{\"options\":[{\"id\":\"3b88f280-e606-4d20-8dfb-01faab99acb4\",\"label\":\"Pr\\u00e9vu \\\"quoted\\\"\"}]}},{\"name\":\"Stage\",\"type\":\"select\",\"config\":{\"options\":[{\"id\":\"3b88f280-e606-4d20-8dfb-01faab99acb4\",\"label\":\"Pr\\u00e9vu \\\"quoted\\\"\"}]}},{\"name\":\"Stage\",\"type\":\"select\",\"config\":{\"options\":[{\"id\":\"3b88f280-e606-4d20-8dfb-01faab99acb4\",\"label\":\"Pr\\u00e9vu \\\"quoted\\\"\"}]}},{\"name\":\"Stage\",\"type\":\"select\",\"config\":{\"options\":[{\"id\":\"3b88f280-e606-4d20-8dfb-01faab99acb4\",\"label\":\"Pr\\u00e9vu \\\"quoted\\\"\"}]}},{\"name\":\"Stage\",\"type\":\"select\",\"config\":{\"options\":[{\"id\":\"3b88f280-e606-4d20-8dfb-01faab99acb4\",\"label\":\"Pr\\u00e9vu \\\"quoted\\\"\"}]}},{\"name\":\"Stage\",\"type\":\"select\",\"config\":{\"options\":[{\"id\":\"3b88f280-e606-4d20-8dfb-01faab99acb4\",\"label\":\"Pr\\u00e9vu \\\"quoted\\\"\"}]}},{\"name\":\"Stage\",\"type\":\"select\",\"config\":{\"options\":[{\"id\":\"3b88f280-e606-4d20-8dfb-01faab99acb4\",\"label\":\"Pr\\u00e9vu \\\"quoted\\\"\"}]}},{\"name\":\"Stage\",\"type\":\"select\",\"config\":{\"options\":[{\"id\":\"3b88f280-e606-4d20-8dfb-01faab99acb4\",\"label\":\"Pr\\u00e9vu \\\"quoted\\\"\"}]}},{\"name\":\"Stage\",\"type\":\"select\",\"config\":{\"options\":[{\"id\":\"3b88f280-e606-4d20-8dfb-01faab99acb4\",\"label\":\"Pr\\u00e9vu \\\"quoted\\\"\"}]}},{\"name\":\"Stage\",\"type\":\"select\",\"config\":{\"options\":[{\"id\":\"3b88f280-e606-4d20-8dfb-01faab99acb4\",\"label\":\"Pr\\u00e9vu \\\"quoted\\\"\"}]}},{\"name\":\"Stage\",\"type\":\"select\",\"config\":{\"options\":[{\"id\":\"3b88f280-e606-4d20-8dfb-01faab99acb4\",\"label\":\"Pr\\u00e9vu \\\"quoted\\\"\"}]}},{\"name\":\"Stage\",\"type\":\"select\",\"config\":{\"options\":[{\"id\":\"3b88f280-e606-4d20-8dfb-01faab99acb4\",\"label\":\"Pr\\u00e9vu \\\"quoted\\\"\"}]}},{\"name\":\"Stage\",\"type\":\"select\",\"config\":{\"options\":[{\"id\":\"3b88f280-e606-4d20-8dfb-01faab99acb4\",\"label\":\"Pr\\u00e9vu \\\"quoted\\\"\"}]}},{\"name\":\"Stage\",\"type\":\"select\",\"config\":{\"options\":[{\"id\":\"3b88f280-e606-4d20-8dfb-01faab99acb4\",\"label\":\"Pr\\u00e9vu \\\"quoted\\\"\"}]}},{\"name\":\"Stage\",\"type\":\"select\",\"config\":{\"options\":[{\"id\":\"3b88f280-e606-4d20-8dfb-01faab99acb4\",\"label\":\"Pr\\u00e9vu \\\"quoted\\\"\"}]}},{\"name\":\"Stage\",\"type\":\"select\",\"config\":{\"options\":[{\"id\":\"3b88f280-e606-4d20-8dfb-01faab99acb4\",\"label\":\"Pr\\u00e9vu \\\"quoted\\\"\"}]}},{\"name\":\"Stage\",\"type\":\"select\",\"config\":{\"options\":[{\"id\":\"3b88f280-e606-4d20-8dfb-01faab99acb4\",\"label\":\"Pr\\u00e9vu \\\"quoted\\\"\"}]}},{\"name\":\"Stage\",\"type\":\"select\",\"config\":{\"options\":[{\"id\":\"3b88f280-e606-4d20-8dfb-01faab99acb4\",\"label\":\"Pr\\u00e9vu \\\"quoted\\\"\"}]}},{\"name\":\"Stage\",\"type\":\"select\",\"config\":{\"options\":[{\"id\":\"3b88f280-e606-4d20-8dfb-01faab99acb4\",\"label\":\"Pr\\u00e9vu \\\"quoted\\\"\"}]}},{\"name\":\"Stage\",\"type\":\"select\",\"config\":{\"options\":[{\"id\":\"3b88f280-e606-4d20-8dfb-01faab99acb4\",\"label\":\"Pr\\u00e9vu \\\"quoted\\\"\"}]}},{\"name\":\"Stage\",\"type\":\"select\",\"config\":{\"options\":[{\"id\":\"3b88f280-e606-4d20-8dfb-01faab99acb4\",\"label\":\"Pr\\u00e9vu \\\"quoted\\\"\"}]}},{\"name\":\"Stage\",\"type\":\"select\",\"config\":{\"options\":[{\"id\":\"3b88f280-e606-4d20-8dfb-01faab99acb4\",\"label\":\"Pr\\u00e9vu \\\"quoted\\\"\"}]}},{\"name\":\"Stage\",\"type\":\"select\",\"config\":{\"options\":[{\"id\":\"3b88f280-e606-4d20-8dfb-01faab99acb4\",\"label\":\"Pr\\u00e9vu \\\"quoted\\\"\"}]}},{\"name\":\"Stage\",\"type\":\"select\",\"config\":{\"options\":[{\"id\":\"3b88f280-e606-4d20-8dfb-01faab99acb4\",\"label\":\"Pr\\u00e9vu \\\"quoted\\\"\"}]}},{\"name\":\"Stage\",\"type\":\"select\",\"config\":{\"options\":[{\"id\":\"3b88f280-e606-4d20-8dfb-01faab99acb4\",\"label\":\"Pr\\u00e9vu \\\"quoted\\\"\"}]}},{\"name\":\"Stage\",\"type\":\"select\",\"config\":{\"options\":[{\"id\":\"3b88f280-e606-4d20-8dfb-01faab99acb4\",\"label\":\"Pr\\u00e9vu \\\"quoted\\\"\"}]}},{\"name\":\"Stage\",\"type\":\"select\",\"config\":{\"options\":[{\"id\":\"3b88f280-e606-4d20-8dfb-01faab99acb4\",\"label\":\"Pr\\u00e9vu \\\"quoted\\\"\"}]}},{\"name\":\"Stage\",\"type\":\"select\",\"config\":{\"options\":[{\"id\":\"3b88f280-e606-4d20-8dfb-01faab99acb4\",\"label\":\"Pr\\u00e9vu \\\"quoted\\\"\"}]}},{\"name\":\"Stage\",\"type\":\"select\",\"config\":{\"options\":[{\"id\":\"3b88f280-e606-4d20-8dfb-01faab99acb4\",\"label\":\"Pr\\u00e9vu \\\"quoted\\\"\"}]}}],\"view\":\"table\"}",
+          "accepted": false
+        },
+        {
+          "name": "non-object config",
+          "input": "{\"title\":\"Advanced\",\"properties\":[{\"name\":\"Stage\",\"type\":\"select\",\"config\":[]}],\"view\":\"table\"}",
+          "accepted": false
+        },
+        {
+          "name": "unknown field",
+          "input": "{\"title\":\"Advanced\",\"properties\":[{\"name\":\"Stage\",\"type\":\"select\",\"config\":{\"options\":[{\"id\":\"3b88f280-e606-4d20-8dfb-01faab99acb4\",\"label\":\"Pr\\u00e9vu \\\"quoted\\\"\"}]}}],\"view\":\"table\",\"execute\":true}",
+          "accepted": false
+        },
+        {
+          "name": "invalid view",
+          "input": "{\"title\":\"Advanced\",\"properties\":[{\"name\":\"Stage\",\"type\":\"select\",\"config\":{\"options\":[{\"id\":\"3b88f280-e606-4d20-8dfb-01faab99acb4\",\"label\":\"Pr\\u00e9vu \\\"quoted\\\"\"}]}}],\"view\":\"board\"}",
+          "accepted": false
+        },
+        {
+          "name": "empty title",
+          "input": "{\"title\":\"\",\"properties\":[{\"name\":\"Stage\",\"type\":\"select\",\"config\":{\"options\":[{\"id\":\"3b88f280-e606-4d20-8dfb-01faab99acb4\",\"label\":\"Pr\\u00e9vu \\\"quoted\\\"\"}]}}],\"view\":\"table\"}",
+          "accepted": false
+        },
+        {
+          "name": "null config",
+          "input": "{\"title\":\"Advanced\",\"properties\":[{\"name\":\"Stage\",\"type\":\"select\",\"config\":null}],\"view\":\"table\"}",
+          "accepted": false
+        },
+        {
+          "name": "truncated document",
+          "input": "{\"title\": \"Advanced\", \"properties\": [{\"name\": \"Stage\", \"type\": \"select\", \"config\": {\"options\": [{\"id\": \"3b88f280-e606-4d20-8dfb-01faab99acb4\", \"label\": \"Pr\\u00e9vu \\\"quoted\\\"\"}]}}], \"view\": \"table\"",
+          "accepted": false
+        },
+        {
+          "name": "excess config depth",
+          "input": "{\"title\":\"Advanced\",\"properties\":[{\"name\":\"Stage\",\"type\":\"select\",\"config\":{\"nested\":{\"nested\":{\"nested\":{\"nested\":{\"nested\":{\"nested\":{}}}}}}}}],\"view\":\"table\"}",
+          "accepted": false
+        },
+        {
+          "name": "array element limit",
+          "input": "{\"title\":\"Advanced\",\"properties\":[{\"name\":\"Stage\",\"type\":\"select\",\"config\":{\"items\":[1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1]}}],\"view\":\"table\"}",
+          "accepted": false
+        },
+        {
+          "name": "generic scalar types",
+          "input": "{\"title\":\"Advanced\",\"properties\":[{\"name\":\"Stage\",\"type\":\"formula\",\"config\":{\"integer\":1,\"decimal\":-0.00125,\"enabled\":true,\"empty\":null,\"values\":[]}}],\"view\":\"table\"}",
+          "accepted": true
+        }
+      ],
+      "log": "\"advanced select and escaped Unicode\": PASS\n\"missing title\": PASS\n\"missing properties\": PASS\n\"missing view\": PASS\n\"missing property name\": PASS\n\"missing property type\": PASS\n\"missing property config\": PASS\n\"32 properties\": PASS\n\"33 properties\": PASS\n\"non-object config\": PASS\n\"unknown field\": PASS\n\"invalid view\": PASS\n\"empty title\": PASS\n\"null config\": PASS\n\"truncated document\": PASS\n\"excess config depth\": PASS\n\"array element limit\": PASS\n\"generic scalar types\": PASS\n"
+    }
+  },
+  "actualModelRun": "Pending parent affected-mode rerun; initial and first-rerun raw logs unchanged",
+  "remainingLimits": [
+    "Grammar structure cannot establish semantic model quality",
+    "Code mode may still emit unwanted fences; bytes are retained and the actual-model task rubric must reject incorrect replacements",
+    "Generic advanced configs still need canonical property and destination validation during proposal preparation",
+    "Existing streamed drafts remain provisional; the UI replaces them with finalized runs"
+  ]
+}
