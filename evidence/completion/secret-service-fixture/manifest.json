@@ -1,0 +1,18 @@
+{
+  "sourceBefore": "3c686ed533050b7c4a11ae39124febb49c780397",
+  "releaseQualified": false,
+  "finding": "Private fixture used dbus.Connect and exposed its well-known name before adding exported methods/subtree. The godbus inbound reader raced with handler-map writes. Production Secret Service code is a client and does not export these methods.",
+  "repair": "Dial the isolated fixture bus; populate all exports before Auth starts its inbound reader; then authenticate, Hello and own the fixture service name.",
+  "test": "go test -race -count=20 ./internal/providers/auth -run ^TestSecretService",
+  "passingTests": 120,
+  "failed": 0,
+  "sourceSha256": "0556edcb1bdd9e6ce6228ff2841927f1c9d0e9f9ef40f5a5dc3178f743c7ea46",
+  "evidence": {
+    "initial-race.jsonl": "5561919da2721302f85d6395370faa88f8ce50913009fdddd2acbc0dfda3041e",
+    "fixed-race.jsonl": "33e0c935e96b5d3ea49fe952e002ff026cb81c9632df00ac0253dee61c7cfbaf"
+  },
+  "initialEvidenceScope": "Unmodified JSONL rows for auth package extracted from retained full candidate go-race.jsonl",
+  "limitations": [
+    "Private synthetic D-Bus daemon on this Mac; actual Linux Secret Service and prompt qualification remains open."
+  ]
+}
