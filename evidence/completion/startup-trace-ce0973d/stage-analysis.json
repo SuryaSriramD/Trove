@@ -1,0 +1,52 @@
+[
+  {
+    "iteration": 0,
+    "usableShellMs": 739.506,
+    "execThroughShutdownMs": 1725.183291000576,
+    "workspaceOpenMs": 9.161999999999978,
+    "nativeInitializationMs": 14.811000000000007,
+    "startupCompleteToDomReadyMs": 259.178,
+    "domReadyToSnapshotReadyMs": 169.35100000000006,
+    "snapshotReadyToShellReadyMs": 115.851
+  },
+  {
+    "iteration": 1,
+    "usableShellMs": 556.906,
+    "execThroughShutdownMs": 671.1184579980909,
+    "workspaceOpenMs": 6.056000000000012,
+    "nativeInitializationMs": 13.013000000000005,
+    "startupCompleteToDomReadyMs": 177.086,
+    "domReadyToSnapshotReadyMs": 142.40099999999995,
+    "snapshotReadyToShellReadyMs": 61.47700000000003
+  },
+  {
+    "iteration": 2,
+    "usableShellMs": 718.66,
+    "execThroughShutdownMs": 796.8978749995586,
+    "workspaceOpenMs": 10.060000000000002,
+    "nativeInitializationMs": 167.42700000000002,
+    "startupCompleteToDomReadyMs": 20.776999999999987,
+    "domReadyToSnapshotReadyMs": 203.767,
+    "snapshotReadyToShellReadyMs": 74.09199999999998
+  },
+  {
+    "iteration": 3,
+    "usableShellMs": 828.908,
+    "execThroughShutdownMs": 886.8043340007716,
+    "workspaceOpenMs": 6.918000000000006,
+    "nativeInitializationMs": 13.556000000000012,
+    "startupCompleteToDomReadyMs": 249.43400000000003,
+    "domReadyToSnapshotReadyMs": 216.45499999999993,
+    "snapshotReadyToShellReadyMs": 110.54000000000008
+  },
+  {
+    "iteration": 4,
+    "usableShellMs": 1530.865,
+    "execThroughShutdownMs": 1663.120584002172,
+    "workspaceOpenMs": 11.967000000000041,
+    "nativeInitializationMs": 18.099999999999966,
+    "startupCompleteToDomReadyMs": 668.6669999999999,
+    "domReadyToSnapshotReadyMs": 253.80500000000006,
+    "snapshotReadyToShellReadyMs": 143.81500000000005
+  }
+]

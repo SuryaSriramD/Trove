@@ -1,0 +1,54 @@
+{
+  "sourceCommit": "ce0973d36fbd6fff4650df8b7e489a95731149d8",
+  "traceSourceCommit": "ec851df1d5255e09eb87dfc155ddabc24fb444e7",
+  "vcsModified": false,
+  "app": "/private/tmp/Trove-startup-trace-v2-development.app",
+  "executableSHA256": "6b23b32fbdd7692517982355112047544fbe307ed8c070492859f6c4993f3d1a",
+  "infoPlistSHA256": "ae54d0034d01fdb972356f40ad2d8dbb58e5cbad9872ec6ab329a91f573e5b8c",
+  "signing": "ad-hoc development",
+  "qualificationScope": "Startup investigation candidate only, preceding later integrated rich-text/support changes",
+  "fixedStageCount": 14,
+  "maximumTraceBytes": 4096,
+  "traceContents": [
+    "fixed stage name",
+    "elapsed milliseconds"
+  ],
+  "traceWrites": "bounded ordinary writes; no fsync or power-loss durability claim",
+  "measurementPassed": true,
+  "narrowSampleThresholdPassed": true,
+  "goShellMaximumMs": 1530.865,
+  "earlierIntegratedCandidateGoShellOutlierMs": 8399.656,
+  "overallStartupPerformanceQualified": false,
+  "supersededPrototype": {
+    "source": "ec851df",
+    "file": "native-trace-ec851df.jsonl",
+    "purpose": "actual native trace emission functional check only; per-stage fsync was removed before controlled timing"
+  },
+  "results": {
+    "correctedFocusedRacePassEvents": 88,
+    "correctedFocusedRaceTopLevel": 26,
+    "normal1000PageLaunches": 5,
+    "actualTraceFiles": 5
+  },
+  "evidenceSHA256": {
+    "application-inventory.json": "f636b5a6df760c85c97f8426c01845a3c50dcc1ec1a38b2e9fef202adf6f2b1e",
+    "native-trace-ec851df.jsonl": "25ac271985c0927ec2b281597c6c793177a461cc396a67cd10f9ad605f9900df",
+    "normal-startup/diagnostics/1000-0.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "normal-startup/diagnostics/1000-0.trace": "a4736467a6a2ca0ceaa49fe4e205773d3c50d7823bddcd9ae48b7c1c6f7796bc",
+    "normal-startup/diagnostics/1000-1.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "normal-startup/diagnostics/1000-1.trace": "f099a5593c4838b5fe71f0e9b741ab72a170f3a8b4db0a79f99cd2731d40c8ca",
+    "normal-startup/diagnostics/1000-2.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "normal-startup/diagnostics/1000-2.trace": "923f58ca7e060c4d97a2a8d7735718a4540cd1ef5cdbab2a435b9ae23fe7c3ae",
+    "normal-startup/diagnostics/1000-3.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "normal-startup/diagnostics/1000-3.trace": "98dd20afa48f4c1fcb4f2378abdebc22875bb034944b9097171e870faf8ea8e2",
+    "normal-startup/diagnostics/1000-4.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "normal-startup/diagnostics/1000-4.trace": "f2f7327e8151a366c454b89f3ea7fa5017772bacf94dd96970a584ce6cff2e98",
+    "normal-startup/environment.json": "e64505eff24cdc675a0e909f386727cc6a1272f02d7adc897fc12ae36f501555",
+    "normal-startup/fixture-profile.json": "1f9d89d4329f36a4ef7f0c06c2dc8d09399974f73b9bb7f5c5195636bda680ef",
+    "normal-startup/shell.json": "f6c2340adb5a5aa59c15ea64312c9636cb723320d9cfd2c016414dd83e8b3114",
+    "stage-analysis.json": "764892bbcbb4a57b9bc21b60675ad52c6289be33a1b0d2c0747eb602294f8312",
+    "trace-corrected-race.jsonl": "64e262937564387252ed9c9ff3630a5cc831db65bf8defd14e2b994a47d17754",
+    "trace-focused-race.jsonl": "5027c94c1bac383ff923e2dfc390200a1434f502f9ab412f5c1df78a87ca6ad3",
+    "trace-normal-startup.log": "3e90f943bb042ec2b306828bb923b0d8e8a10acb08753b11446cbd22fffc8632"
+  }
+}
