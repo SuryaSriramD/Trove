@@ -32,5 +32,13 @@
     "metadataSource": "https://huggingface.co/api/models/Qwen/Qwen2.5-1.5B-Instruct-GGUF?blobs=true",
     "verifiedAt": "2026-09-30",
     "qualification": "Pinned public model and digest; application quality evaluated separately."
+  },
+  {
+    "repository": "ggml-org/SmolVLM-500M-Instruct-GGUF",
+    "revision": "72e986006ef53e37cdd3f6d4241c90b0f01df376",
+    "license": "apache-2.0",
+    "metadataSource": "https://huggingface.co/api/models/ggml-org/SmolVLM-500M-Instruct-GGUF?blobs=true",
+    "verifiedAt": "2026-10-05",
+    "qualification": "Experimental English single-image model/projector pair. Synthetic color, spatial and labeled-chart cases pass; blank-image abstention fails. Not broadly qualified."
   }
 ]

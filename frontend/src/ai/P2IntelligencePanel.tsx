@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { ImageUnderstanding } from "./ImageUnderstanding";
 import {
   batch,
   dispatch,
@@ -348,6 +349,7 @@ export function P2IntelligencePanel({
         {[
           ["graph", "Knowledge graph"],
           ["ocr", "Image text"],
+          ["vision", "Image questions"],
           ["review", "Personal review"],
         ].map(([id, label]) => (
           <button key={id} aria-pressed={tab === id} onClick={() => setTab(id)}>
@@ -492,6 +494,14 @@ export function P2IntelligencePanel({
             </>
           )}
         </>
+      )}
+      {tab === "vision" && (
+        <ImageUnderstanding
+          workspace={workspace}
+          pageId={focus}
+          onNavigate={onNavigate}
+          onError={onError}
+        />
       )}
       {tab === "ocr" && (
         <>

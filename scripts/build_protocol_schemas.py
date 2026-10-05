@@ -241,6 +241,9 @@ defs.update({
 defs.update({
  'PersonalReviewGenerationConfig':obj({'modelPackId':D('Id'),'categories':{**arr(enum('summary','risks','decisions','next_steps'),4),'minItems':1,'uniqueItems':True},'allowedActions':{**arr(enum('append_review','rename_page','append_page','create_task','set_task_status','set_task_due'),6),'uniqueItems':True},'actionPageIds':{**arr(D('Id'),32),'uniqueItems':True}}),
  'PersonalReviewGeneratedDraft':obj({'claims':{**arr(obj({'category':enum('summary','risks','decisions','next_steps'),'text':{'type':'string','minLength':1,'maxLength':2000},'quote':{'type':'string','maxLength':4000}}),12),'minItems':1},'actions':arr({'oneOf':[R('PlanUpdatePage'),R('PlanCreateTask'),R('PlanUpdateTask')]},8)}),
+ 'ImageDescriptionStartRequest':obj({**header,'pageId':D('Id'),'fileId':D('Id'),'modelPackId':D('Id'),'question':{'type':'string','minLength':1,'maxLength':2048}}),
+ 'ImageDescriptionListRequest':obj({**header,'pageId':D('Id')}),
+ 'ImageDescriptionControlRequest':obj({**header,'runId':D('Id')}),
  'PersonalReviewControlRequest':obj({**header,'runId':D('Id')}),
 })
 # Remote HTTPS control is owner-only host IPC. Certificates and tokens never cross it.
@@ -277,9 +280,9 @@ j={
  tagged('automation',{'ruleId':D('Id'),'ruleVersion':D('Revision'),'occurrenceKey':S})]},
 'Job':obj({'jobId':D('Id'),'workspaceId':D('Id'),'kind':R('JobKind'),'payloadVersion':{'const':1},'payload':R('JobPayload'),'state':R('JobState'),'revision':D('Revision'),'idempotencyKey':S,'attempt':{'type':'integer','minimum':0,'maximum':5},'maxAttempts':{'type':'integer','minimum':1,'maximum':5},'nextAttemptAt':D('Timestamp'),'leaseToken':D('Id'),'leaseExpiresAt':D('Timestamp'),'checkpointRef':D('Id'),'progress':R('Progress'),'createdAt':D('Timestamp'),'updatedAt':D('Timestamp'),'error':{'$ref':'service.schema.json#/$defs/Error'}},['jobId','workspaceId','kind','payloadVersion','payload','state','revision','idempotencyKey','attempt','maxAttempts','createdAt','updatedAt']),
 'JobProgressEvent':obj({'contractVersion':{'const':1},'jobId':D('Id'),'jobRevision':D('Revision'),'attempt':{'type':'integer','minimum':0,'maximum':5},'state':R('JobState'),'progress':R('Progress')}),
-'WorkerRequest':obj({'protocolVersion':{'const':1},'requestId':D('Id'),'jobId':D('Id'),'leaseToken':D('Id'),'cancellationId':D('Id'),'operation':enum('generate','embed','transcribe','tokenize'),'modelPackId':D('Id'),'limits':R('ResourceLimits'),'inputs':arr(R('InputHandle'),32)}),
+'WorkerRequest':obj({'protocolVersion':{'const':1},'requestId':D('Id'),'jobId':D('Id'),'leaseToken':D('Id'),'cancellationId':D('Id'),'operation':enum('generate','embed','transcribe','tokenize','image_generate'),'modelPackId':D('Id'),'limits':R('ResourceLimits'),'inputs':arr(R('InputHandle'),32)}),
 'WorkerOutput':{'oneOf':[
- tagged('hello',{'protocolVersion':{'const':1},'runtime':enum('llama.cpp','whisper.cpp'),'runtimeCommit':{'type':'string','pattern':'^[0-9a-f]{40}$'},'architecture':{'const':'arm64'},'capabilities':arr(enum('generate','embed','transcribe','tokenize'),4)}),
+ tagged('hello',{'protocolVersion':{'const':1},'runtime':enum('llama.cpp','whisper.cpp'),'runtimeCommit':{'type':'string','pattern':'^[0-9a-f]{40}$'},'architecture':{'const':'arm64'},'capabilities':arr(enum('generate','embed','transcribe','tokenize','image_generate'),5)}),
  tagged('progress',{'requestId':D('Id'),'sequence':N,'progress':R('Progress')}),
  tagged('token',{'requestId':D('Id'),'sequence':N,'text':{'type':'string','maxLength':16384}}),
  tagged('result',{'requestId':D('Id'),'leaseToken':D('Id'),'sequence':N,'resultHandle':R('InputHandle')}),
@@ -290,7 +293,8 @@ j={
  tagged('generation',{'text':{'type':'string','maxLength':1048576},'citations':arr(D('Location'),256),'finishReason':enum('eos','length')},['text','citations']),
  tagged('embedding',{'modelPackId':D('Id'),'dimension':{'type':'integer','minimum':1,'maximum':8192},'vectors':arr(arr({'type':'number'},8192),256),'locations':arr(D('Location'),256)}),
  tagged('transcript',{'meetingId':D('Id'),'segments':arr(obj({'segmentId':D('Id'),'blockId':D('Id'),'startMs':N,'endMs':N,'text':S}),256)}),
- tagged('token_counts',{'counts':arr({'type':'integer','minimum':1,'maximum':1048576},16)})]},
+ tagged('token_counts',{'counts':arr({'type':'integer','minimum':1,'maximum':1048576},16)}),
+ tagged('image_generation',{'text':{'type':'string','maxLength':16384},'finishReason':enum('eos','length'),'inputTokens':{'type':'integer','minimum':1,'maximum':8192},'outputTokens':{'type':'integer','minimum':0,'maximum':512}})]},
 'EnqueueJobRequest':obj({**header,'kind':R('JobKind'),'payload':R('JobPayload'),'idempotencyKey':S}),
 'GetJobRequest':obj({**header,'jobId':D('Id')}),
 'CancelJobRequest':obj({**header,'jobId':D('Id'),'expectedRevision':D('Revision')}),

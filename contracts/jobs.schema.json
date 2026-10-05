@@ -500,7 +500,8 @@
             "generate",
             "embed",
             "transcribe",
-            "tokenize"
+            "tokenize",
+            "image_generate"
           ]
         },
         "modelPackId": {
@@ -563,10 +564,11 @@
                   "generate",
                   "embed",
                   "transcribe",
-                  "tokenize"
+                  "tokenize",
+                  "image_generate"
                 ]
               },
-              "maxItems": 4
+              "maxItems": 5
             }
           },
           "required": [
@@ -900,6 +902,43 @@
           "required": [
             "kind",
             "counts"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "kind": {
+              "const": "image_generation"
+            },
+            "text": {
+              "type": "string",
+              "maxLength": 16384
+            },
+            "finishReason": {
+              "type": "string",
+              "enum": [
+                "eos",
+                "length"
+              ]
+            },
+            "inputTokens": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 8192
+            },
+            "outputTokens": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 512
+            }
+          },
+          "required": [
+            "kind",
+            "text",
+            "finishReason",
+            "inputTokens",
+            "outputTokens"
           ],
           "additionalProperties": false
         }

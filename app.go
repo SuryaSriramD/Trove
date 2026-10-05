@@ -248,6 +248,11 @@ func (a *App) Dispatch(method, raw string) string {
 		defer a.lifecycle.RUnlock()
 		return a.providerDispatch(method, json.RawMessage(raw))
 	}
+	if method == "image.start" || method == "image.cancel" {
+		a.lifecycle.RLock()
+		defer a.lifecycle.RUnlock()
+		return a.imageDispatch(method, json.RawMessage(raw))
+	}
 	if method == "review.cancel" {
 		a.lifecycle.RLock()
 		defer a.lifecycle.RUnlock()

@@ -72,7 +72,7 @@ func (s *Supervisor) QualificationSmoke(ctx context.Context) (map[string]any, er
 			inputs = append(inputs, ai)
 		}
 		wire := contracts.JobsWorkerRequest{ProtocolVersion: 1, RequestId: contracts.DomainId(NewID()), JobId: contracts.DomainId(NewID()), LeaseToken: contracts.DomainId(NewID()), CancellationId: contracts.DomainId(NewID()), Operation: operation, ModelPackId: contracts.DomainId(p.ID), Limits: contracts.JobsResourceLimits{Threads: 2, MemoryBytes: 1 << 30, TimeoutMs: 120000, MaxOutputBytes: 4 << 20, MaxTokens: 16}}
-		return s.Run(ctx, Request{wire, inputs, PriorityChat}, nil)
+		return s.Run(ctx, Request{Wire: wire, Inputs: inputs, Priority: PriorityChat}, nil)
 	}
 	for _, p := range catalog {
 		// The smoke includes the supported embedding and speech packs. Only

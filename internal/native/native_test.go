@@ -246,7 +246,7 @@ func TestRealWorkerCancellationCrashAndMetal(t *testing.T) {
 			wire.Operation = "embed"
 			wire.ModelPackId = "01990000-0000-7000-8000-000000000102"
 		}
-		return s.Run(ctx, Request{wire, []Input{in}, PriorityChat}, callback)
+		return s.Run(ctx, Request{Wire: wire, Inputs: []Input{in}, Priority: PriorityChat}, callback)
 	}
 	ctx, cancel := context.WithCancel(context.Background())
 	_, e = run(ctx, 0, func(event Event) {

@@ -30,23 +30,25 @@ var uuidPattern = regexp.MustCompile(`^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89a
 var digestPattern = regexp.MustCompile(`^[0-9a-f]{64}$`)
 
 type Pack struct {
-	SchemaVersion        int    `json:"schemaVersion"`
-	ID                   string `json:"id"`
-	Name                 string `json:"name"`
-	Kind                 string `json:"kind"`
-	Format               string `json:"format"`
-	SHA256               string `json:"sha256"`
-	SizeBytes            int64  `json:"sizeBytes"`
-	URL                  string `json:"url"`
-	License              string `json:"license"`
-	LicenseURL           string `json:"licenseUrl"`
-	SourceRevision       string `json:"sourceRevision"`
-	RuntimeCommit        string `json:"runtimeCommit"`
-	Architecture         string `json:"architecture"`
-	ContextTokens        int    `json:"contextTokens"`
-	Dimension            int    `json:"dimension,omitempty"`
-	EstimatedMemoryBytes int64  `json:"estimatedMemoryBytes"`
-	QualificationOnly    bool   `json:"qualificationOnly,omitempty"`
+	SchemaVersion        int             `json:"schemaVersion"`
+	Projector            *VisionArtifact `json:"projector,omitempty"`
+	VisionVersion        int             `json:"visionVersion,omitempty"`
+	ID                   string          `json:"id"`
+	Name                 string          `json:"name"`
+	Kind                 string          `json:"kind"`
+	Format               string          `json:"format"`
+	SHA256               string          `json:"sha256"`
+	SizeBytes            int64           `json:"sizeBytes"`
+	URL                  string          `json:"url"`
+	License              string          `json:"license"`
+	LicenseURL           string          `json:"licenseUrl"`
+	SourceRevision       string          `json:"sourceRevision"`
+	RuntimeCommit        string          `json:"runtimeCommit"`
+	Architecture         string          `json:"architecture"`
+	ContextTokens        int             `json:"contextTokens"`
+	Dimension            int             `json:"dimension,omitempty"`
+	EstimatedMemoryBytes int64           `json:"estimatedMemoryBytes"`
+	QualificationOnly    bool            `json:"qualificationOnly,omitempty"`
 }
 
 type PackStatus struct {
@@ -121,8 +123,11 @@ func (w *modelWriter) Write(b []byte) (int, error) {
 	return n, err
 }
 func (p Pack) Validate() error {
-	if p.SchemaVersion != 1 || !uuidPattern.MatchString(p.ID) || !digestPattern.MatchString(p.SHA256) || p.SizeBytes < 4 || p.SizeBytes > 32<<30 || p.Name == "" || len(p.Name) > 256 || p.License == "" || p.LicenseURL == "" || p.SourceRevision == "" {
+	if (p.SchemaVersion != 1 && p.SchemaVersion != 2) || !uuidPattern.MatchString(p.ID) || !digestPattern.MatchString(p.SHA256) || p.SizeBytes < 4 || p.SizeBytes > 32<<30 || p.Name == "" || len(p.Name) > 256 || p.License == "" || p.LicenseURL == "" || p.SourceRevision == "" {
 		return errors.New("MODEL_INCOMPATIBLE: invalid manifest")
+	}
+	if err := p.validateVisionManifest(); err != nil {
+		return err
 	}
 	if p.Architecture != "arm64" || runtime.GOARCH != "arm64" {
 		return errors.New("MODEL_INCOMPATIBLE: architecture")
@@ -131,12 +136,16 @@ func (p Pack) Validate() error {
 		return errors.New("MODEL_INCOMPATIBLE: memory estimate")
 	}
 	switch p.Kind {
-	case "chat", "embedding":
+	case "chat", "embedding", "vision":
 		if p.Format != "gguf" || p.RuntimeCommit != LlamaCommit || p.ContextTokens < 1 || p.ContextTokens > 131072 {
 			return errors.New("MODEL_INCOMPATIBLE: llama pack")
 		}
 		if p.Kind == "embedding" && (p.Dimension < 1 || p.Dimension > 8192) {
 			return errors.New("MODEL_INCOMPATIBLE: embedding dimension")
+		}
+	case "vision_projector":
+		if p.Format != "gguf" || p.RuntimeCommit != LlamaCommit || p.SizeBytes > 512<<20 || p.ContextTokens != 0 {
+			return errors.New("MODEL_INCOMPATIBLE: vision projector")
 		}
 	case "speech":
 		if p.Format != "whisper-ggml" || p.RuntimeCommit != WhisperCommit {
@@ -289,6 +298,12 @@ func (m *Manager) Import(ctx context.Context, p Pack, input io.Reader, progress 
 		return e
 	}
 	defer m.end(p.ID)
+	if p.Projector != nil {
+		return errors.New("INVALID_INPUT: vision import requires the model and its matching projector")
+	}
+	return m.importContent(ctx, p, input, progress)
+}
+func (m *Manager) importContent(ctx context.Context, p Pack, input io.Reader, progress func(int64)) error {
 	_, part, _ := m.paths(p)
 	if e := ctx.Err(); e != nil {
 		return e
@@ -330,8 +345,33 @@ func (m *Manager) Acquire(ctx context.Context, p Pack, progress func(int64)) err
 		return e
 	}
 	final, part, _ := m.paths(p)
+	if p.Projector != nil {
+		var previous acquisition
+		raw, _ := os.ReadFile(part + ".json")
+		_ = json.Unmarshal(raw, &previous)
+		if previous.Pack.SHA256 != p.SHA256 {
+			previous.ETag = ""
+		}
+		previous.Pack = p
+		previous.State = "acquiring"
+		if err := atomicJSON(part+".json", previous); err != nil {
+			return err
+		}
+		if err := m.Acquire(ctx, p.projectorPack(), progress); err != nil {
+			return err
+		}
+		progress = offsetModelProgress(progress, p.Projector.SizeBytes)
+	}
 	if verifyFile(final, p) == nil {
-		return atomicJSON(filepath.Join(m.root, p.ID+".json"), p)
+		if err := atomicJSON(filepath.Join(m.root, p.ID+".json"), p); err != nil {
+			return err
+		}
+		if p.Projector != nil {
+			if err := os.Remove(part + ".json"); err != nil && !os.IsNotExist(err) {
+				return err
+			}
+		}
+		return nil
 	}
 	var a acquisition
 	raw, _ := os.ReadFile(part + ".json")
@@ -427,7 +467,7 @@ func (m *Manager) List() ([]PackStatus, error) {
 		}
 		if strings.HasSuffix(entry.Name(), ".part.json") {
 			var a acquisition
-			if json.Unmarshal(raw, &a) == nil && a.Pack.Validate() == nil {
+			if json.Unmarshal(raw, &a) == nil && a.Pack.Validate() == nil && a.Pack.Kind != "vision_projector" {
 				s := PackStatus{Pack: a.Pack, State: "interrupted"}
 				if a.State == "corrupt" {
 					s.State = "corrupt"
@@ -438,18 +478,19 @@ func (m *Manager) List() ([]PackStatus, error) {
 				if st, e := os.Stat(filepath.Join(m.root, a.Pack.ID+".part")); e == nil {
 					s.DownloadedBytes = st.Size()
 				}
+				s.DownloadedBytes += m.projectorDownloaded(a.Pack)
 				out = append(out, s)
 			}
 			continue
 		}
 		var p Pack
-		if json.Unmarshal(raw, &p) == nil && p.Validate() == nil {
+		if json.Unmarshal(raw, &p) == nil && p.Validate() == nil && p.Kind != "vision_projector" {
 			state := "ready"
 			final, _, _ := m.paths(p)
-			if verifyFile(final, p) != nil {
+			if verifyFile(final, p) != nil || m.verifyProjector(p) != nil {
 				state = "corrupt"
 			}
-			out = append(out, PackStatus{p, state, p.SizeBytes})
+			out = append(out, PackStatus{p, state, p.DownloadBytes()})
 		}
 	}
 	return out, nil
@@ -497,6 +538,9 @@ func (m *Manager) Remove(id string) error {
 	}
 	if m.busy[id] || m.leases[id] > 0 {
 		return errors.New("RESOURCE_EXHAUSTED: pack in use")
+	}
+	if err := m.removeUnusedProjector(id); err != nil {
+		return err
 	}
 	for _, suffix := range []string{".json", ".model", ".part", ".part.json"} {
 		if e := os.Remove(filepath.Join(m.root, id+suffix)); e != nil && !os.IsNotExist(e) {

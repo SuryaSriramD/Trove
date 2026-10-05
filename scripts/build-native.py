@@ -31,6 +31,7 @@ subprocess.run(['codesign','--force','--sign','-','--entitlements',str(ROOT/'pac
 helpers.append(dict(name=out.name,sha256=hashlib.sha256(out.read_bytes()).hexdigest(),runtime='microphone',runtimeCommit='trove-microphone-v1',architecture='arm64'))
 (a.output/'manifest.json').write_text(json.dumps(dict(schemaVersion=1,helpers=helpers,minimumMacOS='27.0',buildFlags=['arm64','static','CPU','Metal','embedded Metal shaders','no model downloads'],baselineLockSHA256=hashlib.sha256((ROOT/'baseline/baseline.lock.json').read_bytes()).hexdigest()),indent=2)+'\n')
 shutil.copytree(ROOT/'native/models',a.output/'models',dirs_exist_ok=True)
+subprocess.run([sys.executable,str(ROOT/'scripts/build-vision.py'),'--cache',str(a.cache),'--output',str(a.output)],check=True)
 subprocess.run([sys.executable,str(ROOT/'scripts/build-document-extractor.py'),'--cache',str(a.cache),'--output',str(a.output)],check=True)
 subprocess.run([sys.executable,str(ROOT/'scripts/build-audio-decoder.py'),'--cache',str(a.cache),'--output',str(a.output)],check=True)
 subprocess.run([sys.executable,str(ROOT/'scripts/build-pdf-renderer.py'),'--cache',str(a.cache),'--output',str(a.output)],check=True)

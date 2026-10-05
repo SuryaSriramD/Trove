@@ -1,0 +1,2 @@
+ok  	trove.local/phase0/contracts	1.588s
+ok  	trove.local/phase0/internal/workers	10.283s

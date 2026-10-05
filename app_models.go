@@ -96,7 +96,7 @@ func (a *App) nativeDispatch(method string, raw json.RawMessage) string {
 		if err != nil {
 			return errorEnvelope("INTERNAL", err.Error())
 		}
-		return success(map[string]any{"packs": packs, "catalog": n.catalog, "runtime": map[string]any{"available": n.supervisor != nil, "error": n.err}})
+		return success(map[string]any{"packs": packs, "catalog": n.catalog, "runtime": map[string]any{"available": n.supervisor != nil, "visionAvailable": n.supervisor.VisionAvailable(), "error": n.err}})
 	case "models.cancel":
 		n.mu.Lock()
 		cancel := n.cancellations[input.PackID]
@@ -183,7 +183,24 @@ func (a *App) PickModelPack(packID string) error {
 	defer cancel()
 	defer func() { n.mu.Lock(); delete(n.cancellations, packID); n.mu.Unlock() }()
 	runtime.EventsEmit(a.ctx, "models:progress", map[string]any{"packId": packID, "state": "importing", "bytes": 0})
-	err = n.manager.Import(ctx, *pack, f, a.modelProgress(packID, "importing"))
+	if pack.Projector != nil {
+		path, pickErr := runtime.OpenFileDialog(a.ctx, runtime.OpenDialogOptions{Title: "Import matching verified vision projector"})
+		if pickErr != nil {
+			err = pickErr
+		} else if path == "" {
+			err = context.Canceled
+		} else {
+			companion, openErr := os.Open(path)
+			if openErr != nil {
+				err = openErr
+			} else {
+				err = n.manager.ImportVision(ctx, *pack, f, companion, a.modelProgress(packID, "importing"))
+				companion.Close()
+			}
+		}
+	} else {
+		err = n.manager.Import(ctx, *pack, f, a.modelProgress(packID, "importing"))
+	}
 	state := "ready"
 	if err != nil {
 		state = "failed"
