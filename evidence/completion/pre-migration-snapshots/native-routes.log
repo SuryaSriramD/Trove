@@ -1,0 +1,26 @@
+=== RUN   TestDesktopClipperExplicitSessionRevocationAndShutdown
+--- PASS: TestDesktopClipperExplicitSessionRevocationAndShutdown (0.37s)
+=== RUN   TestDeepLinksRejectUnsafeInputsAndRetainColdLaunch
+--- PASS: TestDeepLinksRejectUnsafeInputsAndRetainColdLaunch (0.00s)
+=== RUN   TestSelectedWorkspaceSurvivesRestartAndMissingDriveIsNotRecreated
+--- PASS: TestSelectedWorkspaceSurvivesRestartAndMissingDriveIsNotRecreated (0.13s)
+=== RUN   TestProviderAuthRejectsUntrustedInputsBeforeCredentialStorage
+--- PASS: TestProviderAuthRejectsUntrustedInputsBeforeCredentialStorage (0.07s)
+=== RUN   TestProviderAuthStorageReasonOnlyExposesTypedPublicMessages
+--- PASS: TestProviderAuthStorageReasonOnlyExposesTypedPublicMessages (0.00s)
+=== RUN   TestDesktopProviderDisconnectInterruptsApproval
+--- PASS: TestDesktopProviderDisconnectInterruptsApproval (0.11s)
+=== RUN   TestDesktopStartupWaitsForWorkspaceBeforeRendererAndIntegration
+--- PASS: TestDesktopStartupWaitsForWorkspaceBeforeRendererAndIntegration (0.94s)
+=== RUN   TestDesktopStartupFailureReachesRendererAndIntegration
+--- PASS: TestDesktopStartupFailureReachesRendererAndIntegration (0.12s)
+=== RUN   TestDesktopStartupWaitIsCancellableAndShutdownUnblocksRenderer
+--- PASS: TestDesktopStartupWaitIsCancellableAndShutdownUnblocksRenderer (0.02s)
+=== RUN   TestDesktopStartupCannotReportReadyWithoutAWorkspace
+--- PASS: TestDesktopStartupCannotReportReadyWithoutAWorkspace (0.00s)
+=== RUN   TestDesktopBootstrapUsesTrustedWorkspaceIdentity
+--- PASS: TestDesktopBootstrapUsesTrustedWorkspaceIdentity (0.08s)
+=== RUN   TestDesktopUploadDescriptorSurvivesTemporaryPathCleanup
+--- PASS: TestDesktopUploadDescriptorSurvivesTemporaryPathCleanup (0.13s)
+PASS
+ok  	trove.local/phase0	3.766s
