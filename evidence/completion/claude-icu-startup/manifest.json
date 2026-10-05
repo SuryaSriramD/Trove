@@ -1,0 +1,77 @@
+{
+  "recordedAt": "2026-10-05T12:17:35.095133+00:00",
+  "baseCommit": "bcdbcf0",
+  "platform": "macOS-27.0.1-arm64-arm-64bit",
+  "containmentPolicy": "trove-provider-macos-v2",
+  "runtime": {
+    "provider": "claude_code",
+    "version": "2.1.283",
+    "sha256": "d8cb1e5c79684cc12a8bfc813e3a2073406921b6245744b3009be3ab5651d21e",
+    "sizeBytes": 225036032
+  },
+  "systemLocaleData": {
+    "path": "/usr/share/icu/icudt78l.dat",
+    "sizeBytes": 36103568,
+    "sha256": "09781b9fdd79428c724099159f85dc522b07ddbf51cb7c23d16606a254d758f1",
+    "uid": 0,
+    "mode": "0o444"
+  },
+  "sourceSHA256": {
+    "internal/providers/containment_darwin.go": "6b44a3b5f04b13847e522e0511d0a36dfa6472a84662e3877c9365440b7661f2",
+    "internal/providers/containment_darwin_test.go": "5c74fa527d21900c49c9ee0a3816d9d064cf3fba1dd76e9a45581e6d2aa03a20",
+    "internal/providers/icu_darwin.go": "35355d83223f6896604c817070c93e0d93dfe5e3b7ede5664d6bf60462e23755",
+    "internal/providers/icu_darwin_test.go": "2f55b1bbf77b6cc0635f2286d16f1340b354dfa4e90dd7acc981cf342236cd11",
+    "internal/providers/testdata/icu_probe.c": "f9d457443bf7e07b48ffb8a63afeae301ad9bc6e638bad40648ece6784a4092d"
+  },
+  "providerRace": {
+    "topLevelPassed": 36,
+    "subtestsPassed": 18,
+    "skipped": [
+      "TestInstalledCodexSchema"
+    ],
+    "failed": [],
+    "packageResult": {
+      "Time": "2026-10-05T17:46:41.040515+05:30",
+      "Action": "pass",
+      "Package": "trove.local/phase0/internal/providers",
+      "Elapsed": 15.136
+    }
+  },
+  "originalLogSHA256": {
+    "baseline.log": "82e801bc417ac838937942316c5ed9fec16fcc57c68f072fb8db4ba09ba54abe",
+    "private-and-literal-icu.log": "f5899caf793b3595208271fa586f7c19737fabb960bfcc4b80cc811207da2ee3",
+    "provider-race.jsonl": "0396e7b5dccb4d3bbd9806d7bde5b57a68990199d38a429bb48c64ffc9c3a763",
+    "provider-race.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "logRedaction": "Bun reporting URLs removed to prevent accidental resubmission; arguments, signal, stack addresses and runtime diagnostics retained.",
+  "scope": [
+    "No account authentication, ambient credential reads, model inference, or vendor-runtime modifications.",
+    "Version/help and auth status use fresh profiles with outbound networking denied.",
+    "Provider protocol fixtures, existing native Codex offline initialization, and denial-boundary tests pass.",
+    "A diagnostic symbolication URL unexpectedly submitted its encoded redacted no-account stack/runtime metadata. No additional reporting endpoints were called."
+  ],
+  "sources": [
+    "https://unicode-org.github.io/icu/userguide/icu_data/",
+    "https://github.com/apple-oss-distributions/ICU/blob/main/icu/icu4c/source/common/putil.cpp",
+    "https://code.claude.com/docs/en/env-vars",
+    "https://github.com/oven-sh/WebKit/blob/bun-7c1d0ed28aeba0d56146c5c1e40b28917c900023/Source/JavaScriptCore/runtime/LazyPropertyInlines.h#L105"
+  ],
+  "nativeRoutesPassed": 5,
+  "evidenceSHA256": {
+    "native-routes.log": "81202741b2072bb283617ecefa28901870b443813a2831a6474b946ba99cd3c0",
+    "diagnostic-source.go.txt": "bc72427fc6e92157faed04d8f75e7ae9c4c94dc7aeaff819db6afcfed90bdb05",
+    "provider-race.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "private-and-literal-icu.log": "d52cd7a0ce8920e9311eb981cfdf9097de0a89eb30be862b10547f843fedbcb4",
+    "baseline.log": "7d8f250ef0ff6b806c565d21da486fd92b2e308105073ddd935b831433943db2",
+    "provider-race.jsonl": "e588f83790cad5f2bdb05f21ca3fbb77abe867f547b4a71d59df1e63fe813ad8"
+  },
+  "reportingSideEffect": {
+    "endpointHost": "bun.report",
+    "requestedOperation": "Read symbols for a synthetic contained startup crash",
+    "actualResponse": "Crash Report Sent",
+    "responseDetail": "We've sent a redacted crash report to the Bun team.",
+    "encodedPayload": "Synthetic crash stack addresses, runtime version, platform and runtime feature flags; no account, prompt, workspace content or credential.",
+    "furtherReportingRequests": false,
+    "mitigation": "Do not call the reporting endpoint again; reporting URLs removed from retained logs."
+  }
+}

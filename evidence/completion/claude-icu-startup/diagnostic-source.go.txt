@@ -1,0 +1,91 @@
+//go:build darwin
+
+package providers
+
+import (
+	"context"
+	"encoding/json"
+	"io"
+	"os"
+	"path/filepath"
+	"testing"
+	"time"
+)
+
+// Explicitly enabled diagnostics never read ambient profiles or contact a
+// service: only version/help run under the production deny-network policy.
+func TestClaudeContainedStartupDiagnostic(t *testing.T) {
+	if os.Getenv("TROVE_CLAUDE_DIAGNOSTIC") != "1" {
+		t.Skip("explicit isolated vendor diagnostic")
+	}
+	ctx, cancel := context.WithTimeout(context.Background(), 45*time.Second)
+	defer cancel()
+	r := Discover(ctx, "claude_code")
+	if !r.Available {
+		t.Fatal(r.Reason)
+	}
+	t.Logf("runtime version=%s sha256=%s", r.Version, r.SHA256)
+	cases := []struct {
+		name        string
+		args, extra []string
+	}{
+		{"version", []string{"--version"}, nil},
+		{"help", []string{"--help"}, nil},
+		{"auth-help", []string{"auth", "login", "--help"}, nil},
+		{"private-icu-help", []string{"auth", "login", "--help"}, []string{"private-icu"}},
+		{"literal-icu-help", []string{"auth", "login", "--help"}, []string{"literal-icu"}},
+	}
+	for _, c := range cases {
+		t.Run(c.name, func(t *testing.T) {
+			state, err := filepath.EvalSymlinks(t.TempDir())
+			if err != nil {
+				t.Fatal(err)
+			}
+			extra := c.extra
+			if len(extra) > 0 && extra[0] == "private-icu" {
+				input, e := os.Open("/usr/share/icu/icudt78l.dat")
+				if e != nil {
+					t.Fatal(e)
+				}
+				output, e := os.OpenFile(filepath.Join(state, "icudt78l.dat"), os.O_CREATE|os.O_EXCL|os.O_WRONLY, 0600)
+				if e != nil {
+					t.Fatal(e)
+				}
+				_, e = io.Copy(output, input)
+				input.Close()
+				output.Close()
+				if e != nil {
+					t.Fatal(e)
+				}
+				extra = []string{"ICU_DATA=" + state}
+			}
+			bounded, stop := context.WithTimeout(ctx, 10*time.Second)
+			defer stop()
+			literalICU := len(extra) > 0 && extra[0] == "literal-icu"
+			if literalICU {
+				extra = nil
+			}
+			cmd, err := containedCommand(bounded, r.Path, state, c.args, append(claudeEnv(state), extra...), false)
+			if err != nil {
+				t.Fatal(err)
+			}
+			if literalICU {
+				cmd.Args[2] += "\n(allow file-read-data (literal \"/usr/share/icu/icudt78l.dat\"))\n"
+			}
+			var stdout, stderr limitedBuffer
+			cmd.Stdout = &stdout
+			cmd.Stderr = &stderr
+			err = cmd.Run()
+			exit := 0
+			if cmd.ProcessState != nil {
+				exit = cmd.ProcessState.ExitCode()
+			}
+			record := map[string]any{"case": c.name, "args": c.args, "exit": exit, "stdout": stdout.String(), "stderr": stderr.String()}
+			if err != nil {
+				record["error"] = err.Error()
+			}
+			raw, _ := json.Marshal(record)
+			t.Log(string(raw))
+		})
+	}
+}

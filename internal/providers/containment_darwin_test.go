@@ -30,6 +30,10 @@ func TestContainedProcessProbe(t *testing.T) {
 	denied["dataVolumeAlias"] = err != nil
 	err = exec.Command("/bin/sh", "-c", "exit 0").Run()
 	denied["shell"] = err != nil
+	_, err = os.ReadFile("/usr/share/icu/icutzformat.txt")
+	denied["unrelatedSystemLocaleData"] = err != nil
+	_, err = os.ReadDir("/usr/share/icu")
+	denied["localeDirectoryListing"] = err != nil
 	c, err := net.DialTimeout("tcp", os.Getenv("TROVE_TEST_LISTENER"), time.Second)
 	denied["network"] = err != nil
 	if c != nil {
@@ -44,6 +48,9 @@ func TestContainedProcessProbe(t *testing.T) {
 func TestMacOSContainmentDeniesWorkspaceShellAndUnapprovedNetwork(t *testing.T) {
 	if os.Getenv("TROVE_PROVIDER_INTEGRATION") != "1" {
 		t.Skip("requires actual macOS Seatbelt process execution")
+	}
+	if _, err := os.Stat("/usr/share/icu/icutzformat.txt"); err != nil {
+		t.Fatalf("missing public locale neighbor for denial check: %v", err)
 	}
 	exe, _ := os.Executable()
 	exe, _ = filepath.EvalSymlinks(exe)
@@ -77,7 +84,7 @@ func TestMacOSContainmentDeniesWorkspaceShellAndUnapprovedNetwork(t *testing.T) 
 	if json.Unmarshal(raw, &outcome) != nil {
 		t.Fatalf("invalid probe: %s", raw)
 	}
-	for _, key := range []string{"read", "write", "symlink", "shell", "network", "privateStateWorks"} {
+	for _, key := range []string{"read", "write", "symlink", "shell", "network", "privateStateWorks", "unrelatedSystemLocaleData", "localeDirectoryListing"} {
 		if !outcome[key] {
 			t.Errorf("containment check failed: %s", key)
 		}

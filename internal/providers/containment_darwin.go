@@ -13,7 +13,7 @@ import (
 	"time"
 )
 
-const ContainmentPolicy = "trove-provider-macos-v1"
+const ContainmentPolicy = "trove-provider-macos-v2"
 
 // containedCommand permits only the selected executable and its private state.
 // No workspace path, user home, shell, Apple Events, or Keychain service is
@@ -39,6 +39,11 @@ func containedCommand(ctx context.Context, binary, state string, args, env []str
 (allow file-write* (subpath ` + q(state) + `) (literal "/dev/null"))
 (allow mach-lookup (global-name "com.apple.system.logger") (global-name "com.apple.logd") (global-name "com.apple.trustd.agent") (global-name "com.apple.trustd") (global-name "com.apple.networkd") (global-name "com.apple.SystemConfiguration.configd") (global-name "com.apple.system.opendirectoryd"))
 `
+	localeDataPolicy, err := macOSICUReadPolicy()
+	if err != nil {
+		return nil, err
+	}
+	profile += localeDataPolicy
 	if network {
 		profile += `(allow network-outbound (remote tcp))
 (allow network-outbound (remote udp "*:53"))

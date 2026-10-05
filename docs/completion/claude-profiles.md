@@ -2,9 +2,10 @@
 
 The source implementation now includes private profile creation, public vendor
 status, explicit Terminal login, cancellation, logout and a trusted resolver for
-managed execution. The installed Claude 2.1.283 still fails the actual contained
-startup check. Login and runs remain disabled; these source changes do not close
-EXT-001's native account qualification.
+managed execution. The installed Claude 2.1.283 now passes the actual contained
+startup check after the [ICU system-data fix](claude-icu-startup.md). Actual native
+Terminal sign-in, account switching, logout/revocation and live runs still require
+qualification; these source changes do not close EXT-001's account requirements.
 
 ## Interface and storage
 

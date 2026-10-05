@@ -2,10 +2,11 @@
 
 This package implements the Claude portion of EXT-001 against the unchanged,
 user-installed official CLI. It does **not** qualify EXT-001 as complete. On the
-current macOS host, Claude Code 2.1.283 passes contained discovery and signed-out
-status but crashes during contained native startup. Managed login and execution
-therefore remain disabled by an actual capability probe, including when called
-directly through the adapter.
+current macOS host, Claude Code 2.1.283 passes contained discovery, signed-out
+private-profile status, and full help startup after the narrowly scoped ICU
+system-data fix. Managed login and execution retain the actual capability probe,
+including direct adapter calls. Real-account sign-in and inference remain
+unqualified; startup capability does not qualify EXT-001 by itself.
 
 ## Host integration
 
@@ -88,18 +89,32 @@ With `TROVE_PROVIDER_INTEGRATION=1`, real native tests pass for:
 1. IPv4/IPv6 wildcard and loopback listener denial, plus shell denial in the
    exact login command policy.
 2. The installed Claude 2.1.283 reporting signed out from a fresh private profile.
-3. Actual startup failure producing `Available=false`, and the same failure
-   preventing both login command creation and execution.
+3. Actual `--version`, `--help`, and `auth login --help` startup success under
+   networkless containment. Failure gates remain covered by injected profile
+   tests; startup alone does not establish account or inference capability.
 4. Shared native containment denying workspace reads/writes, symlink and
    `/System/Volumes/Data` aliases, shell and unapproved network while private
    state remains usable.
 
-The startup probe fails with SIGTRAP in the installed native Bun runtime. Narrow
-investigations of process-fork, dynamic-code generation and notification-center
-lookup did not make it work; none of those permissions was added. A proposed
-Seatbelt `localhost` bind/inbound allowance admitted a wildcard socket and actual
-traffic on a non-loopback interface. It was removed, and the committed login
-policy grants no inbound exception. No unsandboxed launch is used as a fallback.
+The original SIGTRAP was traced to JavaScriptCore's `Intl.Collator` creation
+while sorting help text with `String.localeCompare`. An independent ICU fixture
+reproduces `U_FILE_ACCESS_ERROR` under the old policy. A literal data-read rule for
+the root-owned `/usr/share/icu/icudt78l.dat` alone creates a usable collator and
+makes the unchanged native CLI's help commands succeed. The policy discovers
+only bounded, regular, root-owned `icudtNN[l|b].dat` system assets with no group or
+other write access, validates their fixed system ancestors, and grants
+`file-read-data` for those exact files. It grants no directory/subpath read,
+write, executable mapping, service, inbound-network or user-home exception.
+Containment identity is now `trove-provider-macos-v2`, so older checkpoints cannot
+silently resume under changed policy. Full reproduction, exact runtime/data
+identities, denied-boundary checks and the diagnostic reporting disclosure are
+recorded in [the ICU startup investigation](claude-icu-startup.md).
+
+Earlier experiments with fork, JIT and notification permissions did not fix the
+crash and none was retained. The earlier unsafe localhost callback rule remains
+removed: actual IPv4/IPv6 wildcard and loopback listener denial passes with the
+ICU fix. No unsandboxed fallback, vendor patch or alternate authentication mode
+is used.
 
 No live account sign-in, inference, account switching, refresh, completed or
 interrupted live resume, paid entitlement, revocation or real-client MCP request
