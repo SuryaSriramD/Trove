@@ -1409,7 +1409,7 @@
     },
     "PRODUCT.TRD-LOCALAI-001": {
       "id": "PRODUCT.TRD-LOCALAI-001",
-      "description": "P0 fixture for Selection rewrite/summarize: Serialize selected blocks → local LLM structured output → transactional block patch.",
+      "description": "P0 fixture for Selection rewrite/summarize: Serialize selected blocks \u2192 local LLM structured output \u2192 transactional block patch.",
       "path": null,
       "availability": "planned"
     },
@@ -1433,31 +1433,31 @@
     },
     "PRODUCT.TRD-LOCALAI-005": {
       "id": "PRODUCT.TRD-LOCALAI-005",
-      "description": "P0 fixture for Meeting summary/action extraction: whisper.cpp transcript → local LLM structured summary schema.",
+      "description": "P0 fixture for Meeting summary/action extraction: whisper.cpp transcript \u2192 local LLM structured summary schema.",
       "path": null,
       "availability": "planned"
     },
     "PRODUCT.TRD-LOCALAI-006": {
       "id": "PRODUCT.TRD-LOCALAI-006",
-      "description": "P0 fixture for Voice note → page/task: Whisper → intent/classification → tool call with confirmation under the Section 12 write policy, including non-destructive creation.",
+      "description": "P0 fixture for Voice note \u2192 page/task: Whisper \u2192 intent/classification \u2192 tool call with confirmation under the Section 12 write policy, including non-destructive creation.",
       "path": null,
       "availability": "planned"
     },
     "PRODUCT.TRD-LOCALAI-007": {
       "id": "PRODUCT.TRD-LOCALAI-007",
-      "description": "P1 fixture for AI database generation: Structured database schema/view spec → Database Engine validation → creation transaction.",
+      "description": "P1 fixture for AI database generation: Structured database schema/view spec \u2192 Database Engine validation \u2192 creation transaction.",
       "path": null,
       "availability": "planned"
     },
     "PRODUCT.TRD-LOCALAI-008": {
       "id": "PRODUCT.TRD-LOCALAI-008",
-      "description": "P1 fixture for AI Mermaid: Generate source → Mermaid parse validation → render preview → insert block.",
+      "description": "P1 fixture for AI Mermaid: Generate source \u2192 Mermaid parse validation \u2192 render preview \u2192 insert block.",
       "path": null,
       "availability": "planned"
     },
     "PRODUCT.TRD-LOCALAI-009": {
       "id": "PRODUCT.TRD-LOCALAI-009",
-      "description": "P1 fixture for AI code help: Context-limited code block + optional repository snippets → local LLM; never execute output automatically.",
+      "description": "P1 fixture for AI code help: Context-limited code block + optional repository snippets \u2192 local LLM; never execute output automatically.",
       "path": null,
       "availability": "planned"
     },
@@ -1469,7 +1469,7 @@
     },
     "PRODUCT.TRD-LOCALAI-011": {
       "id": "PRODUCT.TRD-LOCALAI-011",
-      "description": "P1 fixture for Workspace agent: Planner/model → typed Tool Registry → permission layer → transaction/audit trail.",
+      "description": "P1 fixture for Workspace agent: Planner/model \u2192 typed Tool Registry \u2192 permission layer \u2192 transaction/audit trail.",
       "path": null,
       "availability": "planned"
     },
@@ -3739,7 +3739,7 @@
           "document": "TRD",
           "section": "29.1 Traceability and acceptance evidence (R08)",
           "line": 1118,
-          "anchor": "V01 — Identity"
+          "anchor": "V01 \u2014 Identity"
         }
       ],
       "amendmentFamily": null,
@@ -3772,7 +3772,7 @@
           "document": "TRD",
           "section": "29.1 Traceability and acceptance evidence (R08)",
           "line": 1120,
-          "anchor": "V02 — Import reconciliation"
+          "anchor": "V02 \u2014 Import reconciliation"
         }
       ],
       "amendmentFamily": null,
@@ -3804,7 +3804,7 @@
           "document": "TRD",
           "section": "29.1 Traceability and acceptance evidence (R08)",
           "line": 1122,
-          "anchor": "V03 — Provenance"
+          "anchor": "V03 \u2014 Provenance"
         }
       ],
       "amendmentFamily": null,
@@ -3836,7 +3836,7 @@
           "document": "TRD",
           "section": "29.1 Traceability and acceptance evidence (R08)",
           "line": 1124,
-          "anchor": "V04 — Editor"
+          "anchor": "V04 \u2014 Editor"
         }
       ],
       "amendmentFamily": null,
@@ -3869,7 +3869,7 @@
           "document": "TRD",
           "section": "29.1 Traceability and acceptance evidence (R08)",
           "line": 1126,
-          "anchor": "V05 — Formulas"
+          "anchor": "V05 \u2014 Formulas"
         }
       ],
       "amendmentFamily": null,
@@ -3915,7 +3915,7 @@
           "document": "TRD",
           "section": "29.1 Traceability and acceptance evidence (R08)",
           "line": 1128,
-          "anchor": "V06 — Recovery"
+          "anchor": "V06 \u2014 Recovery"
         }
       ],
       "amendmentFamily": null,
@@ -3948,7 +3948,7 @@
           "document": "TRD",
           "section": "29.1 Traceability and acceptance evidence (R08)",
           "line": 1130,
-          "anchor": "V07 — Automation"
+          "anchor": "V07 \u2014 Automation"
         }
       ],
       "amendmentFamily": null,
@@ -3994,7 +3994,7 @@
           "document": "TRD",
           "section": "29.1 Traceability and acceptance evidence (R08)",
           "line": 1132,
-          "anchor": "V08 — Offline"
+          "anchor": "V08 \u2014 Offline"
         }
       ],
       "amendmentFamily": null,
@@ -4026,7 +4026,7 @@
           "document": "TRD",
           "section": "29.1 Traceability and acceptance evidence (R08)",
           "line": 1134,
-          "anchor": "V09 — AI evidence"
+          "anchor": "V09 \u2014 AI evidence"
         }
       ],
       "amendmentFamily": null,
@@ -4058,7 +4058,7 @@
           "document": "TRD",
           "section": "29.1 Traceability and acceptance evidence (R08)",
           "line": 1136,
-          "anchor": "V10 — Tool boundaries"
+          "anchor": "V10 \u2014 Tool boundaries"
         }
       ],
       "amendmentFamily": null,
@@ -5402,7 +5402,7 @@
         "docs/phase-6/migration-editor.md"
       ],
       "phase6Package": "migration-editor",
-      "phase6Owner": "B/D — Editor, migration and recovery",
+      "phase6Owner": "B/D \u2014 Editor, migration and recovery",
       "phase6Evidence": "evidence/phase6/latest-run.json",
       "phase6Note": "The bounded Phase 6 package is implemented and its tests are recorded separately. Broad registry parity, general vision/model quality, distribution and missing research-audit qualifications are not inferred from these checks."
     },
@@ -6127,7 +6127,7 @@
         "docs/phase-6/databases.md"
       ],
       "phase6Package": "database",
-      "phase6Owner": "C — Databases",
+      "phase6Owner": "C \u2014 Databases",
       "phase6Evidence": "evidence/phase6/latest-run.json",
       "phase6Note": "The bounded Phase 6 package is implemented and its tests are recorded separately. Broad registry parity, general vision/model quality, distribution and missing research-audit qualifications are not inferred from these checks."
     },
@@ -6167,7 +6167,7 @@
         "docs/phase-6/databases.md"
       ],
       "phase6Package": "database",
-      "phase6Owner": "C — Databases",
+      "phase6Owner": "C \u2014 Databases",
       "phase6Evidence": "evidence/phase6/latest-run.json",
       "phase6Note": "The bounded Phase 6 package is implemented and its tests are recorded separately. Broad registry parity, general vision/model quality, distribution and missing research-audit qualifications are not inferred from these checks."
     },
@@ -7157,7 +7157,7 @@
         "docs/phase-6/databases.md"
       ],
       "phase6Package": "database",
-      "phase6Owner": "C — Databases",
+      "phase6Owner": "C \u2014 Databases",
       "phase6Evidence": "evidence/phase6/latest-run.json",
       "phase6Note": "The bounded Phase 6 package is implemented and its tests are recorded separately. Broad registry parity, general vision/model quality, distribution and missing research-audit qualifications are not inferred from these checks."
     },
@@ -7712,7 +7712,7 @@
         "docs/phase-6/intelligence.md"
       ],
       "phase6Package": "intelligence",
-      "phase6Owner": "E/F — Search, intelligence and runtime",
+      "phase6Owner": "E/F \u2014 Search, intelligence and runtime",
       "phase6Evidence": "evidence/phase6/latest-run.json",
       "phase6Note": "The bounded Phase 6 package is implemented and its tests are recorded separately. Broad registry parity, general vision/model quality, distribution and missing research-audit qualifications are not inferred from these checks."
     },
@@ -8128,7 +8128,7 @@
         "docs/phase-6/migration-editor.md"
       ],
       "phase6Package": "migration-editor",
-      "phase6Owner": "B/D — Editor, migration and recovery",
+      "phase6Owner": "B/D \u2014 Editor, migration and recovery",
       "phase6Evidence": "evidence/phase6/latest-run.json",
       "phase6Note": "The bounded Phase 6 package is implemented and its tests are recorded separately. Broad registry parity, general vision/model quality, distribution and missing research-audit qualifications are not inferred from these checks."
     },
@@ -9009,7 +9009,7 @@
         "docs/phase-6/intelligence.md"
       ],
       "phase6Package": "intelligence",
-      "phase6Owner": "E/F — Search, intelligence and runtime",
+      "phase6Owner": "E/F \u2014 Search, intelligence and runtime",
       "phase6Evidence": "evidence/phase6/latest-run.json",
       "phase6Note": "The bounded Phase 6 package is implemented and its tests are recorded separately. Broad registry parity, general vision/model quality, distribution and missing research-audit qualifications are not inferred from these checks."
     },
@@ -9096,7 +9096,7 @@
         "docs/phase-6/intelligence.md"
       ],
       "phase6Package": "intelligence",
-      "phase6Owner": "E/F — Search, intelligence and runtime",
+      "phase6Owner": "E/F \u2014 Search, intelligence and runtime",
       "phase6Evidence": "evidence/phase6/latest-run.json",
       "phase6Note": "The bounded Phase 6 package is implemented and its tests are recorded separately. Broad registry parity, general vision/model quality, distribution and missing research-audit qualifications are not inferred from these checks."
     },
@@ -10954,7 +10954,7 @@
         "docs/phase-6/databases.md"
       ],
       "phase6Package": "database",
-      "phase6Owner": "C — Databases",
+      "phase6Owner": "C \u2014 Databases",
       "phase6Evidence": "evidence/phase6/latest-run.json",
       "phase6Note": "The bounded Phase 6 package is implemented and its tests are recorded separately. Broad registry parity, general vision/model quality, distribution and missing research-audit qualifications are not inferred from these checks."
     },
@@ -11376,7 +11376,7 @@
         "docs/phase-6/databases.md"
       ],
       "phase6Package": "database",
-      "phase6Owner": "C — Databases",
+      "phase6Owner": "C \u2014 Databases",
       "phase6Evidence": "evidence/phase6/latest-run.json",
       "phase6Note": "The bounded Phase 6 package is implemented and its tests are recorded separately. Broad registry parity, general vision/model quality, distribution and missing research-audit qualifications are not inferred from these checks."
     },
@@ -11416,7 +11416,7 @@
         "docs/phase-6/databases.md"
       ],
       "phase6Package": "database",
-      "phase6Owner": "C — Databases",
+      "phase6Owner": "C \u2014 Databases",
       "phase6Evidence": "evidence/phase6/latest-run.json",
       "phase6Note": "The bounded Phase 6 package is implemented and its tests are recorded separately. Broad registry parity, general vision/model quality, distribution and missing research-audit qualifications are not inferred from these checks."
     },
@@ -11439,7 +11439,7 @@
       "amendmentFamily": null,
       "auditIds": [],
       "acceptanceCriteria": [
-        "Serialize selected blocks → local LLM structured output → transactional block patch.",
+        "Serialize selected blocks \u2192 local LLM structured output \u2192 transactional block patch.",
         "Do not treat retained imported data as native editing support."
       ],
       "tests": [
@@ -11567,7 +11567,7 @@
       "amendmentFamily": null,
       "auditIds": [],
       "acceptanceCriteria": [
-        "whisper.cpp transcript → local LLM structured summary schema.",
+        "whisper.cpp transcript \u2192 local LLM structured summary schema.",
         "Do not treat retained imported data as native editing support."
       ],
       "tests": [
@@ -11582,7 +11582,7 @@
     },
     {
       "id": "TRD-LOCALAI-006",
-      "requirement": "Voice note → page/task",
+      "requirement": "Voice note \u2192 page/task",
       "release": "P0",
       "scope": "product",
       "workPackage": "WP06",
@@ -11593,13 +11593,13 @@
           "document": "TRD",
           "section": "27. Local AI Capability Matrix",
           "line": 1014,
-          "anchor": "Voice note → page/task"
+          "anchor": "Voice note \u2192 page/task"
         }
       ],
       "amendmentFamily": null,
       "auditIds": [],
       "acceptanceCriteria": [
-        "Whisper → intent/classification → tool call with confirmation under the Section 12 write policy, including non-destructive creation.",
+        "Whisper \u2192 intent/classification \u2192 tool call with confirmation under the Section 12 write policy, including non-destructive creation.",
         "Do not treat retained imported data as native editing support."
       ],
       "tests": [
@@ -11631,7 +11631,7 @@
       "amendmentFamily": null,
       "auditIds": [],
       "acceptanceCriteria": [
-        "Structured database schema/view spec → Database Engine validation → creation transaction.",
+        "Structured database schema/view spec \u2192 Database Engine validation \u2192 creation transaction.",
         "Do not treat retained imported data as native editing support."
       ],
       "tests": [
@@ -11676,7 +11676,7 @@
       "amendmentFamily": null,
       "auditIds": [],
       "acceptanceCriteria": [
-        "Generate source → Mermaid parse validation → render preview → insert block.",
+        "Generate source \u2192 Mermaid parse validation \u2192 render preview \u2192 insert block.",
         "Do not treat retained imported data as native editing support."
       ],
       "tests": [
@@ -11721,7 +11721,7 @@
       "amendmentFamily": null,
       "auditIds": [],
       "acceptanceCriteria": [
-        "Context-limited code block + optional repository snippets → local LLM; never execute output automatically.",
+        "Context-limited code block + optional repository snippets \u2192 local LLM; never execute output automatically.",
         "Do not treat retained imported data as native editing support."
       ],
       "tests": [
@@ -11811,7 +11811,7 @@
       "amendmentFamily": null,
       "auditIds": [],
       "acceptanceCriteria": [
-        "Planner/model → typed Tool Registry → permission layer → transaction/audit trail.",
+        "Planner/model \u2192 typed Tool Registry \u2192 permission layer \u2192 transaction/audit trail.",
         "Do not treat retained imported data as native editing support."
       ],
       "tests": [
@@ -11875,7 +11875,7 @@
         "docs/phase-6/intelligence.md"
       ],
       "phase6Package": "intelligence",
-      "phase6Owner": "E/F — Search, intelligence and runtime",
+      "phase6Owner": "E/F \u2014 Search, intelligence and runtime",
       "phase6Evidence": "evidence/phase6/latest-run.json",
       "phase6Note": "The bounded Phase 6 package is implemented and its tests are recorded separately. Broad registry parity, general vision/model quality, distribution and missing research-audit qualifications are not inferred from these checks."
     },
@@ -11917,7 +11917,7 @@
         "docs/phase-6/intelligence.md"
       ],
       "phase6Package": "intelligence",
-      "phase6Owner": "E/F — Search, intelligence and runtime",
+      "phase6Owner": "E/F \u2014 Search, intelligence and runtime",
       "phase6Evidence": "evidence/phase6/latest-run.json",
       "phase6Note": "The bounded Phase 6 package is implemented and its tests are recorded separately. Broad registry parity, general vision/model quality, distribution and missing research-audit qualifications are not inferred from these checks."
     },
@@ -12377,7 +12377,7 @@
         "docs/phase-6/hosting.md"
       ],
       "phase6Package": "hosting",
-      "phase6Owner": "A/F — Contracts, kernel and hosting",
+      "phase6Owner": "A/F \u2014 Contracts, kernel and hosting",
       "phase6Evidence": "evidence/phase6/latest-run.json",
       "phase6Note": "The bounded Phase 6 package is implemented and its tests are recorded separately. Broad registry parity, general vision/model quality, distribution and missing research-audit qualifications are not inferred from these checks."
     },
@@ -13560,7 +13560,7 @@
         "docs/phase-6/hosting.md"
       ],
       "phase6Package": "hosting",
-      "phase6Owner": "A/F — Contracts, kernel and hosting",
+      "phase6Owner": "A/F \u2014 Contracts, kernel and hosting",
       "phase6Evidence": "evidence/phase6/latest-run.json",
       "phase6Note": "The bounded Phase 6 package is implemented and its tests are recorded separately. Broad registry parity, general vision/model quality, distribution and missing research-audit qualifications are not inferred from these checks."
     },
@@ -15685,14 +15685,14 @@
         "V10"
       ]
     },
-    "note": "V01–V10 tests rerun affected P0 workflows and P1 supported contracts. Native UI, live account and incomplete product breadth remain explicit; no wholesale P1 verification promotion.",
+    "note": "V01\u2013V10 tests rerun affected P0 workflows and P1 supported contracts. Native UI, live account and incomplete product breadth remain explicit; no wholesale P1 verification promotion.",
     "qualifiedEvidence": "evidence/phase5/runs/20260930T191730Z-9d0572ce/verification.json",
     "candidate": "build/phase5-candidate-4/Trove.app",
     "candidateArchive": "build/releases/Trove-0.5.0-p1-candidate.zip",
     "archiveManifest": "build/releases/Trove-0.5.0-p1-candidate.zip.manifest.json",
     "nativeEvidence": "evidence/phase5/native-ui/candidate4-session.json",
     "performanceEvidence": "evidence/phase5/performance-final/candidate-binding.json",
-    "qualificationScope": "Supported P0/P1 contracts only; 42 checks and V01–V10 passed. Full release approval remains withheld for the documented remaining scope."
+    "qualificationScope": "Supported P0/P1 contracts only; 42 checks and V01\u2013V10 passed. Full release approval remains withheld for the documented remaining scope."
   },
   "phase6Implementation": {
     "status": "development_preview",
@@ -15702,7 +15702,7 @@
     "latestEvidence": "evidence/phase6/latest-run.json",
     "packages": {
       "database": {
-        "owner": "C — Databases",
+        "owner": "C \u2014 Databases",
         "document": "docs/phase-6/databases.md",
         "artifacts": [
           "internal/workspace/p2_database.go",
@@ -15711,7 +15711,7 @@
         "test": "internal/workspace/p2_database_test.go"
       },
       "intelligence": {
-        "owner": "E/F — Search, intelligence and runtime",
+        "owner": "E/F \u2014 Search, intelligence and runtime",
         "document": "docs/phase-6/intelligence.md",
         "artifacts": [
           "internal/workspace/p2_intelligence_graph.go",
@@ -15722,7 +15722,7 @@
         "test": "internal/workspace/p2_intelligence_test.go"
       },
       "migration-editor": {
-        "owner": "B/D — Editor, migration and recovery",
+        "owner": "B/D \u2014 Editor, migration and recovery",
         "document": "docs/phase-6/migration-editor.md",
         "artifacts": [
           "internal/workspace/import_conversations.go",
@@ -15732,7 +15732,7 @@
         "test": "internal/workspace/p2_migration_editor_test.go"
       },
       "hosting": {
-        "owner": "A/F — Contracts, kernel and hosting",
+        "owner": "A/F \u2014 Contracts, kernel and hosting",
         "document": "docs/phase-6/hosting.md",
         "artifacts": [
           "internal/hosting/server.go",
@@ -15742,7 +15742,7 @@
         "test": "internal/workspace/hosting_transfer_test.go"
       }
     },
-    "sharedContractOwner": "A — Kernel and contracts",
+    "sharedContractOwner": "A \u2014 Kernel and contracts",
     "contractVersion": "1.3.0",
     "missingEvidence": "The separate 307-behavior Notion research report and its fixtures were not supplied."
   },
@@ -15753,6 +15753,15 @@
     "implementationStatus": "in_progress",
     "releaseApproved": false,
     "policy": "Implementation and targeted checks do not close native, real-model, account, device or candidate qualification. Never infer a pass from absent evidence.",
-    "backlogItemCount": 51
+    "backlogItemCount": 51,
+    "latestImplementationEvidence": [
+      "docs/completion/verified-updates.md",
+      "docs/completion/claude-icu-startup.md",
+      "docs/completion/audio-decoding.md",
+      "docs/completion/platform-filesystem.md",
+      "docs/completion/memory-capacity.md",
+      "docs/completion/local-image-understanding.md"
+    ],
+    "latestAssessment": "Implementation and bounded development evidence have advanced; no P0/P1/P2 or platform release is approved. Missing research, independent devices, live accounts, signing, broader AI/performance and native interface qualification remain explicit in the 51-item registry."
   }
 }

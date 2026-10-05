@@ -340,7 +340,11 @@
       },
       "evidence_target": "evidence/completion/CORE-005/",
       "implementation_evidence": [
-        "docs/completion/audio-decoding.md"
+        "docs/completion/audio-decoding.md",
+        "evidence/completion/c7-c8-audio-evidence.json"
+      ],
+      "followup_commits": [
+        "b06c057"
       ]
     },
     {
@@ -798,7 +802,7 @@
       "implementation": "in progress",
       "implementation_commit": "6403b78",
       "verification": {
-        "service_or_interface": "context/token regressions passed; real-model factual/memory quality rubric has retained failures",
+        "service_or_interface": "Original strict factual/memory and four held-out cases pass with optional 7B pack106; previous 1.5B failures retained. Broader mode/task/native quality remains unqualified.",
         "candidate": null,
         "macOS": "unqualified",
         "Windows": "unqualified",
@@ -808,12 +812,17 @@
       "implementation_evidence": [
         "docs/completion/ai-context.md",
         "docs/completion/related-content.md",
-        "docs/completion/development-candidate-4900d4b.md"
+        "docs/completion/development-candidate-4900d4b.md",
+        "docs/completion/memory-capacity.md",
+        "evidence/completion/memory-capacity/manifest.json"
       ],
       "followup_commits": [
         "4900d4b",
-        "d74a719"
-      ]
+        "d74a719",
+        "5140324",
+        "6fdd20d"
+      ],
+      "remaining_qualification": "Evaluate every exposed mode, long representative content, correction effort and peak memory; extend memory preferences/constraints/source edits/deletion/forgetting and semantic relevance across representative data. A single model task family is not general quality qualification."
     },
     {
       "id": "AI-003",
@@ -832,7 +841,7 @@
       "implementation": "in progress",
       "implementation_commit": "6403b78",
       "verification": {
-        "service_or_interface": "context/token regressions passed; real-model factual/memory quality rubric has retained failures",
+        "service_or_interface": "Original strict factual/memory and four held-out cases pass with optional 7B pack106; previous 1.5B failures retained. Broader mode/task/native quality remains unqualified.",
         "candidate": null,
         "macOS": "unqualified",
         "Windows": "unqualified",
@@ -841,12 +850,16 @@
       "evidence_target": "evidence/completion/AI-003/",
       "implementation_evidence": [
         "docs/completion/ai-context.md",
-        "docs/completion/development-candidate-4900d4b.md"
+        "docs/completion/development-candidate-4900d4b.md",
+        "docs/completion/memory-capacity.md",
+        "evidence/completion/memory-capacity/manifest.json"
       ],
       "followup_commits": [
-        "4900d4b"
+        "4900d4b",
+        "5140324",
+        "6fdd20d"
       ],
-      "remaining_qualification": "Stricter real-model expected fact/format rubric remains failed: required launch claim omitted. Do not count earlier weak rubric as a pass."
+      "remaining_qualification": "Evaluate every exposed mode, long representative content, correction effort and peak memory; extend memory preferences/constraints/source edits/deletion/forgetting and semantic relevance across representative data. A single model task family is not general quality qualification."
     },
     {
       "id": "EXT-001",
@@ -864,7 +877,7 @@
       "implementation": "in_progress",
       "implementation_commit": "c6faef8",
       "verification": {
-        "service_or_interface": "targeted_checks_passed_native_startup_failed",
+        "service_or_interface": "targeted_checks_passed; real contained discovery/help/signed-out startup now passes; authenticated execution unqualified",
         "candidate": null,
         "macOS": "unqualified",
         "Windows": "unqualified",
@@ -874,10 +887,12 @@
       "implementation_evidence": [
         "docs/completion/claude-runtime.md",
         "docs/completion/claude-profiles.md",
-        "docs/completion/managed-runtimes.md"
+        "docs/completion/managed-runtimes.md",
+        "docs/completion/claude-icu-startup.md"
       ],
       "followup_commits": [
-        "b3b44a6"
+        "b3b44a6",
+        "b953fc7"
       ]
     },
     {
@@ -1169,7 +1184,7 @@
       "implementation": "in progress",
       "implementation_commit": null,
       "verification": {
-        "service_or_interface": "pending",
+        "service_or_interface": "migration/recovery, reviewed update kit and rollback launch fixtures passed; actual ad-hoc app correctly rejected by production verifier",
         "candidate": null,
         "macOS": "unqualified",
         "Windows": "unqualified",
@@ -1177,12 +1192,15 @@
       },
       "evidence_target": "evidence/completion/REL-006/",
       "followup_commits": [
-        "a00d1b5"
+        "a00d1b5",
+        "f96f185"
       ],
       "implementation_evidence": [
-        "docs/completion/pre-migration-snapshots.md"
+        "docs/completion/pre-migration-snapshots.md",
+        "docs/completion/verified-updates.md",
+        "evidence/completion/verified-updates/manifest.json"
       ],
-      "remaining_qualification": "Full DB/managed files/raw recording snapshots, durable migration fencing and compatible restore are implemented. Verified app update/restart UI is being completed separately. Real signed distribution, physical power-loss, clean-machine recovery, update/rollback and uninstall qualification remain open."
+      "remaining_qualification": "Source includes full pre-migration snapshots, app signature/identity verification, external recovery kits, compatible restore and explicit guarded previous-app launch. Actual signed app pairs, startup-ready acknowledgement, public distribution, physical power-loss, independent clean-machine update/rollback and uninstall qualification remain open."
     },
     {
       "id": "REL-007",
@@ -1293,14 +1311,18 @@
       "followup_commits": [
         "31d5b5c",
         "3731433",
-        "9b05e73"
+        "9b05e73",
+        "b06c057",
+        "8a96bdc"
       ],
       "implementation_evidence": [
         "docs/completion/platform-native-workers.md",
         "docs/completion/platform-credentials.md",
-        "docs/completion/credential-prompt-cancellation.md"
+        "docs/completion/credential-prompt-cancellation.md",
+        "docs/completion/audio-decoding.md",
+        "docs/completion/platform-filesystem.md"
       ],
-      "remaining_qualification": "Windows/Linux worker and credential foundation implemented; Go binaries cross-compile only. Target native decoder/capture/OCR, C++ execution, packaging, filesystem/permissions, model/provider integration, installation/update/rollback/uninstall and portability remain unqualified."
+      "remaining_qualification": "Cross-platform worker/credential/decoder and filesystem ownership/identity sources exist; Go target tests cross-compile only. Target native builds/execution, capture/OCR, desktop packaging/routing, Windows directory durability/workspace DACLs, provider containment, clean installation/update/rollback/uninstall and portable restoration remain open."
     },
     {
       "id": "GOV-001",
@@ -1430,6 +1452,9 @@
         "docs/completion/recovery.md",
         "docs/completion/audio-decoding.md",
         "docs/completion/mcp-sdk.md"
+      ],
+      "followup_commits": [
+        "b06c057"
       ]
     },
     {
