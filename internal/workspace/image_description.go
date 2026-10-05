@@ -170,12 +170,12 @@ func (k *Kernel) finishImageDescription(ctx context.Context, e contracts.Service
 				r.State = "cancelled"
 			}
 		} else {
-			if result.AnalysisMethod == "pixel_measurement" && result.FinishReason == "measurement" && len(result.Text) <= 2000 && result.Text != "" && result.InputTokens == 0 && result.OutputTokens == 0 {
+			if result.AnalysisMethod == "pixel_measurement" && result.FinishReason == "measurement" && len(result.Text) <= 2000 && result.Text != "" && result.InputTokens == 0 && result.OutputTokens == 0 && result.ModelHash == "" && result.ProjectorHash == "" && result.HelperHash == "" && result.PeakRSSBytes == 0 && utf8.ValidString(result.Text) {
 				r.State = "ready"
 				r.Text = result.Text
 				r.AnalysisMethod = result.AnalysisMethod
 				r.FinishReason = "measurement"
-				r.Warning = "Measured from normalized image pixels; no model interpretation or OCR was performed."
+				r.Warning = "Measured from all decoded source pixels before resizing or alpha composition, using encoded orientation. Original bytes are retained; no model interpretation or OCR was performed."
 			} else if result.AnalysisMethod != "local_vision_model" || result.Text == "" || len(result.Text) > 16384 || !utf8.ValidString(result.Text) || !imageDigestPattern.MatchString(result.ModelHash) || !imageDigestPattern.MatchString(result.ProjectorHash) || !imageDigestPattern.MatchString(result.HelperHash) || result.InputTokens < 1 || result.InputTokens > 8192 || result.OutputTokens < 0 || result.OutputTokens > 512 || (result.FinishReason != "eos" && result.FinishReason != "length") {
 				r.State = "failed"
 				r.Error = "Image worker returned an invalid bounded result"

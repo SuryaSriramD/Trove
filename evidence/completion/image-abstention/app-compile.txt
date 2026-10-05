@@ -1,0 +1,4 @@
+# trove.local/phase0
+main.go:18:12: pattern all:frontend/dist: no matching files found
+FAIL	trove.local/phase0 [setup failed]
+FAIL

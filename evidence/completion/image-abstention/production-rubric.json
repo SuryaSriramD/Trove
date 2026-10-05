@@ -1,0 +1,78 @@
+[
+  {
+    "case": "red_square",
+    "fixtureSha256": "11abcd871cec8f5b572c55831211de12a54b5792147382f04f5c153b71334424",
+    "passed": true,
+    "question": "What color is the square? Answer briefly.",
+    "result": {
+      "sampledPeakRSSBytes": 1098399744,
+      "analysisMethod": "local_vision_model",
+      "modelHash": "9d4612de6a42214499e301494a3ecc2be0abdd9de44e663bda63f1152fad1bf4",
+      "projectorHash": "4b2fca922e549e9b9608f4ba56f93565dd5220e935ba5570a2a864a0fcc988a6",
+      "helperHash": "edb38d66cfbc7e8feacdebc422cc55cbd914f7ce32fdabaf251be902c8bb1744",
+      "kind": "image_generation",
+      "text": " Red.",
+      "finishReason": "eos",
+      "inputTokens": 176,
+      "outputTokens": 2
+    },
+    "scope": "production-path behavior; separate from raw model quality",
+    "seconds": 9.020541541
+  },
+  {
+    "case": "spatial",
+    "fixtureSha256": "c300c685c0da8e08eac984ba04ffb4a72e32ebf2989ef7be2dd3799ab40bf4b6",
+    "passed": true,
+    "question": "Which side is the blue circle on relative to the red square?",
+    "result": {
+      "sampledPeakRSSBytes": 1098252288,
+      "analysisMethod": "local_vision_model",
+      "modelHash": "9d4612de6a42214499e301494a3ecc2be0abdd9de44e663bda63f1152fad1bf4",
+      "projectorHash": "4b2fca922e549e9b9608f4ba56f93565dd5220e935ba5570a2a864a0fcc988a6",
+      "helperHash": "edb38d66cfbc7e8feacdebc422cc55cbd914f7ce32fdabaf251be902c8bb1744",
+      "kind": "image_generation",
+      "text": " Right.",
+      "finishReason": "eos",
+      "inputTokens": 180,
+      "outputTokens": 2
+    },
+    "scope": "production-path behavior; separate from raw model quality",
+    "seconds": 9.666584416
+  },
+  {
+    "case": "labeled_chart",
+    "fixtureSha256": "cbacae11c3cf49e4346deedce27bd3e05d04069ffa1c3ed4b62cfabf116ce6cb",
+    "passed": true,
+    "question": "In the chart, what are the values for A and B?",
+    "result": {
+      "sampledPeakRSSBytes": 1098137600,
+      "analysisMethod": "local_vision_model",
+      "modelHash": "9d4612de6a42214499e301494a3ecc2be0abdd9de44e663bda63f1152fad1bf4",
+      "projectorHash": "4b2fca922e549e9b9608f4ba56f93565dd5220e935ba5570a2a864a0fcc988a6",
+      "helperHash": "edb38d66cfbc7e8feacdebc422cc55cbd914f7ce32fdabaf251be902c8bb1744",
+      "kind": "image_generation",
+      "text": " 2, 4.",
+      "finishReason": "eos",
+      "inputTokens": 180,
+      "outputTokens": 6
+    },
+    "scope": "production-path behavior; separate from raw model quality",
+    "seconds": 8.076043209
+  },
+  {
+    "case": "blank_uncertainty",
+    "fixtureSha256": "d79623d7050280a496c43f0a3acd51c7a13e09f3d3bc2ba1dcf390ea1893a1a5",
+    "passed": true,
+    "question": "What objects and text can you identify?",
+    "result": {
+      "analysisMethod": "pixel_measurement",
+      "kind": "image_generation",
+      "text": "Source pixel measurement (256 × 256 decoded pixels, before resizing and alpha composition; encoded orientation): the image is exactly uniform white (blank at decoded-pixel level). No objects or text can be identified from spatial pixel variation. No model interpretation or OCR was attempted.",
+      "finishReason": "measurement",
+      "inputTokens": 0,
+      "outputTokens": 0
+    },
+    "scope": "production-path behavior; separate from raw model quality",
+    "seconds": 0.449326208
+  }
+]

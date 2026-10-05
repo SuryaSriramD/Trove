@@ -67,26 +67,43 @@ func validateVisionInput(p Pack, r Request) (VisionMetadata, error) {
 // Alpha composites over white. Version 1 uses encoded pixel orientation and
 // bounds decode to 20 MP; it never invokes codecs or downloads from the image.
 func NormalizeVisionImage(ctx context.Context, f *os.File) (*os.File, int, int, error) {
+	out, width, height, _, err := normalizeVisionImage(ctx, f, false)
+	return out, width, height, err
+}
+func normalizeVisionImage(ctx context.Context, f *os.File, inspect bool) (*os.File, int, int, string, error) {
 	st, err := f.Stat()
 	if err != nil {
-		return nil, 0, 0, err
+		return nil, 0, 0, "", err
 	}
 	if !st.Mode().IsRegular() || st.Size() > 20<<20 {
-		return nil, 0, 0, errors.New("INVALID_INPUT: PNG/JPEG image must be at most 20 MiB")
+		return nil, 0, 0, "", errors.New("INVALID_INPUT: PNG/JPEG image must be at most 20 MiB")
 	}
-	cfg, format, err := image.DecodeConfig(io.NewSectionReader(f, 0, st.Size()))
+	cfg, format, err := image.DecodeConfig(visionContextReader{ctx, io.NewSectionReader(f, 0, st.Size())})
+	if ctx.Err() != nil {
+		return nil, 0, 0, "", ctx.Err()
+	}
 	if err != nil || (format != "png" && format != "jpeg") {
-		return nil, 0, 0, errors.New("INVALID_INPUT: corrupt or unsupported PNG/JPEG image")
+		return nil, 0, 0, "", errors.New("INVALID_INPUT: corrupt or unsupported PNG/JPEG image")
 	}
 	if cfg.Width < 1 || cfg.Height < 1 || int64(cfg.Width)*int64(cfg.Height) > 20000000 {
-		return nil, 0, 0, errors.New("RESOURCE_EXHAUSTED: image exceeds 20 megapixels")
+		return nil, 0, 0, "", errors.New("RESOURCE_EXHAUSTED: image exceeds 20 megapixels")
 	}
 	if err = ctx.Err(); err != nil {
-		return nil, 0, 0, err
+		return nil, 0, 0, "", err
 	}
-	src, _, err := image.Decode(io.NewSectionReader(f, 0, st.Size()))
+	src, _, err := image.Decode(visionContextReader{ctx, io.NewSectionReader(f, 0, st.Size())})
+	if ctx.Err() != nil {
+		return nil, 0, 0, "", ctx.Err()
+	}
 	if err != nil {
-		return nil, 0, 0, errors.New("INVALID_INPUT: corrupt image pixels")
+		return nil, 0, 0, "", errors.New("INVALID_INPUT: corrupt image pixels")
+	}
+	measurement := ""
+	if inspect {
+		measurement, err = measureVisionSource(ctx, src)
+		if err != nil {
+			return nil, 0, 0, "", err
+		}
 	}
 	w, h := cfg.Width, cfg.Height
 	if max(w, h) > 1024 {
@@ -100,27 +117,46 @@ func NormalizeVisionImage(ctx context.Context, f *os.File) (*os.File, int, int, 
 	}
 	dst := image.NewRGBA(image.Rect(0, 0, w, h))
 	draw.Draw(dst, dst.Bounds(), image.NewUniform(color.White), image.Point{}, draw.Src)
+	normalizedUniform := true
+	var first color.RGBA
 	// Exact bounded nearest-neighbour sampling keeps normalization reproducible.
 	for y := 0; y < h; y++ {
 		if err = ctx.Err(); err != nil {
-			return nil, 0, 0, err
+			return nil, 0, 0, "", err
 		}
 		for x := 0; x < w; x++ {
 			c := color.NRGBAModel.Convert(src.At(src.Bounds().Min.X+x*cfg.Width/w, src.Bounds().Min.Y+y*cfg.Height/h)).(color.NRGBA)
 			a := uint32(c.A)
-			dst.SetRGBA(x, y, color.RGBA{uint8((uint32(c.R)*a + 255*(255-a)) / 255), uint8((uint32(c.G)*a + 255*(255-a)) / 255), uint8((uint32(c.B)*a + 255*(255-a)) / 255), 255})
+			pixel := color.RGBA{uint8((uint32(c.R)*a + 255*(255-a)) / 255), uint8((uint32(c.G)*a + 255*(255-a)) / 255), uint8((uint32(c.B)*a + 255*(255-a)) / 255), 255}
+			if x == 0 && y == 0 {
+				first = pixel
+			} else if pixel != first {
+				normalizedUniform = false
+			}
+			dst.SetRGBA(x, y, pixel)
 		}
+	}
+	if inspect && measurement == "" && normalizedUniform {
+		return nil, 0, 0, "", errors.New("NORMALIZATION_DETAIL_LOST: the original image contains pixel variation that disappears after resizing or alpha/color normalization. No model interpretation was attempted. Keep the original and try a closer crop or a higher-contrast copy.")
+	}
+	if err = ctx.Err(); err != nil {
+		return nil, 0, 0, "", err
 	}
 	out, err := os.CreateTemp("", "trove-normalized-image-")
 	if err != nil {
-		return nil, 0, 0, err
+		return nil, 0, 0, "", err
 	}
-	if err = png.Encode(out, dst); err != nil {
+	if err = png.Encode(visionContextWriter{ctx, out}, dst); err != nil {
 		out.Close()
 		os.Remove(out.Name())
-		return nil, 0, 0, err
+		return nil, 0, 0, "", err
 	}
-	return out, w, h, nil
+	if err = ctx.Err(); err != nil {
+		out.Close()
+		os.Remove(out.Name())
+		return nil, 0, 0, "", err
+	}
+	return out, w, h, measurement, nil
 }
 func (s *Supervisor) GenerateImage(ctx context.Context, packID, question string, source *os.File, onToken func(string)) (VisionResult, error) {
 	return s.generateImage(ctx, packID, question, source, onToken, true)
@@ -141,20 +177,17 @@ func (s *Supervisor) generateImage(ctx context.Context, packID, question string,
 	if p.Kind != "vision" || p.VisionVersion != 1 || p.QualificationOnly {
 		return result, errors.New("MODEL_INCOMPATIBLE: select the verified version 1 vision pair")
 	}
-	normalized, w, h, err := NormalizeVisionImage(ctx, source)
+	normalized, w, h, measurement, err := normalizeVisionImage(ctx, source, inspect)
 	if err != nil {
 		return result, err
 	}
 	defer os.Remove(normalized.Name())
 	defer normalized.Close()
-	if inspect {
-		uniform, err := nearlyUniformImage(ctx, normalized)
-		if err != nil {
+	if measurement != "" {
+		if err = ctx.Err(); err != nil {
 			return result, err
 		}
-		if uniform {
-			return VisionResult{Kind: "image_generation", Text: "Local pixel measurement: this image is nearly uniform. There is too little distinguishable visual variation for a useful description. No model interpretation was attempted.", AnalysisMethod: "pixel_measurement", FinishReason: "measurement"}, nil
-		}
+		return VisionResult{Kind: "image_generation", Text: measurement, AnalysisMethod: "pixel_measurement", FinishReason: "measurement"}, nil
 	}
 	metadata, err := os.CreateTemp("", "trove-image-metadata-")
 	if err != nil {
@@ -201,27 +234,6 @@ func (s *Supervisor) generateImage(ctx context.Context, packID, question string,
 	return result, nil
 }
 
-func nearlyUniformImage(ctx context.Context, f *os.File) (bool, error) {
-	im, _, err := image.Decode(io.NewSectionReader(f, 0, 5<<20))
-	if err != nil {
-		return false, err
-	}
-	lo := [3]uint32{65535, 65535, 65535}
-	hi := [3]uint32{}
-	for y := im.Bounds().Min.Y; y < im.Bounds().Max.Y; y++ {
-		if err = ctx.Err(); err != nil {
-			return false, err
-		}
-		for x := im.Bounds().Min.X; x < im.Bounds().Max.X; x++ {
-			r, g, b, _ := im.At(x, y).RGBA()
-			for i, v := range []uint32{r, g, b} {
-				lo[i] = min(lo[i], v)
-				hi[i] = max(hi[i], v)
-			}
-		}
-	}
-	return hi[0]-lo[0] <= 3*257 && hi[1]-lo[1] <= 3*257 && hi[2]-lo[2] <= 3*257, nil
-}
 func repeatedImageText(text string) bool {
 	words := strings.Fields(strings.ToLower(text))
 	seen := map[string]int{}
