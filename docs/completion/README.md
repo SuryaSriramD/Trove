@@ -38,6 +38,10 @@ Local image understanding is implemented with a pinned model/projector pair, bou
 
 A native tokenizer stall was traced to unwanted Metal initialization and fixed without increasing the timeout. A real local model passed cancellation/forget-during-stream and a narrow named-page creation task with explicit approval and retry deduplication. This does not override the separate failed factual/memory quality rubrics. No release gate is marked complete.
 
+The [4900d4b development candidate](development-candidate-4900d4b.md) passes 620 Go tests/subtests with 27 explicit skips and packaged offline P0/P1/P2/native journeys. Its P2 checks include actual chart values, confirmed actions, conversation branches and retained bytes, backup/reopen and inert portable-import behavior. The stricter memory rubric remains failed; no release is approved.
+
+Later source packages add readable semantic related-content cards with current citation checks, a graph consent fix, protected Windows DPAPI/Linux Secret Service credentials, and cross-platform native-worker build/protocol paths. Credential-prompt review reproduced and repaired a cancellation race before integrating its fix. Windows/Linux Go cross-compilation and macOS model execution do not qualify either target OS. See [related content](related-content.md), [platform credentials](platform-credentials.md), [credential cancellation](credential-prompt-cancellation.md), and [native worker portability](platform-native-workers.md).
+
 See [recovery evidence](recovery.md), [retrieval evidence](retrieval.md), and the [machine-readable registry](registry.json). The registry records owners, phases, interface boundaries, independent expected acceptance outcomes, evidence destinations, implementation commits and qualification status for all 51 items. Planned scenarios are not passing tests.
 
 ## External prerequisites
@@ -87,10 +91,10 @@ The research report has not been supplied. Independent clean machines, authorize
 | REL-003 | B, F | C3, C5, C6, C7, C8 | open |
 | REL-004 | D, E | C3, C5, C6, C7, C8 | open |
 | REL-005 | F | C3, C5, C6, C7, C8 | open |
-| REL-006 | F | C3, C5, C6, C7, C8 | open |
+| REL-006 | F | C3, C5, C6, C7, C8 | in progress |
 | REL-007 | A, B, C, E | C3, C5, C6, C7, C8 | in progress |
 | REL-008 | F | C0, C1, C2, C3, C4, C5, C6, C7, C8 | in_progress |
-| REL-009 | F | C7, C8 | open |
+| REL-009 | F | C7, C8 | in progress |
 | GOV-001 | A | C0 | implemented |
 | GOV-002 | A, F | C0 | implemented |
 | GOV-003 | A | C0, C2, C3, C5, C8 | in_progress |

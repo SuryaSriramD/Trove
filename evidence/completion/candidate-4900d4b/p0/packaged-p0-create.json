@@ -1,0 +1,26 @@
+{
+  "step": "p0-create",
+  "passed": true,
+  "recordedAt": "2026-10-05T11:42:52.220953Z",
+  "state": {
+    "workspaceId": "01a10bdf-b11f-72c8-9c90-f76355e510fd",
+    "pageId": "01a10bdf-b34b-7a66-8fe1-267eef277828",
+    "blockId": "01a10bdf-b398-7b3c-8925-2dc70ff1efd0",
+    "collectionId": "",
+    "propertyId": "",
+    "recordId": "01a10bdf-b376-7aff-a306-14c9e9506e28",
+    "recordPageId": "01a10bdf-b376-73d0-afaa-d83d049f4e9f",
+    "fileId": "",
+    "fileBlockId": "",
+    "contentHash": ""
+  },
+  "checks": [
+    "Notion ZIP inventory and five-outcome reconciliation retained",
+    "imported page body and database record edits persisted",
+    "keyword search works without inference",
+    "forgotten and stale memory excluded from retrieval",
+    "durable interrupted recording remains recoverable"
+  ],
+  "processExitCode": 0,
+  "installedWeightsAvailable": false
+}
