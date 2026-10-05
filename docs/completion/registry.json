@@ -814,7 +814,8 @@
         "docs/completion/related-content.md",
         "docs/completion/development-candidate-4900d4b.md",
         "docs/completion/memory-capacity.md",
-        "evidence/completion/memory-capacity/manifest.json"
+        "evidence/completion/memory-capacity/manifest.json",
+        "docs/completion/native-memory-sampling.md"
       ],
       "followup_commits": [
         "4900d4b",
@@ -1108,7 +1109,11 @@
         "Windows": "unqualified",
         "Linux": "unqualified"
       },
-      "evidence_target": "evidence/completion/REL-003/"
+      "evidence_target": "evidence/completion/REL-003/",
+      "implementation_evidence": [
+        "docs/completion/macos-miniaudio.md",
+        "docs/completion/microphone-portability.md"
+      ]
     },
     {
       "id": "REL-004",
@@ -1238,7 +1243,8 @@
       "implementation_evidence": [
         "docs/completion/development-candidate-5d7cdb0.md",
         "docs/completion/database-performance.md",
-        "docs/completion/startup-investigation.md"
+        "docs/completion/startup-investigation.md",
+        "docs/completion/native-memory-sampling.md"
       ]
     },
     {
@@ -1282,7 +1288,9 @@
       ],
       "implementation_evidence": [
         "docs/completion/development-candidate-4900d4b.md",
-        "docs/completion/pre-migration-snapshots.md"
+        "docs/completion/pre-migration-snapshots.md",
+        "evidence/completion/secret-service-fixture/manifest.json",
+        "docs/completion/codegen-reproducibility.md"
       ]
     },
     {
@@ -1313,16 +1321,23 @@
         "3731433",
         "9b05e73",
         "b06c057",
-        "8a96bdc"
+        "8a96bdc",
+        "5cb3f72",
+        "f780919",
+        "c473568"
       ],
       "implementation_evidence": [
         "docs/completion/platform-native-workers.md",
         "docs/completion/platform-credentials.md",
         "docs/completion/credential-prompt-cancellation.md",
         "docs/completion/audio-decoding.md",
-        "docs/completion/platform-filesystem.md"
+        "docs/completion/platform-filesystem.md",
+        "docs/completion/macos-miniaudio.md",
+        "docs/completion/microphone-portability.md",
+        "docs/completion/platform-desktop-packaging.md",
+        "docs/completion/portable-ocr.md"
       ],
-      "remaining_qualification": "Cross-platform worker/credential/decoder and filesystem ownership/identity sources exist; Go target tests cross-compile only. Target native builds/execution, capture/OCR, desktop packaging/routing, Windows directory durability/workspace DACLs, provider containment, clean installation/update/rollback/uninstall and portable restoration remain open."
+      "remaining_qualification": "Worker, protected credential, decoder, capture, OCR, ownership/identity, offline desktop packaging and launch-routing sources exist. Actual Windows/Linux native builds/execution, PDF/screenshot completion, Windows publication durability/workspace ACLs, provider containment, clean installation/update/rollback/uninstall, backup portability and full applicable product matrix remain open."
     },
     {
       "id": "GOV-001",
@@ -1345,7 +1360,11 @@
         "Windows": "unqualified",
         "Linux": "unqualified"
       },
-      "evidence_target": "evidence/completion/GOV-001/"
+      "evidence_target": "evidence/completion/GOV-001/",
+      "implementation_evidence": [
+        "docs/completion/codegen-reproducibility.md",
+        "docs/completion/platform-desktop-packaging.md"
+      ]
     },
     {
       "id": "GOV-002",
@@ -1369,7 +1388,11 @@
         "Windows": "unqualified",
         "Linux": "unqualified"
       },
-      "evidence_target": "evidence/completion/GOV-002/"
+      "evidence_target": "evidence/completion/GOV-002/",
+      "implementation_evidence": [
+        "docs/completion/codegen-reproducibility.md",
+        "docs/completion/platform-desktop-packaging.md"
+      ]
     },
     {
       "id": "GOV-003",
@@ -1437,10 +1460,10 @@
       "interface_boundary": "Source control, pinned tools, ownership, requirements and evidence ledger",
       "acceptance_scenario": "Implement the selected contract or record an explicitly accepted ADR with behavior, maintenance, security, licensing, offline, and qualification consequences. A different library is not automatically a user-visible bug; silently claiming exact TRD conformance is not acceptable.",
       "backlog_anchor": "../remaining-work.md#gov-005-resolve-selected-stack-deviations-explicitly",
-      "implementation": "in_progress",
-      "implementation_commit": null,
+      "implementation": "implemented",
+      "implementation_commit": "c473568",
       "verification": {
-        "service_or_interface": "pending",
+        "service_or_interface": "Selected audited components now wired in production source; source-specific targeted checks pass; candidate/platform/distribution qualification remains separate.",
         "candidate": null,
         "macOS": "unqualified",
         "Windows": "unqualified",
@@ -1451,10 +1474,13 @@
         "docs/completion/retrieval.md",
         "docs/completion/recovery.md",
         "docs/completion/audio-decoding.md",
-        "docs/completion/mcp-sdk.md"
+        "docs/completion/mcp-sdk.md",
+        "docs/completion/selected-stack-alignment.md",
+        "docs/completion/macos-miniaudio.md"
       ],
       "followup_commits": [
-        "b06c057"
+        "b06c057",
+        "c473568"
       ]
     },
     {
@@ -1484,7 +1510,8 @@
         "docs/completion/local-image-understanding.md",
         "evidence/completion/c6-vision-manifest.json",
         "docs/completion/development-candidate-4900d4b.md",
-        "evidence/completion/image-abstention/manifest.json"
+        "evidence/completion/image-abstention/manifest.json",
+        "docs/completion/portable-ocr.md"
       ],
       "followup_commits": [
         "44f7262"

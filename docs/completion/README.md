@@ -46,6 +46,8 @@ The optional official 7B local pack now passes the original strict memory/author
 
 Verified macOS update selection, external recovery kits, compatible rollback and explicit guarded previous-app launch are implemented with focused service/UI checks. The actual ad-hoc candidate is correctly rejected as a production update. New bundles use restricted, pinned FFmpeg decoding, matching the selected TRD component. Windows/Linux file ownership and identity primitives now have platform implementations and cross-compilation evidence; Windows publication durability and full target behavior remain open. See [update/recovery](verified-updates.md), [audio decoding](audio-decoding.md) and [filesystem boundary](platform-filesystem.md).
 
+New Mac builds now use miniaudio for capture; Windows/Linux have offline packaging, launch-routing and portable English OCR source packages. Fresh-checkout generation and requirements extraction are reproducible, and native memory sampling works inside the offline sandbox. These close specific source gaps while actual device, target-native, clean-install and public distribution qualification remain open. See [selected-component alignment](selected-stack-alignment.md), [portable packaging](platform-desktop-packaging.md), [OCR](portable-ocr.md), [tooling](codegen-reproducibility.md), and [memory sampling](native-memory-sampling.md).
+
 See [recovery evidence](recovery.md), [retrieval evidence](retrieval.md), and the [machine-readable registry](registry.json). The registry records owners, phases, interface boundaries, independent expected acceptance outcomes, evidence destinations, implementation commits and qualification status for all 51 items. Planned scenarios are not passing tests.
 
 ## External prerequisites
@@ -103,7 +105,7 @@ The research report has not been supplied. Independent clean machines, authorize
 | GOV-002 | A, F | C0 | implemented |
 | GOV-003 | A | C0, C2, C3, C5, C8 | in_progress |
 | GOV-004 | A | C0 | awaiting_external_source |
-| GOV-005 | A | C0, C2, C3, C5, C8 | in_progress |
+| GOV-005 | A | C0, C2, C3, C5, C8 | implemented |
 | OPT-001 | E, F | C6 | implemented |
 | OPT-002 | A, E | C6 | implemented |
 | OPT-003 | E, F | C6 | open |

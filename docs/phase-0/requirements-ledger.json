@@ -15760,7 +15760,12 @@
       "docs/completion/audio-decoding.md",
       "docs/completion/platform-filesystem.md",
       "docs/completion/memory-capacity.md",
-      "docs/completion/local-image-understanding.md"
+      "docs/completion/local-image-understanding.md",
+      "docs/completion/codegen-reproducibility.md",
+      "docs/completion/selected-stack-alignment.md",
+      "docs/completion/platform-desktop-packaging.md",
+      "docs/completion/portable-ocr.md",
+      "docs/completion/native-memory-sampling.md"
     ],
     "latestAssessment": "Implementation and bounded development evidence have advanced; no P0/P1/P2 or platform release is approved. Missing research, independent devices, live accounts, signing, broader AI/performance and native interface qualification remain explicit in the 51-item registry."
   }
