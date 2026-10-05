@@ -61,6 +61,16 @@ func (a *App) stopProviderAuth() {
 		}
 	}
 }
+func providerAuthStorageReason(err error) string {
+	// Auth errors contain only locally selected public messages. Raw OS,
+	// D-Bus and credential-store errors never cross the renderer boundary.
+	var safe *auth.Error
+	if errors.As(err, &safe) {
+		return safe.Message
+	}
+	return "Protected account storage is unavailable on this host"
+}
+
 func (a *App) providerAuthDispatch(method string, raw json.RawMessage) string {
 	definitions := map[string]string{"providers.auth.list": "ProviderAuthListRequest", "providers.auth.begin": "ProviderAuthBeginRequest", "providers.auth.attempt": "ProviderAuthAttemptRequest", "providers.auth.cancel": "ProviderAuthAttemptRequest", "providers.auth.retry": "ProviderAuthAttemptRequest", "providers.auth.signOut": "ProviderAuthSignOutRequest"}
 	definition, ok := definitions[method]
@@ -93,10 +103,11 @@ func (a *App) providerAuthDispatch(method string, raw json.RawMessage) string {
 	}
 	manager, err := a.getProviderAuth()
 	if err != nil {
+		reason := providerAuthStorageReason(err)
 		if method == "providers.auth.list" {
-			return success(map[string]any{"available": false, "reason": "Protected account storage is unavailable on this host", "registrations": []auth.Registration{}})
+			return success(map[string]any{"available": false, "reason": reason, "registrations": []auth.Registration{}})
 		}
-		return errorEnvelope("WORKER_FAILED", "Protected account storage is unavailable on this host")
+		return errorEnvelope("WORKER_FAILED", reason)
 	}
 	var result any
 	openURL := func(target string) error { runtime.BrowserOpenURL(ctx, target); return nil }

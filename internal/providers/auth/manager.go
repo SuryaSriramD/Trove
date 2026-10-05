@@ -45,6 +45,9 @@ type Manager struct {
 // NewManager requires an absolute, private host storage root outside any
 // workspace. The desktop adapter chooses this path; the renderer cannot.
 func NewManager(storageRoot string) (*Manager, error) {
+	if !filepath.IsAbs(storageRoot) || filepath.Clean(storageRoot) != storageRoot {
+		return nil, fail("STORAGE_FAILED", "Account storage configuration is invalid")
+	}
 	secret, err := nativeSecretStore(storageRoot)
 	if err != nil {
 		return nil, err
