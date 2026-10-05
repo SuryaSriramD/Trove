@@ -1,0 +1,13 @@
+{"stage":"process_entry","elapsedMs":0.148}
+{"stage":"rollback_channel_ready","elapsedMs":0.287}
+{"stage":"wails_run_start","elapsedMs":0.32}
+{"stage":"native_startup_enter","elapsedMs":217.161}
+{"stage":"native_runtime_ready","elapsedMs":234.214}
+{"stage":"workspace_open_start","elapsedMs":234.42}
+{"stage":"workspace_open_complete","elapsedMs":281.019}
+{"stage":"startup_complete","elapsedMs":281.319}
+{"stage":"dom_ready","elapsedMs":472.989}
+{"stage":"snapshot_ready","elapsedMs":635.03}
+{"stage":"shell_ready","elapsedMs":706.458}
+{"stage":"shutdown_begin","elapsedMs":582747.548}
+{"stage":"shutdown_complete","elapsedMs":582750.318}

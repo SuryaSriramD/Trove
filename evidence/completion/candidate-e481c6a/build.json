@@ -1,0 +1,18 @@
+{
+  "command": [
+    "/Users/suryasriramduvvuri/Library/Caches/Trove/completion/python/requirements-e99394c278ee/bin/python",
+    "scripts/build-desktop.py",
+    "--cache",
+    "/Users/suryasriramduvvuri/Library/Caches/Trove/completion",
+    "--native-bundle",
+    "/private/tmp/trove-native-integrated-e481c6a",
+    "--phase6",
+    "--output",
+    "/private/tmp/Trove-integration-e481c6a.app"
+  ],
+  "exitCode": 0,
+  "elapsedSeconds": 32.445958292,
+  "sourceCommit": "e481c6a7e602313be374785c49bc8ed73252ecad",
+  "app": "/private/tmp/Trove-integration-e481c6a.app",
+  "host": "macOS-27.0.1-arm64-arm-64bit"
+}

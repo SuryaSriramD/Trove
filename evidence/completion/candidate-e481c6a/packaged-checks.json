@@ -1,0 +1,47 @@
+[
+  {
+    "phase": "p0",
+    "command": [
+      "/Users/suryasriramduvvuri/Library/Caches/Trove/completion/python/requirements-e99394c278ee/bin/python",
+      "scripts/verify-packaged.py",
+      "--app",
+      "/private/tmp/Trove-integration-e481c6a.app",
+      "--p0",
+      "--offline",
+      "--evidence",
+      "/private/tmp/trove-integration-e481c6a/packaged-p0"
+    ],
+    "exitCode": 0,
+    "elapsedSeconds": 1.428649791
+  },
+  {
+    "phase": "p1",
+    "command": [
+      "/Users/suryasriramduvvuri/Library/Caches/Trove/completion/python/requirements-e99394c278ee/bin/python",
+      "scripts/verify-packaged.py",
+      "--app",
+      "/private/tmp/Trove-integration-e481c6a.app",
+      "--p1",
+      "--offline",
+      "--evidence",
+      "/private/tmp/trove-integration-e481c6a/packaged-p1"
+    ],
+    "exitCode": 0,
+    "elapsedSeconds": 0.960707625
+  },
+  {
+    "phase": "p2",
+    "command": [
+      "/Users/suryasriramduvvuri/Library/Caches/Trove/completion/python/requirements-e99394c278ee/bin/python",
+      "scripts/verify-packaged.py",
+      "--app",
+      "/private/tmp/Trove-integration-e481c6a.app",
+      "--p2",
+      "--offline",
+      "--evidence",
+      "/private/tmp/trove-integration-e481c6a/packaged-p2"
+    ],
+    "exitCode": 0,
+    "elapsedSeconds": 1.265770792
+  }
+]

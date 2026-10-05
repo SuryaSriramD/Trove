@@ -1,0 +1,34 @@
+{
+  "sourceCommit": "e481c6a7e602313be374785c49bc8ed73252ecad",
+  "applicationBinarySha256": "41339f1341d037961879f35ea5cc64a8ff3ad680897c5982e690a069b34dac2b",
+  "applicationUnchanged": true,
+  "savedDefaultZIP": "/private/tmp/trove-integration-e481c6a/native-ui/Trove-support.zip",
+  "zipSHA256": "69cabc8e4b0365b50204a9e4f6d048c66378e3b3c3084648b565bff9ac3f2e1d",
+  "zipFiles": [
+    "metadata.json",
+    "manifest.json"
+  ],
+  "defaultCategories": [
+    "metadata"
+  ],
+  "archiveMode": "0600",
+  "manifestDigestsValid": true,
+  "defaultContainsNoPageIDsTitlesOrText": true,
+  "canonicalPagesBlocksAndRevisionsUnchanged": true,
+  "stagingRemoved": true,
+  "nativeVisibleObservations": [
+    "Settings showed both optional content checkboxes off by default.",
+    "First save remained open longer than five minutes during tool interruption and review; deadline rejection was shown. No success was claimed.",
+    "Fresh preview saved through native Save dialog and UI confirmed local success.",
+    "Text-only selection of Native verification — café 🦉 previewed exactly Preserve café 🦉 and this important phrase. without its title.",
+    "Optional content preview was discarded without saving.",
+    "App quit through native interface."
+  ],
+  "toolLimitations": [
+    "CUA connection closed transiently after opening Save; re-read confirmed the native save dialog and app remained alive.",
+    "A stale-state action was refused by CUA; refreshed state then selected the intended disposable destination.",
+    "AX truncates long metadata text; exact default ZIP bytes and manifest hashes were independently inspected after saving."
+  ],
+  "releaseQualified": false,
+  "performanceQualified": false
+}

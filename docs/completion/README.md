@@ -22,6 +22,8 @@ C1 prevention work precedes P0 qualification. C2 editor, databases, recovery, re
 
 ## Current checkpoint
 
+The registry currently records **34 items implemented at their stated source scope, 11 in progress, five open and one awaiting the external research report**. These are backlog implementation states, not release approval or a percentage of product readiness. All three platform release matrices remain unqualified.
+
 C1 defect repairs and the C2/C4 product source packages are integrated: editor preservation and controls, scaled database queries/views, hybrid retrieval/sqlite-vec, online backup and historical mapping, restricted FFmpeg decoding, rich layouts/templates/formulas/PDFs, Notion API reconstruction, browser clipping, visible automation, and reviewed local-AI/MCP actions. See the package links in the [51-item registry](registry.json); its planned evidence directories are not passing checks.
 
 The [requirements reconciliation](requirements-reconciliation.md) adds a [current coverage overlay](requirements-overlay.json) for all 312 product requirements and explicitly accounts for the 26 contract/boundary rows. It preserves the original ledger statuses and reports scoped implementation coverage, not blanket completion.
@@ -41,12 +43,13 @@ New Mac builds use [miniaudio capture](macos-miniaudio.md); actual microphone/TC
 | [5d7cdb0](development-candidate-5d7cdb0.md) | 544 Go tests with 21 skips and packaged offline journeys; startup failed with missing readiness events. Temporary binaries were lost; durable reports remain. |
 | [4900d4b](development-candidate-4900d4b.md) | 620 tests/subtests with 27 skips and packaged P0/P1/P2/native journeys. Later memory/image/source repairs do not change its then-failing rubrics or binary. |
 | [be6fc81](development-candidate-be6fc81.md) | 870 service tests/subtests (44 skips), 60 desktop tests/subtests (1 skip), 121 tooling tests and packaged P0/P1/P2/native journeys. Native formatted-word search failed; one of 20 startup samples took 8,399.656 ms and failed its threshold. Later Windows/PDF/rollback/search source is outside this candidate. |
+| [e481c6a](development-candidate-e481c6a.md) | Integrated rollback/search/support source: 1,002 Go tests/subtests (45 skips), 113 desktop (1 skip), 151 tooling checks and packaged offline P0/P1/P2 data journeys pass. Native default support ZIP save and selected-text preview/discard pass; the expired first attempt is retained. No new controlled performance or release qualification. |
 
 The [60-launch instrumented startup investigation](startup-investigation.md) did not reproduce or explain the earlier missing-readiness events. [Database measurements](database-performance.md) record expensive derived queries and scoped improvements. Each report's source, workload and outcome remain binding; no release gate is marked complete.
 
 ## External prerequisites
 
-The research report has not been supplied. Independent clean machines, authorized datasets, live integration accounts, reachable HTTPS and Apple signing access have unknown availability. Coding continues while these remain unresolved. No credentials belong in this record.
+The research report has not been supplied. Independent clean machines, authorized datasets, live integration accounts, reachable HTTPS and Apple signing access have unknown availability. Independent implementation can continue while these remain unresolved. No credentials belong in this record.
 
 ## Item index
 

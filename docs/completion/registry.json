@@ -2040,7 +2040,8 @@
         "docs/completion/development-candidate-5d7cdb0.md",
         "evidence/completion/candidate-5d7cdb0/manifest.json",
         "docs/completion/development-candidate-be6fc81.md",
-        "evidence/completion/candidate-be6fc81/manifest.json"
+        "evidence/completion/candidate-be6fc81/manifest.json",
+        "docs/completion/development-candidate-e481c6a.md"
       ],
       "evidence_target_status": "planned_destination_not_passing_evidence",
       "requirements_overlay_ids": [
@@ -2108,7 +2109,8 @@
         "docs/completion/development-candidate-5d7cdb0.md",
         "evidence/completion/candidate-5d7cdb0/manifest.json",
         "docs/completion/development-candidate-be6fc81.md",
-        "evidence/completion/candidate-be6fc81/manifest.json"
+        "evidence/completion/candidate-be6fc81/manifest.json",
+        "docs/completion/development-candidate-e481c6a.md"
       ],
       "evidence_target_status": "planned_destination_not_passing_evidence",
       "requirements_overlay_ids": [
@@ -2588,7 +2590,8 @@
         "docs/completion/development-candidate-5d7cdb0.md",
         "evidence/completion/candidate-5d7cdb0/manifest.json",
         "docs/completion/development-candidate-be6fc81.md",
-        "evidence/completion/candidate-be6fc81/manifest.json"
+        "evidence/completion/candidate-be6fc81/manifest.json",
+        "docs/completion/development-candidate-e481c6a.md"
       ],
       "followup_commits": [
         "44f7262",
@@ -2891,7 +2894,10 @@
         "docs/completion/support-bundle.md",
         "evidence/completion/support-bundle/manifest.json"
       ],
-      "remaining_qualification": "Ongoing candidate/platform reconciliation and missing research remain open; mapping to implementation packages does not close entire acceptance criteria. TRD-CONSTRAINT-020 has a bounded local support package but broader diagnostics and packaged/platform acceptance remain partial."
+      "remaining_qualification": "Ongoing candidate/platform reconciliation and missing research remain open; mapping to implementation packages does not close entire acceptance criteria. TRD-CONSTRAINT-020 has a bounded local support package but broader diagnostics and packaged/platform acceptance remain partial.",
+      "development_candidate_evidence": [
+        "docs/completion/development-candidate-e481c6a.md"
+      ]
     },
     {
       "id": "GOV-004",
@@ -3186,6 +3192,16 @@
       "packagedJourneys": "passed_for_recorded_P0_P1_P2_native_scope",
       "startupReliability": "all_20_readiness_returns_but_8399.656_ms_sample_failed_2500_ms_target",
       "nativeInterface": "narrow_save_format_reopen_passed_formatted_word_search_failed",
+      "laterPackagesDoNotChangeThisCandidate": true
+    },
+    {
+      "sourceCommit": "e481c6a7e602313be374785c49bc8ed73252ecad",
+      "manifest": "evidence/completion/candidate-e481c6a/manifest.json",
+      "assessment": "docs/completion/development-candidate-e481c6a.md",
+      "releaseApproved": false,
+      "packagedJourneys": "passed_for_recorded_P0_P1_P2_service_scope_without_models",
+      "startupReliability": "not_controlled_on_this_candidate_prior_failure_remains_open",
+      "nativeInterface": "support_default_save_and_optional_preview_discard_passed_after_expired_first_attempt",
       "laterPackagesDoNotChangeThisCandidate": true
     }
   ],

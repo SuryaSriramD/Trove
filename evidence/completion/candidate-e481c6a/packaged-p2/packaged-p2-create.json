@@ -1,0 +1,27 @@
+{
+  "step": "p2-create",
+  "passed": true,
+  "recordedAt": "2026-10-05T16:06:47.709437Z",
+  "state": {
+    "workspaceId": "01a10cd1-5429-78e1-837a-21b6aee4f644",
+    "pageId": "01a10cd1-549d-7936-b9b7-35e11144b9db",
+    "blockId": "01a10cd1-549d-7b77-a39a-4b18e51ef31c",
+    "collectionId": "01a10cd1-549d-766e-93a8-7ced5b219ed9",
+    "propertyId": "01a10cd1-549d-77fb-a94e-b6f9667aa0d0",
+    "recordId": "01a10cd1-549d-79ef-b5fd-7108065bceab",
+    "recordPageId": "01a10cd1-549d-7fb5-8b33-6af5523dc58d",
+    "fileId": "01a10cd1-54b5-713d-be34-00d55665bdf1",
+    "fileBlockId": "01a10cd1-549d-76a1-933b-4077f5d21132",
+    "contentHash": "61cb495898eb4901d8a4ea859ee4cee692bb981cc2474a55f2809e47519fd273"
+  },
+  "checks": [
+    "exact decimal chart follows canonical form and approved row-action values",
+    "missing required form value and unconfirmed row action commit nothing",
+    "graph link retains source block and resolves at its current revision",
+    "display preferences persist independently of page contents",
+    "conversation branches, roles, timestamps and exact original bytes survive",
+    "personal review schedule requires separate activation"
+  ],
+  "processExitCode": 0,
+  "installedWeightsAvailable": false
+}
