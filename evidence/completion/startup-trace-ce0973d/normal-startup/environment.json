@@ -1,0 +1,9 @@
+{
+  "platform": "macOS-27.0.1-arm64-arm-64bit",
+  "machine": "arm64",
+  "os": "ProductName:\t\tmacOS\nProductVersion:\t\t27.0.1\nBuildVersion:\t\t26A434\n",
+  "hardware": "Mac16,12\n25769803776\n10\n",
+  "networkDeniedByOS": true,
+  "privateHOME": true,
+  "profileSourceSHA256": "b1c8f1c6b5dc14cebdd79aefbbd1eb7e4545410d979d4c8c149417ee3fb4f9ae"
+}

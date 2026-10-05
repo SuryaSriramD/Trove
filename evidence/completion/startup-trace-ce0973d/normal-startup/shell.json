@@ -1,0 +1,66 @@
+{
+  "recordedAt": "2026-10-05T15:40:17.254300+00:00",
+  "app": "/private/tmp/Trove-startup-trace-v2-development.app",
+  "appBinarySha256": "6b23b32fbdd7692517982355112047544fbe307ed8c070492859f6c4993f3d1a",
+  "appUnchanged": true,
+  "networkDeniedByOS": true,
+  "modelPacks": [],
+  "fixture": "/private/tmp/trove-traced-shell-noiz4zv6",
+  "profiles": [
+    {
+      "pages": 1000,
+      "paragraphBlocks": 2000,
+      "samples": [
+        {
+          "definition": "Go process initialization to canonical snapshot rendered plus two animation frames",
+          "recordedAt": "2026-10-05T15:40:13.02095Z",
+          "usableShellMs": 739.506,
+          "launchThroughShutdownMs": 1725.183291000576
+        },
+        {
+          "definition": "Go process initialization to canonical snapshot rendered plus two animation frames",
+          "recordedAt": "2026-10-05T15:40:13.737414Z",
+          "usableShellMs": 556.906,
+          "launchThroughShutdownMs": 671.1184579980909
+        },
+        {
+          "definition": "Go process initialization to canonical snapshot rendered plus two animation frames",
+          "recordedAt": "2026-10-05T15:40:14.554189Z",
+          "usableShellMs": 718.66,
+          "launchThroughShutdownMs": 796.8978749995586
+        },
+        {
+          "definition": "Go process initialization to canonical snapshot rendered plus two animation frames",
+          "recordedAt": "2026-10-05T15:40:15.454233Z",
+          "usableShellMs": 828.908,
+          "launchThroughShutdownMs": 886.8043340007716
+        },
+        {
+          "definition": "Go process initialization to canonical snapshot rendered plus two animation frames",
+          "recordedAt": "2026-10-05T15:40:17.046753Z",
+          "usableShellMs": 1530.865,
+          "launchThroughShutdownMs": 1663.120584002172
+        }
+      ],
+      "requestedIterations": 5,
+      "attemptedIterations": 5,
+      "completedIterations": 5,
+      "complete": true,
+      "medianMs": 739.506,
+      "maximumMs": 1530.865,
+      "approximatelyTwoSeconds": true
+    }
+  ],
+  "failures": [],
+  "measurementPassed": true,
+  "definition": "Go process initialization to canonical workspace snapshot rendered and two animation frames. Startup includes native validation and Wails initialization. Each sample uses a new app process; OS disk caches are not flushed. The approximate two-second threshold is explicitly interpreted as at most 2.5 seconds, requires every requested iteration to finish, and exact values are retained.",
+  "limitations": [
+    "Developer Mac only; hardware and synthetic workspace definitions are in benchmark-environment.json.",
+    "Does not measure installer/Gatekeeper time or guarantee editor responsiveness during background work.",
+    "A missing readiness report is a failed measurement; it does not by itself distinguish a workspace, bridge, renderer, or visibility problem."
+  ],
+  "sourceCommit": "ce0973d",
+  "scope": "Five normal starts on a cloned synthetic 1000-page workspace; investigation candidate only, not integrated release qualification.",
+  "quietWindow": "Root and peer agents paused heavy builds/tests for this sequence; no inference or devices.",
+  "traceDurability": "Ordinary bounded writes; no synchronous durability work or power-loss guarantee."
+}
