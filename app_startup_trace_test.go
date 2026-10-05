@@ -80,3 +80,19 @@ func TestStartupTraceNeverReplacesEvidenceAndIgnoresBadSink(t *testing.T) {
 		t.Fatal("overwrote prior evidence", err)
 	}
 }
+
+func TestStartupTraceFinishedOrDisabledDoesNotNeedSnapshotInspection(t *testing.T) {
+	disabled := newStartupStageTrace("", time.Now())
+	if disabled.pending("snapshot_ready") {
+		t.Fatal("disabled trace requested envelope scan")
+	}
+	trace := newStartupStageTrace(filepath.Join(t.TempDir(), "trace"), time.Now())
+	defer trace.close()
+	if !trace.pending("snapshot_ready") {
+		t.Fatal("enabled trace omitted first snapshot")
+	}
+	trace.mark("snapshot_ready")
+	if trace.pending("snapshot_ready") {
+		t.Fatal("completed trace requested repeated envelope scan")
+	}
+}

@@ -316,7 +316,7 @@ func (a *App) Dispatch(method, raw string) string {
 		}
 	}
 	result := a.kernel.Dispatch(a.ctx, a.execution, method, json.RawMessage(raw))
-	if method == "workspace.snapshot" {
+	if method == "workspace.snapshot" && startupTracePending("snapshot_ready") {
 		var envelope struct {
 			OK bool `json:"ok"`
 		}
