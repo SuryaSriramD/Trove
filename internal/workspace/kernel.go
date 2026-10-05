@@ -14,11 +14,11 @@ import (
 	"strconv"
 	"strings"
 	"sync"
-	"syscall"
 	"time"
 
 	_ "github.com/mattn/go-sqlite3"
 	"trove.local/phase0/contracts"
+	"trove.local/phase0/internal/platformfs"
 	"trove.local/phase0/internal/sqlitevec"
 	"trove.local/phase0/schemas"
 )
@@ -163,17 +163,15 @@ func openMigrationObserved(path string, create bool, observe func(string) error)
 	} else if !os.IsNotExist(statErr) {
 		return nil, statErr
 	}
-	lock, err := os.OpenFile(filepath.Join(path, ".owner.lock"), os.O_CREATE|os.O_RDWR|syscall.O_NOFOLLOW, 0600)
+	lock, err := platformfs.AcquireLock(filepath.Join(path, ".owner.lock"))
 	if err != nil {
+		if errors.Is(err, platformfs.ErrLocked) {
+			return nil, Fail("WORKSPACE_LOCKED", "Workspace already has an active owner")
+		}
 		return nil, err
 	}
-	if err = syscall.Flock(int(lock.Fd()), syscall.LOCK_EX|syscall.LOCK_NB); err != nil {
-		lock.Close()
-		return nil, Fail("WORKSPACE_LOCKED", "Workspace already has an active owner")
-	}
 	if _, e := os.Lstat(filepath.Join(path, "OWNER_TRANSFERRED")); e == nil || !os.IsNotExist(e) {
-		syscall.Flock(int(lock.Fd()), syscall.LOCK_UN)
-		lock.Close()
+		platformfs.ReleaseLock(lock)
 		return nil, Fail("WORKSPACE_LOCKED", "Workspace ownership was transferred; open the verified destination instead")
 	}
 	k = &Kernel{path: path, lock: lock, writer: make(chan struct{}, 1), pending: make(chan struct{}, 128), grants: map[string]contracts.ServiceExecutionContext{}, cancellations: map[string]*cancellation{}, listeners: map[uint64]chan json.RawMessage{}}
@@ -400,8 +398,7 @@ func (k *Kernel) Close() error {
 		err = k.db.Close()
 	}
 	if k.lock != nil {
-		syscall.Flock(int(k.lock.Fd()), syscall.LOCK_UN)
-		k.lock.Close()
+		platformfs.ReleaseLock(k.lock)
 	}
 	return err
 }

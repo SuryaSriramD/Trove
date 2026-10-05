@@ -1,0 +1,99 @@
+{
+  "schemaVersion": 1,
+  "scope": "Workspace ownership, selected regular files and external-index descriptor identities; development evidence only",
+  "baseCommit": "b953fc7ed76ac800b5dd8b08027dfde0b49f93c6",
+  "sourceFiles": {
+    "internal/platformfs/files.go": {
+      "sha256": "827a4b3c7fadc515bc29243a136ec60a2675f1239ddace20e5c9a4c169f06222",
+      "bytes": 1299
+    },
+    "internal/platformfs/files_other.go": {
+      "sha256": "48b1ea457c8291e60982e6d2ef3f64c11827632cfe6c9c2bda5380149305fb7d",
+      "bytes": 577
+    },
+    "internal/platformfs/files_test.go": {
+      "sha256": "dce8c9afc01c925c996b35583bbb1e8ed7875c81b6e3d712b91dd046c34208cf",
+      "bytes": 5542
+    },
+    "internal/platformfs/files_unix.go": {
+      "sha256": "1cf733860afd3231de3677bbcfa9eda536314f1ab204131b19c403b4b0254470",
+      "bytes": 1474
+    },
+    "internal/platformfs/files_unix_test.go": {
+      "sha256": "63f92b789a3060eb918f3452349d7ed3e91f178cc7ea8f9563d43c1a52e32601",
+      "bytes": 1206
+    },
+    "internal/platformfs/files_windows.go": {
+      "sha256": "9d3bc0078b6654ebf1de7d795810af2fe99ce19f842ecb190c63f90d8e9e3e66",
+      "bytes": 3231
+    },
+    "internal/platformfs/files_windows_test.go": {
+      "sha256": "89d499836c365bccaf64d139b76b157755484499ffb5c59df5d985884f2e950d",
+      "bytes": 766
+    },
+    "internal/workspace/kernel.go": {
+      "sha256": "bb22d8ba7f8278bdfe290e2394c7530994fbc2b4022a121c9b8ad08afbbf3f0c",
+      "bytes": 17801
+    },
+    "internal/workspace/files.go": {
+      "sha256": "a86cfb70fe5f1498eeca214e2d5385cee88bec6ca4164c7d52188c7a76a6054e",
+      "bytes": 20878
+    },
+    "internal/workspace/index_external.go": {
+      "sha256": "c0710d6c5ef1a4499df0904b5c96c4a497264c6d94ea364a20093e500ea3beb1",
+      "bytes": 20423
+    }
+  },
+  "host": {
+    "system": "Darwin",
+    "release": "27.0.0",
+    "machine": "arm64"
+  },
+  "goVersion": "go version go1.27.1 darwin/arm64",
+  "macOS": {
+    "macos-race.jsonl": {
+      "sha256": "8009a2d8094ccc0c85453031c54f0875d8192bc688e548bd17b7ca8d9e385567",
+      "bytes": 8546,
+      "passTestsAndSubtests": 8,
+      "skipTests": 0,
+      "failTests": 0,
+      "command": "go test -race -count=1 -json -mod=readonly -tags \"fts5 sqlite_omit_load_extension\" ./internal/platformfs and selected workspace indexing/ownership checks"
+    },
+    "workspace-race.jsonl": {
+      "sha256": "86a6d2cacfc5fef43d59c4790bb50edb272322a997c9130d0f2b1970783e0930",
+      "bytes": 66363,
+      "passTestsAndSubtests": 68,
+      "skipTests": 0,
+      "failTests": 0,
+      "command": "go test -race -count=1 -json -mod=readonly -tags \"fts5 sqlite_omit_load_extension\" -run \"^Test(ApprovedRepository|IndexRoot|WorkspaceRestart|FileSelections|OnlineBackup|Backup|Restore|Migration|P0SIGKILL|P2VerifiedOwner)\" ./internal/workspace"
+    }
+  },
+  "crossCompilation": [
+    {
+      "target": "windows-amd64",
+      "command": "GOOS=windows GOARCH=amd64 CGO_ENABLED=0 go test -mod=readonly -c ./internal/platformfs",
+      "exitCode": 0,
+      "executed": false,
+      "testBinary": {
+        "sha256": "6bdf4a3b899f213f03835c8dd4696f01e23759b01806d20d2dec96a8867c5f9b",
+        "bytes": 5359616
+      }
+    },
+    {
+      "target": "linux-amd64",
+      "command": "GOOS=linux GOARCH=amd64 CGO_ENABLED=0 go test -mod=readonly -c ./internal/platformfs",
+      "exitCode": 0,
+      "executed": false,
+      "testBinary": {
+        "sha256": "16b9f7c2112594131088c9c02cc31e72649b2de566ca65f8aa550462a40e292f",
+        "bytes": 4915904
+      }
+    }
+  ],
+  "limitations": [
+    "No Windows/Linux test executable was run",
+    "Full CGO/SQLite application build not demonstrated on either target",
+    "Windows directory publication/durability, workspace DACL and target filesystem/cross-platform restore remain open",
+    "Not release qualification"
+  ]
+}

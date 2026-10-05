@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"context"
 	"database/sql"
-	"fmt"
 	"io"
 	"io/fs"
 	"os"
@@ -12,11 +11,11 @@ import (
 	"path/filepath"
 	"regexp"
 	"strings"
-	"syscall"
 	"time"
 	"unicode/utf8"
 
 	"trove.local/phase0/contracts"
+	"trove.local/phase0/internal/platformfs"
 )
 
 const externalIndexSchema = `
@@ -62,12 +61,6 @@ func init() {
 	RegisterQuery("index.revoke", revokeExternalRoot)
 	RegisterQuery("index.reference", referenceExternalSource)
 }
-func externalIdentity(info os.FileInfo) string {
-	if st, ok := info.Sys().(*syscall.Stat_t); ok {
-		return fmt.Sprintf("%d:%d", st.Dev, st.Ino)
-	}
-	return ""
-}
 
 // This method is called only by a trusted native folder picker, never by a
 // renderer-supplied path. The persisted inode prevents retargeting after approval.
@@ -107,10 +100,11 @@ func (k *Kernel) ApproveIndexRoot(ctx context.Context, e contracts.ServiceExecut
 	if err != nil || !os.SameFile(st, actual) {
 		return out, Fail("CONFLICT", "Folder changed during approval")
 	}
-	out = ExternalRoot{ID: NewID(), Path: canonical, Identity: externalIdentity(st), Repository: repository, Approved: true}
-	if out.Identity == "" {
+	identity, identityErr := platformfs.RootIdentity(root)
+	if identityErr != nil || identity == "" {
 		return out, Fail("UNSUPPORTED_SCHEMA", "Stable filesystem identities are unavailable on this platform")
 	}
+	out = ExternalRoot{ID: NewID(), Path: canonical, Identity: identity, Repository: repository, Approved: true}
 	err = k.write(ctx, func(tx *sql.Tx) error {
 		if err := requireOwnerScope(k, e); err != nil {
 			return err
@@ -379,8 +373,8 @@ func scanExternalRoot(ctx context.Context, k *Kernel, e contracts.ServiceExecuti
 		return nil, err
 	}
 	defer root.Close()
-	st, err := root.Stat(".")
-	if err != nil || externalIdentity(st) != selected.Identity {
+	identity, identityErr := platformfs.RootIdentity(root)
+	if identityErr != nil || identity != selected.Identity {
 		_ = k.write(ctx, func(tx *sql.Tx) error {
 			if err := requireOwnerScope(k, e); err != nil {
 				return err
@@ -411,7 +405,11 @@ func scanExternalRoot(ctx context.Context, k *Kernel, e contracts.ServiceExecuti
 			return nil
 		}
 		lang, chunks := languageChunks(name, string(b))
-		sources = append(sources, source{ExternalSource{NewID(), selected.ID, name, externalIdentity(info), importDigest(b), "present", lang, stamp}, chunks})
+		identity, err := platformfs.FileIdentity(f)
+		if err != nil {
+			return err
+		}
+		sources = append(sources, source{ExternalSource{NewID(), selected.ID, name, identity, importDigest(b), "present", lang, stamp}, chunks})
 		return ctx.Err()
 	})
 	if err != nil {
