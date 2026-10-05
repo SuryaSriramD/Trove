@@ -1,0 +1,76 @@
+{
+  "recordedAt": "2026-10-05T12:02:49.852494+00:00",
+  "baseCommit": "30b6294",
+  "platform": "macOS-27.0.1-arm64-arm-64bit",
+  "architecture": "arm64",
+  "go": "go1.27.1",
+  "buildTags": [
+    "fts5",
+    "sqlite_omit_load_extension"
+  ],
+  "compatibility": {
+    "userVersion": 3,
+    "storageGeneration": 1
+  },
+  "sourceSHA256": {
+    "internal/workspace/kernel.go": "8fc2cf89bdf2ddb3d2d6f25e2f624d5534c554ac8e220bc63693411cdc682293",
+    "internal/workspace/compatibility.go": "7493ebd7bc3a12e15f552b537babbc22e9b9c6e5b49ea66e181b56248dcb812d",
+    "internal/workspace/migration_snapshot.go": "9fb34784cbda203d8d29f8a69bbff8be2b589b15630d4a9cb7f608a5b93dddb8",
+    "internal/workspace/migration_snapshot_test.go": "04d6e9dd54eaec979e7762275fb5594b0c70c7c683652070cad0d8c9b272c62c",
+    "internal/workspace/restore_compatible.go": "eda71daee0af63a153a6b6a69717826ed0372f03e235709a1d4d5b40ed171766",
+    "internal/workspace/restore_compatible_test.go": "45a26288c57aad01ed165ab0118646453ad9d7a583d9ae222382cbe904543a95",
+    "cmd/trove-format/main.go": "b707ad1ecdf99ebe976f3b0581601778d37a503fafff39bea71b97bafdbe880e"
+  },
+  "workspaceRace": {
+    "topLevelPassed": 277,
+    "subtestsPassed": 153,
+    "skipped": [
+      "TestRealLocalMemoryPreferenceAndCurrentAuthority",
+      "TestRealLocalNamedWorkspacePlan",
+      "TestBookmarkLiveMetadataSmoke",
+      "TestClipperBrowserQualification",
+      "TestRichPDFExportBundledRenderer",
+      "TestRealLocalPersonalReviewCitedProposal"
+    ],
+    "failed": [],
+    "packageResult": [
+      {
+        "Time": "2026-10-05T17:30:27.885115+05:30",
+        "Action": "pass",
+        "Package": "trove.local/phase0/internal/workspace",
+        "Elapsed": 70.386
+      }
+    ]
+  },
+  "affectedRace": {
+    "topLevelPassed": 19,
+    "subtestsPassed": 24,
+    "skipped": [],
+    "failed": [],
+    "packageResult": [
+      {
+        "Time": "2026-10-05T17:31:45.010939+05:30",
+        "Action": "pass",
+        "Package": "trove.local/phase0/internal/workspace",
+        "Elapsed": 8.081
+      }
+    ]
+  },
+  "nativeRouteTestsPassed": 12,
+  "scopeNotes": [
+    "All fixtures are synthetic disposable workspaces on the development Mac.",
+    "Full workspace race run includes automatic snapshots and compatible rollback; final reviewed-restore and journal-binding changes are covered by the subsequent complete affected race set.",
+    "No physical power-loss, independent-device, signed updater, or Windows/Linux runtime qualification is claimed.",
+    "Skipped live account/model/source checks in the full suite remain unqualified.",
+    "SQLite synchronous=FULL changes durability/performance behavior; packaged candidate performance must be measured again."
+  ],
+  "evidenceSHA256": {
+    "workspace-race.jsonl": "aad903b253d27d1128cd79af47459a4509aa7ee6a619d49532dc3c3007a85371",
+    "workspace-race.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "affected-race.jsonl": "ae9aa02ffadf1f87938008ccad1ee0235cc6e7fe15eb95e0588af3a7123c71dd",
+    "affected-race.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "native-routes.log": "069d3930425a3d77de7a8fece6ec11c09e8d3d2fe50607b0712805508ea56261",
+    "format.json": "86c85bfdbb2c2a744c578164618b9108e8248559434162c146fc88caa2bebbac",
+    "format.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  }
+}

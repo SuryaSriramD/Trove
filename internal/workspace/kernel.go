@@ -116,18 +116,33 @@ func NewID() string {
 	b[8] = (b[8] & 63) | 0x80
 	return fmt.Sprintf("%x-%x-%x-%x-%x", b[0:4], b[4:6], b[6:8], b[8:10], b[10:])
 }
-func now() string                         { return time.Now().UTC().Format(time.RFC3339Nano) }
-func Create(path string) (*Kernel, error) { return open(path, true) }
-func Open(path string) (*Kernel, error)   { return open(path, false) }
-func open(path string, create bool) (k *Kernel, err error) {
+func now() string                                    { return time.Now().UTC().Format(time.RFC3339Nano) }
+func Create(path string) (*Kernel, error)            { return open(path, true) }
+func Open(path string) (*Kernel, error)              { return open(path, false) }
+func open(path string, create bool) (*Kernel, error) { return openMigrationObserved(path, create, nil) }
+
+// observe is used by fault-injection tests at durable migration boundaries.
+func openMigrationObserved(path string, create bool, observe func(string) error) (k *Kernel, err error) {
+	checkpoint := func(stage string) error {
+		if observe != nil {
+			return observe(stage)
+		}
+		return nil
+	}
 	path, err = filepath.Abs(path)
 	if err != nil {
 		return nil, err
 	}
-	if _, statErr := os.Lstat(filepath.Join(path, "INCOMPLETE")); statErr == nil {
-		return nil, Fail("INTEGRITY_ERROR", "Workspace restore or backup is incomplete")
-	} else if !os.IsNotExist(statErr) {
-		return nil, statErr
+	incomplete, err := markerExists(path)
+	if err != nil {
+		return nil, err
+	}
+	journal, err := readMigrationJournal(path)
+	if err != nil {
+		return nil, err
+	}
+	if incomplete && journal == nil {
+		return nil, Fail("INTEGRITY_ERROR", "Workspace restore, creation, or backup is incomplete")
 	}
 	if create {
 		if err = os.MkdirAll(path, 0700); err != nil {
@@ -139,7 +154,9 @@ func open(path string, create bool) (k *Kernel, err error) {
 			return nil, err
 		}
 	}
+	existingDatabase := false
 	if info, statErr := os.Lstat(filepath.Join(path, "workspace.db")); statErr == nil {
+		existingDatabase = true
 		if !info.Mode().IsRegular() {
 			return nil, Fail("INTEGRITY_ERROR", "Workspace database must be a regular file")
 		}
@@ -166,8 +183,43 @@ func open(path string, create bool) (k *Kernel, err error) {
 			allocated.Close()
 		}
 	}()
+	// Re-read recovery state under the ownership lock. Another process may have
+	// completed or failed a migration between the initial check and lock acquisition.
+	incomplete, err = markerExists(path)
+	if err != nil {
+		return nil, err
+	}
+	journal, err = readMigrationJournal(path)
+	if err != nil {
+		return nil, err
+	}
+	if incomplete && journal == nil {
+		return nil, Fail("INTEGRITY_ERROR", "Workspace restore, creation, or backup is incomplete")
+	}
+	// The database may also have been created while we waited for ownership.
+	if info, e := os.Lstat(filepath.Join(path, "workspace.db")); e == nil {
+		if !info.Mode().IsRegular() {
+			return nil, Fail("INTEGRITY_ERROR", "Workspace database must be a regular file")
+		}
+		existingDatabase = true
+	} else if !os.IsNotExist(e) {
+		return nil, e
+	} else {
+		existingDatabase = false
+	}
+	// Inspect existing storage read-only before configuring WAL or executing DDL.
+	var before CompatibilityDescriptor
+	if existingDatabase {
+		before, err = ReadWorkspaceCompatibility(context.Background(), path)
+		if err != nil {
+			return nil, err
+		}
+	}
+	if journal != nil && (journal.Target.UserVersion > CurrentUserVersion || journal.Target.StorageGeneration > CurrentStorageGeneration) {
+		return nil, Fail("UNSUPPORTED_SCHEMA", "Workspace upgrade requires a newer application")
+	}
 	vecOnce.Do(sqlitevec.Auto)
-	dsn := (&url.URL{Scheme: "file", Path: filepath.Join(path, "workspace.db")}).String() + "?_foreign_keys=on&_journal_mode=WAL&_busy_timeout=5000"
+	dsn := (&url.URL{Scheme: "file", Path: filepath.Join(path, "workspace.db")}).String() + "?_foreign_keys=on&_journal_mode=WAL&_synchronous=FULL&_busy_timeout=5000"
 	k.db, err = sql.Open("sqlite3", dsn)
 	if err != nil {
 		return nil, err
@@ -177,21 +229,46 @@ func open(path string, create bool) (k *Kernel, err error) {
 	if err = k.db.Ping(); err != nil {
 		return nil, err
 	}
-	var version int
-	if err = k.db.QueryRow("PRAGMA user_version").Scan(&version); err != nil {
-		return nil, err
+	if journal != nil {
+		if err = k.resumeMigrationCompletion(context.Background(), journal, incomplete); err != nil {
+			return nil, err
+		}
+		incomplete = false
 	}
-	if version > 2 {
-		return nil, Fail("UNSUPPORTED_SCHEMA", "Workspace requires a newer application")
+	version := before.UserVersion
+	var migration *migrationJournal
+	creatingMarker := []byte("Workspace creation is incomplete.\n")
+	if existingDatabase && before != CurrentCompatibility() {
+		if err = checkpoint("before_snapshot"); err != nil {
+			return nil, err
+		}
+		migration, err = k.createMigrationSnapshot(context.Background(), before)
+		if err != nil {
+			return nil, err
+		}
+		if err = checkpoint("after_snapshot"); err != nil {
+			return nil, err
+		}
+		if err = writeMigrationJSON(path, migrationJournalName, migration); err != nil {
+			return nil, err
+		}
+		if err = checkpoint("after_journal"); err != nil {
+			return nil, err
+		}
+		if err = createMigrationMarker(path, migrationMarker(migration.SnapshotID)); err != nil {
+			return nil, err
+		}
+		if err = checkpoint("before_initializers"); err != nil {
+			return nil, err
+		}
+	} else if !existingDatabase {
+		if err = createMigrationMarker(path, creatingMarker); err != nil {
+			return nil, err
+		}
 	}
 	if version < 2 {
 		if version == 0 && !create {
 			return nil, Fail("INVALID_REQUEST", "Not a Trove workspace")
-		}
-		if version == 1 {
-			if _, err = k.db.Exec("VACUUM INTO ?", filepath.Join(path, "pre-migration-2-"+NewID()+".db")); err != nil {
-				return nil, err
-			}
 		}
 		names := []string{"services.sql"}
 		if version == 0 {
@@ -249,6 +326,39 @@ func open(path string, create bool) (k *Kernel, err error) {
 	for _, initialize := range kernelInitializers {
 		if err = initialize(context.Background(), k); err != nil {
 			return nil, err
+		}
+	}
+	if err = checkpoint("after_initializers"); err != nil {
+		return nil, err
+	}
+	if migration != nil || !existingDatabase {
+		id, digest := "", ""
+		if migration != nil {
+			id, digest = migration.SnapshotID, migration.ManifestSHA256
+		}
+		if err = k.stampCompatibility(context.Background(), id, digest); err != nil {
+			return nil, err
+		}
+		if err = checkpoint("after_stamp"); err != nil {
+			return nil, err
+		}
+		if migration != nil {
+			if err = k.finishMigration(context.Background(), migration); err != nil {
+				return nil, err
+			}
+			if err = checkpoint("after_completion"); err != nil {
+				return nil, err
+			}
+			if err = removeMigrationMarker(path, migrationMarker(migration.SnapshotID)); err != nil {
+				return nil, err
+			}
+		} else {
+			if err = checkMigrationDatabase(context.Background(), path, CurrentCompatibility(), k.id); err != nil {
+				return nil, err
+			}
+			if err = removeMigrationMarker(path, creatingMarker); err != nil {
+				return nil, err
+			}
 		}
 	}
 	if err = k.recoverJobs(context.Background()); err != nil {
