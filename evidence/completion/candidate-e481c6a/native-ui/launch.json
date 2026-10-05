@@ -1,0 +1,12 @@
+{
+  "pid": 56776,
+  "command": [
+    "/usr/bin/sandbox-exec",
+    "-p",
+    "(version 1)(allow default)(deny network*)",
+    "/private/tmp/Trove-integration-e481c6a.app/Contents/MacOS/Trove"
+  ],
+  "workspace": "/private/tmp/trove-integration-e481c6a/native-ui/workspace",
+  "networkDeniedByOS": true,
+  "installedModels": []
+}

@@ -1,0 +1,116 @@
+[
+  {
+    "name": "go-race-bundled",
+    "command": [
+      "/Users/suryasriramduvvuri/Library/Caches/Trove/completion/go/bin/go",
+      "test",
+      "-mod=readonly",
+      "-race",
+      "-tags",
+      "fts5 sqlite_omit_load_extension",
+      "./...",
+      "-count=1",
+      "-timeout=20m",
+      "-json"
+    ],
+    "exitCode": 0,
+    "elapsedSeconds": 232.682293333,
+    "nativeBundle": "/private/tmp/trove-native-integrated-e481c6a",
+    "realDeviceOptIns": false,
+    "testAndSubtestCounts": {
+      "pass": 1002,
+      "skip": 45
+    },
+    "skippedTests": [
+      "TestClaudeLoginRetainsInboundAndShellDenial",
+      "TestInstalledClaudeReadinessGatesLoginAndExecution",
+      "TestRealLocalAIWorkflow",
+      "TestMacOSContainmentDeniesWorkspaceShellAndUnapprovedNetwork",
+      "TestInstalledRuntimeDiscovery",
+      "TestInstalledCodexSchema",
+      "TestInstalledCodexContainedInitializationAndEmptyResumeRefusal",
+      "TestMacOSICUCollatorRequiresOnlyLiteralSystemData",
+      "TestInstalledClaudeLocaleStartupPassesWithContainedSystemData",
+      "TestRealAudioDecoderCommonFormats",
+      "TestRollbackNativeDevelopmentChild",
+      "TestRealAudioDecoderCancellationDuringOutput",
+      "TestRealAudioDecoderProtocolRejectsPathsAndOversizedRequests",
+      "TestRealAudioDecoderRejectsNonfiniteSource",
+      "TestRealInstructionAnswer",
+      "TestRealDurableTranscriptionJob",
+      "TestPortableMicrophoneSyntheticBoundsAndRetainedCancellation",
+      "TestPortableMicrophoneRejectsUnsafeRequestsBeforeCapture",
+      "TestPortableMicrophoneBufferSelfTest",
+      "TestPortableMicrophoneRejectsUnknownWireOptions",
+      "TestLegacyMacMicrophoneSupervisor",
+      "TestPortableMicrophoneStartupDeadlineAndCancellation",
+      "TestProductionMicrophoneRejectsBeforePermissionOrDevice",
+      "TestRealMicrophoneControlCancellationAndParentExit",
+      "TestRealQualification",
+      "TestRealWorkerCancellationCrashAndMetal",
+      "TestPortableOCRNativeEnglishProvenanceCancellation",
+      "TestP2OCRNativeFixture",
+      "TestMacVerifierRejectsAdhocCandidate",
+      "TestRealTokenizerLongInputAndIncompleteOutput",
+      "TestVisionProductionRubric",
+      "TestVisionApprovedAcquisition",
+      "TestVisionRealRubric",
+      "TestVisionRealCancellationAndExactBudget",
+      "TestRealLocalMemoryPreferenceAndCurrentAuthority",
+      "TestRealLocalNamedWorkspacePlan",
+      "TestRealLocalCitedHeldOutFactsAndAbstention",
+      "TestRealLocalExposedModes",
+      "TestRealLocalMeetingSummaryRequiresReview",
+      "TestRealOneHourTranscriptionKeepsEditorResponsive",
+      "TestBookmarkLiveMetadataSmoke",
+      "TestClipperBrowserQualification",
+      "TestDatabasePerformance10K",
+      "TestRichPDFExportBundledRenderer",
+      "TestRealLocalPersonalReviewCitedProposal"
+    ],
+    "failedTests": []
+  },
+  {
+    "name": "desktop-race",
+    "command": [
+      "/Users/suryasriramduvvuri/Library/Caches/Trove/completion/go/bin/go",
+      "test",
+      "-mod=readonly",
+      "-race",
+      "-tags",
+      "desktop production fts5 sqlite_omit_load_extension",
+      ".",
+      "-count=1",
+      "-timeout=10m",
+      "-json"
+    ],
+    "exitCode": 0,
+    "elapsedSeconds": 10.54347125000001,
+    "nativeBundle": "/private/tmp/trove-native-integrated-e481c6a",
+    "realDeviceOptIns": false,
+    "testAndSubtestCounts": {
+      "skip": 1,
+      "pass": 113
+    },
+    "skippedTests": [
+      "TestRealLocalAIWorkflow"
+    ],
+    "failedTests": []
+  },
+  {
+    "name": "tooling",
+    "command": [
+      "/Users/suryasriramduvvuri/Library/Caches/Trove/completion/python/requirements-e99394c278ee/bin/python",
+      "-m",
+      "unittest",
+      "discover",
+      "-s",
+      "tests",
+      "-v"
+    ],
+    "exitCode": 0,
+    "elapsedSeconds": 7.7613995830000135,
+    "nativeBundle": "/private/tmp/trove-native-integrated-e481c6a",
+    "realDeviceOptIns": false
+  }
+]
