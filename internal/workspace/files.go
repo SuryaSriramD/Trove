@@ -15,10 +15,10 @@ import (
 	"strconv"
 	"strings"
 	"sync"
-	"syscall"
 	"time"
 
 	"trove.local/phase0/contracts"
+	"trove.local/phase0/internal/platformfs"
 )
 
 const maxAssetBytes int64 = 1 << 30
@@ -114,11 +114,10 @@ func (k *Kernel) RegisterSelection(path string) (string, error) {
 	if !st.Mode().IsRegular() {
 		return "", Fail("INVALID_REQUEST", "Select a regular file, not a symlink or device")
 	}
-	fd, err := syscall.Open(path, syscall.O_RDONLY|syscall.O_NOFOLLOW|syscall.O_CLOEXEC, 0)
+	f, err := platformfs.OpenRegular(path)
 	if err != nil {
 		return "", err
 	}
-	f := os.NewFile(uintptr(fd), filepath.Base(path))
 	actual, err := f.Stat()
 	if err != nil || !actual.Mode().IsRegular() || !os.SameFile(st, actual) {
 		f.Close()
@@ -296,17 +295,7 @@ func safeDirectory(path string) error {
 	return nil
 }
 func openAsset(path string) (*os.File, error) {
-	fd, err := syscall.Open(path, syscall.O_RDONLY|syscall.O_NOFOLLOW|syscall.O_CLOEXEC, 0)
-	if err != nil {
-		return nil, err
-	}
-	f := os.NewFile(uintptr(fd), path)
-	st, err := f.Stat()
-	if err != nil || !st.Mode().IsRegular() {
-		f.Close()
-		return nil, Fail("INVALID_REQUEST", "Managed asset is not a regular file")
-	}
-	return f, nil
+	return platformfs.OpenRegular(path)
 }
 func verifyAsset(path, digest string, size int64) error {
 	f, err := openAsset(path)
