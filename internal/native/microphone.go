@@ -19,7 +19,7 @@ import (
 const MicrophoneCommit = "miniaudio-0.11.25-trove-microphone-v1"
 
 func validMicrophoneIdentity(h Helper, platform string) bool {
-	return h.Name == "microphone-worker" && h.Runtime == "microphone" && ((platform == "darwin" && h.RuntimeCommit == "trove-microphone-v1") || ((platform == "windows" || platform == "linux") && h.RuntimeCommit == MicrophoneCommit))
+	return h.Name == "microphone-worker" && h.Runtime == "microphone" && ((platform == "darwin" && (h.RuntimeCommit == "trove-microphone-v1" || h.RuntimeCommit == MicrophoneCommit)) || ((platform == "windows" || platform == "linux") && h.RuntimeCommit == MicrophoneCommit))
 }
 
 type CaptureRequest struct {
@@ -45,7 +45,14 @@ type CaptureResult struct {
 // Capture must only be invoked for an explicit recording gesture. Synthetic
 // qualification uses a separate device-free portable fixture or the legacy Mac fixture.
 // The caller owns the staging file and retains flushed audio after cancellation.
+var errCaptureStartup = errors.New("AUDIO_STARTUP_TIMEOUT: microphone did not provide PCM within 30 seconds")
+
 func (s *Supervisor) Capture(ctx context.Context, r CaptureRequest, destination *os.File, onEvent func(json.RawMessage)) (CaptureResult, error) {
+	return s.captureWithStartupLimit(ctx, r, destination, onEvent, 30*time.Second)
+}
+
+// The injectable duration is internal test plumbing, never a user/provider input.
+func (s *Supervisor) captureWithStartupLimit(ctx context.Context, r CaptureRequest, destination *os.File, onEvent func(json.RawMessage), startupLimit time.Duration) (CaptureResult, error) {
 	var result CaptureResult
 	if err := ctx.Err(); err != nil {
 		return result, err
@@ -121,6 +128,8 @@ func (s *Supervisor) Capture(ctx context.Context, r CaptureRequest, destination 
 	}
 	controlR.Close()
 	stopped := make(chan struct{})
+	firstPCM := make(chan struct{})
+	var firstPCMOnce sync.Once
 	var watchers sync.WaitGroup
 	watchers.Add(1)
 	defer func() { close(stopped); watchers.Wait() }()
@@ -128,10 +137,21 @@ func (s *Supervisor) Capture(ctx context.Context, r CaptureRequest, destination 
 		defer watchers.Done()
 		ticker := time.NewTicker(250 * time.Millisecond)
 		defer ticker.Stop()
+		startup := time.NewTimer(startupLimit)
+		defer startup.Stop()
+		deadline := startup.C
+		var ready <-chan struct{} = firstPCM
 		for {
 			select {
 			case <-stopped:
 				return
+			case <-ready:
+				ready = nil
+				deadline = nil
+				startup.Stop()
+			case <-deadline:
+				deadline = nil
+				cancel(errCaptureStartup)
 			case <-ticker.C:
 				if stat, err := destination.Stat(); err == nil && stat.Size() > r.MaxBytes {
 					cancel(errors.New("AUDIO_LIMIT: capture output exceeds request"))
@@ -222,6 +242,9 @@ func (s *Supervisor) Capture(ctx context.Context, r CaptureRequest, destination 
 		previousBytes = ev.Bytes
 		switch ev.Kind {
 		case "progress":
+			if ev.Bytes > 0 {
+				firstPCMOnce.Do(func() { close(firstPCM) })
+			}
 		case "result":
 			terminal = true
 			_ = json.Unmarshal(raw, &result)
@@ -263,6 +286,9 @@ func (s *Supervisor) Capture(ctx context.Context, r CaptureRequest, destination 
 			}
 		}
 		offset += count
+	}
+	if errors.Is(context.Cause(run), errCaptureStartup) {
+		return result, errCaptureStartup
 	}
 	return result, nil
 }

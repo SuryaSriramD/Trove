@@ -1,0 +1,8 @@
+test_rebinds_legacy_manifest_without_changing_other_helpers (test_microphone_bundle.MicrophoneBundleTests) ... ok
+test_refuses_fixture_foreign_identity_and_tampered_helper (test_microphone_bundle.MicrophoneBundleTests) ... ok
+test_startup_stall_cannot_build_production (test_microphone_bundle.MicrophoneBundleTests) ... ok
+
+----------------------------------------------------------------------
+Ran 3 tests in 0.069s
+
+OK

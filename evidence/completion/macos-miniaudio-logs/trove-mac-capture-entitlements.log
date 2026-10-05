@@ -1,0 +1,5 @@
+Executable=/private/tmp/trove-mac-miniaudio-production/microphone-worker
+[Dict]
+	[Key] com.apple.security.device.audio-input
+	[Value]
+		[Bool] true
