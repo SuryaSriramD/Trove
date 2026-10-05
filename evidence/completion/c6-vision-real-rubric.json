@@ -1,0 +1,74 @@
+[
+  {
+    "case": "red_square",
+    "passed": true,
+    "question": "What color is the square? Answer briefly.",
+    "result": {
+      "sampledPeakRSSBytes": 1096695808,
+      "analysisMethod": "local_vision_model",
+      "modelHash": "9d4612de6a42214499e301494a3ecc2be0abdd9de44e663bda63f1152fad1bf4",
+      "projectorHash": "4b2fca922e549e9b9608f4ba56f93565dd5220e935ba5570a2a864a0fcc988a6",
+      "helperHash": "0505373b42c83329d066366d1a04f32d16690e70c538a558f032d06b64fcd6fd",
+      "kind": "image_generation",
+      "text": " Red.",
+      "finishReason": "eos",
+      "inputTokens": 176,
+      "outputTokens": 2
+    },
+    "seconds": 3.409792916
+  },
+  {
+    "case": "spatial",
+    "passed": true,
+    "question": "Which side is the blue circle on relative to the red square?",
+    "result": {
+      "sampledPeakRSSBytes": 1098743808,
+      "analysisMethod": "local_vision_model",
+      "modelHash": "9d4612de6a42214499e301494a3ecc2be0abdd9de44e663bda63f1152fad1bf4",
+      "projectorHash": "4b2fca922e549e9b9608f4ba56f93565dd5220e935ba5570a2a864a0fcc988a6",
+      "helperHash": "0505373b42c83329d066366d1a04f32d16690e70c538a558f032d06b64fcd6fd",
+      "kind": "image_generation",
+      "text": " Right.",
+      "finishReason": "eos",
+      "inputTokens": 180,
+      "outputTokens": 2
+    },
+    "seconds": 2.850153875
+  },
+  {
+    "case": "labeled_chart",
+    "passed": true,
+    "question": "In the chart, what are the values for A and B?",
+    "result": {
+      "sampledPeakRSSBytes": 1096810496,
+      "analysisMethod": "local_vision_model",
+      "modelHash": "9d4612de6a42214499e301494a3ecc2be0abdd9de44e663bda63f1152fad1bf4",
+      "projectorHash": "4b2fca922e549e9b9608f4ba56f93565dd5220e935ba5570a2a864a0fcc988a6",
+      "helperHash": "0505373b42c83329d066366d1a04f32d16690e70c538a558f032d06b64fcd6fd",
+      "kind": "image_generation",
+      "text": " 2, 4.",
+      "finishReason": "eos",
+      "inputTokens": 180,
+      "outputTokens": 6
+    },
+    "seconds": 2.980741958
+  },
+  {
+    "case": "blank_uncertainty",
+    "passed": false,
+    "question": "What objects and text can you identify?",
+    "result": {
+      "sampledPeakRSSBytes": 1099464704,
+      "analysisMethod": "local_vision_model",
+      "modelHash": "9d4612de6a42214499e301494a3ecc2be0abdd9de44e663bda63f1152fad1bf4",
+      "projectorHash": "4b2fca922e549e9b9608f4ba56f93565dd5220e935ba5570a2a864a0fcc988a6",
+      "helperHash": "0505373b42c83329d066366d1a04f32d16690e70c538a558f032d06b64fcd6fd",
+      "kind": "image_generation",
+      "text": " The image contains a white background with black text. The text is written in a clear, sans-serif font. The text reads:\n\n\"The text is written in a clear, sans-serif font. The text reads:\n\n\"The text is written in a clear, sans-serif font. The text reads:\n\n\"The text is written in a clear, sans-serif font. The text reads:\n\n\"The text is written in a clear, sans-serif font. The text reads:\n\n\"The text is written in a clear, sans-serif font. The text reads:\n\n\"The text is written in a clear, sans-serif font. The text reads:\n\n\"The text is written in a clear, sans-serif font. The text reads:\n\n\"The text is written in a clear, sans-serif font. The text reads:\n\n\"The text is written in a clear, sans-serif font. The text reads:\n\n\"The text is written in a clear, sans-serif font. The text reads:\n\n\"The text is written in a clear, sans-serif font. The text reads:\n\n\"The text is written in a clear, sans-serif font. The text reads:\n\n\"The text is written in a clear, sans-serif font. The text reads:\n\n\"The text is written in a clear, sans-serif font. The text reads:\n\n\"The text is written in a clear, sans-serif font. The text reads:\n\n\"The text is written in a clear, sans-serif font. The text reads:\n\n\"The text is written in a clear, sans-serif font. The text reads:\n\n\"The text is written in a clear, sans-serif font. The text reads:\n\n\"The text is written in a clear, sans-serif font. The text reads:\n\n\"The text is written in a clear, sans-serif font. The text reads:\n\n\"The text is written in a clear, sans-serif font. The text reads:\n\n\"The text is written in a clear, sans-serif font. The text reads",
+      "finishReason": "length",
+      "inputTokens": 175,
+      "outputTokens": 512
+    },
+    "seconds": 6.537106041
+  }
+]

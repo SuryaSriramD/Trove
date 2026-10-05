@@ -2047,6 +2047,27 @@ Quote string `json:"quote"`
 } `json:"claims"`
 Actions []ServicePersonalReviewGeneratedDraftActionsItem `json:"actions"`
 }
+type ServiceImageDescriptionStartRequest struct {
+ContractVersion int64 `json:"contractVersion"`
+RequestId DomainId `json:"requestId"`
+WorkspaceId DomainId `json:"workspaceId"`
+PageId DomainId `json:"pageId"`
+FileId DomainId `json:"fileId"`
+ModelPackId DomainId `json:"modelPackId"`
+Question string `json:"question"`
+}
+type ServiceImageDescriptionListRequest struct {
+ContractVersion int64 `json:"contractVersion"`
+RequestId DomainId `json:"requestId"`
+WorkspaceId DomainId `json:"workspaceId"`
+PageId DomainId `json:"pageId"`
+}
+type ServiceImageDescriptionControlRequest struct {
+ContractVersion int64 `json:"contractVersion"`
+RequestId DomainId `json:"requestId"`
+WorkspaceId DomainId `json:"workspaceId"`
+RunId DomainId `json:"runId"`
+}
 type ServicePersonalReviewControlRequest struct {
 ContractVersion int64 `json:"contractVersion"`
 RequestId DomainId `json:"requestId"`
@@ -2174,6 +2195,7 @@ func (JobsWorkerResultVariant1) isJobsWorkerResult() {}
 func (JobsWorkerResultVariant2) isJobsWorkerResult() {}
 func (JobsWorkerResultVariant3) isJobsWorkerResult() {}
 func (JobsWorkerResultVariant4) isJobsWorkerResult() {}
+func (JobsWorkerResultVariant5) isJobsWorkerResult() {}
 func (v JobsWorkerResult) MarshalJSON() ([]byte,error) { return json.Marshal(v.Value) }
 func (v *JobsWorkerResult) UnmarshalJSON(data []byte) error {
 var fields map[string]json.RawMessage
@@ -2182,6 +2204,7 @@ if matchesVariant(fields,[]string{"kind","text","citations"},map[string]string{"
 if matchesVariant(fields,[]string{"kind","modelPackId","dimension","vectors","locations"},map[string]string{"kind":"\"embedding\""},map[string][]string{},[]string{"kind","modelPackId","dimension","vectors","locations"}) { var result JobsWorkerResultVariant2; if err := json.Unmarshal(data,&result); err != nil {return err}; v.Value=result; return nil }
 if matchesVariant(fields,[]string{"kind","meetingId","segments"},map[string]string{"kind":"\"transcript\""},map[string][]string{},[]string{"kind","meetingId","segments"}) { var result JobsWorkerResultVariant3; if err := json.Unmarshal(data,&result); err != nil {return err}; v.Value=result; return nil }
 if matchesVariant(fields,[]string{"kind","counts"},map[string]string{"kind":"\"token_counts\""},map[string][]string{},[]string{"kind","counts"}) { var result JobsWorkerResultVariant4; if err := json.Unmarshal(data,&result); err != nil {return err}; v.Value=result; return nil }
+if matchesVariant(fields,[]string{"kind","text","finishReason","inputTokens","outputTokens"},map[string]string{"kind":"\"image_generation\""},map[string][]string{"finishReason":{"\"eos\"","\"length\""}},[]string{"kind","text","finishReason","inputTokens","outputTokens"}) { var result JobsWorkerResultVariant5; if err := json.Unmarshal(data,&result); err != nil {return err}; v.Value=result; return nil }
 return fmt.Errorf("unknown or incomplete JobsWorkerResult variant")
 }
 type JobsEnqueueJobRequest struct {
@@ -2583,6 +2606,13 @@ Text string `json:"text"`
 type JobsWorkerResultVariant4 struct {
 Kind string `json:"kind"`
 Counts []int64 `json:"counts"`
+}
+type JobsWorkerResultVariant5 struct {
+Kind string `json:"kind"`
+Text string `json:"text"`
+FinishReason string `json:"finishReason"`
+InputTokens int64 `json:"inputTokens"`
+OutputTokens int64 `json:"outputTokens"`
 }
 type JobsJobResponseVariant1 struct {
 Ok bool `json:"ok"`

@@ -1,0 +1,58 @@
+=== RUN   TestVisionRealRubric
+    vision_test.go:219: red_square passed=true:  Red. error=<nil>
+    vision_test.go:219: spatial passed=true:  Right. error=<nil>
+    vision_test.go:219: labeled_chart passed=true:  2, 4. error=<nil>
+    vision_test.go:219: blank_uncertainty passed=false:  The image contains a white background with black text. The text is written in a clear, sans-serif font. The text reads:
+        
+        "The text is written in a clear, sans-serif font. The text reads:
+        
+        "The text is written in a clear, sans-serif font. The text reads:
+        
+        "The text is written in a clear, sans-serif font. The text reads:
+        
+        "The text is written in a clear, sans-serif font. The text reads:
+        
+        "The text is written in a clear, sans-serif font. The text reads:
+        
+        "The text is written in a clear, sans-serif font. The text reads:
+        
+        "The text is written in a clear, sans-serif font. The text reads:
+        
+        "The text is written in a clear, sans-serif font. The text reads:
+        
+        "The text is written in a clear, sans-serif font. The text reads:
+        
+        "The text is written in a clear, sans-serif font. The text reads:
+        
+        "The text is written in a clear, sans-serif font. The text reads:
+        
+        "The text is written in a clear, sans-serif font. The text reads:
+        
+        "The text is written in a clear, sans-serif font. The text reads:
+        
+        "The text is written in a clear, sans-serif font. The text reads:
+        
+        "The text is written in a clear, sans-serif font. The text reads:
+        
+        "The text is written in a clear, sans-serif font. The text reads:
+        
+        "The text is written in a clear, sans-serif font. The text reads:
+        
+        "The text is written in a clear, sans-serif font. The text reads:
+        
+        "The text is written in a clear, sans-serif font. The text reads:
+        
+        "The text is written in a clear, sans-serif font. The text reads:
+        
+        "The text is written in a clear, sans-serif font. The text reads:
+        
+        "The text is written in a clear, sans-serif font. The text reads error=<nil>
+    vision_test.go:229: rubric failed: blank_uncertainty
+--- FAIL: TestVisionRealRubric (15.79s)
+=== RUN   TestVisionRealCancellationAndExactBudget
+    vision_test.go:311: active generation cancelled and both leases released after 2.985s total
+    vision_test.go:322: exact multimodal token budget rejects input plus output overflow
+--- PASS: TestVisionRealCancellationAndExactBudget (3.73s)
+FAIL
+FAIL	trove.local/phase0/internal/native	19.943s
+FAIL

@@ -1,0 +1,182 @@
+{
+  "schemaVersion": 1,
+  "recordedAt": "2026-10-05T10:56:48.749084+00:00",
+  "scope": "OPT-001 development implementation and targeted verification; not a packaged release candidate",
+  "releaseApproved": false,
+  "sourceBaseCommit": "2a64bfeb3607c2e5fd1401088041c18f0423532d",
+  "sourceSha256": {
+    "app.go": "9993f369c560d2c3d0472e070df32d6b4c5f040d5450ebbcf07b3a0b8df3d4d9",
+    "app_image.go": "bdb870c036c790b5c358c837b9ae665d4ba9fd6d298e746c088bd9e99f0147c1",
+    "app_models.go": "36b22e3c107c05a6e9b76ae7dc4ccc232b3d508aebc63f951dd382d00a0fd963",
+    "contracts/generated/jobs.ts": "23af1d58b377f20f73d0ad5d0191788e5b947bee975423c5a2e172125d99095e",
+    "contracts/generated/service.ts": "6b8e6455b65980c0521a9b9349d9db7be0f4df5b95df4472b699c2f44ba1e11d",
+    "contracts/jobs.schema.json": "ae86620e27567e7cc47b1570a465f13432259d45e9d89d19294be2ead329c5ee",
+    "contracts/service.schema.json": "93e38c943a1fb95e440e879d402067268b18069068364212438d8bf2308cce4a",
+    "contracts/types_generated.go": "837af6a5dc8f5cf1afaef947f9e9bcc50fc8a44e1d8eee28d530e2ab289d57ea",
+    "frontend/src/ModelSettings.tsx": "84dd2fa0b12cbf16bc7c6072c884c41a5f5dda2034494687fb7fe765b4eaa90d",
+    "frontend/src/ai/ImageUnderstanding.tsx": "82d94606cc6daac88f0e6cda4d96e5ca770faf05de7c1b1f499a9939b94717a3",
+    "frontend/src/ai/P2IntelligencePanel.tsx": "6837bd0fcf6b5ccf2157473646c5ba0f21b54de444543b7c665b282d902ab772",
+    "frontend/tests/image-understanding.browser.spec.ts": "3fdf9a5ee9e4ffa87d9600484b6af886251c6a576e4c025332368a4320726246",
+    "internal/native/native_test.go": "3379a9e05249e5c5590e7e98245a2ff9dc6b3c45a7d3dc58ecb11ba0b87916b4",
+    "internal/native/packs.go": "737db689285a46351c63b0f6d352d3870b14cac4eb5440d7e9b99a9a191772d4",
+    "internal/native/qualification.go": "35b78f2af85ff4b1f5369439e8c211b97a2d7e84e76182c7860be2e005a440dd",
+    "internal/native/supervisor.go": "6618bf4a2447c43e911aae6a88d82f209293332844dc2caef472ffad55b38975",
+    "internal/native/vision.go": "a0343319e5bab790fe6e630d71781c5f390b5f1034b1e26c7df436ec34c41bd8",
+    "internal/native/vision_packs.go": "ceb0ebd12f5574771acaf8c90323c2479e073c6afb1df87b974a5d5aadf48bdb",
+    "internal/native/vision_test.go": "627872c3f1a4e78cea31649cff77899a88ae2851e7a9cce6c7d3a8877dbfcdf3",
+    "internal/workspace/events.go": "7ae834cb48108b26ca7d78929ea54673af30d1be021e8d52663d917f7d190afd",
+    "internal/workspace/image_description.go": "5b0f116523a7745180847cedc3e5364e557db0c0a8dbc3d7c65272297f4d9467",
+    "internal/workspace/image_description_test.go": "57235845f8a7ea53bc4922400e6800fde6000a4f105dddf7528d21f7a1054f69",
+    "native/models/catalog.json": "95e3fce88ff80d94dfd4f840b5ff79749ccd7d141d50158bb42268244af047ff",
+    "native/models/provenance.json": "0d7180d56e5b65fe395d4f5236dd6763d57f6dbf027b0270f13478834b67b619",
+    "native/vision-worker.cpp": "8fa4375f6ca755aecbeddd604f898ea931021edf604cbffa3c6b868479ab23e9",
+    "scripts/build-desktop.py": "39d6250345624e279f2657d880f0364296b89183576a97c3adad00f09a6d1b71",
+    "scripts/build-native.py": "47ddeda699e02d6338bc26035822909d18b65d3b0d9085a2fc9a78299a52baf3",
+    "scripts/build-vision.py": "7811e2b413eacde68acf6ceb24d32f8dd831845593fc6221518e3c8427156f7a",
+    "scripts/build_protocol_schemas.py": "8b532cc6cc9c3bb943d712918e1eddbd61ffa7c9ec1c457433370fbeeaa68b42",
+    "scripts/record-release-provenance.py": "84fc7ddf9e7019e59788723d02c24eac3184ac896969f086fd52d74252d0bba1"
+  },
+  "hardware": {
+    "hw.model": "Mac16,12",
+    "hw.memsize": "25769803776",
+    "machdep.cpu.brand_string": "Apple M4"
+  },
+  "os": "ProductName:\t\tmacOS\nProductVersion:\t\t27.0.1\nBuildVersion:\t\t26A434",
+  "nativeHelper": {
+    "name": "vision-worker",
+    "sha256": "0505373b42c83329d066366d1a04f32d16690e70c538a558f032d06b64fcd6fd",
+    "runtime": "llama.cpp",
+    "runtimeCommit": "d2e54583c7452353eb35d40431281f6ee984332f",
+    "architecture": "arm64"
+  },
+  "model": {
+    "schemaVersion": 2,
+    "visionVersion": 1,
+    "architecture": "arm64",
+    "license": "Apache-2.0",
+    "estimatedMemoryBytes": 2147483648,
+    "id": "01990000-0000-7000-8000-000000000107",
+    "name": "SmolVLM 500M Q8 (English image descriptions)",
+    "kind": "vision",
+    "format": "gguf",
+    "sha256": "9d4612de6a42214499e301494a3ecc2be0abdd9de44e663bda63f1152fad1bf4",
+    "sizeBytes": 436806912,
+    "url": "https://huggingface.co/ggml-org/SmolVLM-500M-Instruct-GGUF/resolve/72e986006ef53e37cdd3f6d4241c90b0f01df376/SmolVLM-500M-Instruct-Q8_0.gguf",
+    "licenseUrl": "https://huggingface.co/HuggingFaceTB/SmolVLM-500M-Instruct",
+    "sourceRevision": "72e986006ef53e37cdd3f6d4241c90b0f01df376",
+    "runtimeCommit": "d2e54583c7452353eb35d40431281f6ee984332f",
+    "contextTokens": 8192,
+    "projector": {
+      "id": "01990000-0000-7000-8000-000000000108",
+      "sha256": "4b2fca922e549e9b9608f4ba56f93565dd5220e935ba5570a2a864a0fcc988a6",
+      "sizeBytes": 199468800,
+      "url": "https://huggingface.co/ggml-org/SmolVLM-500M-Instruct-GGUF/resolve/72e986006ef53e37cdd3f6d4241c90b0f01df376/mmproj-SmolVLM-500M-Instruct-f16.gguf",
+      "license": "Apache-2.0",
+      "licenseUrl": "https://huggingface.co/HuggingFaceTB/SmolVLM-500M-Instruct",
+      "sourceRevision": "72e986006ef53e37cdd3f6d4241c90b0f01df376"
+    }
+  },
+  "artifactVerification": [
+    {
+      "id": "01990000-0000-7000-8000-000000000107",
+      "sha256": "9d4612de6a42214499e301494a3ecc2be0abdd9de44e663bda63f1152fad1bf4",
+      "sizeBytes": 436806912,
+      "verified": true
+    },
+    {
+      "id": "01990000-0000-7000-8000-000000000108",
+      "sha256": "4b2fca922e549e9b9608f4ba56f93565dd5220e935ba5570a2a864a0fcc988a6",
+      "sizeBytes": 199468800,
+      "verified": true
+    }
+  ],
+  "notices": {
+    "nlohmann-json-3.12.0-LICENSE.MIT": "46a65cffd1ea955132d95a8dd921640714a8d6b537d2e4e482d31145ae95b603",
+    "smolvlm-500m-model-card.md": "39541291e1d9b4fb82db1c1709024f700c9cd8cd79eb1e07c5351f1c958cf106",
+    "smolvlm-APACHE-2.0.txt": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30",
+    "vision-hash-LICENSE": "6ffedbc0f7878612d2b23589f1ff2ab15633e1df7963a5d9fc750ec5500c7e7a",
+    "vision-hash-LICENSE.md": "ca0b44aec101afb6b46f4c39b23369fa06a64fb9c0add37c2689d702156fee55",
+    "vision-hash-rotate-bits-LICENSE.md": "ca0b44aec101afb6b46f4c39b23369fa06a64fb9c0add37c2689d702156fee55",
+    "vision-hash-sha1-PUBLIC-DOMAIN.txt": "77bc62a94fcec83aed989da4ab0970816a8dd748a5500f2fb069cd109a73f42d",
+    "vision-hash-sha256-LICENSE": "b81d0022ca6367918c67b57e9647d3513ee58809fd4b0ef0b3492f1356bced25",
+    "vision-hash-xxhash-LICENSE": "6ffedbc0f7878612d2b23589f1ff2ab15633e1df7963a5d9fc750ec5500c7e7a",
+    "vision-llama-LICENSE.txt": "94f29bbed6a22c35b992c5c6ebf0e7c92f13b836b90f36f461c9cf2f0f1d010d",
+    "vision-miniaudio-LICENSE.txt": "3a0fd41237bf8341d1e4cdd89a52ff4a96228c4fad26e272840ed0ee03efcaf7",
+    "vision-nlohmann-COPYRIGHT.txt": "871e46831dc82ca33ec7b6c8f81ded912e5558e727015e97f8370394155f1a6f",
+    "vision-stb_image-LICENSE.txt": "7587efcca32db8f95bf5860dea6dfa4be410ee723e1964db3689c8ddf2a2e4a9",
+    "vision-subprocess-LICENSE.txt": "8fefbaedb46aa7f48bbb1ffd5cd791988e27043644b0d8e0e09073aab7cce139"
+  },
+  "limits": {
+    "inputBytes": 20971520,
+    "pixels": 20000000,
+    "longestEdge": 1024,
+    "questionCharacters": 2048,
+    "outputTokens": 512,
+    "timeoutSeconds": 300
+  },
+  "status": "model-quality-unqualified",
+  "limitations": [
+    "Raw blank-image abstention rubric fails; uniform-pixel shortcut is a separate measurement, not model qualification.",
+    "No clean installation, signed/notarized distribution, Windows/Linux or broad screenshot/image quality evidence.",
+    "Baseline helpers copied only to satisfy bundle inventory; this report qualifies the separate image helper only."
+  ],
+  "realModelCases": [
+    {
+      "case": "red_square",
+      "passed": true,
+      "fixtureSha256": "11abcd871cec8f5b572c55831211de12a54b5792147382f04f5c153b71334424",
+      "seconds": 11.042554208,
+      "sampledPeakRSSBytes": 1000767488
+    },
+    {
+      "case": "spatial",
+      "passed": true,
+      "fixtureSha256": "c300c685c0da8e08eac984ba04ffb4a72e32ebf2989ef7be2dd3799ab40bf4b6",
+      "seconds": 28.183281875,
+      "sampledPeakRSSBytes": 1043152896
+    },
+    {
+      "case": "labeled_chart",
+      "passed": true,
+      "fixtureSha256": "cbacae11c3cf49e4346deedce27bd3e05d04069ffa1c3ed4b62cfabf116ce6cb",
+      "seconds": 10.2649755,
+      "sampledPeakRSSBytes": 1035550720
+    },
+    {
+      "case": "blank_uncertainty",
+      "passed": false,
+      "fixtureSha256": "d79623d7050280a496c43f0a3acd51c7a13e09f3d3bc2ba1dcf390ea1893a1a5",
+      "seconds": 18.347558833,
+      "sampledPeakRSSBytes": 1098874880
+    }
+  ],
+  "modelRubricPassed": false,
+  "evidence": {
+    "c6-vision-browser.json": "6518b5745dcdb93e3f0484940824adb77e5aec0d244725023d646ce3a61d4eb7",
+    "c6-vision-browser.txt": "4e15ce16ff8d2e688beed2136f50526e39bfedf3d8a48bf1067c9b339529d775",
+    "c6-vision-build-final.txt": "4f3c8ccc9bc14f0399d816c605ae5e08982081d6143700255f3eebfc27a7c9f1",
+    "c6-vision-build.txt": "88ab88d725a9c213e8a96bd0e3f19100f8781be314d14e750a4fa26611ead1a7",
+    "c6-vision-contracts-workers.txt": "b098f9ff8eb1c4e2532993280bbc9e9c37accea1de1bf834dfdc02947fc82624",
+    "c6-vision-final-native.txt": "35f6ca7411c8f94c52b0e273978611f19a6405ed994f5f1ff593bad7c08eb73b",
+    "c6-vision-final-race-fixed.txt": "10ce149e42efe03f0124e291c880a1fa10585a7e0b12dd04a2b923709b801cf4",
+    "c6-vision-final-race.txt": "a694a57894a0b85596d2d98dd1e6c7a48542c61b4db9a9983fef19996c49263a",
+    "c6-vision-final-rubric.json": "275a2c8672f68e48b3900595bcbdde4c655ede9b1049b64c3445db2906d83e5e",
+    "c6-vision-focused-race.txt": "9295493654226fa1953a57f03b864290e398fcf993b91db0a1e9f62819bf6232",
+    "c6-vision-frontend-build.txt": "25ed05d8293222feaa133a8c80c915541d0402ac1d69f777c074870822ff661b",
+    "c6-vision-native-boundaries.txt": "ed067c4e9dca810c145048179da3beb952f2fdee2b27b6a1c8aaeeb6999bd41b",
+    "c6-vision-real-rubric.json": "69b4745b7209fda81ccd798d3daa4f6c7ed9d8638f4fdcb564c5a598ccfbd015",
+    "c6-vision-typescript-final.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "c6-vision-typescript.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "verification": {
+    "focusedRace": "passed: native and image description regressions",
+    "contractsAndWorkersRace": "passed: complete affected packages",
+    "appCompilation": "passed; no app tests selected",
+    "typescript": "passed",
+    "frontendBuild": "passed with existing chunk-size/module-directive warnings",
+    "browser": "1 passed",
+    "rawModelRubric": "3 passed, 1 failed; process intentionally exits nonzero",
+    "nativeCancellationAndExactBudget": "passed, 6.430 seconds total to cancel active generation/release pair; exact budget rejection passed",
+    "notes": "The original preservation-oracle failure and result-variant ordering compilation failure are retained beside corrected passing checks. Blank model abstention remains failed."
+  }
+}

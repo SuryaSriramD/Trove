@@ -5909,6 +5909,92 @@
       ],
       "additionalProperties": false
     },
+    "ImageDescriptionStartRequest": {
+      "type": "object",
+      "properties": {
+        "contractVersion": {
+          "const": 1
+        },
+        "requestId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "workspaceId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "pageId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "fileId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "modelPackId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "question": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 2048
+        }
+      },
+      "required": [
+        "contractVersion",
+        "requestId",
+        "workspaceId",
+        "pageId",
+        "fileId",
+        "modelPackId",
+        "question"
+      ],
+      "additionalProperties": false
+    },
+    "ImageDescriptionListRequest": {
+      "type": "object",
+      "properties": {
+        "contractVersion": {
+          "const": 1
+        },
+        "requestId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "workspaceId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "pageId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        }
+      },
+      "required": [
+        "contractVersion",
+        "requestId",
+        "workspaceId",
+        "pageId"
+      ],
+      "additionalProperties": false
+    },
+    "ImageDescriptionControlRequest": {
+      "type": "object",
+      "properties": {
+        "contractVersion": {
+          "const": 1
+        },
+        "requestId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "workspaceId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "runId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        }
+      },
+      "required": [
+        "contractVersion",
+        "requestId",
+        "workspaceId",
+        "runId"
+      ],
+      "additionalProperties": false
+    },
     "PersonalReviewControlRequest": {
       "type": "object",
       "properties": {

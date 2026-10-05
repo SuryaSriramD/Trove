@@ -34,5 +34,23 @@
     "path": "qwen-1.5b-LICENSE",
     "retrievedAt": "2026-09-30",
     "scope": "Publisher license/model-card declaration at the pinned revision"
+  },
+  {
+    "url": "https://huggingface.co/ggml-org/SmolVLM-500M-Instruct-GGUF/raw/72e986006ef53e37cdd3f6d4241c90b0f01df376/README.md",
+    "path": "smolvlm-500m-model-card.md",
+    "retrievedAt": "2026-10-05",
+    "scope": "Pinned SmolVLM vision pair publisher declaration and Apache-2.0 license text; weights are optional downloads"
+  },
+  {
+    "url": "https://www.apache.org/licenses/LICENSE-2.0.txt",
+    "path": "smolvlm-APACHE-2.0.txt",
+    "retrievedAt": "2026-10-05",
+    "scope": "Pinned SmolVLM vision pair publisher declaration and Apache-2.0 license text; weights are optional downloads"
+  },
+  {
+    "url": "https://raw.githubusercontent.com/nlohmann/json/v3.12.0/LICENSE.MIT",
+    "path": "nlohmann-json-3.12.0-LICENSE.MIT",
+    "retrievedAt": "2026-10-05",
+    "scope": "MIT license for the nlohmann 3.12.0 header vendored in the pinned llama.cpp source; all embedded SPDX copyright declarations are retained separately in the native bundle"
   }
 ]

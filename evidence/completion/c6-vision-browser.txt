@@ -1,0 +1,8 @@
+
+Running 1 test using 1 worker
+
+(node:42689) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓  1 tests/image-understanding.browser.spec.ts:132:1 › image questions are explicit local drafts with source preview and cancellation (836ms)
+
+  1 passed (1.6s)

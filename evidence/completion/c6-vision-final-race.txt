@@ -1,0 +1,57 @@
+# trove.local/phase0/internal/sqlitevec
+internal/sqlitevec/register.go:11:12: warning: 'sqlite3_auto_extension' is deprecated: first deprecated in macOS 10.10 - Process-global auto extensions are not supported on Apple platforms [-Wdeprecated-declarations]
+/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/sqlite3.h:7627:16: note: 'sqlite3_auto_extension' has been explicitly marked deprecated here
+=== RUN   TestVisionPairRequiresBothHashesAndLeases
+--- PASS: TestVisionPairRequiresBothHashesAndLeases (0.09s)
+=== RUN   TestVisionManifestRejectsMixedVersions
+--- PASS: TestVisionManifestRejectsMixedVersions (0.00s)
+=== RUN   TestVisionNormalizationPreservesOriginalAndBounds
+--- PASS: TestVisionNormalizationPreservesOriginalAndBounds (0.47s)
+=== RUN   TestVisionApprovedAcquisition
+    vision_test.go:140: explicit approved acquisition only
+--- SKIP: TestVisionApprovedAcquisition (0.00s)
+=== RUN   TestVisionRealRubric
+    vision_test.go:170: explicit real vision qualification
+--- SKIP: TestVisionRealRubric (0.00s)
+=== RUN   TestVisionUniformMeasurementAndRepetitionGuard
+--- PASS: TestVisionUniformMeasurementAndRepetitionGuard (0.05s)
+=== RUN   TestVisionRealCancellationAndExactBudget
+    vision_test.go:277: explicit native image boundary qualification
+--- SKIP: TestVisionRealCancellationAndExactBudget (0.00s)
+=== RUN   TestVisionPairedAcquisitionResumeAndReadyStatus
+--- PASS: TestVisionPairedAcquisitionResumeAndReadyStatus (0.10s)
+=== RUN   TestVisionRejectsOversizedImageBeforeDecode
+--- PASS: TestVisionRejectsOversizedImageBeforeDecode (0.00s)
+=== RUN   TestVisionQuestionBoundPrecedesPixelShortcut
+--- PASS: TestVisionQuestionBoundPrecedesPixelShortcut (0.00s)
+PASS
+ok  	trove.local/phase0/internal/native	2.238s
+# trove.local/phase0/internal/workers
+internal/workers/runner.go:125:11: body.MeetingId undefined (type contracts.JobsWorkerResultVariant3 has no field or method MeetingId)
+internal/workers/runner.go:128:23: body.Segments undefined (type contracts.JobsWorkerResultVariant3 has no field or method Segments)
+internal/workers/runner.go:129:21: body.Segments undefined (type contracts.JobsWorkerResultVariant3 has no field or method Segments)
+internal/workers/runner.go:137:124: body.Segments undefined (type contracts.JobsWorkerResultVariant3 has no field or method Segments)
+internal/workers/runner.go:145:32: body.Segments undefined (type contracts.JobsWorkerResultVariant3 has no field or method Segments)
+internal/workers/search.go:77:23: body.Vectors undefined (type contracts.JobsWorkerResultVariant2 has no field or method Vectors)
+internal/workers/search.go:80:32: body.Vectors undefined (type contracts.JobsWorkerResultVariant2 has no field or method Vectors)
+=== RUN   TestImageDescriptionDraftIsScopedFreshAndInert
+--- PASS: TestImageDescriptionDraftIsScopedFreshAndInert (0.17s)
+=== RUN   TestImageDescriptionCancelAndMidFlightSourceChange
+=== RUN   TestImageDescriptionCancelAndMidFlightSourceChange/cancel
+=== RUN   TestImageDescriptionCancelAndMidFlightSourceChange/edit
+=== RUN   TestImageDescriptionCancelAndMidFlightSourceChange/revoke
+--- PASS: TestImageDescriptionCancelAndMidFlightSourceChange (0.10s)
+    --- PASS: TestImageDescriptionCancelAndMidFlightSourceChange/cancel (0.03s)
+    --- PASS: TestImageDescriptionCancelAndMidFlightSourceChange/edit (0.03s)
+    --- PASS: TestImageDescriptionCancelAndMidFlightSourceChange/revoke (0.03s)
+=== RUN   TestImageDescriptionContractAndMissingCapabilityFailures
+--- PASS: TestImageDescriptionContractAndMissingCapabilityFailures (0.03s)
+=== RUN   TestImageDescriptionRestartAndPortableImportDoNotReplay
+--- PASS: TestImageDescriptionRestartAndPortableImportDoNotReplay (0.11s)
+PASS
+ok  	trove.local/phase0/internal/workspace	1.990s
+testing: warning: no tests to run
+PASS
+ok  	trove.local/phase0/contracts	1.444s [no tests to run]
+FAIL	trove.local/phase0 [build failed]
+FAIL

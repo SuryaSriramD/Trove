@@ -167,4 +167,7 @@ export type CancelResponse = ({ "ok": true; "result": CancelResult; } | { "ok": 
 export type PrepareFileResponse = ({ "ok": true; "result": PrepareFileResult; } | { "ok": false; "error": Error; });
 export type PersonalReviewGenerationConfig = { "modelPackId": domain.Id; "categories": Array<"summary" | "risks" | "decisions" | "next_steps">; "allowedActions": Array<"append_review" | "rename_page" | "append_page" | "create_task" | "set_task_status" | "set_task_due">; "actionPageIds": Array<domain.Id>; };
 export type PersonalReviewGeneratedDraft = { "claims": Array<{ "category": "summary" | "risks" | "decisions" | "next_steps"; "text": string; "quote": string; }>; "actions": Array<(PlanUpdatePage | PlanCreateTask | PlanUpdateTask)>; };
+export type ImageDescriptionStartRequest = { "contractVersion": 1; "requestId": domain.Id; "workspaceId": domain.Id; "pageId": domain.Id; "fileId": domain.Id; "modelPackId": domain.Id; "question": string; };
+export type ImageDescriptionListRequest = { "contractVersion": 1; "requestId": domain.Id; "workspaceId": domain.Id; "pageId": domain.Id; };
+export type ImageDescriptionControlRequest = { "contractVersion": 1; "requestId": domain.Id; "workspaceId": domain.Id; "runId": domain.Id; };
 export type PersonalReviewControlRequest = { "contractVersion": 1; "requestId": domain.Id; "workspaceId": domain.Id; "runId": domain.Id; };

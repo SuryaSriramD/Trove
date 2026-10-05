@@ -85,5 +85,32 @@
     "sourceRevision": "91cad51170dc346986eccefdc2dd33a9da36ead9",
     "runtimeCommit": "d2e54583c7452353eb35d40431281f6ee984332f",
     "contextTokens": 8192
+  },
+  {
+    "schemaVersion": 2,
+    "visionVersion": 1,
+    "architecture": "arm64",
+    "license": "Apache-2.0",
+    "estimatedMemoryBytes": 2147483648,
+    "id": "01990000-0000-7000-8000-000000000107",
+    "name": "SmolVLM 500M Q8 (English image descriptions)",
+    "kind": "vision",
+    "format": "gguf",
+    "sha256": "9d4612de6a42214499e301494a3ecc2be0abdd9de44e663bda63f1152fad1bf4",
+    "sizeBytes": 436806912,
+    "url": "https://huggingface.co/ggml-org/SmolVLM-500M-Instruct-GGUF/resolve/72e986006ef53e37cdd3f6d4241c90b0f01df376/SmolVLM-500M-Instruct-Q8_0.gguf",
+    "licenseUrl": "https://huggingface.co/HuggingFaceTB/SmolVLM-500M-Instruct",
+    "sourceRevision": "72e986006ef53e37cdd3f6d4241c90b0f01df376",
+    "runtimeCommit": "d2e54583c7452353eb35d40431281f6ee984332f",
+    "contextTokens": 8192,
+    "projector": {
+      "id": "01990000-0000-7000-8000-000000000108",
+      "sha256": "4b2fca922e549e9b9608f4ba56f93565dd5220e935ba5570a2a864a0fcc988a6",
+      "sizeBytes": 199468800,
+      "url": "https://huggingface.co/ggml-org/SmolVLM-500M-Instruct-GGUF/resolve/72e986006ef53e37cdd3f6d4241c90b0f01df376/mmproj-SmolVLM-500M-Instruct-f16.gguf",
+      "license": "Apache-2.0",
+      "licenseUrl": "https://huggingface.co/HuggingFaceTB/SmolVLM-500M-Instruct",
+      "sourceRevision": "72e986006ef53e37cdd3f6d4241c90b0f01df376"
+    }
   }
 ]

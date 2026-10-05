@@ -14,6 +14,7 @@ import (
 	"strconv"
 	"strings"
 	"sync"
+	"sync/atomic"
 	"syscall"
 	"time"
 	"trove.local/phase0/contracts"
@@ -40,7 +41,21 @@ type Input struct {
 	Handle contracts.JobsInputHandle
 	File   *os.File
 }
+type RunMetrics struct{ PeakRSSBytes atomic.Int64 }
+
+func (m *RunMetrics) sampleRSS(n int64) {
+	if m == nil {
+		return
+	}
+	for old := m.PeakRSSBytes.Load(); n > old; old = m.PeakRSSBytes.Load() {
+		if m.PeakRSSBytes.CompareAndSwap(old, n) {
+			return
+		}
+	}
+}
+
 type Request struct {
+	Metrics  *RunMetrics
 	Wire     contracts.JobsWorkerRequest
 	Inputs   []Input
 	Priority Priority
@@ -76,7 +91,7 @@ func NewSupervisor(bundle string, manager *Manager) (*Supervisor, error) {
 	}
 	s := &Supervisor{bundle: bundle, manager: manager, helpers: map[string]Helper{}}
 	for _, h := range m.Helpers {
-		if h.Name != "llama-worker" && h.Name != "whisper-worker" && h.Name != "microphone-worker" {
+		if h.Name != "llama-worker" && h.Name != "whisper-worker" && h.Name != "microphone-worker" && h.Name != "vision-worker" {
 			return nil, errors.New("unknown helper")
 		}
 		if h.Architecture != "arm64" || !digestPattern.MatchString(h.SHA256) {
@@ -177,7 +192,7 @@ func (s *Supervisor) Run(ctx context.Context, r Request, onEvent func(Event)) (j
 	}
 	defer release()
 	operation := r.Wire.Operation
-	if ((operation == "generate" || operation == "tokenize") && p.Kind != "chat") || (operation == "embed" && p.Kind != "embedding") || (operation == "transcribe" && p.Kind != "speech") {
+	if ((operation == "generate" || operation == "tokenize") && p.Kind != "chat") || (operation == "embed" && p.Kind != "embedding") || (operation == "transcribe" && p.Kind != "speech") || (operation == "image_generate" && p.Kind != "vision") {
 		return nil, errors.New("MODEL_INCOMPATIBLE: operation")
 	}
 	if r.Wire.Limits.MemoryBytes > memoryLimit() || p.EstimatedMemoryBytes > r.Wire.Limits.MemoryBytes {
@@ -200,7 +215,22 @@ func (s *Supervisor) Run(ctx context.Context, r Request, onEvent func(Event)) (j
 		}
 		r.Wire.Inputs = append(r.Wire.Inputs, h)
 	}
-	metadata, e := validateInputMetadata(p, operation, r.Inputs)
+	var metadata InputMetadata
+	if operation == "image_generate" {
+		if _, e = validateVisionInput(p, r); e != nil {
+			return nil, e
+		}
+		projector, releaseProjector, err := s.manager.leaseProjector(p)
+		if err != nil {
+			return nil, err
+		}
+		defer releaseProjector()
+		h := contracts.JobsInputHandle{HandleId: contracts.DomainId(p.Projector.ID), Kind: "model", Sha256: p.Projector.SHA256, SizeBytes: p.Projector.SizeBytes}
+		r.Inputs = append(r.Inputs, Input{Handle: h, File: projector})
+		r.Wire.Inputs = append(r.Wire.Inputs, h)
+	} else {
+		metadata, e = validateInputMetadata(p, operation, r.Inputs)
+	}
 	if e != nil {
 		return nil, e
 	}
@@ -224,6 +254,9 @@ func (s *Supervisor) Run(ctx context.Context, r Request, onEvent func(Event)) (j
 	name := "llama-worker"
 	if operation == "transcribe" {
 		name = "whisper-worker"
+	}
+	if operation == "image_generate" {
+		name = "vision-worker"
 	}
 	helper := s.helpers[name]
 	if e = s.verifyHelper(helper); e != nil {
@@ -319,6 +352,7 @@ func (s *Supervisor) Run(ctx context.Context, r Request, onEvent func(Event)) (j
 				raw, e := exec.Command("/bin/ps", "-o", "rss=", "-p", strconv.Itoa(cmd.Process.Pid)).Output()
 				if e == nil {
 					rss, _ := strconv.ParseInt(strings.TrimSpace(string(raw)), 10, 64)
+					r.Metrics.sampleRSS(rss * 1024)
 					if rss*1024 > r.Wire.Limits.MemoryBytes {
 						cancelCause(errors.New("RESOURCE_EXHAUSTED: worker memory limit"))
 					}
@@ -460,6 +494,9 @@ func (s *Supervisor) Run(ctx context.Context, r Request, onEvent func(Event)) (j
 			}
 		}
 	}
+	if operation == "image_generate" && body.Kind != "image_generation" {
+		return nil, errors.New("image generation result mismatch")
+	}
 	if operation == "generate" && body.Kind != "generation" {
 		return nil, errors.New("generation result mismatch")
 	}
@@ -512,3 +549,12 @@ func (s *Supervisor) Run(ctx context.Context, r Request, onEvent func(Event)) (j
 // MemoryBudget reports the supervisor's current platform admission cap so callers
 // cannot accidentally request more than the same supervisor will admit.
 func (s *Supervisor) MemoryBudget() int64 { return memoryLimit() }
+
+// VisionAvailable reports the separately verified optional image helper.
+func (s *Supervisor) VisionAvailable() bool {
+	if s == nil {
+		return false
+	}
+	_, ok := s.helpers["vision-worker"]
+	return ok
+}

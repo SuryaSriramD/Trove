@@ -156,6 +156,16 @@ def main():
                       'verified': path.exists() and actual == pack['sha256'] and path.stat().st_size == pack['sizeBytes']})
         if path.exists() and not packs[-1]['verified']:
             warnings.append('Installed model mismatch: ' + pack['id'])
+        if companion := pack.get('projector'):
+            path = args.models / (companion['id'] + '.model')
+            actual = digest(path) if path.exists() else None
+            verified = path.exists() and actual == companion['sha256'] and path.stat().st_size == companion['sizeBytes']
+            packs[-1]['projectorVerification'] = {'installed': path.exists(), 'installedSha256': actual,
+                'installedSizeBytes': path.stat().st_size if path.exists() else None, 'verified': verified}
+            packs[-1]['verified'] = packs[-1]['verified'] and verified
+            if path.exists() and not verified:
+                warnings.append('Installed vision projector mismatch: ' + companion['id'])
+
     external_notices = []
     license_root = ROOT / 'docs/phase-3/licenses'
     for record in json.loads((license_root / 'sources.json').read_text()):
@@ -166,7 +176,9 @@ def main():
         external_notices.append({**record, 'sha256': digest(source), 'retainedPath': str(dest.relative_to(args.output))})
     inputs = ['go.mod', 'go.sum', 'frontend/package.json', 'frontend/pnpm-lock.yaml', 'baseline/baseline.lock.json',
               'native/models/catalog.json', 'native/models/provenance.json', 'scripts/record-release-provenance.py',
-              'internal/sqlitevec/register.go', 'internal/sqlitevec/upstream.json', 'docs/phase-3/licenses/sources.json']
+              'internal/sqlitevec/register.go', 'internal/sqlitevec/upstream.json', 'docs/phase-3/licenses/sources.json',
+              'native/vision-worker.cpp', 'scripts/build-vision.py', 'internal/native/vision.go',
+              'internal/native/vision_packs.go', 'internal/workspace/image_description.go']
     sources = [p for p in (ROOT / 'schemas').glob('*.sql')]
     sources += [p for p in (ROOT / 'internal/workspace').glob('*.go') if not p.name.endswith('_test.go') and not p.name.startswith('._')]
     report = {'schemaVersion': 1, 'recordedAt': datetime.now(timezone.utc).isoformat(),
