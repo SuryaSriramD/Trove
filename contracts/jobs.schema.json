@@ -555,7 +555,10 @@
             },
             "architecture": {
               "type": "string",
-              "enum": ["arm64", "amd64"]
+              "enum": [
+                "arm64",
+                "amd64"
+              ]
             },
             "capabilities": {
               "type": "array",

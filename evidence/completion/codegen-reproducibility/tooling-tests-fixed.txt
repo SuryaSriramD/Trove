@@ -1,0 +1,48 @@
+...............................................................FFF......................pages=0: completed=2/2, maximum shell ms=1400
+.pages=0: completed=1/1, maximum shell ms=2700
+.pages=0: completed=1/2, maximum shell ms=1000
+pages=0: completed=1/2, maximum shell ms=1000
+pages=0: completed=1/2, maximum shell ms=1000
+pages=0: completed=1/2, maximum shell ms=1000
+..pages=0: completed=1/5, maximum shell ms=1000
+.pages=0: completed=0/1, maximum shell ms=FAILED
+.
+======================================================================
+FAIL: test_source_anchors_and_numbered_requirements_are_preserved (test_ledger.LedgerTests.test_source_anchors_and_numbered_requirements_are_preserved)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/suryasriramduvvuri/.codex/worktrees/completion-candidate/Trove/tests/test_ledger.py", line 74, in test_source_anchors_and_numbered_requirements_are_preserved
+    self.assertEqual(source_lines[ref['document']][ref['line'] - 1], ref['anchor'])
+AssertionError: 'FR-003' != 'FR-001'
+- FR-003
+?      ^
++ FR-001
+?      ^
+
+
+======================================================================
+FAIL: test_source_text_is_complete_and_matches_supplied_docx (test_ledger.LedgerTests.test_source_text_is_complete_and_matches_supplied_docx) (source='PRD')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/suryasriramduvvuri/.codex/worktrees/completion-candidate/Trove/tests/test_ledger.py", line 60, in test_source_text_is_complete_and_matches_supplied_docx
+    self.assertEqual(hashlib.sha256(text_path.read_bytes()).hexdigest(), source['textSha256'])
+AssertionError: '26c52c330efd5ca8629666e88007f5d6dfb89b847d8ca5d2fdbe172112ce586d' != '410b9224eaa644b8d37580232a816d792e2508ff9be26ba808401580caf8c777'
+- 26c52c330efd5ca8629666e88007f5d6dfb89b847d8ca5d2fdbe172112ce586d
++ 410b9224eaa644b8d37580232a816d792e2508ff9be26ba808401580caf8c777
+
+
+======================================================================
+FAIL: test_source_text_is_complete_and_matches_supplied_docx (test_ledger.LedgerTests.test_source_text_is_complete_and_matches_supplied_docx) (source='TRD')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/suryasriramduvvuri/.codex/worktrees/completion-candidate/Trove/tests/test_ledger.py", line 60, in test_source_text_is_complete_and_matches_supplied_docx
+    self.assertEqual(hashlib.sha256(text_path.read_bytes()).hexdigest(), source['textSha256'])
+AssertionError: 'f5b95f9b4219e4512d9d32a660a69d32e47cc962eada9252af60b746d5c8a39c' != '4be29fcb61f55ea0e1ee96b2836ad3d8db86bb36cdba635e36a081697cc7a74e'
+- f5b95f9b4219e4512d9d32a660a69d32e47cc962eada9252af60b746d5c8a39c
++ 4be29fcb61f55ea0e1ee96b2836ad3d8db86bb36cdba635e36a081697cc7a74e
+
+
+----------------------------------------------------------------------
+Ran 93 tests in 1.233s
+
+FAILED (failures=3)

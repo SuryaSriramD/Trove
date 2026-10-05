@@ -93,4 +93,6 @@ python3 scripts/build_examples.py
 python3 scripts/generate_types.py
 ```
 
+`build_protocol_schemas.py --check` and `generate_types.py --check` verify drift without rewriting files. Type generation uses the pinned Go installation’s formatter and honors `TROVE_CACHE_DIR` or `--cache`. Ledger tests reproduce ignored source extracts from the hash-verified original documents, preserving every paragraph and original line anchor.
+
 `build_protocol_schemas.py` is the authoring source for service/jobs schemas; the domain schema and registry are edited directly. Never edit generated types. Contract changes require updated schemas, fixtures, semantic rules, migration/fallback decisions and evidence in the [requirements ledger](docs/phase-0/requirements-ledger.json). The ledger separates implemented from verified and Phase0 from P0/P1/P2 release completion.
