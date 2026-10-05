@@ -11,11 +11,9 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
-	"strconv"
-	"strings"
+	"runtime"
 	"sync"
 	"sync/atomic"
-	"syscall"
 	"time"
 	"trove.local/phase0/contracts"
 )
@@ -29,6 +27,8 @@ type Helper struct {
 }
 type BundleManifest struct {
 	SchemaVersion int      `json:"schemaVersion"`
+	Platform      string   `json:"platform,omitempty"`
+	Architecture  string   `json:"architecture,omitempty"`
 	Helpers       []Helper `json:"helpers"`
 }
 type Supervisor struct {
@@ -86,7 +86,10 @@ func NewSupervisor(bundle string, manager *Manager) (*Supervisor, error) {
 	if e = json.Unmarshal(raw, &m); e != nil {
 		return nil, e
 	}
-	if m.SchemaVersion != 1 {
+	if err := validateBundleTarget(m, runtime.GOOS, runtime.GOARCH); err != nil {
+		return nil, err
+	}
+	if m.SchemaVersion != 1 && m.SchemaVersion != 2 {
 		return nil, errors.New("unsupported native bundle")
 	}
 	s := &Supervisor{bundle: bundle, manager: manager, helpers: map[string]Helper{}}
@@ -94,15 +97,22 @@ func NewSupervisor(bundle string, manager *Manager) (*Supervisor, error) {
 		if h.Name != "llama-worker" && h.Name != "whisper-worker" && h.Name != "microphone-worker" && h.Name != "vision-worker" {
 			return nil, errors.New("unknown helper")
 		}
-		if h.Architecture != "arm64" || !digestPattern.MatchString(h.SHA256) {
+		if h.Architecture != runtime.GOARCH || !digestPattern.MatchString(h.SHA256) {
 			return nil, errors.New("invalid helper manifest")
+		}
+		if _, duplicate := s.helpers[h.Name]; duplicate {
+			return nil, errors.New("duplicate helper")
 		}
 		if e = s.verifyHelper(h); e != nil {
 			return nil, e
 		}
 		s.helpers[h.Name] = h
 	}
-	for _, name := range []string{"llama-worker", "whisper-worker", "microphone-worker"} {
+	required := []string{"llama-worker", "whisper-worker"}
+	if runtime.GOOS == "darwin" {
+		required = append(required, "microphone-worker")
+	}
+	for _, name := range required {
 		if _, ok := s.helpers[name]; !ok {
 			return nil, errors.New("missing bundled helper")
 		}
@@ -110,7 +120,7 @@ func NewSupervisor(bundle string, manager *Manager) (*Supervisor, error) {
 	return s, nil
 }
 func (s *Supervisor) verifyHelper(h Helper) error {
-	path := filepath.Join(s.bundle, h.Name)
+	path := filepath.Join(s.bundle, helperFilename(h.Name))
 	if e := regular(path); e != nil {
 		return e
 	}
@@ -150,13 +160,30 @@ func OpenInput(f *os.File, kind, id string) (Input, error) {
 	h, e := fileHandle(f, kind, id)
 	return Input{h, f}, e
 }
-func memoryLimit() int64 {
-	out, e := exec.Command("/usr/sbin/sysctl", "-n", "hw.memsize").Output()
-	if e != nil {
-		return 512 << 20
+func validateBundleTarget(m BundleManifest, platform, architecture string) error {
+	if !supportedNativeTarget(platform, architecture) {
+		return errors.New("unsupported native target")
 	}
-	n, e := strconv.ParseInt(strings.TrimSpace(string(out)), 10, 64)
-	if e != nil {
+	if m.SchemaVersion == 1 && platform == "darwin" && architecture == "arm64" && m.Platform == "" && m.Architecture == "" {
+		return nil
+	}
+	if m.SchemaVersion != 2 || m.Platform != platform || m.Architecture != architecture {
+		return errors.New("native bundle target mismatch")
+	}
+	return nil
+}
+func supportedNativeTarget(platform, architecture string) bool {
+	return platform == "darwin" && architecture == "arm64" || (platform == "windows" || platform == "linux") && architecture == "amd64"
+}
+func helperFilename(name string) string {
+	if runtime.GOOS == "windows" {
+		return name + ".exe"
+	}
+	return name
+}
+func memoryLimit() int64 {
+	n, err := platformMemoryBytes()
+	if err != nil {
 		return 512 << 20
 	}
 	n = n/2 - (2 << 30)
@@ -262,7 +289,7 @@ func (s *Supervisor) Run(ctx context.Context, r Request, onEvent func(Event)) (j
 	if e = s.verifyHelper(helper); e != nil {
 		return nil, e
 	}
-	dir, e := os.MkdirTemp("", "trove-worker-")
+	dir, e := privateWorkerDirectory("trove-worker-")
 	if e != nil {
 		return nil, e
 	}
@@ -278,15 +305,14 @@ func (s *Supervisor) Run(ctx context.Context, r Request, onEvent func(Event)) (j
 	}
 	defer controlR.Close()
 	defer controlW.Close()
-	cmd := exec.Command(filepath.Join(s.bundle, name))
+	cmd := exec.Command(filepath.Join(s.bundle, helperFilename(name)))
 	cmd.Dir = dir
-	cmd.Env = []string{"PATH=/usr/bin:/bin", "HOME=" + dir, "TMPDIR=" + dir, "LANG=en_US.UTF-8", "TROVE_GPU_LAYERS=0"}
-	cmd.SysProcAttr = &syscall.SysProcAttr{Setpgid: true}
-	cmd.ExtraFiles = []*os.File{controlR, result, model}
+	cmd.Env = workerEnvironment(dir)
+	files := []*os.File{controlR, result, model}
 	for _, in := range r.Inputs {
 		// Snapshot every approved input into private, read-only descriptors. A
 		// concurrent editor/import cannot change bytes underneath a native run.
-		snapshotPath := filepath.Join(dir, fmt.Sprintf("input-%d", len(cmd.ExtraFiles)))
+		snapshotPath := filepath.Join(dir, fmt.Sprintf("input-%d", len(files)))
 		destination, err := os.OpenFile(snapshotPath, os.O_CREATE|os.O_EXCL|os.O_WRONLY, 0600)
 		if err != nil {
 			return nil, err
@@ -305,26 +331,36 @@ func (s *Supervisor) Run(ctx context.Context, r Request, onEvent func(Event)) (j
 		if err != nil || actual != in.Handle {
 			return nil, errors.New("INVALID_INPUT: input changed while staging")
 		}
-		cmd.ExtraFiles = append(cmd.ExtraFiles, snapshot)
+		files = append(files, snapshot)
 	}
 	in, e := cmd.StdinPipe()
 	if e != nil {
 		return nil, e
 	}
+	defer in.Close()
 	out, e := cmd.StdoutPipe()
 	if e != nil {
 		return nil, e
 	}
+	defer out.Close()
 	logs := &ringLog{}
 	cmd.Stderr = logs
-	if e = cmd.Start(); e != nil {
+	process, e := prepareWorker(cmd, files, r.Wire.Limits.MemoryBytes)
+	if e != nil {
+		return nil, e
+	}
+	defer process.close()
+	if e = process.start(); e != nil {
 		return nil, e
 	}
 	controlR.Close()
 	stopped := make(chan struct{})
-	defer close(stopped)
+	var watchers sync.WaitGroup
+	defer func() { close(stopped); watchers.Wait() }()
+	watchers.Add(2)
 	// A separate control pipe and process-group escalation stay responsive even when stdout is backpressured.
 	go func() {
+		defer watchers.Done()
 		select {
 		case <-run.Done():
 			_ = WriteFrame(controlW, map[string]any{"protocolVersion": 1, "kind": "cancel", "requestId": r.Wire.RequestId, "cancellationId": r.Wire.CancellationId})
@@ -332,28 +368,28 @@ func (s *Supervisor) Run(ctx context.Context, r Request, onEvent func(Event)) (j
 			case <-stopped:
 				return
 			case <-time.After(2 * time.Second):
-				_ = syscall.Kill(-cmd.Process.Pid, syscall.SIGTERM)
+				_ = process.stop(false)
 			}
 			select {
 			case <-stopped:
 				return
 			case <-time.After(3 * time.Second):
-				_ = syscall.Kill(-cmd.Process.Pid, syscall.SIGKILL)
+				_ = process.stop(true)
 			}
 		case <-stopped:
 		}
 	}()
 	go func() {
+		defer watchers.Done()
 		ticker := time.NewTicker(250 * time.Millisecond)
 		defer ticker.Stop()
 		for {
 			select {
 			case <-ticker.C:
-				raw, e := exec.Command("/bin/ps", "-o", "rss=", "-p", strconv.Itoa(cmd.Process.Pid)).Output()
+				rss, e := process.rss()
 				if e == nil {
-					rss, _ := strconv.ParseInt(strings.TrimSpace(string(raw)), 10, 64)
-					r.Metrics.sampleRSS(rss * 1024)
-					if rss*1024 > r.Wire.Limits.MemoryBytes {
+					r.Metrics.sampleRSS(rss)
+					if rss > r.Wire.Limits.MemoryBytes {
 						cancelCause(errors.New("RESOURCE_EXHAUSTED: worker memory limit"))
 					}
 				}
@@ -368,7 +404,7 @@ func (s *Supervisor) Run(ctx context.Context, r Request, onEvent func(Event)) (j
 	fail := func(e error) (json.RawMessage, error) {
 		cause := context.Cause(run)
 		cancel()
-		_ = syscall.Kill(-cmd.Process.Pid, syscall.SIGKILL)
+		_ = process.stop(true)
 		_ = cmd.Wait()
 		if ctx.Err() != nil {
 			return nil, ctx.Err()
@@ -387,7 +423,7 @@ func (s *Supervisor) Run(ctx context.Context, r Request, onEvent func(Event)) (j
 	}
 	var event Event
 	_ = json.Unmarshal(frame, &event)
-	if event.Kind != "hello" || event.Runtime != helper.Runtime || event.RuntimeCommit != helper.RuntimeCommit || event.Architecture != "arm64" || event.ProtocolVersion != 1 {
+	if event.Kind != "hello" || event.Runtime != helper.Runtime || event.RuntimeCommit != helper.RuntimeCommit || event.Architecture != helper.Architecture || event.ProtocolVersion != 1 {
 		return fail(errors.New("native hello mismatch"))
 	}
 	capable := false

@@ -554,7 +554,8 @@
               "pattern": "^[0-9a-f]{40}$"
             },
             "architecture": {
-              "const": "arm64"
+              "type": "string",
+              "enum": ["arm64", "amd64"]
             },
             "capabilities": {
               "type": "array",

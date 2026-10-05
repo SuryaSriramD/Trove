@@ -1,0 +1,53 @@
+[
+  {
+    "name": "windows-go-compile",
+    "command": [
+      "/Users/suryasriramduvvuri/Library/Caches/Trove/completion/go/bin/go",
+      "test",
+      "-c",
+      "./internal/native",
+      "-o",
+      "/private/tmp/trove-native-windows.test.exe"
+    ],
+    "returncode": 0,
+    "output": ""
+  },
+  {
+    "name": "linux-go-compile",
+    "command": [
+      "/Users/suryasriramduvvuri/Library/Caches/Trove/completion/go/bin/go",
+      "test",
+      "-c",
+      "./internal/native",
+      "-o",
+      "/private/tmp/trove-native-linux.test"
+    ],
+    "returncode": 0,
+    "output": ""
+  },
+  {
+    "name": "contracts-typescript",
+    "command": [
+      "node",
+      "frontend/node_modules/typescript/bin/tsc",
+      "--project",
+      "contracts/tsconfig.json"
+    ],
+    "returncode": 0,
+    "output": ""
+  },
+  {
+    "name": "platform-regressions",
+    "command": [
+      "/Users/suryasriramduvvuri/Library/Caches/Trove/completion/go/bin/go",
+      "test",
+      "-race",
+      "./internal/native",
+      "-run",
+      "TestBundleTargetBinding|TestPortablePackAndHelloArchitecture|TestNativeWorkerDescriptorTransportAndCancellation|TestNativeWorkerStartFailure",
+      "-count=1"
+    ],
+    "returncode": 0,
+    "output": "ok  \ttrove.local/phase0/internal/native\t3.193s\n"
+  }
+]

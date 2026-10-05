@@ -9,7 +9,7 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
-	"syscall"
+	"runtime"
 	"time"
 )
 
@@ -34,6 +34,9 @@ type CaptureResult struct {
 // The caller owns the staging file and retains flushed audio after cancellation.
 func (s *Supervisor) Capture(ctx context.Context, r CaptureRequest, destination *os.File, onEvent func(json.RawMessage)) (CaptureResult, error) {
 	var result CaptureResult
+	if s == nil || runtime.GOOS != "darwin" || runtime.GOARCH != "arm64" {
+		return result, errors.New("UNSUPPORTED_PLATFORM: microphone capture requires macOS arm64")
+	}
 	if !uuidPattern.MatchString(r.RequestID) || r.DurationMS < 1 || r.DurationMS > 7200000 || r.MaxBytes < 1 || r.MaxBytes > 512<<20 || (!r.Synthetic && !r.RequestPermission) {
 		return result, errors.New("APPROVAL_REQUIRED: explicit microphone action required")
 	}
@@ -69,18 +72,23 @@ func (s *Supervisor) Capture(ctx context.Context, r CaptureRequest, destination 
 	cmd := exec.Command(filepath.Join(s.bundle, h.Name))
 	cmd.Dir = dir
 	cmd.Env = []string{"PATH=/usr/bin:/bin", "HOME=" + dir, "TMPDIR=" + dir}
-	cmd.SysProcAttr = &syscall.SysProcAttr{Setpgid: true}
-	cmd.ExtraFiles = []*os.File{controlR, destination}
+	process, e := prepareWorker(cmd, []*os.File{controlR, destination}, 512<<20)
+	if e != nil {
+		return result, e
+	}
+	defer process.close()
 	cmd.Stderr = &ringLog{}
 	in, e := cmd.StdinPipe()
 	if e != nil {
 		return result, e
 	}
+	defer in.Close()
 	out, e := cmd.StdoutPipe()
 	if e != nil {
 		return result, e
 	}
-	if e = cmd.Start(); e != nil {
+	defer out.Close()
+	if e = process.start(); e != nil {
 		return result, e
 	}
 	controlR.Close()
@@ -94,20 +102,20 @@ func (s *Supervisor) Capture(ctx context.Context, r CaptureRequest, destination 
 			case <-stopped:
 				return
 			case <-time.After(2 * time.Second):
-				_ = syscall.Kill(-cmd.Process.Pid, syscall.SIGTERM)
+				_ = process.stop(false)
 			}
 			select {
 			case <-stopped:
 				return
 			case <-time.After(3 * time.Second):
-				_ = syscall.Kill(-cmd.Process.Pid, syscall.SIGKILL)
+				_ = process.stop(true)
 			}
 		case <-stopped:
 		}
 	}()
 	fail := func(err error) (CaptureResult, error) {
 		cancel()
-		_ = syscall.Kill(-cmd.Process.Pid, syscall.SIGKILL)
+		_ = process.stop(true)
 		_ = cmd.Wait()
 		_ = destination.Sync()
 		return result, err

@@ -2,17 +2,17 @@
 #include "llama.h"
 #include <memory>
 static void logger(enum ggml_log_level,const char*text,void*){fputs(text,stderr);}
-int main(){try{
+int main(){try{worker_init();
  llama_log_set(logger,nullptr);
- frame({{"kind","hello"},{"protocolVersion",1},{"runtime","llama.cpp"},{"runtimeCommit","d2e54583c7452353eb35d40431281f6ee984332f"},{"architecture","arm64"},{"capabilities",{"generate","embed","tokenize"}}});
+ frame({{"kind","hello"},{"protocolVersion",1},{"runtime","llama.cpp"},{"runtimeCommit","d2e54583c7452353eb35d40431281f6ee984332f"},{"architecture",WORKER_ARCHITECTURE},{"capabilities",{"generate","embed","tokenize"}}});
  request=read_frame(0);init_control();auto input=json::parse(read_input(1,4<<20));std::string op=request.at("operation");std::string grammar=input.value("grammar",std::string());if(grammar.size()>65536||(!grammar.empty()&&op!="generate"))throw std::runtime_error("invalid generation grammar");
  // The static registry eagerly creates Metal devices, even for vocabulary-only
  // and CPU work. Do not compile GPU shaders for operations that cannot use them.
  // This is the pinned ggml runtime's device-count switch, local to this worker.
- if(op=="tokenize"||input.value("gpuLayers",0)==0)setenv("GGML_METAL_DEVICES","0",1);
+ if(op=="tokenize"||input.value("gpuLayers",0)==0)worker_disable_gpu();
  if(op!="tokenize")llama_backend_init();
  auto mp=llama_model_default_params();mp.n_gpu_layers=input.value("gpuLayers",0);mp.load_mode=LLAMA_LOAD_MODE_NONE;mp.vocab_only=op=="tokenize";mp.progress_callback=[](float,void*){return !cancelled.load();};
- FILE*mf=fdopen(dup(5),"rb");if(!mf)throw std::runtime_error("model descriptor");std::unique_ptr<llama_model,decltype(&llama_model_free)> model(llama_model_load_from_file_ptr(mf,mp),llama_model_free);fclose(mf);if(!model)throw std::runtime_error("model load failed");check_cancel();progress(1,"Model loaded");
+ FILE*mf=worker_model_file();if(!mf)throw std::runtime_error("model descriptor");std::unique_ptr<llama_model,decltype(&llama_model_free)> model(llama_model_load_from_file_ptr(mf,mp),llama_model_free);fclose(mf);if(!model)throw std::runtime_error("model load failed");check_cancel();progress(1,"Model loaded");
  auto vocab=llama_model_get_vocab(model.get());
  if(op=="tokenize"){auto texts=input.at("texts");if(texts.empty()||texts.size()>16)throw std::runtime_error("tokenizer batch");json counts=json::array();size_t bytes=0;for(const auto&value:texts){check_cancel();auto text=value.get<std::string>();bytes+=text.size();if(text.empty()||text.size()>(128<<10)||bytes>(1<<20))throw std::runtime_error("tokenizer budget");int n=-llama_tokenize(vocab,text.c_str(),(int)text.size(),nullptr,0,true,true);if(n<1||n>1048576)throw std::runtime_error("tokenization failed");counts.push_back(n);}finish({{"kind","token_counts"},{"counts",counts}});return 0;}
 auto cp=llama_context_default_params();cp.n_ctx=input.value("contextTokens",512);if(cp.n_ctx>32768||cp.n_ctx<32)throw std::runtime_error("context budget");cp.n_batch=cp.n_ctx;cp.n_ubatch=cp.n_ctx;cp.n_threads=cp.n_threads_batch=request.at("limits").at("threads");cp.abort_callback=abort_work;cp.abort_callback_data=nullptr;cp.embeddings=op=="embed";if(op=="embed")cp.pooling_type=LLAMA_POOLING_TYPE_MEAN;
