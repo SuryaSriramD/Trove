@@ -3,7 +3,12 @@
 package native
 
 import (
+	"bytes"
+	"context"
 	"errors"
+	"fmt"
+	"io"
+	"math"
 	"os"
 	"os/exec"
 	"strconv"
@@ -26,26 +31,80 @@ func documentEnvironment(private string) []string {
 	}
 	return append(env, "GTK_PRINT_BACKENDS=file", "LC_ALL=C")
 }
+
+const documentSnapshotLimit = 4 << 20
+const documentSnapshotTimeout = 250 * time.Millisecond
+
 func documentProcessRSS(p *workerProcess) (int64, error) {
-	raw, err := exec.Command("/bin/ps", "-e", "-o", "pgid=,rss=").Output()
-	if err != nil {
-		return 0, err
+	if p == nil || p.cmd == nil || p.cmd.Process == nil {
+		return 0, errors.New("document process identity unavailable")
+	}
+	// This is a bounded diagnostic for the local group; it is not an enforceable
+	// browser-domain memory limit. Linux document capability is disabled above.
+	return readDocumentProcessSnapshot(context.Background(), exec.Command("/bin/ps", "-e", "-o", "pid=,pgid=,rss="), p.cmd.Process.Pid)
+}
+
+func readDocumentProcessSnapshot(ctx context.Context, cmd *exec.Cmd, leader int) (int64, error) {
+	if leader <= 0 {
+		return 0, errors.New("invalid document process identity")
+	}
+	ctx, cancel := context.WithTimeout(ctx, documentSnapshotTimeout)
+	defer cancel()
+	// CommandContext owns cancellation; copy only native-created argv. The helper
+	// does not select this command and no ambient credentials/loader options pass.
+	bounded := exec.CommandContext(ctx, cmd.Path, cmd.Args[1:]...)
+	bounded.Env = []string{"PATH=/usr/bin:/bin", "LC_ALL=C"}
+	bounded.WaitDelay = 100 * time.Millisecond
+	var out bytes.Buffer
+	bounded.Stdout = &documentOutput{w: &out, remaining: documentSnapshotLimit}
+	bounded.Stderr = io.Discard
+	if err := bounded.Run(); err != nil {
+		return 0, fmt.Errorf("document memory snapshot unavailable: %w", errors.Join(err, ctx.Err()))
+	}
+	return parseDocumentProcessSnapshot(out.Bytes(), leader)
+}
+
+func parseDocumentProcessSnapshot(raw []byte, leader int) (int64, error) {
+	if leader <= 0 || len(raw) > documentSnapshotLimit {
+		return 0, errors.New("invalid document memory snapshot")
 	}
 	var total int64
+	seen := map[int64]bool{}
+	foundLeader := false
 	for _, line := range strings.Split(string(raw), "\n") {
+		if strings.TrimSpace(line) == "" {
+			continue
+		}
 		fields := strings.Fields(line)
-		if len(fields) != 2 {
+		if len(fields) != 3 {
+			return 0, errors.New("malformed document memory snapshot")
+		}
+		pid, err := strconv.ParseInt(fields[0], 10, 64)
+		if err != nil || pid <= 0 || seen[pid] {
+			return 0, errors.New("invalid or repeated process identity")
+		}
+		seen[pid] = true
+		group, err := strconv.ParseInt(fields[1], 10, 64)
+		if err != nil || group < 0 {
+			return 0, errors.New("invalid process group")
+		}
+		rss, err := strconv.ParseInt(fields[2], 10, 64)
+		if err != nil || rss < 0 {
+			return 0, errors.New("invalid process memory")
+		}
+		if group != int64(leader) {
 			continue
 		}
-		group, e := strconv.Atoi(fields[0])
-		if e != nil || group != p.cmd.Process.Pid {
-			continue
-		}
-		rss, e := strconv.ParseInt(fields[1], 10, 64)
-		if e != nil {
-			return 0, e
+		if rss > math.MaxInt64/1024 || total > math.MaxInt64-rss*1024 {
+			return 0, errors.New("process memory overflow")
 		}
 		total += rss * 1024
+		if pid == int64(leader) {
+			foundLeader = true
+		}
+	}
+	if !foundLeader {
+		return 0, errors.New("document process leader missing from memory snapshot")
 	}
 	return total, nil
 }

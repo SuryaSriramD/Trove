@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"io"
 	"os/exec"
+	"runtime"
 	"time"
 )
 
@@ -17,6 +18,9 @@ func runDocumentProcess(ctx context.Context, executable, mode, root, private str
 	return runDocumentProcessWithMonitor(ctx, executable, mode, root, private, stdout, documentProcessRSS)
 }
 func runDocumentProcessWithMonitor(ctx context.Context, executable, mode, root, private string, stdout io.Writer, memory func(*workerProcess) (int64, error)) (resultErr error) {
+	if err := documentPlatformCapability(runtime.GOOS); err != nil {
+		return err
+	}
 	cmd := exec.Command(executable, mode, root)
 	cmd.Dir = private
 	cmd.Env = documentEnvironment(private)

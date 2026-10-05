@@ -172,7 +172,15 @@ func documentBinaryTarget(f *os.File, platform string) bool {
 // FindDocumentHelper distinguishes absent optional capability from a damaged or
 // incompatible installed helper, which must never silently fall back.
 func FindDocumentHelper(ctx context.Context) (*DocumentHelper, error) {
-	name := documentName(runtime.GOOS)
+	return findDocumentHelperForPlatform(ctx, runtime.GOOS, runtime.GOARCH)
+}
+
+// An unavailable platform is rejected before inspecting helper paths or user input.
+func findDocumentHelperForPlatform(ctx context.Context, platform, arch string) (*DocumentHelper, error) {
+	if err := documentPlatformCapability(platform); err != nil {
+		return nil, err
+	}
+	name := documentName(platform)
 	paths := []string{}
 	if path := os.Getenv("TROVE_DOCUMENT_WORKER"); path != "" {
 		paths = append(paths, path)
@@ -199,7 +207,7 @@ func FindDocumentHelper(ctx context.Context) (*DocumentHelper, error) {
 			return nil, err
 		}
 		bundle := filepath.Dir(path)
-		manifest, err := readDocumentManifest(ctx, filepath.Join(bundle, "document-worker.json"), runtime.GOOS, runtime.GOARCH)
+		manifest, err := readDocumentManifest(ctx, filepath.Join(bundle, "document-worker.json"), platform, arch)
 		if err != nil {
 			return nil, err
 		}
@@ -207,7 +215,7 @@ func FindDocumentHelper(ctx context.Context) (*DocumentHelper, error) {
 		if err != nil {
 			return nil, err
 		}
-		target := documentBinaryTarget(f, runtime.GOOS)
+		target := documentBinaryTarget(f, platform)
 		f.Close()
 		if !target {
 			return nil, errors.New("document helper binary target mismatch")
@@ -216,7 +224,13 @@ func FindDocumentHelper(ctx context.Context) (*DocumentHelper, error) {
 	}
 	return nil, nil
 }
-func (h *DocumentHelper) NewJob(ctx context.Context, mode string) (job *DocumentJob, err error) {
+func (h *DocumentHelper) NewJob(ctx context.Context, mode string) (*DocumentJob, error) {
+	return h.newJobForPlatform(ctx, mode, runtime.GOOS)
+}
+func (h *DocumentHelper) newJobForPlatform(ctx context.Context, mode, platform string) (job *DocumentJob, err error) {
+	if err = documentPlatformCapability(platform); err != nil {
+		return nil, err
+	}
 	if mode != "render" && mode != "extract" {
 		return nil, errors.New("invalid document mode")
 	}
@@ -379,6 +393,12 @@ func (j *DocumentJob) AddFile(ctx context.Context, name string, input io.Reader,
 	return nil
 }
 func (j *DocumentJob) Run(ctx context.Context, output io.Writer) error {
+	return j.runForPlatform(ctx, output, runtime.GOOS)
+}
+func (j *DocumentJob) runForPlatform(ctx context.Context, output io.Writer, platform string) error {
+	if err := documentPlatformCapability(platform); err != nil {
+		return err
+	}
 	ctx, cancel := context.WithTimeout(ctx, 2*time.Minute)
 	defer cancel()
 	raw, err := json.Marshal(map[string]any{"schemaVersion": 1, "files": j.files})

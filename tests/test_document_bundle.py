@@ -23,16 +23,20 @@ class DocumentPackageTests(DesktopPackageTests):
         (root/'document-worker.json').write_text(json.dumps(meta));return meta
     def test_document_bundle_requires_target_policy_and_exact_asset_bytes(self):
         for target in d.TARGETS:
-            root=self.bundle(target);meta=self.document(root,target);d.validate_native(root,target,self.lock)
+            root=self.bundle(target);meta=self.document(root,target)
+            validate(root,target,meta) # Source-manifest validation remains useful while Linux execution is disabled.
+            if target.startswith('linux'):
+                with self.assertRaisesRegex(ValueError,'whole-process containment'):d.validate_native(root,target,self.lock)
+            else:d.validate_native(root,target,self.lock)
             for key,value in [('testOnly',True),('runtime','floating'),('minimumWebView2','94') if target.startswith('windows') else ('webExtensionSha256','0'*64)]:
                 with self.subTest(target=target,key=key),self.assertRaises(ValueError):validate(root,target,dict(meta,**{key:value}))
             (root/'document-assets/assets/parser.js').write_text('modified')
-            with self.assertRaisesRegex(ValueError,'inventory'):d.validate_native(root,target,self.lock)
+            with self.assertRaisesRegex(ValueError,'inventory'):validate(root,target,meta)
     def test_missing_declared_document_or_ocr_is_rejected(self):
         root=self.bundle('linux-amd64');m=json.loads((root/'manifest.json').read_text())
         for capability in ['document_pdf','ocr_english']:
             m['capabilities']=[capability];(root/'manifest.json').write_text(json.dumps(m))
-            with self.assertRaises(FileNotFoundError):d.validate_native(root,'linux-amd64',self.lock)
+            with self.assertRaises(ValueError if capability=='document_pdf' else FileNotFoundError):d.validate_native(root,'linux-amd64',self.lock)
     def test_ocr_target_model_and_production_manifest_are_all_bound(self):
         root=self.bundle('linux-amd64');self.binary(root/'ocr-worker','linux-amd64');(root/'eng.traineddata').write_bytes(b'fixture model')
         pin=json.loads((d.ROOT/'native/ocr.lock.json').read_text())
@@ -54,17 +58,21 @@ class DocumentPackageTests(DesktopPackageTests):
         (root/'secrets.txt').write_text('never served')
         with self.assertRaisesRegex(ValueError,'asset'):assets(root)
     def test_copied_candidate_revalidates_sidecar_after_input_changes(self):
-        root=self.bundle('linux-amd64');self.document(root,'linux-amd64');destination=self.root/'candidate'
+        root=self.bundle('windows-amd64');self.document(root,'windows-amd64');destination=self.root/'candidate'
         original=d.copy_verified
         def changed(source,dest):
             entries=original(source,dest)
             (Path(dest)/'document-assets/assets/parser.js').write_text('changed after review')
             return entries
         with patch('desktop_package.copy_verified',side_effect=changed):
-            with self.assertRaisesRegex(ValueError,'inventory'):d.copy_verified_native(root,destination,'linux-amd64',self.lock)
+            with self.assertRaisesRegex(ValueError,'inventory'):d.copy_verified_native(root,destination,'windows-amd64',self.lock)
     def test_common_builder_plan_has_no_side_effects(self):
         for target in d.TARGETS:
             output=self.root/'not-created'
             run=subprocess.run([sys.executable,d.ROOT/'scripts/build-document-portable.py','--target',target,'--output',output,'--plan'],capture_output=True,text=True,check=True)
-            record=json.loads(run.stdout);self.assertFalse(record['executionQualified']);self.assertFalse(record['networkAcquisition']);self.assertFalse(output.exists())
+            record=json.loads(run.stdout);self.assertFalse(record['executionQualified']);self.assertFalse(record['networkAcquisition']);self.assertFalse(output.exists());self.assertEqual(target.startswith('windows'),record['runtimeAvailable'])
+    def test_linux_actual_document_build_refuses_before_toolchain_or_output(self):
+        output=self.root/'never-created'
+        run=subprocess.run([sys.executable,d.ROOT/'scripts/build-document-portable.py','--target','linux-amd64','--output',output],capture_output=True,text=True)
+        self.assertNotEqual(run.returncode,0);self.assertIn('whole-process containment',run.stderr);self.assertFalse(output.exists())
 if __name__=='__main__':unittest.main()

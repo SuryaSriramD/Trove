@@ -5,6 +5,7 @@ from desktop_package import safe_relative, no_link, digest, inventory, binary_ta
 
 RUNTIMES={'windows':'webview2-pdfjs-6.3.289-v1','linux':'webkitgtk-2.52.6-pdfjs-6.3.289-v1'}
 MIN_WEBVIEW2='141.0.3537.50'
+LINUX_UNAVAILABLE='Linux PDF text extraction/export unavailable until whole-process containment is implemented'
 EXTENSIONS={'.js','.mjs','.css','.json','.woff','.woff2','.ttf','.otf','.pfb','.bcmap','.icc','.wasm','.png','.jpg','.jpeg','.gif','.webp','.svg'}
 ENTRIES={'print.html','extract.html','validate.html'}
 def asset_path(name):
