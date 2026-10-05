@@ -8,11 +8,11 @@ TARGETS = {
     'windows-amd64': {'os': 'windows', 'arch': 'amd64', 'host': 'Windows', 'minimumOS': 'Windows 11 x64',
         'requirements': ['x64 Native Tools command prompt for Visual Studio 2022 or later (MSVC v143 or newer)',
             'Windows 11 SDK', 'Python 3.12+', 'CMake 4.3.2', 'Ninja', 'MSYS2 bash and GNU make on PATH', 'NTFS local staging/cache'],
-        'capture': 'miniaudio build; device execution unqualified', 'audioDecoding': 'restricted FFmpeg build; target execution unqualified', 'ocr': 'Tesseract English; target execution unqualified'},
+        'capture': 'miniaudio build; device execution unqualified', 'audioDecoding': 'restricted FFmpeg build; target execution unqualified', 'ocr': 'Tesseract English; target execution unqualified', 'documents': 'isolated WebView/PDF.js; target execution unqualified'},
     'linux-amd64': {'os': 'linux', 'arch': 'amd64', 'host': 'Linux', 'minimumOS': 'Ubuntu 24.04 LTS x64',
         'requirements': ['Ubuntu 24.04 build-essential (GCC 13)', 'libssl-dev / libssl3t64', 'libpulse-dev / libpulse0 and local user PulseAudio/PipeWire socket', 'Python 3.12',
-            'CMake 4.3.2', 'Ninja', 'procps and mounted /proc'],
-        'capture': 'miniaudio build; device execution unqualified', 'audioDecoding': 'restricted FFmpeg build; target execution unqualified', 'ocr': 'Tesseract English; target execution unqualified'},
+            'CMake 4.3.2', 'Ninja', 'procps and mounted /proc', 'WebKitGTK4.1 and web-extension development packages2.52.6; GTK Unix print; display session'],
+        'capture': 'miniaudio build; device execution unqualified', 'audioDecoding': 'restricted FFmpeg build; target execution unqualified', 'ocr': 'Tesseract English; target execution unqualified', 'documents': 'isolated WebView/PDF.js; target execution unqualified'},
 }
 
 def host_target(system=None, machine=None):

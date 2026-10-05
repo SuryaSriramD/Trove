@@ -22,6 +22,7 @@ import (
 	"time"
 
 	"trove.local/phase0/contracts"
+	"trove.local/phase0/internal/native"
 )
 
 type boundedPDFWriter struct {
@@ -45,8 +46,15 @@ func (k *Kernel) ExportPDF(ctx context.Context, e contracts.ServiceExecutionCont
 	if err = requireOwnerScope(k, e); err != nil {
 		return result, err
 	}
+	portable, findErr := native.FindDocumentHelper(ctx)
+	if findErr != nil {
+		return result, Fail("INTEGRITY_ERROR", "Document helper validation failed: "+findErr.Error())
+	}
+	if portable != nil {
+		return k.exportPortablePDF(ctx, e, destination, portable)
+	}
 	if runtime.GOOS != "darwin" {
-		return result, Fail("UNSUPPORTED_SCHEMA", "Rich PDF export is supported by the bundled macOS renderer. Export HTML and use Print to PDF on this platform.")
+		return result, Fail("UNSUPPORTED_SCHEMA", "The compatible local PDF helper is unavailable in this bundle. Install the complete platform package or export HTML.")
 	}
 	if len(printAssets) != 1 || printAssets[0] == nil {
 		return result, Fail("WORKER_FAILED", "The bundled PDF print assets are unavailable. Reinstall the complete application or export HTML.")

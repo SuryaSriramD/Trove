@@ -1,0 +1,173 @@
+{
+  "schemaVersion": 1,
+  "baseCommit": "cc1492af354dc12b7f297354ef14afe8844c01c6",
+  "recordedAt": "2026-10-05",
+  "host": "macOS-27.0.1-arm64-arm-64bit",
+  "go": "go1.27.1 darwin/arm64",
+  "node": "25.5.0",
+  "python": "3.9.6",
+  "sourceSHA256": {
+    "baseline/baseline.lock.json": "e69e3d2bbfa9ebba6647ccf93185eff693b063468eaba08b14a8f5344771251a",
+    "docs/completion/platform-desktop-packaging.md": "5d2206e7acba3599a3e9d6d56272002dcd1d618498344b770d243b33c58ee04e",
+    "docs/completion/portable-documents.md": "f960680b80283eebab5f86583c2e025e1a9a7b3306d0946c4a1407fa63562a5b",
+    "frontend/extract.html": "43f3f638cc95b47605ec0db1d0c066f98b9ef763a8f827769eb001d7afff8a1a",
+    "frontend/pnpm-lock.yaml": "7a2321bd4af1b4a770f1eaab9568fee634f09c7b50a59528a0a69c303bc7288f",
+    "frontend/print.html": "5351c02bc26a9572ac28055eafc9efdfbdf8913407b5d61b0e0f3ecb1a28a59e",
+    "frontend/src/document/extract.ts": "1c29014f5221b939f0a5d54743ca08cccfa6ef10617fb17204a7b62110ac739c",
+    "frontend/src/print/document.ts": "2d8812a4ef5ae1da9d6f0c4796944bb3bda2e448cb123155b0b8b5c66b864a33",
+    "frontend/tests/document.browser.spec.ts": "4dcbbfb3cb6bda461fc758b9af09cc70f660e3784218c800b6693592ac100abf",
+    "frontend/validate.html": "43f3f638cc95b47605ec0db1d0c066f98b9ef763a8f827769eb001d7afff8a1a",
+    "frontend/vite.config.mjs": "349008809dc2683d7753aaedab4c8670eb30f526587433125d20c353556928b0",
+    "internal/native/document_helper.go": "85c0c85b971845ea2a029dce209d0a353ccaffebe5e50cef1d5106f0b7e0d14c",
+    "internal/native/document_helper_test.go": "9933b3c5336265b0e1b3b719ef700d82451315b1cae5b7690b425ee2721650bd",
+    "internal/native/document_process.go": "2d622c44baad7e305cf8324d95c74de5286643ffdc0c6ab169b4a36c96a4eb42",
+    "internal/native/document_process_unix.go": "e4859d18da47deccb30c27dd34f2783d6b49e67eac318cd9b170f47cc2a26650",
+    "internal/native/document_process_windows.go": "49d0e9f1338508260ccf54290f6ee34aa112f0831473644736a0629e5060aea4",
+    "internal/workspace/export_pdf.go": "a7fced54d170bb71829299ea7032c2d3670ca7f6fbfac27767c21f291f429106",
+    "internal/workspace/export_pdf_portable.go": "a6c89e27bc13fbf2b9fe71c0a8eab929e6803cb565325211d2f712eb53803011",
+    "internal/workspace/extraction.go": "91bc613482bce662f17927c8807e0237f0255d04e42f0f162f7e244b6ba84619",
+    "native/document-policy.hpp": "9765bdbad7f7c4efa9f5eee4c42b3ba30b06173beac8f142fcd574bdd77ca21e",
+    "native/document-web-extension-linux.cpp": "65f582058067dc979abe6b072f17db267a5d0ecd99e9d1bf49a272685da37422",
+    "native/document-windows.lock.json": "9cf77af790025f6900aa902cefb6e78184f02ad5477d2bba1bb7a3782c24602b",
+    "native/document-worker-linux.cpp": "947d55d604844e42f1d760efd8bd02c21586ddacc78d6513254032a9a741c3cf",
+    "native/document-worker-windows.cpp": "e886659ceab4391288688bf41af6f61294b8b5a8b58c1a9fabd51e3f82339745",
+    "native/ocr.lock.json": "eb40fc641d2ba8bda6722b50397900e33644d29324d89a3e4009fce50118d8b6",
+    "scripts/build-desktop-portable.py": "c54059261a4787f011de198753f8a8c2a00829706c27afa3c791d799f8a2a35a",
+    "scripts/build-document-portable.py": "9d73eb99b6c4611a8f03246d638dd7ba4dd849067593c09bb9566418e02296d0",
+    "scripts/build-document-windows.py": "bef11dabcd41e8185e4ad699a9bfaeb87b5197bf27a4eb884f7acd78d8678546",
+    "scripts/build-native-portable.py": "c0f2158223aad945ca17c23117763d35541c00148f13aa3d2494e3debb51c49b",
+    "scripts/desktop_package.py": "d0d7b26833b4956d41e2bfde30b0f112fce530a1ddbf4770489588bb5da2af09",
+    "scripts/document_bundle.py": "4c77e80fe6097b17be60d65876e4db971830c97ffc04d39d1e48d340b15b17a6",
+    "scripts/native_targets.py": "76f6e48105a8d5b7ae21c0c131036902872f9ce42e3d8c51123a0351ed187c4b",
+    "tests/native/document_policy_test.cpp": "cba2c773b2c104e99c2ecabc7a76eaa2ee900cd75835f06471922d5b3033538a",
+    "tests/test_document_bundle.py": "826bb2cde4f634532ff13c0b542eac327d926b861fd0a40c768df54d1c1723ef",
+    "tests/test_document_windows.py": "bc6496255ebc9baa1e5f0b40b7a8f5c374f87d8b99d40d489e202e512ac1226f"
+  },
+  "reportSHA256": {
+    "go-race.txt": "7c7702300f096720469e9599de7ba7373eb1f7cca086f8e63a81c82ca7f782be",
+    "frontend-types.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "frontend-build.txt": "d05f82f1978188f56d1986aa42a569bbf27ca2b817dada1926c708879ff6b50a",
+    "browser-tests.txt": "1973cc84266b9a0ead025c355ade6026c8f48b9a9d54219d1801114ebcbcd7c9",
+    "browser-tests.json": "c58c58816f99d1d39ba1b91342bc2ac91848d4d3e6201c59de2444a13a14820b",
+    "browser-initial-startup-failure.txt": "97108d8000242dceb6ea8bd31a798fa9e435150c931166506b72c3401f458039",
+    "python-policy-package-tests.txt": "36f432810b805c40b60cd238542ab84b734189452daeca31b0274d89528db2a7",
+    "python-initial-policy-skipped.txt": "e52102598abe68073ab65a1c55d96dd8df00a4ac8671a5016729e16a9e34491b",
+    "go-windows-compile.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "go-linux-compile.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "rich-print-browser.png": "6c0e1af1038fca7446bdce0a6196632df2768f829f3a0d3ab6752e7d5fbd3286",
+    "go-final-memory-monitor.txt": "41a668ab952870fa3896ba66b3f65299e5920eafa98c37544f7c14a4bb91eb0e"
+  },
+  "releaseQualified": false,
+  "windowsNativeCompiled": false,
+  "windowsNativeExecuted": false,
+  "linuxNativeCompiled": false,
+  "linuxNativeExecuted": false,
+  "checks": [
+    {
+      "kind": "Go race regressions",
+      "passed": true,
+      "report": "go-race.txt",
+      "command": "GOCACHE=<APFS cache> GOMODCACHE=<verified offline modules> GOTOOLCHAIN=local GOPROXY=off TROVE_NATIVE_BUNDLE=/private/tmp/trove-native-candidate-02eb8c0 go test -race -tags 'fts5 sqlite_omit_load_extension' ./internal/native ./internal/workspace -run '^Test(Document|RichPDFExportRequiresOwnerAndBundledAssets|SearchExtractionJobPersistsAndIndexesFile)' -count=1 -v",
+      "details": "Actual blocked helper cancellation; private staging/changed-resource/bounds/source retention; cleanup uncertainty preserves profile; existing Mac PDF text/integrity and owner export permission checks."
+    },
+    {
+      "kind": "Browser actual PDF.js and print",
+      "passed": 4,
+      "failed": 0,
+      "report": "browser-tests.json",
+      "command": "TROVE_TEST_URL=http://127.0.0.1:4214 node node_modules/@playwright/test/cli.js test tests/document.browser.spec.ts tests/print.browser.spec.ts",
+      "details": "Chromium on macOS; independent PDF xref/text/page fixtures, hostile PDF actions, malformed and page-count bounds. Not WebView2 or WebKitGTK execution."
+    },
+    {
+      "kind": "Browser print screenshot inspection",
+      "passed": true,
+      "report": "rich-print-browser.png",
+      "details": "Visible diagram, equation, two columns, preserved inert script text, repeated table header, explicit offline/missing-image/equation notes; no native PDF page-render claim."
+    },
+    {
+      "kind": "TypeScript and Vite production build",
+      "passed": true,
+      "reports": [
+        "frontend-types.txt",
+        "frontend-build.txt"
+      ],
+      "commands": [
+        "node node_modules/typescript/bin/tsc --noEmit",
+        "node node_modules/vite/bin/vite.js build"
+      ]
+    },
+    {
+      "kind": "Package/SDK/policy and native target recipe tests",
+      "passed": 33,
+      "failed": 0,
+      "skipped": 0,
+      "report": "python-policy-package-tests.txt",
+      "commands": [
+        "TROVE_CACHE_DIR=<verified completion source cache> python3 -m unittest discover -s tests -p test_document*.py -v",
+        "python3 -m unittest discover -s tests -p test_native_targets.py -v"
+      ],
+      "details": "Includes pre-existing base package scenarios; pure shared C++ policy compiled/executed with Apple clang and hash-pinned nlohmann header. No Windows or Linux C++ target compilation."
+    },
+    {
+      "kind": "Windows/Linux Go parent cross-compilation",
+      "passed": true,
+      "reports": [
+        "go-windows-compile.txt",
+        "go-linux-compile.txt"
+      ],
+      "commands": [
+        "CGO_ENABLED=0 GOOS=windows GOARCH=amd64 go test -c ./internal/native",
+        "CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go test -c ./internal/native"
+      ],
+      "details": "Compilation only; no executable run on target OS."
+    },
+    {
+      "kind": "Final fail-closed memory monitor regression",
+      "passed": true,
+      "report": "go-final-memory-monitor.txt",
+      "command": "go test -race -tags 'fts5 sqlite_omit_load_extension' ./internal/native -run '^TestDocument' -count=1 -v",
+      "details": "After all other checks, unavailable OS memory measurement now kills/reaps the actual blocked helper. Final shared process source compiled again for Windows/Linux. No native helper target execution claim."
+    }
+  ],
+  "initialFailuresRetained": [
+    {
+      "report": "browser-initial-startup-failure.txt",
+      "detail": "First test reached preview before listener readiness and failed connection refused; remaining3 passed. After verified readiness/final build all4 passed unchanged."
+    },
+    {
+      "report": "python-initial-policy-skipped.txt",
+      "detail": "Host C++ policy skipped without explicit verified source cache; final run supplies cache and all29 document/package tests plus4 target tests passed."
+    }
+  ],
+  "reviews": [
+    {
+      "reviewer": "startup_reliability",
+      "fixed": [
+        "GLib const argument compile mismatch",
+        "Unverified process drain must retain private profile",
+        "WASM CSP for pinned local decoders"
+      ],
+      "remaining": "Exact custom-scheme PDF.js worker fallback and native execution remain unqualified.",
+      "finalSourceReview": "No remaining source blockers after cleanupUnsafe propagation and GLib correction; Windows PrintToPdf handle and Linux worker behavior remain target gates."
+    },
+    {
+      "reviewer": "finish_vision",
+      "fixed": [
+        "Wrong WebResource request hook replaced by web-process WebPage pre-dispatch extension",
+        "Response headers ownership double-free removed",
+        "Whole Windows job drain before profile cleanup"
+      ],
+      "upstreamVerified": "WebKitGTK2.52.6 set_web_extensions_directory automatically mounts extension directory read-only in its web-process sandbox.",
+      "remaining": "Native sandbox launch, custom-origin module/PDF.js behavior, file printer and process cleanup still need Ubuntu execution."
+    }
+  ],
+  "unqualified": [
+    "Windows MSVC/SDK compile and native WebView2 launch",
+    "Ubuntu native C++ compile/WebKit sandbox/custom scheme/worker path",
+    "Target process tree cleanup and ACL/filesystem semantics",
+    "Native visual multipage PDF export, fonts/images/WASM decoders and large/scanned/encrypted corpora",
+    "Windows PrintToPdf reserved output handle compatibility",
+    "Clean native installs, offline operation and all REL-009 platform checks",
+    "System audio and screenshot acquisition"
+  ]
+}
