@@ -1,0 +1,21 @@
+{
+  "recordedAt": "2026-10-05T14:53:11.596156+00:00",
+  "method": "Native CUA AX and screenshot observation of frozen app, followed by read-only canonical database inspection after quitting. Synthetic workspace only.",
+  "passed": [
+    "New page created from native Home",
+    "Exact Unicode title and body pasted, saved, navigated away and reopened",
+    "Bold mark persisted without losing canonical text",
+    "Quick switcher found page using phrase and reopened it"
+  ],
+  "failed": [
+    "Quick switcher query important phrase returned no matching pages although the displayed word important was unchanged. Canonical runs split imp + ortant phrase.; index inserted a space at the formatting boundary."
+  ],
+  "limitations": [
+    "Initial CUA native app attachment took about 11 minutes; not an application startup measurement.",
+    "CUA typeText omitted non-ASCII input; exact paste was used instead. CUA range selection marked ortant phrase. rather than the requested important phrase; not attributed to application selection semantics.",
+    "AX parent body value was partial while child text, screenshot and canonical bytes retained the entire body.",
+    "No actual mic, screenshot acquisition permission, IME, VoiceOver, or complete advanced UI qualification.",
+    "Screenshots were inspected in the tool output, not stored as a durable image artifact."
+  ],
+  "releaseQualified": false
+}

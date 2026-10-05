@@ -1,0 +1,27 @@
+{
+  "step": "p1-create",
+  "passed": true,
+  "recordedAt": "2026-10-05T14:13:57.565737Z",
+  "state": {
+    "workspaceId": "01a10c6a-05f7-796f-8733-39182d7c0ec4",
+    "pageId": "01a10c6a-06bd-779a-b454-5af2a0a56b0e",
+    "blockId": "01a10c6a-06bd-7eef-87a3-f0352e71a201",
+    "collectionId": "01a10c6a-06bd-7b0d-abc4-e102d10dcfd9",
+    "propertyId": "01a10c6a-06bd-77ea-bee7-850b08c7e452",
+    "recordId": "01a10c6a-06bd-795b-bc5b-f524f1ecfb12",
+    "recordPageId": "01a10c6a-06bd-72de-ba4c-8af2c68eb4a9",
+    "fileId": "01a10c6a-06d5-7f83-a2d5-9373860e6f04",
+    "fileBlockId": "01a10c6a-06bd-785e-9d0d-56a620b75704",
+    "contentHash": "61cb495898eb4901d8a4ea859ee4cee692bb981cc2474a55f2809e47519fd273"
+  },
+  "checks": [
+    "canonical linked gallery shares edited record identity",
+    "formula computes exact 0.3 separately from captured source 999",
+    "advanced reusable content and inert card survive offline",
+    "keyword search includes retained offline card",
+    "automation receipt prevents duplicate effects across repeated ticks",
+    "managed attachment hash preserved"
+  ],
+  "processExitCode": 0,
+  "installedWeightsAvailable": false
+}

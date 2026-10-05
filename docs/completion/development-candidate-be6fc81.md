@@ -1,0 +1,29 @@
+# Development candidate be6fc81
+
+This frozen macOS development candidate passes the recorded service and packaged journeys, but **does not pass the release gate**. Native interface testing found a formatted-word search defect, and one startup sample exceeded the target. These failures remain attached to this exact binary.
+
+Source: `be6fc81eef1d818a4255402a81b520d54b5c8623`. App binary SHA-256: `68faf41c9f746d0d72423cfda3562d60ca9c27f5d04a9bc1460f7d9df5d595ca`. The [manifest](../../evidence/completion/candidate-be6fc81/manifest.json) links the frozen source archive, all 674 application files, native helpers, host identity, raw logs, skipped checks and limitations. Application bytes were unchanged after testing. A later test-only fixture repair, `9a3c075`, changes no application source.
+
+## Verified scope
+
+- **870 Go service tests/subtests passed; 44 explicitly skipped.** The initial full run exposed a private D-Bus test fixture export/startup race. Its failure is retained; the fixture ordering was fixed, checked 120 times under the race detector, and the full suite then passed.
+- **60 desktop tests/subtests passed; one skipped.** Production TypeScript/Vite, native helper and desktop builds passed, with strict ad-hoc signature/resource verification.
+- **121 tooling tests passed.** Initial test-fixture failures are retained: the old desktop fixture omitted the newly required microphone sidecar, and the first repair omitted an import. Production validation was not weakened.
+- Packaged offline [P0](../../evidence/completion/candidate-be6fc81/packaged-p0/packaged-integration.json), [P1](../../evidence/completion/candidate-be6fc81/packaged-p1/packaged-p1-integration.json), [P2](../../evidence/completion/candidate-be6fc81/packaged-p2/packaged-p2-integration.json), and [native worker](../../evidence/completion/candidate-be6fc81/packaged-native/packaged-integration.json) journeys passed. They use disposable workspaces and OS network denial, with separate-process reopen and their stated recovery/content assertions. Native chat, embedding and retained-fixture speech ran locally. Production miniaudio has no synthetic mode; that check is **not_run**, and no actual microphone/permission test was performed.
+- Native CUA interaction created a page, pasted exact Unicode text, applied a bold mark, saved, navigated away, searched and reopened it. Read-only canonical inspection confirmed original text and formatting persistence. The [observations](../../evidence/completion/candidate-be6fc81/native-ui/observations.json) separate tooling limitations from the actual search failure below. This is a narrow UI check, not complete accessibility/IME or advanced workflow qualification.
+
+## Performance and discovered failures
+
+The [startup report](../../evidence/completion/candidate-be6fc81/shell.json) records five fresh process launches each for empty, 100-page, 1,000-page and 10,000-page synthetic workspaces. Counts were independently verified from closed databases: two paragraph blocks per page. All 20 returned readiness and exited successfully; one 1,000-page launch took **8,399.656 ms**, failing the explicit 2,500 ms threshold. The other profile maxima were 1,180.290 ms, 934.751 ms and 1,781.797 ms. `measurementPassed` means samples completed, not that the latency target passed. No stage traces were produced: the runner sets `TROVE_STARTUP_TRACE`, but this candidate has no native consumer. The cause is unresolved; faster neighboring samples cannot erase it.
+
+[Keyword service measurements](../../evidence/completion/candidate-be6fc81/search-startup-profiles/benchmark-service.json) ran 50 samples per profile. Maximums were **1.982 / 5.236 / 39.852 ms** for 100 / 1,000 / 10,000 pages, below 300 ms within this synthetic Go-service boundary. Ten actual local-model hybrid samples on **100 pages only** had a maximum of **117.148 ms**, below one second. These exclude Wails IPC/paint and do not establish representative large semantic-workspace or concurrent workload performance.
+
+The [10,000-record typed database benchmark](../../evidence/completion/candidate-be6fc81/database-full/results.json) passed all nine independent membership/order/pagination oracles. Ordinary first-page median times were approximately **65–216 ms**, and formula/rollup first pages **1,197 / 1,127 ms**. The existing projection/cache optimization remains present; unchanged allocations and broad timing increases do not isolate their cause. These timings remain open performance observations, not a new invented database acceptance threshold.
+
+Native testing saved `Preserve café 🦉 and this important phrase.` across two rich-text runs, with a mark boundary inside `important`. The visible and canonical sentence remained exact, but its indexed body contained `imp ortant`. Quick switcher found `phrase` and reopened the page, while `important phrase` returned no match. The [canonical observation](../../evidence/completion/candidate-be6fc81/native-ui/canonical-observation.json) preserves this defect. A later source fix requires its own regression and candidate check; it does not retroactively qualify this application.
+
+## Remaining gates
+
+This is an ad-hoc build on the developer Mac, not a signed/notarized distributable or clean-install result. Actual microphone/TCC, independent installation/restore, signed update and rollback pairs, live Notion/provider/remote MCP clients, representative authorized datasets, broad model quality, concurrent workload performance, and Windows/Linux execution remain unqualified. The 307-behavior research report is still unavailable.
+
+The app predates subsequent Windows storage/PDF and rollback/search source changes. Later implementation checks cannot change its identity or qualification. Raw reports retain their original `candidate-next` paths after archival relocation; the manifest supplies current relative evidence paths. All 51 backlog acceptance criteria remain binding.

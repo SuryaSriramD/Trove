@@ -1,0 +1,23 @@
+[
+  {
+    "workspacePath": "/var/folders/xc/s78np0812b12p6338l0ndvsm0000gn/T/trove-phase3-benchmark-2709906337/pages-100",
+    "pages": 100,
+    "paragraphBlocks": 200,
+    "databaseSha256": "3f16b07f91ce3ab3e145823fe4f8ca154fcedc763fd759325f28f2ea436dca10",
+    "verification": "Closed, checkpointed source database read immutable; no writes."
+  },
+  {
+    "workspacePath": "/var/folders/xc/s78np0812b12p6338l0ndvsm0000gn/T/trove-phase3-benchmark-2709906337/pages-1000",
+    "pages": 1000,
+    "paragraphBlocks": 2000,
+    "databaseSha256": "d89e9e4c64cbdafcc36d8bd36f9ab16fd40bec15a08c30d02ecbcdcd4980f378",
+    "verification": "Closed, checkpointed source database read immutable; no writes."
+  },
+  {
+    "workspacePath": "/var/folders/xc/s78np0812b12p6338l0ndvsm0000gn/T/trove-phase3-benchmark-2709906337/pages-10000",
+    "pages": 10000,
+    "paragraphBlocks": 20000,
+    "databaseSha256": "eeb376d5819c8cfbf8de1274a483e3fbe6721ae8b691eae590d97d36369d5ae3",
+    "verification": "Closed, checkpointed source database read immutable; no writes."
+  }
+]

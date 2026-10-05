@@ -1,0 +1,191 @@
+{
+  "recordedAt": "2026-10-05T14:30:29.917053+00:00",
+  "app": "/private/tmp/Trove-completion-be6fc81.app",
+  "appBinarySha256": "68faf41c9f746d0d72423cfda3562d60ca9c27f5d04a9bc1460f7d9df5d595ca",
+  "appUnchanged": true,
+  "networkDeniedByOS": true,
+  "modelPacks": [],
+  "fixture": "/var/folders/xc/s78np0812b12p6338l0ndvsm0000gn/T/trove-shell-benchmark-cacwjgdd",
+  "profiles": [
+    {
+      "pages": 0,
+      "paragraphBlocks": 0,
+      "samples": [
+        {
+          "definition": "Go process initialization to canonical snapshot rendered plus two animation frames",
+          "recordedAt": "2026-10-05T14:29:59.255039Z",
+          "usableShellMs": 860.704,
+          "launchThroughShutdownMs": 968.688207998639
+        },
+        {
+          "definition": "Go process initialization to canonical snapshot rendered plus two animation frames",
+          "recordedAt": "2026-10-05T14:30:00.129453Z",
+          "usableShellMs": 763.208,
+          "launchThroughShutdownMs": 875.7188749987108
+        },
+        {
+          "definition": "Go process initialization to canonical snapshot rendered plus two animation frames",
+          "recordedAt": "2026-10-05T14:30:01.239087Z",
+          "usableShellMs": 982.428,
+          "launchThroughShutdownMs": 1104.2080840015842
+        },
+        {
+          "definition": "Go process initialization to canonical snapshot rendered plus two animation frames",
+          "recordedAt": "2026-10-05T14:30:02.307835Z",
+          "usableShellMs": 945.25,
+          "launchThroughShutdownMs": 1041.1080420017242
+        },
+        {
+          "definition": "Go process initialization to canonical snapshot rendered plus two animation frames",
+          "recordedAt": "2026-10-05T14:30:03.657639Z",
+          "usableShellMs": 1180.29,
+          "launchThroughShutdownMs": 1345.2909170009661
+        }
+      ],
+      "requestedIterations": 5,
+      "attemptedIterations": 5,
+      "completedIterations": 5,
+      "complete": true,
+      "medianMs": 945.25,
+      "maximumMs": 1180.29,
+      "approximatelyTwoSeconds": true
+    },
+    {
+      "pages": 100,
+      "paragraphBlocks": 200,
+      "samples": [
+        {
+          "definition": "Go process initialization to canonical snapshot rendered plus two animation frames",
+          "recordedAt": "2026-10-05T14:30:04.654786Z",
+          "usableShellMs": 868.294,
+          "launchThroughShutdownMs": 1003.2822920002218
+        },
+        {
+          "definition": "Go process initialization to canonical snapshot rendered plus two animation frames",
+          "recordedAt": "2026-10-05T14:30:05.737891Z",
+          "usableShellMs": 934.751,
+          "launchThroughShutdownMs": 1067.2103750002861
+        },
+        {
+          "definition": "Go process initialization to canonical snapshot rendered plus two animation frames",
+          "recordedAt": "2026-10-05T14:30:06.654676Z",
+          "usableShellMs": 822.687,
+          "launchThroughShutdownMs": 936.5662909985986
+        },
+        {
+          "definition": "Go process initialization to canonical snapshot rendered plus two animation frames",
+          "recordedAt": "2026-10-05T14:30:07.554662Z",
+          "usableShellMs": 788.765,
+          "launchThroughShutdownMs": 895.3191250002419
+        },
+        {
+          "definition": "Go process initialization to canonical snapshot rendered plus two animation frames",
+          "recordedAt": "2026-10-05T14:30:08.547374Z",
+          "usableShellMs": 869.74,
+          "launchThroughShutdownMs": 1010.1360830012709
+        }
+      ],
+      "requestedIterations": 5,
+      "attemptedIterations": 5,
+      "completedIterations": 5,
+      "complete": true,
+      "medianMs": 868.294,
+      "maximumMs": 934.751,
+      "approximatelyTwoSeconds": true
+    },
+    {
+      "pages": 1000,
+      "paragraphBlocks": 2000,
+      "samples": [
+        {
+          "definition": "Go process initialization to canonical snapshot rendered plus two animation frames",
+          "recordedAt": "2026-10-05T14:30:09.638061Z",
+          "usableShellMs": 940.271,
+          "launchThroughShutdownMs": 1047.251125000912
+        },
+        {
+          "definition": "Go process initialization to canonical snapshot rendered plus two animation frames",
+          "recordedAt": "2026-10-05T14:30:10.888141Z",
+          "usableShellMs": 1094.365,
+          "launchThroughShutdownMs": 1264.3003330013016
+        },
+        {
+          "definition": "Go process initialization to canonical snapshot rendered plus two animation frames",
+          "recordedAt": "2026-10-05T14:30:19.438591Z",
+          "usableShellMs": 8399.656,
+          "launchThroughShutdownMs": 8502.604583001812
+        },
+        {
+          "definition": "Go process initialization to canonical snapshot rendered plus two animation frames",
+          "recordedAt": "2026-10-05T14:30:20.237913Z",
+          "usableShellMs": 740.218,
+          "launchThroughShutdownMs": 834.8888750006154
+        },
+        {
+          "definition": "Go process initialization to canonical snapshot rendered plus two animation frames",
+          "recordedAt": "2026-10-05T14:30:21.272653Z",
+          "usableShellMs": 931.536,
+          "launchThroughShutdownMs": 1005.2565829973901
+        }
+      ],
+      "requestedIterations": 5,
+      "attemptedIterations": 5,
+      "completedIterations": 5,
+      "complete": true,
+      "medianMs": 940.271,
+      "maximumMs": 8399.656,
+      "approximatelyTwoSeconds": false
+    },
+    {
+      "pages": 10000,
+      "paragraphBlocks": 20000,
+      "samples": [
+        {
+          "definition": "Go process initialization to canonical snapshot rendered plus two animation frames",
+          "recordedAt": "2026-10-05T14:30:23.28797Z",
+          "usableShellMs": 1781.797,
+          "launchThroughShutdownMs": 1860.8210420024989
+        },
+        {
+          "definition": "Go process initialization to canonical snapshot rendered plus two animation frames",
+          "recordedAt": "2026-10-05T14:30:24.954736Z",
+          "usableShellMs": 1595.948,
+          "launchThroughShutdownMs": 1693.051332997129
+        },
+        {
+          "definition": "Go process initialization to canonical snapshot rendered plus two animation frames",
+          "recordedAt": "2026-10-05T14:30:26.537244Z",
+          "usableShellMs": 1483.329,
+          "launchThroughShutdownMs": 1587.8911660001904
+        },
+        {
+          "definition": "Go process initialization to canonical snapshot rendered plus two animation frames",
+          "recordedAt": "2026-10-05T14:30:28.238177Z",
+          "usableShellMs": 1603.031,
+          "launchThroughShutdownMs": 1694.4604580021405
+        },
+        {
+          "definition": "Go process initialization to canonical snapshot rendered plus two animation frames",
+          "recordedAt": "2026-10-05T14:30:29.837855Z",
+          "usableShellMs": 1482.595,
+          "launchThroughShutdownMs": 1588.1617500017455
+        }
+      ],
+      "requestedIterations": 5,
+      "attemptedIterations": 5,
+      "completedIterations": 5,
+      "complete": true,
+      "medianMs": 1595.948,
+      "maximumMs": 1781.797,
+      "approximatelyTwoSeconds": true
+    }
+  ],
+  "failures": [],
+  "measurementPassed": true,
+  "definition": "Go process initialization to canonical workspace snapshot rendered and two animation frames. Startup includes native validation and Wails initialization. Each sample uses a new app process; OS disk caches are not flushed. The approximate two-second threshold is explicitly interpreted as at most 2.5 seconds, requires every requested iteration to finish, and exact values are retained.",
+  "limitations": [
+    "Developer Mac only; hardware and synthetic workspace definitions are in benchmark-environment.json.",
+    "Does not measure installer/Gatekeeper time or guarantee editor responsiveness during background work.",
+    "A missing readiness report is a failed measurement; it does not by itself distinguish a workspace, bridge, renderer, or visibility problem."
+  ]
+}

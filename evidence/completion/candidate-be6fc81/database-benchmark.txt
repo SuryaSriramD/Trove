@@ -1,0 +1,16 @@
+{
+  "localMeasurementComplete": true,
+  "releaseQualified": false,
+  "exitCode": 0,
+  "sourceChangedDuringRun": [],
+  "wallSecondsIncludingCompile": 76.43350566599838
+}
+all_live_default_order: rows=9892 first p50=64.97ms p95=70.14ms
+exact_decimal_and_status: rows=1791 first p50=216.22ms p95=260.20ms
+timed_date_and_checkbox: rows=1535 first p50=186.82ms p95=187.43ms
+unicode_text_contains: rows=1321 first p50=66.13ms p95=70.54ms
+bound_literal_not_sql: rows=1 first p50=159.42ms p95=162.13ms
+multi_select_and_missing_number: rows=181 first p50=116.35ms p95=116.96ms
+formula_filter_sort: rows=2572 first p50=1197.38ms p95=1221.69ms
+relation_rollup_filter_sort: rows=1979 first p50=1127.11ms p95=1142.04ms
+provider_bridge_99_selected_rows: rows=99 first p50=43.01ms p95=58.26ms
