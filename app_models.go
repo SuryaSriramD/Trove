@@ -148,6 +148,10 @@ func (a *App) nativeDispatch(method string, raw json.RawMessage) string {
 	}
 }
 func (a *App) PickModelPack(packID string) error {
+	if err := a.requireRollbackCommitted(); err != nil {
+		return err
+	}
+
 	if a.native == nil || a.native.manager == nil {
 		return fmt.Errorf("model manager unavailable")
 	}
@@ -226,6 +230,10 @@ func (a *App) modelProgress(packID, state string) func(int64) {
 
 // SetEditing is a scheduling hint, not an authorization or mutation capability.
 func (a *App) SetEditing(active bool) {
+	if err := a.requireRollbackCommitted(); err != nil {
+		return
+	}
+
 	if a.native != nil && a.native.supervisor != nil {
 		a.native.supervisor.Scheduler.SetEditing(active)
 	}

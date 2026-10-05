@@ -8,6 +8,10 @@ import (
 )
 
 func (a *App) ExportPortable() (string, error) {
+	if err := a.requireRollbackCommitted(); err != nil {
+		return "", err
+	}
+
 	destination, err := runtime.SaveFileDialog(a.ctx, runtime.SaveDialogOptions{Title: "Export readable Markdown, CSV, and attachments", DefaultFilename: "Trove-portable.zip", Filters: []runtime.FileFilter{{DisplayName: "ZIP archive", Pattern: "*.zip"}}})
 	if err != nil || destination == "" {
 		return "", err
@@ -26,6 +30,10 @@ func (a *App) ExportPortable() (string, error) {
 }
 
 func (a *App) ExportHTML() (string, error) {
+	if err := a.requireRollbackCommitted(); err != nil {
+		return "", err
+	}
+
 	destination, err := runtime.SaveFileDialog(a.ctx, runtime.SaveDialogOptions{Title: "Export offline HTML with canonical source", DefaultFilename: "Trove-HTML.zip", Filters: []runtime.FileFilter{{DisplayName: "ZIP archive", Pattern: "*.zip"}}})
 	if err != nil || destination == "" {
 		return "", err
@@ -44,6 +52,10 @@ func (a *App) ExportHTML() (string, error) {
 }
 
 func (a *App) ExportPDF() (string, error) {
+	if err := a.requireRollbackCommitted(); err != nil {
+		return "", err
+	}
+
 	destination, err := runtime.SaveFileDialog(a.ctx, runtime.SaveDialogOptions{Title: "Export rich page PDF", DefaultFilename: "Trove-pages.pdf", Filters: []runtime.FileFilter{{DisplayName: "PDF document", Pattern: "*.pdf"}}})
 	if err != nil || destination == "" {
 		return "", err

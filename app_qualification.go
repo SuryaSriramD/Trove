@@ -15,6 +15,7 @@ var processStarted = time.Now()
 var shellReported sync.Once
 
 func (a *App) ShellReady() {
+	a.confirmRollbackShellReady()
 	path := os.Getenv("TROVE_SHELL_REPORT")
 	if path == "" {
 		return

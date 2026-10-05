@@ -72,7 +72,7 @@ func newRollbackFixture(t *testing.T) rollbackFixture {
 	if err != nil {
 		t.Fatal(err)
 	}
-	f.application = updates.Application{Identity: updates.Identity{BundleID: updates.BundleID, TeamID: "ABCDEFGHIJ", Version: "1.0.0", Build: 1, UserVersion: 3, StorageGeneration: 1, Architecture: "arm64", MinimumOS: "13.0"}, Inventory: inventory}
+	f.application = updates.Application{Identity: updates.Identity{BundleID: updates.BundleID, TeamID: "ABCDEFGHIJ", Version: "1.0.0", Build: 1, UserVersion: 3, StorageGeneration: 1, RollbackHandshake: 1, Architecture: "arm64", MinimumOS: "13.0"}, Inventory: inventory}
 	f.id, err = f.a.saveRollbackLaunchReviewContext(context.Background(), f.source, f.application, f.destination)
 	if err != nil || f.id == "" {
 		t.Fatalf("save launch review: %v", err)
@@ -89,8 +89,11 @@ func (f rollbackFixture) dependencies(t *testing.T) rollbackLaunchDependencies {
 			return f.application, nil
 		}),
 		preference: f.preference, environment: []string{"HOME=/native/home", "TROVE_WORKSPACE=/newer/workspace", "DYLD_INSERT_LIBRARIES=/injected", "OPENAI_API_KEY=never-forward"},
-		start: func(context.Context, string, []string) error { t.Fatal("unexpected launch"); return nil },
-		quit:  func() { t.Fatal("unexpected quit") },
+		start: func(context.Context, string, []string, updates.RollbackTarget) error {
+			t.Fatal("unexpected launch")
+			return nil
+		},
+		quit: func() { t.Fatal("unexpected quit") },
 	}
 }
 func TestRollbackLaunchSelectsRestoredBeforeFirstOpenAndQuit(t *testing.T) {
@@ -100,7 +103,7 @@ func TestRollbackLaunchSelectsRestoredBeforeFirstOpenAndQuit(t *testing.T) {
 	}
 	deps := f.dependencies(t)
 	var events []string
-	deps.start = func(ctx context.Context, path string, env []string) error {
+	deps.start = func(ctx context.Context, path string, env []string, target updates.RollbackTarget) error {
 		if ctx.Err() != nil || path != f.source {
 			t.Fatal("incorrect executable")
 		}
@@ -249,7 +252,7 @@ func TestRollbackLaunchFailureRestoresPreferenceAndKeepsCurrentApp(t *testing.T)
 			defer cancel()
 			deps := f.dependencies(t)
 			called := false
-			deps.start = func(ctx context.Context, _ string, _ []string) error {
+			deps.start = func(ctx context.Context, _ string, _ []string, _ updates.RollbackTarget) error {
 				called = true
 				if kind == "concurrent-change" {
 					if err := saveWorkspaceSelection(f.preference, "/another/selection"); err != nil {
@@ -340,5 +343,62 @@ func TestRollbackLaunchCaptureCancellationAndCompatibility(t *testing.T) {
 	}
 	if id := f.a.saveRollbackLaunchReview("renderer-relative", f.application, f.destination); id != "" {
 		t.Fatal("relative executable accepted")
+	}
+}
+
+func TestRollbackLaunchRejectsMissingSignedHandshakeBeforeSelection(t *testing.T) {
+	f := newRollbackFixture(t)
+	f.application.Identity.RollbackHandshake = 0
+	f.id = f.a.saveRollbackLaunchReview(f.source, f.application, f.destination)
+	if err := f.a.launchApplicationRollback(context.Background(), f.id, f.dependencies(t)); err == nil {
+		t.Fatal("launched protocol-less old application")
+	}
+	if _, err := os.Stat(f.preference); !os.IsNotExist(err) {
+		t.Fatal("changed preference before capability refusal")
+	}
+}
+func TestRollbackLaunchDoesNotQuitUntilReadinessAndInitializationAcknowledged(t *testing.T) {
+	f := newRollbackFixture(t)
+	deps := f.dependencies(t)
+	entered, ack, done := make(chan struct{}), make(chan struct{}), make(chan error, 1)
+	quit := make(chan struct{}, 1)
+	deps.start = func(ctx context.Context, path string, env []string, target updates.RollbackTarget) error {
+		if target.WorkspacePath != f.destination || target.WorkspaceID != "restored-identity" || target.UserVersion != 3 || target.StorageGeneration != 1 {
+			return errors.New("incorrect reviewed target")
+		}
+		close(entered)
+		<-ack
+		return nil
+	}
+	deps.quit = func() { quit <- struct{}{} }
+	go func() { done <- f.a.launchApplicationRollback(context.Background(), f.id, deps) }()
+	<-entered
+	select {
+	case <-quit:
+		t.Fatal("quit before verified startup")
+	default:
+	}
+	close(ack)
+	if err := <-done; err != nil {
+		t.Fatal(err)
+	}
+	select {
+	case <-quit:
+	default:
+		t.Fatal("did not finish acknowledged handoff")
+	}
+}
+func TestRollbackUnverifiedChildCleanupRetainsSelectionAndCurrentApp(t *testing.T) {
+	f := newRollbackFixture(t)
+	deps := f.dependencies(t)
+	deps.start = func(context.Context, string, []string, updates.RollbackTarget) error {
+		return updates.ErrRollbackCleanupUnverified
+	}
+	if err := f.a.launchApplicationRollback(context.Background(), f.id, deps); !errors.Is(err, updates.ErrRollbackCleanupUnverified) {
+		t.Fatal(err)
+	}
+	raw, err := os.ReadFile(f.preference)
+	if err != nil || !strings.Contains(string(raw), f.destination) {
+		t.Fatal("silently redirected a potentially live rollback child", err)
 	}
 }

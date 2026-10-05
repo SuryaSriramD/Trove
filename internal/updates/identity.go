@@ -11,6 +11,7 @@ import (
 const BundleID = "local.trove.desktop"
 
 type Identity struct {
+	RollbackHandshake int    `json:"rollbackHandshake"`
 	BundleID          string `json:"bundleId"`
 	TeamID            string `json:"teamId"`
 	Version           string `json:"version"`

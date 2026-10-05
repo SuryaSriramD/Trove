@@ -40,6 +40,10 @@ func (a *App) updatesState() *updateState {
 	return value.(*updateState)
 }
 func (a *App) beginUpdateOperation() (context.Context, func(), error) {
+	if err := a.requireRollbackCommitted(); err != nil {
+		return nil, nil, err
+	}
+
 	a.mu.RLock()
 	base := a.ctx
 	a.mu.RUnlock()
@@ -57,6 +61,10 @@ func (a *App) beginUpdateOperation() (context.Context, func(), error) {
 	return ctx, func() { cancel(); s.mu.Lock(); s.cancel = nil; s.mu.Unlock() }, nil
 }
 func (a *App) CancelUpdateOperation() {
+	if err := a.requireRollbackCommitted(); err != nil {
+		return
+	}
+
 	s := a.updatesState()
 	s.mu.Lock()
 	defer s.mu.Unlock()

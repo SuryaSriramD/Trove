@@ -42,6 +42,7 @@ type Kernel struct {
 	listeners             map[uint64]chan json.RawMessage
 	listenerSeq           uint64
 	recordQueries         recordQueryCache
+	compatiblePending     bool
 }
 type cancellation struct {
 	cancel      context.CancelFunc
@@ -123,6 +124,9 @@ func open(path string, create bool) (*Kernel, error) { return openMigrationObser
 
 // observe is used by fault-injection tests at durable migration boundaries.
 func openMigrationObserved(path string, create bool, observe func(string) error) (k *Kernel, err error) {
+	return openReviewed(path, create, observe, nil)
+}
+func openReviewed(path string, create bool, observe func(string) error, reviewed *compatibleOpen) (k *Kernel, err error) {
 	checkpoint := func(stage string) error {
 		if observe != nil {
 			return observe(stage)
@@ -216,6 +220,11 @@ func openMigrationObserved(path string, create bool, observe func(string) error)
 			return nil, err
 		}
 	}
+	if reviewed != nil {
+		if err = reviewed.validate(path, existingDatabase, before, incomplete || journal != nil); err != nil {
+			return nil, err
+		}
+	}
 	if journal != nil && (journal.Target.UserVersion > CurrentUserVersion || journal.Target.StorageGeneration > CurrentStorageGeneration) {
 		return nil, Fail("UNSUPPORTED_SCHEMA", "Workspace upgrade requires a newer application")
 	}
@@ -229,6 +238,9 @@ func openMigrationObserved(path string, create bool, observe func(string) error)
 	}
 	vecOnce.Do(sqlitevec.Auto)
 	dsn := (&url.URL{Scheme: "file", Path: filepath.Join(path, "workspace.db")}).String() + "?_foreign_keys=on&_journal_mode=WAL&_synchronous=FULL&_busy_timeout=5000"
+	if reviewed != nil {
+		dsn = (&url.URL{Scheme: "file", Path: filepath.Join(path, "workspace.db")}).String() + "?mode=ro&_query_only=true&_foreign_keys=on&_busy_timeout=5000"
+	}
 	k.db, err = sql.Open("sqlite3", dsn)
 	if err != nil {
 		return nil, err
@@ -305,7 +317,7 @@ func openMigrationObserved(path string, create bool, observe func(string) error)
 	if err != nil {
 		return nil, err
 	}
-	if err = k.db.QueryRow("SELECT value FROM kernel_meta WHERE key='ownerId'").Scan(&k.ownerID); errors.Is(err, sql.ErrNoRows) {
+	if err = k.db.QueryRow("SELECT value FROM kernel_meta WHERE key='ownerId'").Scan(&k.ownerID); errors.Is(err, sql.ErrNoRows) && reviewed == nil {
 		k.ownerID = NewID()
 		_, err = k.db.Exec("INSERT INTO kernel_meta(key,value) VALUES('ownerId',?)", k.ownerID)
 	}
@@ -326,6 +338,10 @@ func openMigrationObserved(path string, create bool, observe func(string) error)
 	}
 	k.recordQueryDB.SetMaxOpenConns(2)
 	k.recordQueryDB.SetMaxIdleConns(2)
+	if reviewed != nil {
+		k.compatiblePending = true
+		return k, nil
+	}
 	if err = k.initServiceRuntime(context.Background()); err != nil {
 		return nil, err
 	}
