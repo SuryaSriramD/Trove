@@ -1,0 +1,143 @@
+{
+  "recordedAt": "2026-10-05T15:15:57.261893+00:00",
+  "sourceCommit": "254d623",
+  "applicationBinarySha256": "b56893e4dd3132f3aff8ea9ccdfcbff182dc9bd992b10e3b2ae6bc7d703f4184",
+  "appFilesUnchanged": true,
+  "method": "Native CUA quick-switcher interaction under OS network denial, followed by read-only inspection of closed synthetic databases.",
+  "query": "important phrase",
+  "expectedResultTitle": "Native verification — café 🦉",
+  "observedMatchingPage": true,
+  "resultOpenedExpectedPage": true,
+  "canonicalPageAndBlocksUnchanged": true,
+  "sourceWorkspaceWasCopiedBeforeOpening": true,
+  "modelPacks": [],
+  "passed": true,
+  "before": {
+    "page": {
+      "id": "01a10c89-555c-7383-9876-baf9ff7e4953",
+      "workspace_id": "01a10c7d-5e6b-7894-865d-32a4db1a7dc9",
+      "parent_page_id": null,
+      "title": "Native verification — café 🦉",
+      "revision": "5",
+      "created_at": "2026-10-05T14:48:09.310867Z",
+      "updated_at": "2026-10-05T14:49:03.265826Z",
+      "deleted_at": null,
+      "provenance_json": null
+    },
+    "blocks": [
+      {
+        "id": "01a10c8a-08d5-70d3-aa51-037510d44e78",
+        "page_id": "01a10c89-555c-7383-9876-baf9ff7e4953",
+        "parent_block_id": null,
+        "sort_key": "000000000001",
+        "type": "paragraph",
+        "schema_version": 1,
+        "data_json": "{\"richText\":[{\"text\":\"Preserve café 🦉 and this imp\"},{\"marks\":[\"bold\"],\"text\":\"ortant phrase.\"}]}",
+        "revision": "2"
+      }
+    ],
+    "chunks": [
+      {
+        "id": "01a10c89-555c-7383-9876-baf9ff7e4953:title",
+        "page_id": "01a10c89-555c-7383-9876-baf9ff7e4953",
+        "source_revision": "5",
+        "block_id": null,
+        "kind": "page",
+        "title": "Native verification — café 🦉",
+        "body": "Native verification — café 🦉",
+        "location_json": "{\"pageId\":\"01a10c89-555c-7383-9876-baf9ff7e4953\",\"sourceRevision\":\"5\"}",
+        "content_hash": "db099be209f944cc1d357d6cedad8be7760656ba023d5ae6694c3459e7ff8ef5",
+        "file_id": null,
+        "document_page": 0
+      },
+      {
+        "id": "01a10c8a-08d5-70d3-aa51-037510d44e78:0",
+        "page_id": "01a10c89-555c-7383-9876-baf9ff7e4953",
+        "source_revision": "5",
+        "block_id": "01a10c8a-08d5-70d3-aa51-037510d44e78",
+        "kind": "page",
+        "title": "Native verification — café 🦉",
+        "body": "Preserve café 🦉 and this imp ortant phrase.",
+        "location_json": "{\"blockId\":\"01a10c8a-08d5-70d3-aa51-037510d44e78\",\"pageId\":\"01a10c89-555c-7383-9876-baf9ff7e4953\",\"sourceRevision\":\"5\"}",
+        "content_hash": "858985df7a970933c861834275544cd7be1b96e6076a7d22ee21969f81c25575",
+        "file_id": null,
+        "document_page": 0
+      }
+    ],
+    "meta": [
+      {
+        "key": "generation",
+        "value": "01a10c7d-5ead-731a-9cb3-585036d59d2a"
+      }
+    ]
+  },
+  "after": {
+    "page": {
+      "id": "01a10c89-555c-7383-9876-baf9ff7e4953",
+      "workspace_id": "01a10c7d-5e6b-7894-865d-32a4db1a7dc9",
+      "parent_page_id": null,
+      "title": "Native verification — café 🦉",
+      "revision": "5",
+      "created_at": "2026-10-05T14:48:09.310867Z",
+      "updated_at": "2026-10-05T14:49:03.265826Z",
+      "deleted_at": null,
+      "provenance_json": null
+    },
+    "blocks": [
+      {
+        "id": "01a10c8a-08d5-70d3-aa51-037510d44e78",
+        "page_id": "01a10c89-555c-7383-9876-baf9ff7e4953",
+        "parent_block_id": null,
+        "sort_key": "000000000001",
+        "type": "paragraph",
+        "schema_version": 1,
+        "data_json": "{\"richText\":[{\"text\":\"Preserve café 🦉 and this imp\"},{\"marks\":[\"bold\"],\"text\":\"ortant phrase.\"}]}",
+        "revision": "2"
+      }
+    ],
+    "chunks": [
+      {
+        "id": "01a10c89-555c-7383-9876-baf9ff7e4953:title",
+        "page_id": "01a10c89-555c-7383-9876-baf9ff7e4953",
+        "source_revision": "5",
+        "block_id": null,
+        "kind": "page",
+        "title": "Native verification — café 🦉",
+        "body": "Native verification — café 🦉",
+        "location_json": "{\"pageId\":\"01a10c89-555c-7383-9876-baf9ff7e4953\",\"sourceRevision\":\"5\"}",
+        "content_hash": "db099be209f944cc1d357d6cedad8be7760656ba023d5ae6694c3459e7ff8ef5",
+        "file_id": null,
+        "document_page": 0
+      },
+      {
+        "id": "01a10c8a-08d5-70d3-aa51-037510d44e78:0",
+        "page_id": "01a10c89-555c-7383-9876-baf9ff7e4953",
+        "source_revision": "5",
+        "block_id": "01a10c8a-08d5-70d3-aa51-037510d44e78",
+        "kind": "page",
+        "title": "Native verification — café 🦉",
+        "body": "Preserve café 🦉 and this important phrase.",
+        "location_json": "{\"blockId\":\"01a10c8a-08d5-70d3-aa51-037510d44e78\",\"pageId\":\"01a10c89-555c-7383-9876-baf9ff7e4953\",\"sourceRevision\":\"5\"}",
+        "content_hash": "77934967be22920a7dcc302cb784d348b0a0fb313153a2ad88975777ac3bb732",
+        "file_id": null,
+        "document_page": 0
+      }
+    ],
+    "meta": [
+      {
+        "key": "generation",
+        "value": "01a10ca1-6777-732e-ad8e-d29b3c667065"
+      },
+      {
+        "key": "readable_projection",
+        "value": "rich-text-contiguous-v2"
+      }
+    ]
+  },
+  "limitations": [
+    "Narrow native regression only; no full release qualification.",
+    "Original be6fc81 app retains its recorded defect.",
+    "No timing threshold measured during this UI check.",
+    "Native screenshots were not saved to files; AX state and rendered result were observed through CUA."
+  ]
+}

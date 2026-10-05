@@ -1,0 +1,13 @@
+Traceback (most recent call last):
+  File "/Users/suryasriramduvvuri/.codex/worktrees/completion-ai-modes/Trove/scripts/build-desktop.py", line 58, in <module>
+    run([ROOT / 'frontend/node_modules/.bin/tsc', '--noEmit'], ROOT / 'frontend')
+  File "/Users/suryasriramduvvuri/.codex/worktrees/completion-ai-modes/Trove/scripts/build-desktop.py", line 53, in run
+    subprocess.run([str(v) for v in argv], cwd=cwd, env=env, check=True)
+  File "/opt/homebrew/Cellar/python@3.12/3.12.13_1/Frameworks/Python.framework/Versions/3.12/lib/python3.12/subprocess.py", line 548, in run
+    with Popen(*popenargs, **kwargs) as process:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/homebrew/Cellar/python@3.12/3.12.13_1/Frameworks/Python.framework/Versions/3.12/lib/python3.12/subprocess.py", line 1026, in __init__
+    self._execute_child(args, executable, preexec_fn, close_fds,
+  File "/opt/homebrew/Cellar/python@3.12/3.12.13_1/Frameworks/Python.framework/Versions/3.12/lib/python3.12/subprocess.py", line 1955, in _execute_child
+    raise child_exception_type(errno_num, err_msg, err_filename)
+FileNotFoundError: [Errno 2] No such file or directory: '/Users/suryasriramduvvuri/.codex/worktrees/completion-ai-modes/Trove/frontend/node_modules/.bin/tsc'

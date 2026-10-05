@@ -29,15 +29,27 @@
   "origin": "Frozen be6fc81 native UI test retained at evidence/completion/candidate-be6fc81/native-ui/.",
   "releaseQualified": false,
   "limitations": [
-    "Targeted service evidence; new packaged UI recheck remains pending.",
+    "Targeted service and native quick-switcher regression evidence only; broad release and platform qualification remain open.",
     "One-time derived index rebuilding may add work to first retrieval on an old or restored workspace. It uses existing32page transactions and does not migrate canonical storage.",
     "New projection version replaces embeddings through existing chunk invalidation and sqlite-vec delete triggers; rebuilding useful semantic vectors still requires enabled local model capability."
   ],
   "files": {
     "review-before.jsonl": "4afa8920bde71cb8c9812a02388696cdcba46c5cac3045400a169f4fd3ab9518",
+    "native-recheck.json": "a675642a557e012c225531b0bc51f8c06ca25bd2c01fa5867d72c740cba5046b",
     "after-race.jsonl": "01b47f3dfd4d35d887738822a56677e828eba816171f8fcbb8dcfe04efc46166",
+    "native-recheck-identity.json": "e5c7290417dca884d16b667a71421ea66f88339dd210773f95a0a5e907140354",
+    "app-build-missing-dependencies.txt": "b3c16b4c6696aedd8eb8a331e9f7385de3361f51e6ba752912185011d7ff143b",
+    "app-build.txt": "c9d9a425ba8cf82e81ec31cad55bd52bb500046f2d51fe5dab3528c74befd865",
+    "frontend-bootstrap.txt": "6990d9a72f5caa5fb1fe2aadcce07c4f7e95f9529e1e126eba971aa67c1c5d61",
     "before.jsonl": "f906883eb46478878ae63ab14d0ac6968f231e5e388c0386b8e7d9a08660a698",
-    "final-race.jsonl": "39f6112790623d59280da786d81d1079643a5bcd41209f1f006cee9accd9de42"
+    "final-race.jsonl": "39f6112790623d59280da786d81d1079643a5bcd41209f1f006cee9accd9de42",
+    "native-recheck.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
   },
-  "independentReview": "D found no durable-reindex blocker and identified the adjacent personal-review text property consumer; shared typed projection and independent field fixture now cover it."
+  "independentReview": "D found no durable-reindex blocker and identified the adjacent personal-review text property consumer; shared typed projection and independent field fixture now cover it.",
+  "nativeRecheck": {
+    "identity": "native-recheck-identity.json",
+    "result": "native-recheck.json",
+    "sourceCommit": "254d623",
+    "passed": true
+  }
 }
