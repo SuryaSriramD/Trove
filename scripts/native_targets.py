@@ -7,12 +7,12 @@ TARGETS = {
         'capture': True, 'audioDecoding': True, 'ocr': 'separate optional macOS helper'},
     'windows-amd64': {'os': 'windows', 'arch': 'amd64', 'host': 'Windows', 'minimumOS': 'Windows 11 x64',
         'requirements': ['x64 Native Tools command prompt for Visual Studio 2022 or later (MSVC v143 or newer)',
-            'Windows 11 SDK', 'Python 3.12+', 'CMake 4.3.2', 'Ninja', 'NTFS local staging/cache'],
-        'capture': False, 'audioDecoding': False, 'ocr': False},
+            'Windows 11 SDK', 'Python 3.12+', 'CMake 4.3.2', 'Ninja', 'MSYS2 bash and GNU make on PATH', 'NTFS local staging/cache'],
+        'capture': False, 'audioDecoding': 'restricted FFmpeg build; target execution unqualified', 'ocr': False},
     'linux-amd64': {'os': 'linux', 'arch': 'amd64', 'host': 'Linux', 'minimumOS': 'Ubuntu 24.04 LTS x64',
         'requirements': ['Ubuntu 24.04 build-essential (GCC 13)', 'libssl-dev / libssl3t64', 'Python 3.12',
             'CMake 4.3.2', 'Ninja', 'procps and mounted /proc'],
-        'capture': False, 'audioDecoding': False, 'ocr': False},
+        'capture': False, 'audioDecoding': 'restricted FFmpeg build; target execution unqualified', 'ocr': False},
 }
 
 def host_target(system=None, machine=None):

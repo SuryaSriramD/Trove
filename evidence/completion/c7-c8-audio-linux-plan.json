@@ -1,0 +1,65 @@
+{
+  "target": "linux-amd64",
+  "source": {
+    "schemaVersion": 1,
+    "version": "9.0.2",
+    "runtimeCommit": "ffmpeg-9.0.2-trove-restricted-v1",
+    "url": "https://ffmpeg.org/releases/ffmpeg-9.0.2.tar.gz",
+    "sha256": "84960df915059e8754fef2cd7c9afeb614062b1b5458ec471eecee619ee04e98",
+    "sourceDirectory": "ffmpeg-9.0.2",
+    "signature": "https://ffmpeg.org/releases/ffmpeg-9.0.2.tar.gz.asc",
+    "signingKeyFingerprint": "FCF986EA15E6E293A5644F10B4322F04D67658D8",
+    "demuxers": [
+      "wav",
+      "mp3",
+      "aac",
+      "mov"
+    ],
+    "parsers": [
+      "aac",
+      "mpegaudio"
+    ],
+    "decoders": [
+      "aac",
+      "mp3float",
+      "pcm_u8",
+      "pcm_s16le",
+      "pcm_s24le",
+      "pcm_s32le",
+      "pcm_f32le",
+      "pcm_f64le"
+    ]
+  },
+  "configure": [
+    "--disable-everything",
+    "--disable-autodetect",
+    "--disable-network",
+    "--disable-protocols",
+    "--disable-programs",
+    "--disable-doc",
+    "--disable-gpl",
+    "--disable-nonfree",
+    "--disable-version3",
+    "--disable-avdevice",
+    "--disable-avfilter",
+    "--disable-swscale",
+    "--disable-hwaccels",
+    "--enable-avformat",
+    "--enable-avcodec",
+    "--enable-swresample",
+    "--enable-static",
+    "--disable-shared",
+    "--disable-asm",
+    "--disable-debug",
+    "--enable-pic",
+    "--enable-demuxer=wav,mp3,aac,mov",
+    "--enable-parser=aac,mpegaudio",
+    "--enable-decoder=aac,mp3float,pcm_u8,pcm_s16le,pcm_s24le,pcm_s32le,pcm_f32le,pcm_f64le",
+    "--arch=x86_64",
+    "--target-os=linux",
+    "--cc=gcc",
+    "--cxx=g++"
+  ],
+  "requires": "Native C++ toolchain, GNU make, bash. Windows: MSYS2 bash/make on PATH in x64 MSVC developer environment.",
+  "qualification": "Target execution must be recorded separately."
+}

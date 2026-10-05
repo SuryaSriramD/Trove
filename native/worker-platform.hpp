@@ -43,7 +43,7 @@ inline uint32_t worker_network_u32(uint32_t value) {
 }
 #ifdef _WIN32
 inline std::vector<int>& worker_descriptors(){static std::vector<int> fds{0,1,2};return fds;}
-inline void worker_init(){
+inline void worker_init(size_t minimum_extra=4){
  _setmode(0,_O_BINARY);_setmode(1,_O_BINARY);
  const char *mapping=std::getenv("TROVE_WORKER_HANDLES");
  if(!mapping||std::strlen(mapping)>1024)throw std::runtime_error("missing worker handle mapping");
@@ -61,7 +61,7 @@ inline void worker_init(){
   if(fd<0)throw std::runtime_error("cannot map worker handle");
   worker_descriptors().push_back(fd);at=end+1;
  }
- if(worker_descriptors().size()<7||value.back()==',')throw std::runtime_error("incomplete worker handle mapping");
+ if(worker_descriptors().size()<3+minimum_extra||value.back()==',')throw std::runtime_error("incomplete worker handle mapping");
  _putenv_s("TROVE_WORKER_HANDLES","");
 }
 inline int worker_fd(int slot){return worker_descriptors().at(slot);}
@@ -76,7 +76,7 @@ inline void worker_sync(int fd){if(_commit(worker_fd(fd)))throw std::runtime_err
 inline FILE *worker_model_file(){return _fdopen(_dup(worker_fd(5)),"rb");}
 inline void worker_disable_gpu(){_putenv_s("GGML_METAL_DEVICES","0");}
 #else
-inline void worker_init(){}
+inline void worker_init(size_t minimum_extra=4){}
 inline int worker_fd(int slot){return slot;}
 inline ssize_t worker_read(int fd,void *buffer,size_t count){ssize_t n;do{n=read(fd,buffer,count);}while(n<0&&errno==EINTR);return n;}
 inline ssize_t worker_write(int fd,const void *buffer,size_t count){ssize_t n;do{n=write(fd,buffer,count);}while(n<0&&errno==EINTR);return n;}

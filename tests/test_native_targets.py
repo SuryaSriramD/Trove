@@ -29,7 +29,7 @@ class NativeTargets(unittest.TestCase):
                 '--target', target, '--plan'], check=True, capture_output=True, text=True)
             body = json.loads(result.stdout)
             self.assertFalse(body['capture'])
-            self.assertFalse(body['audioDecoding'])
+            self.assertIn('target execution unqualified', body['audioDecoding'])
             self.assertFalse(body['ocr'])
             self.assertIn('No platform execution', body['qualification'])
 

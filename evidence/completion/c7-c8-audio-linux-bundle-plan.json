@@ -1,0 +1,21 @@
+{
+  "target": "linux-amd64",
+  "os": "linux",
+  "arch": "amd64",
+  "host": "Linux",
+  "minimumOS": "Ubuntu 24.04 LTS x64",
+  "requirements": [
+    "Ubuntu 24.04 build-essential (GCC 13)",
+    "libssl-dev / libssl3t64",
+    "Python 3.12",
+    "CMake 4.3.2",
+    "Ninja",
+    "procps and mounted /proc"
+  ],
+  "capture": false,
+  "audioDecoding": "restricted FFmpeg build; target execution unqualified",
+  "ocr": false,
+  "mode": "native host only",
+  "models": "separate portable hash-pinned packs",
+  "qualification": "No platform execution is established by this plan."
+}

@@ -1,0 +1,4 @@
+/private/tmp/trove-audio-ffmpeg/audio-relink/audio-decoder:
+	/usr/lib/libSystem.B.dylib (compatibility version 1.0.0, current version 1359.0.0)
+	/usr/lib/libc++.1.dylib (compatibility version 1.0.0, current version 2200.27.0)
+91d4048e547f04921aacf4db85df836e05f8d40296de6e1ac1f3df339bf1b7e6  /private/tmp/trove-audio-relinked-proof

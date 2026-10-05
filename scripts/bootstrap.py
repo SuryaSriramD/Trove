@@ -127,7 +127,8 @@ def main():
                 command.append('--offline')
             run(command, directory)
     if 'native' in args.components:
-        for name, pin in lock['workers'].items():
+        native_pins = dict(lock['workers'], **{'ffmpeg-audio': json.loads((ROOT / 'native/audio-decoder.lock.json').read_text())})
+        for name, pin in native_pins.items():
             source = archive(cache, name, pin, args.fetch, args.seed_cache)
             extract(source, cache, pin['sourceDirectory'])
     if args.browser:

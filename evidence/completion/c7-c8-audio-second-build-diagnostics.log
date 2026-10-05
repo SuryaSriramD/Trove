@@ -1,0 +1,159 @@
+make: Nothing to be done for `all'.
+INSTALL	Users/suryasriramduvvuri/Library/Caches/Trove/completion/ffmpeg-9.0.2/libavformat/avformat.h
+INSTALL	Users/suryasriramduvvuri/Library/Caches/Trove/completion/ffmpeg-9.0.2/libavformat/avio.h
+INSTALL	Users/suryasriramduvvuri/Library/Caches/Trove/completion/ffmpeg-9.0.2/libavformat/version.h
+INSTALL	Users/suryasriramduvvuri/Library/Caches/Trove/completion/ffmpeg-9.0.2/libavformat/version_major.h
+INSTALL	libavformat/libavformat.pc
+INSTALL	Users/suryasriramduvvuri/Library/Caches/Trove/completion/ffmpeg-9.0.2/libavcodec/ac3_parser.h
+INSTALL	Users/suryasriramduvvuri/Library/Caches/Trove/completion/ffmpeg-9.0.2/libavcodec/adts_parser.h
+INSTALL	Users/suryasriramduvvuri/Library/Caches/Trove/completion/ffmpeg-9.0.2/libavcodec/avcodec.h
+INSTALL	Users/suryasriramduvvuri/Library/Caches/Trove/completion/ffmpeg-9.0.2/libavcodec/avdct.h
+INSTALL	Users/suryasriramduvvuri/Library/Caches/Trove/completion/ffmpeg-9.0.2/libavcodec/bsf.h
+INSTALL	Users/suryasriramduvvuri/Library/Caches/Trove/completion/ffmpeg-9.0.2/libavcodec/codec.h
+INSTALL	Users/suryasriramduvvuri/Library/Caches/Trove/completion/ffmpeg-9.0.2/libavcodec/codec_desc.h
+INSTALL	Users/suryasriramduvvuri/Library/Caches/Trove/completion/ffmpeg-9.0.2/libavcodec/codec_id.h
+INSTALL	Users/suryasriramduvvuri/Library/Caches/Trove/completion/ffmpeg-9.0.2/libavcodec/codec_par.h
+INSTALL	Users/suryasriramduvvuri/Library/Caches/Trove/completion/ffmpeg-9.0.2/libavcodec/d3d11va.h
+INSTALL	Users/suryasriramduvvuri/Library/Caches/Trove/completion/ffmpeg-9.0.2/libavcodec/defs.h
+INSTALL	Users/suryasriramduvvuri/Library/Caches/Trove/completion/ffmpeg-9.0.2/libavcodec/dirac.h
+INSTALL	Users/suryasriramduvvuri/Library/Caches/Trove/completion/ffmpeg-9.0.2/libavcodec/dv_profile.h
+INSTALL	Users/suryasriramduvvuri/Library/Caches/Trove/completion/ffmpeg-9.0.2/libavcodec/dxva2.h
+INSTALL	Users/suryasriramduvvuri/Library/Caches/Trove/completion/ffmpeg-9.0.2/libavcodec/exif.h
+INSTALL	Users/suryasriramduvvuri/Library/Caches/Trove/completion/ffmpeg-9.0.2/libavcodec/jni.h
+INSTALL	Users/suryasriramduvvuri/Library/Caches/Trove/completion/ffmpeg-9.0.2/libavcodec/mediacodec.h
+INSTALL	Users/suryasriramduvvuri/Library/Caches/Trove/completion/ffmpeg-9.0.2/libavcodec/packet.h
+INSTALL	Users/suryasriramduvvuri/Library/Caches/Trove/completion/ffmpeg-9.0.2/libavcodec/qsv.h
+INSTALL	Users/suryasriramduvvuri/Library/Caches/Trove/completion/ffmpeg-9.0.2/libavcodec/smpte_436m.h
+INSTALL	Users/suryasriramduvvuri/Library/Caches/Trove/completion/ffmpeg-9.0.2/libavcodec/vdpau.h
+INSTALL	Users/suryasriramduvvuri/Library/Caches/Trove/completion/ffmpeg-9.0.2/libavcodec/version.h
+INSTALL	Users/suryasriramduvvuri/Library/Caches/Trove/completion/ffmpeg-9.0.2/libavcodec/version_major.h
+INSTALL	Users/suryasriramduvvuri/Library/Caches/Trove/completion/ffmpeg-9.0.2/libavcodec/videotoolbox.h
+INSTALL	Users/suryasriramduvvuri/Library/Caches/Trove/completion/ffmpeg-9.0.2/libavcodec/vorbis_parser.h
+INSTALL	libavcodec/libavcodec.pc
+INSTALL	Users/suryasriramduvvuri/Library/Caches/Trove/completion/ffmpeg-9.0.2/libswresample/swresample.h
+INSTALL	Users/suryasriramduvvuri/Library/Caches/Trove/completion/ffmpeg-9.0.2/libswresample/version.h
+INSTALL	Users/suryasriramduvvuri/Library/Caches/Trove/completion/ffmpeg-9.0.2/libswresample/version_major.h
+INSTALL	libswresample/libswresample.pc
+INSTALL	Users/suryasriramduvvuri/Library/Caches/Trove/completion/ffmpeg-9.0.2/libavutil/adler32.h
+INSTALL	Users/suryasriramduvvuri/Library/Caches/Trove/completion/ffmpeg-9.0.2/libavutil/aes.h
+INSTALL	Users/suryasriramduvvuri/Library/Caches/Trove/completion/ffmpeg-9.0.2/libavutil/aes_ctr.h
+INSTALL	Users/suryasriramduvvuri/Library/Caches/Trove/completion/ffmpeg-9.0.2/libavutil/ambient_viewing_environment.h
+INSTALL	Users/suryasriramduvvuri/Library/Caches/Trove/completion/ffmpeg-9.0.2/libavutil/attributes.h
+INSTALL	Users/suryasriramduvvuri/Library/Caches/Trove/completion/ffmpeg-9.0.2/libavutil/audio_fifo.h
+INSTALL	Users/suryasriramduvvuri/Library/Caches/Trove/completion/ffmpeg-9.0.2/libavutil/avassert.h
+INSTALL	Users/suryasriramduvvuri/Library/Caches/Trove/completion/ffmpeg-9.0.2/libavutil/avstring.h
+INSTALL	Users/suryasriramduvvuri/Library/Caches/Trove/completion/ffmpeg-9.0.2/libavutil/avutil.h
+INSTALL	Users/suryasriramduvvuri/Library/Caches/Trove/completion/ffmpeg-9.0.2/libavutil/base64.h
+INSTALL	Users/suryasriramduvvuri/Library/Caches/Trove/completion/ffmpeg-9.0.2/libavutil/blowfish.h
+INSTALL	Users/suryasriramduvvuri/Library/Caches/Trove/completion/ffmpeg-9.0.2/libavutil/bprint.h
+INSTALL	Users/suryasriramduvvuri/Library/Caches/Trove/completion/ffmpeg-9.0.2/libavutil/bswap.h
+INSTALL	Users/suryasriramduvvuri/Library/Caches/Trove/completion/ffmpeg-9.0.2/libavutil/buffer.h
+INSTALL	Users/suryasriramduvvuri/Library/Caches/Trove/completion/ffmpeg-9.0.2/libavutil/cast5.h
+INSTALL	Users/suryasriramduvvuri/Library/Caches/Trove/completion/ffmpeg-9.0.2/libavutil/camellia.h
+INSTALL	Users/suryasriramduvvuri/Library/Caches/Trove/completion/ffmpeg-9.0.2/libavutil/channel_layout.h
+INSTALL	Users/suryasriramduvvuri/Library/Caches/Trove/completion/ffmpeg-9.0.2/libavutil/common.h
+INSTALL	Users/suryasriramduvvuri/Library/Caches/Trove/completion/ffmpeg-9.0.2/libavutil/container_fifo.h
+INSTALL	Users/suryasriramduvvuri/Library/Caches/Trove/completion/ffmpeg-9.0.2/libavutil/cpu.h
+INSTALL	Users/suryasriramduvvuri/Library/Caches/Trove/completion/ffmpeg-9.0.2/libavutil/crc.h
+INSTALL	Users/suryasriramduvvuri/Library/Caches/Trove/completion/ffmpeg-9.0.2/libavutil/csp.h
+INSTALL	Users/suryasriramduvvuri/Library/Caches/Trove/completion/ffmpeg-9.0.2/libavutil/des.h
+INSTALL	Users/suryasriramduvvuri/Library/Caches/Trove/completion/ffmpeg-9.0.2/libavutil/detection_bbox.h
+INSTALL	Users/suryasriramduvvuri/Library/Caches/Trove/completion/ffmpeg-9.0.2/libavutil/dict.h
+INSTALL	Users/suryasriramduvvuri/Library/Caches/Trove/completion/ffmpeg-9.0.2/libavutil/display.h
+INSTALL	Users/suryasriramduvvuri/Library/Caches/Trove/completion/ffmpeg-9.0.2/libavutil/dovi_meta.h
+INSTALL	Users/suryasriramduvvuri/Library/Caches/Trove/completion/ffmpeg-9.0.2/libavutil/downmix_info.h
+INSTALL	Users/suryasriramduvvuri/Library/Caches/Trove/completion/ffmpeg-9.0.2/libavutil/encryption_info.h
+INSTALL	Users/suryasriramduvvuri/Library/Caches/Trove/completion/ffmpeg-9.0.2/libavutil/error.h
+INSTALL	Users/suryasriramduvvuri/Library/Caches/Trove/completion/ffmpeg-9.0.2/libavutil/eval.h
+INSTALL	Users/suryasriramduvvuri/Library/Caches/Trove/completion/ffmpeg-9.0.2/libavutil/executor.h
+INSTALL	Users/suryasriramduvvuri/Library/Caches/Trove/completion/ffmpeg-9.0.2/libavutil/fifo.h
+INSTALL	Users/suryasriramduvvuri/Library/Caches/Trove/completion/ffmpeg-9.0.2/libavutil/file.h
+INSTALL	Users/suryasriramduvvuri/Library/Caches/Trove/completion/ffmpeg-9.0.2/libavutil/film_grain_params.h
+INSTALL	Users/suryasriramduvvuri/Library/Caches/Trove/completion/ffmpeg-9.0.2/libavutil/frame.h
+INSTALL	Users/suryasriramduvvuri/Library/Caches/Trove/completion/ffmpeg-9.0.2/libavutil/hash.h
+INSTALL	Users/suryasriramduvvuri/Library/Caches/Trove/completion/ffmpeg-9.0.2/libavutil/hdr_dynamic_metadata.h
+INSTALL	Users/suryasriramduvvuri/Library/Caches/Trove/completion/ffmpeg-9.0.2/libavutil/hdr_dynamic_vivid_metadata.h
+INSTALL	Users/suryasriramduvvuri/Library/Caches/Trove/completion/ffmpeg-9.0.2/libavutil/hmac.h
+INSTALL	Users/suryasriramduvvuri/Library/Caches/Trove/completion/ffmpeg-9.0.2/libavutil/hwcontext.h
+INSTALL	Users/suryasriramduvvuri/Library/Caches/Trove/completion/ffmpeg-9.0.2/libavutil/hwcontext_cuda.h
+INSTALL	Users/suryasriramduvvuri/Library/Caches/Trove/completion/ffmpeg-9.0.2/libavutil/hwcontext_d3d11va.h
+INSTALL	Users/suryasriramduvvuri/Library/Caches/Trove/completion/ffmpeg-9.0.2/libavutil/hwcontext_d3d12va.h
+INSTALL	Users/suryasriramduvvuri/Library/Caches/Trove/completion/ffmpeg-9.0.2/libavutil/hwcontext_drm.h
+INSTALL	Users/suryasriramduvvuri/Library/Caches/Trove/completion/ffmpeg-9.0.2/libavutil/hwcontext_dxva2.h
+INSTALL	Users/suryasriramduvvuri/Library/Caches/Trove/completion/ffmpeg-9.0.2/libavutil/hwcontext_amf.h
+INSTALL	Users/suryasriramduvvuri/Library/Caches/Trove/completion/ffmpeg-9.0.2/libavutil/hwcontext_qsv.h
+INSTALL	Users/suryasriramduvvuri/Library/Caches/Trove/completion/ffmpeg-9.0.2/libavutil/hwcontext_mediacodec.h
+INSTALL	Users/suryasriramduvvuri/Library/Caches/Trove/completion/ffmpeg-9.0.2/libavutil/hwcontext_opencl.h
+INSTALL	Users/suryasriramduvvuri/Library/Caches/Trove/completion/ffmpeg-9.0.2/libavutil/hwcontext_oh.h
+INSTALL	Users/suryasriramduvvuri/Library/Caches/Trove/completion/ffmpeg-9.0.2/libavutil/hwcontext_vaapi.h
+INSTALL	Users/suryasriramduvvuri/Library/Caches/Trove/completion/ffmpeg-9.0.2/libavutil/hwcontext_videotoolbox.h
+INSTALL	Users/suryasriramduvvuri/Library/Caches/Trove/completion/ffmpeg-9.0.2/libavutil/hwcontext_vdpau.h
+INSTALL	Users/suryasriramduvvuri/Library/Caches/Trove/completion/ffmpeg-9.0.2/libavutil/hwcontext_vulkan.h
+INSTALL	Users/suryasriramduvvuri/Library/Caches/Trove/completion/ffmpeg-9.0.2/libavutil/iamf.h
+INSTALL	Users/suryasriramduvvuri/Library/Caches/Trove/completion/ffmpeg-9.0.2/libavutil/imgutils.h
+INSTALL	Users/suryasriramduvvuri/Library/Caches/Trove/completion/ffmpeg-9.0.2/libavutil/intfloat.h
+INSTALL	Users/suryasriramduvvuri/Library/Caches/Trove/completion/ffmpeg-9.0.2/libavutil/intreadwrite.h
+INSTALL	Users/suryasriramduvvuri/Library/Caches/Trove/completion/ffmpeg-9.0.2/libavutil/lfg.h
+INSTALL	Users/suryasriramduvvuri/Library/Caches/Trove/completion/ffmpeg-9.0.2/libavutil/log.h
+INSTALL	Users/suryasriramduvvuri/Library/Caches/Trove/completion/ffmpeg-9.0.2/libavutil/lzo.h
+INSTALL	Users/suryasriramduvvuri/Library/Caches/Trove/completion/ffmpeg-9.0.2/libavutil/macros.h
+INSTALL	Users/suryasriramduvvuri/Library/Caches/Trove/completion/ffmpeg-9.0.2/libavutil/mathematics.h
+INSTALL	Users/suryasriramduvvuri/Library/Caches/Trove/completion/ffmpeg-9.0.2/libavutil/mastering_display_metadata.h
+INSTALL	Users/suryasriramduvvuri/Library/Caches/Trove/completion/ffmpeg-9.0.2/libavutil/md5.h
+INSTALL	Users/suryasriramduvvuri/Library/Caches/Trove/completion/ffmpeg-9.0.2/libavutil/mem.h
+INSTALL	Users/suryasriramduvvuri/Library/Caches/Trove/completion/ffmpeg-9.0.2/libavutil/motion_vector.h
+INSTALL	Users/suryasriramduvvuri/Library/Caches/Trove/completion/ffmpeg-9.0.2/libavutil/murmur3.h
+INSTALL	Users/suryasriramduvvuri/Library/Caches/Trove/completion/ffmpeg-9.0.2/libavutil/opt.h
+INSTALL	Users/suryasriramduvvuri/Library/Caches/Trove/completion/ffmpeg-9.0.2/libavutil/parseutils.h
+INSTALL	Users/suryasriramduvvuri/Library/Caches/Trove/completion/ffmpeg-9.0.2/libavutil/pixdesc.h
+INSTALL	Users/suryasriramduvvuri/Library/Caches/Trove/completion/ffmpeg-9.0.2/libavutil/pixelutils.h
+INSTALL	Users/suryasriramduvvuri/Library/Caches/Trove/completion/ffmpeg-9.0.2/libavutil/pixfmt.h
+INSTALL	Users/suryasriramduvvuri/Library/Caches/Trove/completion/ffmpeg-9.0.2/libavutil/random_seed.h
+INSTALL	Users/suryasriramduvvuri/Library/Caches/Trove/completion/ffmpeg-9.0.2/libavutil/raw_color_params.h
+INSTALL	Users/suryasriramduvvuri/Library/Caches/Trove/completion/ffmpeg-9.0.2/libavutil/rc4.h
+INSTALL	Users/suryasriramduvvuri/Library/Caches/Trove/completion/ffmpeg-9.0.2/libavutil/rational.h
+INSTALL	Users/suryasriramduvvuri/Library/Caches/Trove/completion/ffmpeg-9.0.2/libavutil/refstruct.h
+INSTALL	Users/suryasriramduvvuri/Library/Caches/Trove/completion/ffmpeg-9.0.2/libavutil/replaygain.h
+INSTALL	Users/suryasriramduvvuri/Library/Caches/Trove/completion/ffmpeg-9.0.2/libavutil/ripemd.h
+INSTALL	Users/suryasriramduvvuri/Library/Caches/Trove/completion/ffmpeg-9.0.2/libavutil/samplefmt.h
+INSTALL	Users/suryasriramduvvuri/Library/Caches/Trove/completion/ffmpeg-9.0.2/libavutil/sha.h
+INSTALL	Users/suryasriramduvvuri/Library/Caches/Trove/completion/ffmpeg-9.0.2/libavutil/sha512.h
+INSTALL	Users/suryasriramduvvuri/Library/Caches/Trove/completion/ffmpeg-9.0.2/libavutil/spherical.h
+INSTALL	Users/suryasriramduvvuri/Library/Caches/Trove/completion/ffmpeg-9.0.2/libavutil/stereo3d.h
+INSTALL	Users/suryasriramduvvuri/Library/Caches/Trove/completion/ffmpeg-9.0.2/libavutil/tdrdi.h
+INSTALL	Users/suryasriramduvvuri/Library/Caches/Trove/completion/ffmpeg-9.0.2/libavutil/threadmessage.h
+INSTALL	Users/suryasriramduvvuri/Library/Caches/Trove/completion/ffmpeg-9.0.2/libavutil/time.h
+INSTALL	Users/suryasriramduvvuri/Library/Caches/Trove/completion/ffmpeg-9.0.2/libavutil/timecode.h
+INSTALL	Users/suryasriramduvvuri/Library/Caches/Trove/completion/ffmpeg-9.0.2/libavutil/timestamp.h
+INSTALL	Users/suryasriramduvvuri/Library/Caches/Trove/completion/ffmpeg-9.0.2/libavutil/tree.h
+INSTALL	Users/suryasriramduvvuri/Library/Caches/Trove/completion/ffmpeg-9.0.2/libavutil/twofish.h
+INSTALL	Users/suryasriramduvvuri/Library/Caches/Trove/completion/ffmpeg-9.0.2/libavutil/uuid.h
+INSTALL	Users/suryasriramduvvuri/Library/Caches/Trove/completion/ffmpeg-9.0.2/libavutil/version.h
+INSTALL	Users/suryasriramduvvuri/Library/Caches/Trove/completion/ffmpeg-9.0.2/libavutil/video_enc_params.h
+INSTALL	Users/suryasriramduvvuri/Library/Caches/Trove/completion/ffmpeg-9.0.2/libavutil/xtea.h
+INSTALL	Users/suryasriramduvvuri/Library/Caches/Trove/completion/ffmpeg-9.0.2/libavutil/tea.h
+INSTALL	Users/suryasriramduvvuri/Library/Caches/Trove/completion/ffmpeg-9.0.2/libavutil/tx.h
+INSTALL	Users/suryasriramduvvuri/Library/Caches/Trove/completion/ffmpeg-9.0.2/libavutil/video_hint.h
+INSTALL	libavutil/avconfig.h
+INSTALL	libavutil/ffversion.h
+INSTALL	libavutil/libavutil.pc
+/Users/suryasriramduvvuri/.codex/worktrees/completion-tooling/Trove/native/audio-decoder.cpp:16:19: error: expected unqualified-id
+   16 | constexpr int64_t MAX_INPUT=512LL<<20, MAX_FRAMES=16000LL*7200;
+      |                   ^
+/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/sys/syslimits.h:90:34: note: expanded from macro 'MAX_INPUT'
+   90 | #define MAX_INPUT                1024   /* max bytes in terminal input */
+      |                                  ^
+/Users/suryasriramduvvuri/.codex/worktrees/completion-tooling/Trove/native/audio-decoder.cpp:66:22: error: use of undeclared identifier 'MAX_FRAMES'
+   66 |   if(count<0||frames>MAX_FRAMES-count)limit("decoded duration exceeds two hours");
+      |                      ^~~~~~~~~~
+2 errors generated.
+Traceback (most recent call last):
+  File "/Users/suryasriramduvvuri/.codex/worktrees/completion-tooling/Trove/scripts/build-audio-decoder.py", line 147, in <module>
+    raise SystemExit(main())
+  File "/Users/suryasriramduvvuri/.codex/worktrees/completion-tooling/Trove/scripts/build-audio-decoder.py", line 81, in main
+    run(compile_command); run(link_command)
+  File "/Users/suryasriramduvvuri/.codex/worktrees/completion-tooling/Trove/scripts/build-audio-decoder.py", line 54, in run
+    subprocess.run(commands[-1], cwd=cwd, env=env, check=True)
+  File "/Applications/Xcode.app/Contents/Developer/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/subprocess.py", line 528, in run
+    raise CalledProcessError(retcode, process.args,
+subprocess.CalledProcessError: Command '['clang++', '-std=c++17', '-O2', '-Wno-deprecated-declarations', '-I/Users/suryasriramduvvuri/Library/Caches/Trove/completion/workspaces/57cf2b22a4db9a56/ffmpeg-audio-darwin-arm64/public-include', '-I/Users/suryasriramduvvuri/Library/Caches/Trove/completion/llama.cpp-d2e54583c7452353eb35d40431281f6ee984332f/vendor', '-c', '/Users/suryasriramduvvuri/.codex/worktrees/completion-tooling/Trove/native/audio-decoder.cpp', '-o', '/Users/suryasriramduvvuri/Library/Caches/Trove/completion/workspaces/57cf2b22a4db9a56/ffmpeg-audio-darwin-arm64/audio-decoder.o']' returned non-zero exit status 1.

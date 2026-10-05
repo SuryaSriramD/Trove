@@ -28,11 +28,10 @@ func normalizedInput(ctx context.Context, source *os.File, meta contracts.Domain
 	if decoder == nil {
 		return nil, func() {}, errAudioNeedsDecoder
 	}
-	output, err := os.CreateTemp("", "trove-normalized-audio-")
+	output, cleanup, err := native.NewPrivateStagingFile()
 	if err != nil {
 		return nil, func() {}, err
 	}
-	cleanup = func() { output.Close(); os.Remove(output.Name()) }
 	if _, err = decoder.DecodeAudio(ctx, source, output); err == nil {
 		err = validatePCMContext(ctx, output)
 	}
@@ -124,11 +123,10 @@ func pcmInputContext(ctx context.Context, source *os.File, meta contracts.Domain
 	if size%(int64(bits)/8) != 0 || size/(int64(bits)/8) > 16000*7200 {
 		return nil, cleanup, errors.New("INVALID_INPUT: WAV must be 16 kHz mono 16-bit PCM or float32 within two hours")
 	}
-	out, err := os.CreateTemp("", "trove-job-audio-")
+	out, cleanup, err := native.NewPrivateStagingFile()
 	if err != nil {
 		return nil, cleanup, err
 	}
-	cleanup = func() { out.Close(); os.Remove(out.Name()) }
 	reader := io.NewSectionReader(source, offset, size)
 	buf := make([]byte, 32<<10)
 	for {

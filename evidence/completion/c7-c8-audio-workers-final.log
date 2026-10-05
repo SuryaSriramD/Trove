@@ -1,0 +1,28 @@
+=== RUN   TestNormalizedAudioUsesPrivateOutputAndPreservesOriginal
+--- PASS: TestNormalizedAudioUsesPrivateOutputAndPreservesOriginal (0.00s)
+=== RUN   TestNormalizedAudioFailureAndInvalidSamplesRemovePartialOutput
+=== RUN   TestNormalizedAudioFailureAndInvalidSamplesRemovePartialOutput/cancel
+=== RUN   TestNormalizedAudioFailureAndInvalidSamplesRemovePartialOutput/corrupt
+=== RUN   TestNormalizedAudioFailureAndInvalidSamplesRemovePartialOutput/unsupported
+=== RUN   TestNormalizedAudioFailureAndInvalidSamplesRemovePartialOutput/invalid-output
+--- PASS: TestNormalizedAudioFailureAndInvalidSamplesRemovePartialOutput (0.00s)
+    --- PASS: TestNormalizedAudioFailureAndInvalidSamplesRemovePartialOutput/cancel (0.00s)
+    --- PASS: TestNormalizedAudioFailureAndInvalidSamplesRemovePartialOutput/corrupt (0.00s)
+    --- PASS: TestNormalizedAudioFailureAndInvalidSamplesRemovePartialOutput/unsupported (0.00s)
+    --- PASS: TestNormalizedAudioFailureAndInvalidSamplesRemovePartialOutput/invalid-output (0.00s)
+=== RUN   TestNormalizedAudioCancellationBeforeValidation
+--- PASS: TestNormalizedAudioCancellationBeforeValidation (0.00s)
+=== RUN   TestNormalizedAudioCanonicalJobRetainsOriginalThroughFailureAndRetry
+--- PASS: TestNormalizedAudioCanonicalJobRetainsOriginalThroughFailureAndRetry (0.31s)
+=== RUN   TestNormalizedAudioPCMStagingLifecycle
+=== RUN   TestNormalizedAudioPCMStagingLifecycle/success
+=== RUN   TestNormalizedAudioPCMStagingLifecycle/invalid-float
+--- PASS: TestNormalizedAudioPCMStagingLifecycle (0.00s)
+    --- PASS: TestNormalizedAudioPCMStagingLifecycle/success (0.00s)
+    --- PASS: TestNormalizedAudioPCMStagingLifecycle/invalid-float (0.00s)
+=== RUN   TestAudioRejectsAmbiguousFormat
+--- PASS: TestAudioRejectsAmbiguousFormat (0.00s)
+=== RUN   TestRestrictedAudioFloatValidationAndWAVConversion
+--- PASS: TestRestrictedAudioFloatValidationAndWAVConversion (0.00s)
+PASS
+ok  	trove.local/phase0/internal/workers	2.440s

@@ -1,0 +1,124 @@
+{
+  "recordedAt": "2026-10-05T12:22:53.692931+00:00",
+  "target": "darwin-arm64",
+  "host": "macOS-27.0.1-arm64-arm-64bit",
+  "sourcePin": {
+    "schemaVersion": 1,
+    "version": "9.0.2",
+    "runtimeCommit": "ffmpeg-9.0.2-trove-restricted-v1",
+    "url": "https://ffmpeg.org/releases/ffmpeg-9.0.2.tar.gz",
+    "sha256": "84960df915059e8754fef2cd7c9afeb614062b1b5458ec471eecee619ee04e98",
+    "sourceDirectory": "ffmpeg-9.0.2",
+    "signature": "https://ffmpeg.org/releases/ffmpeg-9.0.2.tar.gz.asc",
+    "signingKeyFingerprint": "FCF986EA15E6E293A5644F10B4322F04D67658D8",
+    "demuxers": [
+      "wav",
+      "mp3",
+      "aac",
+      "mov"
+    ],
+    "parsers": [
+      "aac",
+      "mpegaudio"
+    ],
+    "decoders": [
+      "aac",
+      "mp3float",
+      "pcm_u8",
+      "pcm_s16le",
+      "pcm_s24le",
+      "pcm_s32le",
+      "pcm_f32le",
+      "pcm_f64le"
+    ]
+  },
+  "configureCommand": [
+    "bash",
+    "/Users/suryasriramduvvuri/Library/Caches/Trove/completion/ffmpeg-9.0.2/configure",
+    "--disable-everything",
+    "--disable-autodetect",
+    "--disable-network",
+    "--disable-protocols",
+    "--disable-programs",
+    "--disable-doc",
+    "--disable-gpl",
+    "--disable-nonfree",
+    "--disable-version3",
+    "--disable-avdevice",
+    "--disable-avfilter",
+    "--disable-swscale",
+    "--disable-hwaccels",
+    "--enable-avformat",
+    "--enable-avcodec",
+    "--enable-swresample",
+    "--enable-static",
+    "--disable-shared",
+    "--disable-asm",
+    "--disable-debug",
+    "--enable-pic",
+    "--enable-demuxer=wav,mp3,aac,mov",
+    "--enable-parser=aac,mpegaudio",
+    "--enable-decoder=aac,mp3float,pcm_u8,pcm_s16le,pcm_s24le,pcm_s32le,pcm_f32le,pcm_f64le",
+    "--arch=aarch64",
+    "--target-os=darwin",
+    "--cc=clang",
+    "--cxx=clang++"
+  ],
+  "commands": [
+    [
+      "make",
+      "-j4"
+    ],
+    [
+      "make",
+      "install-headers",
+      "includedir=/Users/suryasriramduvvuri/Library/Caches/Trove/completion/workspaces/57cf2b22a4db9a56/ffmpeg-audio-darwin-arm64/public-include"
+    ],
+    [
+      "clang++",
+      "-std=c++17",
+      "-O2",
+      "-Wno-deprecated-declarations",
+      "-I/Users/suryasriramduvvuri/Library/Caches/Trove/completion/workspaces/57cf2b22a4db9a56/ffmpeg-audio-darwin-arm64/public-include",
+      "-I/Users/suryasriramduvvuri/Library/Caches/Trove/completion/llama.cpp-d2e54583c7452353eb35d40431281f6ee984332f/vendor",
+      "-c",
+      "/Users/suryasriramduvvuri/.codex/worktrees/completion-tooling/Trove/native/audio-decoder.cpp",
+      "-o",
+      "/Users/suryasriramduvvuri/Library/Caches/Trove/completion/workspaces/57cf2b22a4db9a56/ffmpeg-audio-darwin-arm64/audio-decoder.o"
+    ],
+    [
+      "clang++",
+      "/Users/suryasriramduvvuri/Library/Caches/Trove/completion/workspaces/57cf2b22a4db9a56/ffmpeg-audio-darwin-arm64/audio-decoder.o",
+      "/Users/suryasriramduvvuri/Library/Caches/Trove/completion/workspaces/57cf2b22a4db9a56/ffmpeg-audio-darwin-arm64/libavformat/libavformat.a",
+      "/Users/suryasriramduvvuri/Library/Caches/Trove/completion/workspaces/57cf2b22a4db9a56/ffmpeg-audio-darwin-arm64/libavcodec/libavcodec.a",
+      "/Users/suryasriramduvvuri/Library/Caches/Trove/completion/workspaces/57cf2b22a4db9a56/ffmpeg-audio-darwin-arm64/libswresample/libswresample.a",
+      "/Users/suryasriramduvvuri/Library/Caches/Trove/completion/workspaces/57cf2b22a4db9a56/ffmpeg-audio-darwin-arm64/libavutil/libavutil.a",
+      "-lm",
+      "-lpthread",
+      "-o",
+      "/private/tmp/trove-audio-ffmpeg/audio-decoder"
+    ],
+    [
+      "codesign",
+      "--force",
+      "--sign",
+      "-",
+      "/private/tmp/trove-audio-ffmpeg/audio-decoder"
+    ],
+    [
+      "codesign",
+      "--verify",
+      "--strict",
+      "/private/tmp/trove-audio-ffmpeg/audio-decoder"
+    ]
+  ],
+  "dependencies": "/private/tmp/trove-audio-ffmpeg/audio-decoder:\n\t/usr/lib/libSystem.B.dylib (compatibility version 1.0.0, current version 1359.0.0)\n\t/usr/lib/libc++.1.dylib (compatibility version 1.0.0, current version 2200.27.0)\n",
+  "sourceSha256": {
+    "native/audio-decoder.cpp": "2dc1bd859dfd4019419cfc58d2b03dfb78db206272b494f6b7a02748b28426ec",
+    "native/worker-platform.hpp": "63c01ffe922631b81805ef18dd9ef562c73505e481d5e3ddc081c023883da8cb",
+    "scripts/build-audio-decoder.py": "6a3c67bea1e61c7593171aff4f7f8f426787e9fe1a101e319d4a02e608feff53",
+    "scripts/audio_build.py": "2b0e138eb217c4f0ac08d10c163f27f5c9b97c66d7d7b3236f2624ef79ff6253"
+  },
+  "compiler": "Apple clang version 21.0.0 (clang-2100.3.34.2)\nTarget: arm64-apple-darwin27.0.0\nThread model: posix\nInstalledDir: /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin\n",
+  "qualification": "Build evidence only. Fixture, cancellation and hostile-input results must be recorded separately."
+}

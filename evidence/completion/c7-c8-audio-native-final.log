@@ -1,0 +1,62 @@
+=== RUN   TestAudioDecoderRejectsChangedHelper
+--- PASS: TestAudioDecoderRejectsChangedHelper (0.00s)
+=== RUN   TestAudioDecoderCancellationKeepsOriginalAndRemovesPrivateCopy
+--- PASS: TestAudioDecoderCancellationKeepsOriginalAndRemovesPrivateCopy (0.15s)
+=== RUN   TestAudioDecoderLimitsAndSeparateDestination
+--- PASS: TestAudioDecoderLimitsAndSeparateDestination (0.00s)
+=== RUN   TestAudioDecoderAbsentIsRecoverable
+--- PASS: TestAudioDecoderAbsentIsRecoverable (0.00s)
+=== RUN   TestAudioDecoderRejectsDeclaredDurationBeyondLimit
+--- PASS: TestAudioDecoderRejectsDeclaredDurationBeyondLimit (0.05s)
+=== RUN   TestRealAudioDecoderCommonFormats
+=== RUN   TestRealAudioDecoderCommonFormats/tones.aac
+=== RUN   TestRealAudioDecoderCommonFormats/tones.m4a
+=== RUN   TestRealAudioDecoderCommonFormats/tones.mp3
+=== RUN   TestRealAudioDecoderCommonFormats/tones.wav
+=== RUN   TestRealAudioDecoderCommonFormats/corrupt-known-container
+=== RUN   TestRealAudioDecoderCommonFormats/unsupported
+=== RUN   TestRealAudioDecoderCommonFormats/unsupported-channel-profile
+--- PASS: TestRealAudioDecoderCommonFormats (0.06s)
+    --- PASS: TestRealAudioDecoderCommonFormats/tones.aac (0.01s)
+    --- PASS: TestRealAudioDecoderCommonFormats/tones.m4a (0.01s)
+    --- PASS: TestRealAudioDecoderCommonFormats/tones.mp3 (0.01s)
+    --- PASS: TestRealAudioDecoderCommonFormats/tones.wav (0.01s)
+    --- PASS: TestRealAudioDecoderCommonFormats/corrupt-known-container (0.01s)
+    --- PASS: TestRealAudioDecoderCommonFormats/unsupported (0.01s)
+    --- PASS: TestRealAudioDecoderCommonFormats/unsupported-channel-profile (0.01s)
+=== RUN   TestAudioDecoderRejectsMalformedDerivedSamples
+--- PASS: TestAudioDecoderRejectsMalformedDerivedSamples (0.05s)
+=== RUN   TestAudioDecoderBindsRuntimeAndTarget
+=== RUN   TestAudioDecoderBindsRuntimeAndTarget/platform
+=== RUN   TestAudioDecoderBindsRuntimeAndTarget/architecture
+=== RUN   TestAudioDecoderBindsRuntimeAndTarget/runtimeCommit
+=== RUN   TestAudioDecoderBindsRuntimeAndTarget/name
+--- PASS: TestAudioDecoderBindsRuntimeAndTarget (0.00s)
+    --- PASS: TestAudioDecoderBindsRuntimeAndTarget/platform (0.00s)
+    --- PASS: TestAudioDecoderBindsRuntimeAndTarget/architecture (0.00s)
+    --- PASS: TestAudioDecoderBindsRuntimeAndTarget/runtimeCommit (0.00s)
+    --- PASS: TestAudioDecoderBindsRuntimeAndTarget/name (0.00s)
+=== RUN   TestRealAudioDecoderCancellationDuringOutput
+--- PASS: TestRealAudioDecoderCancellationDuringOutput (0.18s)
+=== RUN   TestRealAudioDecoderProtocolRejectsPathsAndOversizedRequests
+=== RUN   TestRealAudioDecoderProtocolRejectsPathsAndOversizedRequests/{"schemaVersion":1,"url":"https://127.0.0.1/reco
+=== RUN   TestRealAudioDecoderProtocolRejectsPathsAndOversizedRequests/{"schemaVersion":1,"path":"/etc/passwd"}
+=== RUN   TestRealAudioDecoderProtocolRejectsPathsAndOversizedRequests/{"schemaVersion":2}
+=== RUN   TestRealAudioDecoderProtocolRejectsPathsAndOversizedRequests/________________________________________________
+--- PASS: TestRealAudioDecoderProtocolRejectsPathsAndOversizedRequests (0.02s)
+    --- PASS: TestRealAudioDecoderProtocolRejectsPathsAndOversizedRequests/{"schemaVersion":1,"url":"https://127.0.0.1/reco (0.00s)
+    --- PASS: TestRealAudioDecoderProtocolRejectsPathsAndOversizedRequests/{"schemaVersion":1,"path":"/etc/passwd"} (0.00s)
+    --- PASS: TestRealAudioDecoderProtocolRejectsPathsAndOversizedRequests/{"schemaVersion":2} (0.00s)
+    --- PASS: TestRealAudioDecoderProtocolRejectsPathsAndOversizedRequests/________________________________________________ (0.01s)
+=== RUN   TestRealAudioDecoderRejectsNonfiniteSource
+--- PASS: TestRealAudioDecoderRejectsNonfiniteSource (0.02s)
+=== RUN   TestNativeWorkerDescriptorTransportAndCancellation
+=== RUN   TestNativeWorkerDescriptorTransportAndCancellation/cooperative
+=== RUN   TestNativeWorkerDescriptorTransportAndCancellation/forced
+--- PASS: TestNativeWorkerDescriptorTransportAndCancellation (1.07s)
+    --- PASS: TestNativeWorkerDescriptorTransportAndCancellation/cooperative (1.04s)
+    --- PASS: TestNativeWorkerDescriptorTransportAndCancellation/forced (0.03s)
+=== RUN   TestPrivateStagingFileLifecycle
+--- PASS: TestPrivateStagingFileLifecycle (0.00s)
+PASS
+ok  	trove.local/phase0/internal/native	3.151s

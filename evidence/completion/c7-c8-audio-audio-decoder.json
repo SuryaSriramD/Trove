@@ -1,0 +1,41 @@
+{
+  "schemaVersion": 1,
+  "name": "audio-decoder",
+  "sha256": "8e582101947184849b89596568f89394ba5c88a654511d8f5b2974f290e70719",
+  "sourceSha256": "2dc1bd859dfd4019419cfc58d2b03dfb78db206272b494f6b7a02748b28426ec",
+  "runtime": "FFmpeg",
+  "runtimeCommit": "ffmpeg-9.0.2-trove-restricted-v1",
+  "architecture": "arm64",
+  "platform": "darwin",
+  "capabilities": {
+    "containers": [
+      "WAV",
+      "MP3",
+      "AAC",
+      "M4A"
+    ],
+    "inputChannels": [
+      1,
+      2
+    ],
+    "minimumSampleRate": 8000,
+    "maximumSampleRate": 192000,
+    "outputSampleRate": 16000,
+    "outputChannels": 1,
+    "outputFormat": "f32le",
+    "maximumDurationMs": 7200000,
+    "maximumInputBytes": 536870912,
+    "originalBytesRemainCanonical": true,
+    "networkProtocols": [],
+    "decoders": [
+      "aac",
+      "mp3float",
+      "pcm_u8",
+      "pcm_s16le",
+      "pcm_s24le",
+      "pcm_s32le",
+      "pcm_f32le",
+      "pcm_f64le"
+    ]
+  }
+}

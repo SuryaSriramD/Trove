@@ -1,0 +1,6 @@
+# trove.local/phase0/internal/native [trove.local/phase0/internal/native.test]
+internal/native/audio_decoder.go:59:18: not enough arguments in call to supportedNativeTarget
+	have ()
+	want (string, string)
+FAIL	trove.local/phase0/internal/native [build failed]
+FAIL

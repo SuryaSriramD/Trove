@@ -3,16 +3,17 @@ package native
 import (
 	"bytes"
 	"context"
+	"encoding/binary"
 	"encoding/json"
 	"errors"
 	"fmt"
 	"io"
+	"math"
 	"os"
 	"os/exec"
 	"path/filepath"
 	"runtime"
-	"strconv"
-	"strings"
+	"sync"
 	"time"
 )
 
@@ -21,6 +22,8 @@ var (
 	ErrAudioCorrupt     = errors.New("CORRUPT_AUDIO")
 	ErrAudioLimit       = errors.New("AUDIO_LIMIT")
 )
+
+const audioRuntimeCommit = "ffmpeg-9.0.2-trove-restricted-v1"
 
 const maximumDecodedAudioBytes int64 = 16000 * 4 * 7200
 
@@ -53,16 +56,21 @@ func (s *Supervisor) audioDecoder() (Helper, error) {
 		SchemaVersion int    `json:"schemaVersion"`
 		Platform      string `json:"platform"`
 	}
-	if s == nil || runtime.GOOS != "darwin" || runtime.GOARCH != "arm64" {
-		return record.Helper, fmt.Errorf("%w: common-format decoding requires the macOS arm64 helper", ErrAudioUnsupported)
+	if s == nil || !supportedNativeTarget(runtime.GOOS, runtime.GOARCH) {
+		return record.Helper, fmt.Errorf("%w: common-format decoding requires a supported verified helper", ErrAudioUnsupported)
 	}
 	raw, err := os.ReadFile(filepath.Join(s.bundle, "audio-decoder.json"))
 	if err != nil {
 		return record.Helper, fmt.Errorf("%w: bundled audio decoder is unavailable; original recording is retained", ErrAudioUnsupported)
 	}
-	if json.Unmarshal(raw, &record) != nil || record.SchemaVersion != 1 || record.Platform != "darwin" ||
-		record.Name != "audio-decoder" || record.Runtime != "CoreAudio" || record.RuntimeCommit != "trove-audio-decoder-v1" ||
-		record.Architecture != "arm64" || !digestPattern.MatchString(record.SHA256) {
+	if json.Unmarshal(raw, &record) != nil {
+		return record.Helper, errors.New("invalid audio decoder manifest")
+	}
+	legacy := runtime.GOOS == "darwin" && runtime.GOARCH == "arm64" &&
+		record.Runtime == "CoreAudio" && record.RuntimeCommit == "trove-audio-decoder-v1"
+	if record.SchemaVersion != 1 || record.Platform != runtime.GOOS || record.Name != "audio-decoder" ||
+		record.Architecture != runtime.GOARCH || !digestPattern.MatchString(record.SHA256) ||
+		(!legacy && (record.Runtime != "FFmpeg" || record.RuntimeCommit != audioRuntimeCommit)) {
 		return record.Helper, errors.New("invalid audio decoder manifest")
 	}
 	return record.Helper, s.verifyHelper(record.Helper)
@@ -79,6 +87,9 @@ func (s *Supervisor) DecodeAudio(ctx context.Context, source, destination *os.Fi
 	helper, err := s.audioDecoder()
 	if err != nil {
 		return result, err
+	}
+	if source == nil || destination == nil {
+		return result, fmt.Errorf("%w: missing audio descriptor", ErrAudioCorrupt)
 	}
 	input, err := source.Stat()
 	if err != nil || !input.Mode().IsRegular() || input.Size() <= 0 {
@@ -100,7 +111,7 @@ func (s *Supervisor) DecodeAudio(ctx context.Context, source, destination *os.Fi
 	defer timeout()
 	run, cancel := context.WithCancelCause(run)
 	defer cancel(context.Canceled)
-	dir, err := os.MkdirTemp("", "trove-decode-")
+	dir, err := privateWorkerDirectory("trove-decode-")
 	if err != nil {
 		return result, err
 	}
@@ -145,15 +156,19 @@ func (s *Supervisor) DecodeAudio(ctx context.Context, source, destination *os.Fi
 		return result, err
 	}
 	defer snapshot.Close()
-	cmd := exec.CommandContext(run, filepath.Join(s.bundle, helper.Name))
+	cmd := exec.CommandContext(run, filepath.Join(s.bundle, helperFilename(helper.Name)))
 	cmd.Dir = dir
-	cmd.Env = []string{"PATH=/usr/bin:/bin", "HOME=" + dir, "TMPDIR=" + dir}
+	cmd.Env = workerEnvironment(dir)
 	process, err := prepareWorker(cmd, []*os.File{snapshot, destination}, 512<<20)
 	if err != nil {
 		return result, err
 	}
 	defer process.close()
-	cmd.Stdin = strings.NewReader(`{"schemaVersion":1}`)
+	stdin, err := cmd.StdinPipe()
+	if err != nil {
+		return result, err
+	}
+	defer stdin.Close()
 	stdout := &decodeOutput{}
 	cmd.Stdout, cmd.Stderr = stdout, &ringLog{}
 	cmd.Cancel = func() error { return process.stop(true) }
@@ -161,9 +176,22 @@ func (s *Supervisor) DecodeAudio(ctx context.Context, source, destination *os.Fi
 	if err = process.start(); err != nil {
 		return result, err
 	}
+	// The child receives no request until Windows Job assignment succeeds.
+	if _, err = stdin.Write([]byte("{\"schemaVersion\":1}")); err != nil {
+		_ = process.stop(true)
+		_ = cmd.Wait()
+		if run.Err() != nil {
+			return result, context.Cause(run)
+		}
+		return result, err
+	}
+	_ = stdin.Close()
 	stopped := make(chan struct{})
-	defer close(stopped)
+	var watcher sync.WaitGroup
+	watcher.Add(1)
+	defer func() { close(stopped); watcher.Wait() }()
 	go func() {
+		defer watcher.Done()
 		ticker := time.NewTicker(250 * time.Millisecond)
 		defer ticker.Stop()
 		for {
@@ -176,12 +204,8 @@ func (s *Supervisor) DecodeAudio(ctx context.Context, source, destination *os.Fi
 				if stat, e := destination.Stat(); e == nil && stat.Size() > maximumDecodedAudioBytes {
 					cancel(fmt.Errorf("%w: decoded output budget", ErrAudioLimit))
 				}
-				raw, e := exec.Command("/bin/ps", "-o", "rss=", "-p", strconv.Itoa(cmd.Process.Pid)).Output()
-				if e == nil {
-					rss, _ := strconv.ParseInt(strings.TrimSpace(string(raw)), 10, 64)
-					if rss*1024 > 512<<20 {
-						cancel(fmt.Errorf("%w: decoder memory budget", ErrAudioLimit))
-					}
+				if rss, e := process.rss(); e == nil && rss > 512<<20 {
+					cancel(fmt.Errorf("%w: decoder memory budget", ErrAudioLimit))
 				}
 			}
 		}
@@ -212,6 +236,34 @@ func (s *Supervisor) DecodeAudio(ctx context.Context, source, destination *os.Fi
 	if err != nil || result.Bytes <= 0 || result.Frames <= 0 || result.Frames > maximumDecodedAudioBytes/4 || result.Frames*4 != result.Bytes ||
 		output.Size() != result.Bytes || result.SampleRate != 16000 || result.Channels != 1 || result.Format != "f32le" {
 		return result, fmt.Errorf("%w: decoder output shape", ErrAudioCorrupt)
+	}
+	if result.SourceChannels < 1 || result.SourceChannels > 2 || result.SourceSampleRate < 8000 ||
+		result.SourceSampleRate > 192000 || math.IsNaN(result.SourceSampleRate) || math.IsInf(result.SourceSampleRate, 0) ||
+		(result.Container != "WAV" && result.Container != "MP3" && result.Container != "AAC" && result.Container != "M4A") {
+		return result, fmt.Errorf("%w: decoder source shape", ErrAudioCorrupt)
+	}
+	// Independently validate the derived bytes, including a helper that returns
+	// a plausible result envelope but writes NaN, Infinity or clipped samples.
+	samples := make([]byte, 64<<10)
+	for offset := int64(0); offset < result.Bytes; {
+		if run.Err() != nil {
+			return result, context.Cause(run)
+		}
+		count := int64(len(samples))
+		if result.Bytes-offset < count {
+			count = result.Bytes - offset
+		}
+		n, e := destination.ReadAt(samples[:count], offset)
+		if e != nil || int64(n) != count {
+			return result, fmt.Errorf("%w: decoded sample read", ErrAudioCorrupt)
+		}
+		for at := 0; at < n; at += 4 {
+			sample := float64(math.Float32frombits(binary.LittleEndian.Uint32(samples[at:])))
+			if math.IsNaN(sample) || math.IsInf(sample, 0) || math.Abs(sample) > 1.01 {
+				return result, fmt.Errorf("%w: invalid decoded sample", ErrAudioCorrupt)
+			}
+		}
+		offset += count
 	}
 	return result, nil
 }
