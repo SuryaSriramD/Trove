@@ -119,16 +119,7 @@ func run() error {
 		}
 	}
 	workers.ConfigureSearch(k, supervisor)
-	if native.OCRAvailable(*bundle) {
-		k.SetOCRProvider(func(ctx context.Context, f *os.File) (workspace.OCRResult, error) {
-			r, e := native.RunLocalOCR(ctx, f, *bundle)
-			out := workspace.OCRResult{Warning: r.Warning}
-			for _, line := range r.Lines {
-				out.Lines = append(out.Lines, workspace.OCRLine{Text: line.Text, Confidence: line.Confidence})
-			}
-			return out, e
-		})
-	}
+	workers.ConfigureOCR(k, *bundle)
 	done := make(chan struct{})
 	go func() {
 		defer close(done)

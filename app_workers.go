@@ -4,7 +4,6 @@ import (
 	"context"
 	"errors"
 	"github.com/wailsapp/wails/v2/pkg/runtime"
-	"os"
 	"time"
 	"trove.local/phase0/internal/native"
 	"trove.local/phase0/internal/workers"
@@ -18,16 +17,7 @@ func (a *App) startJobs(k *workspace.Kernel) {
 	}
 	workers.ConfigureSearch(k, supervisor)
 	bundle := nativeBundlePath()
-	if native.OCRAvailable(bundle) {
-		k.SetOCRProvider(func(ctx context.Context, f *os.File) (workspace.OCRResult, error) {
-			result, err := native.RunLocalOCR(ctx, f, bundle)
-			out := workspace.OCRResult{Warning: result.Warning}
-			for _, line := range result.Lines {
-				out.Lines = append(out.Lines, workspace.OCRLine{Text: line.Text, Confidence: line.Confidence})
-			}
-			return out, err
-		})
-	}
+	workers.ConfigureOCR(k, bundle)
 	ctx, cancel := context.WithCancel(a.ctx)
 	done := make(chan struct{})
 	a.mu.Lock()

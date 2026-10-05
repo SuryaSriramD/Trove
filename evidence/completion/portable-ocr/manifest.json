@@ -1,0 +1,91 @@
+{
+  "schemaVersion": 1,
+  "package": "portable-ocr",
+  "baseCommit": "89cb63ab540969a12f32989080c30a095fba1f89",
+  "sourceSha256": {
+    "app_workers.go": "b3fd3d4c87a8c068e7929552cc1a1c6ac5b4ff01b589891d2644ccfdccb3290e",
+    "cmd/trove-host/main.go": "81518eb029c015abd8c6c00219a349e1060bc6c8bec1436a0b8fc15733c44006",
+    "docs/completion/licenses/tessdata-fast-LICENSE": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30",
+    "docs/completion/platform-native-workers.md": "27ca8e06b56eb6c62f4de99edda66edce64151ae2bfc7a1ee150101a59190c47",
+    "docs/completion/portable-ocr.md": "f7749920a8c439d4d27ce7230098ca27e7b3787ff155742381c592753543c5e1",
+    "frontend/src/ai/P2IntelligencePanel.tsx": "5a523b34b4d17020561484a5f3f07be09212c3c31bd766038e6fe0480e1f4448",
+    "frontend/tests/portable-ocr.browser.spec.ts": "76cf2eb45493670bfa5119073dda48f29d31ab47e161ff71662ec92abed9928e",
+    "internal/native/p2_ocr.go": "c78e0bf2456012d1e302ee3be8206fa1bcc7f30405029c767b25891c2dc51a36",
+    "internal/native/p2_ocr_portable.go": "f1451290a955e8b14fa0211f6f07a4d7da3c53eb707581ce16ab04437a60add9",
+    "internal/native/p2_ocr_portable_test.go": "f72dbe255503201d5c6845b6d58ec826243625a4e06289e9b93ecffc695ffcdf",
+    "internal/workers/ocr.go": "2a05f4447e1ed273e79b5f3dabe467018d98bc3a81eed4d3f63dc3453f518ab5",
+    "internal/workspace/p2_intelligence_ocr.go": "297ed5a2d3651c9befb0fbbe8306b2048544cc76b186f931b6351f67b9705ccf",
+    "internal/workspace/p2_ocr_provenance_test.go": "1518466868c483735a0a2558083e42e6da4b94d419971904a66b80a88008ca2b",
+    "native/ocr-worker.cpp": "7c427e0bf7a9d649818bd252059124d6a4b63994e5756c55d01a45eba6e3429a",
+    "native/ocr.lock.json": "eb40fc641d2ba8bda6722b50397900e33644d29324d89a3e4009fce50118d8b6",
+    "scripts/build-native-portable.py": "f01dd8e9a17f78b715ea164d8a7fb2776974d871221ec451dfb833199a40276c",
+    "scripts/build-ocr-portable.py": "d3b47429a05c8fd2ca38c602648d051f762f4d71d93ecc393a2cc307f0fbe8ea",
+    "scripts/native_targets.py": "22e7536af5335111cf2329c0ebc016bd1988403e63bae78ff5beba50925be6d5",
+    "tests/test_native_targets.py": "1e449d15d8b6848ca39a648b14451346adc6307e4cc186d419039dbbd7d60687",
+    "tests/test_ocr_build.py": "a3952e180fde79176be824f10fbecf7b3fe93418e4782fc0721803f7f403d18a"
+  },
+  "hardware": {
+    "os": "macOS-27.0.1-arm64-arm-64bit",
+    "machine": "arm64",
+    "cpu": "Apple M4",
+    "memoryBytes": 25769803776
+  },
+  "worker": {
+    "runtime": "tesseract-5.5.1-leptonica-1.85.0-eng-v1",
+    "sha256": "d24610d0ac44350fec03ebced60c5b7e80f490c85706f913574032148e328f5b",
+    "modelSha256": "7d4322bd2a7749724879683fc3912cb542f19906c83bcc1a52132556427170b2",
+    "nativeTarget": "darwin-arm64",
+    "byteIdenticalReviewedRebuild": true
+  },
+  "fixture": {
+    "path": "evidence/phase6/local-ocr-fixture.png",
+    "sha256": "9f726ff8d1b78f429cfd7813b131e0b978f44f790605471d232e4b5478d5db0b",
+    "unchangedExpectedPhrases": [
+      "TROVE LOCAL OCR 2026",
+      "Review sources before approval"
+    ],
+    "minimumConfidence": 0.5
+  },
+  "results": {
+    "actualPortableOCR": "pass on macOS arm64",
+    "actualAppleVisionCompatibility": "pass on macOS arm64",
+    "raceBoundaryAndWorkspaceTests": "pass; no required OCR check skipped in verified-final.log",
+    "browser": "2 passed in 3.1s; built interface, mocked kernel transport",
+    "buildTests": "7 passed",
+    "goWindowsCompile": "pass, compile only",
+    "goLinuxCompile": "pass, compile only",
+    "appAndHostCompile": "pass",
+    "windowsNativeBuildAndExecution": "unqualified",
+    "linuxNativeBuildAndExecution": "unqualified",
+    "broaderOCRQuality": "unqualified",
+    "screenshotsAndPDFPortability": "not implemented by this package"
+  },
+  "evidence": {
+    "acceptance-final.log": "fa0b338abb6b03e92976480bcc3a13389ea52ddd5f44d2219870ef9548ea0b9a",
+    "app-compile.log": "6f595cf124bc41edcbf5f58052be3fbe9c74113137f60e4da57d9810c9ae1272",
+    "app-final-compile.log": "e1fc3dfab8977f7cc7aa4fea28e500e27f421ca4829c63ab5117939d8146f36b",
+    "apple-build.log": "01e066964e4853228fcdcdcfecbce1aee7a6a1acdb4a931d5b1c19e11f22797d",
+    "browser.json": "64f90e1a21205b7ed705675950890c0ca4789b17e04b144fd2b0bf8b29e716d9",
+    "browser.log": "b6369fbe544c69b3619f888103752e469ea2b9cfb403284f2b28ba7af3c23570",
+    "build-final.log": "b17f12b597f9c53ec2d44254acbd293d0364e9fb757a16654b5dc287823a9cf3",
+    "build-plans.log": "55052965d00f7376ad5009db36e1f7d4950065c0a84943a81f572bb1750c1bcc",
+    "build-reviewed.log": "7d26fb73fc15e512c43e9b194f392a41547360d5c90ba06c1a3e202d2780ec13",
+    "build-tests-final.log": "7ada5a8920c08d898b16ea3c74db4f9005848b88f4907a6c3aaa621b806ca2c2",
+    "build-tests.log": "feaeae78b43b3e57227bebdbeb188cdae2ded2094c87eb6d9e1ccb5cae68c7da",
+    "build.log": "4637cbfcf559b6090dd3ed990aa7b2444f625380de3ad38d0eea661248e4d001",
+    "focused-final.log": "747fc6c37336b9859565b16c2b573859fa7d01d27ddd34f86b48acbe4f1c04ac",
+    "focused-initial.log": "e7c4c1cc5c1c032c765b7a62bcddbc988a862a5064ca7e5d6fd28b013526dda8",
+    "focused-refactor-compile.log": "d2a1c63e00862610c067162479b486e10f57038db1d83824dd4875615d2dd894",
+    "focused.log": "252698f7cbaf1938f65a006de97fef23992350d6b7f045ad04eb8fe653684daa",
+    "frontend-build-initial-cli.log": "47cac4ed8117f647a4accf3a68479d80fe375900c4e971f039cd1c78c41d1318",
+    "frontend-build.log": "cbc907b2114dddcb083509f539d27b0fd8d7bc05253ef9803d6a4a592aeaf136",
+    "linux-go-compile.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "linux-go-final.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "typescript.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "verified-final.log": "77fa9f761394aea6522e0d00f5b11b22f5d08586de19850001cb3c6e9f619920",
+    "windows-go-compile.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "windows-go-final.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "worker-build.json": "29b7fbfad9f4e58de1c3af4d43cc39d73badd097bdf1f435530278d0f401daef"
+  },
+  "review": "Independent native reviewer confirmed Windows start barrier and bounded descriptor/process handling. Its executable-copy growth finding was fixed with a hard 128 MiB limit and verified-final tests."
+}

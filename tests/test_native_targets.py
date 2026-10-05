@@ -30,7 +30,7 @@ class NativeTargets(unittest.TestCase):
             body = json.loads(result.stdout)
             self.assertIn('device execution unqualified', body['capture'])
             self.assertIn('target execution unqualified', body['audioDecoding'])
-            self.assertFalse(body['ocr'])
+            self.assertIn('target execution unqualified', body['ocr'])
             self.assertIn('No platform execution', body['qualification'])
 
     def test_microphone_plans_keep_fixture_device_boundary(self):

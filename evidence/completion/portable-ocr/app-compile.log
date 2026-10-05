@@ -1,0 +1,5 @@
+# trove.local/phase0/internal/sqlitevec
+internal/sqlitevec/register.go:11:12: warning: 'sqlite3_auto_extension' is deprecated: first deprecated in macOS 10.10 - Process-global auto extensions are not supported on Apple platforms [-Wdeprecated-declarations]
+/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/sqlite3.h:7627:16: note: 'sqlite3_auto_extension' has been explicitly marked deprecated here
+ok  	trove.local/phase0	0.585s [no tests to run]
+?   	trove.local/phase0/cmd/trove-host	[no test files]
