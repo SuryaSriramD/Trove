@@ -11,16 +11,19 @@ import (
 	"time"
 )
 
-// These tests launch the actual Swift executable. They use only synthetic PCM,
+// These tests launch the legacy Mac worker or separate portable fixture. They use only synthetic PCM,
 // never request microphone permission, and exercise the real control descriptor.
 func TestRealMicrophoneControlCancellationAndParentExit(t *testing.T) {
-	if runtime.GOOS != "darwin" || runtime.GOARCH != "arm64" {
+	if !supportedNativeTarget(runtime.GOOS, runtime.GOARCH) {
 		t.Skip("unsupported microphone helper on this target")
 	}
 	if os.Getenv("TROVE_NATIVE_INTEGRATION") != "1" {
 		t.Skip("requires bundled native microphone helper")
 	}
-	bundle := os.Getenv("TROVE_NATIVE_BUNDLE")
+	bundle := os.Getenv("TROVE_MICROPHONE_FIXTURE")
+	if bundle == "" {
+		bundle = os.Getenv("TROVE_NATIVE_BUNDLE")
+	}
 	if bundle == "" {
 		bundle, _ = filepath.Abs("../../build/native")
 	}
@@ -39,9 +42,20 @@ func TestRealMicrophoneControlCancellationAndParentExit(t *testing.T) {
 				t.Fatal(err)
 			}
 			defer destination.Close()
-			cmd := exec.CommandContext(ctx, filepath.Join(bundle, "microphone-worker"))
-			cmd.ExtraFiles = []*os.File{controlR, destination}
-			cmd.Env = []string{"PATH=/usr/bin:/bin"}
+			cmd := exec.CommandContext(ctx, filepath.Join(bundle, helperFilename("microphone-worker")))
+			directory, err := privateWorkerDirectory("trove-mic-control-")
+			if err != nil {
+				t.Fatal(err)
+			}
+			defer os.RemoveAll(directory)
+			cmd.Dir = directory
+			cmd.Env = workerEnvironment(directory)
+			process, err := prepareWorker(cmd, []*os.File{controlR, destination}, 512<<20)
+			if err != nil {
+				t.Fatal(err)
+			}
+			defer process.close()
+			cmd.Cancel = func() error { return process.stop(true) }
 			in, err := cmd.StdinPipe()
 			if err != nil {
 				t.Fatal(err)
@@ -50,10 +64,10 @@ func TestRealMicrophoneControlCancellationAndParentExit(t *testing.T) {
 			if err != nil {
 				t.Fatal(err)
 			}
-			if err = cmd.Start(); err != nil {
+			if err = process.start(); err != nil {
 				t.Fatal(err)
 			}
-			defer func() { _ = cmd.Process.Kill(); _ = cmd.Wait() }()
+			defer func() { _ = process.stop(true); _ = cmd.Wait() }()
 			controlR.Close()
 			hello, err := ReadFrame(out)
 			if err != nil {

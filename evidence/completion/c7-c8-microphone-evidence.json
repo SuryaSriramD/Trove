@@ -1,0 +1,178 @@
+{
+  "schemaVersion": 1,
+  "recordedAt": "2026-10-05T12:56:33.843265+00:00",
+  "scope": [
+    "C7",
+    "C8",
+    "REL-009",
+    "CORE-005"
+  ],
+  "conclusion": "Portable microphone implementation and native-target recipes; device-free Mac protocol evidence only. Windows/Linux native capture compilation and all real-device/permission qualification remain open.",
+  "sourceBase": "10fbb2c3c0722a7c92d4ccb0c3e195167fb7cd69",
+  "sourceSha256": {
+    "native/microphone-worker.cpp": "3bb4e3eafa0f9ad3b1ff33df7436519468739fe00d427ea3b87abd8076650dcc",
+    "native/capture-buffer.hpp": "82a4fee85f0a7656c41f93299340942efcd890c18982d129a124be89d33eea77",
+    "native/microphone.lock.json": "05063e8278bd6dbc3036fea45d0b0bb1a94ce6cb0bb6204f8edad5cb052a1781",
+    "native/worker-platform.hpp": "63c01ffe922631b81805ef18dd9ef562c73505e481d5e3ddc081c023883da8cb",
+    "internal/native/microphone.go": "89ffd02c658f09ba03cf5f2c413ca22066c8b732fe92ca5a9b00c144a7025228",
+    "internal/native/microphone_test.go": "8dc3979fec3a4277d1eec2349d83e1f68836d3396babfed34007d96a73b13648",
+    "internal/native/microphone_portable_test.go": "274146dc4894c46ee926ebe3446a2394b4b9873c085ea528ffda8ed3271b6c33",
+    "internal/native/supervisor.go": "2def196de6756973c29901ed7a07536cfc0d86f43e2d466e5afe49664060c40c",
+    "scripts/build-microphone.py": "bbf8268db07cf750bd55ca2a66357b507037c5bd0b74b4fdd2c931ef28001b8c",
+    "scripts/build-native-portable.py": "6b980dc5bea7956161da607554365a2979251ca81bb1dc3530f0cc4f4ba30500",
+    "scripts/native_targets.py": "b7e55f18e55870ec765835649f28f35d413194acce99675e22796c07b242d884",
+    "tests/test_native_targets.py": "1f12c150d4753b805dcecd22fe2394fc0a088c8ca50e1a51b2f73ef6cdd565a0"
+  },
+  "host": "macOS-27.0.1-arm64-arm-64bit",
+  "goVersion": "go version go1.27.1 darwin/arm64",
+  "microphoneActivated": false,
+  "productionTargetCaptureExecuted": false,
+  "deviceFreeFixture": {
+    "schemaVersion": 1,
+    "platform": "darwin",
+    "helper": {
+      "name": "microphone-worker",
+      "sha256": "b8d9fb77046f673656c0a44b56abfc8bc83087256f8ec910902612b13b77171e",
+      "runtime": "microphone",
+      "runtimeCommit": "miniaudio-0.11.25-trove-microphone-v1-fixture",
+      "architecture": "arm64"
+    },
+    "testOnly": true,
+    "deviceBackendCompiled": false,
+    "capabilities": [
+      "record_synthetic"
+    ],
+    "permissionState": "not_requested",
+    "deviceState": "not_probed",
+    "deviceQualification": "Unqualified",
+    "runtimeSystemLibraries": [],
+    "sourcePin": {
+      "schemaVersion": 1,
+      "runtimeCommit": "miniaudio-0.11.25-trove-microphone-v1",
+      "version": "0.11.25",
+      "source": "llama.cpp-d2e54583c7452353eb35d40431281f6ee984332f/vendor/miniaudio/miniaudio.h",
+      "headerSha256": "ac7af4de748b7e26b777f37e01cee313a308a7296a3eb080e2906b320cc55c89",
+      "upstream": "https://github.com/mackron/miniaudio",
+      "licenseChoice": "MIT-0",
+      "backends": {
+        "windows-amd64": "WASAPI shared capture",
+        "linux-amd64": "local per-user PulseAudio/PipeWire compatibility socket",
+        "darwin-arm64": "synthetic reference only; existing Swift capture preserved"
+      },
+      "boundedRingFrames": 32768,
+      "output": {
+        "sampleRate": 16000,
+        "channels": 1,
+        "format": "f32le"
+      }
+    },
+    "sourceSha256": {
+      "microphone-worker.cpp": "3bb4e3eafa0f9ad3b1ff33df7436519468739fe00d427ea3b87abd8076650dcc",
+      "capture-buffer.hpp": "82a4fee85f0a7656c41f93299340942efcd890c18982d129a124be89d33eea77",
+      "worker-platform.hpp": "63c01ffe922631b81805ef18dd9ef562c73505e481d5e3ddc081c023883da8cb"
+    },
+    "commands": [
+      [
+        "clang++",
+        "-std=c++17",
+        "-O2",
+        "-Wno-deprecated-declarations",
+        "-I/Users/suryasriramduvvuri/Library/Caches/Trove/completion/llama.cpp-d2e54583c7452353eb35d40431281f6ee984332f/vendor",
+        "/Users/suryasriramduvvuri/.codex/worktrees/completion-tooling/Trove/native/microphone-worker.cpp",
+        "-lpthread",
+        "-lm",
+        "-o",
+        "/private/tmp/trove-microphone-fixture/microphone-worker",
+        "-DTROVE_CAPTURE_FIXTURE_ONLY"
+      ]
+    ],
+    "toolchain": {
+      "python": "3.9.6",
+      "compiler": "Apple clang version 21.0.0 (clang-2100.3.34.2)\nTarget: arm64-apple-darwin27.0.0\nThread model: posix\nInstalledDir: /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin\n",
+      "sdk": "27.0"
+    },
+    "dependencies": "/private/tmp/trove-microphone-fixture/microphone-worker:\n\t/usr/lib/libSystem.B.dylib (compatibility version 1.0.0, current version 1359.0.0)\n\t/usr/lib/libc++.1.dylib (compatibility version 1.0.0, current version 2200.27.0)\n",
+    "host": "macOS-27.0.1-arm64-arm-64bit",
+    "recordedAt": "2026-10-05T12:52:23.849007+00:00"
+  },
+  "legacyMacHelper": {
+    "helper": {
+      "name": "microphone-worker",
+      "sha256": "9940c517026dfad18329843e1bc33ee47d0c67512d5c6f10a819a7753619e448",
+      "runtime": "microphone",
+      "runtimeCommit": "trove-microphone-v1",
+      "architecture": "arm64"
+    },
+    "manifestSha256": "2c0c33f2f7aaf184e4dc798484966c87f59241a8926f922de4be0ad3dd1e6e58",
+    "testMode": "synthetic only; unchanged helper"
+  },
+  "checks": [
+    {
+      "check": "Final microphone fixture and legacy supervisor race checks",
+      "result": "PASS",
+      "topLevelTests": 8,
+      "independentExpectations": [
+        "Exact 6400-byte result from 100 ms byte budget",
+        "Cancellation after flushed progress retains a nonempty recording smaller than the full budget",
+        "Parent EOF and explicit cancellation finish within two seconds and preserve flushed PCM",
+        "Overflow is reported without overwriting queued frames; NaN rejected; exact maximum enforced",
+        "Unknown wire fields and unsafe request bounds rejected before any bytes",
+        "Production supervisor rejects test-only microphone runtime even inside a manifest",
+        "Legacy Mac synthetic helper still yields 6400 bytes for 100 ms"
+      ]
+    },
+    {
+      "check": "Legacy Mac control cancellation and parent EOF regression",
+      "result": "PASS",
+      "scope": "Synthetic; no permission or microphone access"
+    },
+    {
+      "check": "Ordinary internal/native race suite",
+      "result": "PASS",
+      "scope": "Default unit tests; opt-in model/device tests skipped"
+    },
+    {
+      "check": "Native target and microphone plan Python tests",
+      "result": "PASS",
+      "tests": 4
+    },
+    {
+      "check": "Windows amd64 Go native test executable",
+      "result": "CROSS_COMPILED_NOT_EXECUTED",
+      "sha256": "6e3816bbff1ba6917900127350598cd5159454b3958217b19ed526ca158e3ef8"
+    },
+    {
+      "check": "Linux amd64 Go native test executable",
+      "result": "CROSS_COMPILED_NOT_EXECUTED",
+      "sha256": "f937e569c694d244c163ecc30a6c9df654c30b6f79387b8d21269934f2d14974"
+    },
+    {
+      "check": "Windows and Ubuntu production C++ capture, real microphones, OS permission/denial, packaged recording",
+      "result": "UNQUALIFIED",
+      "reason": "No matching target hosts or authorized device exercises in this package"
+    }
+  ],
+  "commands": {
+    "fixture": "python3 scripts/build-microphone.py --fixture-only --cache <verified-cache> --output <fixture-output>",
+    "focused": "TROVE_NATIVE_INTEGRATION=1 TROVE_MICROPHONE_FIXTURE=<fixture-output> TROVE_MICROPHONE_LEGACY_BUNDLE=<existing-mac-bundle> go test -race ./internal/native -run Test(PortableMicrophone|MicrophoneProduction|RealMicrophone|LegacyMacMicrophone) -count=1 -v",
+    "ordinary": "go test -race ./internal/native -count=1",
+    "crossCompile": "CGO_ENABLED=0 GOOS=<windows|linux> GOARCH=amd64 go test -c ./internal/native -o <test-executable>",
+    "python": "python3 -m unittest discover -s tests -p test_native_targets.py -v"
+  },
+  "logs": {
+    "fixtureAndLegacySupervisor": "=== RUN   TestMicrophoneProductionIdentityExcludesFixtures\n--- PASS: TestMicrophoneProductionIdentityExcludesFixtures (0.00s)\n=== RUN   TestMicrophoneProductionManifestRejectsFixture\n--- PASS: TestMicrophoneProductionManifestRejectsFixture (0.00s)\n=== RUN   TestPortableMicrophoneSyntheticBoundsAndRetainedCancellation\n=== RUN   TestPortableMicrophoneSyntheticBoundsAndRetainedCancellation/exact_byte_limit\n=== RUN   TestPortableMicrophoneSyntheticBoundsAndRetainedCancellation/cancel_retains_flushed_bytes\n--- PASS: TestPortableMicrophoneSyntheticBoundsAndRetainedCancellation (0.25s)\n    --- PASS: TestPortableMicrophoneSyntheticBoundsAndRetainedCancellation/exact_byte_limit (0.19s)\n    --- PASS: TestPortableMicrophoneSyntheticBoundsAndRetainedCancellation/cancel_retains_flushed_bytes (0.07s)\n=== RUN   TestPortableMicrophoneRejectsUnsafeRequestsBeforeCapture\n--- PASS: TestPortableMicrophoneRejectsUnsafeRequestsBeforeCapture (0.00s)\n=== RUN   TestPortableMicrophoneBufferSelfTest\n--- PASS: TestPortableMicrophoneBufferSelfTest (0.01s)\n=== RUN   TestPortableMicrophoneRejectsUnknownWireOptions\n--- PASS: TestPortableMicrophoneRejectsUnknownWireOptions (0.01s)\n=== RUN   TestLegacyMacMicrophoneSupervisor\n--- PASS: TestLegacyMacMicrophoneSupervisor (0.13s)\n=== RUN   TestRealMicrophoneControlCancellationAndParentExit\n=== RUN   TestRealMicrophoneControlCancellationAndParentExit/cancel\n=== RUN   TestRealMicrophoneControlCancellationAndParentExit/parent_exit\n--- PASS: TestRealMicrophoneControlCancellationAndParentExit (0.14s)\n    --- PASS: TestRealMicrophoneControlCancellationAndParentExit/cancel (0.07s)\n    --- PASS: TestRealMicrophoneControlCancellationAndParentExit/parent_exit (0.07s)\nPASS\nok  \ttrove.local/phase0/internal/native\t1.992s\n",
+    "legacyControl": "=== RUN   TestRealMicrophoneControlCancellationAndParentExit\n=== RUN   TestRealMicrophoneControlCancellationAndParentExit/cancel\n=== RUN   TestRealMicrophoneControlCancellationAndParentExit/parent_exit\n--- PASS: TestRealMicrophoneControlCancellationAndParentExit (0.13s)\n    --- PASS: TestRealMicrophoneControlCancellationAndParentExit/cancel (0.07s)\n    --- PASS: TestRealMicrophoneControlCancellationAndParentExit/parent_exit (0.06s)\nPASS\nok  \ttrove.local/phase0/internal/native\t1.680s\n",
+    "ordinaryNativeRace": "ok  \ttrove.local/phase0/internal/native\t4.371s\n",
+    "targetPlanTests": "test_microphone_plans_keep_fixture_device_boundary (test_native_targets.NativeTargets) ... ok\ntest_plans_keep_target_execution_unqualified (test_native_targets.NativeTargets) ... ok\ntest_portable_isa_and_pinned_sources (test_native_targets.NativeTargets) ... ok\ntest_target_builds_require_matching_host (test_native_targets.NativeTargets) ... ok\n\n----------------------------------------------------------------------\nRan 4 tests in 0.705s\n\nOK\n",
+    "fixtureBuild": "/private/tmp/trove-microphone-fixture/microphone-worker: replacing existing signature\n/private/tmp/trove-microphone-fixture/microphone-worker\n"
+  },
+  "openGates": [
+    "Native MSVC Windows and GCC Ubuntu capture compilation/linking and recorded dependency inventories",
+    "Explicit actual-device authorization, permission denied/ambiguous/no-device/silence classification",
+    "Default-device changes/disconnects, bounded output stalls and long-duration capture",
+    "Windows inherited handle/job/ACL execution and Linux desktop-session socket behavior",
+    "App crash/restart, power-loss and retained workspace source-asset validation",
+    "Exact packaged target candidate, install/update/uninstall and offline qualification",
+    "Freeze independently reproducible target toolchain images"
+  ]
+}
