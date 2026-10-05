@@ -1,0 +1,12 @@
+{
+  "mappingValidation": "passed",
+  "summary": {
+    "backlogItems": 51,
+    "productMappings": 312,
+    "explicitContractBoundaryExclusions": 26,
+    "coveragePackages": 41,
+    "candidateRecords": 3,
+    "releaseQualified": false
+  },
+  "errors": []
+}

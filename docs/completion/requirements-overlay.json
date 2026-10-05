@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "title": "Current scoped implementation overlay for the historical PRD/TRD ledger",
-  "reviewedSourceCommit": "7f6b1964f5d6cbdd28a02d5c1f66930611c14e7e",
+  "reviewedSourceCommit": "e481c6a7e602313be374785c49bc8ed73252ecad",
   "recordedAt": "2026-10-05",
   "historicalLedger": "docs/phase-0/requirements-ledger.json",
   "historicalLedgerCanonicalSHA256": "8bda6faf8acdbfd5562c9de9e3e2481bafb1e89964c1670edcaea4e12b662a91",
@@ -430,9 +430,11 @@
       ],
       "evidencePaths": [
         "docs/completion/retrieval.md",
-        "docs/completion/ai-context.md"
+        "docs/completion/ai-context.md",
+        "docs/completion/richtext-search.md",
+        "evidence/completion/richtext-search/manifest.json"
       ],
-      "remainingGates": "Recorded retrieval and deletion tests do not imply universal answer correctness; model generation compatibility, representative workload and candidate performance remain scoped. Native be6fc81 evidence finds inline rich-text boundaries split a word in the search index; that source repair and candidate retest are still outstanding in this reviewed source.",
+      "remainingGates": "Recorded retrieval and deletion tests do not imply universal answer correctness; representative model/task/workload evidence remains scoped. The be6fc81 formatted-word search failure remains attached to that binary. The separately linked shared rich-text projection repair has independent service regressions; later native candidate evidence must identify its own source and binary.",
       "coverageStatus": "scoped_source_and_evidence",
       "releaseQualified": false
     },
@@ -684,7 +686,9 @@
       ],
       "evidencePaths": [
         "docs/completion/personal-reviews.md",
-        "evidence/completion/c6-personal-review.json"
+        "evidence/completion/c6-personal-review.json",
+        "docs/completion/richtext-search.md",
+        "evidence/completion/richtext-search/manifest.json"
       ],
       "remainingGates": "One actual-model fixture is narrow evidence; representative scheduled-review quality and native candidate flows remain open. No generated writes commit without approval.",
       "coverageStatus": "scoped_source_and_evidence",
@@ -766,14 +770,19 @@
       "sourcePaths": [
         "scripts/build-desktop.py",
         "scripts/build-desktop-portable.py",
-        "scripts/desktop_package.py"
+        "scripts/desktop_package.py",
+        "app_rollback_child.go",
+        "internal/updates/rollback_wire.go",
+        "internal/workspace/open_compatible.go"
       ],
       "evidencePaths": [
         "docs/completion/verified-updates.md",
         "docs/completion/platform-desktop-packaging.md",
-        "docs/completion/windows-storage.md"
+        "docs/completion/windows-storage.md",
+        "docs/completion/rollback-readiness.md",
+        "evidence/completion/rollback-readiness-3f069dc/manifest.json"
       ],
-      "remainingGates": "Signing/notarization, clean installation, full offline model setup and Windows/Linux execution remain open. Ad-hoc update refusal is expected; Windows recovery is unavailable.",
+      "remainingGates": "Signing/notarization, clean installation, full offline model setup and Windows/Linux execution remain open. Ad-hoc update refusal is expected; Windows recovery is unavailable. Rollback readiness uses authenticated child/shell acknowledgement before preference commit; recorded local signed/ad-hoc fixture evidence is not clean-install/publisher/power-loss qualification.",
       "coverageStatus": "scoped_source_and_evidence",
       "releaseQualified": false
     },
@@ -792,9 +801,11 @@
         "docs/completion/startup-investigation.md",
         "docs/completion/native-memory-sampling.md",
         "docs/completion/development-candidate-be6fc81.md",
-        "evidence/completion/candidate-be6fc81/manifest.json"
+        "evidence/completion/candidate-be6fc81/manifest.json",
+        "docs/completion/startup-stage-tracing.md",
+        "evidence/completion/startup-trace-ce0973d/manifest.json"
       ],
-      "remainingGates": "Candidate be6fc81 returned readiness for all 20 launches but an 8399.656 ms launch exceeded its 2500 ms threshold. Keyword samples passed the 300 ms target on 100/1000/10000 synthetic pages; actual hybrid samples passed only a 100-page profile. Large semantic/concurrent load and full app latency remain open. Typed 10k formula/rollup first-page medians were 1197/1127 ms without a newly invented threshold.",
+      "remainingGates": "Candidate be6fc81 returned readiness for all 20 launches but an 8399.656 ms launch exceeded its 2500 ms threshold. Keyword samples passed the 300 ms target on 100/1000/10000 synthetic pages; actual hybrid samples passed only a 100-page profile. Large semantic/concurrent load and full app latency remain open. Typed 10k formula/rollup first-page medians were 1197/1127 ms without a newly invented threshold. The separate ce0973d startup trace candidate predates integrated support and rich-text changes: five normal 1000-page samples were below its recorded threshold, but earlier 8399.656 ms and rollback acknowledgement outliers remain unresolved; this does not qualify integrated startup or a release.",
       "coverageStatus": "scoped_source_and_evidence",
       "releaseQualified": false
     },
@@ -857,20 +868,29 @@
         "REL-002",
         "REL-008"
       ],
-      "coveredScope": "Bounded worker logs, per-root indexing diagnostics, automation run diagnostics and redacted account-token formatting.",
+      "coveredScope": "Existing narrow worker/index/automation diagnostics plus a bounded metadata-only-by-default local support ZIP, exact preview, explicitly selected titles/text, cancellation, permission/revision fences and no-replace native save.",
       "sourcePaths": [
         "internal/native/protocol.go",
         "internal/workspace/index_external.go",
         "internal/workspace/automation_runner.go",
         "internal/providers/auth/types.go",
-        "internal/providers/auth/manager_test.go"
+        "internal/providers/auth/manager_test.go",
+        "internal/workspace/support_bundle.go",
+        "internal/workspace/support_bundle_test.go",
+        "internal/native/support_inventory.go",
+        "app_support_bundle.go",
+        "app_support_bundle_test.go",
+        "frontend/src/SupportBundlePanel.tsx",
+        "frontend/tests/support.browser.spec.ts"
       ],
       "evidencePaths": [
         "docs/phase-1/1a.md",
         "docs/completion/automation-configuration.md",
-        "docs/completion/codex-siwc-auth.md"
+        "docs/completion/codex-siwc-auth.md",
+        "docs/completion/support-bundle.md",
+        "evidence/completion/support-bundle/manifest.json"
       ],
-      "remainingGates": "No user-generated support-bundle flow with explicit content inclusion was located. Redacted application/job/import/model/search diagnostics as a complete system are not established by these narrower paths. Reconcile the full requirement before any implementation-complete claim.",
+      "remainingGates": "The broader complete redacted application/job/import/model/search diagnostic system remains partial. The local support flow includes no raw log archive and promises no automatic secret redaction of optional user-included page content. Packaged native destination/Settings and Windows/Linux execution require distinct evidence; this source package does not qualify a release.",
       "coverageStatus": "scoped_source_and_evidence",
       "releaseQualified": false
     },
@@ -882,7 +902,7 @@
         "REL-002",
         "REL-009"
       ],
-      "coveredScope": "Bundled PDF.js viewing/text-layer extraction and isolated WebView2/WebKitGTK print/extract source paths, manifests, containment/resource policy and bounded cancellation.",
+      "coveredScope": "Bundled PDF.js viewing/text-layer extraction, bounded Windows WebView2 helper source, and preserved Linux WebKitGTK helper source with runtime capability explicitly disabled before launch until enforceable whole-process containment exists.",
       "sourcePaths": [
         "internal/native/document_helper.go",
         "internal/native/document_process.go",
@@ -891,15 +911,17 @@
         "native/document-worker-linux.cpp",
         "native/document-web-extension-linux.cpp",
         "frontend/src/document/extract.ts",
-        "frontend/tests/document.browser.spec.ts"
+        "frontend/tests/document.browser.spec.ts",
+        "internal/native/document_availability.go"
       ],
       "evidencePaths": [
         "docs/completion/portable-documents.md",
         "docs/completion/windows-document-helper.md",
         "evidence/completion/portable-documents/manifest.json",
-        "evidence/completion/windows-document-helper/manifest.json"
+        "evidence/completion/windows-document-helper/manifest.json",
+        "evidence/completion/document-containment/manifest.json"
       ],
-      "remainingGates": "Windows/Ubuntu C++ compilation, WebView launch, real output/worker behavior, offline interception, live process/profile cleanup, install and target performance were not executed on this Mac. Chromium fixtures and Go cross-compilation are narrower source/interface evidence.",
+      "remainingGates": "Linux native PDF text extraction/export is unavailable_containment because process groups do not enforce process/RSS ownership against new sessions/groups or external launchers. Viewer and HTML export remain available. Owned cgroup-v2/equivalent containment and actual target compilation/execution must precede enablement. Windows native SDK/runtime, interception, output, Job drain/profile cleanup and installation remain target gates. Mac source/browser/Go cross-compilation evidence does not qualify Windows/Linux.",
       "coverageStatus": "scoped_source_and_evidence",
       "releaseQualified": false
     }
@@ -5734,7 +5756,7 @@
         "diagnostics"
       ],
       "releaseQualified": false,
-      "unresolvedAcceptance": "Complete redacted diagnostics and the optional user-generated support bundle with explicit content selection were not located/qualified; only narrower diagnostics sources are linked."
+      "unresolvedAcceptance": "A bounded explicit-consent local support flow now has scoped source/service/browser evidence. Complete redacted diagnostic coverage across application/job/import/model/search and packaged/platform qualification remain unresolved; optional user-included page text can itself contain secrets."
     },
     {
       "requirementId": "TRD-CONSTRAINT-021",

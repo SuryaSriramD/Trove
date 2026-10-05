@@ -1,0 +1,20 @@
+{"Time":"2026-10-05T21:00:21.822237+05:30","Action":"start","Package":"trove.local/phase0"}
+{"Time":"2026-10-05T21:00:22.54188+05:30","Action":"run","Package":"trove.local/phase0","Test":"TestRollbackAuxiliaryBindingsHaveAnEntryGuard"}
+{"Time":"2026-10-05T21:00:22.541973+05:30","Action":"output","Package":"trove.local/phase0","Test":"TestRollbackAuxiliaryBindingsHaveAnEntryGuard","Output":"=== RUN   TestRollbackAuxiliaryBindingsHaveAnEntryGuard\n","OutputType":"frame"}
+{"Time":"2026-10-05T21:00:22.563505+05:30","Action":"output","Package":"trove.local/phase0","Test":"TestRollbackAuxiliaryBindingsHaveAnEntryGuard","Output":"--- PASS: TestRollbackAuxiliaryBindingsHaveAnEntryGuard (0.02s)\n","OutputType":"frame"}
+{"Time":"2026-10-05T21:00:22.563548+05:30","Action":"pass","Package":"trove.local/phase0","Test":"TestRollbackAuxiliaryBindingsHaveAnEntryGuard","Elapsed":0.02}
+{"Time":"2026-10-05T21:00:22.564415+05:30","Action":"run","Package":"trove.local/phase0","Test":"TestDesktopSupportNativeDestinationOpaqueSingleUseAndCurrentWorkspace"}
+{"Time":"2026-10-05T21:00:22.564432+05:30","Action":"output","Package":"trove.local/phase0","Test":"TestDesktopSupportNativeDestinationOpaqueSingleUseAndCurrentWorkspace","Output":"=== RUN   TestDesktopSupportNativeDestinationOpaqueSingleUseAndCurrentWorkspace\n","OutputType":"frame"}
+{"Time":"2026-10-05T21:00:22.769668+05:30","Action":"output","Package":"trove.local/phase0","Test":"TestDesktopSupportNativeDestinationOpaqueSingleUseAndCurrentWorkspace","Output":"--- PASS: TestDesktopSupportNativeDestinationOpaqueSingleUseAndCurrentWorkspace (0.21s)\n","OutputType":"frame"}
+{"Time":"2026-10-05T21:00:22.769698+05:30","Action":"pass","Package":"trove.local/phase0","Test":"TestDesktopSupportNativeDestinationOpaqueSingleUseAndCurrentWorkspace","Elapsed":0.21}
+{"Time":"2026-10-05T21:00:22.769715+05:30","Action":"run","Package":"trove.local/phase0","Test":"TestDesktopSupportCancellationDuringNativeDialogPreventsPublication"}
+{"Time":"2026-10-05T21:00:22.76972+05:30","Action":"output","Package":"trove.local/phase0","Test":"TestDesktopSupportCancellationDuringNativeDialogPreventsPublication","Output":"=== RUN   TestDesktopSupportCancellationDuringNativeDialogPreventsPublication\n","OutputType":"frame"}
+{"Time":"2026-10-05T21:00:22.797131+05:30","Action":"output","Package":"trove.local/phase0","Test":"TestDesktopSupportCancellationDuringNativeDialogPreventsPublication","Output":"--- PASS: TestDesktopSupportCancellationDuringNativeDialogPreventsPublication (0.03s)\n","OutputType":"frame"}
+{"Time":"2026-10-05T21:00:22.797156+05:30","Action":"pass","Package":"trove.local/phase0","Test":"TestDesktopSupportCancellationDuringNativeDialogPreventsPublication","Elapsed":0.03}
+{"Time":"2026-10-05T21:00:22.797164+05:30","Action":"run","Package":"trove.local/phase0","Test":"TestDesktopSupportRollbackPendingRejectsBeforeStateOrDialog"}
+{"Time":"2026-10-05T21:00:22.797168+05:30","Action":"output","Package":"trove.local/phase0","Test":"TestDesktopSupportRollbackPendingRejectsBeforeStateOrDialog","Output":"=== RUN   TestDesktopSupportRollbackPendingRejectsBeforeStateOrDialog\n","OutputType":"frame"}
+{"Time":"2026-10-05T21:00:22.797178+05:30","Action":"output","Package":"trove.local/phase0","Test":"TestDesktopSupportRollbackPendingRejectsBeforeStateOrDialog","Output":"--- PASS: TestDesktopSupportRollbackPendingRejectsBeforeStateOrDialog (0.00s)\n","OutputType":"frame"}
+{"Time":"2026-10-05T21:00:22.797183+05:30","Action":"pass","Package":"trove.local/phase0","Test":"TestDesktopSupportRollbackPendingRejectsBeforeStateOrDialog","Elapsed":0}
+{"Time":"2026-10-05T21:00:22.797949+05:30","Action":"output","Package":"trove.local/phase0","Output":"PASS\n","OutputType":"frame"}
+{"Time":"2026-10-05T21:00:23.805361+05:30","Action":"output","Package":"trove.local/phase0","Output":"ok  \ttrove.local/phase0\t1.983s\n"}
+{"Time":"2026-10-05T21:00:23.805403+05:30","Action":"pass","Package":"trove.local/phase0","Elapsed":1.983}

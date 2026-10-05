@@ -674,7 +674,9 @@
       },
       "evidence_target": "evidence/completion/CORE-004/",
       "implementation_evidence": [
-        "docs/completion/retrieval.md"
+        "docs/completion/retrieval.md",
+        "docs/completion/richtext-search.md",
+        "evidence/completion/richtext-search/manifest.json"
       ],
       "evidence_target_status": "planned_destination_not_passing_evidence",
       "requirements_overlay_ids": [
@@ -1426,7 +1428,8 @@
       "implementation_evidence": [
         "docs/completion/rich-pdf.md",
         "docs/completion/portable-documents.md",
-        "evidence/completion/portable-documents/manifest.json"
+        "evidence/completion/portable-documents/manifest.json",
+        "evidence/completion/document-containment/manifest.json"
       ],
       "evidence_target_status": "planned_destination_not_passing_evidence",
       "requirements_overlay_ids": [
@@ -1448,7 +1451,8 @@
       "coverage_packages": [
         "exports",
         "documents"
-      ]
+      ],
+      "remaining_qualification": " Linux native PDF extraction/export is disabled pending enforceable process containment; target evidence remains unavailable."
     },
     {
       "id": "PARITY-009",
@@ -2446,7 +2450,9 @@
       "implementation_evidence": [
         "docs/completion/pre-migration-snapshots.md",
         "docs/completion/verified-updates.md",
-        "evidence/completion/verified-updates/manifest.json"
+        "evidence/completion/verified-updates/manifest.json",
+        "docs/completion/rollback-readiness.md",
+        "evidence/completion/rollback-readiness-3f069dc/manifest.json"
       ],
       "remaining_qualification": "Source includes full pre-migration snapshots, app signature/identity verification, external recovery kits, compatible restore and explicit guarded previous-app launch. Actual signed app pairs, startup-ready acknowledgement, public distribution, physical power-loss, independent clean-machine update/rollback and uninstall qualification remain open.",
       "evidence_target_status": "planned_destination_not_passing_evidence",
@@ -2527,7 +2533,9 @@
         "docs/completion/development-candidate-5d7cdb0.md",
         "docs/completion/database-performance.md",
         "docs/completion/startup-investigation.md",
-        "docs/completion/native-memory-sampling.md"
+        "docs/completion/native-memory-sampling.md",
+        "docs/completion/startup-stage-tracing.md",
+        "evidence/completion/startup-trace-ce0973d/manifest.json"
       ],
       "evidence_target_status": "planned_destination_not_passing_evidence",
       "requirements_overlay_ids": [
@@ -2712,9 +2720,10 @@
         "evidence/completion/windows-storage/manifest.json",
         "docs/completion/windows-document-helper.md",
         "docs/completion/portable-documents.md",
-        "evidence/completion/portable-documents/manifest.json"
+        "evidence/completion/portable-documents/manifest.json",
+        "evidence/completion/document-containment/manifest.json"
       ],
-      "remaining_qualification": "Actual Windows/Linux native builds and execution, device/screenshot capture, WebView/PDF behavior, provider containment, clean install/update/rollback/uninstall and full product matrix remain open. Windows new-workspace creation, migration, backup, restore and transfer explicitly unavailable pending directory/marker durability protocol.",
+      "remaining_qualification": "Actual Windows/Linux native builds and execution, device/screenshot capture, WebView/PDF behavior, provider containment, clean install/update/rollback/uninstall and full product matrix remain open. Windows new-workspace creation, migration, backup, restore and transfer explicitly unavailable pending directory/marker durability protocol. Linux native PDF extraction/export is disabled pending enforceable process containment; target evidence remains unavailable.",
       "evidence_target_status": "planned_destination_not_passing_evidence",
       "requirements_overlay_ids": [
         "FR-004",
@@ -2878,9 +2887,11 @@
       ],
       "implementation_evidence": [
         "docs/completion/requirements-overlay.json",
-        "docs/completion/requirements-reconciliation.md"
+        "docs/completion/requirements-reconciliation.md",
+        "docs/completion/support-bundle.md",
+        "evidence/completion/support-bundle/manifest.json"
       ],
-      "remaining_qualification": "Ongoing candidate/platform reconciliation and missing research remain open; mapping to implementation packages does not close entire acceptance criteria."
+      "remaining_qualification": "Ongoing candidate/platform reconciliation and missing research remain open; mapping to implementation packages does not close entire acceptance criteria. TRD-CONSTRAINT-020 has a bounded local support package but broader diagnostics and packaged/platform acceptance remain partial."
     },
     {
       "id": "GOV-004",
@@ -3075,7 +3086,9 @@
       "implementation_evidence": [
         "docs/completion/personal-reviews.md",
         "docs/completion/related-content.md",
-        "docs/completion/development-candidate-4900d4b.md"
+        "docs/completion/development-candidate-4900d4b.md",
+        "docs/completion/richtext-search.md",
+        "evidence/completion/richtext-search/manifest.json"
       ],
       "followup_commits": [
         "44f7262",
@@ -3177,6 +3190,6 @@
     }
   ],
   "currentRequirementsOverlay": "docs/completion/requirements-overlay.json",
-  "reconciliationSourceCommit": "7f6b1964f5d6cbdd28a02d5c1f66930611c14e7e",
+  "reconciliationSourceCommit": "e481c6a7e602313be374785c49bc8ed73252ecad",
   "evidencePathPolicy": "evidence_target is only a planned directory. implementation_evidence and development_candidate_evidence are actual linked package records; their original source/candidate scope is binding. Overlay associations are coverage links, not full implementation or qualification."
 }

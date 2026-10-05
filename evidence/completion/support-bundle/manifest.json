@@ -1,0 +1,132 @@
+{
+  "sourceCommit": "2e2a6b9c8e2d05391255261bf9ce3a5fc3a1361b",
+  "baseCommit": "19f1dcd86edddc7a8ee5beda1c790ab8d1ea9f6a",
+  "scope": "Bounded support source/service/native-binding/browser checks only; no packaged or target-platform release qualification.",
+  "platform": "macOS-27.0.1-arm64-arm-64bit",
+  "toolchain": {
+    "go": "go version go1.27.1 darwin/arm64",
+    "node": "v25.5.0"
+  },
+  "sourceFiles": {
+    "app_support_bundle.go": "8c62eeb4aa3bcc84c6ed743540b90fbc8e79ae80618f452f85f3238230fc7fa8",
+    "app_support_bundle_test.go": "80d5fe685a43c8d4697a1b575b4a5e0b97f1ce732a964dc0b5dd10b1015120d3",
+    "frontend/src/App.tsx": "da1e4ea88503046a236d96ac6fd0451374b4be2d0993c416b1e5b446fcc34ea6",
+    "frontend/src/SupportBundlePanel.tsx": "02023249a3758763ed8511573c15a8193f011765755ac17818f14b301a52b700",
+    "frontend/tests/support-fixture.html": "381a99b5fa38777cbb75f1f5fc7906f8cf95f0b4d182147862ab2225c9b4fbaf",
+    "frontend/tests/support-fixture.tsx": "edc1c89b1b0c2ef1db6b8c49d8857444188f8789189c099aa534263454656695",
+    "frontend/tests/support.browser.spec.ts": "69205427fcb5f83a6d06d126bd3684ce95ecec516684d83c0b67a170fb41b6f2",
+    "internal/native/support_inventory.go": "5980995e59de1204dda8bfc091221a073c548aee5361552d2d787740a79fc5f5",
+    "internal/native/support_inventory_test.go": "674ae2899b265b10d2bf88862ba306fdd2c67ef3a8d77d4ec285a4e7f5dddfc8",
+    "internal/workspace/support_bundle.go": "711e46656dd323face14aaa8bfeb075749c1f5f9309816b66185011a3dd1b535",
+    "internal/workspace/support_bundle_test.go": "8d2f7eff85f3a111375f8bd0258f93729174265815407e6c12b586212a0e687d"
+  },
+  "checks": {
+    "affectedGoRace": {
+      "report": "final-affected-tests.jsonl",
+      "passedTestsAndSubtests": 21,
+      "failed": 0,
+      "skipped": 0,
+      "breakdown": {
+        "workspace": 16,
+        "native": 1,
+        "desktop": 4
+      },
+      "command": "GOTOOLCHAIN=local GOPROXY=off go test -race -json -tags 'fts5 sqlite_omit_load_extension' ./internal/workspace ./internal/native . -run 'TestSupport|TestDesktopSupport|TestRollbackAuxiliaryBindingsHaveAnEntryGuard' -count=1"
+    },
+    "browser": {
+      "report": "browser-final.json",
+      "passed": 4,
+      "failed": 0,
+      "scope": "Actual React component with fixture native bridge; final wording clarified transcripts to transcript-linked blocks afterward, without behavioral changes."
+    },
+    "typescript": {
+      "report": "typescript-final.txt",
+      "passed": true,
+      "command": "node frontend/node_modules/typescript/bin/tsc --noEmit -p frontend/tsconfig.json"
+    },
+    "frontendBuild": {
+      "passed": true,
+      "scope": "Development assets built to embed for Go App binding tests; build preceded final privacy/copy corrections. Root owns fresh packaged application validation."
+    },
+    "governance": {
+      "report": "governance-validation.json",
+      "passed": true,
+      "historicalLedgerUnchanged": true,
+      "ledgerTests": {
+        "report": "ledger-tests.txt",
+        "passed": 7
+      }
+    }
+  },
+  "limits": [
+    "No microphone, model inference or network upload was run by this package.",
+    "No Windows/Linux execution or cross-compilation evidence is claimed by this support package.",
+    "Native dialogs were injected in binding tests; actual packaged Settings/destination behavior needs separate candidate evidence.",
+    "TRD-CONSTRAINT-020 remains partial for fuller redacted diagnostics and platform/release verification.",
+    "Operating-system filesystem calls already in progress cannot be interrupted by Go context cancellation."
+  ],
+  "releaseApproved": false,
+  "evidenceFiles": {
+    "before-independent-review-tests.jsonl": {
+      "sha256": "747add9cf5ca2ad2911dc19830af6a4dc83b2692d8d5d65aa2470d09a7c97722",
+      "bytes": 14231
+    },
+    "browser-final.json": {
+      "sha256": "1ee470f1faa84d5c042f03e5cc8438fa15eb20efef5ba6390548840fd025d863",
+      "bytes": 6479
+    },
+    "browser-tests.json": {
+      "sha256": "d15b07cf6de8f0f267be887e7a999bc030d8311bbd307c40afe38354904b662a",
+      "bytes": 5409
+    },
+    "desktop-tests.jsonl": {
+      "sha256": "5495e5d545315f7d4e68e46e24914ad8d34cd6779d84ac5403ccd16cac51cbd3",
+      "bytes": 3985
+    },
+    "final-affected-tests.jsonl": {
+      "sha256": "3b8b5bae51a629bc06d8f5265915b62e4953503ddf270c78ad7912921d1802bf",
+      "bytes": 20956
+    },
+    "governance-validation.json": {
+      "sha256": "9a92f2c2ec9656d97e94765a59ab0c83995024e5b4593e24d0ca8a4c278b6934",
+      "bytes": 255
+    },
+    "independent-review.md": {
+      "sha256": "d12fac83a5942bdf52a4c899b5550f93a634bf87914bf9cc9d52c8e4da780034",
+      "bytes": 5299
+    },
+    "initial-findings.md": {
+      "sha256": "118389202d717e732566175bc4ad1a98a112bf28715f7c88154c0bfa0b08990d",
+      "bytes": 1641
+    },
+    "ledger-tests.txt": {
+      "sha256": "9c19df9f1bd2c0f286d09454679f4a25c53748d2921f77116dc4d9c0c22fe1c4",
+      "bytes": 105
+    },
+    "review-fix-tests.jsonl": {
+      "sha256": "e2f9b7f611d39ceb4cb065fd7953626238c864c630bddc57a95d5c0470a95c3e",
+      "bytes": 33619
+    },
+    "service-native-tests.jsonl": {
+      "sha256": "6d2bdc7b9b1815bbb97598a9f780591e73c7d13d1f73054a5e7072ae598e4986",
+      "bytes": 9351
+    },
+    "typescript-final.txt": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "typescript.txt": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    }
+  },
+  "integratedSourceCommit": "e481c6a7e602313be374785c49bc8ed73252ecad",
+  "review": "independent-review.md",
+  "governanceFiles": {
+    "docs/completion/registry.json": "723d0385dbc00ede0dbce953dbc5f9e9ee1b966d253585e68c6719d1564bd2ef",
+    "docs/completion/requirements-overlay.json": "65173fcc7d2bf638a590b410745f47b97f05c6f6818e3b7914cf2935a2fbff15",
+    "docs/completion/requirements-reconciliation.md": "e5f3f6ec92069f20532ff18b76c966693f33367f4950fdcfb165100a606800ee",
+    "docs/completion/README.md": "be856ffb52ecf55ef46717e625e9cf0936cdd02e23f547dd704fae4b36c3c0d6",
+    "docs/completion/support-bundle.md": "88339f3ca89c751ca2059f91ef72e97325e7b5765e378d5117243e17759cad1f"
+  }
+}
