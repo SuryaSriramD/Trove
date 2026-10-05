@@ -1,0 +1,3 @@
+=== RUN   TestWorkerRSSUsesOwnedProcessWithoutPS
+--- PASS: TestWorkerRSSUsesOwnedProcessWithoutPS (0.01s)
+PASS
