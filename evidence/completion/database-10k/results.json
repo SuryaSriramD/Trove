@@ -1,0 +1,870 @@
+{
+  "canonicalMutationCursorInvalidation": true,
+  "cases": [
+    {
+      "caseWallSeconds": 2.001730125,
+      "cursorRestarts": 0,
+      "derivedOrderingSnapshot": false,
+      "expectedRecordIdsSha256": "76b825b852813ad62ed0555bd6766e1a03bbb9e6dff8c2085ee6434605f45bcf",
+      "expectedRows": 9892,
+      "firstObservationAfterCorrectnessWalk": {
+        "ms": 35.248125,
+        "responseBytes": 540849,
+        "goAllocatedBytes": 17978944,
+        "goAllocations": 288740
+      },
+      "firstPage": {
+        "count": 3,
+        "maxMs": 35.903125,
+        "meanGoAllocatedBytes": 17974554.666666668,
+        "meanMs": 35.23133333333333,
+        "p50Ms": 35.720167,
+        "p95Ms": 35.903125,
+        "samples": [
+          {
+            "ms": 34.070708,
+            "responseBytes": 540849,
+            "goAllocatedBytes": 17969824,
+            "goAllocations": 288751
+          },
+          {
+            "ms": 35.720167,
+            "responseBytes": 540849,
+            "goAllocatedBytes": 17974552,
+            "goAllocations": 288726
+          },
+          {
+            "ms": 35.903125,
+            "responseBytes": 540849,
+            "goAllocatedBytes": 17979288,
+            "goAllocations": 288797
+          }
+        ]
+      },
+      "fullResultWalkPages": 50,
+      "measurementBoundary": "Kernel.Dispatch (caller request already serialized)",
+      "name": "all_live_default_order",
+      "query": {
+        "filter": null,
+        "groupByPropertyId": null,
+        "sorts": [],
+        "subgroupByPropertyId": null,
+        "visiblePropertyIds": [
+          "01a10bae-096b-7e7f-bb8a-efdbc5b83953",
+          "01a10bae-096b-7b26-bd58-c300943913ed",
+          "01a10bae-096b-7559-a5c1-a8311669b3e9",
+          "01a10bae-097f-7e85-8692-9962f5405bcc",
+          "01a10bae-097f-7b2d-8b0d-e64a55cf5b2d",
+          "01a10bae-097f-7d6b-9dae-a0e8f9a52d55",
+          "01a10bae-097f-7870-999f-b238a37c32f4",
+          "01a10bae-097f-7800-8c09-ff6ed6048c14",
+          "01a10bae-097f-76b1-8f05-06ac6ad65e58",
+          "01a10bae-097f-710d-b66d-b30f72e6e56c",
+          "01a10bae-097f-742b-86a6-2daf8f5dcf0f",
+          "01a10bae-097f-72c3-b300-2f5213679234"
+        ]
+      },
+      "secondPage": {
+        "count": 3,
+        "maxMs": 37.648917,
+        "meanGoAllocatedBytes": 17954578.666666668,
+        "meanMs": 36.97454166666667,
+        "p50Ms": 36.86725,
+        "p95Ms": 37.648917,
+        "samples": [
+          {
+            "ms": 36.86725,
+            "responseBytes": 540782,
+            "goAllocatedBytes": 17966760,
+            "goAllocations": 288497
+          },
+          {
+            "ms": 36.407458,
+            "responseBytes": 540782,
+            "goAllocatedBytes": 17957584,
+            "goAllocations": 288424
+          },
+          {
+            "ms": 37.648917,
+            "responseBytes": 540782,
+            "goAllocatedBytes": 17939392,
+            "goAllocations": 288252
+          }
+        ]
+      }
+    },
+    {
+      "caseWallSeconds": 2.980343375,
+      "cursorRestarts": 0,
+      "derivedOrderingSnapshot": false,
+      "expectedRecordIdsSha256": "4e0826d9056071424512344c3b7c823157e34f83fce533d9525de9720ab2a785",
+      "expectedRows": 1791,
+      "firstObservationAfterCorrectnessWalk": {
+        "ms": 183.308792,
+        "responseBytes": 543408,
+        "goAllocatedBytes": 66717352,
+        "goAllocations": 1587577
+      },
+      "firstPage": {
+        "count": 3,
+        "maxMs": 187.158208,
+        "meanGoAllocatedBytes": 66744546.666666664,
+        "meanMs": 186.49022233333335,
+        "p50Ms": 186.58875,
+        "p95Ms": 187.158208,
+        "samples": [
+          {
+            "ms": 185.723709,
+            "responseBytes": 543408,
+            "goAllocatedBytes": 66745248,
+            "goAllocations": 1587795
+          },
+          {
+            "ms": 186.58875,
+            "responseBytes": 543408,
+            "goAllocatedBytes": 66738560,
+            "goAllocations": 1587582
+          },
+          {
+            "ms": 187.158208,
+            "responseBytes": 543408,
+            "goAllocatedBytes": 66749832,
+            "goAllocations": 1587786
+          }
+        ]
+      },
+      "fullResultWalkPages": 9,
+      "measurementBoundary": "Kernel.Dispatch (caller request already serialized)",
+      "name": "exact_decimal_and_status",
+      "query": {
+        "filter": {
+          "op": "and",
+          "terms": [
+            {
+              "op": "gte",
+              "propertyId": "01a10bae-097f-7e85-8692-9962f5405bcc",
+              "value": {
+                "decimal": "9007199254740993.000700",
+                "format": "decimal"
+              }
+            },
+            {
+              "op": "eq",
+              "propertyId": "01a10bae-096b-7b26-bd58-c300943913ed",
+              "value": "01a10bae-096b-75f5-853a-48986924bf25"
+            }
+          ]
+        },
+        "groupByPropertyId": null,
+        "sorts": [
+          {
+            "direction": "desc",
+            "propertyId": "01a10bae-097f-7e85-8692-9962f5405bcc"
+          }
+        ],
+        "subgroupByPropertyId": null,
+        "visiblePropertyIds": [
+          "01a10bae-096b-7e7f-bb8a-efdbc5b83953",
+          "01a10bae-096b-7b26-bd58-c300943913ed",
+          "01a10bae-096b-7559-a5c1-a8311669b3e9",
+          "01a10bae-097f-7e85-8692-9962f5405bcc",
+          "01a10bae-097f-7b2d-8b0d-e64a55cf5b2d",
+          "01a10bae-097f-7d6b-9dae-a0e8f9a52d55",
+          "01a10bae-097f-7870-999f-b238a37c32f4",
+          "01a10bae-097f-7800-8c09-ff6ed6048c14",
+          "01a10bae-097f-76b1-8f05-06ac6ad65e58",
+          "01a10bae-097f-710d-b66d-b30f72e6e56c",
+          "01a10bae-097f-742b-86a6-2daf8f5dcf0f",
+          "01a10bae-097f-72c3-b300-2f5213679234"
+        ]
+      },
+      "secondPage": {
+        "count": 3,
+        "maxMs": 198.833125,
+        "meanGoAllocatedBytes": 71852578.66666667,
+        "meanMs": 197.874861,
+        "p50Ms": 197.756583,
+        "p95Ms": 198.833125,
+        "samples": [
+          {
+            "ms": 197.034875,
+            "responseBytes": 544085,
+            "goAllocatedBytes": 71849208,
+            "goAllocations": 1724890
+          },
+          {
+            "ms": 197.756583,
+            "responseBytes": 544085,
+            "goAllocatedBytes": 71864480,
+            "goAllocations": 1724911
+          },
+          {
+            "ms": 198.833125,
+            "responseBytes": 544085,
+            "goAllocatedBytes": 71844048,
+            "goAllocations": 1724881
+          }
+        ]
+      }
+    },
+    {
+      "caseWallSeconds": 2.917371417,
+      "cursorRestarts": 0,
+      "derivedOrderingSnapshot": false,
+      "expectedRecordIdsSha256": "9ae08c2e36b41ea34881a2c240522d00d7019b1344c2459d78a71e78053490c6",
+      "expectedRows": 1535,
+      "firstObservationAfterCorrectnessWalk": {
+        "ms": 169.421042,
+        "responseBytes": 550156,
+        "goAllocatedBytes": 57489176,
+        "goAllocations": 1373292
+      },
+      "firstPage": {
+        "count": 3,
+        "maxMs": 172.543625,
+        "meanGoAllocatedBytes": 57471338.666666664,
+        "meanMs": 170.83143033333332,
+        "p50Ms": 171.197,
+        "p95Ms": 172.543625,
+        "samples": [
+          {
+            "ms": 168.753666,
+            "responseBytes": 550156,
+            "goAllocatedBytes": 57489024,
+            "goAllocations": 1373161
+          },
+          {
+            "ms": 171.197,
+            "responseBytes": 550156,
+            "goAllocatedBytes": 57469280,
+            "goAllocations": 1373175
+          },
+          {
+            "ms": 172.543625,
+            "responseBytes": 550156,
+            "goAllocatedBytes": 57455712,
+            "goAllocations": 1372971
+          }
+        ]
+      },
+      "fullResultWalkPages": 8,
+      "measurementBoundary": "Kernel.Dispatch (caller request already serialized)",
+      "name": "timed_date_and_checkbox",
+      "query": {
+        "filter": {
+          "op": "and",
+          "terms": [
+            {
+              "op": "gte",
+              "propertyId": "01a10bae-096b-7559-a5c1-a8311669b3e9",
+              "value": {
+                "end": null,
+                "hasTime": true,
+                "start": "2026-01-31T08:00:00Z",
+                "timezone": "UTC"
+              }
+            },
+            {
+              "op": "eq",
+              "propertyId": "01a10bae-097f-76b1-8f05-06ac6ad65e58",
+              "value": true
+            }
+          ]
+        },
+        "groupByPropertyId": null,
+        "sorts": [
+          {
+            "direction": "asc",
+            "propertyId": "01a10bae-096b-7559-a5c1-a8311669b3e9"
+          }
+        ],
+        "subgroupByPropertyId": null,
+        "visiblePropertyIds": [
+          "01a10bae-096b-7e7f-bb8a-efdbc5b83953",
+          "01a10bae-096b-7b26-bd58-c300943913ed",
+          "01a10bae-096b-7559-a5c1-a8311669b3e9",
+          "01a10bae-097f-7e85-8692-9962f5405bcc",
+          "01a10bae-097f-7b2d-8b0d-e64a55cf5b2d",
+          "01a10bae-097f-7d6b-9dae-a0e8f9a52d55",
+          "01a10bae-097f-7870-999f-b238a37c32f4",
+          "01a10bae-097f-7800-8c09-ff6ed6048c14",
+          "01a10bae-097f-76b1-8f05-06ac6ad65e58",
+          "01a10bae-097f-710d-b66d-b30f72e6e56c",
+          "01a10bae-097f-742b-86a6-2daf8f5dcf0f",
+          "01a10bae-097f-72c3-b300-2f5213679234"
+        ]
+      },
+      "secondPage": {
+        "count": 3,
+        "maxMs": 181.438917,
+        "meanGoAllocatedBytes": 61822709.333333336,
+        "meanMs": 176.58255566666665,
+        "p50Ms": 174.368375,
+        "p95Ms": 181.438917,
+        "samples": [
+          {
+            "ms": 181.438917,
+            "responseBytes": 541370,
+            "goAllocatedBytes": 61832784,
+            "goAllocations": 1485443
+          },
+          {
+            "ms": 173.940375,
+            "responseBytes": 541370,
+            "goAllocatedBytes": 61808552,
+            "goAllocations": 1485413
+          },
+          {
+            "ms": 174.368375,
+            "responseBytes": 541370,
+            "goAllocatedBytes": 61826792,
+            "goAllocations": 1485368
+          }
+        ]
+      }
+    },
+    {
+      "caseWallSeconds": 0.891530542,
+      "cursorRestarts": 0,
+      "derivedOrderingSnapshot": false,
+      "expectedRecordIdsSha256": "cad179833d8c02e17f0475a7e6ec6a308cab90b9d377052f081c283ed6a48719",
+      "expectedRows": 1321,
+      "firstObservationAfterCorrectnessWalk": {
+        "ms": 57.247208,
+        "responseBytes": 550107,
+        "goAllocatedBytes": 27057968,
+        "goAllocations": 404745
+      },
+      "firstPage": {
+        "count": 3,
+        "maxMs": 58.336334,
+        "meanGoAllocatedBytes": 27046602.666666668,
+        "meanMs": 57.276014,
+        "p50Ms": 57.139958,
+        "p95Ms": 58.336334,
+        "samples": [
+          {
+            "ms": 58.336334,
+            "responseBytes": 550107,
+            "goAllocatedBytes": 27036776,
+            "goAllocations": 404488
+          },
+          {
+            "ms": 56.35175,
+            "responseBytes": 550107,
+            "goAllocatedBytes": 27053640,
+            "goAllocations": 404693
+          },
+          {
+            "ms": 57.139958,
+            "responseBytes": 550107,
+            "goAllocatedBytes": 27049392,
+            "goAllocations": 404686
+          }
+        ]
+      },
+      "fullResultWalkPages": 7,
+      "measurementBoundary": "Kernel.Dispatch (caller request already serialized)",
+      "name": "unicode_text_contains",
+      "query": {
+        "filter": {
+          "op": "contains",
+          "propertyId": "01a10bae-097f-7d6b-9dae-a0e8f9a52d55",
+          "value": "CAFÉ"
+        },
+        "groupByPropertyId": null,
+        "sorts": [],
+        "subgroupByPropertyId": null,
+        "visiblePropertyIds": [
+          "01a10bae-096b-7e7f-bb8a-efdbc5b83953",
+          "01a10bae-096b-7b26-bd58-c300943913ed",
+          "01a10bae-096b-7559-a5c1-a8311669b3e9",
+          "01a10bae-097f-7e85-8692-9962f5405bcc",
+          "01a10bae-097f-7b2d-8b0d-e64a55cf5b2d",
+          "01a10bae-097f-7d6b-9dae-a0e8f9a52d55",
+          "01a10bae-097f-7870-999f-b238a37c32f4",
+          "01a10bae-097f-7800-8c09-ff6ed6048c14",
+          "01a10bae-097f-76b1-8f05-06ac6ad65e58",
+          "01a10bae-097f-710d-b66d-b30f72e6e56c",
+          "01a10bae-097f-742b-86a6-2daf8f5dcf0f",
+          "01a10bae-097f-72c3-b300-2f5213679234"
+        ]
+      },
+      "secondPage": {
+        "count": 3,
+        "maxMs": 55.902708,
+        "meanGoAllocatedBytes": 27489938.666666668,
+        "meanMs": 54.79987499999999,
+        "p50Ms": 54.2825,
+        "p95Ms": 55.902708,
+        "samples": [
+          {
+            "ms": 54.2825,
+            "responseBytes": 550196,
+            "goAllocatedBytes": 27493488,
+            "goAllocations": 410199
+          },
+          {
+            "ms": 54.214417,
+            "responseBytes": 550196,
+            "goAllocatedBytes": 27487256,
+            "goAllocations": 410138
+          },
+          {
+            "ms": 55.902708,
+            "responseBytes": 550196,
+            "goAllocatedBytes": 27489072,
+            "goAllocations": 410227
+          }
+        ]
+      }
+    },
+    {
+      "caseWallSeconds": 0.503852,
+      "cursorRestarts": 0,
+      "derivedOrderingSnapshot": false,
+      "expectedRecordIdsSha256": "c294ea4cfed1e9c6a22936a97c1a21de24f4edfa743a3622d08d37267f27f974",
+      "expectedRows": 1,
+      "firstObservationAfterCorrectnessWalk": {
+        "ms": 103.420917,
+        "responseBytes": 2831,
+        "goAllocatedBytes": 61423000,
+        "goAllocations": 784755
+      },
+      "firstPage": {
+        "count": 3,
+        "maxMs": 103.120916,
+        "meanGoAllocatedBytes": 61409109.333333336,
+        "meanMs": 98.36743,
+        "p50Ms": 96.053083,
+        "p95Ms": 103.120916,
+        "samples": [
+          {
+            "ms": 103.120916,
+            "responseBytes": 2831,
+            "goAllocatedBytes": 61407200,
+            "goAllocations": 784666
+          },
+          {
+            "ms": 96.053083,
+            "responseBytes": 2831,
+            "goAllocatedBytes": 61394760,
+            "goAllocations": 784637
+          },
+          {
+            "ms": 95.928291,
+            "responseBytes": 2831,
+            "goAllocatedBytes": 61425368,
+            "goAllocations": 784722
+          }
+        ]
+      },
+      "fullResultWalkPages": 1,
+      "measurementBoundary": "Kernel.Dispatch (caller request already serialized)",
+      "name": "bound_literal_not_sql",
+      "query": {
+        "filter": {
+          "op": "contains",
+          "propertyId": "01a10bae-097f-7d6b-9dae-a0e8f9a52d55",
+          "value": "x' OR 1=1 --"
+        },
+        "groupByPropertyId": null,
+        "sorts": [],
+        "subgroupByPropertyId": null,
+        "visiblePropertyIds": [
+          "01a10bae-096b-7e7f-bb8a-efdbc5b83953",
+          "01a10bae-096b-7b26-bd58-c300943913ed",
+          "01a10bae-096b-7559-a5c1-a8311669b3e9",
+          "01a10bae-097f-7e85-8692-9962f5405bcc",
+          "01a10bae-097f-7b2d-8b0d-e64a55cf5b2d",
+          "01a10bae-097f-7d6b-9dae-a0e8f9a52d55",
+          "01a10bae-097f-7870-999f-b238a37c32f4",
+          "01a10bae-097f-7800-8c09-ff6ed6048c14",
+          "01a10bae-097f-76b1-8f05-06ac6ad65e58",
+          "01a10bae-097f-710d-b66d-b30f72e6e56c",
+          "01a10bae-097f-742b-86a6-2daf8f5dcf0f",
+          "01a10bae-097f-72c3-b300-2f5213679234"
+        ]
+      }
+    },
+    {
+      "caseWallSeconds": 0.445286375,
+      "cursorRestarts": 0,
+      "derivedOrderingSnapshot": false,
+      "expectedRecordIdsSha256": "7ce60db1a87aa502fc1af3c31a33d6c653619ed656e4661d7443896e49c234a7",
+      "expectedRows": 181,
+      "firstObservationAfterCorrectnessWalk": {
+        "ms": 87.575958,
+        "responseBytes": 472198,
+        "goAllocatedBytes": 32514560,
+        "goAllocations": 786224
+      },
+      "firstPage": {
+        "count": 3,
+        "maxMs": 87.245291,
+        "meanGoAllocatedBytes": 32503909.333333332,
+        "meanMs": 87.09451366666667,
+        "p50Ms": 87.084125,
+        "p95Ms": 87.245291,
+        "samples": [
+          {
+            "ms": 86.954125,
+            "responseBytes": 472198,
+            "goAllocatedBytes": 32508632,
+            "goAllocations": 786128
+          },
+          {
+            "ms": 87.084125,
+            "responseBytes": 472198,
+            "goAllocatedBytes": 32510264,
+            "goAllocations": 786192
+          },
+          {
+            "ms": 87.245291,
+            "responseBytes": 472198,
+            "goAllocatedBytes": 32492832,
+            "goAllocations": 786054
+          }
+        ]
+      },
+      "fullResultWalkPages": 1,
+      "measurementBoundary": "Kernel.Dispatch (caller request already serialized)",
+      "name": "multi_select_and_missing_number",
+      "query": {
+        "filter": {
+          "op": "and",
+          "terms": [
+            {
+              "op": "contains",
+              "propertyId": "01a10bae-097f-7800-8c09-ff6ed6048c14",
+              "value": "01a10bae-097f-77f8-a3d0-bb73bec838cb"
+            },
+            {
+              "op": "is_empty",
+              "propertyId": "01a10bae-097f-7e85-8692-9962f5405bcc",
+              "value": null
+            }
+          ]
+        },
+        "groupByPropertyId": null,
+        "sorts": [],
+        "subgroupByPropertyId": null,
+        "visiblePropertyIds": [
+          "01a10bae-096b-7e7f-bb8a-efdbc5b83953",
+          "01a10bae-096b-7b26-bd58-c300943913ed",
+          "01a10bae-096b-7559-a5c1-a8311669b3e9",
+          "01a10bae-097f-7e85-8692-9962f5405bcc",
+          "01a10bae-097f-7b2d-8b0d-e64a55cf5b2d",
+          "01a10bae-097f-7d6b-9dae-a0e8f9a52d55",
+          "01a10bae-097f-7870-999f-b238a37c32f4",
+          "01a10bae-097f-7800-8c09-ff6ed6048c14",
+          "01a10bae-097f-76b1-8f05-06ac6ad65e58",
+          "01a10bae-097f-710d-b66d-b30f72e6e56c",
+          "01a10bae-097f-742b-86a6-2daf8f5dcf0f",
+          "01a10bae-097f-72c3-b300-2f5213679234"
+        ]
+      }
+    },
+    {
+      "caseWallSeconds": 7.66046525,
+      "cursorRestarts": 0,
+      "derivedOrderingSnapshot": true,
+      "expectedRecordIdsSha256": "7be7d72781fd49cf991d76df3add70e798d189ad35ebaf493217985b6cc035d5",
+      "expectedRows": 2572,
+      "firstObservationAfterCorrectnessWalk": {
+        "ms": 1230.753917,
+        "responseBytes": 535172,
+        "goAllocatedBytes": 457406312,
+        "goAllocations": 9339640
+      },
+      "firstPage": {
+        "count": 3,
+        "maxMs": 1200.96075,
+        "meanGoAllocatedBytes": 457382090.6666667,
+        "meanMs": 1188.444569666667,
+        "p50Ms": 1185.899542,
+        "p95Ms": 1200.96075,
+        "samples": [
+          {
+            "ms": 1185.899542,
+            "responseBytes": 535172,
+            "goAllocatedBytes": 457422712,
+            "goAllocations": 9340126
+          },
+          {
+            "ms": 1178.473417,
+            "responseBytes": 535172,
+            "goAllocatedBytes": 457329808,
+            "goAllocations": 9338987
+          },
+          {
+            "ms": 1200.96075,
+            "responseBytes": 535172,
+            "goAllocatedBytes": 457393752,
+            "goAllocations": 9339998
+          }
+        ]
+      },
+      "fullResultWalkPages": 13,
+      "measurementBoundary": "Kernel.Dispatch (caller request already serialized)",
+      "name": "formula_filter_sort",
+      "query": {
+        "filter": {
+          "op": "gte",
+          "propertyId": "01a10bae-097f-742b-86a6-2daf8f5dcf0f",
+          "value": {
+            "decimal": "75",
+            "format": "decimal"
+          }
+        },
+        "groupByPropertyId": null,
+        "sorts": [
+          {
+            "direction": "desc",
+            "propertyId": "01a10bae-097f-742b-86a6-2daf8f5dcf0f"
+          }
+        ],
+        "subgroupByPropertyId": null,
+        "visiblePropertyIds": [
+          "01a10bae-096b-7e7f-bb8a-efdbc5b83953",
+          "01a10bae-096b-7b26-bd58-c300943913ed",
+          "01a10bae-096b-7559-a5c1-a8311669b3e9",
+          "01a10bae-097f-7e85-8692-9962f5405bcc",
+          "01a10bae-097f-7b2d-8b0d-e64a55cf5b2d",
+          "01a10bae-097f-7d6b-9dae-a0e8f9a52d55",
+          "01a10bae-097f-7870-999f-b238a37c32f4",
+          "01a10bae-097f-7800-8c09-ff6ed6048c14",
+          "01a10bae-097f-76b1-8f05-06ac6ad65e58",
+          "01a10bae-097f-710d-b66d-b30f72e6e56c",
+          "01a10bae-097f-742b-86a6-2daf8f5dcf0f",
+          "01a10bae-097f-72c3-b300-2f5213679234"
+        ]
+      },
+      "secondPage": {
+        "count": 3,
+        "maxMs": 23.060375,
+        "meanGoAllocatedBytes": 9759778.666666666,
+        "meanMs": 22.021528,
+        "p50Ms": 22.240834,
+        "p95Ms": 23.060375,
+        "samples": [
+          {
+            "ms": 20.763375,
+            "responseBytes": 543817,
+            "goAllocatedBytes": 9734896,
+            "goAllocations": 121619
+          },
+          {
+            "ms": 22.240834,
+            "responseBytes": 543817,
+            "goAllocatedBytes": 9740056,
+            "goAllocations": 121656
+          },
+          {
+            "ms": 23.060375,
+            "responseBytes": 543817,
+            "goAllocatedBytes": 9804384,
+            "goAllocations": 122180
+          }
+        ]
+      }
+    },
+    {
+      "caseWallSeconds": 5.173293458,
+      "cursorRestarts": 0,
+      "derivedOrderingSnapshot": true,
+      "expectedRecordIdsSha256": "061669e59b4c7cac025010a499fb9e3b779a0f6cde774775ec5b151f83d6419f",
+      "expectedRows": 1979,
+      "firstObservationAfterCorrectnessWalk": {
+        "ms": 833.366208,
+        "responseBytes": 535658,
+        "goAllocatedBytes": 277777304,
+        "goAllocations": 5702078
+      },
+      "firstPage": {
+        "count": 3,
+        "maxMs": 827.561917,
+        "meanGoAllocatedBytes": 277700981.3333333,
+        "meanMs": 783.6806946666666,
+        "p50Ms": 763.545167,
+        "p95Ms": 827.561917,
+        "samples": [
+          {
+            "ms": 827.561917,
+            "responseBytes": 535658,
+            "goAllocatedBytes": 277753336,
+            "goAllocations": 5701944
+          },
+          {
+            "ms": 763.545167,
+            "responseBytes": 535658,
+            "goAllocatedBytes": 277673592,
+            "goAllocations": 5701336
+          },
+          {
+            "ms": 759.935,
+            "responseBytes": 535658,
+            "goAllocatedBytes": 277676016,
+            "goAllocations": 5701286
+          }
+        ]
+      },
+      "fullResultWalkPages": 10,
+      "measurementBoundary": "Kernel.Dispatch (caller request already serialized)",
+      "name": "relation_rollup_filter_sort",
+      "query": {
+        "filter": {
+          "op": "gte",
+          "propertyId": "01a10bae-097f-72c3-b300-2f5213679234",
+          "value": {
+            "decimal": "40",
+            "format": "decimal"
+          }
+        },
+        "groupByPropertyId": null,
+        "sorts": [
+          {
+            "direction": "asc",
+            "propertyId": "01a10bae-097f-72c3-b300-2f5213679234"
+          }
+        ],
+        "subgroupByPropertyId": null,
+        "visiblePropertyIds": [
+          "01a10bae-096b-7e7f-bb8a-efdbc5b83953",
+          "01a10bae-096b-7b26-bd58-c300943913ed",
+          "01a10bae-096b-7559-a5c1-a8311669b3e9",
+          "01a10bae-097f-7e85-8692-9962f5405bcc",
+          "01a10bae-097f-7b2d-8b0d-e64a55cf5b2d",
+          "01a10bae-097f-7d6b-9dae-a0e8f9a52d55",
+          "01a10bae-097f-7870-999f-b238a37c32f4",
+          "01a10bae-097f-7800-8c09-ff6ed6048c14",
+          "01a10bae-097f-76b1-8f05-06ac6ad65e58",
+          "01a10bae-097f-710d-b66d-b30f72e6e56c",
+          "01a10bae-097f-742b-86a6-2daf8f5dcf0f",
+          "01a10bae-097f-72c3-b300-2f5213679234"
+        ]
+      },
+      "secondPage": {
+        "count": 3,
+        "maxMs": 30.428667,
+        "meanGoAllocatedBytes": 13442808,
+        "meanMs": 29.164153,
+        "p50Ms": 28.898875,
+        "p95Ms": 30.428667,
+        "samples": [
+          {
+            "ms": 28.164917,
+            "responseBytes": 551585,
+            "goAllocatedBytes": 13433192,
+            "goAllocations": 194926
+          },
+          {
+            "ms": 30.428667,
+            "responseBytes": 551585,
+            "goAllocatedBytes": 13454232,
+            "goAllocations": 194965
+          },
+          {
+            "ms": 28.898875,
+            "responseBytes": 551585,
+            "goAllocatedBytes": 13441000,
+            "goAllocations": 194991
+          }
+        ]
+      }
+    },
+    {
+      "caseWallSeconds": 0.34928725,
+      "cursorRestarts": 0,
+      "derivedOrderingSnapshot": false,
+      "expectedRecordIdsSha256": "87cec10a563c7e894c2ae3133bfb308d9af39817602563c8bbfc096ced26afb1",
+      "expectedRows": 99,
+      "firstObservationAfterCorrectnessWalk": {
+        "ms": 70.601959,
+        "responseBytes": 272000,
+        "goAllocatedBytes": 52532936,
+        "goAllocations": 639607
+      },
+      "firstPage": {
+        "count": 3,
+        "maxMs": 70.714708,
+        "meanGoAllocatedBytes": 52510954.666666664,
+        "meanMs": 68.18268066666667,
+        "p50Ms": 68.734959,
+        "p95Ms": 70.714708,
+        "samples": [
+          {
+            "ms": 68.734959,
+            "responseBytes": 272000,
+            "goAllocatedBytes": 52529240,
+            "goAllocations": 639711
+          },
+          {
+            "ms": 70.714708,
+            "responseBytes": 272000,
+            "goAllocatedBytes": 52518384,
+            "goAllocations": 639552
+          },
+          {
+            "ms": 65.098375,
+            "responseBytes": 272000,
+            "goAllocatedBytes": 52485240,
+            "goAllocations": 639675
+          }
+        ]
+      },
+      "fullResultWalkPages": 1,
+      "measurementBoundary": "ProviderBridge.Call authentication/scope + Kernel.Dispatch + response serialization",
+      "name": "provider_bridge_99_selected_rows",
+      "query": {
+        "filter": null,
+        "groupByPropertyId": null,
+        "sorts": [],
+        "subgroupByPropertyId": null,
+        "visiblePropertyIds": [
+          "01a10bae-096b-7e7f-bb8a-efdbc5b83953",
+          "01a10bae-096b-7b26-bd58-c300943913ed",
+          "01a10bae-096b-7559-a5c1-a8311669b3e9",
+          "01a10bae-097f-7e85-8692-9962f5405bcc",
+          "01a10bae-097f-7b2d-8b0d-e64a55cf5b2d",
+          "01a10bae-097f-7d6b-9dae-a0e8f9a52d55",
+          "01a10bae-097f-7870-999f-b238a37c32f4",
+          "01a10bae-097f-7800-8c09-ff6ed6048c14",
+          "01a10bae-097f-76b1-8f05-06ac6ad65e58",
+          "01a10bae-097f-710d-b66d-b30f72e6e56c",
+          "01a10bae-097f-742b-86a6-2daf8f5dcf0f",
+          "01a10bae-097f-72c3-b300-2f5213679234"
+        ]
+      }
+    }
+  ],
+  "completed": true,
+  "endingGoHeapAllocBytes": 99652288,
+  "endingGoSysBytes": 272685384,
+  "finishedAt": "2026-10-05T10:49:02Z",
+  "iterations": 3,
+  "profileWarmupQueriesPerCase": 1,
+  "providerRevocationChecked": true,
+  "schemaVersion": 1,
+  "scope": "Go Kernel.Dispatch validation/query/response JSON serialization; caller JSON decode and independent assertions excluded. ProviderBridge.Call is in-process, not Wails IPC/network/paint. OS and SQLite caches are not flushed; no cold-start claim.",
+  "setupSeconds": 1.917136625,
+  "startedAt": "2026-10-05T10:48:37Z",
+  "wallSeconds": 24.900196875,
+  "workload": {
+    "bodyUTF8Bytes": 4433340,
+    "deletedRecords": 108,
+    "formula": "effort * 2 + 1",
+    "formulaEvaluatorVersion": 1,
+    "liveRecords": 9892,
+    "pageSize": 200,
+    "paragraphBodies": 10000,
+    "precisionBase": "9007199254740993",
+    "properties": 12,
+    "providerSelectedRecordPages": 99,
+    "queryCases": 8,
+    "records": 10000,
+    "relationTargets": 50,
+    "setup": "Canonical schema and view services; prepared direct SQL bulk record fixture, integrity/FK checked; mutation/import/event cost excluded",
+    "storedTypedValues": 88320
+  }
+}
