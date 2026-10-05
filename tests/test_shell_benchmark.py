@@ -93,6 +93,35 @@ class ShellBenchmarkTests(unittest.TestCase):
                 self.assertEqual(result['profiles'][0]['completedIterations'], 1)
                 self.assertIn('Invalid or missing shell report', result['failures'][0]['reason'])
 
+    def test_existing_evidence_is_never_reused_or_overwritten(self):
+        for suffix in ['.log', '.trace', '.sample', '.json', '.symlink']:
+            with self.subTest(suffix=suffix), tempfile.TemporaryDirectory() as temp:
+                root = Path(temp)
+                app = root / 'Trove.app'
+                binary = app / 'Contents/MacOS/Trove'
+                binary.parent.mkdir(parents=True)
+                binary.write_bytes(b'new candidate')
+                fixture = root / 'fixtures'
+                diagnostics = root / 'diagnostics'
+                fixture.mkdir()
+                diagnostics.mkdir()
+                prior = fixture / '0-1.json' if suffix == '.json' else diagnostics / ('0-1' + suffix)
+                if suffix == '.symlink':
+                    prior = diagnostics / '0-1.trace'
+                    prior.symlink_to(root / 'missing-target')
+                else:
+                    prior.write_bytes(b'prior immutable evidence')
+                with patch.object(benchmark.subprocess, 'Popen') as start:
+                    with self.assertRaisesRegex(ValueError, 'already exists'):
+                        benchmark.measure(app, [{'pages': 0, 'paragraphBlocks': 0, 'workspacePath': None}],
+                                          2, fixture, diagnostics)
+                    start.assert_not_called()
+                if suffix == '.symlink':
+                    self.assertTrue(prior.is_symlink())
+                else:
+                    self.assertEqual(prior.read_bytes(), b'prior immutable evidence')
+                self.assertFalse((diagnostics / '0-0.log').exists())
+
     def test_no_requested_samples_is_invalid(self):
         with self.assertRaises(ValueError):
             self.run_scenarios([], 0)

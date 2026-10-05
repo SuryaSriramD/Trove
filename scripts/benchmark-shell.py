@@ -46,6 +46,15 @@ def measure(app, profiles, iterations, fixture, diagnostics, *, timeout=60):
     before = hashlib.sha256(binary.read_bytes()).hexdigest()
     results, failures = [], []
     diagnostics.mkdir(parents=True, exist_ok=True)
+    # Native traces use exclusive creation. Refuse a reused evidence set before
+    # launching anything, otherwise a prior trace could be attributed to this app.
+    for profile in profiles:
+        for i in range(iterations):
+            stem = f"{profile['pages']}-{i}"
+            paths = [fixture / (stem + '.json')]
+            paths += [diagnostics / (stem + suffix) for suffix in ('.log', '.trace', '.sample')]
+            if any(os.path.lexists(path) for path in paths):
+                raise ValueError('Startup evidence already exists; choose a fresh output directory')
     for profile in profiles:
         n = profile['pages']
         workspace = fixture / f'pages-{n}'
@@ -68,7 +77,7 @@ def measure(app, profiles, iterations, fixture, diagnostics, *, timeout=60):
                        TROVE_STARTUP_TRACE=str(trace_path))
             started = time.monotonic()
             timed_out = False
-            with log_path.open('w') as log:
+            with log_path.open('x') as log:
                 process = subprocess.Popen(['/usr/bin/sandbox-exec', '-p', '(version 1)(allow default)(deny network*)', str(binary)],
                                            env=env, stdout=log, stderr=subprocess.STDOUT)
                 try:
@@ -132,6 +141,8 @@ def main():
     args = parser.parse_args()
     if args.iterations < 1:
         parser.error('--iterations must be positive')
+    if os.path.lexists(args.output):
+        parser.error('Output already exists; choose a fresh candidate evidence path')
     fixture = Path(tempfile.mkdtemp(prefix='trove-shell-benchmark-'))
     profiles = [{'pages': 0, 'paragraphBlocks': 0, 'workspacePath': None}]
     profiles += json.loads(args.profiles.read_text())['profiles']
