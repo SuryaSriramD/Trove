@@ -1,0 +1,43 @@
+{
+  "schemaVersion": 1,
+  "runtimeCommit": "webview2-document-v1",
+  "sdk": {
+    "name": "Microsoft.Web.WebView2",
+    "version": "1.0.3537.50",
+    "url": "https://api.nuget.org/v3-flatcontainer/microsoft.web.webview2/1.0.3537.50/microsoft.web.webview2.1.0.3537.50.nupkg",
+    "filename": "microsoft.web.webview2.1.0.3537.50.nupkg",
+    "sha256": "5ea526bbd728adda0da4d31219267e96460494a427e4894c4e09d9f320f4b9aa",
+    "sizeBytes": 8957746,
+    "files": {
+      "build/native/include/WebView2.h": "387a0524c1a4498db32756a6d3b1f4d43a90ac80cb921527f15d3dbf4a857459",
+      "build/native/include/WebView2EnvironmentOptions.h": "abf86f89f86d2e46f646b398dcdaa0b45b0f30115cefa0c4c4a6a810833850a9",
+      "build/native/x64/WebView2LoaderStatic.lib": "f125ba4c3b0fd7369e87fc16e96733897bc10df54300586c00df29aeaabe3a38",
+      "LICENSE.txt": "0af8f1b807512aae39c2ac1aa4d0cae65cabecb6fd554b8439a5162a0d6eca55"
+    }
+  },
+  "jsonHeader": {
+    "path": "vendor/nlohmann/json.hpp",
+    "sha256": "aaf127c04cb31c406e5b04a63f1ae89369fccde6d8fa7cdda1ed4f32dfc5de63",
+    "licensePath": "licenses/LICENSE-jsonhpp",
+    "licenseSha256": "c0d068392ea65358b798b8c165103560f06e9e3b38c4ab4e2d8810a7b931af86"
+  },
+  "windowsBuild": {
+    "architecture": "amd64",
+    "compiler": "MSVC v143 or newer; static /MT; actual compiler and SDK identifiers recorded",
+    "sdk": "Windows 11 SDK with WRL; actual header identities recorded by target build",
+    "qualification": "No Windows build host available; no tested toolchain image claimed"
+  },
+  "runtimeRequirements": [
+    "ICoreWebView2_7::PrintToPdf for rendering",
+    "ICoreWebView2_22::AddWebResourceRequestedFilterWithRequestSourceKinds ALL",
+    "ICoreWebView2Environment10 in-private controller",
+    "isolated current-user profile; existing installed WebView2; no downloader"
+  ],
+  "sources": [
+    "https://www.nuget.org/packages/Microsoft.Web.WebView2/1.0.3537.50",
+    "https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/icorewebview2_22",
+    "https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/icorewebview2_7",
+    "https://learn.microsoft.com/en-us/windows/apps/windows-sdk/downloads"
+  ],
+  "minimumWebView2": "141.0.3537.50"
+}
