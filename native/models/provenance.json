@@ -34,6 +34,14 @@
     "qualification": "Pinned public model and digest; application quality evaluated separately."
   },
   {
+    "repository": "Qwen/Qwen2.5-7B-Instruct-GGUF",
+    "revision": "bb5d59e06d9551d752d08b292a50eb208b07ab1f",
+    "license": "apache-2.0",
+    "metadataSource": "https://huggingface.co/api/models/Qwen/Qwen2.5-7B-Instruct-GGUF?blobs=true",
+    "verifiedAt": "2026-10-05",
+    "qualification": "Optional higher-capacity instruction pack; memory/current-fact and reviewed-action synthetic rubrics are evaluated separately. Requires 8 GiB native worker admission; no general quality or platform qualification claim."
+  },
+  {
     "repository": "ggml-org/SmolVLM-500M-Instruct-GGUF",
     "revision": "72e986006ef53e37cdd3f6d4241c90b0f01df376",
     "license": "apache-2.0",

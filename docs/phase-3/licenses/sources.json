@@ -52,5 +52,11 @@
     "path": "nlohmann-json-3.12.0-LICENSE.MIT",
     "retrievedAt": "2026-10-05",
     "scope": "MIT license for the nlohmann 3.12.0 header vendored in the pinned llama.cpp source; all embedded SPDX copyright declarations are retained separately in the native bundle"
+  },
+  {
+    "url": "https://huggingface.co/Qwen/Qwen2.5-7B-Instruct-GGUF/resolve/bb5d59e06d9551d752d08b292a50eb208b07ab1f/LICENSE",
+    "path": "qwen-7b-LICENSE",
+    "retrievedAt": "2026-10-05",
+    "scope": "Publisher Apache-2.0 license for the optional Qwen2.5 7B pack at its pinned revision"
   }
 ]

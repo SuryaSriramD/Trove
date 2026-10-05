@@ -27,7 +27,10 @@ func TestRealLocalMemoryPreferenceAndCurrentAuthority(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	pack := "01990000-0000-7000-8000-000000000105"
+	pack := os.Getenv("TROVE_CHAT_EVAL_PACK")
+	if pack == "" {
+		pack = "01990000-0000-7000-8000-000000000105"
+	}
 	k, e := testKernel(t)
 	ctx := context.Background()
 	page := createPage(t, k, e, "Current delivery plan")
@@ -202,7 +205,10 @@ func TestRealLocalNamedWorkspacePlan(t *testing.T) {
 	k, e := testKernel(t)
 	ctx := context.Background()
 	page := createPage(t, k, e, "Launch")
-	pack := "01990000-0000-7000-8000-000000000105"
+	pack := os.Getenv("TROVE_CHAT_EVAL_PACK")
+	if pack == "" {
+		pack = "01990000-0000-7000-8000-000000000105"
+	}
 	budget := AIBudget{ContextTokens: 8192, OutputTokens: 512, CountTokens: func(ctx context.Context, prompts []AIPrompt) ([]int, error) {
 		texts := []string{}
 		for _, p := range prompts {

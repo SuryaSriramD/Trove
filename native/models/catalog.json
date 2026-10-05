@@ -87,6 +87,23 @@
     "contextTokens": 8192
   },
   {
+    "schemaVersion": 1,
+    "architecture": "portable",
+    "license": "Apache-2.0",
+    "estimatedMemoryBytes": 8589934592,
+    "id": "01990000-0000-7000-8000-000000000106",
+    "name": "Qwen2.5 7B Instruct Q3",
+    "kind": "chat",
+    "format": "gguf",
+    "sha256": "a96b16179dc6cc9afdf0cf7a96a80c199cbd00b9be207c3465be21cb721cca5e",
+    "sizeBytes": 3808391072,
+    "url": "https://huggingface.co/Qwen/Qwen2.5-7B-Instruct-GGUF/resolve/bb5d59e06d9551d752d08b292a50eb208b07ab1f/qwen2.5-7b-instruct-q3_k_m.gguf",
+    "licenseUrl": "https://huggingface.co/Qwen/Qwen2.5-7B-Instruct-GGUF/blob/bb5d59e06d9551d752d08b292a50eb208b07ab1f/LICENSE",
+    "sourceRevision": "bb5d59e06d9551d752d08b292a50eb208b07ab1f",
+    "runtimeCommit": "d2e54583c7452353eb35d40431281f6ee984332f",
+    "contextTokens": 8192
+  },
+  {
     "schemaVersion": 2,
     "visionVersion": 1,
     "architecture": "portable",

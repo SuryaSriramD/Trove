@@ -110,7 +110,8 @@ export function AIPanel({
           .map((p) => p.pack);
         setModels(ready);
         setModel(
-          ready.find((p) => p.id.endsWith("000000000105"))?.id ??
+          ready.find((p) => p.id.endsWith("000000000106"))?.id ??
+            ready.find((p) => p.id.endsWith("000000000105"))?.id ??
             ready[0]?.id ??
             "",
         );
