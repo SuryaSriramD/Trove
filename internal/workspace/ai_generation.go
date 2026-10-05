@@ -27,6 +27,9 @@ func GeneratePreparedAI(ctx context.Context, prepared AIPrepared, generate AIGen
 		text, err := generate(ctx, prepared.System, prepared.Prompt, prepared.OutputTokens, actionPlanGrammar(), nil)
 		return AICompletion{Text: text}, err
 	}
+	if prepared.Run.Request.Mode == "code_refactor" || prepared.Run.Request.Mode == "code_comment" {
+		return generateAICodeDraft(ctx, prepared, generate, onToken)
+	}
 	if len(prepared.Run.Sources) == 0 || !aiRequiresCitations(prepared.Run.Request.Mode) {
 		mode := prepared.Run.Request.Mode
 		grammar := ""

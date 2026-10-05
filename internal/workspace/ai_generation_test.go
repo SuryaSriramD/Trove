@@ -125,10 +125,8 @@ func TestAIExactQuoteGrammarRejectsTotalByteOverflow(t *testing.T) {
 
 func TestAIStructuredDraftUnwrapsOnlyOneCompleteFence(t *testing.T) {
 	for _, tc := range []struct{ mode, raw, expected string }{
-		{"code_comment", "```go\n// Retain this comment.\nfunc F() int { return 7 }\n```", "```go\n// Retain this comment.\nfunc F() int { return 7 }\n```"},
 		{"database", "```json\n{\"title\":\"A\",\"properties\":[],\"view\":\"table\"}\n```", "{\"title\":\"A\",\"properties\":[],\"view\":\"table\"}\n"},
 		{"mermaid", "```mermaid\r\nflowchart LR\r\n A-->B\r\n```\r\n", "flowchart LR\r\n A-->B\r\n"},
-		{"code_refactor", "func F() int { return 7 }\n", "func F() int { return 7 }\n"},
 	} {
 		p := AIPrepared{Run: AIRun{Request: AIRequest{Mode: tc.mode}}}
 		result, err := GeneratePreparedAI(context.Background(), p, func(context.Context, string, string, int, string, func(string)) (string, error) { return tc.raw, nil }, nil)
@@ -145,7 +143,7 @@ func TestAIStructuredDraftUnwrapsOnlyOneCompleteFence(t *testing.T) {
 	for _, tc := range []struct {
 		mode    string
 		failure error
-	}{{"rewrite", nil}, {"code_explain", nil}, {"code_comment", context.Canceled}} {
+	}{{"rewrite", nil}, {"code_explain", nil}, {"rewrite", context.Canceled}} {
 		p := AIPrepared{Run: AIRun{Request: AIRequest{Mode: tc.mode}}}
 		result, err := GeneratePreparedAI(context.Background(), p, func(context.Context, string, string, int, string, func(string)) (string, error) {
 			return raw, tc.failure
@@ -172,13 +170,11 @@ func TestAICodeDraftPreservesActualMarkdownFenceThroughReview(t *testing.T) {
 			}
 			var streamed strings.Builder
 			completion, err := GeneratePreparedAI(ctx, prepared, func(_ context.Context, _, _ string, _ int, grammar string, stream func(string)) (string, error) {
-				if grammar != "" {
-					t.Fatal("code source was forced into a structured grammar")
+				if grammar == "" || stream != nil {
+					t.Fatal("missing code transport or raw protocol streaming enabled")
 				}
-				for _, piece := range []string{replacement[:4], replacement[4:]} {
-					stream(piece)
-				}
-				return replacement, nil
+				raw, _ := json.Marshal(map[string]string{"source": replacement})
+				return string(raw), nil
 			}, func(piece string) { streamed.WriteString(piece) })
 			if err != nil || completion.Text != replacement || streamed.String() != replacement {
 				t.Fatalf("literal streamed/final bytes changed: %q / %q, %v", streamed.String(), completion.Text, err)
