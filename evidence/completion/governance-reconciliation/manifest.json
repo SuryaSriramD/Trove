@@ -1,0 +1,49 @@
+{
+  "schemaVersion": 1,
+  "scope": "Documentation and read-only coverage validation; no product/release tests rerun",
+  "sourceBaseCommit": "7f6b1964f5d6cbdd28a02d5c1f66930611c14e7e",
+  "candidateEvidenceImportedFrom": "1876879",
+  "changedFileSHA256": {
+    "README.md": "058c716a1315d57aed3f0db2e02b7f70eb9ec417f3e5f407222c5dc7e8cbd64d",
+    "docs/completion/README.md": "ac19a424fcc743761c5af32a8e981313f2ff0608efb785555aa747c82bfe3091",
+    "docs/completion/registry.json": "2cefc6735f8071b27fddd0ff14461aaff85592342e11c0a2e2fe5cb248073f18",
+    "docs/completion/requirements-overlay.json": "6b172fa4f42f68ab91a4ad679b8f84d7e7519a348159af08bd38645c94342a4a",
+    "docs/completion/requirements-reconciliation.md": "8d3f53f3e85e59ac8d43e8b5bc4bd06d21b965ec06be68bee1de53dadabbb2bb",
+    "docs/phase-0/requirements-ledger.json": "75394204cf69078fcb05d237b1edfe5a10289dfbb198a86dd0d6ce38bf696e0a",
+    "scripts/validate-completion.py": "c09171980f8588d2a975a64be303fd0ab12d9163c48e01fb3ff3ec2712668fb6"
+  },
+  "checks": [
+    {
+      "command": "python3 scripts/validate-completion.py",
+      "result": "passed",
+      "log": "mapping-validation.json"
+    },
+    {
+      "command": "python3 -m unittest discover -s tests -p test_ledger.py -v",
+      "result": "passed",
+      "tests": 7,
+      "log": "ledger-tests.txt"
+    },
+    {
+      "command": "python3 evidence/completion/governance-reconciliation/negative-check-harness.py",
+      "result": "passed",
+      "cases": 7,
+      "log": "negative-checks.json",
+      "boundary": "Temporary metadata copies; original source/evidence read only. Deliberate false claims and broken mappings rejected."
+    }
+  ],
+  "evidenceSHA256": {
+    "mapping-validation.json": "9a92f2c2ec9656d97e94765a59ab0c83995024e5b4593e24d0ca8a4c278b6934",
+    "negative-check-harness.py": "79cded82fedfcc200df2a7ebfe5b53729fe0d7ecf89afd5b9a3f4827299c0e21",
+    "ledger-tests.txt": "d12fc733a25445dea15fe855f2689b2c2f4ba5bafdd9c99bffdf7592c8dba7d5",
+    "negative-checks.json": "8b25a0ece4eda88c867650dcddf668fccaf52de7c7c97053dcae7097a41761ef"
+  },
+  "historicalRequirementsChanged": false,
+  "newReleaseOrPlatformQualification": false,
+  "independentSourceReview": {
+    "reviewer": "database_performance",
+    "scope": "Portable document target limits, Windows recovery unavailable, P2 boundaries and TRD-CONSTRAINT-020 partial coverage",
+    "result": "no_release_overclaim_found_in_reviewed_sections",
+    "correction": "Clarified legacy OPT-001 raw-model status as three of four passing with blank fixture failed, avoiding an ambiguous three-failures reading."
+  }
+}

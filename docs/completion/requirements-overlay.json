@@ -1,0 +1,6726 @@
+{
+  "schemaVersion": 1,
+  "title": "Current scoped implementation overlay for the historical PRD/TRD ledger",
+  "reviewedSourceCommit": "7f6b1964f5d6cbdd28a02d5c1f66930611c14e7e",
+  "recordedAt": "2026-10-05",
+  "historicalLedger": "docs/phase-0/requirements-ledger.json",
+  "historicalLedgerCanonicalSHA256": "8bda6faf8acdbfd5562c9de9e3e2481bafb1e89964c1670edcaea4e12b662a91",
+  "historicalRequirementsCanonicalSHA256": "a01d49bb24b0fb758865dea69eb438145f4407cae12078885f81ea70a0635af4",
+  "coverageMeaning": "A mapping identifies implemented source and scoped historical or package evidence relevant to a requirement. It does not assert that every acceptance behavior is implemented, that historical tests reran on the reviewed source, or that any release/platform is qualified. Package remainingGates are binding for every linked row. Historical ledger statuses are preserved.",
+  "counts": {
+    "allLedgerRows": 338,
+    "mappedProductRows": 312,
+    "explicitlyExcludedContractOrBoundaryRows": 26
+  },
+  "packages": {
+    "kernel": {
+      "backlogIds": [
+        "REL-001",
+        "REL-008",
+        "CORE-010"
+      ],
+      "coveredScope": "Canonical identities, transactional mutation services, owner lock, persistent jobs and current SQLite runtime.",
+      "sourcePaths": [
+        "internal/workspace/kernel.go",
+        "internal/workspace/services.go",
+        "internal/workspace/permissions.go",
+        "internal/workspace/jobs.go",
+        "internal/workspace/kernel_test.go",
+        "internal/workspace/jobs_test.go"
+      ],
+      "evidencePaths": [
+        "docs/phase-1/integration.md",
+        "docs/completion/platform-filesystem.md",
+        "docs/completion/windows-storage.md",
+        "evidence/completion/candidate-4900d4b/manifest.json"
+      ],
+      "remainingGates": "Historical/service evidence does not qualify the latest binary. Windows new-workspace creation and migrations remain unavailable; target runtime and crash recovery remain open.",
+      "coverageStatus": "scoped_source_and_evidence",
+      "releaseQualified": false
+    },
+    "policy": {
+      "backlogIds": [
+        "AI-001",
+        "EXT-003",
+        "REL-008"
+      ],
+      "coveredScope": "Authenticated scoped services, revisions, idempotency and explicit approval of generated mutations.",
+      "sourcePaths": [
+        "internal/workspace/mutations.go",
+        "internal/workspace/permissions.go",
+        "internal/workspace/ai_actions.go",
+        "internal/workspace/provider_actions.go",
+        "internal/workspace/provider_actions_test.go"
+      ],
+      "evidencePaths": [
+        "docs/completion/reviewed-actions.md",
+        "docs/completion/mcp-sdk.md",
+        "evidence/completion/candidate-4900d4b/manifest.json"
+      ],
+      "remainingGates": "Real external-provider operations and candidate-specific hostile input/revocation journeys remain independently unqualified.",
+      "coverageStatus": "scoped_source_and_evidence",
+      "releaseQualified": false
+    },
+    "editor": {
+      "backlogIds": [
+        "FIX-003",
+        "FIX-006",
+        "REL-002"
+      ],
+      "coveredScope": "Structured rich text, core blocks, preservation, clipboard and editor operations in existing implementation and targeted regressions.",
+      "sourcePaths": [
+        "frontend/src/editor/Editor.tsx",
+        "frontend/src/editor/codec.ts",
+        "frontend/src/editor/nodes.tsx",
+        "internal/workspace/advanced_editor.go",
+        "internal/workspace/editor_integrity_test.go",
+        "frontend/tests/editor-integrity.browser.spec.ts",
+        "frontend/src/editor/visibility.ts"
+      ],
+      "evidencePaths": [
+        "docs/completion/rich-layouts.md",
+        "docs/completion/import-structure.md",
+        "evidence/completion/candidate-4900d4b/manifest.json"
+      ],
+      "remainingGates": "Actual native IME/VoiceOver/clipboard and all acceptance variants require candidate-specific evidence; browser fixtures are narrower.",
+      "coverageStatus": "scoped_source_and_evidence",
+      "releaseQualified": false
+    },
+    "table": {
+      "backlogIds": [
+        "CORE-001",
+        "FIX-003"
+      ],
+      "coveredScope": "Table structural controls and preserved rich-text cells.",
+      "sourcePaths": [
+        "frontend/src/editor/tableStructure.ts",
+        "frontend/src/editor/InlineRichEditor.tsx",
+        "frontend/tests/table-structure.test.ts",
+        "internal/workspace/editor_integrity_test.go"
+      ],
+      "evidencePaths": [
+        "docs/completion/README.md",
+        "evidence/completion/checkpoint-1/browser-tests.json"
+      ],
+      "remainingGates": "Targeted fixture coverage does not establish native editor qualification.",
+      "coverageStatus": "scoped_source_and_evidence",
+      "releaseQualified": false
+    },
+    "rich-style": {
+      "backlogIds": [
+        "CORE-002",
+        "FIX-003"
+      ],
+      "coveredScope": "Canonical text colors/highlights across editor and import/export representations.",
+      "sourcePaths": [
+        "internal/workspace/rich_colors.go",
+        "internal/workspace/rich_colors_test.go",
+        "frontend/src/editor/ColorMarks.tsx",
+        "frontend/src/editor/palette.ts",
+        "frontend/tests/rich-colors.test.ts"
+      ],
+      "evidencePaths": [
+        "docs/completion/README.md",
+        "evidence/completion/checkpoint-1/browser-tests.json"
+      ],
+      "remainingGates": "Candidate/native and broader imported-span preservation remain separate gates.",
+      "coverageStatus": "scoped_source_and_evidence",
+      "releaseQualified": false
+    },
+    "presentation": {
+      "backlogIds": [
+        "CORE-003",
+        "GOV-005"
+      ],
+      "coveredScope": "Code/image presentation, bundled Shiki and PDF.js, equations and diagrams.",
+      "sourcePaths": [
+        "frontend/src/editor/TechnicalBlocks.tsx",
+        "frontend/src/editor/PDFBlock.tsx",
+        "frontend/src/editor/codePresentation.ts",
+        "frontend/tests/editor-presentation.test.ts",
+        "frontend/tests/editor-integrity.browser.spec.ts"
+      ],
+      "evidencePaths": [
+        "docs/completion/selected-stack-alignment.md",
+        "docs/completion/rich-pdf.md",
+        "evidence/completion/candidate-4900d4b/manifest.json"
+      ],
+      "remainingGates": "Native platform PDF/WebView behaviors and representative hostile documents remain separately qualified.",
+      "coverageStatus": "scoped_source_and_evidence",
+      "releaseQualified": false
+    },
+    "layout": {
+      "backlogIds": [
+        "PARITY-001",
+        "FIX-006",
+        "PARITY-007"
+      ],
+      "coveredScope": "Tabs, columns and reusable blocks with canonical identities and nested content preservation.",
+      "sourcePaths": [
+        "frontend/src/editor/LayoutBlock.tsx",
+        "frontend/src/editor/ReusableBlock.tsx",
+        "frontend/src/editor/layoutStructure.ts",
+        "internal/workspace/import_structure.go",
+        "frontend/tests/layout-structure.test.ts"
+      ],
+      "evidencePaths": [
+        "docs/completion/rich-layouts.md",
+        "docs/completion/import-structure.md"
+      ],
+      "remainingGates": "Native editing and representative imported structures need candidate evidence.",
+      "coverageStatus": "scoped_source_and_evidence",
+      "releaseQualified": false
+    },
+    "online-content": {
+      "backlogIds": [
+        "PARITY-002"
+      ],
+      "coveredScope": "Explicit cached bookmarks and consented sandboxed supported embeds.",
+      "sourcePaths": [
+        "frontend/src/editor/OnlineBlocks.tsx",
+        "frontend/src/editor/onlineContent.ts",
+        "internal/workspace/bookmark_preview.go",
+        "internal/workspace/bookmark_preview_test.go"
+      ],
+      "evidencePaths": [
+        "docs/completion/online-content.md"
+      ],
+      "remainingGates": "Provider behavior and native consent/network containment require their own current checks; unrestricted embeds are outside the supported boundary.",
+      "coverageStatus": "scoped_source_and_evidence",
+      "releaseQualified": false
+    },
+    "navigation": {
+      "backlogIds": [
+        "FIX-004",
+        "FIX-005",
+        "REL-002"
+      ],
+      "coveredScope": "Stable page/view navigation, source links, persisted toggle visibility, sidebar and search navigation.",
+      "sourcePaths": [
+        "frontend/src/App.tsx",
+        "frontend/src/sourceNavigation.ts",
+        "frontend/src/editor/visibility.ts",
+        "internal/workspace/pages.go"
+      ],
+      "evidencePaths": [
+        "docs/completion/README.md",
+        "evidence/completion/candidate-4900d4b/manifest.json"
+      ],
+      "remainingGates": "Native deep-link launch routing, keyboard/accessibility and target lifecycle evidence remain separate.",
+      "coverageStatus": "scoped_source_and_evidence",
+      "releaseQualified": false
+    },
+    "database": {
+      "backlogIds": [
+        "CORE-007",
+        "CORE-008",
+        "FIX-004"
+      ],
+      "coveredScope": "Canonical records/properties, typed parameterized queries, cursor pagination, virtualization and persisted view controls.",
+      "sourcePaths": [
+        "internal/workspace/database.go",
+        "internal/workspace/database_query.go",
+        "internal/workspace/database_query_test.go",
+        "frontend/src/database/tests/database.browser.spec.ts"
+      ],
+      "evidencePaths": [
+        "docs/completion/database-query-scaling.md",
+        "docs/completion/views.md",
+        "docs/completion/database-performance.md"
+      ],
+      "remainingGates": "Full property/view acceptance and large derived-value latency remain separate; 10k formula/rollup behavior is not a subsecond general guarantee.",
+      "coverageStatus": "scoped_source_and_evidence",
+      "releaseQualified": false
+    },
+    "timeline": {
+      "backlogIds": [
+        "PARITY-003"
+      ],
+      "coveredScope": "Timeline scale, grouping and dependency/sub-item representation.",
+      "sourcePaths": [
+        "frontend/src/database/timelineModel.ts",
+        "frontend/src/database/tests/database.browser.spec.ts",
+        "internal/workspace/database.go"
+      ],
+      "evidencePaths": [
+        "docs/completion/timeline.md"
+      ],
+      "remainingGates": "Native interaction and representative large dependency graphs remain candidate gates.",
+      "coverageStatus": "scoped_source_and_evidence",
+      "releaseQualified": false
+    },
+    "templates": {
+      "backlogIds": [
+        "PARITY-004"
+      ],
+      "coveredScope": "Unified captured page body plus database property defaults with reviewed mapping.",
+      "sourcePaths": [
+        "internal/workspace/templates.go",
+        "internal/workspace/templates_test.go",
+        "frontend/src/database/tests/database.browser.spec.ts"
+      ],
+      "evidencePaths": [
+        "docs/completion/unified-templates.md"
+      ],
+      "remainingGates": "Unsupported/incompatible schemas remain explicit; native library workflows require candidate evidence.",
+      "coverageStatus": "scoped_source_and_evidence",
+      "releaseQualified": false
+    },
+    "formula": {
+      "backlogIds": [
+        "PARITY-005"
+      ],
+      "coveredScope": "Published versioned formula contract, bounded evaluation and relation/rollup behavior.",
+      "sourcePaths": [
+        "internal/workspace/formula_contract.go",
+        "internal/workspace/formula_v2.go",
+        "internal/workspace/formula_v2_test.go",
+        "internal/workspace/formula_translation.go"
+      ],
+      "evidencePaths": [
+        "docs/completion/formula-compatibility.md",
+        "docs/completion/database-performance.md"
+      ],
+      "remainingGates": "Only the declared compatibility subset is supported; captured source values are not live computed results, and representative performance remains open.",
+      "coverageStatus": "scoped_source_and_evidence",
+      "releaseQualified": false
+    },
+    "tasks": {
+      "backlogIds": [
+        "REL-001",
+        "AI-001"
+      ],
+      "coveredScope": "Canonical task facet and completion shared by blocks and records.",
+      "sourcePaths": [
+        "internal/workspace/tasks.go",
+        "internal/workspace/tasks_test.go",
+        "internal/workspace/ai_actions.go"
+      ],
+      "evidencePaths": [
+        "docs/phase-0/decisions.md",
+        "docs/completion/reviewed-actions.md",
+        "evidence/completion/candidate-4900d4b/manifest.json"
+      ],
+      "remainingGates": "Current packaged/native task interactions and reviewed model task creation need their own scope-specific checks.",
+      "coverageStatus": "scoped_source_and_evidence",
+      "releaseQualified": false
+    },
+    "imports": {
+      "backlogIds": [
+        "PARITY-007",
+        "FIX-001",
+        "REL-004"
+      ],
+      "coveredScope": "ZIP/Markdown/CSV/HTML canonical import, nested preservation, reconciliation and immutable supplied provenance.",
+      "sourcePaths": [
+        "internal/workspace/import_parse.go",
+        "internal/workspace/import_commit.go",
+        "internal/workspace/import_structure.go",
+        "internal/workspace/import_structure_test.go",
+        "internal/workspace/import_export_test.go"
+      ],
+      "evidencePaths": [
+        "docs/completion/import-structure.md",
+        "docs/completion/recovery.md",
+        "docs/phase-2/2a.md"
+      ],
+      "remainingGates": "Representative authorized Notion exports/datasets and all source-fidelity acceptance cases remain open; unsupported data stays inert.",
+      "coverageStatus": "scoped_source_and_evidence",
+      "releaseQualified": false
+    },
+    "notion-api": {
+      "backlogIds": [
+        "PARITY-006"
+      ],
+      "coveredScope": "Authorized Notion API roots, versioned resumable source/schema/view reconstruction and explicit partial outcomes.",
+      "sourcePaths": [
+        "internal/workspace/import_notion_capture.go",
+        "internal/workspace/import_notion_database.go",
+        "internal/workspace/import_notion_views.go",
+        "internal/workspace/import_notion_database_test.go",
+        "frontend/tests/notion-capture.browser.spec.ts"
+      ],
+      "evidencePaths": [
+        "docs/completion/notion-api-import.md"
+      ],
+      "remainingGates": "Synthetic API/browser checks are not live-account evidence. Unsupported filters/templates/rollups/relations remain preserved partial outcomes; source comments/history/permissions are not inferred.",
+      "coverageStatus": "scoped_source_and_evidence",
+      "releaseQualified": false
+    },
+    "exports": {
+      "backlogIds": [
+        "FIX-001",
+        "PARITY-008"
+      ],
+      "coveredScope": "Current-content Markdown/CSV/HTML exports and isolated rich PDF rendering.",
+      "sourcePaths": [
+        "internal/workspace/export.go",
+        "internal/workspace/export_html.go",
+        "internal/workspace/export_pdf.go",
+        "internal/workspace/export_pdf_test.go",
+        "frontend/src/print/document.ts"
+      ],
+      "evidencePaths": [
+        "docs/completion/recovery.md",
+        "docs/completion/rich-pdf.md"
+      ],
+      "remainingGates": "Live-content asset selection has targeted regression evidence; visually inspected candidate PDF and target WebView execution remain scoped gates.",
+      "coverageStatus": "scoped_source_and_evidence",
+      "releaseQualified": false
+    },
+    "assets": {
+      "backlogIds": [
+        "FIX-001",
+        "REL-008",
+        "REL-009"
+      ],
+      "coveredScope": "Scoped immutable hashed original assets and guarded same-volume publication.",
+      "sourcePaths": [
+        "internal/workspace/files.go",
+        "internal/platformfs/publication_windows.go",
+        "internal/platformfs/publication_test.go"
+      ],
+      "evidencePaths": [
+        "docs/completion/recovery.md",
+        "docs/completion/windows-storage.md",
+        "evidence/completion/windows-storage/manifest.json"
+      ],
+      "remainingGates": "Windows source and test compilation do not establish native ACL/publication behavior; full recovery durability remains unavailable.",
+      "coverageStatus": "scoped_source_and_evidence",
+      "releaseQualified": false
+    },
+    "recovery": {
+      "backlogIds": [
+        "FIX-002",
+        "CORE-006",
+        "CORE-010",
+        "REL-006"
+      ],
+      "coveredScope": "Page/trash/meeting restoration, historical-value mapping, incremental online backups and pre-migration snapshots.",
+      "sourcePaths": [
+        "internal/workspace/history.go",
+        "internal/workspace/restore.go",
+        "internal/workspace/backup.go",
+        "internal/workspace/backup_online_test.go",
+        "internal/workspace/migration_snapshot.go"
+      ],
+      "evidencePaths": [
+        "docs/completion/recovery.md",
+        "docs/completion/pre-migration-snapshots.md",
+        "docs/completion/windows-storage.md",
+        "evidence/completion/windows-storage/manifest.json"
+      ],
+      "remainingGates": "Independent clean-install restore, fault/power-loss and cross-platform portability remain open. Windows new-workspace, migration, backup, restore and transfer are explicitly unavailable.",
+      "coverageStatus": "scoped_source_and_evidence",
+      "releaseQualified": false
+    },
+    "retrieval": {
+      "backlogIds": [
+        "CORE-004",
+        "CORE-009",
+        "AI-002"
+      ],
+      "coveredScope": "FTS plus sqlite-vec retrieval, index generations, source citations and exact-token context assembly.",
+      "sourcePaths": [
+        "internal/workspace/search.go",
+        "internal/workspace/search_semantic.go",
+        "internal/workspace/search_vectors.go",
+        "internal/workspace/ai_context.go",
+        "internal/workspace/search_vectors_test.go"
+      ],
+      "evidencePaths": [
+        "docs/completion/retrieval.md",
+        "docs/completion/ai-context.md"
+      ],
+      "remainingGates": "Recorded retrieval and deletion tests do not imply universal answer correctness; model generation compatibility, representative workload and candidate performance remain scoped. Native be6fc81 evidence finds inline rich-text boundaries split a word in the search index; that source repair and candidate retest are still outstanding in this reviewed source.",
+      "coverageStatus": "scoped_source_and_evidence",
+      "releaseQualified": false
+    },
+    "ai-modes": {
+      "backlogIds": [
+        "AI-002",
+        "AI-001"
+      ],
+      "coveredScope": "14 fixed local writing/structured modes, typed source transport, required schema grammar and reviewed action preparation.",
+      "sourcePaths": [
+        "internal/workspace/ai_generation.go",
+        "internal/workspace/ai_code_generation.go",
+        "internal/workspace/ai_database_generation.go",
+        "internal/workspace/ai_local_modes_test.go",
+        "internal/workspace/ai_advanced.go"
+      ],
+      "evidencePaths": [
+        "docs/completion/ai-modes.md",
+        "evidence/completion/ai-modes/manifest.json",
+        "docs/completion/reviewed-actions.md"
+      ],
+      "remainingGates": "All 14 predefined tasks passed on ab3ff13 with the optional 7B pack, not every task or native candidate. Earlier failures remain retained; broader quality, correction effort and controlled resource performance remain open.",
+      "coverageStatus": "scoped_source_and_evidence",
+      "releaseQualified": false
+    },
+    "memory": {
+      "backlogIds": [
+        "AI-003",
+        "AI-002"
+      ],
+      "coveredScope": "Approved memory scope, freshness/forgetting, current authority, exact evidence spans and held-out evaluation.",
+      "sourcePaths": [
+        "internal/workspace/memory.go",
+        "internal/workspace/ai_context.go",
+        "internal/workspace/ai_local_evaluation_test.go",
+        "internal/workspace/ai_local_heldout_test.go"
+      ],
+      "evidencePaths": [
+        "docs/completion/ai-context.md",
+        "docs/completion/memory-capacity.md",
+        "evidence/completion/memory-capacity/manifest.json"
+      ],
+      "remainingGates": "Optional 7B passes strict fixed/held-out cases; smaller-model failures remain. Representative quality, correction effort and platform/candidate evidence remain open.",
+      "coverageStatus": "scoped_source_and_evidence",
+      "releaseQualified": false
+    },
+    "related": {
+      "backlogIds": [
+        "AI-003"
+      ],
+      "coveredScope": "Semantic related-content cards with current citations and evidence-aware organization suggestions.",
+      "sourcePaths": [
+        "internal/workspace/related_search.go",
+        "internal/workspace/ai_advanced.go",
+        "internal/workspace/related_graph_test.go",
+        "frontend/tests/related.browser.spec.ts"
+      ],
+      "evidencePaths": [
+        "docs/completion/related-content.md",
+        "evidence/completion/related-content-manifest.json"
+      ],
+      "remainingGates": "Task-specific/source and browser evidence is not broad relevance quality or native platform qualification.",
+      "coverageStatus": "scoped_source_and_evidence",
+      "releaseQualified": false
+    },
+    "meetings": {
+      "backlogIds": [
+        "CORE-005",
+        "REL-003",
+        "REL-004",
+        "AI-002"
+      ],
+      "coveredScope": "Retained original audio, bounded normalized PCM, native transcription and reviewed meeting/voice intelligence.",
+      "sourcePaths": [
+        "internal/workspace/recordings.go",
+        "internal/workspace/meetings.go",
+        "internal/workspace/meeting_intelligence.go",
+        "internal/workers/audio.go",
+        "native/audio-decoder.cpp",
+        "native/microphone-worker.cpp"
+      ],
+      "evidencePaths": [
+        "docs/completion/audio-decoding.md",
+        "docs/completion/macos-miniaudio.md",
+        "docs/completion/microphone-portability.md",
+        "evidence/completion/macos-miniaudio-evidence.json"
+      ],
+      "remainingGates": "No actual microphone activation, TCC/device/signed-app attribution or representative speech qualification is established by device-free fixtures. Target-native decoding/capture remains unqualified.",
+      "coverageStatus": "scoped_source_and_evidence",
+      "releaseQualified": false
+    },
+    "runtime": {
+      "backlogIds": [
+        "GOV-005",
+        "REL-005",
+        "REL-009"
+      ],
+      "coveredScope": "Pinned llama/whisper workers, leased verified model packs, protocol bounds and native process cancellation.",
+      "sourcePaths": [
+        "internal/native/supervisor.go",
+        "internal/native/packs.go",
+        "scripts/build-native.py",
+        "scripts/build-native-portable.py"
+      ],
+      "evidencePaths": [
+        "docs/completion/platform-native-workers.md",
+        "docs/completion/selected-stack-alignment.md",
+        "docs/completion/native-memory-sampling.md"
+      ],
+      "remainingGates": "Independent clean offline installation/model acquisition, distribution rights and Windows/Linux runtime execution remain open; test compilation is source evidence only.",
+      "coverageStatus": "scoped_source_and_evidence",
+      "releaseQualified": false
+    },
+    "capture": {
+      "backlogIds": [
+        "PARITY-009",
+        "REL-003"
+      ],
+      "coveredScope": "Quick capture and paired browser extension with explicit destinations, source provenance and reviewed save.",
+      "sourcePaths": [
+        "internal/workspace/capture.go",
+        "internal/workspace/capture_clipper.go",
+        "internal/clipper/bridge.go",
+        "frontend/src/capture/CapturePanel.tsx",
+        "internal/workspace/capture_clipper_browser_test.go"
+      ],
+      "evidencePaths": [
+        "docs/completion/browser-clipper.md",
+        "docs/completion/portable-ocr.md"
+      ],
+      "remainingGates": "Actual Chromium fixture is scoped; interactive installation/optional permissions, physical screenshots and target OS capture remain separately unqualified.",
+      "coverageStatus": "scoped_source_and_evidence",
+      "releaseQualified": false
+    },
+    "external-index": {
+      "backlogIds": [
+        "REL-002",
+        "REL-008"
+      ],
+      "coveredScope": "Explicit selected external roots and repository indexing with identity/hash and exclusion policy.",
+      "sourcePaths": [
+        "internal/workspace/index_external.go",
+        "internal/workspace/index_external_test.go",
+        "internal/platformfs/files_windows.go"
+      ],
+      "evidencePaths": [
+        "docs/phase-4/4c.md",
+        "docs/completion/platform-filesystem.md"
+      ],
+      "remainingGates": "Target filesystem permission/identity behavior and representative native file selection remain separate gates.",
+      "coverageStatus": "scoped_source_and_evidence",
+      "releaseQualified": false
+    },
+    "automation": {
+      "backlogIds": [
+        "PARITY-010"
+      ],
+      "coveredScope": "Visible local rule/schedule/template configuration, bounded catch-up, origin rules and atomic occurrence receipts.",
+      "sourcePaths": [
+        "internal/workspace/automation.go",
+        "internal/workspace/automation_runner.go",
+        "internal/workspace/automation_templates_test.go",
+        "frontend/src/automation/RuleBuilder.tsx",
+        "frontend/tests/automation.browser.spec.ts"
+      ],
+      "evidencePaths": [
+        "docs/completion/automation-configuration.md"
+      ],
+      "remainingGates": "Fixture/race/browser evidence does not qualify the full native candidate. Rules require Trove running; arbitrary vendor automation compatibility is excluded.",
+      "coverageStatus": "scoped_source_and_evidence",
+      "releaseQualified": false
+    },
+    "providers": {
+      "backlogIds": [
+        "EXT-001",
+        "EXT-002",
+        "EXT-005"
+      ],
+      "coveredScope": "Managed Claude/Codex discovery, account/context selection, streaming/cancellation/resume identity and reviewed handoff records.",
+      "sourcePaths": [
+        "internal/providers/adapter.go",
+        "internal/providers/codex.go",
+        "internal/providers/claude.go",
+        "internal/workspace/provider_managed.go",
+        "internal/workspace/provider_managed_test.go",
+        "frontend/tests/managed-providers.browser.spec.ts"
+      ],
+      "evidencePaths": [
+        "docs/completion/managed-runtimes.md",
+        "docs/completion/claude-runtime.md",
+        "docs/completion/claude-icu-startup.md",
+        "docs/completion/codex-siwc-auth.md"
+      ],
+      "remainingGates": "Real authorized inference, completed/interrupted compatible resume and actual cross-provider handoffs remain unqualified; Windows/Linux runtime containment unavailable.",
+      "coverageStatus": "scoped_source_and_evidence",
+      "releaseQualified": false
+    },
+    "mcp": {
+      "backlogIds": [
+        "EXT-003",
+        "EXT-004"
+      ],
+      "coveredScope": "Official SDK bridge, reviewed creation, authenticated opt-in remote MCP through owning kernel.",
+      "sourcePaths": [
+        "internal/workspace/provider_mcp.go",
+        "internal/workspace/provider_actions.go",
+        "internal/providers/remote/server.go",
+        "internal/workspace/provider_sdk_test.go",
+        "internal/providers/remote/server_test.go"
+      ],
+      "evidencePaths": [
+        "docs/completion/mcp-sdk.md",
+        "docs/completion/remote-mcp.md"
+      ],
+      "remainingGates": "Real hosted HTTPS/client interoperability and account-scoped operations remain open; TLS SDK fixtures are narrower evidence.",
+      "coverageStatus": "scoped_source_and_evidence",
+      "releaseQualified": false
+    },
+    "image": {
+      "backlogIds": [
+        "OPT-001"
+      ],
+      "coveredScope": "Offline bounded paired vision worker, exact-original-pixel abstention, separate OCR text and generated interpretations.",
+      "sourcePaths": [
+        "internal/workspace/image_description.go",
+        "internal/workspace/p2_intelligence_ocr.go",
+        "internal/native/p2_ocr_portable.go",
+        "native/vision-worker.cpp"
+      ],
+      "evidencePaths": [
+        "docs/completion/local-image-understanding.md",
+        "docs/completion/portable-ocr.md",
+        "evidence/completion/image-abstention/manifest.json"
+      ],
+      "remainingGates": "Product path passes four fixed fixtures; raw model blank-image failure retained. Broader image/OCR/language/handwriting quality and target/device evidence remain open.",
+      "coverageStatus": "scoped_source_and_evidence",
+      "releaseQualified": false
+    },
+    "reviews": {
+      "backlogIds": [
+        "OPT-002"
+      ],
+      "coveredScope": "Opt-in generative cited personal reviews, deterministic fallback and separately approved page/task proposals.",
+      "sourcePaths": [
+        "internal/workspace/personal_review_generation.go",
+        "internal/workspace/p2_intelligence_review.go",
+        "internal/workspace/personal_review_local_evaluation_test.go",
+        "frontend/src/ai/GenerativeReview.tsx"
+      ],
+      "evidencePaths": [
+        "docs/completion/personal-reviews.md",
+        "evidence/completion/c6-personal-review.json"
+      ],
+      "remainingGates": "One actual-model fixture is narrow evidence; representative scheduled-review quality and native candidate flows remain open. No generated writes commit without approval.",
+      "coverageStatus": "scoped_source_and_evidence",
+      "releaseQualified": false
+    },
+    "p2": {
+      "backlogIds": [
+        "OPT-003"
+      ],
+      "coveredScope": "Charts/forms/confirmed row actions, evidence graph, branched conversation imports and persisted display preferences.",
+      "sourcePaths": [
+        "internal/workspace/p2_database.go",
+        "internal/workspace/p2_intelligence_graph.go",
+        "internal/workspace/import_conversations.go",
+        "internal/workspace/p2_display.go",
+        "internal/workspace/p2_database_test.go",
+        "internal/workspace/p2_migration_editor_test.go"
+      ],
+      "evidencePaths": [
+        "docs/phase-6/implementation.md",
+        "docs/completion/development-candidate-4900d4b.md",
+        "evidence/completion/candidate-4900d4b/p2/packaged-p2-integration.json",
+        "docs/completion/development-candidate-be6fc81.md",
+        "evidence/completion/candidate-be6fc81/manifest.json"
+      ],
+      "remainingGates": "4900d4b has scoped packaged P2 value/action/branch/bytes/reopen/inert-import checks. Broader package/platform qualification and newest candidate evidence remain separate.",
+      "coverageStatus": "scoped_source_and_evidence",
+      "releaseQualified": false
+    },
+    "hosting": {
+      "backlogIds": [
+        "OPT-003",
+        "REL-009"
+      ],
+      "coveredScope": "Single-owner authenticated host, verified owner transfer and portable operational inactivity.",
+      "sourcePaths": [
+        "internal/hosting/server.go",
+        "internal/hosting/server_test.go",
+        "internal/workspace/hosting_transfer.go",
+        "internal/workspace/hosting_transfer_test.go"
+      ],
+      "evidencePaths": [
+        "docs/phase-6/hosting.md",
+        "docs/phase-6/qualification.md",
+        "docs/completion/windows-storage.md"
+      ],
+      "remainingGates": "No network filesystem/offline multi-device sync claim. Real hosted deployment, independent recovery and Windows transfer are unqualified/unavailable.",
+      "coverageStatus": "scoped_source_and_evidence",
+      "releaseQualified": false
+    },
+    "credentials": {
+      "backlogIds": [
+        "EXT-001",
+        "EXT-002",
+        "REL-009"
+      ],
+      "coveredScope": "OS-protected accounts, explicit access and cancellation-safe credential prompts.",
+      "sourcePaths": [
+        "internal/providers/auth/keychain_darwin.go",
+        "internal/providers/auth/keychain_windows.go",
+        "internal/providers/auth/keychain_linux.go",
+        "internal/providers/auth/manager.go"
+      ],
+      "evidencePaths": [
+        "docs/completion/platform-credentials.md",
+        "docs/completion/credential-prompt-cancellation.md"
+      ],
+      "remainingGates": "Windows DPAPI/Linux Secret Service source and cross-compilation do not qualify actual target accounts/keyring behavior.",
+      "coverageStatus": "scoped_source_and_evidence",
+      "releaseQualified": false
+    },
+    "distribution": {
+      "backlogIds": [
+        "REL-005",
+        "REL-006",
+        "REL-009"
+      ],
+      "coveredScope": "Desktop packaging, verified updates, rollback and portable build/install source paths.",
+      "sourcePaths": [
+        "scripts/build-desktop.py",
+        "scripts/build-desktop-portable.py",
+        "scripts/desktop_package.py"
+      ],
+      "evidencePaths": [
+        "docs/completion/verified-updates.md",
+        "docs/completion/platform-desktop-packaging.md",
+        "docs/completion/windows-storage.md"
+      ],
+      "remainingGates": "Signing/notarization, clean installation, full offline model setup and Windows/Linux execution remain open. Ad-hoc update refusal is expected; Windows recovery is unavailable.",
+      "coverageStatus": "scoped_source_and_evidence",
+      "releaseQualified": false
+    },
+    "performance": {
+      "backlogIds": [
+        "REL-007"
+      ],
+      "coveredScope": "Recorded startup, typed database/retrieval measurements and native worker RSS collection.",
+      "sourcePaths": [
+        "scripts/benchmark-shell.py",
+        "scripts/benchmark-database.py",
+        "internal/workspace/database_query_optimization_test.go"
+      ],
+      "evidencePaths": [
+        "docs/completion/database-performance.md",
+        "docs/completion/startup-investigation.md",
+        "docs/completion/native-memory-sampling.md",
+        "docs/completion/development-candidate-be6fc81.md",
+        "evidence/completion/candidate-be6fc81/manifest.json"
+      ],
+      "remainingGates": "Candidate be6fc81 returned readiness for all 20 launches but an 8399.656 ms launch exceeded its 2500 ms threshold. Keyword samples passed the 300 ms target on 100/1000/10000 synthetic pages; actual hybrid samples passed only a 100-page profile. Large semantic/concurrent load and full app latency remain open. Typed 10k formula/rollup first-page medians were 1197/1127 ms without a newly invented threshold.",
+      "coverageStatus": "scoped_source_and_evidence",
+      "releaseQualified": false
+    },
+    "governance": {
+      "backlogIds": [
+        "GOV-001",
+        "GOV-002",
+        "GOV-003",
+        "GOV-004",
+        "GOV-005",
+        "REL-008"
+      ],
+      "coveredScope": "Pinned reproducible tooling, selected stack reconciliation and requirements/evidence traceability.",
+      "sourcePaths": [
+        "scripts/bootstrap.py",
+        "scripts/doctor.py",
+        "scripts/extract_requirements.py",
+        "contracts/registries.json"
+      ],
+      "evidencePaths": [
+        "docs/completion/codegen-reproducibility.md",
+        "docs/completion/selected-stack-alignment.md",
+        "docs/completion/README.md"
+      ],
+      "remainingGates": "Missing 307-behavior research remains unresolved. This mapping supplies scoped coverage, never automatic implementation or release approval.",
+      "coverageStatus": "scoped_source_and_evidence",
+      "releaseQualified": false
+    },
+    "release": {
+      "backlogIds": [
+        "REL-001",
+        "REL-002",
+        "REL-003",
+        "REL-004",
+        "REL-005",
+        "REL-006",
+        "REL-007",
+        "REL-008",
+        "REL-009"
+      ],
+      "coveredScope": "Candidate and release acceptance inventory with retained failures and explicit skipped prerequisites.",
+      "sourcePaths": [
+        "scripts/verify-packaged.py",
+        "scripts/verify-phase5.py",
+        "scripts/verify-phase6.py"
+      ],
+      "evidencePaths": [
+        "docs/completion/development-candidate-4900d4b.md",
+        "evidence/completion/candidate-4900d4b/manifest.json",
+        "docs/completion/development-candidate-be6fc81.md",
+        "evidence/completion/candidate-be6fc81/manifest.json"
+      ],
+      "remainingGates": "Actual native UI/device, clean machines, signing, authorized representative data/accounts, hosted interoperability, startup/performance and per-platform gates remain open. Candidate be6fc81 fails the startup threshold and formatted-word search despite passing its recorded service/packaged journeys; later repairs cannot qualify that binary.",
+      "coverageStatus": "scoped_source_and_evidence",
+      "releaseQualified": false
+    },
+    "diagnostics": {
+      "backlogIds": [
+        "GOV-003",
+        "REL-002",
+        "REL-008"
+      ],
+      "coveredScope": "Bounded worker logs, per-root indexing diagnostics, automation run diagnostics and redacted account-token formatting.",
+      "sourcePaths": [
+        "internal/native/protocol.go",
+        "internal/workspace/index_external.go",
+        "internal/workspace/automation_runner.go",
+        "internal/providers/auth/types.go",
+        "internal/providers/auth/manager_test.go"
+      ],
+      "evidencePaths": [
+        "docs/phase-1/1a.md",
+        "docs/completion/automation-configuration.md",
+        "docs/completion/codex-siwc-auth.md"
+      ],
+      "remainingGates": "No user-generated support-bundle flow with explicit content inclusion was located. Redacted application/job/import/model/search diagnostics as a complete system are not established by these narrower paths. Reconcile the full requirement before any implementation-complete claim.",
+      "coverageStatus": "scoped_source_and_evidence",
+      "releaseQualified": false
+    },
+    "documents": {
+      "backlogIds": [
+        "PARITY-008",
+        "CORE-003",
+        "GOV-005",
+        "REL-002",
+        "REL-009"
+      ],
+      "coveredScope": "Bundled PDF.js viewing/text-layer extraction and isolated WebView2/WebKitGTK print/extract source paths, manifests, containment/resource policy and bounded cancellation.",
+      "sourcePaths": [
+        "internal/native/document_helper.go",
+        "internal/native/document_process.go",
+        "internal/workspace/export_pdf_portable.go",
+        "native/document-worker-windows.cpp",
+        "native/document-worker-linux.cpp",
+        "native/document-web-extension-linux.cpp",
+        "frontend/src/document/extract.ts",
+        "frontend/tests/document.browser.spec.ts"
+      ],
+      "evidencePaths": [
+        "docs/completion/portable-documents.md",
+        "docs/completion/windows-document-helper.md",
+        "evidence/completion/portable-documents/manifest.json",
+        "evidence/completion/windows-document-helper/manifest.json"
+      ],
+      "remainingGates": "Windows/Ubuntu C++ compilation, WebView launch, real output/worker behavior, offline interception, live process/profile cleanup, install and target performance were not executed on this Mac. Chromium fixtures and Go cross-compilation are narrower source/interface evidence.",
+      "coverageStatus": "scoped_source_and_evidence",
+      "releaseQualified": false
+    }
+  },
+  "requirements": [
+    {
+      "requirementId": "FR-001",
+      "release": "P0",
+      "coverageStatus": "mapped_scoped_coverage",
+      "packageIds": [
+        "kernel",
+        "navigation"
+      ],
+      "backlogIds": [
+        "CORE-010",
+        "FIX-004",
+        "FIX-005",
+        "REL-001",
+        "REL-002",
+        "REL-008"
+      ],
+      "remainingGatesFromPackages": [
+        "kernel",
+        "navigation"
+      ],
+      "releaseQualified": false
+    },
+    {
+      "requirementId": "FR-002",
+      "release": "P0",
+      "coverageStatus": "mapped_scoped_coverage",
+      "packageIds": [
+        "editor",
+        "table",
+        "rich-style",
+        "presentation"
+      ],
+      "backlogIds": [
+        "CORE-001",
+        "CORE-002",
+        "CORE-003",
+        "FIX-003",
+        "FIX-006",
+        "GOV-005",
+        "REL-002"
+      ],
+      "remainingGatesFromPackages": [
+        "editor",
+        "table",
+        "rich-style",
+        "presentation"
+      ],
+      "releaseQualified": false
+    },
+    {
+      "requirementId": "FR-003",
+      "release": "P0",
+      "coverageStatus": "mapped_scoped_coverage",
+      "packageIds": [
+        "editor",
+        "table",
+        "rich-style",
+        "presentation"
+      ],
+      "backlogIds": [
+        "CORE-001",
+        "CORE-002",
+        "CORE-003",
+        "FIX-003",
+        "FIX-006",
+        "GOV-005",
+        "REL-002"
+      ],
+      "remainingGatesFromPackages": [
+        "editor",
+        "table",
+        "rich-style",
+        "presentation"
+      ],
+      "releaseQualified": false
+    },
+    {
+      "requirementId": "FR-004",
+      "release": "P0",
+      "coverageStatus": "mapped_scoped_coverage",
+      "packageIds": [
+        "assets"
+      ],
+      "backlogIds": [
+        "FIX-001",
+        "REL-008",
+        "REL-009"
+      ],
+      "remainingGatesFromPackages": [
+        "assets"
+      ],
+      "releaseQualified": false
+    },
+    {
+      "requirementId": "FR-005",
+      "release": "P0",
+      "coverageStatus": "mapped_scoped_coverage",
+      "packageIds": [
+        "navigation"
+      ],
+      "backlogIds": [
+        "FIX-004",
+        "FIX-005",
+        "REL-002"
+      ],
+      "remainingGatesFromPackages": [
+        "navigation"
+      ],
+      "releaseQualified": false
+    },
+    {
+      "requirementId": "FR-006",
+      "release": "P0",
+      "coverageStatus": "mapped_scoped_coverage",
+      "packageIds": [
+        "retrieval"
+      ],
+      "backlogIds": [
+        "AI-002",
+        "CORE-004",
+        "CORE-009"
+      ],
+      "remainingGatesFromPackages": [
+        "retrieval"
+      ],
+      "releaseQualified": false
+    },
+    {
+      "requirementId": "FR-007",
+      "release": "P0",
+      "coverageStatus": "mapped_scoped_coverage",
+      "packageIds": [
+        "retrieval",
+        "ai-modes"
+      ],
+      "backlogIds": [
+        "AI-001",
+        "AI-002",
+        "CORE-004",
+        "CORE-009"
+      ],
+      "remainingGatesFromPackages": [
+        "retrieval",
+        "ai-modes"
+      ],
+      "releaseQualified": false
+    },
+    {
+      "requirementId": "FR-008",
+      "release": "P0",
+      "coverageStatus": "mapped_scoped_coverage",
+      "packageIds": [
+        "retrieval",
+        "ai-modes"
+      ],
+      "backlogIds": [
+        "AI-001",
+        "AI-002",
+        "CORE-004",
+        "CORE-009"
+      ],
+      "remainingGatesFromPackages": [
+        "retrieval",
+        "ai-modes"
+      ],
+      "releaseQualified": false
+    },
+    {
+      "requirementId": "FR-009",
+      "release": "P0",
+      "coverageStatus": "mapped_scoped_coverage",
+      "packageIds": [
+        "meetings"
+      ],
+      "backlogIds": [
+        "AI-002",
+        "CORE-005",
+        "REL-003",
+        "REL-004"
+      ],
+      "remainingGatesFromPackages": [
+        "meetings"
+      ],
+      "releaseQualified": false
+    },
+    {
+      "requirementId": "FR-010",
+      "release": "P0",
+      "coverageStatus": "mapped_scoped_coverage",
+      "packageIds": [
+        "meetings"
+      ],
+      "backlogIds": [
+        "AI-002",
+        "CORE-005",
+        "REL-003",
+        "REL-004"
+      ],
+      "remainingGatesFromPackages": [
+        "meetings"
+      ],
+      "releaseQualified": false
+    },
+    {
+      "requirementId": "FR-011",
+      "release": "P0",
+      "coverageStatus": "mapped_scoped_coverage",
+      "packageIds": [
+        "tasks"
+      ],
+      "backlogIds": [
+        "AI-001",
+        "REL-001"
+      ],
+      "remainingGatesFromPackages": [
+        "tasks"
+      ],
+      "releaseQualified": false
+    },
+    {
+      "requirementId": "FR-012",
+      "release": "P0",
+      "coverageStatus": "mapped_scoped_coverage",
+      "packageIds": [
+        "database"
+      ],
+      "backlogIds": [
+        "CORE-007",
+        "CORE-008",
+        "FIX-004"
+      ],
+      "remainingGatesFromPackages": [
+        "database"
+      ],
+      "releaseQualified": false
+    },
+    {
+      "requirementId": "FR-013",
+      "release": "P0",
+      "coverageStatus": "mapped_scoped_coverage",
+      "packageIds": [
+        "exports",
+        "recovery"
+      ],
+      "backlogIds": [
+        "CORE-006",
+        "CORE-010",
+        "FIX-001",
+        "FIX-002",
+        "PARITY-008",
+        "REL-006"
+      ],
+      "remainingGatesFromPackages": [
+        "exports",
+        "recovery"
+      ],
+      "releaseQualified": false
+    },
+    {
+      "requirementId": "FR-014",
+      "release": "P1",
+      "coverageStatus": "mapped_scoped_coverage",
+      "packageIds": [
+        "mcp",
+        "policy"
+      ],
+      "backlogIds": [
+        "AI-001",
+        "EXT-003",
+        "EXT-004",
+        "REL-008"
+      ],
+      "remainingGatesFromPackages": [
+        "mcp",
+        "policy"
+      ],
+      "releaseQualified": false
+    },
+    {
+      "requirementId": "FR-015",
+      "release": "P0",
+      "coverageStatus": "mapped_scoped_coverage",
+      "packageIds": [
+        "recovery"
+      ],
+      "backlogIds": [
+        "CORE-006",
+        "CORE-010",
+        "FIX-002",
+        "REL-006"
+      ],
+      "remainingGatesFromPackages": [
+        "recovery"
+      ],
+      "releaseQualified": false
+    },
+    {
+      "requirementId": "FR-016",
+      "release": "P0",
+      "coverageStatus": "mapped_scoped_coverage",
+      "packageIds": [
+        "memory"
+      ],
+      "backlogIds": [
+        "AI-002",
+        "AI-003"
+      ],
+      "remainingGatesFromPackages": [
+        "memory"
+      ],
+      "releaseQualified": false
+    },
+    {
+      "requirementId": "FR-017",
+      "release": "P0",
+      "coverageStatus": "mapped_scoped_coverage",
+      "packageIds": [
+        "runtime",
+        "distribution"
+      ],
+      "backlogIds": [
+        "GOV-005",
+        "REL-005",
+        "REL-006",
+        "REL-009"
+      ],
+      "remainingGatesFromPackages": [
+        "runtime",
+        "distribution"
+      ],
+      "releaseQualified": false
+    },
+    {
+      "requirementId": "FR-018",
+      "release": "P1",
+      "coverageStatus": "mapped_scoped_coverage",
+      "packageIds": [
+        "providers"
+      ],
+      "backlogIds": [
+        "EXT-001",
+        "EXT-002",
+        "EXT-005"
+      ],
+      "remainingGatesFromPackages": [
+        "providers"
+      ],
+      "releaseQualified": false
+    },
+    {
+      "requirementId": "FR-019",
+      "release": "P1",
+      "coverageStatus": "mapped_scoped_coverage",
+      "packageIds": [
+        "notion-api"
+      ],
+      "backlogIds": [
+        "PARITY-006"
+      ],
+      "remainingGatesFromPackages": [
+        "notion-api"
+      ],
+      "releaseQualified": false
+    },
+    {
+      "requirementId": "FR-020",
+      "release": "P1",
+      "coverageStatus": "mapped_scoped_coverage",
+      "packageIds": [
+        "automation"
+      ],
+      "backlogIds": [
+        "PARITY-010"
+      ],
+      "remainingGatesFromPackages": [
+        "automation"
+      ],
+      "releaseQualified": false
+    },
+    {
+      "requirementId": "FR-021",
+      "release": "P0",
+      "coverageStatus": "mapped_scoped_coverage",
+      "packageIds": [
+        "governance",
+        "release"
+      ],
+      "backlogIds": [
+        "GOV-001",
+        "GOV-002",
+        "GOV-003",
+        "GOV-004",
+        "GOV-005",
+        "REL-001",
+        "REL-002",
+        "REL-003",
+        "REL-004",
+        "REL-005",
+        "REL-006",
+        "REL-007",
+        "REL-008",
+        "REL-009"
+      ],
+      "remainingGatesFromPackages": [
+        "governance",
+        "release"
+      ],
+      "releaseQualified": false
+    },
+    {
+      "requirementId": "V01",
+      "release": "P0",
+      "coverageStatus": "mapped_scoped_coverage",
+      "packageIds": [
+        "kernel",
+        "database"
+      ],
+      "backlogIds": [
+        "CORE-007",
+        "CORE-008",
+        "CORE-010",
+        "FIX-004",
+        "REL-001",
+        "REL-008"
+      ],
+      "remainingGatesFromPackages": [
+        "kernel",
+        "database"
+      ],
+      "releaseQualified": false
+    },
+    {
+      "requirementId": "V02",
+      "release": "P0",
+      "coverageStatus": "mapped_scoped_coverage",
+      "packageIds": [
+        "imports",
+        "notion-api"
+      ],
+      "backlogIds": [
+        "FIX-001",
+        "PARITY-006",
+        "PARITY-007",
+        "REL-004"
+      ],
+      "remainingGatesFromPackages": [
+        "imports",
+        "notion-api"
+      ],
+      "releaseQualified": false
+    },
+    {
+      "requirementId": "V03",
+      "release": "P0",
+      "coverageStatus": "mapped_scoped_coverage",
+      "packageIds": [
+        "imports",
+        "database"
+      ],
+      "backlogIds": [
+        "CORE-007",
+        "CORE-008",
+        "FIX-001",
+        "FIX-004",
+        "PARITY-007",
+        "REL-004"
+      ],
+      "remainingGatesFromPackages": [
+        "imports",
+        "database"
+      ],
+      "releaseQualified": false
+    },
+    {
+      "requirementId": "V04",
+      "release": "P0",
+      "coverageStatus": "mapped_scoped_coverage",
+      "packageIds": [
+        "editor",
+        "layout"
+      ],
+      "backlogIds": [
+        "FIX-003",
+        "FIX-006",
+        "PARITY-001",
+        "PARITY-007",
+        "REL-002"
+      ],
+      "remainingGatesFromPackages": [
+        "editor",
+        "layout"
+      ],
+      "releaseQualified": false
+    },
+    {
+      "requirementId": "V05",
+      "release": "P1",
+      "coverageStatus": "mapped_scoped_coverage",
+      "packageIds": [
+        "formula"
+      ],
+      "backlogIds": [
+        "PARITY-005"
+      ],
+      "remainingGatesFromPackages": [
+        "formula"
+      ],
+      "releaseQualified": false
+    },
+    {
+      "requirementId": "V06",
+      "release": "P0",
+      "coverageStatus": "mapped_scoped_coverage",
+      "packageIds": [
+        "recovery"
+      ],
+      "backlogIds": [
+        "CORE-006",
+        "CORE-010",
+        "FIX-002",
+        "REL-006"
+      ],
+      "remainingGatesFromPackages": [
+        "recovery"
+      ],
+      "releaseQualified": false
+    },
+    {
+      "requirementId": "V07",
+      "release": "P1",
+      "coverageStatus": "mapped_scoped_coverage",
+      "packageIds": [
+        "automation"
+      ],
+      "backlogIds": [
+        "PARITY-010"
+      ],
+      "remainingGatesFromPackages": [
+        "automation"
+      ],
+      "releaseQualified": false
+    },
+    {
+      "requirementId": "V08",
+      "release": "P0",
+      "coverageStatus": "mapped_scoped_coverage",
+      "packageIds": [
+        "release",
+        "runtime"
+      ],
+      "backlogIds": [
+        "GOV-005",
+        "REL-001",
+        "REL-002",
+        "REL-003",
+        "REL-004",
+        "REL-005",
+        "REL-006",
+        "REL-007",
+        "REL-008",
+        "REL-009"
+      ],
+      "remainingGatesFromPackages": [
+        "release",
+        "runtime"
+      ],
+      "releaseQualified": false
+    },
+    {
+      "requirementId": "V09",
+      "release": "P0",
+      "coverageStatus": "mapped_scoped_coverage",
+      "packageIds": [
+        "retrieval",
+        "memory"
+      ],
+      "backlogIds": [
+        "AI-002",
+        "AI-003",
+        "CORE-004",
+        "CORE-009"
+      ],
+      "remainingGatesFromPackages": [
+        "retrieval",
+        "memory"
+      ],
+      "releaseQualified": false
+    },
+    {
+      "requirementId": "V10",
+      "release": "P0",
+      "coverageStatus": "mapped_scoped_coverage",
+      "packageIds": [
+        "policy",
+        "providers"
+      ],
+      "backlogIds": [
+        "AI-001",
+        "EXT-001",
+        "EXT-002",
+        "EXT-003",
+        "EXT-005",
+        "REL-008"
+      ],
+      "remainingGatesFromPackages": [
+        "policy",
+        "providers"
+      ],
+      "releaseQualified": false
+    },
+    {
+      "requirementId": "R01",
+      "release": "P0",
+      "coverageStatus": "mapped_scoped_coverage",
+      "packageIds": [
+        "imports",
+        "notion-api"
+      ],
+      "backlogIds": [
+        "FIX-001",
+        "PARITY-006",
+        "PARITY-007",
+        "REL-004"
+      ],
+      "remainingGatesFromPackages": [
+        "imports",
+        "notion-api"
+      ],
+      "releaseQualified": false
+    },
+    {
+      "requirementId": "R02",
+      "release": "P0",
+      "coverageStatus": "mapped_scoped_coverage",
+      "packageIds": [
+        "kernel",
+        "database"
+      ],
+      "backlogIds": [
+        "CORE-007",
+        "CORE-008",
+        "CORE-010",
+        "FIX-004",
+        "REL-001",
+        "REL-008"
+      ],
+      "remainingGatesFromPackages": [
+        "kernel",
+        "database"
+      ],
+      "releaseQualified": false
+    },
+    {
+      "requirementId": "R03",
+      "release": "P0",
+      "coverageStatus": "mapped_scoped_coverage",
+      "packageIds": [
+        "imports",
+        "database"
+      ],
+      "backlogIds": [
+        "CORE-007",
+        "CORE-008",
+        "FIX-001",
+        "FIX-004",
+        "PARITY-007",
+        "REL-004"
+      ],
+      "remainingGatesFromPackages": [
+        "imports",
+        "database"
+      ],
+      "releaseQualified": false
+    },
+    {
+      "requirementId": "R04",
+      "release": "P0",
+      "coverageStatus": "mapped_scoped_coverage",
+      "packageIds": [
+        "editor",
+        "layout"
+      ],
+      "backlogIds": [
+        "FIX-003",
+        "FIX-006",
+        "PARITY-001",
+        "PARITY-007",
+        "REL-002"
+      ],
+      "remainingGatesFromPackages": [
+        "editor",
+        "layout"
+      ],
+      "releaseQualified": false
+    },
+    {
+      "requirementId": "R05",
+      "release": "P1",
+      "coverageStatus": "mapped_scoped_coverage",
+      "packageIds": [
+        "formula"
+      ],
+      "backlogIds": [
+        "PARITY-005"
+      ],
+      "remainingGatesFromPackages": [
+        "formula"
+      ],
+      "releaseQualified": false
+    },
+    {
+      "requirementId": "R06",
+      "release": "P0",
+      "coverageStatus": "mapped_scoped_coverage",
+      "packageIds": [
+        "recovery"
+      ],
+      "backlogIds": [
+        "CORE-006",
+        "CORE-010",
+        "FIX-002",
+        "REL-006"
+      ],
+      "remainingGatesFromPackages": [
+        "recovery"
+      ],
+      "releaseQualified": false
+    },
+    {
+      "requirementId": "R07",
+      "release": "P1",
+      "coverageStatus": "mapped_scoped_coverage",
+      "packageIds": [
+        "automation"
+      ],
+      "backlogIds": [
+        "PARITY-010"
+      ],
+      "remainingGatesFromPackages": [
+        "automation"
+      ],
+      "releaseQualified": false
+    },
+    {
+      "requirementId": "R08",
+      "release": "P0",
+      "coverageStatus": "mapped_scoped_coverage",
+      "packageIds": [
+        "governance",
+        "release"
+      ],
+      "backlogIds": [
+        "GOV-001",
+        "GOV-002",
+        "GOV-003",
+        "GOV-004",
+        "GOV-005",
+        "REL-001",
+        "REL-002",
+        "REL-003",
+        "REL-004",
+        "REL-005",
+        "REL-006",
+        "REL-007",
+        "REL-008",
+        "REL-009"
+      ],
+      "remainingGatesFromPackages": [
+        "governance",
+        "release"
+      ],
+      "releaseQualified": false
+    },
+    {
+      "requirementId": "PRD-EDITOR-001",
+      "release": "P0",
+      "coverageStatus": "mapped_scoped_coverage",
+      "packageIds": [
+        "editor",
+        "rich-style"
+      ],
+      "backlogIds": [
+        "CORE-002",
+        "FIX-003",
+        "FIX-006",
+        "REL-002"
+      ],
+      "remainingGatesFromPackages": [
+        "editor",
+        "rich-style"
+      ],
+      "releaseQualified": false
+    },
+    {
+      "requirementId": "PRD-EDITOR-002",
+      "release": "P0",
+      "coverageStatus": "mapped_scoped_coverage",
+      "packageIds": [
+        "editor"
+      ],
+      "backlogIds": [
+        "FIX-003",
+        "FIX-006",
+        "REL-002"
+      ],
+      "remainingGatesFromPackages": [
+        "editor"
+      ],
+      "releaseQualified": false
+    },
+    {
+      "requirementId": "PRD-EDITOR-003",
+      "release": "P0",
+      "coverageStatus": "mapped_scoped_coverage",
+      "packageIds": [
+        "editor"
+      ],
+      "backlogIds": [
+        "FIX-003",
+        "FIX-006",
+        "REL-002"
+      ],
+      "remainingGatesFromPackages": [
+        "editor"
+      ],
+      "releaseQualified": false
+    },
+    {
+      "requirementId": "PRD-EDITOR-004",
+      "release": "P0",
+      "coverageStatus": "mapped_scoped_coverage",
+      "packageIds": [
+        "editor"
+      ],
+      "backlogIds": [
+        "FIX-003",
+        "FIX-006",
+        "REL-002"
+      ],
+      "remainingGatesFromPackages": [
+        "editor"
+      ],
+      "releaseQualified": false
+    },
+    {
+      "requirementId": "PRD-EDITOR-005",
+      "release": "P0",
+      "coverageStatus": "mapped_scoped_coverage",
+      "packageIds": [
+        "editor"
+      ],
+      "backlogIds": [
+        "FIX-003",
+        "FIX-006",
+        "REL-002"
+      ],
+      "remainingGatesFromPackages": [
+        "editor"
+      ],
+      "releaseQualified": false
+    },
+    {
+      "requirementId": "PRD-EDITOR-006",
+      "release": "P0",
+      "coverageStatus": "mapped_scoped_coverage",
+      "packageIds": [
+        "editor"
+      ],
+      "backlogIds": [
+        "FIX-003",
+        "FIX-006",
+        "REL-002"
+      ],
+      "remainingGatesFromPackages": [
+        "editor"
+      ],
+      "releaseQualified": false
+    },
+    {
+      "requirementId": "PRD-EDITOR-007",
+      "release": "P0",
+      "coverageStatus": "mapped_scoped_coverage",
+      "packageIds": [
+        "presentation"
+      ],
+      "backlogIds": [
+        "CORE-003",
+        "GOV-005"
+      ],
+      "remainingGatesFromPackages": [
+        "presentation"
+      ],
+      "releaseQualified": false
+    },
+    {
+      "requirementId": "PRD-EDITOR-008",
+      "release": "P0",
+      "coverageStatus": "mapped_scoped_coverage",
+      "packageIds": [
+        "presentation"
+      ],
+      "backlogIds": [
+        "CORE-003",
+        "GOV-005"
+      ],
+      "remainingGatesFromPackages": [
+        "presentation"
+      ],
+      "releaseQualified": false
+    },
+    {
+      "requirementId": "PRD-EDITOR-009",
+      "release": "P0",
+      "coverageStatus": "mapped_scoped_coverage",
+      "packageIds": [
+        "presentation"
+      ],
+      "backlogIds": [
+        "CORE-003",
+        "GOV-005"
+      ],
+      "remainingGatesFromPackages": [
+        "presentation"
+      ],
+      "releaseQualified": false
+    },
+    {
+      "requirementId": "PRD-EDITOR-010",
+      "release": "P0",
+      "coverageStatus": "mapped_scoped_coverage",
+      "packageIds": [
+        "table"
+      ],
+      "backlogIds": [
+        "CORE-001",
+        "FIX-003"
+      ],
+      "remainingGatesFromPackages": [
+        "table"
+      ],
+      "releaseQualified": false
+    },
+    {
+      "requirementId": "PRD-EDITOR-011",
+      "release": "P0",
+      "coverageStatus": "mapped_scoped_coverage",
+      "packageIds": [
+        "presentation"
+      ],
+      "backlogIds": [
+        "CORE-003",
+        "GOV-005"
+      ],
+      "remainingGatesFromPackages": [
+        "presentation"
+      ],
+      "releaseQualified": false
+    },
+    {
+      "requirementId": "PRD-EDITOR-012",
+      "release": "P0",
+      "coverageStatus": "mapped_scoped_coverage",
+      "packageIds": [
+        "presentation"
+      ],
+      "backlogIds": [
+        "CORE-003",
+        "GOV-005"
+      ],
+      "remainingGatesFromPackages": [
+        "presentation"
+      ],
+      "releaseQualified": false
+    },
+    {
+      "requirementId": "PRD-EDITOR-013",
+      "release": "P0",
+      "coverageStatus": "mapped_scoped_coverage",
+      "packageIds": [
+        "presentation",
+        "documents"
+      ],
+      "backlogIds": [
+        "CORE-003",
+        "GOV-005",
+        "PARITY-008",
+        "REL-002",
+        "REL-009"
+      ],
+      "remainingGatesFromPackages": [
+        "presentation",
+        "documents"
+      ],
+      "releaseQualified": false
+    },
+    {
+      "requirementId": "PRD-EDITOR-014",
+      "release": "P1",
+      "coverageStatus": "mapped_scoped_coverage",
+      "packageIds": [
+        "online-content"
+      ],
+      "backlogIds": [
+        "PARITY-002"
+      ],
+      "remainingGatesFromPackages": [
+        "online-content"
+      ],
+      "releaseQualified": false
+    },
+    {
+      "requirementId": "PRD-EDITOR-015",
+      "release": "P1",
+      "coverageStatus": "mapped_scoped_coverage",
+      "packageIds": [
+        "online-content"
+      ],
+      "backlogIds": [
+        "PARITY-002"
+      ],
+      "remainingGatesFromPackages": [
+        "online-content"
+      ],
+      "releaseQualified": false
+    },
+    {
+      "requirementId": "PRD-EDITOR-016",
+      "release": "P1",
+      "coverageStatus": "mapped_scoped_coverage",
+      "packageIds": [
+        "layout"
+      ],
+      "backlogIds": [
+        "FIX-006",
+        "PARITY-001",
+        "PARITY-007"
+      ],
+      "remainingGatesFromPackages": [
+        "layout"
+      ],
+      "releaseQualified": false
+    },
+    {
+      "requirementId": "PRD-EDITOR-017",
+      "release": "P1",
+      "coverageStatus": "mapped_scoped_coverage",
+      "packageIds": [
+        "layout"
+      ],
+      "backlogIds": [
+        "FIX-006",
+        "PARITY-001",
+        "PARITY-007"
+      ],
+      "remainingGatesFromPackages": [
+        "layout"
+      ],
+      "releaseQualified": false
+    },
+    {
+      "requirementId": "PRD-EDITOR-018",
+      "release": "P1",
+      "coverageStatus": "mapped_scoped_coverage",
+      "packageIds": [
+        "editor"
+      ],
+      "backlogIds": [
+        "FIX-003",
+        "FIX-006",
+        "REL-002"
+      ],
+      "remainingGatesFromPackages": [
+        "editor"
+      ],
+      "releaseQualified": false
+    },
+    {
+      "requirementId": "PRD-EDITOR-019",
+      "release": "P1",
+      "coverageStatus": "mapped_scoped_coverage",
+      "packageIds": [
+        "editor"
+      ],
+      "backlogIds": [
+        "FIX-003",
+        "FIX-006",
+        "REL-002"
+      ],
+      "remainingGatesFromPackages": [
+        "editor"
+      ],
+      "releaseQualified": false
+    },
+    {
+      "requirementId": "PRD-EDITOR-020",
+      "release": "P1",
+      "coverageStatus": "mapped_scoped_coverage",
+      "packageIds": [
+        "editor"
+      ],
+      "backlogIds": [
+        "FIX-003",
+        "FIX-006",
+        "REL-002"
+      ],
+      "remainingGatesFromPackages": [
+        "editor"
+      ],
+      "releaseQualified": false
+    },
+    {
+      "requirementId": "PRD-EDITOR-021",
+      "release": "P1",
+      "coverageStatus": "mapped_scoped_coverage",
+      "packageIds": [
+        "navigation"
+      ],
+      "backlogIds": [
+        "FIX-004",
+        "FIX-005",
+        "REL-002"
+      ],
+      "remainingGatesFromPackages": [
+        "navigation"
+      ],
+      "releaseQualified": false
+    },
+    {
+      "requirementId": "PRD-EDITOR-022",
+      "release": "P1",
+      "coverageStatus": "mapped_scoped_coverage",
+      "packageIds": [
+        "editor"
+      ],
+      "backlogIds": [
+        "FIX-003",
+        "FIX-006",
+        "REL-002"
+      ],
+      "remainingGatesFromPackages": [
+        "editor"
+      ],
+      "releaseQualified": false
+    },
+    {
+      "requirementId": "PRD-EDITOR-023",
+      "release": "P0",
+      "coverageStatus": "mapped_scoped_coverage",
+      "packageIds": [
+        "navigation",
+        "assets"
+      ],
+      "backlogIds": [
+        "FIX-001",
+        "FIX-004",
+        "FIX-005",
+        "REL-002",
+        "REL-008",
+        "REL-009"
+      ],
+      "remainingGatesFromPackages": [
+        "navigation",
+        "assets"
+      ],
+      "releaseQualified": false
+    },
+    {
+      "requirementId": "PRD-EDITOR-024",
+      "release": "P2",
+      "coverageStatus": "mapped_scoped_coverage",
+      "packageIds": [
+        "p2"
+      ],
+      "backlogIds": [
+        "OPT-003"
+      ],
+      "remainingGatesFromPackages": [
+        "p2"
+      ],
+      "releaseQualified": false
+    },
+    {
+      "requirementId": "PRD-EDITOR-025",
+      "release": "P1",
+      "coverageStatus": "mapped_scoped_coverage",
+      "packageIds": [
+        "layout"
+      ],
+      "backlogIds": [
+        "FIX-006",
+        "PARITY-001",
+        "PARITY-007"
+      ],
+      "remainingGatesFromPackages": [
+        "layout"
+      ],
+      "releaseQualified": false
+    },
+    {
+      "requirementId": "PRD-EDIT-001",
+      "release": "P0",
+      "coverageStatus": "mapped_scoped_coverage",
+      "packageIds": [
+        "editor"
+      ],
+      "backlogIds": [
+        "FIX-003",
+        "FIX-006",
+        "REL-002"
+      ],
+      "remainingGatesFromPackages": [
+        "editor"
+      ],
+      "releaseQualified": false
+    },
+    {
+      "requirementId": "PRD-EDIT-002",
+      "release": "P0",
+      "coverageStatus": "mapped_scoped_coverage",
+      "packageIds": [
+        "editor"
+      ],
+      "backlogIds": [
+        "FIX-003",
+        "FIX-006",
+        "REL-002"
+      ],
+      "remainingGatesFromPackages": [
+        "editor"
+      ],
+      "releaseQualified": false
+    },
+    {
+      "requirementId": "PRD-EDIT-003",
+      "release": "P0",
+      "coverageStatus": "mapped_scoped_coverage",
+      "packageIds": [
+        "editor"
+      ],
+      "backlogIds": [
+        "FIX-003",
+        "FIX-006",
+        "REL-002"
+      ],
+      "remainingGatesFromPackages": [
+        "editor"
+      ],
+      "releaseQualified": false
+    },
+    {
+      "requirementId": "PRD-EDIT-004",
+      "release": "P0",
+      "coverageStatus": "mapped_scoped_coverage",
+      "packageIds": [
+        "editor"
+      ],
+      "backlogIds": [
+        "FIX-003",
+        "FIX-006",
+        "REL-002"
+      ],
+      "remainingGatesFromPackages": [
+        "editor"
+      ],
+      "releaseQualified": false
+    },
+    {
+      "requirementId": "PRD-EDIT-005",
+      "release": "P0",
+      "coverageStatus": "mapped_scoped_coverage",
+      "packageIds": [
+        "editor"
+      ],
+      "backlogIds": [
+        "FIX-003",
+        "FIX-006",
+        "REL-002"
+      ],
+      "remainingGatesFromPackages": [
+        "editor"
+      ],
+      "releaseQualified": false
+    },
+    {
+      "requirementId": "PRD-EDIT-006",
+      "release": "P0",
+      "coverageStatus": "mapped_scoped_coverage",
+      "packageIds": [
+        "editor"
+      ],
+      "backlogIds": [
+        "FIX-003",
+        "FIX-006",
+        "REL-002"
+      ],
+      "remainingGatesFromPackages": [
+        "editor"
+      ],
+      "releaseQualified": false
+    },
+    {
+      "requirementId": "PRD-EDIT-007",
+      "release": "P0",
+      "coverageStatus": "mapped_scoped_coverage",
+      "packageIds": [
+        "editor"
+      ],
+      "backlogIds": [
+        "FIX-003",
+        "FIX-006",
+        "REL-002"
+      ],
+      "remainingGatesFromPackages": [
+        "editor"
+      ],
+      "releaseQualified": false
+    },
+    {
+      "requirementId": "PRD-EDIT-008",
+      "release": "P1",
+      "coverageStatus": "mapped_scoped_coverage",
+      "packageIds": [
+        "editor"
+      ],
+      "backlogIds": [
+        "FIX-003",
+        "FIX-006",
+        "REL-002"
+      ],
+      "remainingGatesFromPackages": [
+        "editor"
+      ],
+      "releaseQualified": false
+    },
+    {
+      "requirementId": "PRD-EDIT-009",
+      "release": "P1",
+      "coverageStatus": "mapped_scoped_coverage",
+      "packageIds": [
+        "editor"
+      ],
+      "backlogIds": [
+        "FIX-003",
+        "FIX-006",
+        "REL-002"
+      ],
+      "remainingGatesFromPackages": [
+        "editor"
+      ],
+      "releaseQualified": false
+    },
+    {
+      "requirementId": "PRD-EDIT-010",
+      "release": "P1",
+      "coverageStatus": "mapped_scoped_coverage",
+      "packageIds": [
+        "editor"
+      ],
+      "backlogIds": [
+        "FIX-003",
+        "FIX-006",
+        "REL-002"
+      ],
+      "remainingGatesFromPackages": [
+        "editor"
+      ],
+      "releaseQualified": false
+    },
+    {
+      "requirementId": "PRD-EDIT-011",
+      "release": "P1",
+      "coverageStatus": "mapped_scoped_coverage",
+      "packageIds": [
+        "templates"
+      ],
+      "backlogIds": [
+        "PARITY-004"
+      ],
+      "remainingGatesFromPackages": [
+        "templates"
+      ],
+      "releaseQualified": false
+    },
+    {
+      "requirementId": "PRD-DATABASE-001",
+      "release": "P0",
+      "coverageStatus": "mapped_scoped_coverage",
+      "packageIds": [
+        "database"
+      ],
+      "backlogIds": [
+        "CORE-007",
+        "CORE-008",
+        "FIX-004"
+      ],
+      "remainingGatesFromPackages": [
+        "database"
+      ],
+      "releaseQualified": false
+    },
+    {
+      "requirementId": "PRD-DATABASE-002",
+      "release": "P0",
+      "coverageStatus": "mapped_scoped_coverage",
+      "packageIds": [
+        "database"
+      ],
+      "backlogIds": [
+        "CORE-007",
+        "CORE-008",
+        "FIX-004"
+      ],
+      "remainingGatesFromPackages": [
+        "database"
+      ],
+      "releaseQualified": false
+    },
+    {
+      "requirementId": "PRD-DATABASE-003",
+      "release": "P0",
+      "coverageStatus": "mapped_scoped_coverage",
+      "packageIds": [
+        "database"
+      ],
+      "backlogIds": [
+        "CORE-007",
+        "CORE-008",
+        "FIX-004"
+      ],
+      "remainingGatesFromPackages": [
+        "database"
+      ],
+      "releaseQualified": false
+    },
+    {
+      "requirementId": "PRD-DATABASE-004",
+      "release": "P0",
+      "coverageStatus": "mapped_scoped_coverage",
+      "packageIds": [
+        "database"
+      ],
+      "backlogIds": [
+        "CORE-007",
+        "CORE-008",
+        "FIX-004"
+      ],
+      "remainingGatesFromPackages": [
+        "database"
+      ],
+      "releaseQualified": false
+    },
+    {
+      "requirementId": "PRD-DATABASE-005",
+      "release": "P1",
+      "coverageStatus": "mapped_scoped_coverage",
+      "packageIds": [
+        "database"
+      ],
+      "backlogIds": [
+        "CORE-007",
+        "CORE-008",
+        "FIX-004"
+      ],
+      "remainingGatesFromPackages": [
+        "database"
+      ],
+      "releaseQualified": false
+    },
+    {
+      "requirementId": "PRD-DATABASE-006",
+      "release": "P1",
+      "coverageStatus": "mapped_scoped_coverage",
+      "packageIds": [
+        "timeline"
+      ],
+      "backlogIds": [
+        "PARITY-003"
+      ],
+      "remainingGatesFromPackages": [
+        "timeline"
+      ],
+      "releaseQualified": false
+    },
+    {
+      "requirementId": "PRD-DATABASE-007",
+      "release": "P2",
+      "coverageStatus": "mapped_scoped_coverage",
+      "packageIds": [
+        "p2"
+      ],
+      "backlogIds": [
+        "OPT-003"
+      ],
+      "remainingGatesFromPackages": [
+        "p2"
+      ],
+      "releaseQualified": false
+    },
+    {
+      "requirementId": "PRD-DATABASE-008",
+      "release": "P2",
+      "coverageStatus": "mapped_scoped_coverage",
+      "packageIds": [
+        "p2"
+      ],
+      "backlogIds": [
+        "OPT-003"
+      ],
+      "remainingGatesFromPackages": [
+        "p2"
+      ],
+      "releaseQualified": false
+    },
+    {
+      "requirementId": "PRD-DATABASE-009",
+      "release": "P0",
+      "coverageStatus": "mapped_scoped_coverage",
+      "packageIds": [
+        "database"
+      ],
+      "backlogIds": [
+        "CORE-007",
+        "CORE-008",
+        "FIX-004"
+      ],
+      "remainingGatesFromPackages": [
+        "database"
+      ],
+      "releaseQualified": false
+    },
+    {
+      "requirementId": "PRD-DATABASE-010",
+      "release": "P0",
+      "coverageStatus": "mapped_scoped_coverage",
+      "packageIds": [
+        "database"
+      ],
+      "backlogIds": [
+        "CORE-007",
+        "CORE-008",
+        "FIX-004"
+      ],
+      "remainingGatesFromPackages": [
+        "database"
+      ],
+      "releaseQualified": false
+    },
+    {
+      "requirementId": "PRD-DATABASE-011",
+      "release": "P0",
+      "coverageStatus": "mapped_scoped_coverage",
+      "packageIds": [
+        "database"
+      ],
+      "backlogIds": [
+        "CORE-007",
+        "CORE-008",
+        "FIX-004"
+      ],
+      "remainingGatesFromPackages": [
+        "database"
+      ],
+      "releaseQualified": false
+    },
+    {
+      "requirementId": "PRD-DATABASE-012",
+      "release": "P1",
+      "coverageStatus": "mapped_scoped_coverage",
+      "packageIds": [
+        "templates"
+      ],
+      "backlogIds": [
+        "PARITY-004"
+      ],
+      "remainingGatesFromPackages": [
+        "templates"
+      ],
+      "releaseQualified": false
+    },
+    {
+      "requirementId": "PRD-DATABASE-013",
+      "release": "P1",
+      "coverageStatus": "mapped_scoped_coverage",
+      "packageIds": [
+        "database"
+      ],
+      "backlogIds": [
+        "CORE-007",
+        "CORE-008",
+        "FIX-004"
+      ],
+      "remainingGatesFromPackages": [
+        "database"
+      ],
+      "releaseQualified": false
+    },
+    {
+      "requirementId": "PRD-DATABASE-014",
+      "release": "P1",
+      "coverageStatus": "mapped_scoped_coverage",
+      "packageIds": [
+        "timeline"
+      ],
+      "backlogIds": [
+        "PARITY-003"
+      ],
+      "remainingGatesFromPackages": [
+        "timeline"
+      ],
+      "releaseQualified": false
+    },
+    {
+      "requirementId": "PRD-DATABASE-015",
+      "release": "P1",
+      "coverageStatus": "mapped_scoped_coverage",
+      "packageIds": [
+        "database"
+      ],
+      "backlogIds": [
+        "CORE-007",
+        "CORE-008",
+        "FIX-004"
+      ],
+      "remainingGatesFromPackages": [
+        "database"
+      ],
+      "releaseQualified": false
+    },
+    {
+      "requirementId": "PRD-DATABASE-016",
+      "release": "P1",
+      "coverageStatus": "mapped_scoped_coverage",
+      "packageIds": [
+        "database"
+      ],
+      "backlogIds": [
+        "CORE-007",
+        "CORE-008",
+        "FIX-004"
+      ],
+      "remainingGatesFromPackages": [
+        "database"
+      ],
+      "releaseQualified": false
+    },
+    {
+      "requirementId": "PRD-DATABASE-017",
+      "release": "P1",
+      "coverageStatus": "mapped_scoped_coverage",
+      "packageIds": [
+        "automation"
+      ],
+      "backlogIds": [
+        "PARITY-010"
+      ],
+      "remainingGatesFromPackages": [
+        "automation"
+      ],
+      "releaseQualified": false
+    },
+    {
+      "requirementId": "PRD-PROPERTY-001",
+      "release": "P0",
+      "coverageStatus": "mapped_scoped_coverage",
+      "packageIds": [
+        "database"
+      ],
+      "backlogIds": [
+        "CORE-007",
+        "CORE-008",
+        "FIX-004"
+      ],
+      "remainingGatesFromPackages": [
+        "database"
+      ],
+      "releaseQualified": false
+    },
+    {
+      "requirementId": "PRD-PROPERTY-002",
+      "release": "P0",
+      "coverageStatus": "mapped_scoped_coverage",
+      "packageIds": [
+        "database"
+      ],
+      "backlogIds": [
+        "CORE-007",
+        "CORE-008",
+        "FIX-004"
+      ],
+      "remainingGatesFromPackages": [
+        "database"
+      ],
+      "releaseQualified": false
+    },
+    {
+      "requirementId": "PRD-PROPERTY-003",
+      "release": "P0",
+      "coverageStatus": "mapped_scoped_coverage",
+      "packageIds": [
+        "database"
+      ],
+      "backlogIds": [
+        "CORE-007",
+        "CORE-008",
+        "FIX-004"
+      ],
+      "remainingGatesFromPackages": [
+        "database"
+      ],
+      "releaseQualified": false
+    },
+    {
+      "requirementId": "PRD-PROPERTY-004",
+      "release": "P0",
+      "coverageStatus": "mapped_scoped_coverage",
+      "packageIds": [
+        "database"
+      ],
+      "backlogIds": [
+        "CORE-007",
+        "CORE-008",
+        "FIX-004"
+      ],
+      "remainingGatesFromPackages": [
+        "database"
+      ],
+      "releaseQualified": false
+    },
+    {
+      "requirementId": "PRD-PROPERTY-005",
+      "release": "P0",
+      "coverageStatus": "mapped_scoped_coverage",
+      "packageIds": [
+        "database"
+      ],
+      "backlogIds": [
+        "CORE-007",
+        "CORE-008",
+        "FIX-004"
+      ],
+      "remainingGatesFromPackages": [
+        "database"
+      ],
+      "releaseQualified": false
+    },
+    {
+      "requirementId": "PRD-PROPERTY-006",
+      "release": "P0",
+      "coverageStatus": "mapped_scoped_coverage",
+      "packageIds": [
+        "database"
+      ],
+      "backlogIds": [
+        "CORE-007",
+        "CORE-008",
+        "FIX-004"
+      ],
+      "remainingGatesFromPackages": [
+        "database"
+      ],
+      "releaseQualified": false
+    },
+    {
+      "requirementId": "PRD-PROPERTY-007",
+      "release": "P0",
+      "coverageStatus": "mapped_scoped_coverage",
+      "packageIds": [
+        "database"
+      ],
+      "backlogIds": [
+        "CORE-007",
+        "CORE-008",
+        "FIX-004"
+      ],
+      "remainingGatesFromPackages": [
+        "database"
+      ],
+      "releaseQualified": false
+    },
+    {
+      "requirementId": "PRD-PROPERTY-008",
+      "release": "P0",
+      "coverageStatus": "mapped_scoped_coverage",
+      "packageIds": [
+        "database"
+      ],
+      "backlogIds": [
+        "CORE-007",
+        "CORE-008",
+        "FIX-004"
+      ],
+      "remainingGatesFromPackages": [
+        "database"
+      ],
+      "releaseQualified": false
+    },
+    {
+      "requirementId": "PRD-PROPERTY-009",
+      "release": "P0",
+      "coverageStatus": "mapped_scoped_coverage",
+      "packageIds": [
+        "database"
+      ],
+      "backlogIds": [
+        "CORE-007",
+        "CORE-008",
+        "FIX-004"
+      ],
+      "remainingGatesFromPackages": [
+        "database"
+      ],
+      "releaseQualified": false
+    },
+    {
+      "requirementId": "PRD-PROPERTY-010",
+      "release": "P1",
+      "coverageStatus": "mapped_scoped_coverage",
+      "packageIds": [
+        "database"
+      ],
+      "backlogIds": [
+        "CORE-007",
+        "CORE-008",
+        "FIX-004"
+      ],
+      "remainingGatesFromPackages": [
+        "database"
+      ],
+      "releaseQualified": false
+    },
+    {
+      "requirementId": "PRD-PROPERTY-011",
+      "release": "P1",
+      "coverageStatus": "mapped_scoped_coverage",
+      "packageIds": [
+        "formula"
+      ],
+      "backlogIds": [
+        "PARITY-005"
+      ],
+      "remainingGatesFromPackages": [
+        "formula"
+      ],
+      "releaseQualified": false
+    },
+    {
+      "requirementId": "PRD-PROPERTY-012",
+      "release": "P1",
+      "coverageStatus": "mapped_scoped_coverage",
+      "packageIds": [
+        "formula"
+      ],
+      "backlogIds": [
+        "PARITY-005"
+      ],
+      "remainingGatesFromPackages": [
+        "formula"
+      ],
+      "releaseQualified": false
+    },
+    {
+      "requirementId": "PRD-PROPERTY-013",
+      "release": "P1",
+      "coverageStatus": "mapped_scoped_coverage",
+      "packageIds": [
+        "database"
+      ],
+      "backlogIds": [
+        "CORE-007",
+        "CORE-008",
+        "FIX-004"
+      ],
+      "remainingGatesFromPackages": [
+        "database"
+      ],
+      "releaseQualified": false
+    },
+    {
+      "requirementId": "PRD-PROPERTY-014",
+      "release": "P1",
+      "coverageStatus": "mapped_scoped_coverage",
+      "packageIds": [
+        "database"
+      ],
+      "backlogIds": [
+        "CORE-007",
+        "CORE-008",
+        "FIX-004"
+      ],
+      "remainingGatesFromPackages": [
+        "database"
+      ],
+      "releaseQualified": false
+    },
+    {
+      "requirementId": "PRD-PROPERTY-015",
+      "release": "P1",
+      "coverageStatus": "mapped_scoped_coverage",
+      "packageIds": [
+        "database"
+      ],
+      "backlogIds": [
+        "CORE-007",
+        "CORE-008",
+        "FIX-004"
+      ],
+      "remainingGatesFromPackages": [
+        "database"
+      ],
+      "releaseQualified": false
+    },
+    {
+      "requirementId": "PRD-PROPERTY-016",
+      "release": "P2",
+      "coverageStatus": "mapped_scoped_coverage",
+      "packageIds": [
+        "p2"
+      ],
+      "backlogIds": [
+        "OPT-003"
+      ],
+      "remainingGatesFromPackages": [
+        "p2"
+      ],
+      "releaseQualified": false
+    },
+    {
+      "requirementId": "PRD-PROPERTY-017-P0",
+      "release": "P0",
+      "coverageStatus": "mapped_scoped_coverage",
+      "packageIds": [
+        "database",
+        "imports",
+        "notion-api"
+      ],
+      "backlogIds": [
+        "CORE-007",
+        "CORE-008",
+        "FIX-001",
+        "FIX-004",
+        "PARITY-006",
+        "PARITY-007",
+        "REL-004"
+      ],
+      "remainingGatesFromPackages": [
+        "database",
+        "imports",
+        "notion-api"
+      ],
+      "releaseQualified": false
+    },
+    {
+      "requirementId": "PRD-PROPERTY-017-P1",
+      "release": "P1",
+      "coverageStatus": "mapped_scoped_coverage",
+      "packageIds": [
+        "database",
+        "imports",
+        "notion-api"
+      ],
+      "backlogIds": [
+        "CORE-007",
+        "CORE-008",
+        "FIX-001",
+        "FIX-004",
+        "PARITY-006",
+        "PARITY-007",
+        "REL-004"
+      ],
+      "remainingGatesFromPackages": [
+        "database",
+        "imports",
+        "notion-api"
+      ],
+      "releaseQualified": false
+    },
+    {
+      "requirementId": "PRD-PROPERTY-018-P0",
+      "release": "P0",
+      "coverageStatus": "mapped_scoped_coverage",
+      "packageIds": [
+        "database",
+        "imports",
+        "notion-api"
+      ],
+      "backlogIds": [
+        "CORE-007",
+        "CORE-008",
+        "FIX-001",
+        "FIX-004",
+        "PARITY-006",
+        "PARITY-007",
+        "REL-004"
+      ],
+      "remainingGatesFromPackages": [
+        "database",
+        "imports",
+        "notion-api"
+      ],
+      "releaseQualified": false
+    },
+    {
+      "requirementId": "PRD-PROPERTY-018-P1",
+      "release": "P1",
+      "coverageStatus": "mapped_scoped_coverage",
+      "packageIds": [
+        "database",
+        "imports",
+        "notion-api"
+      ],
+      "backlogIds": [
+        "CORE-007",
+        "CORE-008",
+        "FIX-001",
+        "FIX-004",
+        "PARITY-006",
+        "PARITY-007",
+        "REL-004"
+      ],
+      "remainingGatesFromPackages": [
+        "database",
+        "imports",
+        "notion-api"
+      ],
+      "releaseQualified": false
+    },
+    {
+      "requirementId": "PRD-NAV-001",
+      "release": "P0",
+      "coverageStatus": "mapped_scoped_coverage",
+      "packageIds": [
+        "navigation"
+      ],
+      "backlogIds": [
+        "FIX-004",
+        "FIX-005",
+        "REL-002"
+      ],
+      "remainingGatesFromPackages": [
+        "navigation"
+      ],
+      "releaseQualified": false
+    },
+    {
+      "requirementId": "PRD-NAV-002",
+      "release": "P0",
+      "coverageStatus": "mapped_scoped_coverage",
+      "packageIds": [
+        "navigation"
+      ],
+      "backlogIds": [
+        "FIX-004",
+        "FIX-005",
+        "REL-002"
+      ],
+      "remainingGatesFromPackages": [
+        "navigation"
+      ],
+      "releaseQualified": false
+    },
+    {
+      "requirementId": "PRD-NAV-003",
+      "release": "P0",
+      "coverageStatus": "mapped_scoped_coverage",
+      "packageIds": [
+        "navigation"
+      ],
+      "backlogIds": [
+        "FIX-004",
+        "FIX-005",
+        "REL-002"
+      ],
+      "remainingGatesFromPackages": [
+        "navigation"
+      ],
+      "releaseQualified": false
+    },
+    {
+      "requirementId": "PRD-NAV-004",
+      "release": "P0",
+      "coverageStatus": "mapped_scoped_coverage",
+      "packageIds": [
+        "navigation"
+      ],
+      "backlogIds": [
+        "FIX-004",
+        "FIX-005",
+        "REL-002"
+      ],
+      "remainingGatesFromPackages": [
+        "navigation"
+      ],
+      "releaseQualified": false
+    },
+    {
+      "requirementId": "PRD-NAV-005",
+      "release": "P0",
+      "coverageStatus": "mapped_scoped_coverage",
+      "packageIds": [
+        "navigation"
+      ],
+      "backlogIds": [
+        "FIX-004",
+        "FIX-005",
+        "REL-002"
+      ],
+      "remainingGatesFromPackages": [
+        "navigation"
+      ],
+      "releaseQualified": false
+    },
+    {
+      "requirementId": "PRD-NAV-006",
+      "release": "P0",
+      "coverageStatus": "mapped_scoped_coverage",
+      "packageIds": [
+        "navigation"
+      ],
+      "backlogIds": [
+        "FIX-004",
+        "FIX-005",
+        "REL-002"
+      ],
+      "remainingGatesFromPackages": [
+        "navigation"
+      ],
+      "releaseQualified": false
+    },
+    {
+      "requirementId": "PRD-NAV-007",
+      "release": "P0",
+      "coverageStatus": "mapped_scoped_coverage",
+      "packageIds": [
+        "navigation"
+      ],
+      "backlogIds": [
+        "FIX-004",
+        "FIX-005",
+        "REL-002"
+      ],
+      "remainingGatesFromPackages": [
+        "navigation"
+      ],
+      "releaseQualified": false
+    },
+    {
+      "requirementId": "PRD-NAV-008",
+      "release": "P0",
+      "coverageStatus": "mapped_scoped_coverage",
+      "packageIds": [
+        "navigation"
+      ],
+      "backlogIds": [
+        "FIX-004",
+        "FIX-005",
+        "REL-002"
+      ],
+      "remainingGatesFromPackages": [
+        "navigation"
+      ],
+      "releaseQualified": false
+    },
+    {
+      "requirementId": "PRD-NAV-009",
+      "release": "P1",
+      "coverageStatus": "mapped_scoped_coverage",
+      "packageIds": [
+        "navigation"
+      ],
+      "backlogIds": [
+        "FIX-004",
+        "FIX-005",
+        "REL-002"
+      ],
+      "remainingGatesFromPackages": [
+        "navigation"
+      ],
+      "releaseQualified": false
+    },
+    {
+      "requirementId": "PRD-NAV-010",
+      "release": "P1",
+      "coverageStatus": "mapped_scoped_coverage",
+      "packageIds": [
+        "related"
+      ],
+      "backlogIds": [
+        "AI-003"
+      ],
+      "remainingGatesFromPackages": [
+        "related"
+      ],
+      "releaseQualified": false
+    },
+    {
+      "requirementId": "PRD-NAV-011",
+      "release": "P2",
+      "coverageStatus": "mapped_scoped_coverage",
+      "packageIds": [
+        "p2"
+      ],
+      "backlogIds": [
+        "OPT-003"
+      ],
+      "remainingGatesFromPackages": [
+        "p2"
+      ],
+      "releaseQualified": false
+    },
+    {
+      "requirementId": "PRD-NAV-012",
+      "release": "P0",
+      "coverageStatus": "mapped_scoped_coverage",
+      "packageIds": [
+        "recovery"
+      ],
+      "backlogIds": [
+        "CORE-006",
+        "CORE-010",
+        "FIX-002",
+        "REL-006"
+      ],
+      "remainingGatesFromPackages": [
+        "recovery"
+      ],
+      "releaseQualified": false
+    },
+    {
+      "requirementId": "PRD-NAV-013",
+      "release": "P0",
+      "coverageStatus": "mapped_scoped_coverage",
+      "packageIds": [
+        "recovery"
+      ],
+      "backlogIds": [
+        "CORE-006",
+        "CORE-010",
+        "FIX-002",
+        "REL-006"
+      ],
+      "remainingGatesFromPackages": [
+        "recovery"
+      ],
+      "releaseQualified": false
+    },
+    {
+      "requirementId": "PRD-NAV-014",
+      "release": "P1",
+      "coverageStatus": "mapped_scoped_coverage",
+      "packageIds": [
+        "templates"
+      ],
+      "backlogIds": [
+        "PARITY-004"
+      ],
+      "remainingGatesFromPackages": [
+        "templates"
+      ],
+      "releaseQualified": false
+    },
+    {
+      "requirementId": "PRD-PORTABLE-001",
+      "release": "P0",
+      "coverageStatus": "mapped_scoped_coverage",
+      "packageIds": [
+        "imports",
+        "exports"
+      ],
+      "backlogIds": [
+        "FIX-001",
+        "PARITY-007",
+        "PARITY-008",
+        "REL-004"
+      ],
+      "remainingGatesFromPackages": [
+        "imports",
+        "exports"
+      ],
+      "releaseQualified": false
+    },
+    {
+      "requirementId": "PRD-PORTABLE-002",
+      "release": "P0",
+      "coverageStatus": "mapped_scoped_coverage",
+      "packageIds": [
+        "imports",
+        "exports"
+      ],
+      "backlogIds": [
+        "FIX-001",
+        "PARITY-007",
+        "PARITY-008",
+        "REL-004"
+      ],
+      "remainingGatesFromPackages": [
+        "imports",
+        "exports"
+      ],
+      "releaseQualified": false
+    },
+    {
+      "requirementId": "PRD-PORTABLE-003",
+      "release": "P0",
+      "coverageStatus": "mapped_scoped_coverage",
+      "packageIds": [
+        "imports",
+        "exports"
+      ],
+      "backlogIds": [
+        "FIX-001",
+        "PARITY-007",
+        "PARITY-008",
+        "REL-004"
+      ],
+      "remainingGatesFromPackages": [
+        "imports",
+        "exports"
+      ],
+      "releaseQualified": false
+    },
+    {
+      "requirementId": "PRD-PORTABLE-004",
+      "release": "P0",
+      "coverageStatus": "mapped_scoped_coverage",
+      "packageIds": [
+        "imports",
+        "exports"
+      ],
+      "backlogIds": [
+        "FIX-001",
+        "PARITY-007",
+        "PARITY-008",
+        "REL-004"
+      ],
+      "remainingGatesFromPackages": [
+        "imports",
+        "exports"
+      ],
+      "releaseQualified": false
+    },
+    {
+      "requirementId": "PRD-PORTABLE-005",
+      "release": "P1",
+      "coverageStatus": "mapped_scoped_coverage",
+      "packageIds": [
+        "imports",
+        "exports"
+      ],
+      "backlogIds": [
+        "FIX-001",
+        "PARITY-007",
+        "PARITY-008",
+        "REL-004"
+      ],
+      "remainingGatesFromPackages": [
+        "imports",
+        "exports"
+      ],
+      "releaseQualified": false
+    },
+    {
+      "requirementId": "PRD-PORTABLE-006",
+      "release": "P1",
+      "coverageStatus": "mapped_scoped_coverage",
+      "packageIds": [
+        "exports",
+        "documents"
+      ],
+      "backlogIds": [
+        "CORE-003",
+        "FIX-001",
+        "GOV-005",
+        "PARITY-008",
+        "REL-002",
+        "REL-009"
+      ],
+      "remainingGatesFromPackages": [
+        "exports",
+        "documents"
+      ],
+      "releaseQualified": false
+    },
+    {
+      "requirementId": "PRD-PORTABLE-007",
+      "release": "P1",
+      "coverageStatus": "mapped_scoped_coverage",
+      "packageIds": [
+        "imports",
+        "exports"
+      ],
+      "backlogIds": [
+        "FIX-001",
+        "PARITY-007",
+        "PARITY-008",
+        "REL-004"
+      ],
+      "remainingGatesFromPackages": [
+        "imports",
+        "exports"
+      ],
+      "releaseQualified": false
+    },
+    {
+      "requirementId": "PRD-PORTABLE-008",
+      "release": "P2",
+      "coverageStatus": "mapped_scoped_coverage",
+      "packageIds": [
+        "p2"
+      ],
+      "backlogIds": [
+        "OPT-003"
+      ],
+      "remainingGatesFromPackages": [
+        "p2"
+      ],
+      "releaseQualified": false
+    },
+    {
+      "requirementId": "PRD-PORTABLE-009",
+      "release": "P0",
+      "coverageStatus": "mapped_scoped_coverage",
+      "packageIds": [
+        "recovery"
+      ],
+      "backlogIds": [
+        "CORE-006",
+        "CORE-010",
+        "FIX-002",
+        "REL-006"
+      ],
+      "remainingGatesFromPackages": [
+        "recovery"
+      ],
+      "releaseQualified": false
+    },
+    {
+      "requirementId": "PRD-MEDIA-001",
+      "release": "P0",
+      "coverageStatus": "mapped_scoped_coverage",
+      "packageIds": [
+        "presentation",
+        "documents"
+      ],
+      "backlogIds": [
+        "CORE-003",
+        "GOV-005",
+        "PARITY-008",
+        "REL-002",
+        "REL-009"
+      ],
+      "remainingGatesFromPackages": [
+        "presentation",
+        "documents"
+      ],
+      "releaseQualified": false
+    },
+    {
+      "requirementId": "PRD-MEDIA-002",
+      "release": "P0",
+      "coverageStatus": "mapped_scoped_coverage",
+      "packageIds": [
+        "presentation"
+      ],
+      "backlogIds": [
+        "CORE-003",
+        "GOV-005"
+      ],
+      "remainingGatesFromPackages": [
+        "presentation"
+      ],
+      "releaseQualified": false
+    },
+    {
+      "requirementId": "PRD-MEDIA-003",
+      "release": "P0",
+      "coverageStatus": "mapped_scoped_coverage",
+      "packageIds": [
+        "presentation"
+      ],
+      "backlogIds": [
+        "CORE-003",
+        "GOV-005"
+      ],
+      "remainingGatesFromPackages": [
+        "presentation"
+      ],
+      "releaseQualified": false
+    },
+    {
+      "requirementId": "PRD-MEDIA-004",
+      "release": "P0",
+      "coverageStatus": "mapped_scoped_coverage",
+      "packageIds": [
+        "presentation"
+      ],
+      "backlogIds": [
+        "CORE-003",
+        "GOV-005"
+      ],
+      "remainingGatesFromPackages": [
+        "presentation"
+      ],
+      "releaseQualified": false
+    },
+    {
+      "requirementId": "PRD-MEDIA-005",
+      "release": "P1",
+      "coverageStatus": "mapped_scoped_coverage",
+      "packageIds": [
+        "online-content"
+      ],
+      "backlogIds": [
+        "PARITY-002"
+      ],
+      "remainingGatesFromPackages": [
+        "online-content"
+      ],
+      "releaseQualified": false
+    },
+    {
+      "requirementId": "PRD-MEDIA-006",
+      "release": "P1",
+      "coverageStatus": "mapped_scoped_coverage",
+      "packageIds": [
+        "capture"
+      ],
+      "backlogIds": [
+        "PARITY-009",
+        "REL-003"
+      ],
+      "remainingGatesFromPackages": [
+        "capture"
+      ],
+      "releaseQualified": false
+    },
+    {
+      "requirementId": "PRD-MEDIA-007",
+      "release": "P0",
+      "coverageStatus": "mapped_scoped_coverage",
+      "packageIds": [
+        "capture"
+      ],
+      "backlogIds": [
+        "PARITY-009",
+        "REL-003"
+      ],
+      "remainingGatesFromPackages": [
+        "capture"
+      ],
+      "releaseQualified": false
+    },
+    {
+      "requirementId": "PRD-MEDIA-008",
+      "release": "P1",
+      "coverageStatus": "mapped_scoped_coverage",
+      "packageIds": [
+        "capture"
+      ],
+      "backlogIds": [
+        "PARITY-009",
+        "REL-003"
+      ],
+      "remainingGatesFromPackages": [
+        "capture"
+      ],
+      "releaseQualified": false
+    },
+    {
+      "requirementId": "PRD-MEDIA-009",
+      "release": "P1",
+      "coverageStatus": "mapped_scoped_coverage",
+      "packageIds": [
+        "external-index"
+      ],
+      "backlogIds": [
+        "REL-002",
+        "REL-008"
+      ],
+      "remainingGatesFromPackages": [
+        "external-index"
+      ],
+      "releaseQualified": false
+    },
+    {
+      "requirementId": "PRD-MEDIA-010",
+      "release": "P1",
+      "coverageStatus": "mapped_scoped_coverage",
+      "packageIds": [
+        "external-index"
+      ],
+      "backlogIds": [
+        "REL-002",
+        "REL-008"
+      ],
+      "remainingGatesFromPackages": [
+        "external-index"
+      ],
+      "releaseQualified": false
+    },
+    {
+      "requirementId": "PRD-AI-001",
+      "release": "P0",
+      "coverageStatus": "mapped_scoped_coverage",
+      "packageIds": [
+        "retrieval"
+      ],
+      "backlogIds": [
+        "AI-002",
+        "CORE-004",
+        "CORE-009"
+      ],
+      "remainingGatesFromPackages": [
+        "retrieval"
+      ],
+      "releaseQualified": false
+    },
+    {
+      "requirementId": "PRD-AI-002",
+      "release": "P0",
+      "coverageStatus": "mapped_scoped_coverage",
+      "packageIds": [
+        "retrieval"
+      ],
+      "backlogIds": [
+        "AI-002",
+        "CORE-004",
+        "CORE-009"
+      ],
+      "remainingGatesFromPackages": [
+        "retrieval"
+      ],
+      "releaseQualified": false
+    },
+    {
+      "requirementId": "PRD-AI-003",
+      "release": "P0",
+      "coverageStatus": "mapped_scoped_coverage",
+      "packageIds": [
+        "ai-modes",
+        "policy"
+      ],
+      "backlogIds": [
+        "AI-001",
+        "AI-002",
+        "EXT-003",
+        "REL-008"
+      ],
+      "remainingGatesFromPackages": [
+        "ai-modes",
+        "policy"
+      ],
+      "releaseQualified": false
+    },
+    {
+      "requirementId": "PRD-AI-004",
+      "release": "P0",
+      "coverageStatus": "mapped_scoped_coverage",
+      "packageIds": [
+        "ai-modes",
+        "policy"
+      ],
+      "backlogIds": [
+        "AI-001",
+        "AI-002",
+        "EXT-003",
+        "REL-008"
+      ],
+      "remainingGatesFromPackages": [
+        "ai-modes",
+        "policy"
+      ],
+      "releaseQualified": false
+    },
+    {
+      "requirementId": "PRD-AI-005",
+      "release": "P1",
+      "coverageStatus": "mapped_scoped_coverage",
+      "packageIds": [
+        "ai-modes",
+        "policy"
+      ],
+      "backlogIds": [
+        "AI-001",
+        "AI-002",
+        "EXT-003",
+        "REL-008"
+      ],
+      "remainingGatesFromPackages": [
+        "ai-modes",
+        "policy"
+      ],
+      "releaseQualified": false
+    },
+    {
+      "requirementId": "PRD-AI-006",
+      "release": "P1",
+      "coverageStatus": "mapped_scoped_coverage",
+      "packageIds": [
+        "ai-modes",
+        "policy"
+      ],
+      "backlogIds": [
+        "AI-001",
+        "AI-002",
+        "EXT-003",
+        "REL-008"
+      ],
+      "remainingGatesFromPackages": [
+        "ai-modes",
+        "policy"
+      ],
+      "releaseQualified": false
+    },
+    {
+      "requirementId": "PRD-AI-007",
+      "release": "P1",
+      "coverageStatus": "mapped_scoped_coverage",
+      "packageIds": [
+        "ai-modes",
+        "policy"
+      ],
+      "backlogIds": [
+        "AI-001",
+        "AI-002",
+        "EXT-003",
+        "REL-008"
+      ],
+      "remainingGatesFromPackages": [
+        "ai-modes",
+        "policy"
+      ],
+      "releaseQualified": false
+    },
+    {
+      "requirementId": "PRD-AI-008",
+      "release": "P1",
+      "coverageStatus": "mapped_scoped_coverage",
+      "packageIds": [
+        "ai-modes",
+        "policy"
+      ],
+      "backlogIds": [
+        "AI-001",
+        "AI-002",
+        "EXT-003",
+        "REL-008"
+      ],
+      "remainingGatesFromPackages": [
+        "ai-modes",
+        "policy"
+      ],
+      "releaseQualified": false
+    },
+    {
+      "requirementId": "PRD-AI-009",
+      "release": "P1",
+      "coverageStatus": "mapped_scoped_coverage",
+      "packageIds": [
+        "policy",
+        "ai-modes"
+      ],
+      "backlogIds": [
+        "AI-001",
+        "AI-002",
+        "EXT-003",
+        "REL-008"
+      ],
+      "remainingGatesFromPackages": [
+        "policy",
+        "ai-modes"
+      ],
+      "releaseQualified": false
+    },
+    {
+      "requirementId": "PRD-AI-010",
+      "release": "P0",
+      "coverageStatus": "mapped_scoped_coverage",
+      "packageIds": [
+        "meetings",
+        "policy"
+      ],
+      "backlogIds": [
+        "AI-001",
+        "AI-002",
+        "CORE-005",
+        "EXT-003",
+        "REL-003",
+        "REL-004",
+        "REL-008"
+      ],
+      "remainingGatesFromPackages": [
+        "meetings",
+        "policy"
+      ],
+      "releaseQualified": false
+    },
+    {
+      "requirementId": "PRD-AI-011",
+      "release": "P0",
+      "coverageStatus": "mapped_scoped_coverage",
+      "packageIds": [
+        "meetings",
+        "policy"
+      ],
+      "backlogIds": [
+        "AI-001",
+        "AI-002",
+        "CORE-005",
+        "EXT-003",
+        "REL-003",
+        "REL-004",
+        "REL-008"
+      ],
+      "remainingGatesFromPackages": [
+        "meetings",
+        "policy"
+      ],
+      "releaseQualified": false
+    },
+    {
+      "requirementId": "PRD-AI-012",
+      "release": "P2",
+      "coverageStatus": "mapped_scoped_coverage",
+      "packageIds": [
+        "image"
+      ],
+      "backlogIds": [
+        "OPT-001"
+      ],
+      "remainingGatesFromPackages": [
+        "image"
+      ],
+      "releaseQualified": false
+    },
+    {
+      "requirementId": "PRD-AI-013",
+      "release": "P1",
+      "coverageStatus": "mapped_scoped_coverage",
+      "packageIds": [
+        "related"
+      ],
+      "backlogIds": [
+        "AI-003"
+      ],
+      "remainingGatesFromPackages": [
+        "related"
+      ],
+      "releaseQualified": false
+    },
+    {
+      "requirementId": "PRD-AI-014",
+      "release": "P2",
+      "coverageStatus": "mapped_scoped_coverage",
+      "packageIds": [
+        "reviews"
+      ],
+      "backlogIds": [
+        "OPT-002"
+      ],
+      "remainingGatesFromPackages": [
+        "reviews"
+      ],
+      "releaseQualified": false
+    },
+    {
+      "requirementId": "PRD-AI-015",
+      "release": "P0",
+      "coverageStatus": "mapped_scoped_coverage",
+      "packageIds": [
+        "memory"
+      ],
+      "backlogIds": [
+        "AI-002",
+        "AI-003"
+      ],
+      "remainingGatesFromPackages": [
+        "memory"
+      ],
+      "releaseQualified": false
+    },
+    {
+      "requirementId": "PRD-AI-016",
+      "release": "P1",
+      "coverageStatus": "mapped_scoped_coverage",
+      "packageIds": [
+        "providers"
+      ],
+      "backlogIds": [
+        "EXT-001",
+        "EXT-002",
+        "EXT-005"
+      ],
+      "remainingGatesFromPackages": [
+        "providers"
+      ],
+      "releaseQualified": false
+    },
+    {
+      "requirementId": "TRD-BLOCK-001",
+      "release": "P0",
+      "coverageStatus": "mapped_scoped_coverage",
+      "packageIds": [
+        "editor",
+        "rich-style"
+      ],
+      "backlogIds": [
+        "CORE-002",
+        "FIX-003",
+        "FIX-006",
+        "REL-002"
+      ],
+      "remainingGatesFromPackages": [
+        "editor",
+        "rich-style"
+      ],
+      "releaseQualified": false
+    },
+    {
+      "requirementId": "TRD-BLOCK-002-P0",
+      "release": "P0",
+      "coverageStatus": "mapped_scoped_coverage",
+      "packageIds": [
+        "editor",
+        "imports"
+      ],
+      "backlogIds": [
+        "FIX-001",
+        "FIX-003",
+        "FIX-006",
+        "PARITY-007",
+        "REL-002",
+        "REL-004"
+      ],
+      "remainingGatesFromPackages": [
+        "editor",
+        "imports"
+      ],
+      "releaseQualified": false
+    },
+    {
+      "requirementId": "TRD-BLOCK-002-P1",
+      "release": "P1",
+      "coverageStatus": "mapped_scoped_coverage",
+      "packageIds": [
+        "editor",
+        "imports"
+      ],
+      "backlogIds": [
+        "FIX-001",
+        "FIX-003",
+        "FIX-006",
+        "PARITY-007",
+        "REL-002",
+        "REL-004"
+      ],
+      "remainingGatesFromPackages": [
+        "editor",
+        "imports"
+      ],
+      "releaseQualified": false
+    },
+    {
+      "requirementId": "TRD-BLOCK-003",
+      "release": "P0",
+      "coverageStatus": "mapped_scoped_coverage",
+      "packageIds": [
+        "editor"
+      ],
+      "backlogIds": [
+        "FIX-003",
+        "FIX-006",
+        "REL-002"
+      ],
+      "remainingGatesFromPackages": [
+        "editor"
+      ],
+      "releaseQualified": false
+    },
+    {
+      "requirementId": "TRD-BLOCK-004",
+      "release": "P0",
+      "coverageStatus": "mapped_scoped_coverage",
+      "packageIds": [
+        "editor"
+      ],
+      "backlogIds": [
+        "FIX-003",
+        "FIX-006",
+        "REL-002"
+      ],
+      "remainingGatesFromPackages": [
+        "editor"
+      ],
+      "releaseQualified": false
+    },
+    {
+      "requirementId": "TRD-BLOCK-005",
+      "release": "P0",
+      "coverageStatus": "mapped_scoped_coverage",
+      "packageIds": [
+        "editor"
+      ],
+      "backlogIds": [
+        "FIX-003",
+        "FIX-006",
+        "REL-002"
+      ],
+      "remainingGatesFromPackages": [
+        "editor"
+      ],
+      "releaseQualified": false
+    },
+    {
+      "requirementId": "TRD-BLOCK-006",
+      "release": "P0",
+      "coverageStatus": "mapped_scoped_coverage",
+      "packageIds": [
+        "editor"
+      ],
+      "backlogIds": [
+        "FIX-003",
+        "FIX-006",
+        "REL-002"
+      ],
+      "remainingGatesFromPackages": [
+        "editor"
+      ],
+      "releaseQualified": false
+    },
+    {
+      "requirementId": "TRD-BLOCK-007",
+      "release": "P0",
+      "coverageStatus": "mapped_scoped_coverage",
+      "packageIds": [
+        "editor"
+      ],
+      "backlogIds": [
+        "FIX-003",
+        "FIX-006",
+        "REL-002"
+      ],
+      "remainingGatesFromPackages": [
+        "editor"
+      ],
+      "releaseQualified": false
+    },
+    {
+      "requirementId": "TRD-BLOCK-008",
+      "release": "P0",
+      "coverageStatus": "mapped_scoped_coverage",
+      "packageIds": [
+        "editor"
+      ],
+      "backlogIds": [
+        "FIX-003",
+        "FIX-006",
+        "REL-002"
+      ],
+      "remainingGatesFromPackages": [
+        "editor"
+      ],
+      "releaseQualified": false
+    },
+    {
+      "requirementId": "TRD-BLOCK-009",
+      "release": "P0",
+      "coverageStatus": "mapped_scoped_coverage",
+      "packageIds": [
+        "editor"
+      ],
+      "backlogIds": [
+        "FIX-003",
+        "FIX-006",
+        "REL-002"
+      ],
+      "remainingGatesFromPackages": [
+        "editor"
+      ],
+      "releaseQualified": false
+    },
+    {
+      "requirementId": "TRD-BLOCK-010",
+      "release": "P0",
+      "coverageStatus": "mapped_scoped_coverage",
+      "packageIds": [
+        "presentation"
+      ],
+      "backlogIds": [
+        "CORE-003",
+        "GOV-005"
+      ],
+      "remainingGatesFromPackages": [
+        "presentation"
+      ],
+      "releaseQualified": false
+    },
+    {
+      "requirementId": "TRD-BLOCK-011",
+      "release": "P0",
+      "coverageStatus": "mapped_scoped_coverage",
+      "packageIds": [
+        "presentation"
+      ],
+      "backlogIds": [
+        "CORE-003",
+        "GOV-005"
+      ],
+      "remainingGatesFromPackages": [
+        "presentation"
+      ],
+      "releaseQualified": false
+    },
+    {
+      "requirementId": "TRD-BLOCK-012",
+      "release": "P0",
+      "coverageStatus": "mapped_scoped_coverage",
+      "packageIds": [
+        "presentation"
+      ],
+      "backlogIds": [
+        "CORE-003",
+        "GOV-005"
+      ],
+      "remainingGatesFromPackages": [
+        "presentation"
+      ],
+      "releaseQualified": false
+    },
+    {
+      "requirementId": "TRD-BLOCK-013",
+      "release": "P0",
+      "coverageStatus": "mapped_scoped_coverage",
+      "packageIds": [
+        "table"
+      ],
+      "backlogIds": [
+        "CORE-001",
+        "FIX-003"
+      ],
+      "remainingGatesFromPackages": [
+        "table"
+      ],
+      "releaseQualified": false
+    },
+    {
+      "requirementId": "TRD-BLOCK-014",
+      "release": "P0",
+      "coverageStatus": "mapped_scoped_coverage",
+      "packageIds": [
+        "presentation"
+      ],
+      "backlogIds": [
+        "CORE-003",
+        "GOV-005"
+      ],
+      "remainingGatesFromPackages": [
+        "presentation"
+      ],
+      "releaseQualified": false
+    },
+    {
+      "requirementId": "TRD-BLOCK-015",
+      "release": "P0",
+      "coverageStatus": "mapped_scoped_coverage",
+      "packageIds": [
+        "presentation"
+      ],
+      "backlogIds": [
+        "CORE-003",
+        "GOV-005"
+      ],
+      "remainingGatesFromPackages": [
+        "presentation"
+      ],
+      "releaseQualified": false
+    },
+    {
+      "requirementId": "TRD-BLOCK-016",
+      "release": "P0",
+      "coverageStatus": "mapped_scoped_coverage",
+      "packageIds": [
+        "presentation"
+      ],
+      "backlogIds": [
+        "CORE-003",
+        "GOV-005"
+      ],
+      "remainingGatesFromPackages": [
+        "presentation"
+      ],
+      "releaseQualified": false
+    },
+    {
+      "requirementId": "TRD-BLOCK-017",
+      "release": "P0",
+      "coverageStatus": "mapped_scoped_coverage",
+      "packageIds": [
+        "presentation"
+      ],
+      "backlogIds": [
+        "CORE-003",
+        "GOV-005"
+      ],
+      "remainingGatesFromPackages": [
+        "presentation"
+      ],
+      "releaseQualified": false
+    },
+    {
+      "requirementId": "TRD-BLOCK-018",
+      "release": "P0",
+      "coverageStatus": "mapped_scoped_coverage",
+      "packageIds": [
+        "presentation",
+        "documents"
+      ],
+      "backlogIds": [
+        "CORE-003",
+        "GOV-005",
+        "PARITY-008",
+        "REL-002",
+        "REL-009"
+      ],
+      "remainingGatesFromPackages": [
+        "presentation",
+        "documents"
+      ],
+      "releaseQualified": false
+    },
+    {
+      "requirementId": "TRD-BLOCK-019",
+      "release": "P1",
+      "coverageStatus": "mapped_scoped_coverage",
+      "packageIds": [
+        "online-content"
+      ],
+      "backlogIds": [
+        "PARITY-002"
+      ],
+      "remainingGatesFromPackages": [
+        "online-content"
+      ],
+      "releaseQualified": false
+    },
+    {
+      "requirementId": "TRD-BLOCK-020",
+      "release": "P1",
+      "coverageStatus": "mapped_scoped_coverage",
+      "packageIds": [
+        "online-content"
+      ],
+      "backlogIds": [
+        "PARITY-002"
+      ],
+      "remainingGatesFromPackages": [
+        "online-content"
+      ],
+      "releaseQualified": false
+    },
+    {
+      "requirementId": "TRD-BLOCK-021",
+      "release": "P1",
+      "coverageStatus": "mapped_scoped_coverage",
+      "packageIds": [
+        "layout"
+      ],
+      "backlogIds": [
+        "FIX-006",
+        "PARITY-001",
+        "PARITY-007"
+      ],
+      "remainingGatesFromPackages": [
+        "layout"
+      ],
+      "releaseQualified": false
+    },
+    {
+      "requirementId": "TRD-BLOCK-022",
+      "release": "P1",
+      "coverageStatus": "mapped_scoped_coverage",
+      "packageIds": [
+        "layout"
+      ],
+      "backlogIds": [
+        "FIX-006",
+        "PARITY-001",
+        "PARITY-007"
+      ],
+      "remainingGatesFromPackages": [
+        "layout"
+      ],
+      "releaseQualified": false
+    },
+    {
+      "requirementId": "TRD-BLOCK-023",
+      "release": "P1",
+      "coverageStatus": "mapped_scoped_coverage",
+      "packageIds": [
+        "editor"
+      ],
+      "backlogIds": [
+        "FIX-003",
+        "FIX-006",
+        "REL-002"
+      ],
+      "remainingGatesFromPackages": [
+        "editor"
+      ],
+      "releaseQualified": false
+    },
+    {
+      "requirementId": "TRD-BLOCK-024",
+      "release": "P1",
+      "coverageStatus": "mapped_scoped_coverage",
+      "packageIds": [
+        "editor"
+      ],
+      "backlogIds": [
+        "FIX-003",
+        "FIX-006",
+        "REL-002"
+      ],
+      "remainingGatesFromPackages": [
+        "editor"
+      ],
+      "releaseQualified": false
+    },
+    {
+      "requirementId": "TRD-BLOCK-025",
+      "release": "P1",
+      "coverageStatus": "mapped_scoped_coverage",
+      "packageIds": [
+        "editor"
+      ],
+      "backlogIds": [
+        "FIX-003",
+        "FIX-006",
+        "REL-002"
+      ],
+      "remainingGatesFromPackages": [
+        "editor"
+      ],
+      "releaseQualified": false
+    },
+    {
+      "requirementId": "TRD-BLOCK-026",
+      "release": "P1",
+      "coverageStatus": "mapped_scoped_coverage",
+      "packageIds": [
+        "editor"
+      ],
+      "backlogIds": [
+        "FIX-003",
+        "FIX-006",
+        "REL-002"
+      ],
+      "remainingGatesFromPackages": [
+        "editor"
+      ],
+      "releaseQualified": false
+    },
+    {
+      "requirementId": "TRD-BLOCK-027",
+      "release": "P1",
+      "coverageStatus": "mapped_scoped_coverage",
+      "packageIds": [
+        "editor"
+      ],
+      "backlogIds": [
+        "FIX-003",
+        "FIX-006",
+        "REL-002"
+      ],
+      "remainingGatesFromPackages": [
+        "editor"
+      ],
+      "releaseQualified": false
+    },
+    {
+      "requirementId": "TRD-BLOCK-028",
+      "release": "P0",
+      "coverageStatus": "mapped_scoped_coverage",
+      "packageIds": [
+        "imports"
+      ],
+      "backlogIds": [
+        "FIX-001",
+        "PARITY-007",
+        "REL-004"
+      ],
+      "remainingGatesFromPackages": [
+        "imports"
+      ],
+      "releaseQualified": false
+    },
+    {
+      "requirementId": "TRD-BLOCK-029",
+      "release": "P1",
+      "coverageStatus": "mapped_scoped_coverage",
+      "packageIds": [
+        "layout"
+      ],
+      "backlogIds": [
+        "FIX-006",
+        "PARITY-001",
+        "PARITY-007"
+      ],
+      "remainingGatesFromPackages": [
+        "layout"
+      ],
+      "releaseQualified": false
+    },
+    {
+      "requirementId": "TRD-TYPE-001",
+      "release": "P0",
+      "coverageStatus": "mapped_scoped_coverage",
+      "packageIds": [
+        "database"
+      ],
+      "backlogIds": [
+        "CORE-007",
+        "CORE-008",
+        "FIX-004"
+      ],
+      "remainingGatesFromPackages": [
+        "database"
+      ],
+      "releaseQualified": false
+    },
+    {
+      "requirementId": "TRD-TYPE-002",
+      "release": "P0",
+      "coverageStatus": "mapped_scoped_coverage",
+      "packageIds": [
+        "database"
+      ],
+      "backlogIds": [
+        "CORE-007",
+        "CORE-008",
+        "FIX-004"
+      ],
+      "remainingGatesFromPackages": [
+        "database"
+      ],
+      "releaseQualified": false
+    },
+    {
+      "requirementId": "TRD-TYPE-003",
+      "release": "P0",
+      "coverageStatus": "mapped_scoped_coverage",
+      "packageIds": [
+        "database"
+      ],
+      "backlogIds": [
+        "CORE-007",
+        "CORE-008",
+        "FIX-004"
+      ],
+      "remainingGatesFromPackages": [
+        "database"
+      ],
+      "releaseQualified": false
+    },
+    {
+      "requirementId": "TRD-TYPE-004",
+      "release": "P0",
+      "coverageStatus": "mapped_scoped_coverage",
+      "packageIds": [
+        "database"
+      ],
+      "backlogIds": [
+        "CORE-007",
+        "CORE-008",
+        "FIX-004"
+      ],
+      "remainingGatesFromPackages": [
+        "database"
+      ],
+      "releaseQualified": false
+    },
+    {
+      "requirementId": "TRD-TYPE-005",
+      "release": "P0",
+      "coverageStatus": "mapped_scoped_coverage",
+      "packageIds": [
+        "database"
+      ],
+      "backlogIds": [
+        "CORE-007",
+        "CORE-008",
+        "FIX-004"
+      ],
+      "remainingGatesFromPackages": [
+        "database"
+      ],
+      "releaseQualified": false
+    },
+    {
+      "requirementId": "TRD-TYPE-006",
+      "release": "P0",
+      "coverageStatus": "mapped_scoped_coverage",
+      "packageIds": [
+        "database"
+      ],
+      "backlogIds": [
+        "CORE-007",
+        "CORE-008",
+        "FIX-004"
+      ],
+      "remainingGatesFromPackages": [
+        "database"
+      ],
+      "releaseQualified": false
+    },
+    {
+      "requirementId": "TRD-TYPE-007",
+      "release": "P0",
+      "coverageStatus": "mapped_scoped_coverage",
+      "packageIds": [
+        "database"
+      ],
+      "backlogIds": [
+        "CORE-007",
+        "CORE-008",
+        "FIX-004"
+      ],
+      "remainingGatesFromPackages": [
+        "database"
+      ],
+      "releaseQualified": false
+    },
+    {
+      "requirementId": "TRD-TYPE-008",
+      "release": "P0",
+      "coverageStatus": "mapped_scoped_coverage",
+      "packageIds": [
+        "database"
+      ],
+      "backlogIds": [
+        "CORE-007",
+        "CORE-008",
+        "FIX-004"
+      ],
+      "remainingGatesFromPackages": [
+        "database"
+      ],
+      "releaseQualified": false
+    },
+    {
+      "requirementId": "TRD-TYPE-009",
+      "release": "P0",
+      "coverageStatus": "mapped_scoped_coverage",
+      "packageIds": [
+        "database"
+      ],
+      "backlogIds": [
+        "CORE-007",
+        "CORE-008",
+        "FIX-004"
+      ],
+      "remainingGatesFromPackages": [
+        "database"
+      ],
+      "releaseQualified": false
+    },
+    {
+      "requirementId": "TRD-TYPE-010",
+      "release": "P0",
+      "coverageStatus": "mapped_scoped_coverage",
+      "packageIds": [
+        "database"
+      ],
+      "backlogIds": [
+        "CORE-007",
+        "CORE-008",
+        "FIX-004"
+      ],
+      "remainingGatesFromPackages": [
+        "database"
+      ],
+      "releaseQualified": false
+    },
+    {
+      "requirementId": "TRD-TYPE-011",
+      "release": "P1",
+      "coverageStatus": "mapped_scoped_coverage",
+      "packageIds": [
+        "database"
+      ],
+      "backlogIds": [
+        "CORE-007",
+        "CORE-008",
+        "FIX-004"
+      ],
+      "remainingGatesFromPackages": [
+        "database"
+      ],
+      "releaseQualified": false
+    },
+    {
+      "requirementId": "TRD-TYPE-012",
+      "release": "P1",
+      "coverageStatus": "mapped_scoped_coverage",
+      "packageIds": [
+        "formula"
+      ],
+      "backlogIds": [
+        "PARITY-005"
+      ],
+      "remainingGatesFromPackages": [
+        "formula"
+      ],
+      "releaseQualified": false
+    },
+    {
+      "requirementId": "TRD-TYPE-013",
+      "release": "P1",
+      "coverageStatus": "mapped_scoped_coverage",
+      "packageIds": [
+        "formula"
+      ],
+      "backlogIds": [
+        "PARITY-005"
+      ],
+      "remainingGatesFromPackages": [
+        "formula"
+      ],
+      "releaseQualified": false
+    },
+    {
+      "requirementId": "TRD-TYPE-014",
+      "release": "P1",
+      "coverageStatus": "mapped_scoped_coverage",
+      "packageIds": [
+        "database"
+      ],
+      "backlogIds": [
+        "CORE-007",
+        "CORE-008",
+        "FIX-004"
+      ],
+      "remainingGatesFromPackages": [
+        "database"
+      ],
+      "releaseQualified": false
+    },
+    {
+      "requirementId": "TRD-TYPE-015",
+      "release": "P1",
+      "coverageStatus": "mapped_scoped_coverage",
+      "packageIds": [
+        "database"
+      ],
+      "backlogIds": [
+        "CORE-007",
+        "CORE-008",
+        "FIX-004"
+      ],
+      "remainingGatesFromPackages": [
+        "database"
+      ],
+      "releaseQualified": false
+    },
+    {
+      "requirementId": "TRD-TYPE-016",
+      "release": "P1",
+      "coverageStatus": "mapped_scoped_coverage",
+      "packageIds": [
+        "database"
+      ],
+      "backlogIds": [
+        "CORE-007",
+        "CORE-008",
+        "FIX-004"
+      ],
+      "remainingGatesFromPackages": [
+        "database"
+      ],
+      "releaseQualified": false
+    },
+    {
+      "requirementId": "TRD-TYPE-017",
+      "release": "P2",
+      "coverageStatus": "mapped_scoped_coverage",
+      "packageIds": [
+        "p2"
+      ],
+      "backlogIds": [
+        "OPT-003"
+      ],
+      "remainingGatesFromPackages": [
+        "p2"
+      ],
+      "releaseQualified": false
+    },
+    {
+      "requirementId": "TRD-TYPE-018-P0",
+      "release": "P0",
+      "coverageStatus": "mapped_scoped_coverage",
+      "packageIds": [
+        "database",
+        "imports",
+        "notion-api"
+      ],
+      "backlogIds": [
+        "CORE-007",
+        "CORE-008",
+        "FIX-001",
+        "FIX-004",
+        "PARITY-006",
+        "PARITY-007",
+        "REL-004"
+      ],
+      "remainingGatesFromPackages": [
+        "database",
+        "imports",
+        "notion-api"
+      ],
+      "releaseQualified": false
+    },
+    {
+      "requirementId": "TRD-TYPE-018-P1",
+      "release": "P1",
+      "coverageStatus": "mapped_scoped_coverage",
+      "packageIds": [
+        "database",
+        "imports",
+        "notion-api"
+      ],
+      "backlogIds": [
+        "CORE-007",
+        "CORE-008",
+        "FIX-001",
+        "FIX-004",
+        "PARITY-006",
+        "PARITY-007",
+        "REL-004"
+      ],
+      "remainingGatesFromPackages": [
+        "database",
+        "imports",
+        "notion-api"
+      ],
+      "releaseQualified": false
+    },
+    {
+      "requirementId": "TRD-TYPE-019-P0",
+      "release": "P0",
+      "coverageStatus": "mapped_scoped_coverage",
+      "packageIds": [
+        "database",
+        "imports",
+        "notion-api"
+      ],
+      "backlogIds": [
+        "CORE-007",
+        "CORE-008",
+        "FIX-001",
+        "FIX-004",
+        "PARITY-006",
+        "PARITY-007",
+        "REL-004"
+      ],
+      "remainingGatesFromPackages": [
+        "database",
+        "imports",
+        "notion-api"
+      ],
+      "releaseQualified": false
+    },
+    {
+      "requirementId": "TRD-TYPE-019-P1",
+      "release": "P1",
+      "coverageStatus": "mapped_scoped_coverage",
+      "packageIds": [
+        "database",
+        "imports",
+        "notion-api"
+      ],
+      "backlogIds": [
+        "CORE-007",
+        "CORE-008",
+        "FIX-001",
+        "FIX-004",
+        "PARITY-006",
+        "PARITY-007",
+        "REL-004"
+      ],
+      "remainingGatesFromPackages": [
+        "database",
+        "imports",
+        "notion-api"
+      ],
+      "releaseQualified": false
+    },
+    {
+      "requirementId": "TRD-VIEW-001",
+      "release": "P0",
+      "coverageStatus": "mapped_scoped_coverage",
+      "packageIds": [
+        "database"
+      ],
+      "backlogIds": [
+        "CORE-007",
+        "CORE-008",
+        "FIX-004"
+      ],
+      "remainingGatesFromPackages": [
+        "database"
+      ],
+      "releaseQualified": false
+    },
+    {
+      "requirementId": "TRD-VIEW-002",
+      "release": "P0",
+      "coverageStatus": "mapped_scoped_coverage",
+      "packageIds": [
+        "database"
+      ],
+      "backlogIds": [
+        "CORE-007",
+        "CORE-008",
+        "FIX-004"
+      ],
+      "remainingGatesFromPackages": [
+        "database"
+      ],
+      "releaseQualified": false
+    },
+    {
+      "requirementId": "TRD-VIEW-003",
+      "release": "P0",
+      "coverageStatus": "mapped_scoped_coverage",
+      "packageIds": [
+        "database"
+      ],
+      "backlogIds": [
+        "CORE-007",
+        "CORE-008",
+        "FIX-004"
+      ],
+      "remainingGatesFromPackages": [
+        "database"
+      ],
+      "releaseQualified": false
+    },
+    {
+      "requirementId": "TRD-VIEW-004",
+      "release": "P0",
+      "coverageStatus": "mapped_scoped_coverage",
+      "packageIds": [
+        "database"
+      ],
+      "backlogIds": [
+        "CORE-007",
+        "CORE-008",
+        "FIX-004"
+      ],
+      "remainingGatesFromPackages": [
+        "database"
+      ],
+      "releaseQualified": false
+    },
+    {
+      "requirementId": "TRD-VIEW-005",
+      "release": "P1",
+      "coverageStatus": "mapped_scoped_coverage",
+      "packageIds": [
+        "database"
+      ],
+      "backlogIds": [
+        "CORE-007",
+        "CORE-008",
+        "FIX-004"
+      ],
+      "remainingGatesFromPackages": [
+        "database"
+      ],
+      "releaseQualified": false
+    },
+    {
+      "requirementId": "TRD-VIEW-006",
+      "release": "P1",
+      "coverageStatus": "mapped_scoped_coverage",
+      "packageIds": [
+        "timeline"
+      ],
+      "backlogIds": [
+        "PARITY-003"
+      ],
+      "remainingGatesFromPackages": [
+        "timeline"
+      ],
+      "releaseQualified": false
+    },
+    {
+      "requirementId": "TRD-VIEW-007",
+      "release": "P2",
+      "coverageStatus": "mapped_scoped_coverage",
+      "packageIds": [
+        "p2"
+      ],
+      "backlogIds": [
+        "OPT-003"
+      ],
+      "remainingGatesFromPackages": [
+        "p2"
+      ],
+      "releaseQualified": false
+    },
+    {
+      "requirementId": "TRD-VIEW-008",
+      "release": "P2",
+      "coverageStatus": "mapped_scoped_coverage",
+      "packageIds": [
+        "p2"
+      ],
+      "backlogIds": [
+        "OPT-003"
+      ],
+      "remainingGatesFromPackages": [
+        "p2"
+      ],
+      "releaseQualified": false
+    },
+    {
+      "requirementId": "TRD-LOCALAI-001",
+      "release": "P0",
+      "coverageStatus": "mapped_scoped_coverage",
+      "packageIds": [
+        "ai-modes",
+        "policy"
+      ],
+      "backlogIds": [
+        "AI-001",
+        "AI-002",
+        "EXT-003",
+        "REL-008"
+      ],
+      "remainingGatesFromPackages": [
+        "ai-modes",
+        "policy"
+      ],
+      "releaseQualified": false
+    },
+    {
+      "requirementId": "TRD-LOCALAI-002",
+      "release": "P0",
+      "coverageStatus": "mapped_scoped_coverage",
+      "packageIds": [
+        "retrieval"
+      ],
+      "backlogIds": [
+        "AI-002",
+        "CORE-004",
+        "CORE-009"
+      ],
+      "remainingGatesFromPackages": [
+        "retrieval"
+      ],
+      "releaseQualified": false
+    },
+    {
+      "requirementId": "TRD-LOCALAI-003",
+      "release": "P0",
+      "coverageStatus": "mapped_scoped_coverage",
+      "packageIds": [
+        "retrieval"
+      ],
+      "backlogIds": [
+        "AI-002",
+        "CORE-004",
+        "CORE-009"
+      ],
+      "remainingGatesFromPackages": [
+        "retrieval"
+      ],
+      "releaseQualified": false
+    },
+    {
+      "requirementId": "TRD-LOCALAI-004",
+      "release": "P0",
+      "coverageStatus": "mapped_scoped_coverage",
+      "packageIds": [
+        "ai-modes",
+        "policy"
+      ],
+      "backlogIds": [
+        "AI-001",
+        "AI-002",
+        "EXT-003",
+        "REL-008"
+      ],
+      "remainingGatesFromPackages": [
+        "ai-modes",
+        "policy"
+      ],
+      "releaseQualified": false
+    },
+    {
+      "requirementId": "TRD-LOCALAI-005",
+      "release": "P0",
+      "coverageStatus": "mapped_scoped_coverage",
+      "packageIds": [
+        "meetings",
+        "policy"
+      ],
+      "backlogIds": [
+        "AI-001",
+        "AI-002",
+        "CORE-005",
+        "EXT-003",
+        "REL-003",
+        "REL-004",
+        "REL-008"
+      ],
+      "remainingGatesFromPackages": [
+        "meetings",
+        "policy"
+      ],
+      "releaseQualified": false
+    },
+    {
+      "requirementId": "TRD-LOCALAI-006",
+      "release": "P0",
+      "coverageStatus": "mapped_scoped_coverage",
+      "packageIds": [
+        "meetings",
+        "policy"
+      ],
+      "backlogIds": [
+        "AI-001",
+        "AI-002",
+        "CORE-005",
+        "EXT-003",
+        "REL-003",
+        "REL-004",
+        "REL-008"
+      ],
+      "remainingGatesFromPackages": [
+        "meetings",
+        "policy"
+      ],
+      "releaseQualified": false
+    },
+    {
+      "requirementId": "TRD-LOCALAI-007",
+      "release": "P1",
+      "coverageStatus": "mapped_scoped_coverage",
+      "packageIds": [
+        "ai-modes",
+        "policy"
+      ],
+      "backlogIds": [
+        "AI-001",
+        "AI-002",
+        "EXT-003",
+        "REL-008"
+      ],
+      "remainingGatesFromPackages": [
+        "ai-modes",
+        "policy"
+      ],
+      "releaseQualified": false
+    },
+    {
+      "requirementId": "TRD-LOCALAI-008",
+      "release": "P1",
+      "coverageStatus": "mapped_scoped_coverage",
+      "packageIds": [
+        "ai-modes",
+        "policy"
+      ],
+      "backlogIds": [
+        "AI-001",
+        "AI-002",
+        "EXT-003",
+        "REL-008"
+      ],
+      "remainingGatesFromPackages": [
+        "ai-modes",
+        "policy"
+      ],
+      "releaseQualified": false
+    },
+    {
+      "requirementId": "TRD-LOCALAI-009",
+      "release": "P1",
+      "coverageStatus": "mapped_scoped_coverage",
+      "packageIds": [
+        "ai-modes",
+        "policy"
+      ],
+      "backlogIds": [
+        "AI-001",
+        "AI-002",
+        "EXT-003",
+        "REL-008"
+      ],
+      "remainingGatesFromPackages": [
+        "ai-modes",
+        "policy"
+      ],
+      "releaseQualified": false
+    },
+    {
+      "requirementId": "TRD-LOCALAI-010",
+      "release": "P1",
+      "coverageStatus": "mapped_scoped_coverage",
+      "packageIds": [
+        "related"
+      ],
+      "backlogIds": [
+        "AI-003"
+      ],
+      "remainingGatesFromPackages": [
+        "related"
+      ],
+      "releaseQualified": false
+    },
+    {
+      "requirementId": "TRD-LOCALAI-011",
+      "release": "P1",
+      "coverageStatus": "mapped_scoped_coverage",
+      "packageIds": [
+        "ai-modes",
+        "policy"
+      ],
+      "backlogIds": [
+        "AI-001",
+        "AI-002",
+        "EXT-003",
+        "REL-008"
+      ],
+      "remainingGatesFromPackages": [
+        "ai-modes",
+        "policy"
+      ],
+      "releaseQualified": false
+    },
+    {
+      "requirementId": "TRD-LOCALAI-012",
+      "release": "P2",
+      "coverageStatus": "mapped_scoped_coverage",
+      "packageIds": [
+        "image"
+      ],
+      "backlogIds": [
+        "OPT-001"
+      ],
+      "remainingGatesFromPackages": [
+        "image"
+      ],
+      "releaseQualified": false
+    },
+    {
+      "requirementId": "TRD-LOCALAI-013",
+      "release": "P2",
+      "coverageStatus": "mapped_scoped_coverage",
+      "packageIds": [
+        "reviews"
+      ],
+      "backlogIds": [
+        "OPT-002"
+      ],
+      "remainingGatesFromPackages": [
+        "reviews"
+      ],
+      "releaseQualified": false
+    },
+    {
+      "requirementId": "TRD-LOCALAI-014",
+      "release": "P0",
+      "coverageStatus": "mapped_scoped_coverage",
+      "packageIds": [
+        "memory"
+      ],
+      "backlogIds": [
+        "AI-002",
+        "AI-003"
+      ],
+      "remainingGatesFromPackages": [
+        "memory"
+      ],
+      "releaseQualified": false
+    },
+    {
+      "requirementId": "ADR-001",
+      "release": "P0",
+      "coverageStatus": "mapped_scoped_coverage",
+      "packageIds": [
+        "kernel"
+      ],
+      "backlogIds": [
+        "CORE-010",
+        "REL-001",
+        "REL-008"
+      ],
+      "remainingGatesFromPackages": [
+        "kernel"
+      ],
+      "releaseQualified": false
+    },
+    {
+      "requirementId": "ADR-002",
+      "release": "P0",
+      "coverageStatus": "mapped_scoped_coverage",
+      "packageIds": [
+        "kernel"
+      ],
+      "backlogIds": [
+        "CORE-010",
+        "REL-001",
+        "REL-008"
+      ],
+      "remainingGatesFromPackages": [
+        "kernel"
+      ],
+      "releaseQualified": false
+    },
+    {
+      "requirementId": "ADR-003",
+      "release": "P0",
+      "coverageStatus": "mapped_scoped_coverage",
+      "packageIds": [
+        "editor"
+      ],
+      "backlogIds": [
+        "FIX-003",
+        "FIX-006",
+        "REL-002"
+      ],
+      "remainingGatesFromPackages": [
+        "editor"
+      ],
+      "releaseQualified": false
+    },
+    {
+      "requirementId": "ADR-004",
+      "release": "P0",
+      "coverageStatus": "mapped_scoped_coverage",
+      "packageIds": [
+        "imports"
+      ],
+      "backlogIds": [
+        "FIX-001",
+        "PARITY-007",
+        "REL-004"
+      ],
+      "remainingGatesFromPackages": [
+        "imports"
+      ],
+      "releaseQualified": false
+    },
+    {
+      "requirementId": "ADR-005",
+      "release": "P0",
+      "coverageStatus": "mapped_scoped_coverage",
+      "packageIds": [
+        "retrieval"
+      ],
+      "backlogIds": [
+        "AI-002",
+        "CORE-004",
+        "CORE-009"
+      ],
+      "remainingGatesFromPackages": [
+        "retrieval"
+      ],
+      "releaseQualified": false
+    },
+    {
+      "requirementId": "ADR-006",
+      "release": "P0",
+      "coverageStatus": "mapped_scoped_coverage",
+      "packageIds": [
+        "runtime"
+      ],
+      "backlogIds": [
+        "GOV-005",
+        "REL-005",
+        "REL-009"
+      ],
+      "remainingGatesFromPackages": [
+        "runtime"
+      ],
+      "releaseQualified": false
+    },
+    {
+      "requirementId": "ADR-007",
+      "release": "P0",
+      "coverageStatus": "mapped_scoped_coverage",
+      "packageIds": [
+        "kernel"
+      ],
+      "backlogIds": [
+        "CORE-010",
+        "REL-001",
+        "REL-008"
+      ],
+      "remainingGatesFromPackages": [
+        "kernel"
+      ],
+      "releaseQualified": false
+    },
+    {
+      "requirementId": "ADR-008",
+      "release": "P0",
+      "coverageStatus": "mapped_scoped_coverage",
+      "packageIds": [
+        "policy"
+      ],
+      "backlogIds": [
+        "AI-001",
+        "EXT-003",
+        "REL-008"
+      ],
+      "remainingGatesFromPackages": [
+        "policy"
+      ],
+      "releaseQualified": false
+    },
+    {
+      "requirementId": "ADR-009",
+      "release": "P1",
+      "coverageStatus": "mapped_scoped_coverage",
+      "packageIds": [
+        "mcp"
+      ],
+      "backlogIds": [
+        "EXT-003",
+        "EXT-004"
+      ],
+      "remainingGatesFromPackages": [
+        "mcp"
+      ],
+      "releaseQualified": false
+    },
+    {
+      "requirementId": "ADR-010",
+      "release": "P0",
+      "coverageStatus": "mapped_scoped_coverage",
+      "packageIds": [
+        "policy"
+      ],
+      "backlogIds": [
+        "AI-001",
+        "EXT-003",
+        "REL-008"
+      ],
+      "remainingGatesFromPackages": [
+        "policy"
+      ],
+      "releaseQualified": false
+    },
+    {
+      "requirementId": "ADR-011",
+      "release": "P0",
+      "coverageStatus": "mapped_scoped_coverage",
+      "packageIds": [
+        "memory"
+      ],
+      "backlogIds": [
+        "AI-002",
+        "AI-003"
+      ],
+      "remainingGatesFromPackages": [
+        "memory"
+      ],
+      "releaseQualified": false
+    },
+    {
+      "requirementId": "ADR-012",
+      "release": "P0",
+      "coverageStatus": "mapped_scoped_coverage",
+      "packageIds": [
+        "runtime"
+      ],
+      "backlogIds": [
+        "GOV-005",
+        "REL-005",
+        "REL-009"
+      ],
+      "remainingGatesFromPackages": [
+        "runtime"
+      ],
+      "releaseQualified": false
+    },
+    {
+      "requirementId": "ADR-013",
+      "release": "P2",
+      "coverageStatus": "mapped_scoped_coverage",
+      "packageIds": [
+        "hosting"
+      ],
+      "backlogIds": [
+        "OPT-003",
+        "REL-009"
+      ],
+      "remainingGatesFromPackages": [
+        "hosting"
+      ],
+      "releaseQualified": false
+    },
+    {
+      "requirementId": "ADR-014",
+      "release": "P1",
+      "coverageStatus": "mapped_scoped_coverage",
+      "packageIds": [
+        "providers"
+      ],
+      "backlogIds": [
+        "EXT-001",
+        "EXT-002",
+        "EXT-005"
+      ],
+      "remainingGatesFromPackages": [
+        "providers"
+      ],
+      "releaseQualified": false
+    },
+    {
+      "requirementId": "ADR-015",
+      "release": "P0",
+      "coverageStatus": "mapped_scoped_coverage",
+      "packageIds": [
+        "governance"
+      ],
+      "backlogIds": [
+        "GOV-001",
+        "GOV-002",
+        "GOV-003",
+        "GOV-004",
+        "GOV-005",
+        "REL-008"
+      ],
+      "remainingGatesFromPackages": [
+        "governance"
+      ],
+      "releaseQualified": false
+    },
+    {
+      "requirementId": "TRD-CONSTRAINT-001",
+      "release": "P0",
+      "coverageStatus": "mapped_scoped_coverage",
+      "packageIds": [
+        "kernel",
+        "assets",
+        "retrieval"
+      ],
+      "backlogIds": [
+        "AI-002",
+        "CORE-004",
+        "CORE-009",
+        "CORE-010",
+        "FIX-001",
+        "REL-001",
+        "REL-008",
+        "REL-009"
+      ],
+      "remainingGatesFromPackages": [
+        "kernel",
+        "assets",
+        "retrieval"
+      ],
+      "releaseQualified": false
+    },
+    {
+      "requirementId": "TRD-CONSTRAINT-002",
+      "release": "P0",
+      "coverageStatus": "mapped_scoped_coverage",
+      "packageIds": [
+        "database"
+      ],
+      "backlogIds": [
+        "CORE-007",
+        "CORE-008",
+        "FIX-004"
+      ],
+      "remainingGatesFromPackages": [
+        "database"
+      ],
+      "releaseQualified": false
+    },
+    {
+      "requirementId": "TRD-CONSTRAINT-003",
+      "release": "P0",
+      "coverageStatus": "mapped_scoped_coverage",
+      "packageIds": [
+        "imports"
+      ],
+      "backlogIds": [
+        "FIX-001",
+        "PARITY-007",
+        "REL-004"
+      ],
+      "remainingGatesFromPackages": [
+        "imports"
+      ],
+      "releaseQualified": false
+    },
+    {
+      "requirementId": "TRD-CONSTRAINT-004",
+      "release": "P0",
+      "coverageStatus": "mapped_scoped_coverage",
+      "packageIds": [
+        "kernel",
+        "assets",
+        "retrieval"
+      ],
+      "backlogIds": [
+        "AI-002",
+        "CORE-004",
+        "CORE-009",
+        "CORE-010",
+        "FIX-001",
+        "REL-001",
+        "REL-008",
+        "REL-009"
+      ],
+      "remainingGatesFromPackages": [
+        "kernel",
+        "assets",
+        "retrieval"
+      ],
+      "releaseQualified": false
+    },
+    {
+      "requirementId": "TRD-CONSTRAINT-005",
+      "release": "P0",
+      "coverageStatus": "mapped_scoped_coverage",
+      "packageIds": [
+        "policy"
+      ],
+      "backlogIds": [
+        "AI-001",
+        "EXT-003",
+        "REL-008"
+      ],
+      "remainingGatesFromPackages": [
+        "policy"
+      ],
+      "releaseQualified": false
+    },
+    {
+      "requirementId": "TRD-CONSTRAINT-006",
+      "release": "P0",
+      "coverageStatus": "mapped_scoped_coverage",
+      "packageIds": [
+        "imports"
+      ],
+      "backlogIds": [
+        "FIX-001",
+        "PARITY-007",
+        "REL-004"
+      ],
+      "remainingGatesFromPackages": [
+        "imports"
+      ],
+      "releaseQualified": false
+    },
+    {
+      "requirementId": "TRD-CONSTRAINT-007",
+      "release": "P1",
+      "coverageStatus": "mapped_scoped_coverage",
+      "packageIds": [
+        "notion-api"
+      ],
+      "backlogIds": [
+        "PARITY-006"
+      ],
+      "remainingGatesFromPackages": [
+        "notion-api"
+      ],
+      "releaseQualified": false
+    },
+    {
+      "requirementId": "TRD-CONSTRAINT-008",
+      "release": "P0",
+      "coverageStatus": "mapped_scoped_coverage",
+      "packageIds": [
+        "retrieval"
+      ],
+      "backlogIds": [
+        "AI-002",
+        "CORE-004",
+        "CORE-009"
+      ],
+      "remainingGatesFromPackages": [
+        "retrieval"
+      ],
+      "releaseQualified": false
+    },
+    {
+      "requirementId": "TRD-CONSTRAINT-009",
+      "release": "P0",
+      "coverageStatus": "mapped_scoped_coverage",
+      "packageIds": [
+        "retrieval",
+        "ai-modes",
+        "memory"
+      ],
+      "backlogIds": [
+        "AI-001",
+        "AI-002",
+        "AI-003",
+        "CORE-004",
+        "CORE-009"
+      ],
+      "remainingGatesFromPackages": [
+        "retrieval",
+        "ai-modes",
+        "memory"
+      ],
+      "releaseQualified": false
+    },
+    {
+      "requirementId": "TRD-CONSTRAINT-010",
+      "release": "P0",
+      "coverageStatus": "mapped_scoped_coverage",
+      "packageIds": [
+        "meetings",
+        "runtime"
+      ],
+      "backlogIds": [
+        "AI-002",
+        "CORE-005",
+        "GOV-005",
+        "REL-003",
+        "REL-004",
+        "REL-005",
+        "REL-009"
+      ],
+      "remainingGatesFromPackages": [
+        "meetings",
+        "runtime"
+      ],
+      "releaseQualified": false
+    },
+    {
+      "requirementId": "TRD-CONSTRAINT-011",
+      "release": "P0",
+      "coverageStatus": "mapped_scoped_coverage",
+      "packageIds": [
+        "policy"
+      ],
+      "backlogIds": [
+        "AI-001",
+        "EXT-003",
+        "REL-008"
+      ],
+      "remainingGatesFromPackages": [
+        "policy"
+      ],
+      "releaseQualified": false
+    },
+    {
+      "requirementId": "TRD-CONSTRAINT-012",
+      "release": "P1",
+      "coverageStatus": "mapped_scoped_coverage",
+      "packageIds": [
+        "providers",
+        "credentials"
+      ],
+      "backlogIds": [
+        "EXT-001",
+        "EXT-002",
+        "EXT-005",
+        "REL-009"
+      ],
+      "remainingGatesFromPackages": [
+        "providers",
+        "credentials"
+      ],
+      "releaseQualified": false
+    },
+    {
+      "requirementId": "TRD-CONSTRAINT-013",
+      "release": "P1",
+      "coverageStatus": "mapped_scoped_coverage",
+      "packageIds": [
+        "providers",
+        "credentials"
+      ],
+      "backlogIds": [
+        "EXT-001",
+        "EXT-002",
+        "EXT-005",
+        "REL-009"
+      ],
+      "remainingGatesFromPackages": [
+        "providers",
+        "credentials"
+      ],
+      "releaseQualified": false
+    },
+    {
+      "requirementId": "TRD-CONSTRAINT-014",
+      "release": "P1",
+      "coverageStatus": "mapped_scoped_coverage",
+      "packageIds": [
+        "providers",
+        "credentials"
+      ],
+      "backlogIds": [
+        "EXT-001",
+        "EXT-002",
+        "EXT-005",
+        "REL-009"
+      ],
+      "remainingGatesFromPackages": [
+        "providers",
+        "credentials"
+      ],
+      "releaseQualified": false
+    },
+    {
+      "requirementId": "TRD-CONSTRAINT-015",
+      "release": "P0",
+      "coverageStatus": "mapped_scoped_coverage",
+      "packageIds": [
+        "kernel"
+      ],
+      "backlogIds": [
+        "CORE-010",
+        "REL-001",
+        "REL-008"
+      ],
+      "remainingGatesFromPackages": [
+        "kernel"
+      ],
+      "releaseQualified": false
+    },
+    {
+      "requirementId": "TRD-CONSTRAINT-016",
+      "release": "P1",
+      "coverageStatus": "mapped_scoped_coverage",
+      "packageIds": [
+        "automation"
+      ],
+      "backlogIds": [
+        "PARITY-010"
+      ],
+      "remainingGatesFromPackages": [
+        "automation"
+      ],
+      "releaseQualified": false
+    },
+    {
+      "requirementId": "TRD-CONSTRAINT-017",
+      "release": "P0",
+      "coverageStatus": "mapped_scoped_coverage",
+      "packageIds": [
+        "policy",
+        "assets",
+        "credentials",
+        "imports"
+      ],
+      "backlogIds": [
+        "AI-001",
+        "EXT-001",
+        "EXT-002",
+        "EXT-003",
+        "FIX-001",
+        "PARITY-007",
+        "REL-004",
+        "REL-008",
+        "REL-009"
+      ],
+      "remainingGatesFromPackages": [
+        "policy",
+        "assets",
+        "credentials",
+        "imports"
+      ],
+      "releaseQualified": false
+    },
+    {
+      "requirementId": "TRD-CONSTRAINT-018",
+      "release": "P0",
+      "coverageStatus": "mapped_scoped_coverage",
+      "packageIds": [
+        "recovery"
+      ],
+      "backlogIds": [
+        "CORE-006",
+        "CORE-010",
+        "FIX-002",
+        "REL-006"
+      ],
+      "remainingGatesFromPackages": [
+        "recovery"
+      ],
+      "releaseQualified": false
+    },
+    {
+      "requirementId": "TRD-CONSTRAINT-019",
+      "release": "P0",
+      "coverageStatus": "mapped_scoped_coverage",
+      "packageIds": [
+        "recovery"
+      ],
+      "backlogIds": [
+        "CORE-006",
+        "CORE-010",
+        "FIX-002",
+        "REL-006"
+      ],
+      "remainingGatesFromPackages": [
+        "recovery"
+      ],
+      "releaseQualified": false
+    },
+    {
+      "requirementId": "TRD-CONSTRAINT-020",
+      "release": "P0",
+      "coverageStatus": "partial_scope_unreconciled",
+      "packageIds": [
+        "diagnostics"
+      ],
+      "backlogIds": [
+        "GOV-003",
+        "REL-002",
+        "REL-008"
+      ],
+      "remainingGatesFromPackages": [
+        "diagnostics"
+      ],
+      "releaseQualified": false,
+      "unresolvedAcceptance": "Complete redacted diagnostics and the optional user-generated support bundle with explicit content selection were not located/qualified; only narrower diagnostics sources are linked."
+    },
+    {
+      "requirementId": "TRD-CONSTRAINT-021",
+      "release": "P0",
+      "coverageStatus": "mapped_scoped_coverage",
+      "packageIds": [
+        "performance"
+      ],
+      "backlogIds": [
+        "REL-007"
+      ],
+      "remainingGatesFromPackages": [
+        "performance"
+      ],
+      "releaseQualified": false
+    },
+    {
+      "requirementId": "TRD-CONSTRAINT-022",
+      "release": "P0",
+      "coverageStatus": "mapped_scoped_coverage",
+      "packageIds": [
+        "database"
+      ],
+      "backlogIds": [
+        "CORE-007",
+        "CORE-008",
+        "FIX-004"
+      ],
+      "remainingGatesFromPackages": [
+        "database"
+      ],
+      "releaseQualified": false
+    },
+    {
+      "requirementId": "TRD-CONSTRAINT-023",
+      "release": "P1",
+      "coverageStatus": "mapped_scoped_coverage",
+      "packageIds": [
+        "formula"
+      ],
+      "backlogIds": [
+        "PARITY-005"
+      ],
+      "remainingGatesFromPackages": [
+        "formula"
+      ],
+      "releaseQualified": false
+    },
+    {
+      "requirementId": "TRD-CONSTRAINT-024",
+      "release": "P0",
+      "coverageStatus": "mapped_scoped_coverage",
+      "packageIds": [
+        "presentation",
+        "editor",
+        "documents"
+      ],
+      "backlogIds": [
+        "CORE-003",
+        "FIX-003",
+        "FIX-006",
+        "GOV-005",
+        "PARITY-008",
+        "REL-002",
+        "REL-009"
+      ],
+      "remainingGatesFromPackages": [
+        "presentation",
+        "editor",
+        "documents"
+      ],
+      "releaseQualified": false
+    },
+    {
+      "requirementId": "TRD-CONSTRAINT-025",
+      "release": "P1",
+      "coverageStatus": "mapped_scoped_coverage",
+      "packageIds": [
+        "external-index"
+      ],
+      "backlogIds": [
+        "REL-002",
+        "REL-008"
+      ],
+      "remainingGatesFromPackages": [
+        "external-index"
+      ],
+      "releaseQualified": false
+    },
+    {
+      "requirementId": "TRD-CONSTRAINT-026",
+      "release": "P0",
+      "coverageStatus": "mapped_scoped_coverage",
+      "packageIds": [
+        "runtime"
+      ],
+      "backlogIds": [
+        "GOV-005",
+        "REL-005",
+        "REL-009"
+      ],
+      "remainingGatesFromPackages": [
+        "runtime"
+      ],
+      "releaseQualified": false
+    },
+    {
+      "requirementId": "TRD-CONSTRAINT-027",
+      "release": "P0",
+      "coverageStatus": "mapped_scoped_coverage",
+      "packageIds": [
+        "runtime"
+      ],
+      "backlogIds": [
+        "GOV-005",
+        "REL-005",
+        "REL-009"
+      ],
+      "remainingGatesFromPackages": [
+        "runtime"
+      ],
+      "releaseQualified": false
+    },
+    {
+      "requirementId": "TRD-CONSTRAINT-028",
+      "release": "P0",
+      "coverageStatus": "mapped_scoped_coverage",
+      "packageIds": [
+        "meetings",
+        "runtime"
+      ],
+      "backlogIds": [
+        "AI-002",
+        "CORE-005",
+        "GOV-005",
+        "REL-003",
+        "REL-004",
+        "REL-005",
+        "REL-009"
+      ],
+      "remainingGatesFromPackages": [
+        "meetings",
+        "runtime"
+      ],
+      "releaseQualified": false
+    },
+    {
+      "requirementId": "TRD-CONSTRAINT-029",
+      "release": "P0",
+      "coverageStatus": "mapped_scoped_coverage",
+      "packageIds": [
+        "memory"
+      ],
+      "backlogIds": [
+        "AI-002",
+        "AI-003"
+      ],
+      "remainingGatesFromPackages": [
+        "memory"
+      ],
+      "releaseQualified": false
+    },
+    {
+      "requirementId": "TRD-CONSTRAINT-030",
+      "release": "P0",
+      "coverageStatus": "mapped_scoped_coverage",
+      "packageIds": [
+        "memory"
+      ],
+      "backlogIds": [
+        "AI-002",
+        "AI-003"
+      ],
+      "remainingGatesFromPackages": [
+        "memory"
+      ],
+      "releaseQualified": false
+    },
+    {
+      "requirementId": "TRD-CONSTRAINT-031",
+      "release": "P0",
+      "coverageStatus": "mapped_scoped_coverage",
+      "packageIds": [
+        "distribution"
+      ],
+      "backlogIds": [
+        "REL-005",
+        "REL-006",
+        "REL-009"
+      ],
+      "remainingGatesFromPackages": [
+        "distribution"
+      ],
+      "releaseQualified": false
+    },
+    {
+      "requirementId": "TRD-CONSTRAINT-032",
+      "release": "P2",
+      "coverageStatus": "mapped_scoped_coverage",
+      "packageIds": [
+        "hosting"
+      ],
+      "backlogIds": [
+        "OPT-003",
+        "REL-009"
+      ],
+      "remainingGatesFromPackages": [
+        "hosting"
+      ],
+      "releaseQualified": false
+    },
+    {
+      "requirementId": "TRD-CONSTRAINT-033",
+      "release": "P1",
+      "coverageStatus": "mapped_scoped_coverage",
+      "packageIds": [
+        "mcp"
+      ],
+      "backlogIds": [
+        "EXT-003",
+        "EXT-004"
+      ],
+      "remainingGatesFromPackages": [
+        "mcp"
+      ],
+      "releaseQualified": false
+    },
+    {
+      "requirementId": "TRD-CONSTRAINT-034",
+      "release": "P0",
+      "coverageStatus": "mapped_scoped_coverage",
+      "packageIds": [
+        "release"
+      ],
+      "backlogIds": [
+        "REL-001",
+        "REL-002",
+        "REL-003",
+        "REL-004",
+        "REL-005",
+        "REL-006",
+        "REL-007",
+        "REL-008",
+        "REL-009"
+      ],
+      "remainingGatesFromPackages": [
+        "release"
+      ],
+      "releaseQualified": false
+    },
+    {
+      "requirementId": "PRD-CONSTRAINT-035",
+      "release": "P0",
+      "coverageStatus": "mapped_scoped_coverage",
+      "packageIds": [
+        "distribution"
+      ],
+      "backlogIds": [
+        "REL-005",
+        "REL-006",
+        "REL-009"
+      ],
+      "remainingGatesFromPackages": [
+        "distribution"
+      ],
+      "releaseQualified": false
+    },
+    {
+      "requirementId": "PRD-CONSTRAINT-036",
+      "release": "P0",
+      "coverageStatus": "mapped_scoped_coverage",
+      "packageIds": [
+        "memory"
+      ],
+      "backlogIds": [
+        "AI-002",
+        "AI-003"
+      ],
+      "remainingGatesFromPackages": [
+        "memory"
+      ],
+      "releaseQualified": false
+    },
+    {
+      "requirementId": "BASELINE-SQLITE-VEC-RELEASE",
+      "release": "P0",
+      "coverageStatus": "mapped_scoped_coverage",
+      "packageIds": [
+        "retrieval",
+        "release"
+      ],
+      "backlogIds": [
+        "AI-002",
+        "CORE-004",
+        "CORE-009",
+        "REL-001",
+        "REL-002",
+        "REL-003",
+        "REL-004",
+        "REL-005",
+        "REL-006",
+        "REL-007",
+        "REL-008",
+        "REL-009"
+      ],
+      "remainingGatesFromPackages": [
+        "retrieval",
+        "release"
+      ],
+      "releaseQualified": false
+    },
+    {
+      "requirementId": "PH1-A-STORAGE",
+      "release": "P0",
+      "coverageStatus": "mapped_scoped_coverage",
+      "packageIds": [
+        "kernel",
+        "recovery"
+      ],
+      "backlogIds": [
+        "CORE-006",
+        "CORE-010",
+        "FIX-002",
+        "REL-001",
+        "REL-006",
+        "REL-008"
+      ],
+      "remainingGatesFromPackages": [
+        "kernel",
+        "recovery"
+      ],
+      "releaseQualified": false
+    },
+    {
+      "requirementId": "PH1-A-POLICY",
+      "release": "P0",
+      "coverageStatus": "mapped_scoped_coverage",
+      "packageIds": [
+        "policy"
+      ],
+      "backlogIds": [
+        "AI-001",
+        "EXT-003",
+        "REL-008"
+      ],
+      "remainingGatesFromPackages": [
+        "policy"
+      ],
+      "releaseQualified": false
+    },
+    {
+      "requirementId": "PH1-A-JOBS",
+      "release": "P0",
+      "coverageStatus": "mapped_scoped_coverage",
+      "packageIds": [
+        "kernel"
+      ],
+      "backlogIds": [
+        "CORE-010",
+        "REL-001",
+        "REL-008"
+      ],
+      "remainingGatesFromPackages": [
+        "kernel"
+      ],
+      "releaseQualified": false
+    },
+    {
+      "requirementId": "PH1-B-NAV",
+      "release": "P0",
+      "coverageStatus": "mapped_scoped_coverage",
+      "packageIds": [
+        "navigation"
+      ],
+      "backlogIds": [
+        "FIX-004",
+        "FIX-005",
+        "REL-002"
+      ],
+      "remainingGatesFromPackages": [
+        "navigation"
+      ],
+      "releaseQualified": false
+    },
+    {
+      "requirementId": "PH1-B-EDITOR",
+      "release": "P0",
+      "coverageStatus": "mapped_scoped_coverage",
+      "packageIds": [
+        "editor",
+        "presentation"
+      ],
+      "backlogIds": [
+        "CORE-003",
+        "FIX-003",
+        "FIX-006",
+        "GOV-005",
+        "REL-002"
+      ],
+      "remainingGatesFromPackages": [
+        "editor",
+        "presentation"
+      ],
+      "releaseQualified": false
+    },
+    {
+      "requirementId": "PH1-B-PRESERVATION",
+      "release": "P0",
+      "coverageStatus": "mapped_scoped_coverage",
+      "packageIds": [
+        "editor",
+        "layout",
+        "imports"
+      ],
+      "backlogIds": [
+        "FIX-001",
+        "FIX-003",
+        "FIX-006",
+        "PARITY-001",
+        "PARITY-007",
+        "REL-002",
+        "REL-004"
+      ],
+      "remainingGatesFromPackages": [
+        "editor",
+        "layout",
+        "imports"
+      ],
+      "releaseQualified": false
+    },
+    {
+      "requirementId": "PH1-B-NAV-SCENARIOS",
+      "release": "P0",
+      "coverageStatus": "mapped_scoped_coverage",
+      "packageIds": [
+        "navigation"
+      ],
+      "backlogIds": [
+        "FIX-004",
+        "FIX-005",
+        "REL-002"
+      ],
+      "remainingGatesFromPackages": [
+        "navigation"
+      ],
+      "releaseQualified": false
+    },
+    {
+      "requirementId": "PH1-B-EDITOR-SCENARIOS",
+      "release": "P0",
+      "coverageStatus": "mapped_scoped_coverage",
+      "packageIds": [
+        "editor",
+        "presentation"
+      ],
+      "backlogIds": [
+        "CORE-003",
+        "FIX-003",
+        "FIX-006",
+        "GOV-005",
+        "REL-002"
+      ],
+      "remainingGatesFromPackages": [
+        "editor",
+        "presentation"
+      ],
+      "releaseQualified": false
+    },
+    {
+      "requirementId": "PH1-C-ENGINE",
+      "release": "P0",
+      "coverageStatus": "mapped_scoped_coverage",
+      "packageIds": [
+        "database"
+      ],
+      "backlogIds": [
+        "CORE-007",
+        "CORE-008",
+        "FIX-004"
+      ],
+      "remainingGatesFromPackages": [
+        "database"
+      ],
+      "releaseQualified": false
+    },
+    {
+      "requirementId": "PH1-C-VIEWS",
+      "release": "P0",
+      "coverageStatus": "mapped_scoped_coverage",
+      "packageIds": [
+        "database"
+      ],
+      "backlogIds": [
+        "CORE-007",
+        "CORE-008",
+        "FIX-004"
+      ],
+      "remainingGatesFromPackages": [
+        "database"
+      ],
+      "releaseQualified": false
+    },
+    {
+      "requirementId": "PH1-C-TASKS",
+      "release": "P0",
+      "coverageStatus": "mapped_scoped_coverage",
+      "packageIds": [
+        "tasks"
+      ],
+      "backlogIds": [
+        "AI-001",
+        "REL-001"
+      ],
+      "remainingGatesFromPackages": [
+        "tasks"
+      ],
+      "releaseQualified": false
+    },
+    {
+      "requirementId": "PH1-D-ASSETS",
+      "release": "P0",
+      "coverageStatus": "mapped_scoped_coverage",
+      "packageIds": [
+        "assets"
+      ],
+      "backlogIds": [
+        "FIX-001",
+        "REL-008",
+        "REL-009"
+      ],
+      "remainingGatesFromPackages": [
+        "assets"
+      ],
+      "releaseQualified": false
+    },
+    {
+      "requirementId": "PH1-D-HISTORY",
+      "release": "P0",
+      "coverageStatus": "mapped_scoped_coverage",
+      "packageIds": [
+        "recovery"
+      ],
+      "backlogIds": [
+        "CORE-006",
+        "CORE-010",
+        "FIX-002",
+        "REL-006"
+      ],
+      "remainingGatesFromPackages": [
+        "recovery"
+      ],
+      "releaseQualified": false
+    },
+    {
+      "requirementId": "PH1-D-BACKUP",
+      "release": "P0",
+      "coverageStatus": "mapped_scoped_coverage",
+      "packageIds": [
+        "recovery"
+      ],
+      "backlogIds": [
+        "CORE-006",
+        "CORE-010",
+        "FIX-002",
+        "REL-006"
+      ],
+      "remainingGatesFromPackages": [
+        "recovery"
+      ],
+      "releaseQualified": false
+    },
+    {
+      "requirementId": "PH1-E-WORKERS",
+      "release": "P0",
+      "coverageStatus": "mapped_scoped_coverage",
+      "packageIds": [
+        "runtime",
+        "meetings"
+      ],
+      "backlogIds": [
+        "AI-002",
+        "CORE-005",
+        "GOV-005",
+        "REL-003",
+        "REL-004",
+        "REL-005",
+        "REL-009"
+      ],
+      "remainingGatesFromPackages": [
+        "runtime",
+        "meetings"
+      ],
+      "releaseQualified": false
+    },
+    {
+      "requirementId": "PH1-E-MODELS",
+      "release": "P0",
+      "coverageStatus": "mapped_scoped_coverage",
+      "packageIds": [
+        "runtime",
+        "meetings"
+      ],
+      "backlogIds": [
+        "AI-002",
+        "CORE-005",
+        "GOV-005",
+        "REL-003",
+        "REL-004",
+        "REL-005",
+        "REL-009"
+      ],
+      "remainingGatesFromPackages": [
+        "runtime",
+        "meetings"
+      ],
+      "releaseQualified": false
+    },
+    {
+      "requirementId": "PH1-E-LOCAL-PACKAGE",
+      "release": "P0",
+      "coverageStatus": "mapped_scoped_coverage",
+      "packageIds": [
+        "distribution"
+      ],
+      "backlogIds": [
+        "REL-005",
+        "REL-006",
+        "REL-009"
+      ],
+      "remainingGatesFromPackages": [
+        "distribution"
+      ],
+      "releaseQualified": false
+    },
+    {
+      "requirementId": "PH1-INTEGRATION",
+      "release": "P0",
+      "coverageStatus": "mapped_scoped_coverage",
+      "packageIds": [
+        "release"
+      ],
+      "backlogIds": [
+        "REL-001",
+        "REL-002",
+        "REL-003",
+        "REL-004",
+        "REL-005",
+        "REL-006",
+        "REL-007",
+        "REL-008",
+        "REL-009"
+      ],
+      "remainingGatesFromPackages": [
+        "release"
+      ],
+      "releaseQualified": false
+    },
+    {
+      "requirementId": "PH1-B-NATIVE-INPUT",
+      "release": "P0",
+      "coverageStatus": "mapped_scoped_coverage",
+      "packageIds": [
+        "editor",
+        "release"
+      ],
+      "backlogIds": [
+        "FIX-003",
+        "FIX-006",
+        "REL-001",
+        "REL-002",
+        "REL-003",
+        "REL-004",
+        "REL-005",
+        "REL-006",
+        "REL-007",
+        "REL-008",
+        "REL-009"
+      ],
+      "remainingGatesFromPackages": [
+        "editor",
+        "release"
+      ],
+      "releaseQualified": false
+    },
+    {
+      "requirementId": "PH1-E-DISTRIBUTION",
+      "release": "P0",
+      "coverageStatus": "mapped_scoped_coverage",
+      "packageIds": [
+        "distribution"
+      ],
+      "backlogIds": [
+        "REL-005",
+        "REL-006",
+        "REL-009"
+      ],
+      "remainingGatesFromPackages": [
+        "distribution"
+      ],
+      "releaseQualified": false
+    },
+    {
+      "requirementId": "PH1-E-REAL-MIC",
+      "release": "P0",
+      "coverageStatus": "mapped_scoped_coverage",
+      "packageIds": [
+        "meetings",
+        "release"
+      ],
+      "backlogIds": [
+        "AI-002",
+        "CORE-005",
+        "REL-001",
+        "REL-002",
+        "REL-003",
+        "REL-004",
+        "REL-005",
+        "REL-006",
+        "REL-007",
+        "REL-008",
+        "REL-009"
+      ],
+      "remainingGatesFromPackages": [
+        "meetings",
+        "release"
+      ],
+      "releaseQualified": false
+    },
+    {
+      "requirementId": "PH2-A",
+      "release": "P0",
+      "coverageStatus": "mapped_scoped_coverage",
+      "packageIds": [
+        "imports",
+        "exports"
+      ],
+      "backlogIds": [
+        "FIX-001",
+        "PARITY-007",
+        "PARITY-008",
+        "REL-004"
+      ],
+      "remainingGatesFromPackages": [
+        "imports",
+        "exports"
+      ],
+      "releaseQualified": false
+    },
+    {
+      "requirementId": "PH2-B",
+      "release": "P0",
+      "coverageStatus": "mapped_scoped_coverage",
+      "packageIds": [
+        "retrieval",
+        "external-index",
+        "documents"
+      ],
+      "backlogIds": [
+        "AI-002",
+        "CORE-003",
+        "CORE-004",
+        "CORE-009",
+        "GOV-005",
+        "PARITY-008",
+        "REL-002",
+        "REL-008",
+        "REL-009"
+      ],
+      "remainingGatesFromPackages": [
+        "retrieval",
+        "external-index",
+        "documents"
+      ],
+      "releaseQualified": false
+    },
+    {
+      "requirementId": "PH2-C",
+      "release": "P0",
+      "coverageStatus": "mapped_scoped_coverage",
+      "packageIds": [
+        "ai-modes",
+        "memory",
+        "policy"
+      ],
+      "backlogIds": [
+        "AI-001",
+        "AI-002",
+        "AI-003",
+        "EXT-003",
+        "REL-008"
+      ],
+      "remainingGatesFromPackages": [
+        "ai-modes",
+        "memory",
+        "policy"
+      ],
+      "releaseQualified": false
+    },
+    {
+      "requirementId": "PH2-D",
+      "release": "P0",
+      "coverageStatus": "mapped_scoped_coverage",
+      "packageIds": [
+        "meetings"
+      ],
+      "backlogIds": [
+        "AI-002",
+        "CORE-005",
+        "REL-003",
+        "REL-004"
+      ],
+      "remainingGatesFromPackages": [
+        "meetings"
+      ],
+      "releaseQualified": false
+    },
+    {
+      "requirementId": "PH2-E",
+      "release": "P0",
+      "coverageStatus": "mapped_scoped_coverage",
+      "packageIds": [
+        "recovery"
+      ],
+      "backlogIds": [
+        "CORE-006",
+        "CORE-010",
+        "FIX-002",
+        "REL-006"
+      ],
+      "remainingGatesFromPackages": [
+        "recovery"
+      ],
+      "releaseQualified": false
+    }
+  ],
+  "excludedRows": [
+    {
+      "requirementId": "PH0-BASELINE",
+      "scope": "contract",
+      "reason": "Historical contract qualification remains in the original ledger; this overlay does not requalify it."
+    },
+    {
+      "requirementId": "PH0-IDENTITY",
+      "scope": "contract",
+      "reason": "Historical contract qualification remains in the original ledger; this overlay does not requalify it."
+    },
+    {
+      "requirementId": "PH0-REGISTRIES",
+      "scope": "contract",
+      "reason": "Historical contract qualification remains in the original ledger; this overlay does not requalify it."
+    },
+    {
+      "requirementId": "PH0-SERVICES",
+      "scope": "contract",
+      "reason": "Historical contract qualification remains in the original ledger; this overlay does not requalify it."
+    },
+    {
+      "requirementId": "PH0-MUTATIONS",
+      "scope": "contract",
+      "reason": "Historical contract qualification remains in the original ledger; this overlay does not requalify it."
+    },
+    {
+      "requirementId": "PH0-JOBS",
+      "scope": "contract",
+      "reason": "Historical contract qualification remains in the original ledger; this overlay does not requalify it."
+    },
+    {
+      "requirementId": "PH0-LOCATORS",
+      "scope": "contract",
+      "reason": "Historical contract qualification remains in the original ledger; this overlay does not requalify it."
+    },
+    {
+      "requirementId": "PH0-LEDGER",
+      "scope": "contract",
+      "reason": "Historical contract qualification remains in the original ledger; this overlay does not requalify it."
+    },
+    {
+      "requirementId": "PH0-TASKS",
+      "scope": "contract",
+      "reason": "Historical contract qualification remains in the original ledger; this overlay does not requalify it."
+    },
+    {
+      "requirementId": "PH0-REIMPORT",
+      "scope": "contract",
+      "reason": "Historical contract qualification remains in the original ledger; this overlay does not requalify it."
+    },
+    {
+      "requirementId": "PH0-MEMORY",
+      "scope": "contract",
+      "reason": "Historical contract qualification remains in the original ledger; this overlay does not requalify it."
+    },
+    {
+      "requirementId": "PH0-HANDOFF",
+      "scope": "contract",
+      "reason": "Historical contract qualification remains in the original ledger; this overlay does not requalify it."
+    },
+    {
+      "requirementId": "EXCLUDED-01",
+      "scope": "boundary",
+      "reason": "Excluded or proposed boundary remains unchanged; not promoted into product implementation scope."
+    },
+    {
+      "requirementId": "EXCLUDED-02",
+      "scope": "boundary",
+      "reason": "Excluded or proposed boundary remains unchanged; not promoted into product implementation scope."
+    },
+    {
+      "requirementId": "EXCLUDED-03",
+      "scope": "boundary",
+      "reason": "Excluded or proposed boundary remains unchanged; not promoted into product implementation scope."
+    },
+    {
+      "requirementId": "EXCLUDED-04",
+      "scope": "boundary",
+      "reason": "Excluded or proposed boundary remains unchanged; not promoted into product implementation scope."
+    },
+    {
+      "requirementId": "EXCLUDED-05",
+      "scope": "boundary",
+      "reason": "Excluded or proposed boundary remains unchanged; not promoted into product implementation scope."
+    },
+    {
+      "requirementId": "EXCLUDED-06",
+      "scope": "boundary",
+      "reason": "Excluded or proposed boundary remains unchanged; not promoted into product implementation scope."
+    },
+    {
+      "requirementId": "EXCLUDED-07",
+      "scope": "boundary",
+      "reason": "Excluded or proposed boundary remains unchanged; not promoted into product implementation scope."
+    },
+    {
+      "requirementId": "EXCLUDED-08",
+      "scope": "boundary",
+      "reason": "Excluded or proposed boundary remains unchanged; not promoted into product implementation scope."
+    },
+    {
+      "requirementId": "EXCLUDED-09",
+      "scope": "boundary",
+      "reason": "Excluded or proposed boundary remains unchanged; not promoted into product implementation scope."
+    },
+    {
+      "requirementId": "EXCLUDED-10",
+      "scope": "boundary",
+      "reason": "Excluded or proposed boundary remains unchanged; not promoted into product implementation scope."
+    },
+    {
+      "requirementId": "EXCLUDED-11",
+      "scope": "boundary",
+      "reason": "Excluded or proposed boundary remains unchanged; not promoted into product implementation scope."
+    },
+    {
+      "requirementId": "EXCLUDED-12",
+      "scope": "boundary",
+      "reason": "Excluded or proposed boundary remains unchanged; not promoted into product implementation scope."
+    },
+    {
+      "requirementId": "PROPOSED-01",
+      "scope": "boundary",
+      "reason": "Excluded or proposed boundary remains unchanged; not promoted into product implementation scope."
+    },
+    {
+      "requirementId": "PROPOSED-02",
+      "scope": "boundary",
+      "reason": "Excluded or proposed boundary remains unchanged; not promoted into product implementation scope."
+    }
+  ],
+  "releaseQualified": false,
+  "knownCandidateFailures": [
+    {
+      "sourceCommit": "be6fc81eef1d818a4255402a81b520d54b5c8623",
+      "failure": "Formatted-word search indexes adjacent rich-text runs with an inserted space. Original canonical text and marks remain intact.",
+      "evidencePath": "evidence/completion/candidate-be6fc81/native-ui/canonical-observation.json",
+      "backlogIds": [
+        "CORE-004",
+        "REL-002",
+        "REL-008"
+      ]
+    },
+    {
+      "sourceCommit": "be6fc81eef1d818a4255402a81b520d54b5c8623",
+      "failure": "One of 20 shell launches took 8399.656 ms, exceeding the declared 2500 ms threshold; all returned readiness.",
+      "evidencePath": "evidence/completion/candidate-be6fc81/shell.json",
+      "backlogIds": [
+        "REL-007"
+      ]
+    }
+  ]
+}

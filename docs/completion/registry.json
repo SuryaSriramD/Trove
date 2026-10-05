@@ -100,6 +100,48 @@
       ],
       "implementation_evidence": [
         "docs/completion/recovery.md"
+      ],
+      "evidence_target_status": "planned_destination_not_passing_evidence",
+      "requirements_overlay_ids": [
+        "FR-004",
+        "FR-013",
+        "V02",
+        "V03",
+        "R01",
+        "R03",
+        "PRD-EDITOR-023",
+        "PRD-PROPERTY-017-P0",
+        "PRD-PROPERTY-017-P1",
+        "PRD-PROPERTY-018-P0",
+        "PRD-PROPERTY-018-P1",
+        "PRD-PORTABLE-001",
+        "PRD-PORTABLE-002",
+        "PRD-PORTABLE-003",
+        "PRD-PORTABLE-004",
+        "PRD-PORTABLE-005",
+        "PRD-PORTABLE-006",
+        "PRD-PORTABLE-007",
+        "TRD-BLOCK-002-P0",
+        "TRD-BLOCK-002-P1",
+        "TRD-BLOCK-028",
+        "TRD-TYPE-018-P0",
+        "TRD-TYPE-018-P1",
+        "TRD-TYPE-019-P0",
+        "TRD-TYPE-019-P1",
+        "ADR-004",
+        "TRD-CONSTRAINT-001",
+        "TRD-CONSTRAINT-003",
+        "TRD-CONSTRAINT-004",
+        "TRD-CONSTRAINT-006",
+        "TRD-CONSTRAINT-017",
+        "PH1-B-PRESERVATION",
+        "PH1-D-ASSETS",
+        "PH2-A"
+      ],
+      "coverage_packages": [
+        "imports",
+        "exports",
+        "assets"
       ]
     },
     {
@@ -124,7 +166,29 @@
         "Windows": "unqualified",
         "Linux": "unqualified"
       },
-      "evidence_target": "evidence/completion/FIX-002/"
+      "evidence_target": "evidence/completion/FIX-002/",
+      "evidence_target_status": "planned_destination_not_passing_evidence",
+      "requirements_overlay_ids": [
+        "FR-013",
+        "FR-015",
+        "V06",
+        "R06",
+        "PRD-NAV-012",
+        "PRD-NAV-013",
+        "PRD-PORTABLE-009",
+        "TRD-CONSTRAINT-018",
+        "TRD-CONSTRAINT-019",
+        "PH1-A-STORAGE",
+        "PH1-D-HISTORY",
+        "PH1-D-BACKUP",
+        "PH2-E"
+      ],
+      "coverage_packages": [
+        "recovery"
+      ],
+      "implementation_evidence": [
+        "docs/completion/recovery.md"
+      ]
     },
     {
       "id": "FIX-003",
@@ -147,7 +211,66 @@
         "Windows": "unqualified",
         "Linux": "unqualified"
       },
-      "evidence_target": "evidence/completion/FIX-003/"
+      "evidence_target": "evidence/completion/FIX-003/",
+      "evidence_target_status": "planned_destination_not_passing_evidence",
+      "requirements_overlay_ids": [
+        "FR-002",
+        "FR-003",
+        "V04",
+        "R04",
+        "PRD-EDITOR-001",
+        "PRD-EDITOR-002",
+        "PRD-EDITOR-003",
+        "PRD-EDITOR-004",
+        "PRD-EDITOR-005",
+        "PRD-EDITOR-006",
+        "PRD-EDITOR-010",
+        "PRD-EDITOR-018",
+        "PRD-EDITOR-019",
+        "PRD-EDITOR-020",
+        "PRD-EDITOR-022",
+        "PRD-EDIT-001",
+        "PRD-EDIT-002",
+        "PRD-EDIT-003",
+        "PRD-EDIT-004",
+        "PRD-EDIT-005",
+        "PRD-EDIT-006",
+        "PRD-EDIT-007",
+        "PRD-EDIT-008",
+        "PRD-EDIT-009",
+        "PRD-EDIT-010",
+        "TRD-BLOCK-001",
+        "TRD-BLOCK-002-P0",
+        "TRD-BLOCK-002-P1",
+        "TRD-BLOCK-003",
+        "TRD-BLOCK-004",
+        "TRD-BLOCK-005",
+        "TRD-BLOCK-006",
+        "TRD-BLOCK-007",
+        "TRD-BLOCK-008",
+        "TRD-BLOCK-009",
+        "TRD-BLOCK-013",
+        "TRD-BLOCK-023",
+        "TRD-BLOCK-024",
+        "TRD-BLOCK-025",
+        "TRD-BLOCK-026",
+        "TRD-BLOCK-027",
+        "ADR-003",
+        "TRD-CONSTRAINT-024",
+        "PH1-B-EDITOR",
+        "PH1-B-PRESERVATION",
+        "PH1-B-EDITOR-SCENARIOS",
+        "PH1-B-NATIVE-INPUT"
+      ],
+      "coverage_packages": [
+        "editor",
+        "table",
+        "rich-style"
+      ],
+      "implementation_evidence": [
+        "docs/completion/rich-layouts.md",
+        "evidence/completion/checkpoint-1/browser-tests.json"
+      ]
     },
     {
       "id": "FIX-004",
@@ -171,7 +294,93 @@
         "Windows": "unqualified",
         "Linux": "unqualified"
       },
-      "evidence_target": "evidence/completion/FIX-004/"
+      "evidence_target": "evidence/completion/FIX-004/",
+      "evidence_target_status": "planned_destination_not_passing_evidence",
+      "requirements_overlay_ids": [
+        "FR-001",
+        "FR-005",
+        "FR-012",
+        "V01",
+        "V03",
+        "R02",
+        "R03",
+        "PRD-EDITOR-021",
+        "PRD-EDITOR-023",
+        "PRD-DATABASE-001",
+        "PRD-DATABASE-002",
+        "PRD-DATABASE-003",
+        "PRD-DATABASE-004",
+        "PRD-DATABASE-005",
+        "PRD-DATABASE-009",
+        "PRD-DATABASE-010",
+        "PRD-DATABASE-011",
+        "PRD-DATABASE-013",
+        "PRD-DATABASE-015",
+        "PRD-DATABASE-016",
+        "PRD-PROPERTY-001",
+        "PRD-PROPERTY-002",
+        "PRD-PROPERTY-003",
+        "PRD-PROPERTY-004",
+        "PRD-PROPERTY-005",
+        "PRD-PROPERTY-006",
+        "PRD-PROPERTY-007",
+        "PRD-PROPERTY-008",
+        "PRD-PROPERTY-009",
+        "PRD-PROPERTY-010",
+        "PRD-PROPERTY-013",
+        "PRD-PROPERTY-014",
+        "PRD-PROPERTY-015",
+        "PRD-PROPERTY-017-P0",
+        "PRD-PROPERTY-017-P1",
+        "PRD-PROPERTY-018-P0",
+        "PRD-PROPERTY-018-P1",
+        "PRD-NAV-001",
+        "PRD-NAV-002",
+        "PRD-NAV-003",
+        "PRD-NAV-004",
+        "PRD-NAV-005",
+        "PRD-NAV-006",
+        "PRD-NAV-007",
+        "PRD-NAV-008",
+        "PRD-NAV-009",
+        "TRD-TYPE-001",
+        "TRD-TYPE-002",
+        "TRD-TYPE-003",
+        "TRD-TYPE-004",
+        "TRD-TYPE-005",
+        "TRD-TYPE-006",
+        "TRD-TYPE-007",
+        "TRD-TYPE-008",
+        "TRD-TYPE-009",
+        "TRD-TYPE-010",
+        "TRD-TYPE-011",
+        "TRD-TYPE-014",
+        "TRD-TYPE-015",
+        "TRD-TYPE-016",
+        "TRD-TYPE-018-P0",
+        "TRD-TYPE-018-P1",
+        "TRD-TYPE-019-P0",
+        "TRD-TYPE-019-P1",
+        "TRD-VIEW-001",
+        "TRD-VIEW-002",
+        "TRD-VIEW-003",
+        "TRD-VIEW-004",
+        "TRD-VIEW-005",
+        "TRD-CONSTRAINT-002",
+        "TRD-CONSTRAINT-022",
+        "PH1-B-NAV",
+        "PH1-B-NAV-SCENARIOS",
+        "PH1-C-ENGINE",
+        "PH1-C-VIEWS"
+      ],
+      "coverage_packages": [
+        "navigation",
+        "database"
+      ],
+      "implementation_evidence": [
+        "docs/completion/views.md",
+        "evidence/completion/checkpoint-1/view-config-tests.json"
+      ]
     },
     {
       "id": "FIX-005",
@@ -195,7 +404,32 @@
         "Windows": "unqualified",
         "Linux": "unqualified"
       },
-      "evidence_target": "evidence/completion/FIX-005/"
+      "evidence_target": "evidence/completion/FIX-005/",
+      "evidence_target_status": "planned_destination_not_passing_evidence",
+      "requirements_overlay_ids": [
+        "FR-001",
+        "FR-005",
+        "PRD-EDITOR-021",
+        "PRD-EDITOR-023",
+        "PRD-NAV-001",
+        "PRD-NAV-002",
+        "PRD-NAV-003",
+        "PRD-NAV-004",
+        "PRD-NAV-005",
+        "PRD-NAV-006",
+        "PRD-NAV-007",
+        "PRD-NAV-008",
+        "PRD-NAV-009",
+        "PH1-B-NAV",
+        "PH1-B-NAV-SCENARIOS"
+      ],
+      "coverage_packages": [
+        "navigation"
+      ],
+      "implementation_evidence": [
+        "docs/completion/platform-desktop-packaging.md",
+        "evidence/completion/platform-desktop-packaging/manifest.json"
+      ]
     },
     {
       "id": "FIX-006",
@@ -218,7 +452,69 @@
         "Windows": "unqualified",
         "Linux": "unqualified"
       },
-      "evidence_target": "evidence/completion/FIX-006/"
+      "evidence_target": "evidence/completion/FIX-006/",
+      "evidence_target_status": "planned_destination_not_passing_evidence",
+      "requirements_overlay_ids": [
+        "FR-002",
+        "FR-003",
+        "V04",
+        "R04",
+        "PRD-EDITOR-001",
+        "PRD-EDITOR-002",
+        "PRD-EDITOR-003",
+        "PRD-EDITOR-004",
+        "PRD-EDITOR-005",
+        "PRD-EDITOR-006",
+        "PRD-EDITOR-016",
+        "PRD-EDITOR-017",
+        "PRD-EDITOR-018",
+        "PRD-EDITOR-019",
+        "PRD-EDITOR-020",
+        "PRD-EDITOR-022",
+        "PRD-EDITOR-025",
+        "PRD-EDIT-001",
+        "PRD-EDIT-002",
+        "PRD-EDIT-003",
+        "PRD-EDIT-004",
+        "PRD-EDIT-005",
+        "PRD-EDIT-006",
+        "PRD-EDIT-007",
+        "PRD-EDIT-008",
+        "PRD-EDIT-009",
+        "PRD-EDIT-010",
+        "TRD-BLOCK-001",
+        "TRD-BLOCK-002-P0",
+        "TRD-BLOCK-002-P1",
+        "TRD-BLOCK-003",
+        "TRD-BLOCK-004",
+        "TRD-BLOCK-005",
+        "TRD-BLOCK-006",
+        "TRD-BLOCK-007",
+        "TRD-BLOCK-008",
+        "TRD-BLOCK-009",
+        "TRD-BLOCK-021",
+        "TRD-BLOCK-022",
+        "TRD-BLOCK-023",
+        "TRD-BLOCK-024",
+        "TRD-BLOCK-025",
+        "TRD-BLOCK-026",
+        "TRD-BLOCK-027",
+        "TRD-BLOCK-029",
+        "ADR-003",
+        "TRD-CONSTRAINT-024",
+        "PH1-B-EDITOR",
+        "PH1-B-PRESERVATION",
+        "PH1-B-EDITOR-SCENARIOS",
+        "PH1-B-NATIVE-INPUT"
+      ],
+      "coverage_packages": [
+        "editor",
+        "layout"
+      ],
+      "implementation_evidence": [
+        "docs/completion/rich-layouts.md",
+        "evidence/completion/checkpoint-1/browser-tests.json"
+      ]
     },
     {
       "id": "CORE-001",
@@ -241,7 +537,20 @@
         "Windows": "unqualified",
         "Linux": "unqualified"
       },
-      "evidence_target": "evidence/completion/CORE-001/"
+      "evidence_target": "evidence/completion/CORE-001/",
+      "evidence_target_status": "planned_destination_not_passing_evidence",
+      "requirements_overlay_ids": [
+        "FR-002",
+        "FR-003",
+        "PRD-EDITOR-010",
+        "TRD-BLOCK-013"
+      ],
+      "coverage_packages": [
+        "table"
+      ],
+      "implementation_evidence": [
+        "evidence/completion/checkpoint-1/browser-tests.json"
+      ]
     },
     {
       "id": "CORE-002",
@@ -265,7 +574,21 @@
         "Windows": "unqualified",
         "Linux": "unqualified"
       },
-      "evidence_target": "evidence/completion/CORE-002/"
+      "evidence_target": "evidence/completion/CORE-002/",
+      "evidence_target_status": "planned_destination_not_passing_evidence",
+      "requirements_overlay_ids": [
+        "FR-002",
+        "FR-003",
+        "PRD-EDITOR-001",
+        "TRD-BLOCK-001"
+      ],
+      "coverage_packages": [
+        "rich-style"
+      ],
+      "implementation_evidence": [
+        "docs/completion/selected-stack-alignment.md",
+        "evidence/completion/checkpoint-1/browser-tests.json"
+      ]
     },
     {
       "id": "CORE-003",
@@ -288,7 +611,45 @@
         "Windows": "unqualified",
         "Linux": "unqualified"
       },
-      "evidence_target": "evidence/completion/CORE-003/"
+      "evidence_target": "evidence/completion/CORE-003/",
+      "evidence_target_status": "planned_destination_not_passing_evidence",
+      "requirements_overlay_ids": [
+        "FR-002",
+        "FR-003",
+        "PRD-EDITOR-007",
+        "PRD-EDITOR-008",
+        "PRD-EDITOR-009",
+        "PRD-EDITOR-011",
+        "PRD-EDITOR-012",
+        "PRD-EDITOR-013",
+        "PRD-PORTABLE-006",
+        "PRD-MEDIA-001",
+        "PRD-MEDIA-002",
+        "PRD-MEDIA-003",
+        "PRD-MEDIA-004",
+        "TRD-BLOCK-010",
+        "TRD-BLOCK-011",
+        "TRD-BLOCK-012",
+        "TRD-BLOCK-014",
+        "TRD-BLOCK-015",
+        "TRD-BLOCK-016",
+        "TRD-BLOCK-017",
+        "TRD-BLOCK-018",
+        "TRD-CONSTRAINT-024",
+        "PH1-B-EDITOR",
+        "PH1-B-EDITOR-SCENARIOS",
+        "PH2-B"
+      ],
+      "coverage_packages": [
+        "presentation",
+        "documents"
+      ],
+      "implementation_evidence": [
+        "docs/completion/selected-stack-alignment.md",
+        "evidence/completion/checkpoint-1/browser-tests.json",
+        "docs/completion/portable-documents.md",
+        "evidence/completion/portable-documents/manifest.json"
+      ]
     },
     {
       "id": "CORE-004",
@@ -314,6 +675,27 @@
       "evidence_target": "evidence/completion/CORE-004/",
       "implementation_evidence": [
         "docs/completion/retrieval.md"
+      ],
+      "evidence_target_status": "planned_destination_not_passing_evidence",
+      "requirements_overlay_ids": [
+        "FR-006",
+        "FR-007",
+        "FR-008",
+        "V09",
+        "PRD-AI-001",
+        "PRD-AI-002",
+        "TRD-LOCALAI-002",
+        "TRD-LOCALAI-003",
+        "ADR-005",
+        "TRD-CONSTRAINT-001",
+        "TRD-CONSTRAINT-004",
+        "TRD-CONSTRAINT-008",
+        "TRD-CONSTRAINT-009",
+        "BASELINE-SQLITE-VEC-RELEASE",
+        "PH2-B"
+      ],
+      "coverage_packages": [
+        "retrieval"
       ]
     },
     {
@@ -341,10 +723,30 @@
       "evidence_target": "evidence/completion/CORE-005/",
       "implementation_evidence": [
         "docs/completion/audio-decoding.md",
-        "evidence/completion/c7-c8-audio-evidence.json"
+        "evidence/completion/c7-c8-audio-evidence.json",
+        "docs/completion/macos-miniaudio.md",
+        "evidence/completion/macos-miniaudio-evidence.json"
       ],
       "followup_commits": [
         "b06c057"
+      ],
+      "evidence_target_status": "planned_destination_not_passing_evidence",
+      "requirements_overlay_ids": [
+        "FR-009",
+        "FR-010",
+        "PRD-AI-010",
+        "PRD-AI-011",
+        "TRD-LOCALAI-005",
+        "TRD-LOCALAI-006",
+        "TRD-CONSTRAINT-010",
+        "TRD-CONSTRAINT-028",
+        "PH1-E-WORKERS",
+        "PH1-E-MODELS",
+        "PH1-E-REAL-MIC",
+        "PH2-D"
+      ],
+      "coverage_packages": [
+        "meetings"
       ]
     },
     {
@@ -372,6 +774,25 @@
       "evidence_target": "evidence/completion/CORE-006/",
       "implementation_evidence": [
         "docs/completion/recovery.md"
+      ],
+      "evidence_target_status": "planned_destination_not_passing_evidence",
+      "requirements_overlay_ids": [
+        "FR-013",
+        "FR-015",
+        "V06",
+        "R06",
+        "PRD-NAV-012",
+        "PRD-NAV-013",
+        "PRD-PORTABLE-009",
+        "TRD-CONSTRAINT-018",
+        "TRD-CONSTRAINT-019",
+        "PH1-A-STORAGE",
+        "PH1-D-HISTORY",
+        "PH1-D-BACKUP",
+        "PH2-E"
+      ],
+      "coverage_packages": [
+        "recovery"
       ]
     },
     {
@@ -404,6 +825,72 @@
       ],
       "followup_commits": [
         "31ac9fe"
+      ],
+      "evidence_target_status": "planned_destination_not_passing_evidence",
+      "requirements_overlay_ids": [
+        "FR-012",
+        "V01",
+        "V03",
+        "R02",
+        "R03",
+        "PRD-DATABASE-001",
+        "PRD-DATABASE-002",
+        "PRD-DATABASE-003",
+        "PRD-DATABASE-004",
+        "PRD-DATABASE-005",
+        "PRD-DATABASE-009",
+        "PRD-DATABASE-010",
+        "PRD-DATABASE-011",
+        "PRD-DATABASE-013",
+        "PRD-DATABASE-015",
+        "PRD-DATABASE-016",
+        "PRD-PROPERTY-001",
+        "PRD-PROPERTY-002",
+        "PRD-PROPERTY-003",
+        "PRD-PROPERTY-004",
+        "PRD-PROPERTY-005",
+        "PRD-PROPERTY-006",
+        "PRD-PROPERTY-007",
+        "PRD-PROPERTY-008",
+        "PRD-PROPERTY-009",
+        "PRD-PROPERTY-010",
+        "PRD-PROPERTY-013",
+        "PRD-PROPERTY-014",
+        "PRD-PROPERTY-015",
+        "PRD-PROPERTY-017-P0",
+        "PRD-PROPERTY-017-P1",
+        "PRD-PROPERTY-018-P0",
+        "PRD-PROPERTY-018-P1",
+        "TRD-TYPE-001",
+        "TRD-TYPE-002",
+        "TRD-TYPE-003",
+        "TRD-TYPE-004",
+        "TRD-TYPE-005",
+        "TRD-TYPE-006",
+        "TRD-TYPE-007",
+        "TRD-TYPE-008",
+        "TRD-TYPE-009",
+        "TRD-TYPE-010",
+        "TRD-TYPE-011",
+        "TRD-TYPE-014",
+        "TRD-TYPE-015",
+        "TRD-TYPE-016",
+        "TRD-TYPE-018-P0",
+        "TRD-TYPE-018-P1",
+        "TRD-TYPE-019-P0",
+        "TRD-TYPE-019-P1",
+        "TRD-VIEW-001",
+        "TRD-VIEW-002",
+        "TRD-VIEW-003",
+        "TRD-VIEW-004",
+        "TRD-VIEW-005",
+        "TRD-CONSTRAINT-002",
+        "TRD-CONSTRAINT-022",
+        "PH1-C-ENGINE",
+        "PH1-C-VIEWS"
+      ],
+      "coverage_packages": [
+        "database"
       ]
     },
     {
@@ -430,6 +917,72 @@
       "evidence_target": "evidence/completion/CORE-008/",
       "implementation_evidence": [
         "docs/completion/views.md"
+      ],
+      "evidence_target_status": "planned_destination_not_passing_evidence",
+      "requirements_overlay_ids": [
+        "FR-012",
+        "V01",
+        "V03",
+        "R02",
+        "R03",
+        "PRD-DATABASE-001",
+        "PRD-DATABASE-002",
+        "PRD-DATABASE-003",
+        "PRD-DATABASE-004",
+        "PRD-DATABASE-005",
+        "PRD-DATABASE-009",
+        "PRD-DATABASE-010",
+        "PRD-DATABASE-011",
+        "PRD-DATABASE-013",
+        "PRD-DATABASE-015",
+        "PRD-DATABASE-016",
+        "PRD-PROPERTY-001",
+        "PRD-PROPERTY-002",
+        "PRD-PROPERTY-003",
+        "PRD-PROPERTY-004",
+        "PRD-PROPERTY-005",
+        "PRD-PROPERTY-006",
+        "PRD-PROPERTY-007",
+        "PRD-PROPERTY-008",
+        "PRD-PROPERTY-009",
+        "PRD-PROPERTY-010",
+        "PRD-PROPERTY-013",
+        "PRD-PROPERTY-014",
+        "PRD-PROPERTY-015",
+        "PRD-PROPERTY-017-P0",
+        "PRD-PROPERTY-017-P1",
+        "PRD-PROPERTY-018-P0",
+        "PRD-PROPERTY-018-P1",
+        "TRD-TYPE-001",
+        "TRD-TYPE-002",
+        "TRD-TYPE-003",
+        "TRD-TYPE-004",
+        "TRD-TYPE-005",
+        "TRD-TYPE-006",
+        "TRD-TYPE-007",
+        "TRD-TYPE-008",
+        "TRD-TYPE-009",
+        "TRD-TYPE-010",
+        "TRD-TYPE-011",
+        "TRD-TYPE-014",
+        "TRD-TYPE-015",
+        "TRD-TYPE-016",
+        "TRD-TYPE-018-P0",
+        "TRD-TYPE-018-P1",
+        "TRD-TYPE-019-P0",
+        "TRD-TYPE-019-P1",
+        "TRD-VIEW-001",
+        "TRD-VIEW-002",
+        "TRD-VIEW-003",
+        "TRD-VIEW-004",
+        "TRD-VIEW-005",
+        "TRD-CONSTRAINT-002",
+        "TRD-CONSTRAINT-022",
+        "PH1-C-ENGINE",
+        "PH1-C-VIEWS"
+      ],
+      "coverage_packages": [
+        "database"
       ]
     },
     {
@@ -457,6 +1010,27 @@
       "evidence_target": "evidence/completion/CORE-009/",
       "implementation_evidence": [
         "docs/completion/retrieval.md"
+      ],
+      "evidence_target_status": "planned_destination_not_passing_evidence",
+      "requirements_overlay_ids": [
+        "FR-006",
+        "FR-007",
+        "FR-008",
+        "V09",
+        "PRD-AI-001",
+        "PRD-AI-002",
+        "TRD-LOCALAI-002",
+        "TRD-LOCALAI-003",
+        "ADR-005",
+        "TRD-CONSTRAINT-001",
+        "TRD-CONSTRAINT-004",
+        "TRD-CONSTRAINT-008",
+        "TRD-CONSTRAINT-009",
+        "BASELINE-SQLITE-VEC-RELEASE",
+        "PH2-B"
+      ],
+      "coverage_packages": [
+        "retrieval"
       ]
     },
     {
@@ -488,6 +1062,36 @@
       ],
       "followup_commits": [
         "a00d1b5"
+      ],
+      "evidence_target_status": "planned_destination_not_passing_evidence",
+      "requirements_overlay_ids": [
+        "FR-001",
+        "FR-013",
+        "FR-015",
+        "V01",
+        "V06",
+        "R02",
+        "R06",
+        "PRD-NAV-012",
+        "PRD-NAV-013",
+        "PRD-PORTABLE-009",
+        "ADR-001",
+        "ADR-002",
+        "ADR-007",
+        "TRD-CONSTRAINT-001",
+        "TRD-CONSTRAINT-004",
+        "TRD-CONSTRAINT-015",
+        "TRD-CONSTRAINT-018",
+        "TRD-CONSTRAINT-019",
+        "PH1-A-STORAGE",
+        "PH1-A-JOBS",
+        "PH1-D-HISTORY",
+        "PH1-D-BACKUP",
+        "PH2-E"
+      ],
+      "coverage_packages": [
+        "kernel",
+        "recovery"
       ]
     },
     {
@@ -514,6 +1118,21 @@
       "evidence_target": "evidence/completion/PARITY-001/",
       "implementation_evidence": [
         "docs/completion/rich-layouts.md"
+      ],
+      "evidence_target_status": "planned_destination_not_passing_evidence",
+      "requirements_overlay_ids": [
+        "V04",
+        "R04",
+        "PRD-EDITOR-016",
+        "PRD-EDITOR-017",
+        "PRD-EDITOR-025",
+        "TRD-BLOCK-021",
+        "TRD-BLOCK-022",
+        "TRD-BLOCK-029",
+        "PH1-B-PRESERVATION"
+      ],
+      "coverage_packages": [
+        "layout"
       ]
     },
     {
@@ -541,6 +1160,17 @@
       "evidence_target": "evidence/completion/PARITY-002/",
       "implementation_evidence": [
         "docs/completion/online-content.md"
+      ],
+      "evidence_target_status": "planned_destination_not_passing_evidence",
+      "requirements_overlay_ids": [
+        "PRD-EDITOR-014",
+        "PRD-EDITOR-015",
+        "PRD-MEDIA-005",
+        "TRD-BLOCK-019",
+        "TRD-BLOCK-020"
+      ],
+      "coverage_packages": [
+        "online-content"
       ]
     },
     {
@@ -567,6 +1197,15 @@
       "evidence_target": "evidence/completion/PARITY-003/",
       "implementation_evidence": [
         "docs/completion/timeline.md"
+      ],
+      "evidence_target_status": "planned_destination_not_passing_evidence",
+      "requirements_overlay_ids": [
+        "PRD-DATABASE-006",
+        "PRD-DATABASE-014",
+        "TRD-VIEW-006"
+      ],
+      "coverage_packages": [
+        "timeline"
       ]
     },
     {
@@ -594,6 +1233,15 @@
       "evidence_target": "evidence/completion/PARITY-004/",
       "implementation_evidence": [
         "docs/completion/unified-templates.md"
+      ],
+      "evidence_target_status": "planned_destination_not_passing_evidence",
+      "requirements_overlay_ids": [
+        "PRD-EDIT-011",
+        "PRD-DATABASE-012",
+        "PRD-NAV-014"
+      ],
+      "coverage_packages": [
+        "templates"
       ]
     },
     {
@@ -620,6 +1268,19 @@
       "evidence_target": "evidence/completion/PARITY-005/",
       "implementation_evidence": [
         "docs/completion/formula-compatibility.md"
+      ],
+      "evidence_target_status": "planned_destination_not_passing_evidence",
+      "requirements_overlay_ids": [
+        "V05",
+        "R05",
+        "PRD-PROPERTY-011",
+        "PRD-PROPERTY-012",
+        "TRD-TYPE-012",
+        "TRD-TYPE-013",
+        "TRD-CONSTRAINT-023"
+      ],
+      "coverage_packages": [
+        "formula"
       ]
     },
     {
@@ -646,6 +1307,27 @@
       },
       "evidence_target": "evidence/completion/PARITY-006/",
       "evidence_documents": [
+        "docs/completion/notion-api-import.md"
+      ],
+      "evidence_target_status": "planned_destination_not_passing_evidence",
+      "requirements_overlay_ids": [
+        "FR-019",
+        "V02",
+        "R01",
+        "PRD-PROPERTY-017-P0",
+        "PRD-PROPERTY-017-P1",
+        "PRD-PROPERTY-018-P0",
+        "PRD-PROPERTY-018-P1",
+        "TRD-TYPE-018-P0",
+        "TRD-TYPE-018-P1",
+        "TRD-TYPE-019-P0",
+        "TRD-TYPE-019-P1",
+        "TRD-CONSTRAINT-007"
+      ],
+      "coverage_packages": [
+        "notion-api"
+      ],
+      "implementation_evidence": [
         "docs/completion/notion-api-import.md"
       ]
     },
@@ -674,6 +1356,48 @@
       "evidence_target": "evidence/completion/PARITY-007/",
       "implementation_evidence": [
         "docs/completion/import-structure.md"
+      ],
+      "evidence_target_status": "planned_destination_not_passing_evidence",
+      "requirements_overlay_ids": [
+        "V02",
+        "V03",
+        "V04",
+        "R01",
+        "R03",
+        "R04",
+        "PRD-EDITOR-016",
+        "PRD-EDITOR-017",
+        "PRD-EDITOR-025",
+        "PRD-PROPERTY-017-P0",
+        "PRD-PROPERTY-017-P1",
+        "PRD-PROPERTY-018-P0",
+        "PRD-PROPERTY-018-P1",
+        "PRD-PORTABLE-001",
+        "PRD-PORTABLE-002",
+        "PRD-PORTABLE-003",
+        "PRD-PORTABLE-004",
+        "PRD-PORTABLE-005",
+        "PRD-PORTABLE-007",
+        "TRD-BLOCK-002-P0",
+        "TRD-BLOCK-002-P1",
+        "TRD-BLOCK-021",
+        "TRD-BLOCK-022",
+        "TRD-BLOCK-028",
+        "TRD-BLOCK-029",
+        "TRD-TYPE-018-P0",
+        "TRD-TYPE-018-P1",
+        "TRD-TYPE-019-P0",
+        "TRD-TYPE-019-P1",
+        "ADR-004",
+        "TRD-CONSTRAINT-003",
+        "TRD-CONSTRAINT-006",
+        "TRD-CONSTRAINT-017",
+        "PH1-B-PRESERVATION",
+        "PH2-A"
+      ],
+      "coverage_packages": [
+        "layout",
+        "imports"
       ]
     },
     {
@@ -700,7 +1424,30 @@
       },
       "evidence_target": "evidence/completion/PARITY-008/",
       "implementation_evidence": [
-        "docs/completion/rich-pdf.md"
+        "docs/completion/rich-pdf.md",
+        "docs/completion/portable-documents.md",
+        "evidence/completion/portable-documents/manifest.json"
+      ],
+      "evidence_target_status": "planned_destination_not_passing_evidence",
+      "requirements_overlay_ids": [
+        "FR-013",
+        "PRD-EDITOR-013",
+        "PRD-PORTABLE-001",
+        "PRD-PORTABLE-002",
+        "PRD-PORTABLE-003",
+        "PRD-PORTABLE-004",
+        "PRD-PORTABLE-005",
+        "PRD-PORTABLE-006",
+        "PRD-PORTABLE-007",
+        "PRD-MEDIA-001",
+        "TRD-BLOCK-018",
+        "TRD-CONSTRAINT-024",
+        "PH2-A",
+        "PH2-B"
+      ],
+      "coverage_packages": [
+        "exports",
+        "documents"
       ]
     },
     {
@@ -727,6 +1474,18 @@
       },
       "evidence_target": "evidence/completion/PARITY-009/",
       "evidence_documents": [
+        "docs/completion/browser-clipper.md"
+      ],
+      "evidence_target_status": "planned_destination_not_passing_evidence",
+      "requirements_overlay_ids": [
+        "PRD-MEDIA-006",
+        "PRD-MEDIA-007",
+        "PRD-MEDIA-008"
+      ],
+      "coverage_packages": [
+        "capture"
+      ],
+      "implementation_evidence": [
         "docs/completion/browser-clipper.md"
       ]
     },
@@ -755,6 +1514,20 @@
       "evidence_target": "evidence/completion/PARITY-010/",
       "evidence_documents": [
         "docs/completion/automation-configuration.md"
+      ],
+      "evidence_target_status": "planned_destination_not_passing_evidence",
+      "requirements_overlay_ids": [
+        "FR-020",
+        "V07",
+        "R07",
+        "PRD-DATABASE-017",
+        "TRD-CONSTRAINT-016"
+      ],
+      "coverage_packages": [
+        "automation"
+      ],
+      "implementation_evidence": [
+        "docs/completion/automation-configuration.md"
       ]
     },
     {
@@ -782,6 +1555,45 @@
       "evidence_target": "evidence/completion/AI-001/",
       "implementation_evidence": [
         "docs/completion/reviewed-actions.md"
+      ],
+      "evidence_target_status": "planned_destination_not_passing_evidence",
+      "requirements_overlay_ids": [
+        "FR-007",
+        "FR-008",
+        "FR-011",
+        "FR-014",
+        "V10",
+        "PRD-AI-003",
+        "PRD-AI-004",
+        "PRD-AI-005",
+        "PRD-AI-006",
+        "PRD-AI-007",
+        "PRD-AI-008",
+        "PRD-AI-009",
+        "PRD-AI-010",
+        "PRD-AI-011",
+        "TRD-LOCALAI-001",
+        "TRD-LOCALAI-004",
+        "TRD-LOCALAI-005",
+        "TRD-LOCALAI-006",
+        "TRD-LOCALAI-007",
+        "TRD-LOCALAI-008",
+        "TRD-LOCALAI-009",
+        "TRD-LOCALAI-011",
+        "ADR-008",
+        "ADR-010",
+        "TRD-CONSTRAINT-005",
+        "TRD-CONSTRAINT-009",
+        "TRD-CONSTRAINT-011",
+        "TRD-CONSTRAINT-017",
+        "PH1-A-POLICY",
+        "PH1-C-TASKS",
+        "PH2-C"
+      ],
+      "coverage_packages": [
+        "policy",
+        "tasks",
+        "ai-modes"
       ]
     },
     {
@@ -799,10 +1611,10 @@
       "interface_boundary": "Retrieval evidence, model capabilities, memory freshness and reviewed proposals",
       "acceptance_scenario": "Long inputs have useful bounded behavior and explicit omissions; code replacement cannot drop omitted source; malformed outputs stay drafts; citations resolve to supplied current evidence; no silent cloud fallback. Record correctness, citation validity, latency, memory, and correction effort rather than relying only on schema-valid output.",
       "backlog_anchor": "../remaining-work.md#ai-002-qualify-context-budgeting-and-every-exposed-ai-mode",
-      "implementation": "in progress",
+      "implementation": "in_progress",
       "implementation_commit": "6403b78",
       "verification": {
-        "service_or_interface": "Original strict factual/memory and four held-out cases pass with optional 7B pack106; previous 1.5B failures retained. Broader mode/task/native quality remains unqualified.",
+        "service_or_interface": "All 14 fixed writing/structured modes pass on ab3ff13 with optional 7B pack; exact-token/typed-source/schema boundaries and strict memory/held-out cases have separate scoped evidence. Previous failures retained; no broad quality or release qualification.",
         "candidate": null,
         "macOS": "unqualified",
         "Windows": "unqualified",
@@ -815,15 +1627,75 @@
         "docs/completion/development-candidate-4900d4b.md",
         "docs/completion/memory-capacity.md",
         "evidence/completion/memory-capacity/manifest.json",
-        "docs/completion/native-memory-sampling.md"
+        "docs/completion/native-memory-sampling.md",
+        "docs/completion/ai-modes.md",
+        "evidence/completion/ai-modes/manifest.json"
       ],
       "followup_commits": [
         "4900d4b",
         "d74a719",
         "5140324",
-        "6fdd20d"
+        "6fdd20d",
+        "13a5750"
       ],
-      "remaining_qualification": "Evaluate every exposed mode, long representative content, correction effort and peak memory; extend memory preferences/constraints/source edits/deletion/forgetting and semantic relevance across representative data. A single model task family is not general quality qualification."
+      "remaining_qualification": "Representative long-context and mode task sets, actual user correction effort, controlled latency/concurrency/full application memory and native candidate/platform journeys remain open. The 14 fixed cases are not general quality approval.",
+      "evidence_target_status": "planned_destination_not_passing_evidence",
+      "requirements_overlay_ids": [
+        "FR-006",
+        "FR-007",
+        "FR-008",
+        "FR-009",
+        "FR-010",
+        "FR-016",
+        "V09",
+        "PRD-AI-001",
+        "PRD-AI-002",
+        "PRD-AI-003",
+        "PRD-AI-004",
+        "PRD-AI-005",
+        "PRD-AI-006",
+        "PRD-AI-007",
+        "PRD-AI-008",
+        "PRD-AI-009",
+        "PRD-AI-010",
+        "PRD-AI-011",
+        "PRD-AI-015",
+        "TRD-LOCALAI-001",
+        "TRD-LOCALAI-002",
+        "TRD-LOCALAI-003",
+        "TRD-LOCALAI-004",
+        "TRD-LOCALAI-005",
+        "TRD-LOCALAI-006",
+        "TRD-LOCALAI-007",
+        "TRD-LOCALAI-008",
+        "TRD-LOCALAI-009",
+        "TRD-LOCALAI-011",
+        "TRD-LOCALAI-014",
+        "ADR-005",
+        "ADR-011",
+        "TRD-CONSTRAINT-001",
+        "TRD-CONSTRAINT-004",
+        "TRD-CONSTRAINT-008",
+        "TRD-CONSTRAINT-009",
+        "TRD-CONSTRAINT-010",
+        "TRD-CONSTRAINT-028",
+        "TRD-CONSTRAINT-029",
+        "TRD-CONSTRAINT-030",
+        "PRD-CONSTRAINT-036",
+        "BASELINE-SQLITE-VEC-RELEASE",
+        "PH1-E-WORKERS",
+        "PH1-E-MODELS",
+        "PH1-E-REAL-MIC",
+        "PH2-B",
+        "PH2-C",
+        "PH2-D"
+      ],
+      "coverage_packages": [
+        "retrieval",
+        "ai-modes",
+        "memory",
+        "meetings"
+      ]
     },
     {
       "id": "AI-003",
@@ -839,7 +1711,7 @@
       "interface_boundary": "Retrieval evidence, model capabilities, memory freshness and reviewed proposals",
       "acceptance_scenario": "Memory improves the declared task set without overriding newer authoritative records; stale/forgotten entries remain excluded during concurrent changes, including entries restored in those states; decisions cite evidence. Explain that restoring an older backup can recover earlier memory states: forgetting does not retroactively erase historical backups. Semantic and lexical suggestions are distinguishable and scope-safe. Existing memory lifecycle services remain the foundation.",
       "backlog_anchor": "../remaining-work.md#ai-003-qualify-memory-and-semantic-related-content-workflows",
-      "implementation": "in progress",
+      "implementation": "in_progress",
       "implementation_commit": "6403b78",
       "verification": {
         "service_or_interface": "Original strict factual/memory and four held-out cases pass with optional 7B pack106; previous 1.5B failures retained. Broader mode/task/native quality remains unqualified.",
@@ -853,14 +1725,36 @@
         "docs/completion/ai-context.md",
         "docs/completion/development-candidate-4900d4b.md",
         "docs/completion/memory-capacity.md",
-        "evidence/completion/memory-capacity/manifest.json"
+        "evidence/completion/memory-capacity/manifest.json",
+        "docs/completion/related-content.md",
+        "evidence/completion/related-content-manifest.json"
       ],
       "followup_commits": [
         "4900d4b",
         "5140324",
         "6fdd20d"
       ],
-      "remaining_qualification": "Evaluate every exposed mode, long representative content, correction effort and peak memory; extend memory preferences/constraints/source edits/deletion/forgetting and semantic relevance across representative data. A single model task family is not general quality qualification."
+      "remaining_qualification": "Broader memory preferences/constraints/source edits/deletion/forgetting and semantic relevance across representative data remain open. Strict fixed and held-out passes with the optional 7B pack do not erase smaller-model failures or qualify native/platform behavior.",
+      "evidence_target_status": "planned_destination_not_passing_evidence",
+      "requirements_overlay_ids": [
+        "FR-016",
+        "V09",
+        "PRD-NAV-010",
+        "PRD-AI-013",
+        "PRD-AI-015",
+        "TRD-LOCALAI-010",
+        "TRD-LOCALAI-014",
+        "ADR-011",
+        "TRD-CONSTRAINT-009",
+        "TRD-CONSTRAINT-029",
+        "TRD-CONSTRAINT-030",
+        "PRD-CONSTRAINT-036",
+        "PH2-C"
+      ],
+      "coverage_packages": [
+        "memory",
+        "related"
+      ]
     },
     {
       "id": "EXT-001",
@@ -894,6 +1788,21 @@
       "followup_commits": [
         "b3b44a6",
         "b953fc7"
+      ],
+      "evidence_target_status": "planned_destination_not_passing_evidence",
+      "requirements_overlay_ids": [
+        "FR-018",
+        "V10",
+        "PRD-AI-016",
+        "ADR-014",
+        "TRD-CONSTRAINT-012",
+        "TRD-CONSTRAINT-013",
+        "TRD-CONSTRAINT-014",
+        "TRD-CONSTRAINT-017"
+      ],
+      "coverage_packages": [
+        "providers",
+        "credentials"
       ]
     },
     {
@@ -909,7 +1818,7 @@
       "interface_boundary": "Shared proposals, scoped grants, provider lifecycle and owning-kernel bridge",
       "acceptance_scenario": "A real completed request proves account/model eligibility; refresh/resume, account switching, denied tools, expired/revoked authorization, interrupted streams, and cancellation pass. Credentials remain out of logs/workspace/model prompts. API billing is never an automatic fallback.",
       "backlog_anchor": "../remaining-work.md#ext-002-complete-managed-codex-execution",
-      "implementation": "in progress",
+      "implementation": "in_progress",
       "implementation_commit": "01830f7",
       "verification": {
         "service_or_interface": "scoped transport/auth and desktop fixtures pass; real account inference remains unqualified",
@@ -934,6 +1843,21 @@
         "docs/completion/codex-siwc-auth.md",
         "docs/completion/platform-credentials.md",
         "docs/completion/credential-prompt-cancellation.md"
+      ],
+      "evidence_target_status": "planned_destination_not_passing_evidence",
+      "requirements_overlay_ids": [
+        "FR-018",
+        "V10",
+        "PRD-AI-016",
+        "ADR-014",
+        "TRD-CONSTRAINT-012",
+        "TRD-CONSTRAINT-013",
+        "TRD-CONSTRAINT-014",
+        "TRD-CONSTRAINT-017"
+      ],
+      "coverage_packages": [
+        "providers",
+        "credentials"
       ]
     },
     {
@@ -961,6 +1885,41 @@
       "evidence_target": "evidence/completion/EXT-003/",
       "implementation_evidence": [
         "docs/completion/reviewed-actions.md"
+      ],
+      "evidence_target_status": "planned_destination_not_passing_evidence",
+      "requirements_overlay_ids": [
+        "FR-014",
+        "V10",
+        "PRD-AI-003",
+        "PRD-AI-004",
+        "PRD-AI-005",
+        "PRD-AI-006",
+        "PRD-AI-007",
+        "PRD-AI-008",
+        "PRD-AI-009",
+        "PRD-AI-010",
+        "PRD-AI-011",
+        "TRD-LOCALAI-001",
+        "TRD-LOCALAI-004",
+        "TRD-LOCALAI-005",
+        "TRD-LOCALAI-006",
+        "TRD-LOCALAI-007",
+        "TRD-LOCALAI-008",
+        "TRD-LOCALAI-009",
+        "TRD-LOCALAI-011",
+        "ADR-008",
+        "ADR-009",
+        "ADR-010",
+        "TRD-CONSTRAINT-005",
+        "TRD-CONSTRAINT-011",
+        "TRD-CONSTRAINT-017",
+        "TRD-CONSTRAINT-033",
+        "PH1-A-POLICY",
+        "PH2-C"
+      ],
+      "coverage_packages": [
+        "policy",
+        "mcp"
       ]
     },
     {
@@ -992,6 +1951,15 @@
       ],
       "followup_commits": [
         "b3b44a6"
+      ],
+      "evidence_target_status": "planned_destination_not_passing_evidence",
+      "requirements_overlay_ids": [
+        "FR-014",
+        "ADR-009",
+        "TRD-CONSTRAINT-033"
+      ],
+      "coverage_packages": [
+        "mcp"
       ]
     },
     {
@@ -1007,16 +1975,35 @@
       "interface_boundary": "Shared proposals, scoped grants, provider lifecycle and owning-kernel bridge",
       "acceptance_scenario": "Handoffs exclude secrets, hidden reasoning, unrelated history, and uncommitted changes. Resume remains provider/account/version compatible. One active mutating provider run is enforced; duplicate retries cannot repeat effects. No unannounced provider/billing/context switch occurs.",
       "backlog_anchor": "../remaining-work.md#ext-005-qualify-provider-handoffs-and-client-interoperability",
-      "implementation": "in progress",
-      "implementation_commit": null,
+      "implementation": "in_progress",
+      "implementation_commit": "8e1e89e",
       "verification": {
-        "service_or_interface": "pending",
+        "service_or_interface": "Scoped lifecycle/handoff/approval fixtures and real installed runtime discovery/initialization evidence exist; authorized inference, compatible completed-turn resume and cross-provider handoffs remain unqualified.",
         "candidate": null,
         "macOS": "unqualified",
         "Windows": "unqualified",
         "Linux": "unqualified"
       },
-      "evidence_target": "evidence/completion/EXT-005/"
+      "evidence_target": "evidence/completion/EXT-005/",
+      "evidence_target_status": "planned_destination_not_passing_evidence",
+      "requirements_overlay_ids": [
+        "FR-018",
+        "V10",
+        "PRD-AI-016",
+        "ADR-014",
+        "TRD-CONSTRAINT-012",
+        "TRD-CONSTRAINT-013",
+        "TRD-CONSTRAINT-014"
+      ],
+      "coverage_packages": [
+        "providers"
+      ],
+      "implementation_evidence": [
+        "docs/completion/managed-runtimes.md",
+        "docs/completion/mcp-sdk.md",
+        "docs/completion/remote-mcp.md"
+      ],
+      "remaining_qualification": "Real authorized clients, completed/interrupted-turn resume, cross-provider handoffs, revocation and repeated/interrupted requests need current account/client evidence; Windows/Linux managed containment remains unavailable."
     },
     {
       "id": "REL-001",
@@ -1047,7 +2034,42 @@
       "evidence_target": "evidence/completion/REL-001/",
       "development_candidate_evidence": [
         "docs/completion/development-candidate-5d7cdb0.md",
-        "evidence/completion/candidate-5d7cdb0/manifest.json"
+        "evidence/completion/candidate-5d7cdb0/manifest.json",
+        "docs/completion/development-candidate-be6fc81.md",
+        "evidence/completion/candidate-be6fc81/manifest.json"
+      ],
+      "evidence_target_status": "planned_destination_not_passing_evidence",
+      "requirements_overlay_ids": [
+        "FR-001",
+        "FR-011",
+        "FR-021",
+        "V01",
+        "V08",
+        "R02",
+        "R08",
+        "ADR-001",
+        "ADR-002",
+        "ADR-007",
+        "TRD-CONSTRAINT-001",
+        "TRD-CONSTRAINT-004",
+        "TRD-CONSTRAINT-015",
+        "TRD-CONSTRAINT-034",
+        "BASELINE-SQLITE-VEC-RELEASE",
+        "PH1-A-STORAGE",
+        "PH1-A-JOBS",
+        "PH1-C-TASKS",
+        "PH1-INTEGRATION",
+        "PH1-B-NATIVE-INPUT",
+        "PH1-E-REAL-MIC"
+      ],
+      "coverage_packages": [
+        "kernel",
+        "tasks",
+        "release"
+      ],
+      "implementation_evidence": [
+        "docs/completion/development-candidate-4900d4b.md",
+        "evidence/completion/candidate-4900d4b/manifest.json"
       ]
     },
     {
@@ -1071,7 +2093,7 @@
       "implementation": "open",
       "implementation_commit": null,
       "verification": {
-        "service_or_interface": "pending",
+        "service_or_interface": "be6fc81 narrow native save/format/navigation/reopen observed; formatted-word search failed. Full native acceptance remains open.",
         "candidate": null,
         "macOS": "unqualified",
         "Windows": "unqualified",
@@ -1080,7 +2102,99 @@
       "evidence_target": "evidence/completion/REL-002/",
       "development_candidate_evidence": [
         "docs/completion/development-candidate-5d7cdb0.md",
-        "evidence/completion/candidate-5d7cdb0/manifest.json"
+        "evidence/completion/candidate-5d7cdb0/manifest.json",
+        "docs/completion/development-candidate-be6fc81.md",
+        "evidence/completion/candidate-be6fc81/manifest.json"
+      ],
+      "evidence_target_status": "planned_destination_not_passing_evidence",
+      "requirements_overlay_ids": [
+        "FR-001",
+        "FR-002",
+        "FR-003",
+        "FR-005",
+        "FR-021",
+        "V04",
+        "V08",
+        "R04",
+        "R08",
+        "PRD-EDITOR-001",
+        "PRD-EDITOR-002",
+        "PRD-EDITOR-003",
+        "PRD-EDITOR-004",
+        "PRD-EDITOR-005",
+        "PRD-EDITOR-006",
+        "PRD-EDITOR-013",
+        "PRD-EDITOR-018",
+        "PRD-EDITOR-019",
+        "PRD-EDITOR-020",
+        "PRD-EDITOR-021",
+        "PRD-EDITOR-022",
+        "PRD-EDITOR-023",
+        "PRD-EDIT-001",
+        "PRD-EDIT-002",
+        "PRD-EDIT-003",
+        "PRD-EDIT-004",
+        "PRD-EDIT-005",
+        "PRD-EDIT-006",
+        "PRD-EDIT-007",
+        "PRD-EDIT-008",
+        "PRD-EDIT-009",
+        "PRD-EDIT-010",
+        "PRD-NAV-001",
+        "PRD-NAV-002",
+        "PRD-NAV-003",
+        "PRD-NAV-004",
+        "PRD-NAV-005",
+        "PRD-NAV-006",
+        "PRD-NAV-007",
+        "PRD-NAV-008",
+        "PRD-NAV-009",
+        "PRD-PORTABLE-006",
+        "PRD-MEDIA-001",
+        "PRD-MEDIA-009",
+        "PRD-MEDIA-010",
+        "TRD-BLOCK-001",
+        "TRD-BLOCK-002-P0",
+        "TRD-BLOCK-002-P1",
+        "TRD-BLOCK-003",
+        "TRD-BLOCK-004",
+        "TRD-BLOCK-005",
+        "TRD-BLOCK-006",
+        "TRD-BLOCK-007",
+        "TRD-BLOCK-008",
+        "TRD-BLOCK-009",
+        "TRD-BLOCK-018",
+        "TRD-BLOCK-023",
+        "TRD-BLOCK-024",
+        "TRD-BLOCK-025",
+        "TRD-BLOCK-026",
+        "TRD-BLOCK-027",
+        "ADR-003",
+        "TRD-CONSTRAINT-020",
+        "TRD-CONSTRAINT-024",
+        "TRD-CONSTRAINT-025",
+        "TRD-CONSTRAINT-034",
+        "BASELINE-SQLITE-VEC-RELEASE",
+        "PH1-B-NAV",
+        "PH1-B-EDITOR",
+        "PH1-B-PRESERVATION",
+        "PH1-B-NAV-SCENARIOS",
+        "PH1-B-EDITOR-SCENARIOS",
+        "PH1-INTEGRATION",
+        "PH1-B-NATIVE-INPUT",
+        "PH1-E-REAL-MIC",
+        "PH2-B"
+      ],
+      "coverage_packages": [
+        "editor",
+        "navigation",
+        "external-index",
+        "release",
+        "diagnostics",
+        "documents"
+      ],
+      "implementation_evidence": [
+        "docs/completion/development-candidate-4900d4b.md"
       ]
     },
     {
@@ -1113,6 +2227,40 @@
       "implementation_evidence": [
         "docs/completion/macos-miniaudio.md",
         "docs/completion/microphone-portability.md"
+      ],
+      "evidence_target_status": "planned_destination_not_passing_evidence",
+      "requirements_overlay_ids": [
+        "FR-009",
+        "FR-010",
+        "FR-021",
+        "V08",
+        "R08",
+        "PRD-MEDIA-006",
+        "PRD-MEDIA-007",
+        "PRD-MEDIA-008",
+        "PRD-AI-010",
+        "PRD-AI-011",
+        "TRD-LOCALAI-005",
+        "TRD-LOCALAI-006",
+        "TRD-CONSTRAINT-010",
+        "TRD-CONSTRAINT-028",
+        "TRD-CONSTRAINT-034",
+        "BASELINE-SQLITE-VEC-RELEASE",
+        "PH1-E-WORKERS",
+        "PH1-E-MODELS",
+        "PH1-INTEGRATION",
+        "PH1-B-NATIVE-INPUT",
+        "PH1-E-REAL-MIC",
+        "PH2-D"
+      ],
+      "coverage_packages": [
+        "meetings",
+        "capture",
+        "release"
+      ],
+      "development_candidate_evidence": [
+        "docs/completion/development-candidate-be6fc81.md",
+        "evidence/completion/candidate-be6fc81/manifest.json"
       ]
     },
     {
@@ -1141,7 +2289,65 @@
         "Windows": "unqualified",
         "Linux": "unqualified"
       },
-      "evidence_target": "evidence/completion/REL-004/"
+      "evidence_target": "evidence/completion/REL-004/",
+      "evidence_target_status": "planned_destination_not_passing_evidence",
+      "requirements_overlay_ids": [
+        "FR-009",
+        "FR-010",
+        "FR-021",
+        "V02",
+        "V03",
+        "V08",
+        "R01",
+        "R03",
+        "R08",
+        "PRD-PROPERTY-017-P0",
+        "PRD-PROPERTY-017-P1",
+        "PRD-PROPERTY-018-P0",
+        "PRD-PROPERTY-018-P1",
+        "PRD-PORTABLE-001",
+        "PRD-PORTABLE-002",
+        "PRD-PORTABLE-003",
+        "PRD-PORTABLE-004",
+        "PRD-PORTABLE-005",
+        "PRD-PORTABLE-007",
+        "PRD-AI-010",
+        "PRD-AI-011",
+        "TRD-BLOCK-002-P0",
+        "TRD-BLOCK-002-P1",
+        "TRD-BLOCK-028",
+        "TRD-TYPE-018-P0",
+        "TRD-TYPE-018-P1",
+        "TRD-TYPE-019-P0",
+        "TRD-TYPE-019-P1",
+        "TRD-LOCALAI-005",
+        "TRD-LOCALAI-006",
+        "ADR-004",
+        "TRD-CONSTRAINT-003",
+        "TRD-CONSTRAINT-006",
+        "TRD-CONSTRAINT-010",
+        "TRD-CONSTRAINT-017",
+        "TRD-CONSTRAINT-028",
+        "TRD-CONSTRAINT-034",
+        "BASELINE-SQLITE-VEC-RELEASE",
+        "PH1-B-PRESERVATION",
+        "PH1-E-WORKERS",
+        "PH1-E-MODELS",
+        "PH1-INTEGRATION",
+        "PH1-B-NATIVE-INPUT",
+        "PH1-E-REAL-MIC",
+        "PH2-A",
+        "PH2-D"
+      ],
+      "coverage_packages": [
+        "imports",
+        "meetings",
+        "release"
+      ],
+      "implementation_evidence": [
+        "docs/completion/notion-api-import.md",
+        "docs/completion/audio-decoding.md"
+      ]
     },
     {
       "id": "REL-005",
@@ -1168,7 +2374,44 @@
         "Windows": "unqualified",
         "Linux": "unqualified"
       },
-      "evidence_target": "evidence/completion/REL-005/"
+      "evidence_target": "evidence/completion/REL-005/",
+      "evidence_target_status": "planned_destination_not_passing_evidence",
+      "requirements_overlay_ids": [
+        "FR-017",
+        "FR-021",
+        "V08",
+        "R08",
+        "ADR-006",
+        "ADR-012",
+        "TRD-CONSTRAINT-010",
+        "TRD-CONSTRAINT-026",
+        "TRD-CONSTRAINT-027",
+        "TRD-CONSTRAINT-028",
+        "TRD-CONSTRAINT-031",
+        "TRD-CONSTRAINT-034",
+        "PRD-CONSTRAINT-035",
+        "BASELINE-SQLITE-VEC-RELEASE",
+        "PH1-E-WORKERS",
+        "PH1-E-MODELS",
+        "PH1-E-LOCAL-PACKAGE",
+        "PH1-INTEGRATION",
+        "PH1-B-NATIVE-INPUT",
+        "PH1-E-DISTRIBUTION",
+        "PH1-E-REAL-MIC"
+      ],
+      "coverage_packages": [
+        "runtime",
+        "distribution",
+        "release"
+      ],
+      "implementation_evidence": [
+        "docs/completion/platform-desktop-packaging.md",
+        "docs/completion/development-candidate-4900d4b.md"
+      ],
+      "development_candidate_evidence": [
+        "docs/completion/development-candidate-be6fc81.md",
+        "evidence/completion/candidate-be6fc81/manifest.json"
+      ]
     },
     {
       "id": "REL-006",
@@ -1186,7 +2429,7 @@
       "interface_boundary": "Immutable candidates, platform support and acceptance evidence",
       "acceptance_scenario": "Published artifacts have verified hashes and reproducible manifests; upgrades and rollback preserve canonical data; failed updates retain recoverable state; uninstall does not delete workspaces without an explicit request. Keep the current ad-hoc build labeled as such until these checks pass.",
       "backlog_anchor": "../remaining-work.md#rel-006-finish-distribution-update-and-recovery-qualification",
-      "implementation": "in progress",
+      "implementation": "in_progress",
       "implementation_commit": null,
       "verification": {
         "service_or_interface": "migration/recovery, reviewed update kit and rollback launch fixtures passed; actual ad-hoc app correctly rejected by production verifier",
@@ -1205,7 +2448,45 @@
         "docs/completion/verified-updates.md",
         "evidence/completion/verified-updates/manifest.json"
       ],
-      "remaining_qualification": "Source includes full pre-migration snapshots, app signature/identity verification, external recovery kits, compatible restore and explicit guarded previous-app launch. Actual signed app pairs, startup-ready acknowledgement, public distribution, physical power-loss, independent clean-machine update/rollback and uninstall qualification remain open."
+      "remaining_qualification": "Source includes full pre-migration snapshots, app signature/identity verification, external recovery kits, compatible restore and explicit guarded previous-app launch. Actual signed app pairs, startup-ready acknowledgement, public distribution, physical power-loss, independent clean-machine update/rollback and uninstall qualification remain open.",
+      "evidence_target_status": "planned_destination_not_passing_evidence",
+      "requirements_overlay_ids": [
+        "FR-013",
+        "FR-015",
+        "FR-017",
+        "FR-021",
+        "V06",
+        "V08",
+        "R06",
+        "R08",
+        "PRD-NAV-012",
+        "PRD-NAV-013",
+        "PRD-PORTABLE-009",
+        "TRD-CONSTRAINT-018",
+        "TRD-CONSTRAINT-019",
+        "TRD-CONSTRAINT-031",
+        "TRD-CONSTRAINT-034",
+        "PRD-CONSTRAINT-035",
+        "BASELINE-SQLITE-VEC-RELEASE",
+        "PH1-A-STORAGE",
+        "PH1-D-HISTORY",
+        "PH1-D-BACKUP",
+        "PH1-E-LOCAL-PACKAGE",
+        "PH1-INTEGRATION",
+        "PH1-B-NATIVE-INPUT",
+        "PH1-E-DISTRIBUTION",
+        "PH1-E-REAL-MIC",
+        "PH2-E"
+      ],
+      "coverage_packages": [
+        "recovery",
+        "distribution",
+        "release"
+      ],
+      "development_candidate_evidence": [
+        "docs/completion/development-candidate-be6fc81.md",
+        "evidence/completion/candidate-be6fc81/manifest.json"
+      ]
     },
     {
       "id": "REL-007",
@@ -1229,7 +2510,7 @@
       "implementation": "in_progress",
       "implementation_commit": null,
       "verification": {
-        "service_or_interface": "bounded_measurements_recorded_startup_intermittency_unresolved",
+        "service_or_interface": "be6fc81: 20 readiness returns; startup threshold failed at 8399.656 ms. Synthetic keyword and 100-page actual hybrid targets passed within recorded service scope; 10k typed formula/rollup remain measured limits.",
         "candidate": null,
         "macOS": "unqualified",
         "Windows": "unqualified",
@@ -1238,13 +2519,31 @@
       "evidence_target": "evidence/completion/REL-007/",
       "development_candidate_evidence": [
         "docs/completion/development-candidate-5d7cdb0.md",
-        "evidence/completion/candidate-5d7cdb0/manifest.json"
+        "evidence/completion/candidate-5d7cdb0/manifest.json",
+        "docs/completion/development-candidate-be6fc81.md",
+        "evidence/completion/candidate-be6fc81/manifest.json"
       ],
       "implementation_evidence": [
         "docs/completion/development-candidate-5d7cdb0.md",
         "docs/completion/database-performance.md",
         "docs/completion/startup-investigation.md",
         "docs/completion/native-memory-sampling.md"
+      ],
+      "evidence_target_status": "planned_destination_not_passing_evidence",
+      "requirements_overlay_ids": [
+        "FR-021",
+        "V08",
+        "R08",
+        "TRD-CONSTRAINT-021",
+        "TRD-CONSTRAINT-034",
+        "BASELINE-SQLITE-VEC-RELEASE",
+        "PH1-INTEGRATION",
+        "PH1-B-NATIVE-INPUT",
+        "PH1-E-REAL-MIC"
+      ],
+      "coverage_packages": [
+        "performance",
+        "release"
       ]
     },
     {
@@ -1279,7 +2578,9 @@
       "evidence_target": "evidence/completion/REL-008/",
       "development_candidate_evidence": [
         "docs/completion/development-candidate-5d7cdb0.md",
-        "evidence/completion/candidate-5d7cdb0/manifest.json"
+        "evidence/completion/candidate-5d7cdb0/manifest.json",
+        "docs/completion/development-candidate-be6fc81.md",
+        "evidence/completion/candidate-be6fc81/manifest.json"
       ],
       "followup_commits": [
         "44f7262",
@@ -1291,7 +2592,74 @@
         "docs/completion/pre-migration-snapshots.md",
         "evidence/completion/secret-service-fixture/manifest.json",
         "docs/completion/codegen-reproducibility.md"
-      ]
+      ],
+      "evidence_target_status": "planned_destination_not_passing_evidence",
+      "requirements_overlay_ids": [
+        "FR-001",
+        "FR-004",
+        "FR-014",
+        "FR-021",
+        "V01",
+        "V08",
+        "V10",
+        "R02",
+        "R08",
+        "PRD-EDITOR-023",
+        "PRD-MEDIA-009",
+        "PRD-MEDIA-010",
+        "PRD-AI-003",
+        "PRD-AI-004",
+        "PRD-AI-005",
+        "PRD-AI-006",
+        "PRD-AI-007",
+        "PRD-AI-008",
+        "PRD-AI-009",
+        "PRD-AI-010",
+        "PRD-AI-011",
+        "TRD-LOCALAI-001",
+        "TRD-LOCALAI-004",
+        "TRD-LOCALAI-005",
+        "TRD-LOCALAI-006",
+        "TRD-LOCALAI-007",
+        "TRD-LOCALAI-008",
+        "TRD-LOCALAI-009",
+        "TRD-LOCALAI-011",
+        "ADR-001",
+        "ADR-002",
+        "ADR-007",
+        "ADR-008",
+        "ADR-010",
+        "ADR-015",
+        "TRD-CONSTRAINT-001",
+        "TRD-CONSTRAINT-004",
+        "TRD-CONSTRAINT-005",
+        "TRD-CONSTRAINT-011",
+        "TRD-CONSTRAINT-015",
+        "TRD-CONSTRAINT-017",
+        "TRD-CONSTRAINT-020",
+        "TRD-CONSTRAINT-025",
+        "TRD-CONSTRAINT-034",
+        "BASELINE-SQLITE-VEC-RELEASE",
+        "PH1-A-STORAGE",
+        "PH1-A-POLICY",
+        "PH1-A-JOBS",
+        "PH1-D-ASSETS",
+        "PH1-INTEGRATION",
+        "PH1-B-NATIVE-INPUT",
+        "PH1-E-REAL-MIC",
+        "PH2-B",
+        "PH2-C"
+      ],
+      "coverage_packages": [
+        "kernel",
+        "policy",
+        "assets",
+        "external-index",
+        "governance",
+        "release",
+        "diagnostics"
+      ],
+      "remaining_qualification": "Preserve the be6fc81 formatted-word search failure and add a source regression/candidate retest; ongoing audit, model, native, device and platform regressions remain required."
     },
     {
       "id": "REL-009",
@@ -1306,10 +2674,10 @@
       "interface_boundary": "Immutable candidates, platform support and acceptance evidence",
       "acceptance_scenario": "Publish platform-specific supported features and evidence. Do not infer cross-platform readiness from Go portability or the macOS build.",
       "backlog_anchor": "../remaining-work.md#rel-009-qualify-additional-platforms-separately",
-      "implementation": "in progress",
+      "implementation": "in_progress",
       "implementation_commit": null,
       "verification": {
-        "service_or_interface": "pending",
+        "service_or_interface": "Native worker, decoder, capture, OCR, packaging/routing, credential, file-identity, private-storage and Windows document-helper sources exist; cross-compilation/host fixtures do not establish target execution.",
         "candidate": null,
         "macOS": "unqualified",
         "Windows": "unqualified",
@@ -1324,7 +2692,11 @@
         "8a96bdc",
         "5cb3f72",
         "f780919",
-        "c473568"
+        "c473568",
+        "dd74fbb",
+        "cb12af4",
+        "8883464",
+        "7f6b196"
       ],
       "implementation_evidence": [
         "docs/completion/platform-native-workers.md",
@@ -1335,9 +2707,64 @@
         "docs/completion/macos-miniaudio.md",
         "docs/completion/microphone-portability.md",
         "docs/completion/platform-desktop-packaging.md",
-        "docs/completion/portable-ocr.md"
+        "docs/completion/portable-ocr.md",
+        "docs/completion/windows-storage.md",
+        "evidence/completion/windows-storage/manifest.json",
+        "docs/completion/windows-document-helper.md",
+        "docs/completion/portable-documents.md",
+        "evidence/completion/portable-documents/manifest.json"
       ],
-      "remaining_qualification": "Worker, protected credential, decoder, capture, OCR, ownership/identity, offline desktop packaging and launch-routing sources exist. Actual Windows/Linux native builds/execution, PDF/screenshot completion, Windows publication durability/workspace ACLs, provider containment, clean installation/update/rollback/uninstall, backup portability and full applicable product matrix remain open."
+      "remaining_qualification": "Actual Windows/Linux native builds and execution, device/screenshot capture, WebView/PDF behavior, provider containment, clean install/update/rollback/uninstall and full product matrix remain open. Windows new-workspace creation, migration, backup, restore and transfer explicitly unavailable pending directory/marker durability protocol.",
+      "evidence_target_status": "planned_destination_not_passing_evidence",
+      "requirements_overlay_ids": [
+        "FR-004",
+        "FR-017",
+        "FR-021",
+        "V08",
+        "R08",
+        "PRD-EDITOR-013",
+        "PRD-EDITOR-023",
+        "PRD-PORTABLE-006",
+        "PRD-MEDIA-001",
+        "TRD-BLOCK-018",
+        "ADR-006",
+        "ADR-012",
+        "ADR-013",
+        "TRD-CONSTRAINT-001",
+        "TRD-CONSTRAINT-004",
+        "TRD-CONSTRAINT-010",
+        "TRD-CONSTRAINT-012",
+        "TRD-CONSTRAINT-013",
+        "TRD-CONSTRAINT-014",
+        "TRD-CONSTRAINT-017",
+        "TRD-CONSTRAINT-024",
+        "TRD-CONSTRAINT-026",
+        "TRD-CONSTRAINT-027",
+        "TRD-CONSTRAINT-028",
+        "TRD-CONSTRAINT-031",
+        "TRD-CONSTRAINT-032",
+        "TRD-CONSTRAINT-034",
+        "PRD-CONSTRAINT-035",
+        "BASELINE-SQLITE-VEC-RELEASE",
+        "PH1-D-ASSETS",
+        "PH1-E-WORKERS",
+        "PH1-E-MODELS",
+        "PH1-E-LOCAL-PACKAGE",
+        "PH1-INTEGRATION",
+        "PH1-B-NATIVE-INPUT",
+        "PH1-E-DISTRIBUTION",
+        "PH1-E-REAL-MIC",
+        "PH2-B"
+      ],
+      "coverage_packages": [
+        "assets",
+        "runtime",
+        "hosting",
+        "credentials",
+        "distribution",
+        "release",
+        "documents"
+      ]
     },
     {
       "id": "GOV-001",
@@ -1364,6 +2791,15 @@
       "implementation_evidence": [
         "docs/completion/codegen-reproducibility.md",
         "docs/completion/platform-desktop-packaging.md"
+      ],
+      "evidence_target_status": "planned_destination_not_passing_evidence",
+      "requirements_overlay_ids": [
+        "FR-021",
+        "R08",
+        "ADR-015"
+      ],
+      "coverage_packages": [
+        "governance"
       ]
     },
     {
@@ -1392,6 +2828,15 @@
       "implementation_evidence": [
         "docs/completion/codegen-reproducibility.md",
         "docs/completion/platform-desktop-packaging.md"
+      ],
+      "evidence_target_status": "planned_destination_not_passing_evidence",
+      "requirements_overlay_ids": [
+        "FR-021",
+        "R08",
+        "ADR-015"
+      ],
+      "coverage_packages": [
+        "governance"
       ]
     },
     {
@@ -1413,13 +2858,29 @@
       "implementation": "in_progress",
       "implementation_commit": null,
       "verification": {
-        "service_or_interface": "pending",
+        "service_or_interface": "Current overlay accounts for every original ledger ID and links all 51 backlog items to scoped sources/evidence or an explicit unresolved state; historical ledger statuses remain unchanged.",
         "candidate": null,
         "macOS": "unqualified",
         "Windows": "unqualified",
         "Linux": "unqualified"
       },
-      "evidence_target": "evidence/completion/GOV-003/"
+      "evidence_target": "evidence/completion/GOV-003/",
+      "evidence_target_status": "planned_destination_not_passing_evidence",
+      "requirements_overlay_ids": [
+        "FR-021",
+        "R08",
+        "ADR-015",
+        "TRD-CONSTRAINT-020"
+      ],
+      "coverage_packages": [
+        "governance",
+        "diagnostics"
+      ],
+      "implementation_evidence": [
+        "docs/completion/requirements-overlay.json",
+        "docs/completion/requirements-reconciliation.md"
+      ],
+      "remaining_qualification": "Ongoing candidate/platform reconciliation and missing research remain open; mapping to implementation packages does not close entire acceptance criteria."
     },
     {
       "id": "GOV-004",
@@ -1442,7 +2903,21 @@
         "Windows": "unqualified",
         "Linux": "unqualified"
       },
-      "evidence_target": "evidence/completion/GOV-004/"
+      "evidence_target": "evidence/completion/GOV-004/",
+      "evidence_target_status": "planned_destination_not_passing_evidence",
+      "requirements_overlay_ids": [
+        "FR-021",
+        "R08",
+        "ADR-015"
+      ],
+      "coverage_packages": [
+        "governance"
+      ],
+      "implementation_evidence": [],
+      "status_evidence": [
+        "docs/phase-0/requirements-ledger.json"
+      ],
+      "remaining_qualification": "Referenced 307-behavior research remains not supplied; no source wording or completion is invented."
     },
     {
       "id": "GOV-005",
@@ -1476,11 +2951,60 @@
         "docs/completion/audio-decoding.md",
         "docs/completion/mcp-sdk.md",
         "docs/completion/selected-stack-alignment.md",
-        "docs/completion/macos-miniaudio.md"
+        "docs/completion/macos-miniaudio.md",
+        "docs/completion/portable-documents.md",
+        "evidence/completion/portable-documents/manifest.json"
       ],
       "followup_commits": [
         "b06c057",
         "c473568"
+      ],
+      "evidence_target_status": "planned_destination_not_passing_evidence",
+      "requirements_overlay_ids": [
+        "FR-002",
+        "FR-003",
+        "FR-017",
+        "FR-021",
+        "V08",
+        "R08",
+        "PRD-EDITOR-007",
+        "PRD-EDITOR-008",
+        "PRD-EDITOR-009",
+        "PRD-EDITOR-011",
+        "PRD-EDITOR-012",
+        "PRD-EDITOR-013",
+        "PRD-PORTABLE-006",
+        "PRD-MEDIA-001",
+        "PRD-MEDIA-002",
+        "PRD-MEDIA-003",
+        "PRD-MEDIA-004",
+        "TRD-BLOCK-010",
+        "TRD-BLOCK-011",
+        "TRD-BLOCK-012",
+        "TRD-BLOCK-014",
+        "TRD-BLOCK-015",
+        "TRD-BLOCK-016",
+        "TRD-BLOCK-017",
+        "TRD-BLOCK-018",
+        "ADR-006",
+        "ADR-012",
+        "ADR-015",
+        "TRD-CONSTRAINT-010",
+        "TRD-CONSTRAINT-024",
+        "TRD-CONSTRAINT-026",
+        "TRD-CONSTRAINT-027",
+        "TRD-CONSTRAINT-028",
+        "PH1-B-EDITOR",
+        "PH1-B-EDITOR-SCENARIOS",
+        "PH1-E-WORKERS",
+        "PH1-E-MODELS",
+        "PH2-B"
+      ],
+      "coverage_packages": [
+        "presentation",
+        "runtime",
+        "governance",
+        "documents"
       ]
     },
     {
@@ -1499,7 +3023,7 @@
       "implementation": "implemented",
       "implementation_commit": "4e3fe92",
       "verification": {
-        "service_or_interface": "targeted_checks_and_four_original_fixture_product_paths_passed_raw_model_rubric_failed_3_of_4",
+        "service_or_interface": "targeted_checks_and_four_original_fixture_product_paths_passed; raw_model_passed_3_of_4_blank_fixture_failed",
         "candidate": null,
         "macOS": "unqualified",
         "Windows": "unqualified",
@@ -1515,6 +3039,14 @@
       ],
       "followup_commits": [
         "44f7262"
+      ],
+      "evidence_target_status": "planned_destination_not_passing_evidence",
+      "requirements_overlay_ids": [
+        "PRD-AI-012",
+        "TRD-LOCALAI-012"
+      ],
+      "coverage_packages": [
+        "image"
       ]
     },
     {
@@ -1548,6 +3080,14 @@
       "followup_commits": [
         "44f7262",
         "d74a719"
+      ],
+      "evidence_target_status": "planned_destination_not_passing_evidence",
+      "requirements_overlay_ids": [
+        "PRD-AI-014",
+        "TRD-LOCALAI-013"
+      ],
+      "coverage_packages": [
+        "reviews"
       ]
     },
     {
@@ -1563,16 +3103,48 @@
       "interface_boundary": "Versioned image/review capabilities, jobs, source manifests and reviewed mutations",
       "acceptance_scenario": "Conversation fixtures preserve branches/roles/timestamps/provenance; graph associations disclose evidence; calculations and submissions remain canonical; operational settings stay inert on portable import; host authentication/TLS/ownership transfer/recovery remain correct. Arbitrary remote infrastructure, network filesystems, and offline multi-device sync are not implied by the existing host tests.",
       "backlog_anchor": "../remaining-work.md#opt-003-qualify-declared-p2-package-boundaries",
-      "implementation": "open",
-      "implementation_commit": null,
+      "implementation": "in_progress",
+      "implementation_commit": "632d0cd",
       "verification": {
-        "service_or_interface": "pending",
+        "service_or_interface": "Declared packages exist; 4900d4b packaged offline P2 fixtures verify chart values, confirmed actions, graph citations, conversation branches/original bytes, display settings, backup/reopen and inactive portable operational settings. A separate be6fc81 packaged P2 rerun passed its recorded scope; that candidate still fails startup and formatted-word search.",
         "candidate": null,
         "macOS": "unqualified",
         "Windows": "unqualified",
         "Linux": "unqualified"
       },
-      "evidence_target": "evidence/completion/OPT-003/"
+      "evidence_target": "evidence/completion/OPT-003/",
+      "evidence_target_status": "planned_destination_not_passing_evidence",
+      "requirements_overlay_ids": [
+        "PRD-EDITOR-024",
+        "PRD-DATABASE-007",
+        "PRD-DATABASE-008",
+        "PRD-PROPERTY-016",
+        "PRD-NAV-011",
+        "PRD-PORTABLE-008",
+        "TRD-TYPE-017",
+        "TRD-VIEW-007",
+        "TRD-VIEW-008",
+        "ADR-013",
+        "TRD-CONSTRAINT-032"
+      ],
+      "coverage_packages": [
+        "p2",
+        "hosting"
+      ],
+      "implementation_evidence": [
+        "docs/phase-6/implementation.md",
+        "docs/phase-6/hosting.md",
+        "docs/completion/development-candidate-4900d4b.md",
+        "evidence/completion/candidate-4900d4b/p2/packaged-p2-integration.json"
+      ],
+      "followup_commits": [
+        "4900d4b"
+      ],
+      "remaining_qualification": "Complete P2 package, model, hosted environment, native interface and per-platform gates remain open. Packaged fixture coverage is not general P2 or release approval.",
+      "development_candidate_evidence": [
+        "docs/completion/development-candidate-be6fc81.md",
+        "evidence/completion/candidate-be6fc81/manifest.json"
+      ]
     }
   ],
   "developmentCandidates": [
@@ -1583,6 +3155,28 @@
       "packagedJourneys": "passed_for_recorded_scope",
       "startupReliability": "failed_missing_readiness_events",
       "temporaryArtifactAvailability": "lost_after_environment_restart"
+    },
+    {
+      "sourceCommit": "4900d4bfbdb7a324ebc6e828544ca7204f72a709",
+      "manifest": "evidence/completion/candidate-4900d4b/manifest.json",
+      "assessment": "docs/completion/development-candidate-4900d4b.md",
+      "releaseApproved": false,
+      "packagedJourneys": "passed_for_recorded_P0_P1_P2_native_scope",
+      "qualification": "unqualified; prior startup incident, then-current model rubric failures and external/native/platform gates remain recorded",
+      "laterPackagesDoNotChangeThisCandidate": true
+    },
+    {
+      "sourceCommit": "be6fc81eef1d818a4255402a81b520d54b5c8623",
+      "manifest": "evidence/completion/candidate-be6fc81/manifest.json",
+      "assessment": "docs/completion/development-candidate-be6fc81.md",
+      "releaseApproved": false,
+      "packagedJourneys": "passed_for_recorded_P0_P1_P2_native_scope",
+      "startupReliability": "all_20_readiness_returns_but_8399.656_ms_sample_failed_2500_ms_target",
+      "nativeInterface": "narrow_save_format_reopen_passed_formatted_word_search_failed",
+      "laterPackagesDoNotChangeThisCandidate": true
     }
-  ]
+  ],
+  "currentRequirementsOverlay": "docs/completion/requirements-overlay.json",
+  "reconciliationSourceCommit": "7f6b1964f5d6cbdd28a02d5c1f66930611c14e7e",
+  "evidencePathPolicy": "evidence_target is only a planned directory. implementation_evidence and development_candidate_evidence are actual linked package records; their original source/candidate scope is binding. Overlay associations are coverage links, not full implementation or qualification."
 }

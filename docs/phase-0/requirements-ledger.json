@@ -2,6 +2,10 @@
   "schemaVersion": 1,
   "contractVersion": "1.0.0",
   "title": "Trove contracts and product requirements ledger",
+  "currentImplementationOverlay": {
+    "path": "docs/completion/requirements-overlay.json",
+    "meaning": "Current scoped source/evidence mapping; does not overwrite historical requirement statuses or establish full implementation/release qualification."
+  },
   "statusMeaning": {
     "implemented": "The entire requirement at its stated scope exists in the referenced artifacts; accepting a design is insufficient for product requirements.",
     "verified": "Relevant tests have passed with inspected evidence bound to actual artifacts/builds; implementation alone is insufficient.",

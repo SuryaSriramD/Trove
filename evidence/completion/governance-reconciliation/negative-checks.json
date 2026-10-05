@@ -1,0 +1,41 @@
+{
+  "validatorMutationChecks": [
+    {
+      "case": "Historical verification flag cannot be silently changed",
+      "result": "rejected_as_expected",
+      "expectedDiagnostic": "historical ledger content changed"
+    },
+    {
+      "case": "Missing product requirement cannot pass mapping",
+      "result": "rejected_as_expected",
+      "expectedDiagnostic": "product mappings are duplicated, missing or outside product scope"
+    },
+    {
+      "case": "Coverage association cannot become release approval",
+      "result": "rejected_as_expected",
+      "expectedDiagnostic": "mapping became a completion claim"
+    },
+    {
+      "case": "Nonexistent evidence cannot be counted",
+      "result": "rejected_as_expected",
+      "expectedDiagnostic": "missing file: evidence/does-not-exist.json"
+    },
+    {
+      "case": "Candidate identity cannot borrow another manifest",
+      "result": "rejected_as_expected",
+      "expectedDiagnostic": "candidate manifest source differs"
+    },
+    {
+      "case": "Planned folder cannot be represented as passing evidence",
+      "result": "rejected_as_expected",
+      "expectedDiagnostic": "planned evidence path lacks explicit status"
+    },
+    {
+      "case": "Missing research cannot be closed by documentation",
+      "result": "rejected_as_expected",
+      "expectedDiagnostic": "missing research incorrectly closed"
+    }
+  ],
+  "productTestsExecuted": false,
+  "releaseQualified": false
+}

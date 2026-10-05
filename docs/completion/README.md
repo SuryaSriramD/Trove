@@ -22,33 +22,27 @@ C1 prevention work precedes P0 qualification. C2 editor, databases, recovery, re
 
 ## Current checkpoint
 
-C1's six defect repairs are implemented with targeted regressions. C2 source implementation now includes table structure, canonical colors/highlights, code/image controls, hybrid Q&A, local audio decoding, historical value mapping, persisted database columns/calendar resizing, sqlite-vec retrieval and online backup. The reproducible toolchain has an offline bootstrap and doctor. These source and regression results do not constitute release qualification.
+C1 defect repairs and the C2/C4 product source packages are integrated: editor preservation and controls, scaled database queries/views, hybrid retrieval/sqlite-vec, online backup and historical mapping, restricted FFmpeg decoding, rich layouts/templates/formulas/PDFs, Notion API reconstruction, browser clipping, visible automation, and reviewed local-AI/MCP actions. See the package links in the [51-item registry](registry.json); its planned evidence directories are not passing checks.
 
-Database queries now use scoped, sealed cursors and parameterized typed SQLite predicates. Shell snapshots load active page bodies lazily, the quick switcher uses scoped body search, and table/gallery views page and virtualize their results. Shiki and PDF.js use bundled assets. Exact model token budgeting is implemented, while broader AI and memory quality checks retain failures and remain open.
+The [requirements reconciliation](requirements-reconciliation.md) adds a [current coverage overlay](requirements-overlay.json) for all 312 product requirements and explicitly accounts for the 26 contract/boundary rows. It preserves the original ledger statuses and reports scoped implementation coverage, not blanket completion.
 
-C4 implementation includes rich layout/reusable content, explicitly fetched bookmark previews and consented provider embeds, timeline scales/grouping/dependencies, unified values-and-body templates, versioned formula editing, native rich PDF export, nested import preservation, and shared reviewed local-AI/MCP creation. The integrated Go suite before formula/PDF/SDK integration passed 416 tests with 14 optional checks skipped; 46 frontend unit tests and the two new approval-interface browser cases passed. New packages supply affected checks separately; these are development checks, not a frozen release candidate. Notion database/view migration, the paired browser clipper, and automation configuration are now integrated with affected checks. Managed provider integration, P2 expansion and platform qualification continue. The official MCP SDK and real SDK-client/stdio tests are integrated.
+The optional 7B pack passes [all 14 fixed AI mode tasks](ai-modes.md), the original strict memory/authority rubric and four [held-out evidence cases](memory-capacity.md). The product image path passes four fixed fixtures with original-pixel blank-image abstention; the [raw model failure remains](local-image-understanding.md). Generative reviews retain deterministic fallback and separate approval of every proposed write. Broad task quality, correction effort, controlled latency/resources and native candidate qualification remain open.
 
-The Codex desktop now connects isolated account authorization, an account-specific model catalog, reviewed context/tool selection, contained execution, cancellation and compatible session controls. Seven provider/account/approval browser fixtures pass; real account inference remains unqualified. Claude contained startup now passes after granting access only to validated system ICU data files. Live account execution remains unqualified; see [startup repair](claude-icu-startup.md).
+Claude/Codex managed execution, account/context controls, contained discovery, cancellation and compatible session/handoff records have source and fixture evidence. Real authorized inference, completed-turn resume and cross-provider handoffs remain unqualified. Remote MCP has official-SDK/TLS fixtures; a real hosted client remains unqualified. See [managed runtimes](managed-runtimes.md), [Claude startup](claude-icu-startup.md) and [remote MCP](remote-mcp.md).
 
-A later isolated development snapshot passed 544 Go tests with 21 explicit skips, frontend checks, and packaged offline P0/P1/native worker journeys. Repeated startup qualification failed because two launches never reported readiness; successful launch timings do not close this finding. Its exact source/application/helper/model identities, evidence and limits are in [development candidate 5d7cdb0](development-candidate-5d7cdb0.md). Temporary binaries were lost after an environment restart, while the durable reports remain.
+New Mac builds use [miniaudio capture](macos-miniaudio.md); actual microphone/TCC/device evidence remains open. Windows/Linux have [native workers](platform-native-workers.md), [packaging/routing](platform-desktop-packaging.md), [protected credentials](platform-credentials.md) and [OCR](portable-ocr.md) source packages. [Windows storage](windows-storage.md) now creates private directories and audits existing ACLs without changing them, but new-workspace creation, migration, backup, restore and transfer remain explicitly unavailable pending recovery durability. [Portable PDF helper sources](portable-documents.md) and their browser/protocol fixtures are not target execution evidence. Neither platform is release-qualified.
 
-Remote MCP now has source implementation and real TLS official-SDK fixture coverage, with native consent, scoped authorization, token refresh and revocation. A real hosted client remains unqualified. Optional local generative reviews retain deterministic fallback, cited drafts and separate approval of every proposed page/task change; one real-model review fixture passes, with broader quality evaluation still open.
+[Verified macOS updates and recovery](verified-updates.md), [pre-migration snapshots](pre-migration-snapshots.md), [reproducible code generation](codegen-reproducibility.md) and [selected-component alignment](selected-stack-alignment.md) close scoped source gaps. Signing/notarization, clean installation/restore, actual devices, live accounts, representative datasets and current candidate performance remain separate release gates.
 
-Local image understanding is implemented with a pinned model/projector pair, bounded offline native execution, source-linked drafts and cancellation. Its unchanged real-model rubric passed three of four cases; blank-image abstention failed and remains unqualified. The app distinguishes pixel measurements from model interpretation and rejects repetitive/incomplete output. A new instrumented startup candidate passed 60 launches, but did not reproduce or explain the earlier missing-readiness events. Typed 10,000-record benchmarks exposed expensive derived queries; the integrated optimization reduces formula/rollup allocations while preserving live permission checks. See [image evidence](local-image-understanding.md), [startup investigation](startup-investigation.md) and [database measurements](database-performance.md).
+## Candidate-specific evidence
 
-A native tokenizer stall was traced to unwanted Metal initialization and fixed without increasing the timeout. A real local model passed cancellation/forget-during-stream and a narrow named-page creation task with explicit approval and retry deduplication. This does not override the separate failed factual/memory quality rubrics. No release gate is marked complete.
+| Candidate | Recorded scope and limits |
+| --- | --- |
+| [5d7cdb0](development-candidate-5d7cdb0.md) | 544 Go tests with 21 skips and packaged offline journeys; startup failed with missing readiness events. Temporary binaries were lost; durable reports remain. |
+| [4900d4b](development-candidate-4900d4b.md) | 620 tests/subtests with 27 skips and packaged P0/P1/P2/native journeys. Later memory/image/source repairs do not change its then-failing rubrics or binary. |
+| [be6fc81](development-candidate-be6fc81.md) | 870 service tests/subtests (44 skips), 60 desktop tests/subtests (1 skip), 121 tooling tests and packaged P0/P1/P2/native journeys. Native formatted-word search failed; one of 20 startup samples took 8,399.656 ms and failed its threshold. Later Windows/PDF/rollback/search source is outside this candidate. |
 
-The [4900d4b development candidate](development-candidate-4900d4b.md) passes 620 Go tests/subtests with 27 explicit skips and packaged offline P0/P1/P2/native journeys. Its P2 checks include actual chart values, confirmed actions, conversation branches and retained bytes, backup/reopen and inert portable-import behavior. The stricter memory rubric remains failed; no release is approved.
-
-Later source packages add readable semantic related-content cards with current citation checks, a graph consent fix, protected Windows DPAPI/Linux Secret Service credentials, and cross-platform native-worker build/protocol paths. Credential-prompt review reproduced and repaired a cancellation race before integrating its fix. Windows/Linux Go cross-compilation and macOS model execution do not qualify either target OS. See [related content](related-content.md), [platform credentials](platform-credentials.md), [credential cancellation](credential-prompt-cancellation.md), and [native worker portability](platform-native-workers.md).
-
-The optional official 7B local pack now passes the original strict memory/authority rubric and four held-out evidence cases, while the smaller pack's failures are retained. The product image path passes the same four image fixtures using exact original-pixel abstention for a blank image; the raw model still fails that blank fixture. These are bounded task results, not broad model-quality approval. See [memory capacity](memory-capacity.md) and [image evidence](local-image-understanding.md).
-
-Verified macOS update selection, external recovery kits, compatible rollback and explicit guarded previous-app launch are implemented with focused service/UI checks. The actual ad-hoc candidate is correctly rejected as a production update. New bundles use restricted, pinned FFmpeg decoding, matching the selected TRD component. Windows/Linux file ownership and identity primitives now have platform implementations and cross-compilation evidence; Windows publication durability and full target behavior remain open. See [update/recovery](verified-updates.md), [audio decoding](audio-decoding.md) and [filesystem boundary](platform-filesystem.md).
-
-New Mac builds now use miniaudio for capture; Windows/Linux have offline packaging, launch-routing and portable English OCR source packages. Fresh-checkout generation and requirements extraction are reproducible, and native memory sampling works inside the offline sandbox. These close specific source gaps while actual device, target-native, clean-install and public distribution qualification remain open. See [selected-component alignment](selected-stack-alignment.md), [portable packaging](platform-desktop-packaging.md), [OCR](portable-ocr.md), [tooling](codegen-reproducibility.md), and [memory sampling](native-memory-sampling.md).
-
-See [recovery evidence](recovery.md), [retrieval evidence](retrieval.md), and the [machine-readable registry](registry.json). The registry records owners, phases, interface boundaries, independent expected acceptance outcomes, evidence destinations, implementation commits and qualification status for all 51 items. Planned scenarios are not passing tests.
+The [60-launch instrumented startup investigation](startup-investigation.md) did not reproduce or explain the earlier missing-readiness events. [Database measurements](database-performance.md) record expensive derived queries and scoped improvements. Each report's source, workload and outcome remain binding; no release gate is marked complete.
 
 ## External prerequisites
 
@@ -85,22 +79,22 @@ The research report has not been supplied. Independent clean machines, authorize
 | PARITY-009 | B, D | C4 | implemented |
 | PARITY-010 | A, B | C4 | implemented |
 | AI-001 | A, E | C4 | implemented |
-| AI-002 | E, F | C2, C4, C6 | in progress |
-| AI-003 | E | C2, C4, C6 | in progress |
-| EXT-001 | A, F | C5 | in progress |
-| EXT-002 | A, F | C5 | in progress |
+| AI-002 | E, F | C2, C4, C6 | in_progress |
+| AI-003 | E | C2, C4, C6 | in_progress |
+| EXT-001 | A, F | C5 | in_progress |
+| EXT-002 | A, F | C5 | in_progress |
 | EXT-003 | A | C4, C5 | implemented |
 | EXT-004 | A, F | C5 | implemented |
-| EXT-005 | A, E | C5 | in progress |
+| EXT-005 | A, E | C5 | in_progress |
 | REL-001 | A, F | C3, C5, C6, C7, C8 | open |
 | REL-002 | B, D, E | C3, C5, C6, C7, C8 | open |
 | REL-003 | B, F | C3, C5, C6, C7, C8 | open |
 | REL-004 | D, E | C3, C5, C6, C7, C8 | open |
 | REL-005 | F | C3, C5, C6, C7, C8 | open |
-| REL-006 | F | C3, C5, C6, C7, C8 | in progress |
-| REL-007 | A, B, C, E | C3, C5, C6, C7, C8 | in progress |
+| REL-006 | F | C3, C5, C6, C7, C8 | in_progress |
+| REL-007 | A, B, C, E | C3, C5, C6, C7, C8 | in_progress |
 | REL-008 | F | C0, C1, C2, C3, C4, C5, C6, C7, C8 | in_progress |
-| REL-009 | F | C7, C8 | in progress |
+| REL-009 | F | C7, C8 | in_progress |
 | GOV-001 | A | C0 | implemented |
 | GOV-002 | A, F | C0 | implemented |
 | GOV-003 | A | C0, C2, C3, C5, C8 | in_progress |
@@ -108,7 +102,7 @@ The research report has not been supplied. Independent clean machines, authorize
 | GOV-005 | A | C0, C2, C3, C5, C8 | implemented |
 | OPT-001 | E, F | C6 | implemented |
 | OPT-002 | A, E | C6 | implemented |
-| OPT-003 | E, F | C6 | open |
+| OPT-003 | E, F | C6 | in_progress |
 
 ## Evidence policy
 
