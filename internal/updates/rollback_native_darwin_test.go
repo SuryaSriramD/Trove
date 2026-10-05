@@ -3,7 +3,9 @@
 package updates
 
 import (
+	"bytes"
 	"context"
+	"encoding/json"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -44,11 +46,38 @@ func TestRollbackNativeDevelopmentChild(t *testing.T) {
 	cmd := exec.Command(filepath.Join(bundle, "Contents", "MacOS", "Trove"))
 	cmd.Dir = "/"
 	cmd.Env = []string{"PATH=/usr/bin:/bin:/usr/sbin:/sbin", "HOME=" + home, "TMPDIR=" + home, "LANG=en_US.UTF-8", "TROVE_WORKSPACE=" + path}
+	tracePath := filepath.Join(home, "native-startup.jsonl")
+	if os.Getenv("TROVE_TEST_NATIVE_TRACE") == "1" {
+		cmd.Env = append(cmd.Env, "TROVE_STARTUP_TRACE="+tracePath)
+	}
 	started := time.Now()
 	if err = launchRollbackProcess(ctx, cmd, target); err != nil {
 		t.Fatal(err)
 	}
 	defer cmd.Process.Kill()
+	if os.Getenv("TROVE_TEST_NATIVE_TRACE") == "1" {
+		raw, readErr := os.ReadFile(tracePath)
+		if readErr != nil || len(raw) > 4096 {
+			t.Fatal("native trace absent or unbounded", readErr)
+		}
+		stages := map[string]bool{}
+		for _, line := range bytes.Split(bytes.TrimSpace(raw), []byte("\n")) {
+			var row struct {
+				Stage     string  `json:"stage"`
+				ElapsedMS float64 `json:"elapsedMs"`
+			}
+			if json.Unmarshal(line, &row) != nil {
+				t.Fatal("invalid native trace")
+			}
+			stages[row.Stage] = true
+		}
+		for _, stage := range []string{"process_entry", "native_startup_enter", "workspace_open_complete", "snapshot_ready", "shell_ready"} {
+			if !stages[stage] {
+				t.Fatal("missing native lifecycle trace", stage)
+			}
+		}
+		t.Logf("Native startup trace:\n%s", raw)
+	}
 	t.Logf("Actual Wails child PID %d acknowledged rendered workspace and committed initialization after %s", cmd.Process.Pid, time.Since(started))
 	if err = cmd.Process.Signal(syscall.Signal(0)); err != nil {
 		t.Fatal("child exited after committed acknowledgement", err)

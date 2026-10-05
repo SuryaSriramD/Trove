@@ -12,6 +12,7 @@ import (
 )
 
 func (a *App) domReady(ctx context.Context) {
+	markStartupStage("dom_ready")
 	step := os.Getenv("TROVE_INTEGRATION_STEP")
 	if step == "" {
 		return

@@ -20,6 +20,7 @@ import (
 var frontendAssets embed.FS
 
 func main() {
+	markStartupStage("process_entry")
 	child, err := updates.ReceiveRollbackChild()
 	if err != nil || child != nil && len(os.Args) != 1 {
 		fmt.Fprintln(os.Stderr, "invalid rollback startup")
@@ -31,6 +32,7 @@ func main() {
 		}
 		os.Exit(providers.RunClaudeLoginHelper(os.Args[2]))
 	}
+	markStartupStage("rollback_channel_ready")
 	app := NewApp()
 	if child != nil {
 		app.attachRollbackChild(child, func() { os.Exit(3) })
@@ -52,6 +54,7 @@ func main() {
 		Mac:         &mac.Options{TitleBar: mac.TitleBarDefault(), OnUrlOpen: app.openURL},
 	}
 	configureDesktopPlatform(desktopOptions, app)
+	markStartupStage("wails_run_start")
 	err = wails.Run(desktopOptions)
 	if err != nil {
 		fmt.Fprintln(os.Stderr, err)
