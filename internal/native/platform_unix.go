@@ -6,8 +6,6 @@ import (
 	"errors"
 	"os"
 	"os/exec"
-	"strconv"
-	"strings"
 	"syscall"
 )
 
@@ -31,12 +29,10 @@ func (p *workerProcess) stop(force bool) error {
 	return syscall.Kill(-p.cmd.Process.Pid, signal)
 }
 func (p *workerProcess) rss() (int64, error) {
-	raw, err := exec.Command("/bin/ps", "-o", "rss=", "-p", strconv.Itoa(p.cmd.Process.Pid)).Output()
-	if err != nil {
-		return 0, err
+	if p.cmd.Process == nil {
+		return 0, os.ErrProcessDone
 	}
-	n, err := strconv.ParseInt(strings.TrimSpace(string(raw)), 10, 64)
-	return n * 1024, err
+	return processRSS(p.cmd.Process.Pid)
 }
 func privateWorkerDirectory(prefix string) (string, error) { return os.MkdirTemp("", prefix) }
 func workerEnvironment(dir string) []string {
