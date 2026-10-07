@@ -31,6 +31,7 @@ export default function SupportBundlePanel({
   }[];
   onError(error: unknown): void;
 }) {
+  const [diagnostics, setDiagnostics] = useState(false);
   const [titles, setTitles] = useState(false),
     [text, setText] = useState(false),
     [selected, setSelected] = useState<string[]>([]);
@@ -44,6 +45,7 @@ export default function SupportBundlePanel({
     setPreview(null);
     setSelected([]);
     setTitles(false);
+    setDiagnostics(false);
     setText(false);
     setResult("");
     return () => {
@@ -99,6 +101,17 @@ export default function SupportBundlePanel({
         <label>
           <input
             type="checkbox"
+            checked={diagnostics}
+            onChange={(e) => {
+              invalidate();
+              setDiagnostics(e.target.checked);
+            }}
+          />{" "}
+          Include operational diagnostics (no content or raw errors)
+        </label>
+        <label>
+          <input
+            type="checkbox"
             checked={titles}
             onChange={(e) => {
               invalidate();
@@ -125,8 +138,9 @@ export default function SupportBundlePanel({
               saving; Trove does not automatically redact the content you
               choose. Only text in supported paragraph, heading, list, quote,
               callout, toggle and code blocks is included. Other blocks are
-              counted as omitted; attachments, transcript-linked blocks, properties and
-              linked content are excluded. Limit: five pages and 256 KiB.
+              counted as omitted; attachments, transcript-linked blocks,
+              properties and linked content are excluded. Limit: five pages and
+              256 KiB.
             </p>
             <label>
               Pages to include
@@ -171,6 +185,7 @@ export default function SupportBundlePanel({
               JSON.stringify({
                 workspaceId,
                 selection: {
+                  ...(diagnostics ? { diagnostics: true } : {}),
                   titles,
                   text,
                   pageIds: contentSelected ? selected : [],

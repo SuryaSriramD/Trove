@@ -1,0 +1,18 @@
+# trove.local/phase0/internal/sqlitevec
+internal/sqlitevec/register.go:11:12: warning: 'sqlite3_auto_extension' is deprecated: first deprecated in macOS 10.10 - Process-global auto extensions are not supported on Apple platforms [-Wdeprecated-declarations]
+/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/sqlite3.h:7627:16: note: 'sqlite3_auto_extension' has been explicitly marked deprecated here
+ok  	trove.local/phase0/internal/diagnostics	1.762s
+# trove.local/phase0/internal/workspace [trove.local/phase0/internal/workspace.test]
+internal/workspace/ai.go:84:13: undefined: time
+internal/workspace/ai.go:87:59: undefined: time
+internal/workspace/ai.go:386:13: undefined: time
+internal/workspace/ai.go:392:58: undefined: time
+internal/workspace/support_bundle_test.go:120:79: cannot use []string{…} (value of type []string) as bool value in struct literal
+internal/workspace/support_bundle_test.go:120:95: cannot use c.title (variable of type bool) as []string value in struct literal
+internal/workspace/support_bundle_test.go:120:110: too few values in struct literal of type SupportSelection
+internal/workspace/support_bundle_test.go:140:77: cannot use []string{…} (value of type []string) as bool value in struct literal
+internal/workspace/support_bundle_test.go:140:93: cannot use true (untyped bool constant) as []string value in struct literal
+internal/workspace/support_bundle_test.go:140:103: too few values in struct literal of type SupportSelection
+internal/workspace/support_bundle_test.go:140:103: too many errors
+FAIL	trove.local/phase0/internal/workspace [build failed]
+FAIL

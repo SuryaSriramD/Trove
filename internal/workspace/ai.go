@@ -9,6 +9,7 @@ import (
 	"sort"
 	"strconv"
 	"strings"
+	"time"
 
 	"trove.local/phase0/contracts"
 )
@@ -80,8 +81,12 @@ func (k *Kernel) PrepareAI(ctx context.Context, e contracts.ServiceExecutionCont
 	return k.PrepareAIWithBudget(ctx, e, r, AIBudget{ContextTokens: 8192, OutputTokens: 512})
 }
 
-func (k *Kernel) PrepareAIWithBudget(ctx context.Context, e contracts.ServiceExecutionContext, r AIRequest, budget AIBudget) (AIPrepared, error) {
-	var out AIPrepared
+func (k *Kernel) PrepareAIWithBudget(ctx context.Context, e contracts.ServiceExecutionContext, r AIRequest, budget AIBudget) (out AIPrepared, resultErr error) {
+	started := time.Now()
+	defer func() {
+		outcome, code := diagnosticOutcome(resultErr)
+		k.diagnostics.Record("model", "prepare", outcome, code, time.Since(started), int64(budget.ContextTokens))
+	}()
 	if err := k.authorize(e); err != nil {
 		return out, err
 	}
@@ -378,7 +383,15 @@ func (k *Kernel) CheckpointAI(ctx context.Context, e contracts.ServiceExecutionC
 
 var aiCitationPattern = regexp.MustCompile(`\[(\d+)\]`)
 
-func (k *Kernel) FinishAI(ctx context.Context, e contracts.ServiceExecutionContext, id, text, state, failure string) (AIRun, error) {
+func (k *Kernel) FinishAI(ctx context.Context, e contracts.ServiceExecutionContext, id, text, state, failure string) (final AIRun, resultErr error) {
+	started := time.Now()
+	defer func() {
+		outcome, code := diagnosticOutcome(resultErr)
+		if resultErr == nil && final.State != "" {
+			outcome = final.State
+		}
+		k.diagnostics.Record("model", "finish", outcome, code, time.Since(started), 0)
+	}()
 	run, err := k.AIRun(ctx, e, id)
 	if err != nil {
 		return run, err

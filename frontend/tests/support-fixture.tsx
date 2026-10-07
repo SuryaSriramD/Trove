@@ -19,6 +19,14 @@ window.go = {
           expiresAt: "2099-01-01T00:00:00Z",
           files: [
             { name: "metadata.json", content: '{"application":"Trove"}' },
+            ...(request.selection.diagnostics
+              ? [
+                  {
+                    name: "diagnostics.json",
+                    content: '{"version":1,"events":[{"component":"search"}]}',
+                  },
+                ]
+              : []),
             ...(request.selection.text || request.selection.titles
               ? [
                   {

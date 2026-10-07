@@ -83,6 +83,7 @@ func (k *Kernel) CompleteCompatibleStartup(ctx context.Context) error {
 		return err
 	}
 	k.compatiblePending = false
+	k.startCompatibleDiagnostics()
 	return nil
 }
 

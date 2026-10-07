@@ -117,7 +117,7 @@ func TestSupportOptionalContentSeparateConsentAndStaleness(t *testing.T) {
 		title, text bool
 	}{{"title", true, false}, {"text", false, true}, {"both", true, true}} {
 		t.Run(c.name, func(t *testing.T) {
-			b, err := k.PrepareSupportBundle(context.Background(), e, SupportSelection{[]string{page}, c.title, c.text}, SupportRuntime{})
+			b, err := k.PrepareSupportBundle(context.Background(), e, SupportSelection{PageIDs: []string{page}, Titles: c.title, Text: c.text}, SupportRuntime{})
 			if err != nil {
 				t.Fatal(err)
 			}
@@ -137,7 +137,7 @@ func TestSupportOptionalContentSeparateConsentAndStaleness(t *testing.T) {
 			}
 		})
 	}
-	b, err := k.PrepareSupportBundle(context.Background(), e, SupportSelection{[]string{page}, true, true}, SupportRuntime{})
+	b, err := k.PrepareSupportBundle(context.Background(), e, SupportSelection{PageIDs: []string{page}, Titles: true, Text: true}, SupportRuntime{})
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -160,7 +160,7 @@ func TestSupportBoundsRevocationExpiryCancellationAndHostileDestination(t *testi
 	if err != nil {
 		t.Fatal(err)
 	}
-	if _, err = k.PrepareSupportBundle(context.Background(), e, SupportSelection{[]string{page}, true, false}, SupportRuntime{}); err == nil {
+	if _, err = k.PrepareSupportBundle(context.Background(), e, SupportSelection{PageIDs: []string{page}, Titles: true}, SupportRuntime{}); err == nil {
 		t.Fatal("oversized title accepted")
 	}
 	b, err := k.PrepareSupportBundle(context.Background(), e, SupportSelection{}, SupportRuntime{})
@@ -272,7 +272,7 @@ func TestSupportPreviewFenceRejectsMidPreparationRevocationAndDeletion(t *testin
 		t.Run(change, func(t *testing.T) {
 			k, e := testKernel(t)
 			page := createPage(t, k, e, "private content")
-			_, err := k.prepareSupportBundle(context.Background(), e, SupportSelection{[]string{page}, true, false}, SupportRuntime{}, func() {
+			_, err := k.prepareSupportBundle(context.Background(), e, SupportSelection{PageIDs: []string{page}, Titles: true}, SupportRuntime{}, func() {
 				switch change {
 				case "revoke":
 					k.RevokeGrant(string(e.ScopeGrantId))
@@ -328,7 +328,7 @@ func TestSupportTextOmitsActualTranscriptParagraphs(t *testing.T) {
 	page, meeting, _ := meetingFixture(t, k, e)
 	transcript, ordinary := NewID(), NewID()
 	testOK(t, dbBatch(t, k, e, []any{map[string]any{"kind": "meeting.appendSegments", "meetingId": meeting, "segments": []any{map[string]any{"segmentId": NewID(), "blockId": transcript, "startMs": 0, "endMs": 500, "text": "private transcript must stay excluded"}}}, map[string]any{"kind": "block.insert", "block": map[string]any{"blockId": ordinary, "pageId": page, "type": "paragraph", "schemaVersion": 1, "data": map[string]any{"richText": richImport("ordinary explicitly selected note")}}}}, "page", page, "meeting", meeting, "block", transcript, "block", ordinary))
-	b, err := k.PrepareSupportBundle(context.Background(), e, SupportSelection{[]string{page}, false, true}, SupportRuntime{})
+	b, err := k.PrepareSupportBundle(context.Background(), e, SupportSelection{PageIDs: []string{page}, Text: true}, SupportRuntime{})
 	if err != nil {
 		t.Fatal(err)
 	}

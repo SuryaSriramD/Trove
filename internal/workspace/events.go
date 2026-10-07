@@ -6,6 +6,7 @@ import (
 	"encoding/json"
 	"errors"
 	"strings"
+	"time"
 	"trove.local/phase0/contracts"
 )
 
@@ -43,30 +44,41 @@ func (k *Kernel) publish(event json.RawMessage) {
 	}
 }
 func (k *Kernel) Dispatch(ctx context.Context, e contracts.ServiceExecutionContext, method string, raw json.RawMessage) json.RawMessage {
+	started := time.Now()
+	outcome, code := "completed", "none"
+	fail := func(id string, err error) json.RawMessage {
+		outcome, code = diagnosticOutcome(err)
+		return errorResponse(id, err)
+	}
+	defer func() {
+		k.diagnostics.Record(diagnosticComponent(method), "request", outcome, code, time.Since(started), 0)
+	}()
 	if len(raw) > 4*1024*1024 {
-		return errorResponse("", Fail("RESOURCE_EXHAUSTED", "Request exceeds 4 MiB"))
+		return fail("", Fail("RESOURCE_EXHAUSTED", "Request exceeds 4 MiB"))
 	}
 	var r map[string]any
 	if err := json.Unmarshal(raw, &r); err != nil {
-		return errorResponse("", Fail("INVALID_REQUEST", "Invalid JSON"))
+		return fail("", Fail("INVALID_REQUEST", "Invalid JSON"))
 	}
 	id := str(r["requestId"])
 	if method == "batch" {
-		return k.batch(ctx, e, raw)
+		response := k.batch(ctx, e, raw)
+		outcome, code = diagnosticBatchResponse(response)
+		return response
 	}
 	if err := k.checkEnvelope(e, r); err != nil {
-		return errorResponse(id, err)
+		return fail(id, err)
 	}
 	defs := map[string]string{"image.start": "ImageDescriptionStartRequest", "image.list": "ImageDescriptionListRequest", "image.cancel": "ImageDescriptionControlRequest", "review.propose": "PersonalReviewControlRequest", "review.apply": "PersonalReviewControlRequest", "review.retry": "PersonalReviewControlRequest", "review.cancel": "PersonalReviewControlRequest", "graph.query": "GraphQueryRequest", "ocr.status": "OCRStatusRequest", "ocr.run": "OCRRunRequest", "review.list": "ReviewListRequest", "review.run": "ReviewRunRequest", "databaseP2": "DatabaseP2Request", "databaseChart": "DatabaseChartRequest", "pageDisplay.get": "PageDisplayGetRequest", "history.list": "HistoryListRequest", "history.previewRestore": "HistoryPreviewRestoreRequest", "history.trash": "HistoryTrashRequest", "history.recoveryPoint": "HistoryRecoveryPointRequest", "workspace.snapshot": "WorkspaceSnapshotRequest", "links.backlinks": "BacklinksRequest", "jobs.list": "JobsListRequest", "allocateIds": "AllocateIdsRequest", "readPage": "ReadPageRequest", "readEvents": "ReadEventsRequest", "cancel": "CancelRequest", "queryRecords": "QueryRecordsRequest", "search": "SearchRequest", "resolveCitation": "ResolveCitationRequest", "prepareFile": "PrepareFileRequest", "previewImport": "PreviewImportRequest", "getImportReport": "GetImportReportRequest", "listMemory": "ListMemoryRequest"}
 	if def := defs[method]; def != "" {
 		if err := contracts.Validate("service", def, raw); err != nil {
-			return errorResponse(id, Fail("INVALID_REQUEST", err.Error()))
+			return fail(id, Fail("INVALID_REQUEST", err.Error()))
 		}
 	}
 	if method == "enqueueJob" || method == "getJob" || method == "cancelJob" {
 		def := strings.ToUpper(method[:1]) + method[1:] + "Request"
 		if err := contracts.Validate("jobs", def, raw); err != nil {
-			return errorResponse(id, Fail("INVALID_REQUEST", err.Error()))
+			return fail(id, Fail("INVALID_REQUEST", err.Error()))
 		}
 	}
 	var result any
@@ -144,7 +156,7 @@ func (k *Kernel) Dispatch(ctx context.Context, e contracts.ServiceExecutionConte
 		}
 	}
 	if err != nil {
-		return errorResponse(id, err)
+		return fail(id, err)
 	}
 	return success(result)
 }

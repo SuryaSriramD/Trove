@@ -1,0 +1,63 @@
+ok  	trove.local/phase0/internal/diagnostics	1.541s
+ok  	trove.local/phase0/internal/platformfs	1.463s
+--- FAIL: TestOperationalDiagnosticsConsentExactPreviewAndPrivacy (0.03s)
+    diagnostics_test.go:13: no such module: fts5
+--- FAIL: TestDiagnosticsJobSuccessRequiresCommittedValidLease (0.02s)
+    diagnostics_test.go:55: no such module: fts5
+--- FAIL: TestJobUnitReceiptAtomicFenceAndSourceConflict (0.02s)
+    jobs_test.go:50: no such module: fts5
+--- FAIL: TestJobCannotBypassApprovalAndDelegationRevocation (0.03s)
+    jobs_test.go:108: no such module: fts5
+--- FAIL: TestRunJobsContinuesAfterFailureAndStopsCleanly (0.02s)
+    jobs_test.go:208: no such module: fts5
+--- FAIL: TestJobInputRevisionAndCustomRequestSchemas (0.02s)
+    jobs_test.go:289: no such module: fts5
+--- FAIL: TestRunJobsShutdownFencesUnfinishedAttempt (0.02s)
+    jobs_test.go:299: no such module: fts5
+--- FAIL: TestTransientRetriesAreBoundedAndDurable (0.02s)
+    jobs_test.go:322: no such module: fts5
+--- FAIL: TestJobsRestartCancellationAndLeaseFencing (0.02s)
+    kernel_test.go:196: no such module: fts5
+--- FAIL: TestCompatibleReviewedOpenPreservesPendingJobUntilCommit (0.02s)
+    open_compatible_test.go:13: no such module: fts5
+--- FAIL: TestCompatibleReviewedOpenRejectsWithoutMigrationOrCreation (0.14s)
+    --- FAIL: TestCompatibleReviewedOpenRejectsWithoutMigrationOrCreation/identity (0.02s)
+        open_compatible_test.go:61: no such module: fts5
+    --- FAIL: TestCompatibleReviewedOpenRejectsWithoutMigrationOrCreation/old-format (0.02s)
+        open_compatible_test.go:61: no such module: fts5
+    --- FAIL: TestCompatibleReviewedOpenRejectsWithoutMigrationOrCreation/future-format (0.02s)
+        open_compatible_test.go:61: no such module: fts5
+    --- FAIL: TestCompatibleReviewedOpenRejectsWithoutMigrationOrCreation/incomplete (0.02s)
+        open_compatible_test.go:61: no such module: fts5
+    --- FAIL: TestCompatibleReviewedOpenRejectsWithoutMigrationOrCreation/cancelled (0.02s)
+        open_compatible_test.go:61: no such module: fts5
+    --- FAIL: TestCompatibleReviewedOpenRejectsWithoutMigrationOrCreation/locked (0.02s)
+        open_compatible_test.go:61: no such module: fts5
+    --- FAIL: TestCompatibleReviewedOpenRejectsWithoutMigrationOrCreation/missing (0.02s)
+        open_compatible_test.go:61: no such module: fts5
+--- FAIL: TestCompatibleReviewedDeleteJournalIsStrictlyReadOnly (0.02s)
+    open_compatible_test.go:116: no such module: fts5
+--- FAIL: TestSupportDefaultExactAllowlistAndReviewBytes (0.02s)
+    support_bundle_test.go:46: no such module: fts5
+--- FAIL: TestSupportOptionalContentSeparateConsentAndStaleness (0.02s)
+    support_bundle_test.go:110: no such module: fts5
+--- FAIL: TestSupportBoundsRevocationExpiryCancellationAndHostileDestination (0.02s)
+    support_bundle_test.go:152: no such module: fts5
+--- FAIL: TestSupportBuildIdentityAcceptsOnlyFixedBuildFields (0.02s)
+    support_bundle_test.go:246: no such module: fts5
+--- FAIL: TestSupportPreviewFenceRejectsMidPreparationRevocationAndDeletion (0.06s)
+    --- FAIL: TestSupportPreviewFenceRejectsMidPreparationRevocationAndDeletion/revoke (0.02s)
+        support_bundle_test.go:273: no such module: fts5
+    --- FAIL: TestSupportPreviewFenceRejectsMidPreparationRevocationAndDeletion/delete (0.02s)
+        support_bundle_test.go:273: no such module: fts5
+    --- FAIL: TestSupportPreviewFenceRejectsMidPreparationRevocationAndDeletion/close (0.02s)
+        support_bundle_test.go:273: no such module: fts5
+--- FAIL: TestSupportWaitingExportRechecksExpiry (0.02s)
+    support_bundle_test.go:292: no such module: fts5
+--- FAIL: TestSupportTextOmitsActualTranscriptParagraphs (0.02s)
+    support_bundle_test.go:327: no such module: fts5
+--- FAIL: TestSupportDamagedErrorJSONMapsToOtherWithoutReadingMessages (0.02s)
+    support_bundle_test.go:347: no such module: fts5
+FAIL
+FAIL	trove.local/phase0/internal/workspace	1.112s
+FAIL

@@ -65,6 +65,14 @@ func lockFile(f *os.File) error {
 func unlockFile(f *os.File) error {
 	return windows.UnlockFileEx(windows.Handle(f.Fd()), 0, 1, 0, &windows.Overlapped{})
 }
+func auditPrivateHandle(f *os.File, directory bool) error {
+	h := windows.Handle(f.Fd())
+	if _, err := storageInfo(h, directory); err != nil {
+		return err
+	}
+	_, err := auditStorageACL(h)
+	return err
+}
 func FileIdentity(f *os.File) (string, error) {
 	h := windows.Handle(f.Fd())
 	kind, err := windows.GetFileType(h)

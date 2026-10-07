@@ -1,0 +1,83 @@
+{
+  "schemaVersion": 1,
+  "recordedAt": "2026-10-07",
+  "baseSourceCommit": "317b782",
+  "sourceHashes": {
+    "frontend/src/SupportBundlePanel.tsx": "e5d8da7d34886afaf553a81b48ae785a6778f0b1843c9070ee6250c1c1cb3cbc",
+    "frontend/tests/support-fixture.tsx": "23279828f03a974d5428538b339ee5420ef8791af4099e3adc55b6379e7ee843",
+    "frontend/tests/support.browser.spec.ts": "16f8b328ffa45158bba764d75987a90bd27a54cbc85c8b5c5b5fc4e929874db9",
+    "internal/diagnostics/store.go": "6a85121e13cd276a5361c5b4eb0254397947ec2d902d36dccc534d8430f0eb72",
+    "internal/diagnostics/store_test.go": "890a8dbff28756341678a71cfd7aa93ad1e059d86700c809518a335cf283d8d2",
+    "internal/platformfs/files.go": "c7a06c8f6d082a85a84077e7ff63b8e7df42ee93e7ab4b729cd2a53ec459c0e5",
+    "internal/platformfs/files_other.go": "f3becea476876e3916502c9ca514de048163d222ac90124de3593eb8cb34aae5",
+    "internal/platformfs/files_unix.go": "833051cebd70048476a80d9e3fa041d7fbf20263b41f4fe427777538d0771008",
+    "internal/platformfs/files_windows.go": "d3ae914046d7d20c26faf11e1a66b778c8274d51016f3dca0b437e499aed9dbe",
+    "internal/platformfs/root_lock_test.go": "fd872d4db9e7ba3e5682a3013a6845a75da5171eab40b8bbb69ba22fb6d9d320",
+    "internal/workspace/ai.go": "66cf5f2ae26ff55f2effcdab87e47f1da448038cbf1244892177cf279a070be3",
+    "internal/workspace/diagnostics.go": "6c1e9604c5379df2776b0bff70addabab92546da21e0dd4078aa99cfeec47ea6",
+    "internal/workspace/diagnostics_test.go": "e9418a8c8e934981b7623bc1085526bde998bcc7bbf02dbb17ad4461004331e7",
+    "internal/workspace/events.go": "067d8eeec198f4b0b018aa308f76e9327338ddbd608d0950d9f3e62b9043e1bf",
+    "internal/workspace/jobs.go": "517985a843cbcf219ac690ace0913a7248f3266ea32811f7da7e1f869e707a54",
+    "internal/workspace/kernel.go": "d645db70369b94712f608300640ba7f8e6779185d6320d30c6fe2ee48a580ebf",
+    "internal/workspace/open_compatible.go": "1ec6c0cd0118f9d2ebf24bcd58a1db3443ae6231c5b352dc9fe6496c6f55d844",
+    "internal/workspace/support_bundle.go": "02ab9a17d4a7732c1efcbdbe81e7540889bfd985371113fe6e5b52a157eaaf68",
+    "internal/workspace/support_bundle_test.go": "10fe4deb732ad820cd4529f7c747c71d88118d11220bdc132cd419e76e432bb4"
+  },
+  "platform": "macOS-27.0.1-arm64-arm-64bit",
+  "releaseQualified": false,
+  "checks": {
+    "finalAffectedRace": {
+      "passed": 44,
+      "failed": 0,
+      "skipped": 0,
+      "command": "go test -tags sqlite_fts5 -race -json ./internal/diagnostics ./internal/platformfs ./internal/workspace -run 'Test(PersistentDiagnostic|Diagnostic|OperationalDiagnostics|Support|Job|RunJobs|TransientRetries|RootLock|Compatible)' -count=1",
+      "goVersion": "1.27.1",
+      "nativeBundle": "/private/tmp/trove-native-integrated-e481c6a"
+    },
+    "fullWorkspaceBeforeReview": {
+      "passed": 541,
+      "failed": 0,
+      "skipped": 9,
+      "scope": "Before final rooted-storage, retention, lease and lifecycle review fixes; not final-source full regression"
+    },
+    "browser": {
+      "passed": 5,
+      "failed": 0,
+      "skipped": 0,
+      "scope": "Settings support component including diagnostic consent and invalidation"
+    },
+    "typescript": "noEmit passed",
+    "windowsCrossCompile": {
+      "exitCode": 0,
+      "target": "windows/amd64",
+      "scope": "compile only; no Windows execution"
+    }
+  },
+  "preservedFailures": [
+    "Initial missing time import and obsolete unkeyed SupportSelection test literals were repaired.",
+    "First broad workspace run: 540 pass, 9 skip, 1 failure because PDF native bundle was not configured; unchanged suite passed with configured helper bundle.",
+    "First affected review invocation lacked sqlite_fts5 tag and failed workspace setup; corrected invocation and final tagged run passed.",
+    "First browser server startup exceeded 10-second fixture boot wait; later 90-second server boot and five browser tests passed.",
+    "First Windows compile attempt was not executed because automatic approval routing timed out; registered routing was refreshed and approved retry compiled successfully."
+  ],
+  "limitations": [
+    "No packaged native candidate qualification",
+    "No Windows/Linux execution",
+    "Unavailable prerequisites and skipped real-model/device/account tests remain unqualified",
+    "Initialization durations exclude earlier database open/migration work",
+    "Disposable persistence has no crash-durability guarantee",
+    "Pre-workspace failures and complete native-worker resource diagnostics remain open"
+  ],
+  "evidenceHashes": {
+    "initial-compile.log": "30bd090a9cd8b30489cac33b45751ab362ec4954c377e2aa0bfeac73ff5239b1",
+    "focused-before-review.log": "5e536106eeb136b9612454a1562ea69b7f9455fd364c8a14300b970418ebcb54",
+    "workspace-missing-native.jsonl": "d8d27a7ee825035c5e0872f24b8d9da2aff48b3f5115641907131d397905d113",
+    "workspace-configured-before-review.jsonl": "743e033ea9ae8376c15f027cc0d36585bba61efafdbabbc6aefcee807b447ab6",
+    "review-missing-build-tag.log": "1a2ce43d8339887b7973ab0f19b62e66b35dd96dc170c7e57a615868b41fd007",
+    "review-configured.log": "d4e8cbc662d72f271a6885aa8116b8d56a4c132bc1a9cb2cb13bf18fb2106ae3",
+    "final-affected.jsonl": "4a579c4d2ca674ed1cd11593b46c92cdc7e2afe0778647bc45e9e84a4469d469",
+    "browser.json": "19ef8b292421e1e2c8475ef62437111eedd09060745d022d004f8bc3fa4a5235",
+    "browser-server.log": "c57da2f2dd84d1dff2b5edcc001d34fd4732761cf6ba95912f563fb0067ad647",
+    "windows-compile.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  }
+}
