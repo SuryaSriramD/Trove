@@ -321,7 +321,13 @@ func RestoreBackupReviewed(ctx context.Context, source, destination string, expe
 	}
 	return restoreBackupVerified(ctx, source, destination, current)
 }
-func restoreBackupVerified(ctx context.Context, source, destination string, m BackupManifest) (result RestoreResult, err error) {
+func restoreBackupVerified(ctx context.Context, source, destination string, m BackupManifest) (RestoreResult, error) {
+	return restoreBackupVerifiedExtra(ctx, source, destination, m, nil)
+}
+
+// Extra provenance is selected by trusted owner-transfer code and is included in
+// the exact publication inventory before verification and completion.
+func restoreBackupVerifiedExtra(ctx context.Context, source, destination string, m BackupManifest, transferReceipt []byte) (result RestoreResult, err error) {
 	if err = platformfs.RequireRecoveryDurability(); err != nil {
 		return result, err
 	}
@@ -332,6 +338,9 @@ func restoreBackupVerified(ctx context.Context, source, destination string, m Ba
 	if _, err = os.Lstat(destination); err == nil {
 		return result, os.ErrExist
 	} else if !errors.Is(err, os.ErrNotExist) {
+		return result, err
+	}
+	if err = validateRestoreSeparation(source, destination); err != nil {
 		return result, err
 	}
 	stage, err := os.MkdirTemp(filepath.Dir(destination), ".trove-restore-")
@@ -349,12 +358,19 @@ func restoreBackupVerified(ctx context.Context, source, destination string, m Ba
 			return result, err
 		}
 	}
+	if err = clearCopiedRecoveryBinding(ctx, stage, m.Database); err != nil {
+		return result, err
+	}
 	// Search is derived. The backed-up canonical rows, history and evidence remain.
 	k, err := Open(stage)
 	if err != nil {
 		return result, err
 	}
+	operationID := newRecoveryOperation()
 	err = k.write(ctx, func(tx *sql.Tx) error {
+		if _, err := tx.ExecContext(ctx, "INSERT OR REPLACE INTO kernel_meta(key,value) VALUES(?,?)", recoveryOperationKey, operationID); err != nil {
+			return err
+		}
 		// A native backup preserves external references, not permission to read
 		// this installation's filesystem. The user must select each root again;
 		// retained source identities remain available for that reconciliation.
@@ -377,46 +393,69 @@ func restoreBackupVerified(ctx context.Context, source, destination string, m Ba
 	if err = ctx.Err(); err != nil {
 		return result, err
 	}
-	// Reserve the final name without replacing any existing destination. All
-	// partial output keeps INCOMPLETE until publication and directory fsync.
-	if err = os.Mkdir(destination, 0700); err != nil {
+	receipt := map[string]any{"backupId": m.BackupID, "workspaceId": m.WorkspaceID, "restoredAt": now(), "sourceManifest": m}
+	if err = durableRecoveryFile(filepath.Join(stage, "restore-receipt.json"), marshal(receipt)); err != nil {
 		return result, err
 	}
-	if err = durableRecoveryFile(filepath.Join(destination, "INCOMPLETE"), []byte("Restore publication in progress\n")); err != nil {
-		return result, err
-	}
-	if err = syncRecoveryDirectory(destination); err != nil {
-		return result, err
-	}
-	if err = syncRecoveryDirectory(filepath.Dir(destination)); err != nil {
-		return result, err
-	}
-	entries, err := os.ReadDir(stage)
-	if err != nil {
-		return result, err
-	}
-	for _, entry := range entries {
-		if err = os.Rename(filepath.Join(stage, entry.Name()), filepath.Join(destination, entry.Name())); err != nil {
+	if transferReceipt != nil {
+		if err = durableRecoveryFile(filepath.Join(stage, "owner-transfer.json"), transferReceipt); err != nil {
 			return result, err
 		}
 	}
-	receipt := map[string]any{"backupId": m.BackupID, "workspaceId": m.WorkspaceID, "restoredAt": now(), "sourceManifest": m}
-	if err = durableRecoveryFile(filepath.Join(destination, "restore-receipt.json"), marshal(receipt)); err != nil {
-		return result, err
-	}
-	if err = syncRecoveryTree(destination); err != nil {
-		return result, err
-	}
-	if err = os.Remove(filepath.Join(destination, "INCOMPLETE")); err != nil {
-		return result, err
-	}
-	d, err := os.Open(destination)
+	plan := platformfs.RecoveryPlan{Version: 1, OperationID: operationID, Kind: "restore", SourceID: m.BackupID}
+	sourceHash := sha256.Sum256(marshal(m))
+	plan.SourceSHA256 = hex.EncodeToString(sourceHash[:])
+	err = filepath.WalkDir(stage, func(name string, entry os.DirEntry, walkErr error) error {
+		if walkErr != nil {
+			return walkErr
+		}
+		if entry.IsDir() {
+			return nil
+		}
+		relative, e := filepath.Rel(stage, name)
+		if e != nil {
+			return e
+		}
+		relative = filepath.ToSlash(relative)
+		if relative == ".owner.lock" {
+			return nil
+		}
+		if !entry.Type().IsRegular() {
+			return platformfs.ErrPrivateStorage
+		}
+		hash, size, e := hashFile(ctx, name)
+		if e != nil {
+			return e
+		}
+		plan.Objects = append(plan.Objects, platformfs.RecoveryObject{Path: relative, SHA256: hash, SizeBytes: size})
+		return nil
+	})
 	if err != nil {
 		return result, err
 	}
-	err = d.Sync()
-	d.Close()
+	publication, err := platformfs.BeginRecoveryPublication(ctx, destination, plan)
 	if err != nil {
+		return result, err
+	}
+	defer publication.Close()
+	for _, object := range plan.Objects {
+		input, e := platformfs.OpenRegular(filepath.Join(stage, filepath.FromSlash(object.Path)))
+		if e != nil {
+			return result, e
+		}
+		e = publication.Stage(ctx, object.Path, input)
+		closeErr := input.Close()
+		if e == nil {
+			e = closeErr
+		}
+		if e != nil {
+			return result, e
+		}
+	}
+	if err = publication.Verify(ctx); err != nil {
+		return result, err
+	}
+	if err = publication.Commit(ctx); err != nil {
 		return result, err
 	}
 	result = RestoreResult{WorkspaceID: m.WorkspaceID, Destination: destination, BackupID: m.BackupID, Assets: len(m.Assets), RecordingObjects: len(m.Recordings), IndexRebuilt: true}

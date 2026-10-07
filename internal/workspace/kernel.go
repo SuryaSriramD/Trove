@@ -214,10 +214,18 @@ func openReviewed(path string, create bool, observe func(string) error, reviewed
 	} else {
 		existingDatabase = false
 	}
+	recoveryOperation, recoveryStatus, err := inspectRecoveryPublication(path, existingDatabase, reviewed != nil)
+	if err != nil {
+		return nil, err
+	}
 	// Inspect existing storage read-only before configuring WAL or executing DDL.
 	var before CompatibilityDescriptor
 	if existingDatabase {
-		before, err = ReadWorkspaceCompatibility(context.Background(), path)
+		if recoveryStatus.State == "complete" {
+			before, err = readImmutableRecoveryCompatibility(context.Background(), path)
+		} else {
+			before, err = ReadWorkspaceCompatibility(context.Background(), path)
+		}
 		if err != nil {
 			return nil, err
 		}
@@ -235,6 +243,11 @@ func openReviewed(path string, create bool, observe func(string) error, reviewed
 	// marker protocol; reject before opening SQLite for mutation.
 	if !existingDatabase || before != CurrentCompatibility() || journal != nil {
 		if err = platformfs.RequireRecoveryDurability(); err != nil {
+			return nil, err
+		}
+	}
+	if recoveryStatus.State == "complete" {
+		if err = platformfs.ActivateRecoveryAdmission(path, recoveryOperation, lock); err != nil {
 			return nil, err
 		}
 	}

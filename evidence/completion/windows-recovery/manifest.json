@@ -1,0 +1,166 @@
+{
+  "schemaVersion": 1,
+  "package": "C7 recovery publication foundation",
+  "generatedAt": "2026-10-07T09:48:45.557816+00:00",
+  "sourceBase": "65a14ed41b05782cb808dbfd5fed0a1ebb51a7e9",
+  "sourceFilesSHA256": {
+    "internal/platformfs/recovery_publication.go": "6f72bbec74a35516839cc33c1ae741d92e74f47fbcba544be472c8380c06141f",
+    "internal/platformfs/recovery_publication_darwin.go": "629500f50c844ebd8c018b055cc8e82fdfcc60017bd2932e2386ef943413d106",
+    "internal/platformfs/recovery_publication_linux.go": "85d1de97f7d802a2300961e26f9abeb7a2766f114888966e387d8bbb2a2d1668",
+    "internal/platformfs/recovery_publication_test.go": "1a8d370e6acdaaf42b4e5eb9c0d19728190c1d7ea2b349445dc5fbae8bfa3083",
+    "internal/platformfs/recovery_publication_unix.go": "43baad367aee88e25fef184be1dd2fea6497abb25a2196832050427db6362e59",
+    "internal/platformfs/recovery_publication_windows.go": "140c9156e3be5230cbf856eebd26d7b3da34938264a3bf5186952d40bee00575",
+    "internal/platformfs/recovery_publication_windows_test.go": "0e67bc0e3d38c8588b3dbf86048e6e0ed9c20e0ee61acef012fd092a805f068f",
+    "internal/workspace/hosting_transfer.go": "bb3bcabaee14be011dd7b006d48fefd3f827ca9ce7f9b996a30b61e4e3ce8163",
+    "internal/workspace/kernel.go": "874f429f25a39e2390384805a0fe7cb9ba03460b11626247cef8728e64ee1314",
+    "internal/workspace/migration_snapshot.go": "55b6d18d1cbe76f1242e0dbeaf9df29c4fdab06bb6c110a03e12dfbd8987caeb",
+    "internal/workspace/recovery_admission.go": "2586d1e208d7a0b1508180f89c18365589880cda80453acdce3ad6e5c229139a",
+    "internal/workspace/recovery_admission_test.go": "c1889f1e12beb00b7d5e69097853fb66e9575cf8d7223f9c2bc492fa7845a491",
+    "internal/workspace/restore.go": "22bae8a4192d6691aec4a0a469d69e19e197e615e8068a0114b879b096fd6a49",
+    "internal/workspace/restore_compatible.go": "04d4820c20acdaa78e3df33b1027d3f8b97a7f1c8690eb6ca453312ff1531050"
+  },
+  "sourceFingerprint": "4ffc732e0c6c928436852bb89e1299c67b1949d3538beaa4b0abac5f6e69d2be",
+  "host": {
+    "system": "Darwin",
+    "release": "27.0.0",
+    "machine": "arm64",
+    "goVersion": "go version go1.27.1 darwin/arm64",
+    "nativeBundleManifestSHA256": "d6e97000cbe66f3c42735cbec41fe2d1c925b8ef0c4beb73267e161a3b5ea379"
+  },
+  "finalHostTests": {
+    "command": "go test -race -tags sqlite_fts5 ./internal/platformfs ./internal/workspace -count=1 -json",
+    "environment": {
+      "GOTOOLCHAIN": "local",
+      "GOPROXY": "off",
+      "TROVE_NATIVE_BUNDLE": "/private/tmp/trove-native-integrated-e481c6a"
+    },
+    "exitCode": 0,
+    "result": "passed-with-explicit-skips",
+    "allTestNodes": {
+      "pass": 707,
+      "skip": 11
+    },
+    "topLevelTests": {
+      "pass": 370,
+      "skip": 11
+    },
+    "log": "host-final.jsonl",
+    "logSHA256": "d6683811ead0dbae8c3a111b73820e792057ae7902082a2a7b4c4e345c9b38fb",
+    "skipped": [
+      {
+        "package": "trove.local/phase0/internal/workspace",
+        "test": "TestRealLocalExpandedP0QAMemory",
+        "output": "=== RUN   TestRealLocalExpandedP0QAMemory\n    ai_expanded_evaluation_test.go:229: requires explicit verified native bundle and installed model\n--- SKIP: TestRealLocalExpandedP0QAMemory (0.00s)\n"
+      },
+      {
+        "package": "trove.local/phase0/internal/workspace",
+        "test": "TestRealLocalExpandedModes",
+        "output": "=== RUN   TestRealLocalExpandedModes\n    ai_expanded_modes_test.go:238: explicit verified native bundle/model required\n--- SKIP: TestRealLocalExpandedModes (0.00s)\n"
+      },
+      {
+        "package": "trove.local/phase0/internal/workspace",
+        "test": "TestRealLocalMemoryPreferenceAndCurrentAuthority",
+        "output": "=== RUN   TestRealLocalMemoryPreferenceAndCurrentAuthority\n    ai_local_evaluation_test.go:20: requires supported local model and native helpers\n--- SKIP: TestRealLocalMemoryPreferenceAndCurrentAuthority (0.00s)\n"
+      },
+      {
+        "package": "trove.local/phase0/internal/workspace",
+        "test": "TestRealLocalNamedWorkspacePlan",
+        "output": "=== RUN   TestRealLocalNamedWorkspacePlan\n    ai_local_evaluation_test.go:195: requires supported local model and native helpers\n--- SKIP: TestRealLocalNamedWorkspacePlan (0.00s)\n"
+      },
+      {
+        "package": "trove.local/phase0/internal/workspace",
+        "test": "TestRealLocalCitedHeldOutFactsAndAbstention",
+        "output": "=== RUN   TestRealLocalCitedHeldOutFactsAndAbstention\n    ai_local_heldout_test.go:20: requires supported local model and native helpers\n--- SKIP: TestRealLocalCitedHeldOutFactsAndAbstention (0.00s)\n"
+      },
+      {
+        "package": "trove.local/phase0/internal/workspace",
+        "test": "TestRealLocalExposedModes",
+        "output": "=== RUN   TestRealLocalExposedModes\n    ai_local_modes_test.go:23: requires verified native helper and explicitly installed local model\n--- SKIP: TestRealLocalExposedModes (0.00s)\n"
+      },
+      {
+        "package": "trove.local/phase0/internal/workspace",
+        "test": "TestBookmarkLiveMetadataSmoke",
+        "output": "=== RUN   TestBookmarkLiveMetadataSmoke\n    bookmark_preview_test.go:163: requires explicit network qualification\n--- SKIP: TestBookmarkLiveMetadataSmoke (0.00s)\n"
+      },
+      {
+        "package": "trove.local/phase0/internal/workspace",
+        "test": "TestClipperBrowserQualification",
+        "output": "=== RUN   TestClipperBrowserQualification\n    capture_clipper_browser_test.go:18: set TROVE_CLIPPER_BROWSER to a Chromium executable supporting unpacked extensions\n--- SKIP: TestClipperBrowserQualification (0.00s)\n"
+      },
+      {
+        "package": "trove.local/phase0/internal/workspace",
+        "test": "TestDatabasePerformance10K",
+        "output": "=== RUN   TestDatabasePerformance10K\n    database_benchmark_test.go:87: opt in with scripts/benchmark-database.py\n--- SKIP: TestDatabasePerformance10K (0.00s)\n"
+      },
+      {
+        "package": "trove.local/phase0/internal/workspace",
+        "test": "TestRichPDFExportBundledRenderer",
+        "output": "=== RUN   TestRichPDFExportBundledRenderer\n    export_pdf_test.go:43: opt-in native WebKit visual qualification\n--- SKIP: TestRichPDFExportBundledRenderer (0.00s)\n"
+      },
+      {
+        "package": "trove.local/phase0/internal/workspace",
+        "test": "TestRealLocalPersonalReviewCitedProposal",
+        "output": "=== RUN   TestRealLocalPersonalReviewCitedProposal\n    personal_review_local_evaluation_test.go:16: requires verified local instruction model and native bundle\n--- SKIP: TestRealLocalPersonalReviewCitedProposal (0.00s)\n"
+      }
+    ]
+  },
+  "crossCompiles": [
+    {
+      "target": "windows/amd64",
+      "command": "CGO_ENABLED=0 GOOS=windows GOARCH=amd64 go test -c ./internal/platformfs",
+      "result": "compiled-only",
+      "nativeExecuted": false,
+      "binarySHA256": "764038574c05bf8e74c52706a9cb458e696fa891242066b666df304f13ed6414",
+      "log": "windows-compile.log",
+      "logSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "target": "linux/amd64",
+      "command": "CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go test -c ./internal/platformfs",
+      "result": "compiled-only",
+      "nativeExecuted": false,
+      "binarySHA256": "0f69e19f8d5d5330b367d75654b97c22863b8038637f0ad1fd5c301350478316",
+      "log": "linux-compile.log",
+      "logSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  ],
+  "releaseQualified": false,
+  "windowsNativeExecuted": false,
+  "linuxNativeExecuted": false,
+  "performanceQualified": false,
+  "windowsDurabilityEnabled": false,
+  "review": {
+    "kind": "independent read-only source and oracle review",
+    "reviewer": "tracker_status_audit",
+    "result": "no remaining source blocker after four initial findings and two final edges were fixed; reviewer did not run tests"
+  },
+  "scope": [
+    "Explicit begin/stage/verify/commit/recover API and root/operation/source-bound positive receipts",
+    "Production ordinary restore plus mandatory public startup admission and explicit baseline activation",
+    "Verified copied metadata reset for portable ordinary/compatible/migration-snapshot restores",
+    "Transfer provenance included in baseline and guarded same-volume whole-directory relocation",
+    "Legacy compatible normal edits preserved; all existing Windows recovery durability gates remain closed"
+  ],
+  "limitations": [
+    "Host fault tests simulate declared interruption boundaries, not hardware write reordering or power loss.",
+    "No Windows or Linux native recovery execution was performed. Cross-compiles are source evidence only.",
+    "Native Windows protocol/order qualification and producer integration remain required before capability gates can change.",
+    "Real-model, real-account, independent-machine and device checks listed as skips are not qualified by this package."
+  ],
+  "supersededChecks": [
+    {
+      "log": "affected-initial.jsonl",
+      "status": "51 top-level passes before final review hardening"
+    },
+    {
+      "log": "host-full.jsonl",
+      "status": "368 top-level passes and 11 explicit skips before final two edge fixes"
+    }
+  ],
+  "approvalInfrastructureIncident": {
+    "action": "final owner-continuity source/test edit plus full affected test command",
+    "executed": false,
+    "reason": "Automatic approval review failed: workspace routing discovery timed out",
+    "resolution": "Confirmed read-only worktree registration with list_artifacts and retried the exact scoped command with the same escalation review; retry succeeded."
+  }
+}

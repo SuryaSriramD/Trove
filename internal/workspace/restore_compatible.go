@@ -80,6 +80,9 @@ func RestoreBackupCompatible(ctx context.Context, source, destination string, ex
 	if err = checkMigrationDatabase(ctx, stage, expectedFormat, current.WorkspaceID); err != nil {
 		return result, err
 	}
+	if err = clearCopiedRecoveryBinding(ctx, stage, current.Database); err != nil {
+		return result, err
+	}
 	if err = revokeCompatibleRestorePermissions(ctx, stage); err != nil {
 		return result, err
 	}
