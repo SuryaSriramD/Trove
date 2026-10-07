@@ -1,0 +1,70 @@
+{
+  "schemaVersion": 1,
+  "sourceCommit": "bc964e23f9d108bc392564deb909b6a15afaa178",
+  "workingTreeStatus": "",
+  "family": "p0",
+  "inputs": {
+    "/Users/suryasriramduvvuri/.codex/worktrees/completion-evaluation/Trove/internal/workspace/testdata/expanded-evaluation/p0-qa-memory.json": {
+      "sha256": "3fdb5e0fc556620cda76a9e3c255dbdce35551bbe134cbfea17153eaabbd6fee",
+      "bytes": 30455
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/completion-evaluation/Trove/internal/workspace/ai_expanded_evaluation_test.go": {
+      "sha256": "0e142c4c6b8acfc5d549d0c3e651d1946d5fd655ebef7c108880dc6e4ad0c2a9",
+      "bytes": 11229
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/completion-evaluation/Trove/internal/workspace/ai_expanded_modes_test.go": {
+      "sha256": "ea283f8c7c5ffb322df49197a87b9e0e06c8f3da9257bc477bf998ee3d403bce",
+      "bytes": 11342
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/completion-evaluation/Trove/scripts/run-expanded-evaluation.py": {
+      "sha256": "dcc08daad09b0f42fc568eec61b23752eaf67d878cf0707abdecc23cd8e5713f",
+      "bytes": 7555
+    },
+    "/private/tmp/trove-native-integrated-e481c6a/manifest.json": {
+      "sha256": "d6e97000cbe66f3c42735cbec41fe2d1c925b8ef0c4beb73267e161a3b5ea379",
+      "bytes": 1366
+    },
+    "/private/tmp/trove-native-integrated-e481c6a/llama-worker": {
+      "sha256": "6bdae1f55891d9df40f40eb7ac9e4a5fccfb93fd22f30fda181554a1c2b2c9af",
+      "bytes": 7111232
+    },
+    "/Users/suryasriramduvvuri/Library/Caches/Trove/completion/models/01990000-0000-7000-8000-000000000106.json": {
+      "sha256": "90214ba59ba2d123e041371e8cb30fa746d49a9b3655c0ed53ff574ed786b8f2",
+      "bytes": 772
+    },
+    "/Users/suryasriramduvvuri/Library/Caches/Trove/completion/models/01990000-0000-7000-8000-000000000106.model": {
+      "sha256": "a96b16179dc6cc9afdf0cf7a96a80c199cbd00b9be207c3465be21cb721cca5e",
+      "bytes": 3808391072
+    }
+  },
+  "hardware": "macOS-27.0.1-arm64-arm-64bit",
+  "networkPolicy": "(version 1)(allow default)(deny network*)",
+  "performanceQualified": false,
+  "releaseQualified": false,
+  "state": "started",
+  "buildCommand": [
+    "/Users/suryasriramduvvuri/Library/Caches/Trove/completion/go/bin/go",
+    "test",
+    "-mod=readonly",
+    "-tags",
+    "fts5 sqlite_omit_load_extension",
+    "-c",
+    "-o",
+    "/private/tmp/trove-expanded-p0-full-1/evaluation.test",
+    "./internal/workspace"
+  ],
+  "testBinarySHA256": "fe8752c125dded0e32cc6ee428834f02190de548fda2e21f642c6700b76d053c",
+  "runCommand": [
+    "/Users/suryasriramduvvuri/Library/Caches/Trove/completion/go/bin/go",
+    "tool",
+    "test2json",
+    "-t",
+    "-p",
+    "trove.local/phase0/internal/workspace",
+    "/private/tmp/trove-expanded-p0-full-1/evaluation.test",
+    "-test.run",
+    "^TestRealLocalExpandedP0QAMemory$",
+    "-test.v",
+    "-test.timeout=150m"
+  ]
+}
