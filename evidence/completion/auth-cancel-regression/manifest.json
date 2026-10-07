@@ -1,0 +1,71 @@
+{
+  "schemaVersion": 1,
+  "package": "auth-cancel-regression",
+  "recordedAt": "2026-10-07T10:04:38.868096+00:00",
+  "baseSourceCommit": "74a6e35a92f9e935067474a747f9f4900da405ee",
+  "sourceHashes": {
+    "internal/providers/auth/manager_prompt_test.go": "5e8602accbf692fb1daeffcca358c9783e490216f0abbda530c5239a9bd9721e",
+    "internal/providers/auth/manager.go": "360a9fa8ff707bafc9b7f37dfd800d79ffd731d84544e97254fd920e72d7f67f",
+    "internal/providers/auth/manager_test.go": "4b9043633619af3d32b40c95de81445b2cbfc591ab4c089f779fb5fb94e16c98",
+    "docs/completion/auth-cancel-regression.md": "965d8fe89dcc74f1676240a05610b978595f6a370c0c38dec2a0faec1d83fd11"
+  },
+  "productionCodeChanged": false,
+  "normalCallbackHelperChanged": false,
+  "originalIntegratedRun": {
+    "sourceCommit": "74a6e35a92f9e935067474a747f9f4900da405ee",
+    "fullLogPath": "/private/tmp/trove-integrated-74a6e35/go-service.jsonl",
+    "fullLogSHA256": "55eb37045cf49eb41119bb274f4bac3465daa2e9c087400cc407c4fded0c51f4",
+    "result": "failed",
+    "failure": "TestSIWCCancelledCredentialCleanupSerializesNextSignIn: callback EOF followed by completion timeout",
+    "excerpt": "integrated-failure-excerpt.jsonl"
+  },
+  "checks": {
+    "focusedRace30": {
+      "counts": {
+        "passTopLevel": 30
+      },
+      "callbackOutcomes": {
+        "HTTP status=400, closed transport=false": 29,
+        "HTTP status=0, closed transport=true": 1
+      },
+      "skippedTests": [],
+      "packageResults": [
+        "pass"
+      ]
+    },
+    "completeAuthRace3": {
+      "counts": {
+        "passSubcases": 78,
+        "passTopLevel": 60
+      },
+      "callbackOutcomes": {
+        "HTTP status=400, closed transport=false": 3
+      },
+      "skippedTests": [],
+      "packageResults": [
+        "pass"
+      ]
+    },
+    "sandboxedAttempt": {
+      "result": "failed-before-callback",
+      "counts": {
+        "failTopLevel": 30
+      },
+      "independentLoopbackProbe": "PermissionError [Errno 1] Operation not permitted"
+    }
+  },
+  "logs": {
+    "auth-suite-race-3.jsonl": "baa36926666773f4a46679caa5405f7edc6c31b6fc6719f819f163205b83ed38",
+    "targeted-race-30-loopback.jsonl": "44267d8a5666992ff16502df989839fdedff86498a7f2dead418f53554817c5a",
+    "integrated-failure-excerpt.jsonl": "71c71187a2e5780c25ec0b21375bc639eed015efac0c1099e89cc6b8ee7c8164",
+    "targeted-race-30.jsonl": "701821ea64742f88bea117c55b367625adb596bcb9c4c54e4e651b4d47022124"
+  },
+  "commands": [
+    "<pinned-offline-go-environment> go test -count=30 -race -json ./internal/providers/auth -run '^TestSIWCCancelledCredentialCleanupSerializesNextSignIn$'",
+    "<pinned-offline-go-environment> go test -count=3 -race -json ./internal/providers/auth"
+  ],
+  "realAccountEvidence": false,
+  "nativeCredentialStoreEvidence": false,
+  "integratedSuiteRerun": false,
+  "releaseQualified": false
+}
