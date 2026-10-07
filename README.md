@@ -4,7 +4,7 @@ The active work is the [C0–C8 completion programme](docs/completion/README.md)
 
 The optional 7B local pack passes [14 fixed AI mode tasks](docs/completion/ai-modes.md) and separate memory/authority cases; broader quality remains open. Actual device permissions, live provider/Notion accounts, independent clean installation/restore, signing and candidate performance remain explicit gates. Windows new-workspace creation and recovery operations currently stop before data writes because their durability protocol remains unavailable.
 
-The latest recorded [macOS development candidate be6fc81](docs/completion/development-candidate-be6fc81.md) passes its scoped service and packaged journeys, but fails native formatted-word search and the startup latency threshold. Its failures remain attached to that binary; later source repairs need separate checks.
+The latest packaged [macOS development candidate e481c6a](docs/completion/development-candidate-e481c6a.md) passes its recorded regression suites, packaged data journeys and narrow native support-export checks. The earlier be6fc81 search failure has a separate source repair and native retest; its 8.4-second startup failure remains unexplained. The [October 7 continuation](docs/completion/remaining-plan-execution.md) adds qualification, benchmark, diagnostics, signing and expanded-evaluation source packages. Those later sources have not yet been frozen into a new qualified application.
 
 ## Historical previews
 

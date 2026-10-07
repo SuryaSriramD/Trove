@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "authority": "Accepted Trove completion roadmap C0\u2013C8; acceptance in docs/remaining-work.md remains binding",
-  "updatedAt": "2026-10-05",
+  "updatedAt": "2026-10-07",
   "baselineCommit": "632d0cd0141dc2dcdc7922274757e10083623616",
   "integrationBranch": "integration",
   "ownerRoles": {
@@ -34,13 +34,29 @@
       "description": "Referenced 307-behavior Notion research report; no report located in the audited workspace."
     },
     {
-      "id": "clean-platforms",
-      "status": "availability_unknown",
+      "id": "clean-macos",
+      "status": "not_available",
       "neededFor": [
         "REL-005",
+        "REL-006"
+      ],
+      "description": "User confirmed that a separate clean Mac is unavailable; independent installation and second-installation restoration stay pending."
+    },
+    {
+      "id": "windows-environment",
+      "status": "availability_unknown",
+      "neededFor": [
         "REL-009"
       ],
-      "description": "Independent clean macOS, Windows 11 x64 and Ubuntu 24.04 x64 installations."
+      "description": "Windows 11 x64 with local NTFS and target-native tools; runtime qualification unavailable in this macOS session."
+    },
+    {
+      "id": "linux-environment",
+      "status": "availability_unknown",
+      "neededFor": [
+        "REL-009"
+      ],
+      "description": "Ubuntu 24.04 x64, pinned WebKitGTK, desktop services and delegated cgroup-v2 hierarchy; target-native evidence unavailable."
     },
     {
       "id": "authorized-datasets",
@@ -70,6 +86,16 @@
         "REL-006"
       ],
       "description": "Apple signing/notarization access and model redistribution evidence."
+    },
+    {
+      "id": "evaluation-storage",
+      "status": "insufficient_at_last_attempt",
+      "neededFor": [
+        "AI-002",
+        "AI-003",
+        "OPT-003"
+      ],
+      "description": "Expanded 7B run was interrupted by internal-disk exhaustion. Original logs are retained; runner requires at least 4 GiB free on its private temporary and evidence filesystems before retry. Only task-owned disposable artifacts were removed."
     }
   ],
   "items": [
@@ -1633,7 +1659,10 @@
         "evidence/completion/memory-capacity/manifest.json",
         "docs/completion/native-memory-sampling.md",
         "docs/completion/ai-modes.md",
-        "evidence/completion/ai-modes/manifest.json"
+        "evidence/completion/ai-modes/manifest.json",
+        "docs/completion/expanded-evaluation.md",
+        "evidence/completion/expanded-evaluation/manifest.json",
+        "evidence/completion/expanded-evaluation/full-p0-incomplete/reaccounted.json"
       ],
       "followup_commits": [
         "4900d4b",
@@ -1731,7 +1760,10 @@
         "docs/completion/memory-capacity.md",
         "evidence/completion/memory-capacity/manifest.json",
         "docs/completion/related-content.md",
-        "evidence/completion/related-content-manifest.json"
+        "evidence/completion/related-content-manifest.json",
+        "docs/completion/expanded-evaluation.md",
+        "evidence/completion/expanded-evaluation/manifest.json",
+        "evidence/completion/expanded-evaluation/full-p0-incomplete/reaccounted.json"
       ],
       "followup_commits": [
         "4900d4b",
@@ -2074,7 +2106,10 @@
       ],
       "implementation_evidence": [
         "docs/completion/development-candidate-4900d4b.md",
-        "evidence/completion/candidate-4900d4b/manifest.json"
+        "evidence/completion/candidate-4900d4b/manifest.json",
+        "docs/completion/qualification.md",
+        "docs/completion/qualification-mapping.md",
+        "evidence/completion/qualification-mapping/manifest.json"
       ]
     },
     {
@@ -2098,7 +2133,7 @@
       "implementation": "open",
       "implementation_commit": null,
       "verification": {
-        "service_or_interface": "be6fc81 narrow native save/format/navigation/reopen observed; formatted-word search failed. Full native acceptance remains open.",
+        "service_or_interface": "Historical be6fc81 native save/format/navigation/reopen evidence remains; formatted-word search was repaired and independently retested on 254d623. e481c6a adds narrow native support-export evidence. Complete native acceptance remains open.",
         "candidate": null,
         "macOS": "unqualified",
         "Windows": "unqualified",
@@ -2200,7 +2235,9 @@
         "documents"
       ],
       "implementation_evidence": [
-        "docs/completion/development-candidate-4900d4b.md"
+        "docs/completion/development-candidate-4900d4b.md",
+        "docs/completion/operational-diagnostics.md",
+        "evidence/completion/operational-diagnostics/hardening-manifest.json"
       ]
     },
     {
@@ -2454,9 +2491,11 @@
         "docs/completion/verified-updates.md",
         "evidence/completion/verified-updates/manifest.json",
         "docs/completion/rollback-readiness.md",
-        "evidence/completion/rollback-readiness-3f069dc/manifest.json"
+        "evidence/completion/rollback-readiness-3f069dc/manifest.json",
+        "docs/completion/macos-production-signing.md",
+        "evidence/completion/macos-production-signing/manifest.json"
       ],
-      "remaining_qualification": "Source includes full pre-migration snapshots, app signature/identity verification, external recovery kits, compatible restore and explicit guarded previous-app launch. Actual signed app pairs, startup-ready acknowledgement, public distribution, physical power-loss, independent clean-machine update/rollback and uninstall qualification remain open.",
+      "remaining_qualification": "Developer ID signing/notarization tooling is implemented and fixture-tested; no actual identity or notarization was used. Authenticated startup-ready/commit acknowledgement already has separate ad-hoc native evidence. Actual signed app pairs, public distribution, physical power-loss, independent clean-machine update/rollback and uninstall qualification remain open.",
       "evidence_target_status": "planned_destination_not_passing_evidence",
       "requirements_overlay_ids": [
         "FR-013",
@@ -2537,7 +2576,8 @@
         "docs/completion/startup-investigation.md",
         "docs/completion/native-memory-sampling.md",
         "docs/completion/startup-stage-tracing.md",
-        "evidence/completion/startup-trace-ce0973d/manifest.json"
+        "evidence/completion/startup-trace-ce0973d/manifest.json",
+        "evidence/completion/performance-harness/manifest.json"
       ],
       "evidence_target_status": "planned_destination_not_passing_evidence",
       "requirements_overlay_ids": [
@@ -2554,7 +2594,8 @@
       "coverage_packages": [
         "performance",
         "release"
-      ]
+      ],
+      "remaining_qualification": " The corrected harness rejects shell-threshold failure and can measure actual hybrid retrieval at all three required scales; final controlled 80-launch/300-keyword/90-hybrid/database/concurrency runs remain pending."
     },
     {
       "id": "REL-008",
@@ -2602,7 +2643,12 @@
         "docs/completion/development-candidate-4900d4b.md",
         "docs/completion/pre-migration-snapshots.md",
         "evidence/completion/secret-service-fixture/manifest.json",
-        "docs/completion/codegen-reproducibility.md"
+        "docs/completion/codegen-reproducibility.md",
+        "docs/completion/qualification.md",
+        "docs/completion/qualification-mapping.md",
+        "evidence/completion/qualification-mapping/manifest.json",
+        "docs/completion/operational-diagnostics.md",
+        "evidence/completion/operational-diagnostics/hardening-manifest.json"
       ],
       "evidence_target_status": "planned_destination_not_passing_evidence",
       "requirements_overlay_ids": [
@@ -2670,7 +2716,7 @@
         "release",
         "diagnostics"
       ],
-      "remaining_qualification": "Preserve the be6fc81 formatted-word search failure and add a source regression/candidate retest; ongoing audit, model, native, device and platform regressions remain required."
+      "remaining_qualification": "Preserve the be6fc81 formatted-word search failure. Its source regression and separate 254d623 native retest are already complete; later integrated candidates still need their affected regression matrix. Exact candidate/tier/platform qualification and all missing/skipped model, native, device and account cases remain pending."
     },
     {
       "id": "REL-009",
@@ -2724,7 +2770,9 @@
         "docs/completion/windows-document-helper.md",
         "docs/completion/portable-documents.md",
         "evidence/completion/portable-documents/manifest.json",
-        "evidence/completion/document-containment/manifest.json"
+        "evidence/completion/document-containment/manifest.json",
+        "docs/completion/linux-process-domain.md",
+        "evidence/completion/linux-process-domain/manifest.json"
       ],
       "remaining_qualification": "Actual Windows/Linux native builds and execution, device/screenshot capture, WebView/PDF behavior, provider containment, clean install/update/rollback/uninstall and full product matrix remain open. Windows new-workspace creation, migration, backup, restore and transfer explicitly unavailable pending directory/marker durability protocol. Linux native PDF extraction/export is disabled pending enforceable process containment; target evidence remains unavailable.",
       "evidence_target_status": "planned_destination_not_passing_evidence",
@@ -2892,7 +2940,12 @@
         "docs/completion/requirements-overlay.json",
         "docs/completion/requirements-reconciliation.md",
         "docs/completion/support-bundle.md",
-        "evidence/completion/support-bundle/manifest.json"
+        "evidence/completion/support-bundle/manifest.json",
+        "docs/completion/qualification.md",
+        "docs/completion/qualification-mapping.md",
+        "evidence/completion/qualification-mapping/manifest.json",
+        "docs/completion/operational-diagnostics.md",
+        "evidence/completion/operational-diagnostics/hardening-manifest.json"
       ],
       "remaining_qualification": "Ongoing candidate/platform reconciliation and missing research remain open; mapping to implementation packages does not close entire acceptance criteria. TRD-CONSTRAINT-020 has a bounded local support package but broader diagnostics and packaged/platform acceptance remain partial.",
       "development_candidate_evidence": [
@@ -3154,7 +3207,10 @@
         "docs/phase-6/implementation.md",
         "docs/phase-6/hosting.md",
         "docs/completion/development-candidate-4900d4b.md",
-        "evidence/completion/candidate-4900d4b/p2/packaged-p2-integration.json"
+        "evidence/completion/candidate-4900d4b/p2/packaged-p2-integration.json",
+        "docs/completion/expanded-evaluation.md",
+        "evidence/completion/expanded-evaluation/manifest.json",
+        "evidence/completion/expanded-evaluation/full-p0-incomplete/reaccounted.json"
       ],
       "followup_commits": [
         "4900d4b"

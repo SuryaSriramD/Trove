@@ -1,8 +1,8 @@
 {
   "schemaVersion": 1,
   "title": "Current scoped implementation overlay for the historical PRD/TRD ledger",
-  "reviewedSourceCommit": "e481c6a7e602313be374785c49bc8ed73252ecad",
-  "recordedAt": "2026-10-05",
+  "reviewedSourceCommit": "65a14ed41b05782cb808dbfd5fed0a1ebb51a7e9",
+  "recordedAt": "2026-10-07",
   "historicalLedger": "docs/phase-0/requirements-ledger.json",
   "historicalLedgerCanonicalSHA256": "8bda6faf8acdbfd5562c9de9e3e2481bafb1e89964c1670edcaea4e12b662a91",
   "historicalRequirementsCanonicalSHA256": "a01d49bb24b0fb758865dea69eb438145f4407cae12078885f81ea70a0635af4",
@@ -454,9 +454,11 @@
       "evidencePaths": [
         "docs/completion/ai-modes.md",
         "evidence/completion/ai-modes/manifest.json",
-        "docs/completion/reviewed-actions.md"
+        "docs/completion/reviewed-actions.md",
+        "docs/completion/expanded-evaluation.md",
+        "evidence/completion/expanded-evaluation/manifest.json"
       ],
-      "remainingGates": "All 14 predefined tasks passed on ab3ff13 with the optional 7B pack, not every task or native candidate. Earlier failures remain retained; broader quality, correction effort and controlled resource performance remain open.",
+      "remainingGates": "All 14 predefined tasks passed on ab3ff13 with the optional 7B pack, not every task or native candidate. Earlier failures remain retained; broader quality, correction effort and controlled resource performance remain open. Expanded P0 attempt: seven reported passes, one extra-formatting-claim failure, one disk/runtime failure, fifteen missing outcomes. Prompt clarification requires unchanged failed-case and held-out real-model reruns; 42 held-out modes are not yet model-qualified.",
       "coverageStatus": "scoped_source_and_evidence",
       "releaseQualified": false
     },
@@ -475,9 +477,11 @@
       "evidencePaths": [
         "docs/completion/ai-context.md",
         "docs/completion/memory-capacity.md",
-        "evidence/completion/memory-capacity/manifest.json"
+        "evidence/completion/memory-capacity/manifest.json",
+        "docs/completion/expanded-evaluation.md",
+        "evidence/completion/expanded-evaluation/manifest.json"
       ],
-      "remainingGates": "Optional 7B passes strict fixed/held-out cases; smaller-model failures remain. Representative quality, correction effort and platform/candidate evidence remain open.",
+      "remainingGates": "Optional 7B passes strict fixed/held-out cases; smaller-model failures remain. Representative quality, correction effort and platform/candidate evidence remain open. Expanded P0 attempt: seven reported passes, one extra-formatting-claim failure, one disk/runtime failure, fifteen missing outcomes. Prompt clarification requires unchanged failed-case and held-out real-model reruns; 42 held-out modes are not yet model-qualified.",
       "coverageStatus": "scoped_source_and_evidence",
       "releaseQualified": false
     },
@@ -494,7 +498,9 @@
       ],
       "evidencePaths": [
         "docs/completion/related-content.md",
-        "evidence/completion/related-content-manifest.json"
+        "evidence/completion/related-content-manifest.json",
+        "docs/completion/expanded-evaluation.md",
+        "evidence/completion/expanded-evaluation/manifest.json"
       ],
       "remainingGates": "Task-specific/source and browser evidence is not broad relevance quality or native platform qualification.",
       "coverageStatus": "scoped_source_and_evidence",
@@ -667,7 +673,9 @@
       "evidencePaths": [
         "docs/completion/local-image-understanding.md",
         "docs/completion/portable-ocr.md",
-        "evidence/completion/image-abstention/manifest.json"
+        "evidence/completion/image-abstention/manifest.json",
+        "docs/completion/expanded-evaluation.md",
+        "evidence/completion/expanded-evaluation/manifest.json"
       ],
       "remainingGates": "Product path passes four fixed fixtures; raw model blank-image failure retained. Broader image/OCR/language/handwriting quality and target/device evidence remain open.",
       "coverageStatus": "scoped_source_and_evidence",
@@ -688,7 +696,9 @@
         "docs/completion/personal-reviews.md",
         "evidence/completion/c6-personal-review.json",
         "docs/completion/richtext-search.md",
-        "evidence/completion/richtext-search/manifest.json"
+        "evidence/completion/richtext-search/manifest.json",
+        "docs/completion/expanded-evaluation.md",
+        "evidence/completion/expanded-evaluation/manifest.json"
       ],
       "remainingGates": "One actual-model fixture is narrow evidence; representative scheduled-review quality and native candidate flows remain open. No generated writes commit without approval.",
       "coverageStatus": "scoped_source_and_evidence",
@@ -773,14 +783,18 @@
         "scripts/desktop_package.py",
         "app_rollback_child.go",
         "internal/updates/rollback_wire.go",
-        "internal/workspace/open_compatible.go"
+        "internal/workspace/open_compatible.go",
+        "scripts/macos_signing.py",
+        "scripts/notarize-macos.py"
       ],
       "evidencePaths": [
         "docs/completion/verified-updates.md",
         "docs/completion/platform-desktop-packaging.md",
         "docs/completion/windows-storage.md",
         "docs/completion/rollback-readiness.md",
-        "evidence/completion/rollback-readiness-3f069dc/manifest.json"
+        "evidence/completion/rollback-readiness-3f069dc/manifest.json",
+        "docs/completion/macos-production-signing.md",
+        "evidence/completion/macos-production-signing/manifest.json"
       ],
       "remainingGates": "Signing/notarization, clean installation, full offline model setup and Windows/Linux execution remain open. Ad-hoc update refusal is expected; Windows recovery is unavailable. Rollback readiness uses authenticated child/shell acknowledgement before preference commit; recorded local signed/ad-hoc fixture evidence is not clean-install/publisher/power-loss qualification.",
       "coverageStatus": "scoped_source_and_evidence",
@@ -790,11 +804,13 @@
       "backlogIds": [
         "REL-007"
       ],
-      "coveredScope": "Recorded startup, typed database/retrieval measurements and native worker RSS collection.",
+      "coveredScope": "Recorded startup, typed database/retrieval measurements and native worker RSS collection. Corrected shell gate exit status, separate diagnostic-only sampling and real per-scale hybrid benchmark coverage.",
       "sourcePaths": [
         "scripts/benchmark-shell.py",
         "scripts/benchmark-database.py",
-        "internal/workspace/database_query_optimization_test.go"
+        "internal/workspace/database_query_optimization_test.go",
+        "scripts/benchmark-phase3.py",
+        "scripts/phase3-benchmark/main.go"
       ],
       "evidencePaths": [
         "docs/completion/database-performance.md",
@@ -803,7 +819,8 @@
         "docs/completion/development-candidate-be6fc81.md",
         "evidence/completion/candidate-be6fc81/manifest.json",
         "docs/completion/startup-stage-tracing.md",
-        "evidence/completion/startup-trace-ce0973d/manifest.json"
+        "evidence/completion/startup-trace-ce0973d/manifest.json",
+        "evidence/completion/performance-harness/manifest.json"
       ],
       "remainingGates": "Candidate be6fc81 returned readiness for all 20 launches but an 8399.656 ms launch exceeded its 2500 ms threshold. Keyword samples passed the 300 ms target on 100/1000/10000 synthetic pages; actual hybrid samples passed only a 100-page profile. Large semantic/concurrent load and full app latency remain open. Typed 10k formula/rollup first-page medians were 1197/1127 ms without a newly invented threshold. The separate ce0973d startup trace candidate predates integrated support and rich-text changes: five normal 1000-page samples were below its recorded threshold, but earlier 8399.656 ms and rollback acknowledgement outliers remain unresolved; this does not qualify integrated startup or a release.",
       "coverageStatus": "scoped_source_and_evidence",
@@ -823,14 +840,19 @@
         "scripts/bootstrap.py",
         "scripts/doctor.py",
         "scripts/extract_requirements.py",
-        "contracts/registries.json"
+        "contracts/registries.json",
+        "scripts/completion_qualification.py",
+        "docs/completion/qualification-policy.json"
       ],
       "evidencePaths": [
         "docs/completion/codegen-reproducibility.md",
         "docs/completion/selected-stack-alignment.md",
-        "docs/completion/README.md"
+        "docs/completion/README.md",
+        "docs/completion/qualification.md",
+        "docs/completion/qualification-mapping.md",
+        "evidence/completion/qualification-mapping/manifest.json"
       ],
-      "remainingGates": "Missing 307-behavior research remains unresolved. This mapping supplies scoped coverage, never automatic implementation or release approval.",
+      "remainingGates": "The 307-behavior research remains unresolved on its own reconciliation track. Candidate records bind exact source, artifacts, prerequisites and acceptance evidence; most criteria remain unmapped or pending. No tier/platform release is qualified.",
       "coverageStatus": "scoped_source_and_evidence",
       "releaseQualified": false
     },
@@ -868,7 +890,7 @@
         "REL-002",
         "REL-008"
       ],
-      "coveredScope": "Existing narrow worker/index/automation diagnostics plus a bounded metadata-only-by-default local support ZIP, exact preview, explicitly selected titles/text, cancellation, permission/revision fences and no-replace native save.",
+      "coveredScope": "Existing narrow worker/index/automation diagnostics plus a bounded metadata-only-by-default local support ZIP, exact preview, explicitly selected titles/text, cancellation, permission/revision fences and no-replace native save. Adds bounded allowlisted application/job/import/model/search events, private rooted persistence, separate export consent and exact frozen diagnostic preview bytes.",
       "sourcePaths": [
         "internal/native/protocol.go",
         "internal/workspace/index_external.go",
@@ -881,16 +903,21 @@
         "app_support_bundle.go",
         "app_support_bundle_test.go",
         "frontend/src/SupportBundlePanel.tsx",
-        "frontend/tests/support.browser.spec.ts"
+        "frontend/tests/support.browser.spec.ts",
+        "internal/diagnostics/store.go",
+        "internal/workspace/diagnostics.go",
+        "internal/platformfs/files.go"
       ],
       "evidencePaths": [
         "docs/phase-1/1a.md",
         "docs/completion/automation-configuration.md",
         "docs/completion/codex-siwc-auth.md",
         "docs/completion/support-bundle.md",
-        "evidence/completion/support-bundle/manifest.json"
+        "evidence/completion/support-bundle/manifest.json",
+        "docs/completion/operational-diagnostics.md",
+        "evidence/completion/operational-diagnostics/hardening-manifest.json"
       ],
-      "remainingGates": "The broader complete redacted application/job/import/model/search diagnostic system remains partial. The local support flow includes no raw log archive and promises no automatic secret redaction of optional user-included page content. Packaged native destination/Settings and Windows/Linux execution require distinct evidence; this source package does not qualify a release.",
+      "remainingGates": "Pre-workspace startup failures, complete worker-resource reporting, packaged diagnostic-export interaction and Windows/Linux execution remain open. Disposable snapshots do not claim crash durability or automatic redaction of explicitly selected page content.",
       "coverageStatus": "scoped_source_and_evidence",
       "releaseQualified": false
     },
@@ -912,16 +939,20 @@
         "native/document-web-extension-linux.cpp",
         "frontend/src/document/extract.ts",
         "frontend/tests/document.browser.spec.ts",
-        "internal/native/document_availability.go"
+        "internal/native/document_availability.go",
+        "internal/processdomain/domain.go",
+        "internal/processdomain/domain_linux.go"
       ],
       "evidencePaths": [
         "docs/completion/portable-documents.md",
         "docs/completion/windows-document-helper.md",
         "evidence/completion/portable-documents/manifest.json",
         "evidence/completion/windows-document-helper/manifest.json",
-        "evidence/completion/document-containment/manifest.json"
+        "evidence/completion/document-containment/manifest.json",
+        "docs/completion/linux-process-domain.md",
+        "evidence/completion/linux-process-domain/manifest.json"
       ],
-      "remainingGates": "Linux native PDF text extraction/export is unavailable_containment because process groups do not enforce process/RSS ownership against new sessions/groups or external launchers. Viewer and HTML export remain available. Owned cgroup-v2/equivalent containment and actual target compilation/execution must precede enablement. Windows native SDK/runtime, interception, output, Job drain/profile cleanup and installation remain target gates. Mac source/browser/Go cross-compilation evidence does not qualify Windows/Linux.",
+      "remainingGates": "Linux native PDF text extraction/export is unavailable_containment because process groups do not enforce process/RSS ownership against new sessions/groups or external launchers. Viewer and HTML export remain available. Owned cgroup-v2/equivalent containment and actual target compilation/execution must precede enablement. Windows native SDK/runtime, interception, output, Job drain/profile cleanup and installation remain target gates. Mac source/browser/Go cross-compilation evidence does not qualify Windows/Linux. New cgroup-v2 source admits trusted qualification fixtures only; malicious same-UID migration/crash cleanup and full PDF/provider isolation remain unresolved, so product enablement is unchanged.",
       "coverageStatus": "scoped_source_and_evidence",
       "releaseQualified": false
     }
