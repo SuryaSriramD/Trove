@@ -83,6 +83,8 @@ func (MacVerifier) Inspect(ctx context.Context, path string) (Application, error
 	if err != nil {
 		return out, err
 	}
+	out.Identity.Platform = "darwin"
+	out.Identity.Publisher = Publisher{Kind: AppleDeveloperID, ID: out.Identity.TeamID}
 	if err = validateIdentity(out.Identity); err != nil {
 		return out, err
 	}

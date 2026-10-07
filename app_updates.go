@@ -303,7 +303,7 @@ func (a *App) PreviewApplicationRollback() (string, error) {
 	return jsonResult(map[string]any{"previewId": id, "previous": kit.Previous.Identity, "snapshot": kit.Snapshot, "createdAt": kit.CreatedAt, "warnings": []string{"Restore creates a new workspace. Keep your newer workspace to retain changes made after this backup.", "After restoring, use the reviewed launch button to open the restored copy with the saved previous app. This selects the compatible copy before that app opens any workspace."}})
 }
 func compatibleRollbackPublisher(current updates.Application, kit updates.Kit) error {
-	if current.Identity.BundleID != kit.Previous.Identity.BundleID || current.Identity.TeamID != kit.Previous.Identity.TeamID || current.Identity.Architecture != kit.Previous.Identity.Architecture || current.Identity.Build < kit.Previous.Identity.Build {
+	if !updates.SamePublisher(current.Identity, kit.Previous.Identity) || current.Identity.Architecture != kit.Previous.Identity.Architecture || current.Identity.Build < kit.Previous.Identity.Build {
 		return errors.New("recovery folder is not compatible with this installed publisher or architecture")
 	}
 	return nil

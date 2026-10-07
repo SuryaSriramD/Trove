@@ -11,15 +11,17 @@ import (
 const BundleID = "local.trove.desktop"
 
 type Identity struct {
-	RollbackHandshake int    `json:"rollbackHandshake"`
-	BundleID          string `json:"bundleId"`
-	TeamID            string `json:"teamId"`
-	Version           string `json:"version"`
-	Build             uint64 `json:"build"`
-	UserVersion       int    `json:"userVersion"`
-	StorageGeneration int    `json:"storageGeneration"`
-	Architecture      string `json:"architecture"`
-	MinimumOS         string `json:"minimumOS"`
+	RollbackHandshake int       `json:"rollbackHandshake"`
+	BundleID          string    `json:"bundleId"`
+	TeamID            string    `json:"teamId,omitempty"`
+	Platform          string    `json:"platform,omitempty"`
+	Publisher         Publisher `json:"publisher,omitzero"`
+	Version           string    `json:"version"`
+	Build             uint64    `json:"build"`
+	UserVersion       int       `json:"userVersion"`
+	StorageGeneration int       `json:"storageGeneration"`
+	Architecture      string    `json:"architecture"`
+	MinimumOS         string    `json:"minimumOS"`
 }
 
 type Application struct {
@@ -35,7 +37,10 @@ var teamPattern = regexp.MustCompile(`^[A-Z0-9]{10}$`)
 var versionPattern = regexp.MustCompile(`^[0-9]+\.[0-9]+\.[0-9]+$`)
 
 func validateIdentity(id Identity) error {
-	if id.BundleID != BundleID || !teamPattern.MatchString(id.TeamID) || !versionPattern.MatchString(id.Version) || id.Build == 0 || id.UserVersion < 3 || id.StorageGeneration < 1 || (id.Architecture != "arm64" && id.Architecture != "amd64") || !osVersionPattern.MatchString(id.MinimumOS) {
+	if _, _, err := canonicalPublisher(id); err != nil {
+		return err
+	}
+	if id.BundleID != BundleID || !versionPattern.MatchString(id.Version) || id.Build == 0 || id.UserVersion < 3 || id.StorageGeneration < 1 || (id.Architecture != "arm64" && id.Architecture != "amd64") || !osVersionPattern.MatchString(id.MinimumOS) {
 		return errors.New("application lacks supported signed update metadata")
 	}
 	return nil
@@ -48,7 +53,7 @@ func VerifyUpgrade(current, next Application) error {
 	if err := validateIdentity(next.Identity); err != nil {
 		return err
 	}
-	if current.Identity.BundleID != next.Identity.BundleID || current.Identity.TeamID != next.Identity.TeamID {
+	if !SamePublisher(current.Identity, next.Identity) {
 		return errors.New("update publisher differs from this application")
 	}
 	if current.Identity.Architecture != next.Identity.Architecture {

@@ -49,7 +49,11 @@ func InspectTree(ctx context.Context, path string) (Inventory, error) {
 			return err
 		}
 		if name == "." {
-			return nil
+			st, err := root.Lstat(name)
+			if err != nil {
+				return err
+			}
+			return inventoryDirectoryPolicy(root, name, st)
 		}
 		if len(name) > 4096 || strings.ContainsAny(name, "\\\x00\r\n") || len(out.Objects) >= maxBundleFiles {
 			return errors.New("application inventory exceeds supported bounds")
@@ -58,11 +62,15 @@ func InspectTree(ctx context.Context, path string) (Inventory, error) {
 		if err != nil {
 			return err
 		}
-		object := Object{Path: name, Mode: uint32(st.Mode().Perm()), Directory: st.IsDir()}
-		if st.Mode().Perm()&0022 != 0 || st.Mode()&(fs.ModeSetuid|fs.ModeSetgid|fs.ModeSticky) != 0 {
-			return errors.New("application must not contain group/world-writable objects")
+		mode, err := inventoryMode(st)
+		if err != nil {
+			return err
 		}
+		object := Object{Path: name, Mode: mode, Directory: st.IsDir()}
 		if st.IsDir() {
+			if err := inventoryDirectoryPolicy(root, name, st); err != nil {
+				return err
+			}
 			out.Objects = append(out.Objects, object)
 			return nil
 		}
@@ -83,6 +91,9 @@ func InspectTree(ctx context.Context, path string) (Inventory, error) {
 		}
 		if !os.SameFile(st, opened) || !opened.Mode().IsRegular() {
 			return errors.New("application changed while inspecting")
+		}
+		if err = inventoryFilePolicy(f); err != nil {
+			return err
 		}
 		h := sha256.New()
 		n, err := copyContext(ctx, h, f, st.Size())

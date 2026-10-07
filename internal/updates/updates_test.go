@@ -8,6 +8,7 @@ import (
 	"errors"
 	"os"
 	"path/filepath"
+	"runtime"
 	"strings"
 	"testing"
 )
@@ -145,6 +146,9 @@ func TestApplicationInventoryRejectsLinksWritableAndOversizedFiles(t *testing.T)
 					t.Fatal(err)
 				}
 			case "group writable":
+				if runtime.GOOS == "windows" {
+					t.Skip("POSIX group mode is not a Windows ACL; native stream/read-only checks are separate")
+				}
 				write(t, file, []byte("bad"))
 				if err := os.Chmod(file, 0660); err != nil {
 					t.Fatal(err)
