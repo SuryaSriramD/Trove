@@ -1,0 +1,64 @@
+{
+  "schemaVersion": 1,
+  "scope": "Qualification-runner metadata, schema and evidence-boundary tests only. No product candidate, native/device/account/model outcome is asserted.",
+  "baseSourceCommit": "317b782",
+  "tests": {
+    "command": [
+      "/Users/suryasriramduvvuri/Library/Caches/Trove/completion/python/requirements-e99394c278ee/bin/python",
+      "-m",
+      "unittest",
+      "discover",
+      "-s",
+      "tests",
+      "-p",
+      "test_completion_qualification.py",
+      "-v"
+    ],
+    "passed": 26,
+    "failed": 0
+  },
+  "dryRunTargets": 3,
+  "dryRunTiers": 3,
+  "releaseQualified": false,
+  "releaseApproved": false,
+  "files": {
+    "scripts/completion_qualification.py": {
+      "sha256": "e60f47119912e90f8f7db78cf9180202a8a9463b54288720b5c1992d731b1003",
+      "size": 34654
+    },
+    "scripts/qualify-completion.py": {
+      "sha256": "6f77a2aa4204640dd67f0c379766722df49d6442b3d8342f3bfd3203add8573a",
+      "size": 206
+    },
+    "docs/completion/qualification-policy.json": {
+      "sha256": "36d5bb0c4884b7bfdc7ab1d2582cf560bf76a385c78e9f382fbbe3c2714d3ba7",
+      "size": 27217
+    },
+    "docs/completion/qualification.schema.json": {
+      "sha256": "1ecf564c2ee81f4f7ae0b3ede530fb5b42bc3918152f5ae77ba8ce582e13b2fe",
+      "size": 14428
+    },
+    "docs/completion/qualification.md": {
+      "sha256": "b0d8e5d014eac54755835ad2d151d2467efd06091fbbf30cb8a3fb5bdf46849b",
+      "size": 8767
+    },
+    "tests/test_completion_qualification.py": {
+      "sha256": "b8e20e666d8b5f52b0354782e8c740f5edb0c212acdaa91d20e83ebe41027ddf",
+      "size": 19508
+    },
+    "evidence/completion/qualification-runner/tests.txt": {
+      "sha256": "19c6b64bd3c8fd050a538d17c79030cfb730699af7ee2f7e56405ca744637276",
+      "size": 4445
+    },
+    "evidence/completion/qualification-runner/dry-run.json": {
+      "sha256": "8b4139891040516128003ecffbcc3cbec171c1a6d89c9dd6dcf705d4cb177d6b",
+      "size": 2538
+    }
+  },
+  "limitations": [
+    "Initial acceptanceCases mapping is empty; every applicable criterion remains pending.",
+    "No independent clean Mac is available.",
+    "Human observations require actual artifacts and remain operator attestations, not machine-proven facts.",
+    "All platform release and external prerequisite gates remain open."
+  ]
+}

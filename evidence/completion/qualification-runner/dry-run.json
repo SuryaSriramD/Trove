@@ -1,0 +1,104 @@
+{
+  "kind": "read-only policy dry run; no product evidence",
+  "results": [
+    {
+      "target": "darwin-arm64",
+      "tier": "P0",
+      "checks": 13,
+      "acceptanceRequired": 393,
+      "acceptancePassed": 0,
+      "backlogItemsAccounted": 51,
+      "status": "pending",
+      "releaseQualified": false,
+      "releaseApproved": false
+    },
+    {
+      "target": "darwin-arm64",
+      "tier": "P1",
+      "checks": 20,
+      "acceptanceRequired": 585,
+      "acceptancePassed": 0,
+      "backlogItemsAccounted": 51,
+      "status": "pending",
+      "releaseQualified": false,
+      "releaseApproved": false
+    },
+    {
+      "target": "darwin-arm64",
+      "tier": "P2",
+      "checks": 24,
+      "acceptanceRequired": 616,
+      "acceptancePassed": 0,
+      "backlogItemsAccounted": 51,
+      "status": "pending",
+      "releaseQualified": false,
+      "releaseApproved": false
+    },
+    {
+      "target": "windows-amd64",
+      "tier": "P0",
+      "checks": 14,
+      "acceptanceRequired": 394,
+      "acceptancePassed": 0,
+      "backlogItemsAccounted": 51,
+      "status": "pending",
+      "releaseQualified": false,
+      "releaseApproved": false
+    },
+    {
+      "target": "windows-amd64",
+      "tier": "P1",
+      "checks": 21,
+      "acceptanceRequired": 586,
+      "acceptancePassed": 0,
+      "backlogItemsAccounted": 51,
+      "status": "pending",
+      "releaseQualified": false,
+      "releaseApproved": false
+    },
+    {
+      "target": "windows-amd64",
+      "tier": "P2",
+      "checks": 25,
+      "acceptanceRequired": 617,
+      "acceptancePassed": 0,
+      "backlogItemsAccounted": 51,
+      "status": "pending",
+      "releaseQualified": false,
+      "releaseApproved": false
+    },
+    {
+      "target": "linux-amd64",
+      "tier": "P0",
+      "checks": 14,
+      "acceptanceRequired": 394,
+      "acceptancePassed": 0,
+      "backlogItemsAccounted": 51,
+      "status": "pending",
+      "releaseQualified": false,
+      "releaseApproved": false
+    },
+    {
+      "target": "linux-amd64",
+      "tier": "P1",
+      "checks": 21,
+      "acceptanceRequired": 586,
+      "acceptancePassed": 0,
+      "backlogItemsAccounted": 51,
+      "status": "pending",
+      "releaseQualified": false,
+      "releaseApproved": false
+    },
+    {
+      "target": "linux-amd64",
+      "tier": "P2",
+      "checks": 25,
+      "acceptanceRequired": 617,
+      "acceptancePassed": 0,
+      "backlogItemsAccounted": 51,
+      "status": "pending",
+      "releaseQualified": false,
+      "releaseApproved": false
+    }
+  ]
+}

@@ -1,0 +1,870 @@
+{
+  "schemaVersion": 1,
+  "id": "trove-completion-release-v1",
+  "tiers": [
+    "P0",
+    "P1",
+    "P2"
+  ],
+  "targets": [
+    "darwin-arm64",
+    "windows-amd64",
+    "linux-amd64"
+  ],
+  "meaning": "Cumulative minimum evidence gates; software pass is not product or release approval. Historical evidence is never promoted automatically.",
+  "checks": [
+    {
+      "id": "p0-service-regressions",
+      "tier": "P0",
+      "scope": "software",
+      "group": "regression",
+      "kind": "go",
+      "targets": [
+        "darwin-arm64",
+        "windows-amd64",
+        "linux-amd64"
+      ],
+      "package": "./internal/workspace",
+      "tests": [
+        "TestOnlineBackupAllowsEditsAndCaptureWithConsistentRecovery",
+        "TestOnlineBackupCancellationAndDiskFailureKeepSourceAndReleasePins",
+        "TestRestoreSecondInstallationPreservesCanonicalHistoryAndEvidence",
+        "TestRestoreRejectsCorruptUnsafeAndChangedBackups",
+        "TestSearchFTSChangesDeletesScopesAndRebuild",
+        "TestSearchSemanticRevisionBoundAndHybrid",
+        "TestDatabaseFourViewsShareRecordsAndRestart",
+        "TestDatabaseFiltersDecimalSortCursorAndAtomicity"
+      ],
+      "timeoutSeconds": 900,
+      "prerequisites": [],
+      "assets": [],
+      "scenarios": []
+    },
+    {
+      "id": "p1-workspace-regressions",
+      "tier": "P1",
+      "scope": "software",
+      "group": "regression",
+      "kind": "go",
+      "targets": [
+        "darwin-arm64",
+        "windows-amd64",
+        "linux-amd64"
+      ],
+      "package": "./internal/workspace",
+      "tests": [
+        "TestUnifiedTemplateValuesNestedBodyTasksAndIndependentInstances",
+        "TestUnifiedTemplateMappingsStaleGuardsAndTemplateHash",
+        "TestFormulaV2IndependentCompatibilityFixtures",
+        "TestAutomationUnifiedTemplatePreviewDeterminismAndReopen",
+        "TestAutomationTemplateHashSchemaLocksAndDeniedOrigins"
+      ],
+      "timeoutSeconds": 900,
+      "prerequisites": [],
+      "assets": [],
+      "scenarios": []
+    },
+    {
+      "id": "p1-reviewed-tools-regressions",
+      "tier": "P1",
+      "scope": "software",
+      "group": "regression",
+      "kind": "go",
+      "targets": [
+        "darwin-arm64",
+        "windows-amd64",
+        "linux-amd64"
+      ],
+      "package": "./internal/workspace",
+      "tests": [
+        "TestReviewedProviderNamedCreationRetryStaleAndRevocation",
+        "TestNamedAIPlanReviewUsesSharedApprovalAndPreservesOrigin",
+        "TestAIApprovalCannotOutliveApprovingScope",
+        "TestManagedProviderUsesSameScopedReviewAndRevocation",
+        "TestProviderStaleRevisionAndRevocationBeforeCommit",
+        "TestProviderDisconnectCancelsApprovalBeforeCommit"
+      ],
+      "timeoutSeconds": 900,
+      "prerequisites": [],
+      "assets": [],
+      "scenarios": []
+    },
+    {
+      "id": "p2-regressions",
+      "tier": "P2",
+      "scope": "software",
+      "group": "regression",
+      "kind": "go",
+      "targets": [
+        "darwin-arm64",
+        "windows-amd64",
+        "linux-amd64"
+      ],
+      "package": "./internal/workspace",
+      "tests": [
+        "TestConversationExportCanonicalBranchesProvenanceSearchAndRoundTrip",
+        "TestConversationExportClaudeAndInvalidGraphsRetainOriginal",
+        "TestPageDisplayPersistenceScopeHistoryPortableAndBackup",
+        "TestPersonalReviewGenerationRequiresReviewAndAppliesOnce",
+        "TestPersonalReviewGenerationCancellationFreshnessAndRetry",
+        "TestPersonalReviewPortableImportNeverActivatesModelOrReplaysRuns"
+      ],
+      "timeoutSeconds": 900,
+      "prerequisites": [],
+      "assets": [],
+      "scenarios": []
+    },
+    {
+      "id": "affected-suites",
+      "tier": "P0",
+      "scope": "software",
+      "group": "regression",
+      "kind": "observation",
+      "targets": [
+        "darwin-arm64",
+        "windows-amd64",
+        "linux-amd64"
+      ],
+      "scenarios": [
+        {
+          "id": "affected",
+          "expected": "Affected Go, frontend, tooling, contract and integration suites pass on exact source; every required case executes; explicit optional cases remain separately unqualified."
+        },
+        {
+          "id": "negative",
+          "expected": "Each correction has an independent failing-before/passing-after regression and byte/content inspection where relevant."
+        }
+      ],
+      "prerequisites": [],
+      "assets": []
+    },
+    {
+      "id": "build-provenance",
+      "tier": "P0",
+      "scope": "release",
+      "group": "candidate",
+      "kind": "observation",
+      "targets": [
+        "darwin-arm64",
+        "windows-amd64",
+        "linux-amd64"
+      ],
+      "scenarios": [
+        {
+          "id": "source",
+          "expected": "Clean committed source and reproducible build report match this source archive and application inventory."
+        },
+        {
+          "id": "inputs",
+          "expected": "Helpers, models, fixture datasets, dependency/runtime revisions and distribution notices have exact recorded identities."
+        },
+        {
+          "id": "target",
+          "expected": "Actual target native build and execution match recorded OS, architecture and hardware; cross-compilation alone does not pass."
+        }
+      ],
+      "prerequisites": [],
+      "assets": []
+    },
+    {
+      "id": "p0-packaged-journey",
+      "tier": "P0",
+      "scope": "software",
+      "group": "packaged",
+      "kind": "observation",
+      "targets": [
+        "darwin-arm64",
+        "windows-amd64",
+        "linux-amd64"
+      ],
+      "scenarios": [
+        {
+          "id": "create-reopen",
+          "expected": "Exact packaged app imports, edits, saves, exits and reopens durable canonical content on an isolated workspace."
+        },
+        {
+          "id": "restore",
+          "expected": "Packaged backup/restore retains canonical content, assets, history, timing and recording bytes; original source survives."
+        },
+        {
+          "id": "offline",
+          "expected": "OS network denial is independently verified; model-free editing/import/search and installed local-model operation work without cloud fallback."
+        }
+      ],
+      "prerequisites": [],
+      "assets": [
+        "helpers",
+        "fixtures"
+      ]
+    },
+    {
+      "id": "p0-native-editor",
+      "tier": "P0",
+      "scope": "release",
+      "group": "native",
+      "kind": "observation",
+      "targets": [
+        "darwin-arm64",
+        "windows-amd64",
+        "linux-amd64"
+      ],
+      "scenarios": [
+        {
+          "id": "preservation",
+          "expected": "Actual UI preserves tables, marks, links, colors, layouts and assets through edit, undo/redo, restart, export and history restore."
+        },
+        {
+          "id": "navigation",
+          "expected": "Nested toggles, distinct linked-view identities and page/block deep links work through native launch/navigation."
+        },
+        {
+          "id": "input",
+          "expected": "Native keyboard, IME, clipboard and accessibility scenarios pass on this target."
+        },
+        {
+          "id": "views",
+          "expected": "Large incremental tables, properties, saved order/width, dates and calendar range edits work through actual UI."
+        }
+      ],
+      "prerequisites": [],
+      "assets": [
+        "fixtures"
+      ]
+    },
+    {
+      "id": "p0-recovery",
+      "tier": "P0",
+      "scope": "release",
+      "group": "recovery",
+      "kind": "observation",
+      "targets": [
+        "darwin-arm64",
+        "windows-amd64",
+        "linux-amd64"
+      ],
+      "scenarios": [
+        {
+          "id": "snapshot",
+          "expected": "Online backup remains responsive with concurrent editing/recording and yields a verified consistent database/asset snapshot."
+        },
+        {
+          "id": "history",
+          "expected": "Meeting segments and schema-aware historical value mappings restore atomically without rewinding unrelated/shared data."
+        },
+        {
+          "id": "faults",
+          "expected": "Cancellation, disk-full, process interruption and declared crash/durability fault points retain a safe original or explicit incomplete state."
+        },
+        {
+          "id": "portability",
+          "expected": "Backup restoration into a fresh selected destination retains original data and revokes installation-specific grants."
+        }
+      ],
+      "prerequisites": [],
+      "assets": [
+        "fixtures"
+      ]
+    },
+    {
+      "id": "p0-local-ai",
+      "tier": "P0",
+      "scope": "release",
+      "group": "model",
+      "kind": "observation",
+      "targets": [
+        "darwin-arm64",
+        "windows-amd64",
+        "linux-amd64"
+      ],
+      "scenarios": [
+        {
+          "id": "retrieval",
+          "expected": "Representative conceptual questions use compatible hybrid retrieval with current scoped citations; absent/incompatible packs give explicit fallback."
+        },
+        {
+          "id": "memory",
+          "expected": "Factual recall, preferences, constraints, source edits/deletion, forgetting and current authority pass predefined independent expected outcomes."
+        },
+        {
+          "id": "budget",
+          "expected": "Long input, useful context budgeting, cancellation and incomplete output rejection pass on the declared packs and hardware."
+        },
+        {
+          "id": "quality",
+          "expected": "Representative task correctness, correction effort, latency and whole-application memory meet the predeclared rubric; fixed toy passes alone do not qualify."
+        }
+      ],
+      "prerequisites": [
+        "representative-datasets"
+      ],
+      "assets": [
+        "helpers",
+        "models",
+        "fixtures"
+      ]
+    },
+    {
+      "id": "p0-audio-device",
+      "tier": "P0",
+      "scope": "release",
+      "group": "device",
+      "kind": "observation",
+      "targets": [
+        "darwin-arm64",
+        "windows-amd64",
+        "linux-amd64"
+      ],
+      "scenarios": [
+        {
+          "id": "microphone",
+          "expected": "Physical microphone capture, permission denial/revocation, missing/unplugged device, cancel and interrupted processing preserve recording bytes."
+        },
+        {
+          "id": "formats",
+          "expected": "Declared MP3/M4A/AAC/WAV originals normalize and transcribe offline with bounded resources and useful unsupported/corrupt handling."
+        },
+        {
+          "id": "speech",
+          "expected": "Authorized varied speech dataset passes the predeclared quality rubric; timing links and reviewable tasks remain correct."
+        }
+      ],
+      "prerequisites": [
+        "physical-devices",
+        "representative-datasets"
+      ],
+      "assets": [
+        "helpers",
+        "models",
+        "fixtures"
+      ]
+    },
+    {
+      "id": "p0-import-datasets",
+      "tier": "P0",
+      "scope": "release",
+      "group": "migration",
+      "kind": "observation",
+      "targets": [
+        "darwin-arm64",
+        "windows-amd64",
+        "linux-amd64"
+      ],
+      "scenarios": [
+        {
+          "id": "notion",
+          "expected": "Authorized representative Notion exports preserve supported page/database/schema/value/structure/link/asset behavior."
+        },
+        {
+          "id": "reimport",
+          "expected": "Repeated imports, partial failures, duplicate mappings and unsupported preserved evidence stay distinguishable from live native values."
+        },
+        {
+          "id": "hostile",
+          "expected": "Hostile documents, links, archives and resources cannot execute active content or escape scope."
+        }
+      ],
+      "prerequisites": [
+        "representative-datasets"
+      ],
+      "assets": [
+        "fixtures"
+      ]
+    },
+    {
+      "id": "p0-performance",
+      "tier": "P0",
+      "scope": "release",
+      "group": "performance",
+      "kind": "observation",
+      "targets": [
+        "darwin-arm64",
+        "windows-amd64",
+        "linux-amd64"
+      ],
+      "scenarios": [
+        {
+          "id": "shell",
+          "expected": "Controlled recorded workloads meet the declared approximately two-second startup target; missing readiness/outliers are retained and investigated."
+        },
+        {
+          "id": "search",
+          "expected": "Representative keyword searches meet 300 ms and hybrid retrieval meets one second excluding optional reranking, with exact workload and hardware."
+        },
+        {
+          "id": "database",
+          "expected": "Realistic database including formula/rollup queries measures service plus bridge/paint and memory; accepted limits are explicitly recorded."
+        },
+        {
+          "id": "concurrent",
+          "expected": "Recording, indexing and AI concurrency remains responsive, bounded and cancellable."
+        }
+      ],
+      "prerequisites": [],
+      "assets": [
+        "helpers",
+        "models",
+        "fixtures"
+      ]
+    },
+    {
+      "id": "clean-install",
+      "tier": "P0",
+      "scope": "release",
+      "group": "installation",
+      "kind": "observation",
+      "targets": [
+        "darwin-arm64",
+        "windows-amd64",
+        "linux-amd64"
+      ],
+      "scenarios": [
+        {
+          "id": "install",
+          "expected": "Independent clean target installation runs without developer tools or product account."
+        },
+        {
+          "id": "models",
+          "expected": "Model-free and complete explicitly acquired offline model-pack path both work."
+        },
+        {
+          "id": "restore",
+          "expected": "Backup from another installation restores in a second clean installation."
+        }
+      ],
+      "prerequisites": [
+        "independent-clean-target"
+      ],
+      "assets": [
+        "helpers",
+        "models",
+        "fixtures"
+      ]
+    },
+    {
+      "id": "signed-distribution",
+      "tier": "P0",
+      "scope": "release",
+      "group": "distribution",
+      "kind": "observation",
+      "targets": [
+        "darwin-arm64",
+        "windows-amd64",
+        "linux-amd64"
+      ],
+      "scenarios": [
+        {
+          "id": "publisher",
+          "expected": "Platform publisher authentication and required macOS signing/notarization validate on the distributed package."
+        },
+        {
+          "id": "notices",
+          "expected": "Dependency/model redistribution and notices are reviewed for the exact application and pack bytes."
+        },
+        {
+          "id": "update",
+          "expected": "Authentic update rejects changed/wrong-publisher/downgrade packages and preserves a pre-migration recovery point."
+        },
+        {
+          "id": "rollback",
+          "expected": "Compatible prior app and restored snapshot perform reviewed authenticated startup handoff; interruption/failure preserves recoverability."
+        },
+        {
+          "id": "uninstall",
+          "expected": "Uninstall preserves workspace, models and declared user settings on actual target."
+        }
+      ],
+      "prerequisites": [
+        "distribution-access",
+        "independent-clean-target"
+      ],
+      "assets": [
+        "helpers",
+        "fixtures"
+      ]
+    },
+    {
+      "id": "requirements-reconciliation",
+      "tier": "P0",
+      "scope": "release",
+      "group": "governance",
+      "kind": "observation",
+      "targets": [
+        "darwin-arm64",
+        "windows-amd64",
+        "linux-amd64"
+      ],
+      "scenarios": [
+        {
+          "id": "ledger",
+          "expected": "All selected PRD/TRD/backlog acceptance criteria have accurate implementation and candidate/platform evidence or remain explicitly open."
+        },
+        {
+          "id": "research",
+          "expected": "Referenced accepted research behaviors are reconciled from the actual supplied source; absent wording is not invented."
+        }
+      ],
+      "prerequisites": [
+        "research-report"
+      ],
+      "assets": []
+    },
+    {
+      "id": "p1-native-workspace",
+      "tier": "P1",
+      "scope": "release",
+      "group": "native",
+      "kind": "observation",
+      "targets": [
+        "darwin-arm64",
+        "windows-amd64",
+        "linux-amd64"
+      ],
+      "scenarios": [
+        {
+          "id": "layouts",
+          "expected": "Rich tabs/columns/reusable blocks, cached bookmarks and explicitly enabled sandboxed embeds pass visible editing and offline behavior."
+        },
+        {
+          "id": "databases",
+          "expected": "Timeline scales/groups/dependencies, unified templates, gallery virtualization and declared formula compatibility pass native interactions."
+        },
+        {
+          "id": "automation",
+          "expected": "Schedules, conditions, recurring templates, actions, missed runs and history work through visible controls; portable import stays inactive."
+        },
+        {
+          "id": "export",
+          "expected": "Rich PDF output is visually inspected with images/fonts/pagination; original and unsupported content remain preserved."
+        }
+      ],
+      "prerequisites": [],
+      "assets": [
+        "helpers",
+        "fixtures"
+      ]
+    },
+    {
+      "id": "p1-capture-migration",
+      "tier": "P1",
+      "scope": "release",
+      "group": "migration",
+      "kind": "observation",
+      "targets": [
+        "darwin-arm64",
+        "windows-amd64",
+        "linux-amd64"
+      ],
+      "scenarios": [
+        {
+          "id": "api",
+          "expected": "Real authorized Notion account validates source/schema/view reconstruction, property pagination/resume and nested preservation."
+        },
+        {
+          "id": "clipper",
+          "expected": "Actual installed paired browser extension selects a destination, retains provenance and obeys explicit permissions."
+        },
+        {
+          "id": "screenshot",
+          "expected": "Actual native screenshot picker and consent/denial/cancellation preserve selected original image through reviewed import."
+        }
+      ],
+      "prerequisites": [
+        "notion-account",
+        "physical-devices"
+      ],
+      "assets": [
+        "helpers",
+        "fixtures"
+      ]
+    },
+    {
+      "id": "p1-local-ai",
+      "tier": "P1",
+      "scope": "release",
+      "group": "model",
+      "kind": "observation",
+      "targets": [
+        "darwin-arm64",
+        "windows-amd64",
+        "linux-amd64"
+      ],
+      "scenarios": [
+        {
+          "id": "modes",
+          "expected": "Every exposed writing/code/structured/organize mode and reviewed page/task creation passes a predeclared representative task rubric."
+        },
+        {
+          "id": "approval",
+          "expected": "Generated writes remain understandable typed proposals; denied/stale/revoked/changed destinations never commit without fresh approval."
+        },
+        {
+          "id": "memory",
+          "expected": "Broader memory and semantic related-content relevance, forgetting and source freshness meet the declared rubric."
+        }
+      ],
+      "prerequisites": [
+        "representative-datasets"
+      ],
+      "assets": [
+        "helpers",
+        "models",
+        "fixtures"
+      ]
+    },
+    {
+      "id": "p1-live-providers",
+      "tier": "P1",
+      "scope": "release",
+      "group": "providers",
+      "kind": "observation",
+      "targets": [
+        "darwin-arm64",
+        "windows-amd64",
+        "linux-amd64"
+      ],
+      "scenarios": [
+        {
+          "id": "claude",
+          "expected": "Real authorized Claude discovery, supported sign-in, contained execution, streaming, cancellation, compatible resume and disconnect pass."
+        },
+        {
+          "id": "codex",
+          "expected": "Real authorized Codex account/billing/model selection, contained execution, streaming, cancellation, compatible resume and disconnect pass."
+        },
+        {
+          "id": "containment",
+          "expected": "OS canaries prove providers cannot read/write the workspace or bypass Trove tool/approval scopes; missing containment fails closed."
+        },
+        {
+          "id": "handoff",
+          "expected": "Real cross-provider handoffs, completed/interrupted turns, repeated requests and revocation preserve exact account/context/scope identities."
+        }
+      ],
+      "prerequisites": [
+        "provider-accounts"
+      ],
+      "assets": [
+        "fixtures"
+      ]
+    },
+    {
+      "id": "p1-live-mcp",
+      "tier": "P1",
+      "scope": "release",
+      "group": "providers",
+      "kind": "observation",
+      "targets": [
+        "darwin-arm64",
+        "windows-amd64",
+        "linux-amd64"
+      ],
+      "scenarios": [
+        {
+          "id": "local",
+          "expected": "Actual authorized MCP clients perform scoped reads and reviewed creation against the single owning kernel."
+        },
+        {
+          "id": "remote",
+          "expected": "Explicitly enabled authenticated reachable HTTPS supports actual client interoperability and reviewed operations."
+        },
+        {
+          "id": "revocation",
+          "expected": "Revocation, stale proposals, repeated requests, interrupted streams and server shutdown enforce permissions and deduplication."
+        }
+      ],
+      "prerequisites": [
+        "https-environment",
+        "provider-accounts"
+      ],
+      "assets": [
+        "fixtures"
+      ]
+    },
+    {
+      "id": "p2-image",
+      "tier": "P2",
+      "scope": "release",
+      "group": "model",
+      "kind": "observation",
+      "targets": [
+        "darwin-arm64",
+        "windows-amd64",
+        "linux-amd64"
+      ],
+      "scenarios": [
+        {
+          "id": "quality",
+          "expected": "Representative real-model image descriptions/questions and distinct OCR text pass predeclared quality rubrics, including blank/unanswerable abstention."
+        },
+        {
+          "id": "boundary",
+          "expected": "Original images, source links, input bounds, cancellation, offline execution and capability/quality reporting remain correct."
+        }
+      ],
+      "prerequisites": [
+        "representative-datasets"
+      ],
+      "assets": [
+        "helpers",
+        "models",
+        "fixtures"
+      ]
+    },
+    {
+      "id": "p2-reviews",
+      "tier": "P2",
+      "scope": "release",
+      "group": "model",
+      "kind": "observation",
+      "targets": [
+        "darwin-arm64",
+        "windows-amd64",
+        "linux-amd64"
+      ],
+      "scenarios": [
+        {
+          "id": "quality",
+          "expected": "Real-model daily/weekly cited summaries, unresolved tasks and suggested actions pass representative expected-outcome rubrics."
+        },
+        {
+          "id": "consent",
+          "expected": "Allowed proposal categories require explicit review before every write; schedules consent, deduplication, retry, freshness and inactive portable imports hold."
+        },
+        {
+          "id": "fallback",
+          "expected": "Deterministic reviews remain useful when generation is absent/unavailable."
+        }
+      ],
+      "prerequisites": [
+        "representative-datasets"
+      ],
+      "assets": [
+        "helpers",
+        "models",
+        "fixtures"
+      ]
+    },
+    {
+      "id": "p2-packages",
+      "tier": "P2",
+      "scope": "release",
+      "group": "optional",
+      "kind": "observation",
+      "targets": [
+        "darwin-arm64",
+        "windows-amd64",
+        "linux-amd64"
+      ],
+      "scenarios": [
+        {
+          "id": "packages",
+          "expected": "Charts/forms/row actions/graph/conversation imports/display settings/OCR pass declared canonical value, branch, bytes and provenance cases."
+        },
+        {
+          "id": "hosting",
+          "expected": "Real hosted authentication/TLS, single ownership, transfer and recovery pass; no offline multi-device sync claim is inferred."
+        }
+      ],
+      "prerequisites": [
+        "https-environment"
+      ],
+      "assets": [
+        "fixtures"
+      ]
+    },
+    {
+      "id": "windows-native",
+      "tier": "P0",
+      "scope": "release",
+      "group": "platform",
+      "kind": "observation",
+      "targets": [
+        "windows-amd64"
+      ],
+      "scenarios": [
+        {
+          "id": "storage",
+          "expected": "Native NTFS ACLs, junction/handle/path races, no-replace publication and recovery durability pass without modifying existing access."
+        },
+        {
+          "id": "credentials",
+          "expected": "Actual DPAPI account isolation, lock/cancel/sign-out and original-byte preservation pass."
+        },
+        {
+          "id": "shell",
+          "expected": "Windows clipboard, deep-link first/second instance, WebView prerequisites and lifecycle work offline."
+        }
+      ],
+      "prerequisites": [],
+      "assets": [
+        "helpers",
+        "fixtures"
+      ]
+    },
+    {
+      "id": "linux-native",
+      "tier": "P0",
+      "scope": "release",
+      "group": "platform",
+      "kind": "observation",
+      "targets": [
+        "linux-amd64"
+      ],
+      "scenarios": [
+        {
+          "id": "documents",
+          "expected": "Enforced full-process PDF ownership, aggregate memory, cancellation, empty-domain cleanup and exact WebKit policy pass; unavailable is not a pass."
+        },
+        {
+          "id": "credentials",
+          "expected": "Actual Secret Service encrypted sessions, prompts/cancellation, peer checks and account isolation pass."
+        },
+        {
+          "id": "shell",
+          "expected": "Ubuntu desktop routing, permissions, clipboard, WebKitGTK/runtime and worker lifecycle work offline."
+        }
+      ],
+      "prerequisites": [],
+      "assets": [
+        "helpers",
+        "fixtures"
+      ]
+    }
+  ],
+  "prerequisites": {
+    "independent-clean-target": {
+      "default": "unknown",
+      "darwin-arm64": "not_available",
+      "reason": "User reports no separate clean Mac. Same-machine fresh user or VM evidence must be labelled and does not satisfy independent-machine qualification."
+    },
+    "research-report": {
+      "default": "not_available",
+      "reason": "Referenced 307-behavior report has not been supplied."
+    },
+    "representative-datasets": {
+      "default": "unknown",
+      "reason": "Availability must be recorded from actual resources; no credentials belong in records."
+    },
+    "physical-devices": {
+      "default": "unknown",
+      "reason": "Availability must be recorded from actual resources; no credentials belong in records."
+    },
+    "distribution-access": {
+      "default": "unknown",
+      "reason": "Availability must be recorded from actual resources; no credentials belong in records."
+    },
+    "notion-account": {
+      "default": "unknown",
+      "reason": "Availability must be recorded from actual resources; no credentials belong in records."
+    },
+    "provider-accounts": {
+      "default": "unknown",
+      "reason": "Availability must be recorded from actual resources; no credentials belong in records."
+    },
+    "https-environment": {
+      "default": "unknown",
+      "reason": "Availability must be recorded from actual resources; no credentials belong in records."
+    }
+  },
+  "acceptanceCases": {}
+}
