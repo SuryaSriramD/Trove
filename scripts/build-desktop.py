@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
-"""Build the pinned frontend and a self-contained, ad-hoc-signed arm64 .app.
+"""Build the pinned frontend and a self-contained arm64 .app.
 
-Developer ID signing/notarization is a separate release qualification step.
-Native helpers are already signed before hashing; never re-sign them here.
+Default signing is ad-hoc. Explicit Developer ID signing rebinds helper hashes
+before sealing the app; notarization and product qualification remain separate.
 """
 import argparse
 import hashlib
@@ -17,6 +17,7 @@ import sys
 
 from devtools import build_env, cache_dir, go_binary
 from microphone_bundle import install_microphone_record
+from macos_signing import SigningBlocked, SigningSession, notarize
 
 ROOT = Path(__file__).resolve().parents[1]
 parser = argparse.ArgumentParser()
@@ -30,6 +31,11 @@ parser.add_argument('--output', type=Path, default=ROOT / 'build' / 'Trove.app')
 parser.add_argument('--release-notices', type=Path, help='Directory with provenance.json and THIRD-PARTY-NOTICES.txt for distribution')
 parser.add_argument('--version', help='Signed three-component release version; phase default if omitted')
 parser.add_argument('--build-number', type=int, help='Signed monotonically increasing build number; phase default if omitted')
+parser.add_argument('--signing-identity', help='Exact 40-hex Developer ID Application certificate fingerprint; absent keeps ad-hoc development signing')
+parser.add_argument('--team-id', help='Expected ten-character Apple Developer Team ID')
+parser.add_argument('--signing-evidence', type=Path, help='New external evidence directory for signing and notarization records')
+parser.add_argument('--notarize', action='store_true', help='Explicitly submit the signed candidate to Apple, staple acceptance and freeze the distribution archive')
+parser.add_argument('--notary-profile', help='Configured notarytool Keychain profile name; credentials are never accepted here')
 args = parser.parse_args()
 if args.version is not None and not re.fullmatch(r'[0-9]+\.[0-9]+\.[0-9]+', args.version):
     parser.error('--version must contain three numeric components')
@@ -39,8 +45,21 @@ if sum([args.phase4, args.phase5, args.phase6]) > 1:
     parser.error('Choose one release phase')
 if (args.phase5 or args.phase6) and args.output.exists():
     parser.error('P1 candidates are immutable; choose an unused output path')
-if args.phase5 and not args.release_notices:
-    parser.error('P1 candidates require --release-notices from the provenance inventory')
+if (args.phase5 or args.signing_identity) and not args.release_notices:
+    parser.error('Production-signed and P1 candidates require --release-notices from the provenance inventory')
+if not args.signing_identity and any([args.team_id, args.signing_evidence, args.notarize, args.notary_profile]):
+    parser.error('Production signing/notarization options require --signing-identity; ad-hoc is never a fallback')
+if args.signing_identity and (not args.team_id or not args.signing_evidence or not args.version or not args.build_number):
+    parser.error('Production signing requires --team-id, --signing-evidence, --version and --build-number')
+if args.notary_profile and not args.notarize:
+    parser.error('--notary-profile requires explicit --notarize; otherwise use notarize-macos.py later')
+signing = None
+if args.signing_identity:
+    try:
+        signing = SigningSession(args.signing_identity, args.team_id, args.signing_evidence)
+        signing.preflight(args.output, args.notary_profile, args.notarize)
+    except SigningBlocked as error:
+        parser.exit(1, 'BLOCKED: ' + str(error) + '\n')
 args.cache = cache_dir(args.cache)
 env = build_env(args.cache)
 go = go_binary(args.cache)
@@ -119,7 +138,7 @@ info = {
     'TroveRollbackHandshakeVersion': 1,
     'TroveWorkspaceStorageGeneration': compatibility['storageGeneration'],
     'TroveArchitecture': env['GOARCH'],
-    'TroveReleaseChannel': 'P2 development preview' if args.phase6 else 'P1 personal-use candidate' if args.phase5 else ('P1 development preview' if args.phase4 else 'P0 release candidate'),
+    'TroveReleaseChannel': 'Developer ID signed candidate' if signing else 'P2 development preview' if args.phase6 else 'P1 personal-use candidate' if args.phase5 else ('P1 development preview' if args.phase4 else 'P0 release candidate'),
     'NSHighResolutionCapable': True,
     'NSMicrophoneUsageDescription': 'Trove records meetings locally when you start a recording.',
     'CFBundleURLTypes': [{'CFBundleURLName': 'local.trove.workspace', 'CFBundleURLSchemes': ['trove']}],
@@ -132,13 +151,21 @@ with (contents / 'Info.plist').open('wb') as f:
 for sidecar in args.output.rglob('._*'):
     sidecar.unlink()
 run(['/usr/bin/xattr', '-cr', args.output])
-run(['/usr/bin/codesign', '--force', '--sign', '-',
-     '--entitlements', ROOT / 'packaging' / 'desktop.entitlements.plist', args.output])
-run(['/usr/bin/codesign', '--verify', '--deep', '--strict', '--verbose=2', args.output])
 manifest = json.loads((native / 'manifest.json').read_text())
 for source in native.rglob('*'):
     if source.is_file() and not source.name.startswith('._'):
         copied = destination / source.relative_to(native)
         if hashlib.sha256(source.read_bytes()).digest() != hashlib.sha256(copied.read_bytes()).digest():
             raise SystemExit(f'Native resource changed during packaging: {source}')
+if signing:
+    try:
+        signing.sign(args.output)
+        if args.notarize:
+            notarize(args.output, args.signing_evidence, args.notary_profile)
+    except SigningBlocked as error:
+        parser.exit(1, 'BLOCKED: ' + str(error) + '\n')
+else:
+    run(['/usr/bin/codesign', '--force', '--sign', '-',
+         '--entitlements', ROOT / 'packaging' / 'desktop.entitlements.plist', args.output])
+    run(['/usr/bin/codesign', '--verify', '--deep', '--strict', '--verbose=2', args.output])
 print(args.output)

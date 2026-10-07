@@ -1,0 +1,46 @@
+{
+  "schemaVersion": 1,
+  "package": "macos-production-signing",
+  "recordedAt": "2026-10-07T07:53:05.490351+00:00",
+  "baseSourceCommit": "576041d",
+  "sourceHashes": {
+    "scripts/build-desktop.py": "e3cabde140183f78ef6929f524d56f20d33529a41a6335a60a6be73089d7d40b",
+    "scripts/macos_signing.py": "8180b8ce92aa6190ce52438475c1fac85ebbd37dd5c96d6468fdd202fd25f419",
+    "scripts/notarize-macos.py": "75f2377a165c35d30cbe502fea5129d96736da3ca05142bb23e07def6d54f12c",
+    "tests/test_macos_signing.py": "2ac184206543abd4a6f9e6f8e825faed8a295ecc90d7972a64739aa08ee417ae",
+    "docs/completion/macos-production-signing.md": "99dbd48186969eb554b4a34d0b9a99f8452752a5c24492c0e590cf89e18323bb"
+  },
+  "logs": {
+    "tooling.log": "ac235ca8df980f40d078f561215b6682ab5839e48f538a45f5c7bc2fc6c1a6dd",
+    "tooling-pinned.log": "7eee2192971801a2634bff2033a7134ab5dcd54721c086dd6d111565651c879d"
+  },
+  "checks": {
+    "correctedPinnedTooling": {
+      "run": 175,
+      "passed": 175,
+      "failed": 0,
+      "skipped": 0
+    },
+    "signingBoundaryTests": 14,
+    "initialBroadInvocation": {
+      "run": 175,
+      "errors": 1,
+      "skipped": 1,
+      "reason": "TROVE_CACHE_DIR not selected; existing pinned Go was not found"
+    }
+  },
+  "command": "PYTHONDONTWRITEBYTECODE=1 TROVE_CACHE_DIR=<existing-pinned-cache> GOTOOLCHAIN=local GOPROXY=off GOSUMDB=off <pinned-python> -m unittest discover -s tests -p test_*.py -v",
+  "scope": "Python source/tooling and injected vendor-command fixtures only",
+  "target": "darwin-arm64, minimum macOS 27.0",
+  "actualSigning": false,
+  "actualNotarization": false,
+  "credentialsAccessed": false,
+  "independentMacEvidence": false,
+  "releaseQualified": false,
+  "limits": [
+    "Source commit for integrated candidate, toolchain/model/fixture identities and actual release acceptance remain separate.",
+    "No real Apple signing identity, Keychain profile or account was used.",
+    "Unknown upload outcome without receipt requires manual investigation; no automatic recovery-ID import.",
+    "Historical candidate flags and startup failures remain unchanged."
+  ]
+}
