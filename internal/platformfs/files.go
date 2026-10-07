@@ -39,6 +39,39 @@ func AcquireLock(path string) (*os.File, error) {
 	}
 	return f, nil
 }
+
+// AuditPrivateHandle checks the pinned object, not a pathname that could be
+// redirected after validation. It never changes permissions.
+func AuditPrivateHandle(f *os.File, directory bool) error { return auditPrivateHandle(f, directory) }
+
+// AcquireRootLock confines all name resolution to an already pinned directory.
+// Only a private regular file with one link can become the lock object.
+func AcquireRootLock(root *os.Root, name string) (*os.File, error) {
+	if st, err := root.Lstat(name); err == nil && !st.Mode().IsRegular() {
+		return nil, errors.New("owner lock is not regular")
+	} else if err != nil && !os.IsNotExist(err) {
+		return nil, err
+	}
+	f, err := root.OpenFile(name, os.O_RDWR|os.O_CREATE, 0600)
+	if err != nil {
+		return nil, err
+	}
+	if err = AuditPrivateHandle(f, false); err != nil {
+		f.Close()
+		return nil, err
+	}
+	st, err := root.Lstat(name)
+	pinned, statErr := f.Stat()
+	if err != nil || statErr != nil || !st.Mode().IsRegular() || !os.SameFile(st, pinned) {
+		f.Close()
+		return nil, errors.New("owner lock changed during admission")
+	}
+	if err = lockFile(f); err != nil {
+		f.Close()
+		return nil, err
+	}
+	return f, nil
+}
 func ReleaseLock(f *os.File) error {
 	if f == nil {
 		return nil

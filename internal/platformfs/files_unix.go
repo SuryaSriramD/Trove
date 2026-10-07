@@ -41,6 +41,17 @@ func lockFile(f *os.File) error {
 	return err
 }
 func unlockFile(f *os.File) error { return syscall.Flock(int(f.Fd()), syscall.LOCK_UN) }
+func auditPrivateHandle(f *os.File, directory bool) error {
+	st, err := f.Stat()
+	if err != nil {
+		return err
+	}
+	native, ok := st.Sys().(*syscall.Stat_t)
+	if !ok || native.Uid != uint32(os.Geteuid()) || st.Mode().Perm()&0077 != 0 || st.IsDir() != directory || (!directory && (!st.Mode().IsRegular() || native.Nlink != 1)) {
+		return ErrPrivateStorage
+	}
+	return nil
+}
 func FileIdentity(f *os.File) (string, error) {
 	st, err := f.Stat()
 	if err != nil {

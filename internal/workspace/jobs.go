@@ -241,6 +241,9 @@ func (k *Kernel) ClaimJob(ctx context.Context, kinds []string) (contracts.JobsJo
 		result, err = k.job(ctx, tx, id)
 		return err
 	})
+	if err == nil {
+		k.diagnostics.Record("job", "transition", "running", "none", 0, int64(result.Attempt))
+	}
 	return result, err
 }
 func (k *Kernel) HeartbeatJob(ctx context.Context, id, lease string) error {
@@ -379,6 +382,7 @@ func (k *Kernel) RunJobs(ctx context.Context, handlers map[string]func(context.C
 		if err != nil {
 			return err
 		}
+		jobStarted := time.Now()
 		workCtx, cancel := context.WithTimeout(ctx, 2*time.Hour)
 		finished := make(chan error, 1)
 		go func() {
@@ -397,6 +401,8 @@ func (k *Kernel) RunJobs(ctx context.Context, handlers map[string]func(context.C
 		for finished != nil {
 			select {
 			case runErr := <-finished:
+				outcome, code := diagnosticOutcome(runErr)
+				k.diagnostics.Record("job", "worker_finish", outcome, code, time.Since(jobStarted), 0)
 				cancel()
 				finishCtx, done := context.WithTimeout(context.Background(), 5*time.Second)
 				current, readErr := k.ReadJob(finishCtx, string(j.JobId))
@@ -505,6 +511,7 @@ func (k *Kernel) interruptJob(ctx context.Context, id, lease string) error {
 }
 func (k *Kernel) transitionJob(ctx context.Context, id string, fn func(*sql.Tx) error) error {
 	var event json.RawMessage
+	var diagnosticState string
 	err := k.write(ctx, func(tx *sql.Tx) error {
 		if err := fn(tx); err != nil {
 			return err
@@ -513,6 +520,7 @@ func (k *Kernel) transitionJob(ctx context.Context, id string, fn func(*sql.Tx) 
 		if err != nil {
 			return err
 		}
+		diagnosticState = string(j.State)
 		progress := contracts.JobsProgress{Sequence: 0, Completed: 0, Unit: "steps"}
 		if j.Progress != nil {
 			progress = *j.Progress
@@ -523,6 +531,7 @@ func (k *Kernel) transitionJob(ctx context.Context, id string, fn func(*sql.Tx) 
 	})
 	if err == nil {
 		k.publish(event)
+		k.diagnostics.Record("job", "transition", diagnosticState, "none", 0, 0)
 	}
 	return err
 }

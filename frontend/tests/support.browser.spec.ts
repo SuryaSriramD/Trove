@@ -137,3 +137,30 @@ test("cancelled or replaced preview ignores a late successful native reply", asy
   });
   await expect(page.getByLabel("Support bundle preview")).toHaveCount(0);
 });
+
+test("operational diagnostics require explicit consent and fresh preview", async ({
+  page,
+}) => {
+  await page.goto(`${base}/tests/support-fixture.html`);
+  const option = page.getByRole("checkbox", {
+    name: "Include operational diagnostics",
+  });
+  await expect(option).not.toBeChecked();
+  await option.check();
+  await page
+    .getByRole("button", { name: "Preview exact bundle contents" })
+    .click();
+  await expect(page.getByLabel("Support bundle preview")).toContainText(
+    "diagnostics.json",
+  );
+  expect(
+    await page.evaluate(
+      () => (window as any).supportCalls.at(-1).request.selection,
+    ),
+  ).toEqual({ diagnostics: true, titles: false, text: false, pageIds: [] });
+  await option.uncheck();
+  await expect(page.getByLabel("Support bundle preview")).toHaveCount(0);
+  await expect(
+    page.getByRole("button", { name: "Save reviewed bundle…" }),
+  ).toHaveCount(0);
+});

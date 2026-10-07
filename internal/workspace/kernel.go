@@ -18,12 +18,14 @@ import (
 
 	_ "github.com/mattn/go-sqlite3"
 	"trove.local/phase0/contracts"
+	"trove.local/phase0/internal/diagnostics"
 	"trove.local/phase0/internal/platformfs"
 	"trove.local/phase0/internal/sqlitevec"
 	"trove.local/phase0/schemas"
 )
 
 type Kernel struct {
+	diagnostics           *diagnostics.Store
 	db                    *sql.DB
 	writeDB               *sql.DB
 	recordQueryDB         *sql.DB
@@ -342,6 +344,19 @@ func openReviewed(path string, create bool, observe func(string) error, reviewed
 		k.compatiblePending = true
 		return k, nil
 	}
+	k.diagnostics = diagnostics.New(path)
+	observedDiagnostics := k.diagnostics
+	openedAt := time.Now()
+	defer func() {
+		outcome, code := diagnosticOutcome(err)
+		observedDiagnostics.Record("application", "initialize", outcome, code, time.Since(openedAt), 0)
+		if migration != nil {
+			observedDiagnostics.Record("application", "post_migration_initialize", outcome, code, time.Since(openedAt), 0)
+		}
+		if err != nil {
+			observedDiagnostics.Close()
+		}
+	}()
 	if err = k.initServiceRuntime(context.Background()); err != nil {
 		return nil, err
 	}
@@ -424,6 +439,8 @@ func (k *Kernel) Close() error {
 	if k.db != nil {
 		err = k.db.Close()
 	}
+	k.diagnostics.Record("application", "close", "completed", "none", 0, 0)
+	k.diagnostics.Close()
 	if k.lock != nil {
 		platformfs.ReleaseLock(k.lock)
 	}

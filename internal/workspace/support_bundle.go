@@ -28,9 +28,10 @@ const supportBundleLimit = 2 << 20
 // SupportSelection is consent to these exact categories on at most five pages.
 // It is a native-service DTO, not an authorization or destination supplied by AI.
 type SupportSelection struct {
-	PageIDs []string `json:"pageIds"`
-	Titles  bool     `json:"titles"`
-	Text    bool     `json:"text"`
+	Diagnostics bool     `json:"diagnostics,omitempty"`
+	PageIDs     []string `json:"pageIds"`
+	Titles      bool     `json:"titles"`
+	Text        bool     `json:"text"`
 }
 type SupportRuntime struct {
 	AppVersion             string
@@ -62,7 +63,7 @@ func (b *SupportBundle) Preview() SupportPreview {
 	return p
 }
 
-var supportExclusions = []string{"Workspace/account/model names and identifiers, file paths, credentials, job payloads and raw errors/logs are not collected.", "Attachments, database properties, linked/reusable content, OCR, transcript-linked blocks, history, archived/trash pages and raw block JSON are not collected.", "Optional selected page titles/text may contain secrets. No automatic secret redaction is promised for content you include.", "Metadata is a point-in-time snapshot; configured helpers do not prove device, permission, model quality or platform release qualification.", "No logs are archived and nothing is uploaded. This is not a full workspace backup."}
+var supportExclusions = []string{"Workspace/account/model names and identifiers, file paths, credentials, job payloads and raw errors/logs are not collected.", "Attachments, database properties, linked/reusable content, OCR, transcript-linked blocks, history, archived/trash pages and raw block JSON are not collected.", "Optional selected page titles/text may contain secrets. No automatic secret redaction is promised for content you include.", "Metadata is a point-in-time snapshot; configured helpers do not prove device, permission, model quality or platform release qualification.", "Only explicitly selected structured operational diagnostics can be included; raw logs are never archived. Nothing is uploaded. This is not a full workspace backup."}
 
 // PrepareSupportBundle uses the same authenticated owner-scope boundary as native
 // export. No arbitrary diagnostic strings can enter the default allowlist.
@@ -175,6 +176,12 @@ func (k *Kernel) prepareSupportBundle(ctx context.Context, e contracts.ServiceEx
 		return nil, err
 	}
 	categories := []string{"metadata"}
+	if selection.Diagnostics {
+		if err = add("diagnostics.json", k.diagnostics.Snapshot()); err != nil {
+			return nil, err
+		}
+		categories = append(categories, "diagnostics")
+	}
 	revisions := map[string]string{}
 	content := []map[string]any{}
 	total := 0
