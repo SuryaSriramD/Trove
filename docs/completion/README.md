@@ -22,6 +22,8 @@ C1 prevention work precedes P0 qualification. C2 editor, databases, recovery, re
 
 ## Current checkpoint
 
+The [7 October continuation](remaining-plan-execution.md) records new qualification, performance, diagnostics, signing and expanded-evaluation work, plus the Linux process-domain foundation. These source packages are later than the latest packaged application and do not qualify it retroactively.
+
 The registry currently records **34 items implemented at their stated source scope, 11 in progress, five open and one awaiting the external research report**. These are backlog implementation states, not release approval or a percentage of product readiness. All three platform release matrices remain unqualified.
 
 C1 defect repairs and the C2/C4 product source packages are integrated: editor preservation and controls, scaled database queries/views, hybrid retrieval/sqlite-vec, online backup and historical mapping, restricted FFmpeg decoding, rich layouts/templates/formulas/PDFs, Notion API reconstruction, browser clipping, visible automation, and reviewed local-AI/MCP actions. See the package links in the [51-item registry](registry.json); its planned evidence directories are not passing checks.
@@ -49,7 +51,7 @@ The [60-launch instrumented startup investigation](startup-investigation.md) did
 
 ## External prerequisites
 
-The research report has not been supplied. Independent clean machines, authorized datasets, live integration accounts, reachable HTTPS and Apple signing access have unknown availability. Independent implementation can continue while these remain unresolved. No credentials belong in this record.
+The research report has not been supplied. A separate clean Mac is confirmed unavailable. Windows/Linux environments, authorized datasets, live integration accounts, reachable HTTPS and Apple signing access have not been established. The expanded 7B run also encountered internal-disk exhaustion; its partial outcomes remain recorded and a new storage preflight prevents a misleading retry. Independent implementation can continue. No credentials belong in this record.
 
 ## Item index
 
@@ -111,4 +113,4 @@ The research report has not been supplied. Independent clean machines, authorize
 
 Retain historical reports unchanged. New evidence records source identity, command, fixture identity, hardware, outcome and limitations. Freeze application/helper/model hashes before native qualification. A changed candidate needs affected checks again. Missing or skipped native/model/account/device checks remain unqualified.
 
-The [local support bundle](support-bundle.md) provides metadata-only defaults, exact preview and explicit optional page-content consent before native save. Broader diagnostics and packaged/platform verification remain partial. [Authenticated rollback readiness](rollback-readiness.md) and the [rich-text search repair](richtext-search.md) have separate source/evidence scopes; neither changes earlier candidate failures.
+The [local support bundle](support-bundle.md) provides metadata-only defaults, exact preview and explicit optional content consent before native save. [Operational diagnostics](operational-diagnostics.md) adds bounded sanitized events under separate consent; full startup/resource coverage and packaged/platform verification remain partial. [Authenticated rollback readiness](rollback-readiness.md) and the [rich-text search repair](richtext-search.md) already have separate native regression evidence; neither changes earlier candidate failures.

@@ -1,0 +1,16 @@
+{
+  "schemaVersion": 1,
+  "recordedAt": "2026-10-07",
+  "reviewedSourceCommit": "65a14ed41b05782cb808dbfd5fed0a1ebb51a7e9",
+  "paths": {
+    "README.md": "cecf7681f3e31676f6643adb3f639fb1ba8d5f684ba602c07215d705eb2ac4d2",
+    "docs/completion/README.md": "18fecb89cacddea73da753d76d8e1a5c0ce21ee880b5a82637becb83d3ecd5d2",
+    "docs/completion/registry.json": "fb098296473e077cea34b78214cdb3606dd13efdb8a7f52ee41a77b31a542c4a",
+    "docs/completion/requirements-overlay.json": "468e738a884cbf714697b7f4a6b683596aec9a8db8a5861c6213c8312d143f26",
+    "docs/completion/remaining-plan-execution.md": "c5be5f32ed7080a008d5d3d55c9d58e55614f4ef5b5b37835804a6cd4c21f16d"
+  },
+  "historicalLedgerUnchanged": true,
+  "implementationStatuses": "34 implemented, 11 in_progress, 5 open, 1 awaiting_external_source; unchanged",
+  "releaseQualified": false,
+  "note": "Current narrative, evidence links and prerequisite availability only; historical candidate reports retained."
+}
