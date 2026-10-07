@@ -1,6 +1,6 @@
 import { useState } from "react";
 
-type AppIdentity = { version: string; build: number; teamId: string; userVersion: number; storageGeneration: number };
+type AppIdentity = { version: string; build: number; teamId?: string; platform?: string; publisher?: { kind: string; id: string }; userVersion: number; storageGeneration: number };
 type UpdateReview = { previewId: string; current: AppIdentity; update: AppIdentity; workspaceId: string; bytes: number; warnings: string[] };
 type RollbackReview = { previewId: string; previous: AppIdentity; createdAt: string; snapshot: { workspaceId: string }; warnings: string[] };
 type MigrationReview = { previewId: string; snapshot: { workspaceId: string; createdAt: string; before: { userVersion: number; storageGeneration: number }; objects: unknown[] }; warnings: string[] };
@@ -34,7 +34,7 @@ export default function UpdateRecoveryControls({ workspaceId, onError }: { works
     {update && <article aria-label="Application update review">
       <h3>Review update</h3>
       <p>Version {update.current.version} (build {update.current.build}) → {update.update.version} (build {update.update.build})</p>
-      <p>Verified publisher: {update.update.teamId}. Application copies need {(update.bytes / 1024 / 1024).toFixed(1)} MiB, plus the workspace backup.</p>
+      <p>Verified publisher: {update.update.publisher?.id ?? update.update.teamId}. Application copies need {(update.bytes / 1024 / 1024).toFixed(1)} MiB, plus the workspace backup.</p>
       {update.warnings.map(text => <p key={text}>{text}</p>)}
       {workspaceId !== update.workspaceId && <p role="alert">The workspace changed. Choose the update again.</p>}
       <button disabled={busy || workspaceId !== update.workspaceId} onClick={() => void run(async () => { const id = update.previewId; setUpdate(null); const raw = await bridge().PrepareApplicationUpdate(id); if (raw) setResult(JSON.parse(raw)); })}>Save verified apps and workspace backup…</button>

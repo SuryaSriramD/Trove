@@ -1,0 +1,136 @@
+{
+  "schemaVersion": 1,
+  "package": "platform-publisher",
+  "recordedAt": "2026-10-07T09:28:14.315292+00:00",
+  "baseSourceCommit": "8a95b5302fa676c29ff93ac9119fb2e303b658d3",
+  "host": "darwin-arm64 macOS 27.0.1 (26A434)",
+  "toolchain": "Go 1.27.1, existing pinned offline cache",
+  "sourceHashes": {
+    "app_update_launch.go": "8c25ec3672fc53dc03c91176080acaa562cafc9e658024d52e185392eceb3913",
+    "app_updates.go": "ea131de75f7880c272bbe5ad8fd19fad6bad627619155554258a3fc284f4bafa",
+    "app_update_publisher_test.go": "e9e36e6b2631e0e3c6b460c2b287d4c81c03fd57b89891b648e8e4a30c1e2e86",
+    "frontend/src/recovery/UpdateRecoveryControls.tsx": "21bc03be617eb6b11073708dc13635a327602678c38d67eb5c11124271966ad6",
+    "internal/updates/identity.go": "60ec853740a01f937e888942aca8410ba77ec0e57b8dd336e4c28ce73cc93c77",
+    "internal/updates/kit.go": "73d4732fd43924de5478dd8aebc69c3c53d4706cecc90690ebb8f29d27861bed",
+    "internal/updates/tree.go": "ce8f179322b31dd2ba06cf111fdca62520e75c930f4ef88a84e6a2b6a064b0ff",
+    "internal/updates/updates_test.go": "f1c9c42c11434a25eb16e8e6747334f479741ff072c2005e9ab09dace077fd52",
+    "internal/updates/verify_darwin.go": "e9aeae7a4b8bcf7bb7e3dfc88aee4a784e8c94a5f13476ac28d4f56606f4a2ad",
+    "internal/updates/portable.go": "5715acd48914b2e907e0695af8c304e322b4283c036935c7f1a807def5969c1f",
+    "internal/updates/publisher.go": "24b5cbb0881dd4d846dfbeec57c3a71aa22bcab8e0e98446a68461df13db0ed6",
+    "internal/updates/publisher_test.go": "6c0079c22e81439c23b18b0cd0464234ba553b160162cbd64a4e048d8b282616",
+    "internal/updates/publisher_windows_test.go": "2b037c7033fb161d4a6508bf1511ff371c2f36097e7fe00fd1b255f10fcc6945",
+    "internal/updates/tree_policy_other.go": "cb20d06645d8d2be46f72e867d36d8043fcb45141426bfa796e2fa6b89a8de73",
+    "internal/updates/tree_policy_windows.go": "7b62de2e90cd42bab0ca9b100ac5176eb5b94d05ff6e34aadb55440053a6caf3",
+    "internal/updates/verify_windows.go": "49b0e2bb343073ab7972ba60fc811f4f1bb510a7654fe687ee2f80f592b20593",
+    "internal/updates/verify_windows_other.go": "3600ca765c83edc6d1a3d518a112bee5e5d122a0688fa9d4ab49d5902da19f65",
+    "cmd/trove-release-manifest/main.go": "0a22bb566280542b132716da698df4a1f8cfa6341b9615f33b7071c66c348f7f",
+    "cmd/trove-release-manifest/main_test.go": "dcdb6572e2d8d732129ee53ae7bbf8807c1541da68ee3ace601b9ef8788d3a62",
+    "packaging/update-publishers.json": "23e2a0d434f10fc249dea972898d7bbe9f60d11e81c3a34c18d52a2e42fa368c",
+    "docs/completion/platform-publisher.md": "a0a0a1c4fe94d07fc55c359543c481c01c8d3c4fb362cc6bff8fcf86c444c129"
+  },
+  "logs": {
+    "updates.jsonl": "b365ec85fee553a4f92991f7e25c48776012328d2e3aea9e2c281dbb7e520e63",
+    "app-recovery.jsonl": "2ee74c3514c3dc0bac639975c838b896af25145cae0a4fb099b6cb6b55f1d584",
+    "frontend-typecheck.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "windows-compile.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "linux-compile.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "checks": {
+    "updatesAndPackaging": {
+      "counts": [
+        {
+          "package": "trove.local/phase0/cmd/trove-release-manifest",
+          "action": "pass",
+          "scope": "topLevel",
+          "count": 1
+        },
+        {
+          "package": "trove.local/phase0/internal/updates",
+          "action": "pass",
+          "scope": "topLevel",
+          "count": 21
+        },
+        {
+          "package": "trove.local/phase0/internal/updates",
+          "action": "pass",
+          "scope": "subcase",
+          "count": 43
+        },
+        {
+          "package": "trove.local/phase0/internal/updates",
+          "action": "skip",
+          "scope": "topLevel",
+          "count": 3
+        }
+      ],
+      "skippedTests": [
+        "TestWindowsNativePublisherQualificationPending",
+        "TestRollbackNativeDevelopmentChild",
+        "TestMacVerifierRejectsAdhocCandidate"
+      ],
+      "packageResults": {
+        "trove.local/phase0/cmd/trove-release-manifest": "pass",
+        "trove.local/phase0/internal/updates": "pass"
+      }
+    },
+    "appRecovery": {
+      "counts": [
+        {
+          "package": "trove.local/phase0",
+          "action": "pass",
+          "scope": "subcase",
+          "count": 62
+        },
+        {
+          "package": "trove.local/phase0",
+          "action": "pass",
+          "scope": "topLevel",
+          "count": 21
+        }
+      ],
+      "skippedTests": [],
+      "packageResults": {
+        "trove.local/phase0": "pass"
+      }
+    },
+    "frontendTypecheck": {
+      "exitCode": 0
+    },
+    "crossCompilation": {
+      "windows-amd64": {
+        "exitCode": 0,
+        "binarySHA256": "d358bd0a2f25063521e08684bfd18ff6c8697297ed8dde29bfe58809dec99279",
+        "executed": false
+      },
+      "linux-amd64": {
+        "exitCode": 0,
+        "binarySHA256": "88f4e8b1c9a77339ceebf721432e370774d14591ac713756d8d4c793b8f18cf7",
+        "executed": false
+      }
+    }
+  },
+  "commands": [
+    "GOTOOLCHAIN=local GOPROXY=off GOSUMDB=off GOMODCACHE=<existing-pinned-cache>/go-mod GOCACHE=<existing-go-cache> <pinned-go> test -count=1 -race -json ./internal/updates ./cmd/trove-release-manifest",
+    "<same-pinned-go-environment> <pinned-go> test -count=1 -json -tags 'fts5 sqlite_omit_load_extension' . -run '^Test(Rollback|UpdateReview|ReviewedUpdateSnapshot)'",
+    "cd frontend && ./node_modules/.bin/tsc --noEmit",
+    "<same-pinned-go-environment> GOOS=windows GOARCH=amd64 CGO_ENABLED=0 <pinned-go> test -c -o <new-output> ./internal/updates",
+    "<same-pinned-go-environment> GOOS=linux GOARCH=amd64 CGO_ENABLED=0 <pinned-go> test -c -o <new-output> ./internal/updates"
+  ],
+  "actualNativeWindowsTrust": false,
+  "actualNativeLinuxExecution": false,
+  "actualProductionSigning": false,
+  "credentialsAccessed": false,
+  "productionPinsConfigured": false,
+  "portableProductLaunchEnabled": false,
+  "independentMachineEvidence": false,
+  "releaseQualified": false,
+  "limits": [
+    "Portable Ed25519 and recovery-kit tests use deterministic test keys on macOS, not production publisher material.",
+    "Native Windows catalog, strong trust, cached revocation, streams, ACL, copy durability and cancellation need actual Windows qualification.",
+    "Linux native filesystem, install, update and rollback acceptance remain open.",
+    "Windows and Linux desktop selection, launch and rollback remain unavailable.",
+    "Native WinVerifyTrust cancellation cannot preempt the synchronous Windows API call.",
+    "Named Windows streams, including Zone.Identifier, currently fail closed; do not strip provenance to bypass this boundary.",
+    "No application, helper, model or fixture release candidate was rebuilt or qualified. Historical startup and qualification results are unchanged."
+  ]
+}

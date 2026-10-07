@@ -9,6 +9,7 @@ import (
 	"io"
 	"os"
 	"path/filepath"
+	"reflect"
 	"strings"
 	"time"
 )
@@ -72,7 +73,7 @@ func PrepareKit(ctx context.Context, v Verifier, currentPath, updatePath, destin
 		if err = os.Mkdir(parent, 0700); err != nil {
 			return kit, err
 		}
-		copyPath := filepath.Join(parent, "Trove.app")
+		copyPath := filepath.Join(parent, applicationDirectory(item.expected.Identity))
 		if err = CopyTree(ctx, item.source, copyPath, item.expected.Inventory); err != nil {
 			return kit, err
 		}
@@ -97,7 +98,11 @@ func PrepareKit(ctx context.Context, v Verifier, currentPath, updatePath, destin
 	if err = verify(ctx, filepath.Join(destination, "workspace"), snapshot); err != nil {
 		return kit, err
 	}
-	kit = Kit{FormatVersion: 1, CreatedAt: time.Now().UTC().Format(time.RFC3339Nano), Previous: current, Update: next, Snapshot: snapshot}
+	formatVersion := 1
+	if current.Identity.Platform == "linux" || current.Identity.Platform == "windows" {
+		formatVersion = 2
+	}
+	kit = Kit{FormatVersion: formatVersion, CreatedAt: time.Now().UTC().Format(time.RFC3339Nano), Previous: current, Update: next, Snapshot: snapshot}
 	raw, err := json.MarshalIndent(kit, "", "  ")
 	if err != nil {
 		return kit, err
@@ -152,8 +157,14 @@ func InspectKit(ctx context.Context, v Verifier, path string, verify VerifySnaps
 	if err != nil || len(raw) > 16<<20 {
 		return kit, errors.New("recovery kit manifest exceeds its bound")
 	}
-	if json.Unmarshal(raw, &kit) != nil || kit.FormatVersion != 1 {
+	if json.Unmarshal(raw, &kit) != nil || (kit.FormatVersion != 1 && kit.FormatVersion != 2) {
 		return kit, errors.New("unsupported recovery kit manifest")
+	}
+	if kit.FormatVersion == 1 {
+		platform, _, e := canonicalPublisher(kit.Previous.Identity)
+		if e != nil || platform != "darwin" {
+			return kit, errors.New("legacy recovery kits require macOS identity")
+		}
 	}
 	if err = VerifyUpgrade(kit.Previous, kit.Update); err != nil {
 		return kit, err
@@ -165,7 +176,7 @@ func InspectKit(ctx context.Context, v Verifier, path string, verify VerifySnaps
 		name     string
 		expected Application
 	}{{"previous", kit.Previous}, {"update", kit.Update}} {
-		app, err := v.Inspect(ctx, filepath.Join(path, item.name, "Trove.app"))
+		app, err := v.Inspect(ctx, filepath.Join(path, item.name, applicationDirectory(item.expected.Identity)))
 		if err != nil {
 			return kit, err
 		}
@@ -183,7 +194,7 @@ func InspectKit(ctx context.Context, v Verifier, path string, verify VerifySnaps
 }
 
 func sameApplication(a, b Application) bool {
-	return a.Identity == b.Identity && a.Inventory.SHA256 == b.Inventory.SHA256 && a.Inventory.Bytes == b.Inventory.Bytes
+	return EqualIdentity(a.Identity, b.Identity) && reflect.DeepEqual(a.Inventory, b.Inventory)
 }
 func pathsOverlap(a, b string) bool {
 	a, ea := resolvedPath(a)
@@ -235,4 +246,12 @@ func writeExclusive(path string, data []byte) error {
 		return err
 	}
 	return f.Sync()
+}
+
+func applicationDirectory(id Identity) string {
+	platform, _, _ := canonicalPublisher(id)
+	if platform == "darwin" {
+		return "Trove.app"
+	}
+	return "Trove"
 }

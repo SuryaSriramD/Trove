@@ -181,7 +181,7 @@ func (a *App) launchApplicationRollbackLocked(ctx context.Context, id string, de
 	if application.Identity.RollbackHandshake != updates.RollbackHandshakeVersion {
 		return errors.New("saved application does not support verified rollback startup; keep the restored copy and current app open")
 	}
-	if !reflect.DeepEqual(application, review.application) {
+	if !updates.EqualIdentity(application.Identity, review.application.Identity) || !reflect.DeepEqual(application.Inventory, review.application.Inventory) {
 		return errors.New("saved previous application changed after review")
 	}
 	snapshot, err := inspectRollbackWorkspace(ctx, review.destination)
