@@ -1,6 +1,6 @@
 # Expanded local AI evaluation
 
-This package adds executable evaluation breadth without changing production prompts, inference code, existing task rubrics, model selection or the shared proposal boundary. It is development evidence only. AI-002/003, OPT-001/003 and platform release qualification remain open.
+This package adds executable evaluation breadth and one narrow cited-prompt clarification after a real formatting failure. Inference code, existing task rubrics, model selection and the shared proposal boundary remain unchanged. It is development evidence only. AI-002/003, OPT-001/003 and platform release qualification remain open.
 
 ## Executable corpora
 
@@ -50,7 +50,7 @@ python3 scripts/run-expanded-evaluation.py \
   --output /absolute/new-evidence-directory
 ```
 
-Use `--family modes` for all 42 held-out mode cases. The macOS runner builds the test binary with offline Go resolution, denies networking through the OS sandbox during build/execution, omits ambient provider credentials, records source state and input/binary/output digests, and checks unchanged inputs afterward. Missing/duplicate/skipped cases, absent/mismatched reports, failed task or no-write assertions, malformed logs and nonzero execution all prevent an automated-corpus pass. Another operating system must supply separately qualified network-denial behavior; the script refuses to silently drop the macOS boundary.
+Use `--family modes` for all 42 held-out mode cases. Repeat `--case <fixture-id>` for a focused retry; the report explicitly sets `fullFamilyRun=false` and never counts that retry as a full-corpus pass. The macOS runner builds the test binary with offline Go resolution, denies networking through the OS sandbox during build/execution, omits ambient provider credentials, records source state and production/corpus/helper/model/binary/output digests, and checks unchanged inputs afterward. Output records split across Go log events are reassembled per test before accounting. Manifest replacement is atomic; at least 4 GiB of free space is required on both evidence and private temporary volumes before starting. This harness reserve is not a new product storage requirement. External scratch may hold build caches/evidence, but must not be presented as qualified private runtime storage. Missing/duplicate/skipped cases, absent/mismatched reports, failed task or no-write assertions, malformed logs and nonzero execution all prevent an automated-corpus pass. Another operating system must supply separately qualified network-denial behavior; the script refuses to silently drop the macOS boundary.
 
 The runner records sampled generation-worker RSS, token budget and wall latency. It does not measure full application/GPU peak memory, manual correction time or native Wails interaction, and never marks performance or release qualification true. Use a separately scheduled quiet benchmark to evaluate performance; a functional run amid development activity is not controlled performance evidence.
 
@@ -59,8 +59,23 @@ The runner records sampled generation-worker RSS, token budget and wall latency.
 The package's initial evidence is under `evidence/completion/expanded-evaluation/`:
 
 - 90 model-free subcases pass: 24 poisoned-oracle checks, 24 canonical seed/publication checks and 42 mode-outcome checks. Three parent tests also pass.
-- Nine evidence-accounting tests pass, including skipped, missing, duplicate and mismatched report rejection.
+- Fifteen evidence-accounting tests pass, including skipped/missing/duplicate/mismatched report rejection, split/interleaved/truncated output, atomic-write failure retention and free-space preflight.
 - Two real 7B P0 canaries pass with networking denied, using the existing e481c6a helper bundle: `delivery-plain` and `delivery-memory`. Both retain canonical content and current citations. The observed 33.7s/17.5s latencies and 4.61/4.34 GB sampled worker RSS were collected during other development work; they are functional observations only.
 - The first structural attempt failed on the new fixture's incorrect `pages.page_id` lookup; the canonical schema uses `pages.id`. Only that test setup was corrected, with its log retained. The first native launch used the repository root instead of the package fixture directory and failed before inference; its log is retained. The corrected package-directory canaries passed.
 
 The complete 24-case and 42-case real-model sets have not yet passed or established quality. Full native-candidate journeys, representative authorized content, manual correction effort, independent installation and per-platform evidence remain separate gates.
+
+## First complete-corpus attempt: incomplete and failed
+
+The 24-case attempt on source `bc964e2` began with a clean worktree, the verified 7B pack and the existing e481c6a native helpers, under OS network denial. Seven task reports passed before/around two failures:
+
+- `research-memory` returned the two correct current facts but added a third claim, “The heading is Research brief.” The requested heading plus two factual lines became four lines. This is a real format/instruction-following failure; current-fact/citation authority and canonical no-write checks remained intact.
+- `service-plain` failed to create the native generation request because the internal disk was full; saving the failed draft also reported a full database/disk. Fifteen subsequent cases have no recorded result. The evidence runner could not persist its final manifest, so the surviving initial manifest remains `started`. No complete test terminal inventory exists.
+
+The raw logs and initial manifest are retained under `full-p0-incomplete/`. `reaccounted.json` parses the identical raw bytes with the repaired split-record accounting and explicitly fails the corpus. The initial parser missed the long research report because Go split its JSON across events; fixing that parser exposes the failure and does not relax the task oracle.
+
+The cited system instruction now clarifies that formatting preferences control presentation and should not become extra factual claims unless the user explicitly asks about them. No fixed claim count, fixture name, answer fact, grammar clipping or post-generation deletion was added. The failed original case and independent delivery/event memory cases must be rerun unchanged before calling this clarification an effective model-quality repair. **That real-model retry is pending adequate private temporary disk space.** Model-free checks can establish unaffected boundaries but cannot establish the repaired model outcome.
+
+The affected model-free Go checks pass after the prompt clarification; the recorded report remains separate from real-model quality.
+
+The internal data volume showed only 410 MiB available at failure. Only this task's disposable 292 MiB Go build cache was removed; later free space measured 2.7 GiB. The external disk has ample space for build caches/evidence but does not substitute for native private runtime storage. The runner now refuses another inference run below its 4 GiB headroom check. No user workspace, model pack, unrelated cache or prior evidence was deleted.
