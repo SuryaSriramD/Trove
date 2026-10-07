@@ -1,0 +1,608 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://trove.local/completion/qualification.schema.json",
+  "title": "Trove candidate-bound qualification records (not release approval)",
+  "oneOf": [
+    {
+      "$ref": "#/$defs/candidate"
+    },
+    {
+      "$ref": "#/$defs/observation"
+    },
+    {
+      "$ref": "#/$defs/receipt"
+    }
+  ],
+  "$defs": {
+    "fileIdentity": {
+      "type": "object",
+      "properties": {
+        "sha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "size": {
+          "type": "integer",
+          "minimum": 0
+        }
+      },
+      "required": [
+        "sha256",
+        "size"
+      ],
+      "additionalProperties": false
+    },
+    "binding": {
+      "oneOf": [
+        {
+          "type": "object",
+          "properties": {
+            "path": {
+              "type": "string",
+              "minLength": 1
+            },
+            "kind": {
+              "const": "file"
+            },
+            "sha256": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            },
+            "size": {
+              "type": "integer",
+              "minimum": 0
+            }
+          },
+          "required": [
+            "path",
+            "kind",
+            "sha256",
+            "size"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "path": {
+              "type": "string",
+              "minLength": 1
+            },
+            "kind": {
+              "const": "directory"
+            },
+            "sha256": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            },
+            "inventory": {
+              "type": "object",
+              "properties": {
+                "files": {
+                  "type": "object",
+                  "minProperties": 1,
+                  "additionalProperties": {
+                    "$ref": "#/$defs/fileIdentity"
+                  }
+                },
+                "directories": {
+                  "type": "array",
+                  "minItems": 1,
+                  "uniqueItems": true,
+                  "items": {
+                    "type": "string",
+                    "minLength": 1
+                  }
+                }
+              },
+              "required": [
+                "files",
+                "directories"
+              ],
+              "additionalProperties": false
+            }
+          },
+          "required": [
+            "path",
+            "kind",
+            "sha256",
+            "inventory"
+          ],
+          "additionalProperties": false
+        }
+      ]
+    },
+    "scenario": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "expected": {
+          "type": "string",
+          "minLength": 1
+        },
+        "result": {
+          "enum": [
+            "passed",
+            "failed",
+            "skipped",
+            "pending",
+            "not_available",
+            "unqualified"
+          ]
+        },
+        "observed": {
+          "type": "string",
+          "minLength": 1
+        },
+        "artifactIds": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
+      },
+      "required": [
+        "id",
+        "expected",
+        "result",
+        "observed",
+        "artifactIds"
+      ],
+      "additionalProperties": false
+    },
+    "prerequisite": {
+      "type": "object",
+      "properties": {
+        "status": {
+          "enum": [
+            "available",
+            "unknown",
+            "not_available"
+          ]
+        },
+        "description": {
+          "type": "string",
+          "minLength": 1
+        },
+        "artifactIds": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
+      },
+      "required": [
+        "status",
+        "description",
+        "artifactIds"
+      ],
+      "additionalProperties": false
+    },
+    "candidate": {
+      "type": "object",
+      "properties": {
+        "schemaVersion": {
+          "const": 1
+        },
+        "qualificationId": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "frozenAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "sourceCommit": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{40}$"
+        },
+        "sourceTree": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{40}$"
+        },
+        "sourceArchive": {
+          "$ref": "#/$defs/binding"
+        },
+        "target": {
+          "enum": [
+            "darwin-arm64",
+            "windows-amd64",
+            "linux-amd64"
+          ]
+        },
+        "tier": {
+          "enum": [
+            "P0",
+            "P1",
+            "P2"
+          ]
+        },
+        "environment": {
+          "type": "object",
+          "properties": {
+            "hardware": {
+              "type": "string",
+              "minLength": 1
+            },
+            "osVersion": {
+              "type": "string",
+              "minLength": 1
+            }
+          },
+          "required": [
+            "hardware",
+            "osVersion"
+          ],
+          "additionalProperties": false
+        },
+        "policySha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "bundle": {
+          "$ref": "#/$defs/binding"
+        },
+        "assets": {
+          "type": "object",
+          "properties": {
+            "helpers": {
+              "type": "array",
+              "items": {
+                "$ref": "#/$defs/binding"
+              }
+            },
+            "models": {
+              "type": "array",
+              "items": {
+                "$ref": "#/$defs/binding"
+              }
+            },
+            "fixtures": {
+              "type": "array",
+              "items": {
+                "$ref": "#/$defs/binding"
+              }
+            }
+          },
+          "required": [
+            "helpers",
+            "models",
+            "fixtures"
+          ],
+          "additionalProperties": false
+        },
+        "requiredChecks": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "prerequisites": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "object",
+            "properties": {
+              "status": {
+                "enum": [
+                  "unknown",
+                  "not_available"
+                ]
+              },
+              "reason": {
+                "type": "string",
+                "minLength": 1
+              }
+            },
+            "required": [
+              "status",
+              "reason"
+            ],
+            "additionalProperties": false
+          }
+        },
+        "releaseApproved": {
+          "const": false
+        },
+        "candidateId": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "acceptanceCatalogSha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        }
+      },
+      "required": [
+        "schemaVersion",
+        "qualificationId",
+        "frozenAt",
+        "sourceCommit",
+        "sourceTree",
+        "sourceArchive",
+        "target",
+        "tier",
+        "environment",
+        "policySha256",
+        "bundle",
+        "assets",
+        "requiredChecks",
+        "prerequisites",
+        "releaseApproved",
+        "candidateId",
+        "acceptanceCatalogSha256"
+      ],
+      "additionalProperties": false
+    },
+    "observation": {
+      "type": "object",
+      "properties": {
+        "candidateId": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "policySha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "checkId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "observedAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "observer": {
+          "type": "string",
+          "minLength": 1
+        },
+        "environment": {
+          "type": "object",
+          "properties": {
+            "target": {
+              "enum": [
+                "darwin-arm64",
+                "windows-amd64",
+                "linux-amd64"
+              ]
+            },
+            "hardware": {
+              "type": "string",
+              "minLength": 1
+            },
+            "osVersion": {
+              "type": "string",
+              "minLength": 1
+            }
+          },
+          "required": [
+            "target",
+            "hardware",
+            "osVersion"
+          ],
+          "additionalProperties": false
+        },
+        "scenarios": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "$ref": "#/$defs/scenario"
+          }
+        },
+        "prerequisites": {
+          "type": "object",
+          "additionalProperties": {
+            "$ref": "#/$defs/prerequisite"
+          }
+        },
+        "artifacts": {
+          "type": "object",
+          "minProperties": 1,
+          "additionalProperties": {
+            "$ref": "#/$defs/binding"
+          }
+        }
+      },
+      "required": [
+        "candidateId",
+        "policySha256",
+        "checkId",
+        "observedAt",
+        "observer",
+        "environment",
+        "scenarios",
+        "prerequisites",
+        "artifacts"
+      ],
+      "additionalProperties": false
+    },
+    "receipt": {
+      "oneOf": [
+        {
+          "type": "object",
+          "properties": {
+            "schemaVersion": {
+              "const": 1
+            },
+            "candidateId": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            },
+            "policySha256": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            },
+            "checkId": {
+              "type": "string",
+              "minLength": 1
+            },
+            "checkSpecSha256": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            },
+            "recordedAt": {
+              "type": "string",
+              "format": "date-time"
+            },
+            "result": {
+              "enum": [
+                "passed",
+                "failed",
+                "skipped",
+                "pending",
+                "not_available",
+                "unqualified"
+              ]
+            },
+            "evidence": {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "$ref": "#/$defs/binding"
+              }
+            },
+            "releaseApproved": {
+              "const": false
+            }
+          },
+          "required": [
+            "schemaVersion",
+            "candidateId",
+            "policySha256",
+            "checkId",
+            "checkSpecSha256",
+            "recordedAt",
+            "result",
+            "evidence",
+            "releaseApproved"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "schemaVersion": {
+              "const": 1
+            },
+            "candidateId": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            },
+            "policySha256": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            },
+            "checkId": {
+              "type": "string",
+              "minLength": 1
+            },
+            "checkSpecSha256": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            },
+            "recordedAt": {
+              "type": "string",
+              "format": "date-time"
+            },
+            "result": {
+              "enum": [
+                "passed",
+                "failed",
+                "skipped",
+                "pending",
+                "not_available",
+                "unqualified"
+              ]
+            },
+            "evidence": {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "$ref": "#/$defs/binding"
+              }
+            },
+            "releaseApproved": {
+              "const": false
+            },
+            "command": {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "type": "string",
+                "minLength": 1
+              }
+            },
+            "tool": {
+              "$ref": "#/$defs/binding"
+            },
+            "exitCode": {
+              "type": [
+                "integer",
+                "null"
+              ]
+            },
+            "errors": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "minLength": 1
+              }
+            },
+            "environment": {
+              "type": "object",
+              "properties": {
+                "target": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "hardware": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "osVersion": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "required": [
+                "target",
+                "hardware",
+                "osVersion"
+              ],
+              "additionalProperties": false
+            }
+          },
+          "required": [
+            "schemaVersion",
+            "candidateId",
+            "policySha256",
+            "checkId",
+            "checkSpecSha256",
+            "recordedAt",
+            "result",
+            "evidence",
+            "releaseApproved",
+            "command",
+            "tool",
+            "exitCode",
+            "errors",
+            "environment"
+          ],
+          "additionalProperties": false
+        }
+      ]
+    }
+  }
+}
