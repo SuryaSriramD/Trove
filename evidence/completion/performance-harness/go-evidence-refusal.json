@@ -1,0 +1,49 @@
+{
+  "kind": "actual Go CLI existing-evidence refusal; no workload or models executed",
+  "binarySha256": "c3abcfd78c34bcb6eef92c02753eac8c381b1d2253581ba850453c88e8324bed",
+  "checks": [
+    {
+      "kind": "file",
+      "command": [
+        "/private/tmp/trove-performance-harness-evidence/service-benchmark",
+        "-pages",
+        "1",
+        "-iterations",
+        "5",
+        "-hybrid-iterations",
+        "30",
+        "-output",
+        "/var/folders/xc/s78np0812b12p6338l0ndvsm0000gn/T/trove-service-refusal-b1y19buw/file.json",
+        "-workspaces",
+        "/var/folders/xc/s78np0812b12p6338l0ndvsm0000gn/T/trove-service-refusal-b1y19buw/file-workspace"
+      ],
+      "exitCode": 2,
+      "evidencePreserved": true,
+      "workspaceCreated": false,
+      "passed": true,
+      "stderr": "panic: open /var/folders/xc/s78np0812b12p6338l0ndvsm0000gn/T/trove-service-refusal-b1y19buw/file.json: file exists\n\ngoroutine 1 [running]:\nmain.must(...)\n\t/Users/suryasriramduvvuri/.codex/worktrees/completion-tooling/Trove/scripts/phase3-benchmark/main.go:28\nmain.main()\n\t/Users/suryasriramduvvuri/.codex/worktrees/completion-tooling/Trove/scripts/phase3-benchmark/main.go:295 +0xb74\n"
+    },
+    {
+      "kind": "dangling_link",
+      "command": [
+        "/private/tmp/trove-performance-harness-evidence/service-benchmark",
+        "-pages",
+        "1",
+        "-iterations",
+        "5",
+        "-hybrid-iterations",
+        "30",
+        "-output",
+        "/var/folders/xc/s78np0812b12p6338l0ndvsm0000gn/T/trove-service-refusal-b1y19buw/dangling_link.json",
+        "-workspaces",
+        "/var/folders/xc/s78np0812b12p6338l0ndvsm0000gn/T/trove-service-refusal-b1y19buw/dangling_link-workspace"
+      ],
+      "exitCode": 2,
+      "evidencePreserved": true,
+      "workspaceCreated": false,
+      "passed": true,
+      "stderr": "panic: open /var/folders/xc/s78np0812b12p6338l0ndvsm0000gn/T/trove-service-refusal-b1y19buw/dangling_link.json: file exists\n\ngoroutine 1 [running]:\nmain.must(...)\n\t/Users/suryasriramduvvuri/.codex/worktrees/completion-tooling/Trove/scripts/phase3-benchmark/main.go:28\nmain.main()\n\t/Users/suryasriramduvvuri/.codex/worktrees/completion-tooling/Trove/scripts/phase3-benchmark/main.go:295 +0xb74\n"
+    }
+  ],
+  "passed": true
+}

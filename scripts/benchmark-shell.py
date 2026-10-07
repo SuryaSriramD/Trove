@@ -39,9 +39,13 @@ def read_sample(path):
         return None, 'Invalid or missing shell report: ' + str(error)
 
 
-def measure(app, profiles, iterations, fixture, diagnostics, *, timeout=60):
+def measure(app, profiles, iterations, fixture, diagnostics, *, timeout=60, diagnostic_slow_ms=None):
     if iterations < 1 or timeout <= 0:
         raise ValueError('Iterations and timeout must be positive')
+    if diagnostic_slow_ms is not None and (not math.isfinite(diagnostic_slow_ms) or not 0 < diagnostic_slow_ms < timeout * 1000):
+        raise ValueError('Diagnostic trigger must be positive and precede the process deadline')
+    if not profiles or len({p['pages'] for p in profiles}) != len(profiles):
+        raise ValueError('Workspace profiles must be nonempty and distinct')
     binary = app.resolve() / 'Contents/MacOS/Trove'
     before = hashlib.sha256(binary.read_bytes()).hexdigest()
     results, failures = [], []
@@ -77,14 +81,27 @@ def measure(app, profiles, iterations, fixture, diagnostics, *, timeout=60):
                        TROVE_STARTUP_TRACE=str(trace_path))
             started = time.monotonic()
             timed_out = False
+            sampling_attempted = False
             with log_path.open('x') as log:
                 process = subprocess.Popen(['/usr/bin/sandbox-exec', '-p', '(version 1)(allow default)(deny network*)', str(binary)],
                                            env=env, stdout=log, stderr=subprocess.STDOUT)
                 try:
-                    process.wait(timeout=timeout)
+                    if diagnostic_slow_ms is not None:
+                        try:
+                            process.wait(timeout=diagnostic_slow_ms / 1000)
+                        except subprocess.TimeoutExpired:
+                            # Parent exec time is a trigger, not the Go-shell metric.
+                            # Sampling may perturb this launch and its shutdown.
+                            sampling_attempted = True
+                            capture_stalled_process(process, native_sample, log)
+                            process.wait(timeout=max(0, timeout - (time.monotonic() - started)))
+                    else:
+                        process.wait(timeout=timeout)
                 except subprocess.TimeoutExpired:
                     timed_out = True
-                    capture_stalled_process(process, native_sample, log)
+                    if not sampling_attempted:
+                        sampling_attempted = True
+                        capture_stalled_process(process, native_sample, log)
                     process.terminate()
                     try:
                         process.wait(timeout=5)
@@ -98,7 +115,8 @@ def measure(app, profiles, iterations, fixture, diagnostics, *, timeout=60):
                     'App exited unsuccessfully' if process.returncode != 0 else invalid)
                 failure = {'pages': n, 'iteration': i, 'exitCode': process.returncode,
                            'timedOut': timed_out, 'launchThroughShutdownMs': outer,
-                           'reason': reason, 'log': str(log_path)}
+                           'reason': reason, 'log': str(log_path),
+                           'diagnosticSamplingAttempted': sampling_attempted}
                 if trace_path.exists():
                     failure['startupTrace'] = str(trace_path)
                 if native_sample.exists():
@@ -110,6 +128,9 @@ def measure(app, profiles, iterations, fixture, diagnostics, *, timeout=60):
                 failures.append(failure)
                 break
             sample['launchThroughShutdownMs'] = outer
+            sample['diagnosticSamplingAttempted'] = sampling_attempted
+            if native_sample.exists():
+                sample['processSample'] = str(native_sample)
             samples.append(sample)
         values = [s['usableShellMs'] for s in samples]
         complete = len(samples) == iterations
@@ -121,13 +142,22 @@ def measure(app, profiles, iterations, fixture, diagnostics, *, timeout=60):
                         'approximatelyTwoSeconds': complete and max(values) <= 2500})
         print(f'pages={n}: completed={len(samples)}/{iterations}, maximum shell ms={max(values) if values else "FAILED"}', flush=True)
     after = hashlib.sha256(binary.read_bytes()).hexdigest()
+    measurement_passed = bool(results) and not failures and before == after
+    observed_target = measurement_passed and all(p['approximatelyTwoSeconds'] for p in results)
     return {'recordedAt': datetime.now(timezone.utc).isoformat(), 'app': str(app),
             'appBinarySha256': after, 'appUnchanged': before == after,
             'networkDeniedByOS': True, 'modelPacks': [], 'fixture': str(fixture),
             'profiles': results, 'failures': failures,
-            'measurementPassed': bool(results) and not failures and before == after,
+            'measurementPassed': measurement_passed,
+            'observedShellThresholdPassed': observed_target,
+            'shellTargetPassed': observed_target and diagnostic_slow_ms is None,
+            'instrumented': diagnostic_slow_ms is not None,
+            'diagnosticTriggerMs': diagnostic_slow_ms,
+            'diagnosticTriggerMetric': 'parent executable launch through shutdown; not Go-shell elapsed time',
+            'releaseQualified': False,
             'definition': 'Go process initialization to canonical workspace snapshot rendered and two animation frames. Startup includes native validation and Wails initialization. Each sample uses a new app process; OS disk caches are not flushed. The approximate two-second threshold is explicitly interpreted as at most 2.5 seconds, requires every requested iteration to finish, and exact values are retained.',
             'limitations': ['Developer Mac only; hardware and synthetic workspace definitions are in benchmark-environment.json.',
+                           'Diagnostic mode is ineligible for performance promotion, even if no sampling was needed; sampling may perturb timing.',
                            'Does not measure installer/Gatekeeper time or guarantee editor responsiveness during background work.',
                            'A missing readiness report is a failed measurement; it does not by itself distinguish a workspace, bridge, renderer, or visibility problem.']}
 
@@ -137,6 +167,7 @@ def main():
     parser.add_argument('--app', type=Path, required=True)
     parser.add_argument('--profiles', type=Path, default=ROOT / 'evidence/phase3/benchmark-service.json')
     parser.add_argument('--iterations', type=int, default=5)
+    parser.add_argument('--diagnostic-slow-ms', type=float, help='Diagnostic only: sample a still-running owned app after this parent elapsed time; never qualifies timing')
     parser.add_argument('--output', type=Path, default=ROOT / 'evidence/phase3/shell-benchmark.json')
     args = parser.parse_args()
     if args.iterations < 1:
@@ -147,10 +178,14 @@ def main():
     profiles = [{'pages': 0, 'paragraphBlocks': 0, 'workspacePath': None}]
     profiles += json.loads(args.profiles.read_text())['profiles']
     result = measure(args.app, profiles, args.iterations, fixture,
-                     args.output.parent / (args.output.stem + '-diagnostics'))
+                     args.output.parent / (args.output.stem + '-diagnostics'),
+                     diagnostic_slow_ms=args.diagnostic_slow_ms)
     args.output.parent.mkdir(parents=True, exist_ok=True)
-    args.output.write_text(json.dumps(result, indent=2) + '\n')
-    return 0 if result['measurementPassed'] else 1
+    with args.output.open('x') as output:
+        output.write(json.dumps(result, indent=2) + '\n')
+    if args.diagnostic_slow_ms is not None:
+        return 0 if result['measurementPassed'] else 1
+    return 0 if result['shellTargetPassed'] else 1
 
 
 if __name__ == '__main__':

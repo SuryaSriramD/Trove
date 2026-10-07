@@ -1,0 +1,140 @@
+test_all_scales_request_explicit_hybrid_iteration_count (test_service_benchmark.ServiceBenchmarkTests.test_all_scales_request_explicit_hybrid_iteration_count) ... FAIL
+test_existing_evidence_is_refused_before_any_host_or_worker_command (test_service_benchmark.ServiceBenchmarkTests.test_existing_evidence_is_refused_before_any_host_or_worker_command) ... FAIL
+test_first_profile_only_hybrid_is_an_incomplete_measurement (test_service_benchmark.ServiceBenchmarkTests.test_first_profile_only_hybrid_is_an_incomplete_measurement) ... FAIL
+test_wrong_sample_count_or_duplicate_profile_cannot_pass (test_service_benchmark.ServiceBenchmarkTests.test_wrong_sample_count_or_duplicate_profile_cannot_pass) ... 
+  test_wrong_sample_count_or_duplicate_profile_cannot_pass (test_service_benchmark.ServiceBenchmarkTests.test_wrong_sample_count_or_duplicate_profile_cannot_pass) (variant='short') ... FAIL
+  test_wrong_sample_count_or_duplicate_profile_cannot_pass (test_service_benchmark.ServiceBenchmarkTests.test_wrong_sample_count_or_duplicate_profile_cannot_pass) (variant='duplicate') ... FAIL
+test_cli_fails_a_complete_measurement_above_the_target (test_shell_benchmark.ShellBenchmarkTests.test_cli_fails_a_complete_measurement_above_the_target) ... FAIL
+test_complete_fast_samples_pass (test_shell_benchmark.ShellBenchmarkTests.test_complete_fast_samples_pass) ... {
+  "qualifiedMeasurement": true,
+  "exitCode": 0,
+  "metadataErrors": [],
+  "sourceChangedDuringRun": []
+}
+{
+  "qualifiedMeasurement": true,
+  "exitCode": 0,
+  "metadataErrors": [],
+  "sourceChangedDuringRun": []
+}
+{
+  "qualifiedMeasurement": true,
+  "exitCode": 0,
+  "metadataErrors": [],
+  "sourceChangedDuringRun": []
+}
+{
+  "qualifiedMeasurement": true,
+  "exitCode": 0,
+  "metadataErrors": [],
+  "sourceChangedDuringRun": []
+}
+{
+  "qualifiedMeasurement": true,
+  "exitCode": 0,
+  "metadataErrors": [],
+  "sourceChangedDuringRun": []
+}
+pages=0: completed=2/2, maximum shell ms=1400
+ok
+test_complete_slow_samples_are_valid_measurements_but_miss_target (test_shell_benchmark.ShellBenchmarkTests.test_complete_slow_samples_are_valid_measurements_but_miss_target) ... pages=0: completed=1/1, maximum shell ms=2700
+ERROR
+test_diagnostic_mode_cannot_promote_even_without_sampling (test_shell_benchmark.ShellBenchmarkTests.test_diagnostic_mode_cannot_promote_even_without_sampling) ... ERROR
+test_diagnostic_sampling_is_not_a_passing_timing_run (test_shell_benchmark.ShellBenchmarkTests.test_diagnostic_sampling_is_not_a_passing_timing_run) ... ERROR
+test_existing_evidence_is_never_reused_or_overwritten (test_shell_benchmark.ShellBenchmarkTests.test_existing_evidence_is_never_reused_or_overwritten) ... ok
+test_invalid_report_fails_without_discarding_prior_samples (test_shell_benchmark.ShellBenchmarkTests.test_invalid_report_fails_without_discarding_prior_samples) ... pages=0: completed=1/2, maximum shell ms=1000
+pages=0: completed=1/2, maximum shell ms=1000
+pages=0: completed=1/2, maximum shell ms=1000
+pages=0: completed=1/2, maximum shell ms=1000
+ok
+test_no_requested_samples_is_invalid (test_shell_benchmark.ShellBenchmarkTests.test_no_requested_samples_is_invalid) ... ok
+test_partial_profile_never_claims_two_second_target (test_shell_benchmark.ShellBenchmarkTests.test_partial_profile_never_claims_two_second_target) ... pages=0: completed=1/5, maximum shell ms=1000
+ok
+test_timeout_is_failure_even_with_report_and_clean_exit (test_shell_benchmark.ShellBenchmarkTests.test_timeout_is_failure_even_with_report_and_clean_exit) ... pages=0: completed=0/1, maximum shell ms=FAILED
+ok
+
+======================================================================
+ERROR: test_complete_slow_samples_are_valid_measurements_but_miss_target (test_shell_benchmark.ShellBenchmarkTests.test_complete_slow_samples_are_valid_measurements_but_miss_target)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/suryasriramduvvuri/.codex/worktrees/completion-tooling/Trove/tests/test_shell_benchmark.py", line 87, in test_complete_slow_samples_are_valid_measurements_but_miss_target
+    self.assertFalse(result['shellTargetPassed'])
+                     ~~~~~~^^^^^^^^^^^^^^^^^^^^^
+KeyError: 'shellTargetPassed'
+
+======================================================================
+ERROR: test_diagnostic_mode_cannot_promote_even_without_sampling (test_shell_benchmark.ShellBenchmarkTests.test_diagnostic_mode_cannot_promote_even_without_sampling)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/suryasriramduvvuri/.codex/worktrees/completion-tooling/Trove/tests/test_shell_benchmark.py", line 113, in test_diagnostic_mode_cannot_promote_even_without_sampling
+    result = self.run_scenarios([{'report': {'usableShellMs': 1200}}], 1,
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/suryasriramduvvuri/.codex/worktrees/completion-tooling/Trove/tests/test_shell_benchmark.py", line 55, in run_scenarios
+    return benchmark.measure(app, [{'pages': 0, 'paragraphBlocks': 0, 'workspacePath': None}],
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+TypeError: measure() got an unexpected keyword argument 'diagnostic_slow_ms'
+
+======================================================================
+ERROR: test_diagnostic_sampling_is_not_a_passing_timing_run (test_shell_benchmark.ShellBenchmarkTests.test_diagnostic_sampling_is_not_a_passing_timing_run)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/suryasriramduvvuri/.codex/worktrees/completion-tooling/Trove/tests/test_shell_benchmark.py", line 104, in test_diagnostic_sampling_is_not_a_passing_timing_run
+    result = self.run_scenarios([{'timeout': True, 'report': {'usableShellMs': 1200}}], 1,
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/suryasriramduvvuri/.codex/worktrees/completion-tooling/Trove/tests/test_shell_benchmark.py", line 55, in run_scenarios
+    return benchmark.measure(app, [{'pages': 0, 'paragraphBlocks': 0, 'workspacePath': None}],
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+TypeError: measure() got an unexpected keyword argument 'diagnostic_slow_ms'
+
+======================================================================
+FAIL: test_all_scales_request_explicit_hybrid_iteration_count (test_service_benchmark.ServiceBenchmarkTests.test_all_scales_request_explicit_hybrid_iteration_count)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/suryasriramduvvuri/.codex/worktrees/completion-tooling/Trove/tests/test_service_benchmark.py", line 71, in test_all_scales_request_explicit_hybrid_iteration_count
+    self.assertIn('-hybrid-iterations', command)
+AssertionError: '-hybrid-iterations' not found in ['go', 'run', '-mod=readonly', '-tags', 'fts5 sqlite_omit_load_extension', './scripts/phase3-benchmark', '-pages', '100,1000,10000', '-iterations', '5', '-models', '/var/folders/xc/s78np0812b12p6338l0ndvsm0000gn/T/tmp4u66unn_/models', '-bundle', '/var/folders/xc/s78np0812b12p6338l0ndvsm0000gn/T/trove-benchmark-native-2d69noqj/native', '-output', '/var/folders/xc/s78np0812b12p6338l0ndvsm0000gn/T/tmp4u66unn_/evidence/benchmark-service.json', '-hybrid']
+
+======================================================================
+FAIL: test_existing_evidence_is_refused_before_any_host_or_worker_command (test_service_benchmark.ServiceBenchmarkTests.test_existing_evidence_is_refused_before_any_host_or_worker_command)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/suryasriramduvvuri/.codex/worktrees/completion-tooling/Trove/tests/test_service_benchmark.py", line 99, in test_existing_evidence_is_refused_before_any_host_or_worker_command
+    self.assertNotEqual(code, 0)
+AssertionError: 0 == 0
+
+======================================================================
+FAIL: test_first_profile_only_hybrid_is_an_incomplete_measurement (test_service_benchmark.ServiceBenchmarkTests.test_first_profile_only_hybrid_is_an_incomplete_measurement)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/suryasriramduvvuri/.codex/worktrees/completion-tooling/Trove/tests/test_service_benchmark.py", line 81, in test_first_profile_only_hybrid_is_an_incomplete_measurement
+    self.assertEqual(code, 1)
+AssertionError: 0 != 1
+
+======================================================================
+FAIL: test_wrong_sample_count_or_duplicate_profile_cannot_pass (test_service_benchmark.ServiceBenchmarkTests.test_wrong_sample_count_or_duplicate_profile_cannot_pass) (variant='short')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/suryasriramduvvuri/.codex/worktrees/completion-tooling/Trove/tests/test_service_benchmark.py", line 95, in test_wrong_sample_count_or_duplicate_profile_cannot_pass
+    self.assertEqual(code, 1)
+AssertionError: 0 != 1
+
+======================================================================
+FAIL: test_wrong_sample_count_or_duplicate_profile_cannot_pass (test_service_benchmark.ServiceBenchmarkTests.test_wrong_sample_count_or_duplicate_profile_cannot_pass) (variant='duplicate')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/suryasriramduvvuri/.codex/worktrees/completion-tooling/Trove/tests/test_service_benchmark.py", line 95, in test_wrong_sample_count_or_duplicate_profile_cannot_pass
+    self.assertEqual(code, 1)
+AssertionError: 0 != 1
+
+======================================================================
+FAIL: test_cli_fails_a_complete_measurement_above_the_target (test_shell_benchmark.ShellBenchmarkTests.test_cli_fails_a_complete_measurement_above_the_target)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/suryasriramduvvuri/.codex/worktrees/completion-tooling/Trove/tests/test_shell_benchmark.py", line 100, in test_cli_fails_a_complete_measurement_above_the_target
+    self.assertEqual(benchmark.main(), 1)
+AssertionError: 0 != 1
+
+----------------------------------------------------------------------
+Ran 14 tests in 0.036s
+
+FAILED (failures=6, errors=3)

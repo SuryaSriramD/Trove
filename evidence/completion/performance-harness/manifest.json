@@ -1,0 +1,83 @@
+{
+  "schemaVersion": 1,
+  "kind": "focused benchmark harness source and regression evidence",
+  "sourceBaseCommit": "317b78282f63b6150269b11166463d3ecc997b17",
+  "sourceSha256": {
+    "scripts/benchmark-shell.py": "58ce8df62bce8f1e4d77cc489b09ed250d62e7ffc5ef958a19f51ad22590e452",
+    "scripts/benchmark-phase3.py": "8b3878ab32d7c0a4ef14080a801eca9304e77a04784511f471dc65262c4908dd",
+    "scripts/phase3-benchmark/main.go": "2b46b1864c81d6499b832c830add88639f7537d56b1f6a1d35e813b905401459",
+    "tests/test_shell_benchmark.py": "471ab39a8b7804eedfb83dd654306173012e8b4dd932a41d049797191926280f",
+    "tests/test_service_benchmark.py": "f3a81b5436fbec47997b44275bdbf7b2108f7987f060e0679e6ec24a045672f4"
+  },
+  "releaseQualified": false,
+  "before": {
+    "report": "before.log",
+    "testCount": 14,
+    "outcome": "failed",
+    "assertionFailures": 6,
+    "missingInterfaceErrors": 3,
+    "note": "Regressions were added before changing production harnesses; missing diagnostic interface errors are distinct from the six reproduced assertion failures."
+  },
+  "after": {
+    "report": "after.log",
+    "testCount": 16,
+    "outcome": "passed"
+  },
+  "goCompile": {
+    "report": "go-compile.log",
+    "outcome": "passed",
+    "note": "Package has no Go tests; this result is compilation only."
+  },
+  "goCLIRefusal": {
+    "report": "go-evidence-refusal.json",
+    "checks": 2,
+    "outcome": "passed",
+    "scope": "Actual executable refuses existing file and dangling link without creating benchmark workspace."
+  },
+  "commands": [
+    [
+      "<pinned-python>",
+      "-m",
+      "unittest",
+      "discover",
+      "-s",
+      "tests",
+      "-p",
+      "test_*benchmark.py",
+      "-v"
+    ],
+    [
+      "<pinned-go>",
+      "test",
+      "-mod=readonly",
+      "-tags",
+      "fts5 sqlite_omit_load_extension",
+      "./scripts/phase3-benchmark",
+      "-count=1"
+    ],
+    [
+      "<pinned-go>",
+      "build",
+      "-mod=readonly",
+      "-tags",
+      "fts5 sqlite_omit_load_extension",
+      "-o",
+      "<temporary-executable>",
+      "./scripts/phase3-benchmark"
+    ]
+  ],
+  "limits": [
+    "No actual shell launches, dataset measurements, model inference or platform qualification ran.",
+    "Prior be6fc81 8399.656 ms failure remains unresolved; this package repairs measurement/reporting and adds diagnostics, not the application startup cause.",
+    "Diagnostic slow sampling is explicitly instrumented; collection success does not pass the shell threshold.",
+    "Hybrid all-scale orchestration is implemented and completeness regression-tested with synthetic outcomes; actual 1000/10000-page hybrid measurements are pending."
+  ],
+  "reportSha256": {
+    "go-compile.log": "eca1d1fda67d734aafe6710fafa006ea77b798fce72eeeb27842bedd8f2f2888",
+    "after-initial.log": "26a4bb01068d1fbd0fd535ddab1f1ced8938ef4223695d05febe9789fd180daa",
+    "go-evidence-refusal.json": "a6f3cd571e6141401937ad83c014f97395acfcecb3f6906bf72fcdfbe50e39a5",
+    "go-build.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "before.log": "2163aad6eb4682aa4d5db0e1c8aacc4dc3455e177b5c401ea2d6015701a70a3c",
+    "after.log": "ce166f277fdc5424c1dc8b0618e2fc626b3faa3181360e7f47866b085ed1463d"
+  }
+}
