@@ -243,6 +243,12 @@ func (s *Store) run(workspace string) {
 			s.setStatus("unavailable")
 			return
 		}
+		pinned, statErr := f.Stat()
+		if statErr != nil || !os.SameFile(st, pinned) || platformfs.AuditPrivateHandle(f, false) != nil {
+			f.Close()
+			s.setStatus("unavailable")
+			return
+		}
 		raw, err := io.ReadAll(io.LimitReader(f, maxBytes+1))
 		f.Close()
 		previous, dropped, valid := decode(raw)

@@ -8,6 +8,7 @@ import (
 	"golang.org/x/sys/windows"
 	"os"
 	"path/filepath"
+	"runtime"
 	"strings"
 )
 
@@ -64,6 +65,24 @@ func lockFile(f *os.File) error {
 }
 func unlockFile(f *os.File) error {
 	return windows.UnlockFileEx(windows.Handle(f.Fd()), 0, 1, 0, &windows.Overlapped{})
+}
+
+var reopenLockFile = windows.NewLazySystemDLL("kernel32.dll").NewProc("ReOpenFile")
+
+// os.Root.OpenFile shares delete access on Windows. Reopen the pinned object,
+// without resolving a pathname, to deny rename/delete while ownership is held.
+// The caller closes the original handle and re-audits identity and ACLs.
+// https://learn.microsoft.com/en-us/windows/win32/api/winbase/nf-winbase-reopenfile
+func protectLockHandle(f *os.File) (*os.File, error) {
+	h, _, err := reopenLockFile.Call(f.Fd(), uintptr(windows.GENERIC_READ|windows.GENERIC_WRITE|windows.READ_CONTROL), uintptr(windows.FILE_SHARE_READ|windows.FILE_SHARE_WRITE), uintptr(windows.FILE_FLAG_OPEN_REPARSE_POINT))
+	runtime.KeepAlive(f)
+	if windows.Handle(h) == windows.InvalidHandle || h == 0 {
+		if err == windows.ERROR_SUCCESS {
+			err = errors.New("cannot protect owner lock from replacement")
+		}
+		return nil, err
+	}
+	return os.NewFile(h, f.Name()), nil
 }
 func auditPrivateHandle(f *os.File, directory bool) error {
 	h := windows.Handle(f.Fd())

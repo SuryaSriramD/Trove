@@ -173,3 +173,29 @@ func TestDiagnosticExpiresEveryUnorderedHistoricalEvent(t *testing.T) {
 		t.Fatal(p)
 	}
 }
+
+func TestDiagnosticRejectsHardLinkedPrivateHistory(t *testing.T) {
+	root, outside := t.TempDir(), t.TempDir()
+	dir := filepath.Join(root, "logs", "operational")
+	if err := os.MkdirAll(dir, 0700); err != nil {
+		t.Fatal(err)
+	}
+	external := filepath.Join(outside, "other-workspace-history.json")
+	raw, _ := json.Marshal(Snapshot{Version: 1, Persistence: "ready", Events: []Event{{At: time.Now().UTC().Format(time.RFC3339Nano), Component: "model", Operation: "prepare", Outcome: "passed", Code: "none", Count: 9912}}})
+	if err := os.WriteFile(external, raw, 0600); err != nil {
+		t.Fatal(err)
+	}
+	if err := os.Link(external, filepath.Join(dir, fileName)); err != nil {
+		t.Fatal(err)
+	}
+	s := New(root)
+	s.Close()
+	p := s.Snapshot()
+	if p.Persistence != "unavailable" || len(p.Events) != 0 {
+		t.Fatal("read foreign private history", p)
+	}
+	actual, err := os.ReadFile(external)
+	if err != nil || string(actual) != string(raw) {
+		t.Fatal("external history changed", err)
+	}
+}

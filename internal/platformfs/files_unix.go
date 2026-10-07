@@ -40,7 +40,8 @@ func lockFile(f *os.File) error {
 	}
 	return err
 }
-func unlockFile(f *os.File) error { return syscall.Flock(int(f.Fd()), syscall.LOCK_UN) }
+func unlockFile(f *os.File) error                    { return syscall.Flock(int(f.Fd()), syscall.LOCK_UN) }
+func protectLockHandle(f *os.File) (*os.File, error) { return f, nil }
 func auditPrivateHandle(f *os.File, directory bool) error {
 	st, err := f.Stat()
 	if err != nil {

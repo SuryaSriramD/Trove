@@ -1,0 +1,55 @@
+{
+  "schemaVersion": 1,
+  "recordedAt": "2026-10-07",
+  "parentPackageCommit": "3c54c58",
+  "sourceHashes": {
+    "frontend/src/SupportBundlePanel.tsx": "e5d8da7d34886afaf553a81b48ae785a6778f0b1843c9070ee6250c1c1cb3cbc",
+    "frontend/tests/support-fixture.tsx": "23279828f03a974d5428538b339ee5420ef8791af4099e3adc55b6379e7ee843",
+    "frontend/tests/support.browser.spec.ts": "16f8b328ffa45158bba764d75987a90bd27a54cbc85c8b5c5b5fc4e929874db9",
+    "internal/diagnostics/store.go": "c6198c194b06cc761fb4ad9e5573a370578fb391a8f79493cf99144b6e897b44",
+    "internal/diagnostics/store_test.go": "5524e928aef5b5f2e30bd88abc7f78fd9d9c61f893a11d4028f5b2621392b60a",
+    "internal/platformfs/files.go": "b2b09f8d182cbaef8f02d4115d3ae66bc43b1cec171957c5a5357818a0888cd1",
+    "internal/platformfs/files_other.go": "da2af9b87bf566731e3f5e399fd2f5f9aefe8ae7a7bb6fe8195789e2211c983f",
+    "internal/platformfs/files_unix.go": "7340a4ad5a51c12a46ee703136d05719a245b27063d153adacbc5fdb616ce2af",
+    "internal/platformfs/files_windows.go": "6650e2a46d1f299c6b9c2612bbc67f2a6d11339f8508f172c0a1f65ace3fe0bb",
+    "internal/platformfs/files_windows_test.go": "03e420176c6b3f7acd71bb3876efc5e4f4f702b5690178cfa1cf7e327a837356",
+    "internal/platformfs/root_lock_test.go": "fd872d4db9e7ba3e5682a3013a6845a75da5171eab40b8bbb69ba22fb6d9d320",
+    "internal/workspace/ai.go": "66cf5f2ae26ff55f2effcdab87e47f1da448038cbf1244892177cf279a070be3",
+    "internal/workspace/diagnostics.go": "6c1e9604c5379df2776b0bff70addabab92546da21e0dd4078aa99cfeec47ea6",
+    "internal/workspace/diagnostics_test.go": "e9418a8c8e934981b7623bc1085526bde998bcc7bbf02dbb17ad4461004331e7",
+    "internal/workspace/events.go": "067d8eeec198f4b0b018aa308f76e9327338ddbd608d0950d9f3e62b9043e1bf",
+    "internal/workspace/jobs.go": "517985a843cbcf219ac690ace0913a7248f3266ea32811f7da7e1f869e707a54",
+    "internal/workspace/kernel.go": "d645db70369b94712f608300640ba7f8e6779185d6320d30c6fe2ee48a580ebf",
+    "internal/workspace/open_compatible.go": "1ec6c0cd0118f9d2ebf24bcd58a1db3443ae6231c5b352dc9fe6496c6f55d844",
+    "internal/workspace/support_bundle.go": "02ab9a17d4a7732c1efcbdbe81e7540889bfd985371113fe6e5b52a157eaaf68",
+    "internal/workspace/support_bundle_test.go": "10fe4deb732ad820cd4529f7c747c71d88118d11220bdc132cd419e76e432bb4"
+  },
+  "reviewFixes": [
+    "Reject foreign hard-linked history and audit opened file ownership/ACL/identity before reading.",
+    "Windows ReOpenFile denies delete sharing on the pinned owner lock before identity recheck and byte locking."
+  ],
+  "checks": {
+    "affectedRace": {
+      "pass": 45
+    },
+    "windowsRootLockCrossCompile": {
+      "exitCode": 0,
+      "target": "windows/amd64",
+      "nativeExecution": false
+    }
+  },
+  "nativeWindowsPending": [
+    "Private ACL history admission",
+    "Active lock rename/delete refusal and second-owner refusal"
+  ],
+  "reviewSources": [
+    "https://learn.microsoft.com/en-us/windows/win32/api/winbase/nf-winbase-reopenfile"
+  ],
+  "evidenceHashes": {
+    "hardening-final.jsonl": "8a7bb1e0123ec97368771519c503507ca38b37cd0a684ea17321c010572918e8",
+    "history-audit.jsonl": "828870638870cafa8ff12420868690b28543f8d0015e219f60045a2650113ebf",
+    "windows-root-lock-compile.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "priorReports": "Original manifest and 44-test report remain unchanged; this adds post-review source and evidence.",
+  "releaseQualified": false
+}
