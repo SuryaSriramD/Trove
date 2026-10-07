@@ -33,12 +33,57 @@
         "TestSearchFTSChangesDeletesScopesAndRebuild",
         "TestSearchSemanticRevisionBoundAndHybrid",
         "TestDatabaseFourViewsShareRecordsAndRestart",
-        "TestDatabaseFiltersDecimalSortCursorAndAtomicity"
+        "TestDatabaseFiltersDecimalSortCursorAndAtomicity",
+        "TestCurrentContentExportsExcludeTrashAndUnreferencedAssets",
+        "TestRestoreSubtreeIsAtomicAndPreservesUnrelatedValues"
       ],
       "timeoutSeconds": 900,
       "prerequisites": [],
       "assets": [],
-      "scenarios": []
+      "scenarios": [
+        {
+          "id": "export-archive-privacy",
+          "expected": "A trashed-only or otherwise unreferenced private asset is absent from current-content exports; a shared asset still referenced by a live page remains present; Markdown/CSV and HTML exports behave consistently. Verify archive bytes, not just manifest counts.",
+          "context": "Service export archive bytes for current Markdown/CSV and HTML content.",
+          "evidenceKind": "service",
+          "tests": [
+            "TestCurrentContentExportsExcludeTrashAndUnreferencedAssets"
+          ],
+          "sourceProofs": [
+            {
+              "test": "TestCurrentContentExportsExcludeTrashAndUnreferencedAssets",
+              "path": "internal/workspace/export_privacy_test.go",
+              "sha256": "714d17facf8aac009e5d2ae12065e96b3cde14375be908cc61a669675871254b",
+              "assertions": [
+                "for _, html := range []bool{false, true}",
+                "assertExportAbsent(t, entries, private, orphan, \"TRASH_ONLY_PRIVATE_BYTES\", \"UNREFERENCED_PRIVATE_BYTES\", \"Private trashed page\")",
+                "assertExportAsset(t, entries, shared, \"SHARED_LIVE_BYTES\")"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "restore-unrelated-records",
+          "expected": "page restoration does not rewind unrelated records or schemas.",
+          "context": "Service page restoration preserves shared schemas and unrelated records.",
+          "evidenceKind": "service",
+          "tests": [
+            "TestRestoreSubtreeIsAtomicAndPreservesUnrelatedValues"
+          ],
+          "sourceProofs": [
+            {
+              "test": "TestRestoreSubtreeIsAtomicAndPreservesUnrelatedValues",
+              "path": "internal/workspace/restore_test.go",
+              "sha256": "253ed118cc6cdd5c54b0c51bbd3998cbc72ad695da905e001b91e0b8e4d16205",
+              "assertions": [
+                "t.Fatal(\"restore rewound shared schemas\")",
+                "t.Fatal(\"unrelated record was rewound\", actual)",
+                "t.Fatal(\"partial subtree restored\")"
+              ]
+            }
+          ]
+        }
+      ]
     },
     {
       "id": "p1-workspace-regressions",
@@ -497,15 +542,9 @@
         {
           "id": "ledger",
           "expected": "All selected PRD/TRD/backlog acceptance criteria have accurate implementation and candidate/platform evidence or remain explicitly open."
-        },
-        {
-          "id": "research",
-          "expected": "Referenced accepted research behaviors are reconciled from the actual supplied source; absent wording is not invented."
         }
       ],
-      "prerequisites": [
-        "research-report"
-      ],
+      "prerequisites": [],
       "assets": []
     },
     {
@@ -829,6 +868,28 @@
         "helpers",
         "fixtures"
       ]
+    },
+    {
+      "id": "research-parity-reconciliation",
+      "tier": "P0",
+      "scope": "programme",
+      "group": "research",
+      "kind": "observation",
+      "targets": [
+        "darwin-arm64",
+        "windows-amd64",
+        "linux-amd64"
+      ],
+      "scenarios": [
+        {
+          "id": "research",
+          "expected": "Referenced accepted research behaviors are reconciled from the actual supplied source; absent wording is not invented."
+        }
+      ],
+      "prerequisites": [
+        "research-report"
+      ],
+      "assets": []
     }
   ],
   "prerequisites": {
@@ -866,5 +927,2233 @@
       "reason": "Availability must be recorded from actual resources; no credentials belong in records."
     }
   },
-  "acceptanceCases": {}
+  "acceptanceCases": {
+    "darwin-arm64/P0": {
+      "backlog:FIX-001/archive-bytes": {
+        "criterionSha256": "896aaf7548d75db3a57f10ac2b7357c98ffe650b52b887a25d9f92542fda5443",
+        "cases": [
+          {
+            "checkId": "p0-service-regressions",
+            "scenarioId": "export-archive-privacy"
+          }
+        ]
+      },
+      "requirement:PH2-E:1/unrelated-records": {
+        "criterionSha256": "b01b6df6f7f5288cbb2fc732ec25e2c1749a2340103cec034f653029b003b29a",
+        "cases": [
+          {
+            "checkId": "p0-service-regressions",
+            "scenarioId": "restore-unrelated-records"
+          }
+        ]
+      }
+    },
+    "darwin-arm64/P1": {
+      "backlog:FIX-001/archive-bytes": {
+        "criterionSha256": "896aaf7548d75db3a57f10ac2b7357c98ffe650b52b887a25d9f92542fda5443",
+        "cases": [
+          {
+            "checkId": "p0-service-regressions",
+            "scenarioId": "export-archive-privacy"
+          }
+        ]
+      },
+      "requirement:PH2-E:1/unrelated-records": {
+        "criterionSha256": "b01b6df6f7f5288cbb2fc732ec25e2c1749a2340103cec034f653029b003b29a",
+        "cases": [
+          {
+            "checkId": "p0-service-regressions",
+            "scenarioId": "restore-unrelated-records"
+          }
+        ]
+      }
+    },
+    "darwin-arm64/P2": {
+      "backlog:FIX-001/archive-bytes": {
+        "criterionSha256": "896aaf7548d75db3a57f10ac2b7357c98ffe650b52b887a25d9f92542fda5443",
+        "cases": [
+          {
+            "checkId": "p0-service-regressions",
+            "scenarioId": "export-archive-privacy"
+          }
+        ]
+      },
+      "requirement:PH2-E:1/unrelated-records": {
+        "criterionSha256": "b01b6df6f7f5288cbb2fc732ec25e2c1749a2340103cec034f653029b003b29a",
+        "cases": [
+          {
+            "checkId": "p0-service-regressions",
+            "scenarioId": "restore-unrelated-records"
+          }
+        ]
+      }
+    },
+    "windows-amd64/P0": {
+      "backlog:FIX-001/archive-bytes": {
+        "criterionSha256": "896aaf7548d75db3a57f10ac2b7357c98ffe650b52b887a25d9f92542fda5443",
+        "cases": [
+          {
+            "checkId": "p0-service-regressions",
+            "scenarioId": "export-archive-privacy"
+          }
+        ]
+      },
+      "requirement:PH2-E:1/unrelated-records": {
+        "criterionSha256": "b01b6df6f7f5288cbb2fc732ec25e2c1749a2340103cec034f653029b003b29a",
+        "cases": [
+          {
+            "checkId": "p0-service-regressions",
+            "scenarioId": "restore-unrelated-records"
+          }
+        ]
+      }
+    },
+    "windows-amd64/P1": {
+      "backlog:FIX-001/archive-bytes": {
+        "criterionSha256": "896aaf7548d75db3a57f10ac2b7357c98ffe650b52b887a25d9f92542fda5443",
+        "cases": [
+          {
+            "checkId": "p0-service-regressions",
+            "scenarioId": "export-archive-privacy"
+          }
+        ]
+      },
+      "requirement:PH2-E:1/unrelated-records": {
+        "criterionSha256": "b01b6df6f7f5288cbb2fc732ec25e2c1749a2340103cec034f653029b003b29a",
+        "cases": [
+          {
+            "checkId": "p0-service-regressions",
+            "scenarioId": "restore-unrelated-records"
+          }
+        ]
+      }
+    },
+    "windows-amd64/P2": {
+      "backlog:FIX-001/archive-bytes": {
+        "criterionSha256": "896aaf7548d75db3a57f10ac2b7357c98ffe650b52b887a25d9f92542fda5443",
+        "cases": [
+          {
+            "checkId": "p0-service-regressions",
+            "scenarioId": "export-archive-privacy"
+          }
+        ]
+      },
+      "requirement:PH2-E:1/unrelated-records": {
+        "criterionSha256": "b01b6df6f7f5288cbb2fc732ec25e2c1749a2340103cec034f653029b003b29a",
+        "cases": [
+          {
+            "checkId": "p0-service-regressions",
+            "scenarioId": "restore-unrelated-records"
+          }
+        ]
+      }
+    },
+    "linux-amd64/P0": {
+      "backlog:FIX-001/archive-bytes": {
+        "criterionSha256": "896aaf7548d75db3a57f10ac2b7357c98ffe650b52b887a25d9f92542fda5443",
+        "cases": [
+          {
+            "checkId": "p0-service-regressions",
+            "scenarioId": "export-archive-privacy"
+          }
+        ]
+      },
+      "requirement:PH2-E:1/unrelated-records": {
+        "criterionSha256": "b01b6df6f7f5288cbb2fc732ec25e2c1749a2340103cec034f653029b003b29a",
+        "cases": [
+          {
+            "checkId": "p0-service-regressions",
+            "scenarioId": "restore-unrelated-records"
+          }
+        ]
+      }
+    },
+    "linux-amd64/P1": {
+      "backlog:FIX-001/archive-bytes": {
+        "criterionSha256": "896aaf7548d75db3a57f10ac2b7357c98ffe650b52b887a25d9f92542fda5443",
+        "cases": [
+          {
+            "checkId": "p0-service-regressions",
+            "scenarioId": "export-archive-privacy"
+          }
+        ]
+      },
+      "requirement:PH2-E:1/unrelated-records": {
+        "criterionSha256": "b01b6df6f7f5288cbb2fc732ec25e2c1749a2340103cec034f653029b003b29a",
+        "cases": [
+          {
+            "checkId": "p0-service-regressions",
+            "scenarioId": "restore-unrelated-records"
+          }
+        ]
+      }
+    },
+    "linux-amd64/P2": {
+      "backlog:FIX-001/archive-bytes": {
+        "criterionSha256": "896aaf7548d75db3a57f10ac2b7357c98ffe650b52b887a25d9f92542fda5443",
+        "cases": [
+          {
+            "checkId": "p0-service-regressions",
+            "scenarioId": "export-archive-privacy"
+          }
+        ]
+      },
+      "requirement:PH2-E:1/unrelated-records": {
+        "criterionSha256": "b01b6df6f7f5288cbb2fc732ec25e2c1749a2340103cec034f653029b003b29a",
+        "cases": [
+          {
+            "checkId": "p0-service-regressions",
+            "scenarioId": "restore-unrelated-records"
+          }
+        ]
+      }
+    }
+  },
+  "acceptanceDecomposition": {
+    "backlog:FIX-003": {
+      "sourceSha256": "2c5a977020590d503c52239fd04dcb874402b4a00f8209359e11eb50c465e949",
+      "rationale": "Same binding acceptance is independently qualified within each explicitly named release scope; preserving all original wording is intentional.",
+      "requiredParts": [
+        "p0-1",
+        "p1-2"
+      ],
+      "parts": [
+        {
+          "id": "p0-1",
+          "release": "P0",
+          "targets": [
+            "darwin-arm64",
+            "windows-amd64",
+            "linux-amd64"
+          ],
+          "track": "release",
+          "context": "P0 rich-content preservation through the actual existing cell and layout editing handlers, including every stated round trip.",
+          "fragments": [
+            "Import a cell and layout paragraph containing bold text and links, change one character through the visible control, save, reopen, undo/redo, export, and restore. Unaffected formatting and targets remain intact. Test the actual change handlers, not only serialization helpers."
+          ],
+          "evidenceKind": "observation"
+        },
+        {
+          "id": "p1-2",
+          "release": "P1",
+          "targets": [
+            "darwin-arm64",
+            "windows-amd64",
+            "linux-amd64"
+          ],
+          "track": "release",
+          "context": "P1 expanded layout editing controls; all the same rich-content preservation expectations apply.",
+          "fragments": [
+            "Import a cell and layout paragraph containing bold text and links, change one character through the visible control, save, reopen, undo/redo, export, and restore. Unaffected formatting and targets remain intact. Test the actual change handlers, not only serialization helpers."
+          ],
+          "evidenceKind": "observation"
+        }
+      ]
+    },
+    "backlog:CORE-007": {
+      "sourceSha256": "f7f95d96c616ec504860cb1a0e364b4923ec470850bc5721b072189522d06015",
+      "rationale": "Same binding acceptance is independently qualified within each explicitly named release scope; preserving all original wording is intentional.",
+      "requiredParts": [
+        "p0-1",
+        "p1-2"
+      ],
+      "parts": [
+        {
+          "id": "p0-1",
+          "release": "P0",
+          "targets": [
+            "darwin-arm64",
+            "windows-amd64",
+            "linux-amd64"
+          ],
+          "track": "release",
+          "context": "P0 table loading/rendering and all committed P0 query/property semantics. Qualify representative database workloads and bridge/paint timing; gallery and advanced P1 formulas are separately scoped.",
+          "fragments": [
+            "Large representative collections load incrementally with bounded memory and visible-row rendering. Typed filters, formula/rollup behavior, stable sorting, scopes, and cursor invalidation remain correct. Measure bridge/paint as well as service time; do not reuse page-search benchmarks as database-view evidence."
+          ],
+          "evidenceKind": "observation"
+        },
+        {
+          "id": "p1-2",
+          "release": "P1",
+          "targets": [
+            "darwin-arm64",
+            "windows-amd64",
+            "linux-amd64"
+          ],
+          "track": "release",
+          "context": "P1 gallery loading/rendering and the advanced formula/rollup query behaviors committed for P1; repeat the stated correctness and representative performance expectations.",
+          "fragments": [
+            "Large representative collections load incrementally with bounded memory and visible-row rendering. Typed filters, formula/rollup behavior, stable sorting, scopes, and cursor invalidation remain correct. Measure bridge/paint as well as service time; do not reuse page-search benchmarks as database-view evidence."
+          ],
+          "evidenceKind": "observation"
+        }
+      ]
+    },
+    "backlog:AI-002": {
+      "sourceSha256": "60102b571efafe89783cf12a4f3a294abab283c067cd71241cf84dd5542a16b7",
+      "rationale": "Same binding acceptance is independently qualified within each explicitly named release scope; preserving all original wording is intentional.",
+      "requiredParts": [
+        "p0-1",
+        "p1-2"
+      ],
+      "parts": [
+        {
+          "id": "p0-1",
+          "release": "P0",
+          "targets": [
+            "darwin-arm64",
+            "windows-amd64",
+            "linux-amd64"
+          ],
+          "track": "release",
+          "context": "The local AI modes and context/retrieval behavior committed to P0 in the requirements ledger; every stated safety, quality, omission and measurement rule applies to those modes.",
+          "fragments": [
+            "Long inputs have useful bounded behavior and explicit omissions; code replacement cannot drop omitted source; malformed outputs stay drafts; citations resolve to supplied current evidence; no silent cloud fallback. Record correctness, citation validity, latency, memory, and correction effort rather than relying only on schema-valid output."
+          ],
+          "evidenceKind": "observation"
+        },
+        {
+          "id": "p1-2",
+          "release": "P1",
+          "targets": [
+            "darwin-arm64",
+            "windows-amd64",
+            "linux-amd64"
+          ],
+          "track": "release",
+          "context": "Additional P1 AI modes, editing and reviewed agent assistance; every stated safety, quality, omission and measurement rule applies to those modes.",
+          "fragments": [
+            "Long inputs have useful bounded behavior and explicit omissions; code replacement cannot drop omitted source; malformed outputs stay drafts; citations resolve to supplied current evidence; no silent cloud fallback. Record correctness, citation validity, latency, memory, and correction effort rather than relying only on schema-valid output."
+          ],
+          "evidenceKind": "observation"
+        }
+      ]
+    },
+    "backlog:REL-003": {
+      "sourceSha256": "00162e98e4a1a515d6d55341df4c6e5f4cfe246530b27088cf745e9915862aa7",
+      "rationale": "Same binding acceptance is independently qualified within each explicitly named release scope; preserving all original wording is intentional.",
+      "requiredParts": [
+        "p0-1",
+        "p1-2"
+      ],
+      "parts": [
+        {
+          "id": "p0-1",
+          "release": "P0",
+          "targets": [
+            "darwin-arm64",
+            "windows-amd64",
+            "linux-amd64"
+          ],
+          "track": "release",
+          "context": "Microphone and uploaded-audio workflows, including real device consent/interruption and retained originals. System-audio capture remains separately platform-qualified and is not required for this microphone/upload-first scope.",
+          "fragments": [
+            "Device/user-consent outcomes are visible and recoverable; captured originals survive interruption; no unrelated private audio/screen content is used as a fixture. System-audio capture remains separately platform-qualified and need not block a microphone/upload-first release."
+          ],
+          "evidenceKind": "observation"
+        },
+        {
+          "id": "p1-2",
+          "release": "P1",
+          "targets": [
+            "darwin-arm64",
+            "windows-amd64",
+            "linux-amd64"
+          ],
+          "track": "release",
+          "context": "Screenshot capture, including actual native consent/interruption and retained source image. The distinct system-audio support boundary remains recorded.",
+          "fragments": [
+            "Device/user-consent outcomes are visible and recoverable; captured originals survive interruption; no unrelated private audio/screen content is used as a fixture. System-audio capture remains separately platform-qualified and need not block a microphone/upload-first release."
+          ],
+          "evidenceKind": "observation"
+        }
+      ]
+    },
+    "backlog:REL-001": {
+      "sourceSha256": "60303998fff9ad060d7096f350e5ff206b7cb2cb751f00ccd63696ab6945b218",
+      "rationale": "Same binding acceptance is independently qualified within each explicitly named release scope; preserving all original wording is intentional.",
+      "requiredParts": [
+        "p0-1",
+        "p1-2",
+        "p2-3"
+      ],
+      "parts": [
+        {
+          "id": "p0-1",
+          "release": "P0",
+          "targets": [
+            "darwin-arm64",
+            "windows-amd64",
+            "linux-amd64"
+          ],
+          "track": "release",
+          "context": "P0 candidate: apply every stated acceptance obligation to the workflows and requirements committed at P0; all earlier-tier scopes remain independently required.",
+          "fragments": [
+            "Source/bundle hashes remain stable through qualification; required checks cannot pass through missing/skipped evidence; candidate-specific limitations and approval state are explicit."
+          ],
+          "evidenceKind": "observation"
+        },
+        {
+          "id": "p1-2",
+          "release": "P1",
+          "targets": [
+            "darwin-arm64",
+            "windows-amd64",
+            "linux-amd64"
+          ],
+          "track": "release",
+          "context": "P1 candidate: apply every stated acceptance obligation to the workflows and requirements committed at P1; all earlier-tier scopes remain independently required.",
+          "fragments": [
+            "Source/bundle hashes remain stable through qualification; required checks cannot pass through missing/skipped evidence; candidate-specific limitations and approval state are explicit."
+          ],
+          "evidenceKind": "observation"
+        },
+        {
+          "id": "p2-3",
+          "release": "P2",
+          "targets": [
+            "darwin-arm64",
+            "windows-amd64",
+            "linux-amd64"
+          ],
+          "track": "release",
+          "context": "P2 candidate: apply every stated acceptance obligation to the workflows and requirements committed at P2; all earlier-tier scopes remain independently required.",
+          "fragments": [
+            "Source/bundle hashes remain stable through qualification; required checks cannot pass through missing/skipped evidence; candidate-specific limitations and approval state are explicit."
+          ],
+          "evidenceKind": "observation"
+        }
+      ]
+    },
+    "backlog:REL-002": {
+      "sourceSha256": "c080c959c5ceae5742f14497480b8331383783cbb27c0cb53408617e13c4cc1b",
+      "rationale": "Same binding acceptance is independently qualified within each explicitly named release scope; preserving all original wording is intentional.",
+      "requiredParts": [
+        "p0-1",
+        "p1-2",
+        "p2-3"
+      ],
+      "parts": [
+        {
+          "id": "p0-1",
+          "release": "P0",
+          "targets": [
+            "darwin-arm64",
+            "windows-amd64",
+            "linux-amd64"
+          ],
+          "track": "release",
+          "context": "P0 candidate: apply every stated acceptance obligation to the workflows and requirements committed at P0; all earlier-tier scopes remain independently required.",
+          "fragments": [
+            "Record actual user-visible behavior on that exact build, including restored content and selected workspace. Mocked-browser/service fixtures cannot substitute for native observations. Resolve the previously interrupted final-candidate checks."
+          ],
+          "evidenceKind": "observation"
+        },
+        {
+          "id": "p1-2",
+          "release": "P1",
+          "targets": [
+            "darwin-arm64",
+            "windows-amd64",
+            "linux-amd64"
+          ],
+          "track": "release",
+          "context": "P1 candidate: apply every stated acceptance obligation to the workflows and requirements committed at P1; all earlier-tier scopes remain independently required.",
+          "fragments": [
+            "Record actual user-visible behavior on that exact build, including restored content and selected workspace. Mocked-browser/service fixtures cannot substitute for native observations. Resolve the previously interrupted final-candidate checks."
+          ],
+          "evidenceKind": "observation"
+        },
+        {
+          "id": "p2-3",
+          "release": "P2",
+          "targets": [
+            "darwin-arm64",
+            "windows-amd64",
+            "linux-amd64"
+          ],
+          "track": "release",
+          "context": "P2 candidate: apply every stated acceptance obligation to the workflows and requirements committed at P2; all earlier-tier scopes remain independently required.",
+          "fragments": [
+            "Record actual user-visible behavior on that exact build, including restored content and selected workspace. Mocked-browser/service fixtures cannot substitute for native observations. Resolve the previously interrupted final-candidate checks."
+          ],
+          "evidenceKind": "observation"
+        }
+      ]
+    },
+    "backlog:REL-004": {
+      "sourceSha256": "b84192c7b84c25d0ba7dc5580a1279b4cbacd1fc5ffb8c9a95ab7ff649e5178f",
+      "rationale": "Same binding acceptance is independently qualified within each explicitly named release scope; preserving all original wording is intentional.",
+      "requiredParts": [
+        "p0-1",
+        "p1-2",
+        "p2-3"
+      ],
+      "parts": [
+        {
+          "id": "p0-1",
+          "release": "P0",
+          "targets": [
+            "darwin-arm64",
+            "windows-amd64",
+            "linux-amd64"
+          ],
+          "track": "release",
+          "context": "P0 candidate: apply every stated acceptance obligation to the workflows and requirements committed at P0; all earlier-tier scopes remain independently required.",
+          "fragments": [
+            "Reconcile every discovered item, compare meaningful source content and asset bytes, report source omissions, and measure task/transcript quality. Repeated public speech and fixture HTTP servers remain useful regression inputs but do not establish general fidelity or live-account compatibility."
+          ],
+          "evidenceKind": "observation"
+        },
+        {
+          "id": "p1-2",
+          "release": "P1",
+          "targets": [
+            "darwin-arm64",
+            "windows-amd64",
+            "linux-amd64"
+          ],
+          "track": "release",
+          "context": "P1 candidate: apply every stated acceptance obligation to the workflows and requirements committed at P1; all earlier-tier scopes remain independently required.",
+          "fragments": [
+            "Reconcile every discovered item, compare meaningful source content and asset bytes, report source omissions, and measure task/transcript quality. Repeated public speech and fixture HTTP servers remain useful regression inputs but do not establish general fidelity or live-account compatibility."
+          ],
+          "evidenceKind": "observation"
+        },
+        {
+          "id": "p2-3",
+          "release": "P2",
+          "targets": [
+            "darwin-arm64",
+            "windows-amd64",
+            "linux-amd64"
+          ],
+          "track": "release",
+          "context": "P2 candidate: apply every stated acceptance obligation to the workflows and requirements committed at P2; all earlier-tier scopes remain independently required.",
+          "fragments": [
+            "Reconcile every discovered item, compare meaningful source content and asset bytes, report source omissions, and measure task/transcript quality. Repeated public speech and fixture HTTP servers remain useful regression inputs but do not establish general fidelity or live-account compatibility."
+          ],
+          "evidenceKind": "observation"
+        }
+      ]
+    },
+    "backlog:REL-007": {
+      "sourceSha256": "98e7514e4fe352c20fff0220fedb986b17e6959a119c8be712b9b86e7141f782",
+      "rationale": "Same binding acceptance is independently qualified within each explicitly named release scope; preserving all original wording is intentional.",
+      "requiredParts": [
+        "p0-1",
+        "p1-2",
+        "p2-3"
+      ],
+      "parts": [
+        {
+          "id": "p0-1",
+          "release": "P0",
+          "targets": [
+            "darwin-arm64",
+            "windows-amd64",
+            "linux-amd64"
+          ],
+          "track": "release",
+          "context": "P0 candidate: apply every stated acceptance obligation to the workflows and requirements committed at P0; all earlier-tier scopes remain independently required.",
+          "fragments": [
+            "Verify the declared approximately-two-second shell, under-300-ms common keyword search, under-one-second hybrid retrieval excluding optional reranking, and responsive editing against the agreed profiles. Record limits honestly; a 100-page hybrid benchmark or 10,000 simple pages is not evidence for all workloads."
+          ],
+          "evidenceKind": "observation"
+        },
+        {
+          "id": "p1-2",
+          "release": "P1",
+          "targets": [
+            "darwin-arm64",
+            "windows-amd64",
+            "linux-amd64"
+          ],
+          "track": "release",
+          "context": "P1 candidate: apply every stated acceptance obligation to the workflows and requirements committed at P1; all earlier-tier scopes remain independently required.",
+          "fragments": [
+            "Verify the declared approximately-two-second shell, under-300-ms common keyword search, under-one-second hybrid retrieval excluding optional reranking, and responsive editing against the agreed profiles. Record limits honestly; a 100-page hybrid benchmark or 10,000 simple pages is not evidence for all workloads."
+          ],
+          "evidenceKind": "observation"
+        },
+        {
+          "id": "p2-3",
+          "release": "P2",
+          "targets": [
+            "darwin-arm64",
+            "windows-amd64",
+            "linux-amd64"
+          ],
+          "track": "release",
+          "context": "P2 candidate: apply every stated acceptance obligation to the workflows and requirements committed at P2; all earlier-tier scopes remain independently required.",
+          "fragments": [
+            "Verify the declared approximately-two-second shell, under-300-ms common keyword search, under-one-second hybrid retrieval excluding optional reranking, and responsive editing against the agreed profiles. Record limits honestly; a 100-page hybrid benchmark or 10,000 simple pages is not evidence for all workloads."
+          ],
+          "evidenceKind": "observation"
+        }
+      ]
+    },
+    "backlog:REL-008": {
+      "sourceSha256": "38a679c4df8083cbdacca9c10100dc6cd567f988c1e21c6c397c4937122351d9",
+      "rationale": "Same binding acceptance is independently qualified within each explicitly named release scope; preserving all original wording is intentional.",
+      "requiredParts": [
+        "p0-1",
+        "p1-2",
+        "p2-3"
+      ],
+      "parts": [
+        {
+          "id": "p0-1",
+          "release": "P0",
+          "targets": [
+            "darwin-arm64",
+            "windows-amd64",
+            "linux-amd64"
+          ],
+          "track": "release",
+          "context": "P0 candidate: apply every stated acceptance obligation to the workflows and requirements committed at P0; all earlier-tier scopes remain independently required.",
+          "fragments": [
+            "Tests fail on the audited behavior and pass after the fix. Use independent expected outcomes and archive/content inspection; avoid tests that simply repeat implementation logic. Run affected existing suites and real integration paths before closing an item."
+          ],
+          "evidenceKind": "observation"
+        },
+        {
+          "id": "p1-2",
+          "release": "P1",
+          "targets": [
+            "darwin-arm64",
+            "windows-amd64",
+            "linux-amd64"
+          ],
+          "track": "release",
+          "context": "P1 candidate: apply every stated acceptance obligation to the workflows and requirements committed at P1; all earlier-tier scopes remain independently required.",
+          "fragments": [
+            "Tests fail on the audited behavior and pass after the fix. Use independent expected outcomes and archive/content inspection; avoid tests that simply repeat implementation logic. Run affected existing suites and real integration paths before closing an item."
+          ],
+          "evidenceKind": "observation"
+        },
+        {
+          "id": "p2-3",
+          "release": "P2",
+          "targets": [
+            "darwin-arm64",
+            "windows-amd64",
+            "linux-amd64"
+          ],
+          "track": "release",
+          "context": "P2 candidate: apply every stated acceptance obligation to the workflows and requirements committed at P2; all earlier-tier scopes remain independently required.",
+          "fragments": [
+            "Tests fail on the audited behavior and pass after the fix. Use independent expected outcomes and archive/content inspection; avoid tests that simply repeat implementation logic. Run affected existing suites and real integration paths before closing an item."
+          ],
+          "evidenceKind": "observation"
+        }
+      ]
+    },
+    "backlog:CORE-001": {
+      "sourceSha256": "0bcd72e174e923ecfd518b76a6c4aa684c3710a0dccc681cfc81dc9eddc61cbc",
+      "rationale": "The source explicitly assigns reversible merge editing to P1; all earlier preservation and table structure remain P0.",
+      "requiredParts": [
+        "table-structure",
+        "merge-editing"
+      ],
+      "parts": [
+        {
+          "id": "table-structure",
+          "release": "P0",
+          "targets": [
+            "darwin-arm64",
+            "windows-amd64",
+            "linux-amd64"
+          ],
+          "track": "release",
+          "context": "P0 table structure and preservation.",
+          "fragments": [
+            "Users can grow and shrink tables without dropping populated cells silently; header rendering, undo, import, export, and restart preserve structure."
+          ],
+          "evidenceKind": "observation"
+        },
+        {
+          "id": "merge-editing",
+          "release": "P1",
+          "targets": [
+            "darwin-arm64",
+            "windows-amd64",
+            "linux-amd64"
+          ],
+          "track": "release",
+          "context": "P1 reversible merged-cell editing.",
+          "fragments": [
+            "P1 merge/unmerge continues to preserve original cell content."
+          ],
+          "evidenceKind": "observation"
+        }
+      ]
+    },
+    "backlog:AI-003": {
+      "sourceSha256": "2cdb0c40e3be26385d6d2563b99dede624b8aa268f3827c7bdfe08c226860e46",
+      "rationale": "Backlog scope explicitly separates P0 memory from P1 related-content suggestions.",
+      "requiredParts": [
+        "memory",
+        "related-content"
+      ],
+      "parts": [
+        {
+          "id": "memory",
+          "release": "P0",
+          "targets": [
+            "darwin-arm64",
+            "windows-amd64",
+            "linux-amd64"
+          ],
+          "track": "release",
+          "context": "P0 real-model memory value, freshness, restoration and historical-backup explanation.",
+          "fragments": [
+            "Memory improves the declared task set without overriding newer authoritative records; stale/forgotten entries remain excluded during concurrent changes, including entries restored in those states; decisions cite evidence. Explain that restoring an older backup can recover earlier memory states: forgetting does not retroactively erase historical backups.",
+            "Existing memory lifecycle services remain the foundation."
+          ],
+          "evidenceKind": "observation"
+        },
+        {
+          "id": "related-content",
+          "release": "P1",
+          "targets": [
+            "darwin-arm64",
+            "windows-amd64",
+            "linux-amd64"
+          ],
+          "track": "release",
+          "context": "P1 semantic versus lexical related-content suggestions.",
+          "fragments": [
+            "Semantic and lexical suggestions are distinguishable and scope-safe."
+          ],
+          "evidenceKind": "observation"
+        }
+      ]
+    },
+    "backlog:GOV-004": {
+      "sourceSha256": "304463ee009a5a5e6243fe018adaf02b812d03edf2c945f94926b49e5a7332f9",
+      "rationale": "Full research-parity reconciliation is a separate programme closure obligation, as C0 explicitly allows unrelated fixes and P0 qualification to proceed. Existing accepted ledger requirements, including ADR-015, remain required.",
+      "requiredParts": [
+        "research-parity"
+      ],
+      "parts": [
+        {
+          "id": "research-parity",
+          "release": "P0",
+          "targets": [
+            "darwin-arm64",
+            "windows-amd64",
+            "linux-amd64"
+          ],
+          "track": "research_parity",
+          "context": "Obtain the referenced 307-behavior report and reconcile accepted behavior against the actual source. This remains open for programme completion. No release receipt can close it.",
+          "fragments": [
+            "Each accepted behavior has traceable evidence or an explicit unresolved state. Missing source wording is not invented. Research proposals do not become accepted features automatically. The CodeSwitchOS documents are design precedent, not a prerequisite for fixing known product defects."
+          ],
+          "evidenceKind": "observation"
+        }
+      ]
+    },
+    "backlog:REL-009": {
+      "sourceSha256": "a2b13689bc8bc1ad6e9b984028fbb31f387e84b5a3986260c52066b12ec4a331",
+      "rationale": "Platform acceptance is independent; a macOS-only release does not claim Windows or Linux support.",
+      "requiredParts": [
+        "windows",
+        "linux"
+      ],
+      "parts": [
+        {
+          "id": "windows",
+          "release": "P0",
+          "targets": [
+            "windows-amd64"
+          ],
+          "track": "release",
+          "context": "Windows release: all selected cumulative tier obligations need Windows evidence.",
+          "fragments": [
+            "Publish platform-specific supported features and evidence. Do not infer cross-platform readiness from Go portability or the macOS build."
+          ],
+          "evidenceKind": "observation"
+        },
+        {
+          "id": "linux",
+          "release": "P0",
+          "targets": [
+            "linux-amd64"
+          ],
+          "track": "release",
+          "context": "Linux release: all selected cumulative tier obligations need Linux evidence.",
+          "fragments": [
+            "Publish platform-specific supported features and evidence. Do not infer cross-platform readiness from Go portability or the macOS build."
+          ],
+          "evidenceKind": "observation"
+        }
+      ]
+    },
+    "requirement:FR-013:1": {
+      "sourceSha256": "04c8278f5653289b3dee671542b73f4c6b1ab3a1b1376c3d7bad3013b6dae032",
+      "rationale": "Same binding acceptance is independently qualified within each explicitly named release scope; preserving all original wording is intentional.",
+      "requiredParts": [
+        "p0-1",
+        "p1-2"
+      ],
+      "parts": [
+        {
+          "id": "p0-1",
+          "release": "P0",
+          "targets": [
+            "darwin-arm64",
+            "windows-amd64",
+            "linux-amd64"
+          ],
+          "track": "release",
+          "context": "Markdown/CSV current-content export and complete native backup.",
+          "fragments": [
+            "Export Markdown/CSV and a complete native backup; HTML/PDF export follows at P1."
+          ],
+          "evidenceKind": "observation"
+        },
+        {
+          "id": "p1-2",
+          "release": "P1",
+          "targets": [
+            "darwin-arm64",
+            "windows-amd64",
+            "linux-amd64"
+          ],
+          "track": "release",
+          "context": "HTML/PDF export and the unchanged P0 export/backup obligations.",
+          "fragments": [
+            "Export Markdown/CSV and a complete native backup; HTML/PDF export follows at P1."
+          ],
+          "evidenceKind": "observation"
+        }
+      ]
+    },
+    "requirement:R01:1": {
+      "sourceSha256": "6b1925a91fc537dca9ba858f8434cf6092998386720f3f1d350cb8e3d3d394d9",
+      "rationale": "Same binding acceptance is independently qualified within each explicitly named release scope; preserving all original wording is intentional.",
+      "requiredParts": [
+        "p0-1",
+        "p1-2"
+      ],
+      "parts": [
+        {
+          "id": "p0-1",
+          "release": "P0",
+          "targets": [
+            "darwin-arm64",
+            "windows-amd64",
+            "linux-amd64"
+          ],
+          "track": "release",
+          "context": "ZIP import fidelity and retained source evidence.",
+          "fragments": [
+            "ZIP P0; full HTML/API P1"
+          ],
+          "evidenceKind": "observation"
+        },
+        {
+          "id": "p1-2",
+          "release": "P1",
+          "targets": [
+            "darwin-arm64",
+            "windows-amd64",
+            "linux-amd64"
+          ],
+          "track": "release",
+          "context": "Full supported HTML/API reconstruction and fidelity.",
+          "fragments": [
+            "ZIP P0; full HTML/API P1"
+          ],
+          "evidenceKind": "observation"
+        }
+      ]
+    },
+    "requirement:R02:1": {
+      "sourceSha256": "bc7a66ccbb6b12a20d8a8597b1780b5ba0883519f4cefdd69c46c0078a32afc9",
+      "rationale": "Same binding acceptance is independently qualified within each explicitly named release scope; preserving all original wording is intentional.",
+      "requiredParts": [
+        "p0-1",
+        "p1-2"
+      ],
+      "parts": [
+        {
+          "id": "p0-1",
+          "release": "P0",
+          "targets": [
+            "darwin-arm64",
+            "windows-amd64",
+            "linux-amd64"
+          ],
+          "track": "release",
+          "context": "Canonical database and record identity.",
+          "fragments": [
+            "P0 identity; P1 linked views"
+          ],
+          "evidenceKind": "observation"
+        },
+        {
+          "id": "p1-2",
+          "release": "P1",
+          "targets": [
+            "darwin-arm64",
+            "windows-amd64",
+            "linux-amd64"
+          ],
+          "track": "release",
+          "context": "Linked-view editing/navigation with shared canonical records.",
+          "fragments": [
+            "P0 identity; P1 linked views"
+          ],
+          "evidenceKind": "observation"
+        }
+      ]
+    },
+    "requirement:R03:1": {
+      "sourceSha256": "31a4efe2bc6852e68124979ea86c759d880cc912b06b007a4a6b441b45a7e7ed",
+      "rationale": "Same binding acceptance is independently qualified within each explicitly named release scope; preserving all original wording is intentional.",
+      "requiredParts": [
+        "p0-1",
+        "p1-2"
+      ],
+      "parts": [
+        {
+          "id": "p0-1",
+          "release": "P0",
+          "targets": [
+            "darwin-arm64",
+            "windows-amd64",
+            "linux-amd64"
+          ],
+          "track": "release",
+          "context": "Preservation of supported and fallback content.",
+          "fragments": [
+            "P0 preservation; P1 editing controls"
+          ],
+          "evidenceKind": "observation"
+        },
+        {
+          "id": "p1-2",
+          "release": "P1",
+          "targets": [
+            "darwin-arm64",
+            "windows-amd64",
+            "linux-amd64"
+          ],
+          "track": "release",
+          "context": "Native editing controls for the committed P1 structures.",
+          "fragments": [
+            "P0 preservation; P1 editing controls"
+          ],
+          "evidenceKind": "observation"
+        }
+      ]
+    },
+    "requirement:R04:1": {
+      "sourceSha256": "e2a6ed5d8fcc1e6b8f6f5c19c37d87712fe96233f6b8368d7cdc19295828639d",
+      "rationale": "Same binding acceptance is independently qualified within each explicitly named release scope; preserving all original wording is intentional.",
+      "requiredParts": [
+        "p0-1",
+        "p1-2"
+      ],
+      "parts": [
+        {
+          "id": "p0-1",
+          "release": "P0",
+          "targets": [
+            "darwin-arm64",
+            "windows-amd64",
+            "linux-amd64"
+          ],
+          "track": "release",
+          "context": "Core editing quality and preservation of imported H4/spans/tabs.",
+          "fragments": [
+            "P0 editing quality/preservation; H4, spans and tabs native editing P1"
+          ],
+          "evidenceKind": "observation"
+        },
+        {
+          "id": "p1-2",
+          "release": "P1",
+          "targets": [
+            "darwin-arm64",
+            "windows-amd64",
+            "linux-amd64"
+          ],
+          "track": "release",
+          "context": "Native H4, span/merge and tab editing.",
+          "fragments": [
+            "P0 editing quality/preservation; H4, spans and tabs native editing P1"
+          ],
+          "evidenceKind": "observation"
+        }
+      ]
+    },
+    "requirement:R07:1": {
+      "sourceSha256": "82b1c3009e104f39271bf428a23abe70403f33d929e1d8d4ecc07cdac58d4382",
+      "rationale": "Same binding acceptance is independently qualified within each explicitly named release scope; preserving all original wording is intentional.",
+      "requiredParts": [
+        "p1-1",
+        "p2-2"
+      ],
+      "parts": [
+        {
+          "id": "p1-1",
+          "release": "P1",
+          "targets": [
+            "darwin-arm64",
+            "windows-amd64",
+            "linux-amd64"
+          ],
+          "track": "release",
+          "context": "Rules and recurrence committed to P1.",
+          "fragments": [
+            "P1 rules/recurrence; A048 row buttons remain P2"
+          ],
+          "evidenceKind": "observation"
+        },
+        {
+          "id": "p2-2",
+          "release": "P2",
+          "targets": [
+            "darwin-arm64",
+            "windows-amd64",
+            "linux-amd64"
+          ],
+          "track": "release",
+          "context": "A048 row-button actions committed to P2.",
+          "fragments": [
+            "P1 rules/recurrence; A048 row buttons remain P2"
+          ],
+          "evidenceKind": "observation"
+        }
+      ]
+    },
+    "requirement:PRD-EDITOR-002:1": {
+      "sourceSha256": "b2199fe42fe023f95cd3ffe40aa0ef485bf6e87e47584d29d2a7290f9419ff3f",
+      "rationale": "Same binding acceptance is independently qualified within each explicitly named release scope; preserving all original wording is intentional.",
+      "requiredParts": [
+        "p0-1",
+        "p1-2"
+      ],
+      "parts": [
+        {
+          "id": "p0-1",
+          "release": "P0",
+          "targets": [
+            "darwin-arm64",
+            "windows-amd64",
+            "linux-amd64"
+          ],
+          "track": "release",
+          "context": "H1-H3 editing and imported H4 preservation.",
+          "fragments": [
+            "H1-H3 editing at P0. Preserve imported H4 at P0; native H4 creation and outline behavior qualify at P1."
+          ],
+          "evidenceKind": "observation"
+        },
+        {
+          "id": "p1-2",
+          "release": "P1",
+          "targets": [
+            "darwin-arm64",
+            "windows-amd64",
+            "linux-amd64"
+          ],
+          "track": "release",
+          "context": "Native H4 creation and outline behavior.",
+          "fragments": [
+            "H1-H3 editing at P0. Preserve imported H4 at P0; native H4 creation and outline behavior qualify at P1."
+          ],
+          "evidenceKind": "observation"
+        }
+      ]
+    },
+    "requirement:PRD-EDITOR-010:1": {
+      "sourceSha256": "c857ca6e66b67ddd97836fd82793f445e8c74bcdf32367363be5c360262a536c",
+      "rationale": "Same binding acceptance is independently qualified within each explicitly named release scope; preserving all original wording is intentional.",
+      "requiredParts": [
+        "p0-1",
+        "p1-2"
+      ],
+      "parts": [
+        {
+          "id": "p0-1",
+          "release": "P0",
+          "targets": [
+            "darwin-arm64",
+            "windows-amd64",
+            "linux-amd64"
+          ],
+          "track": "release",
+          "context": "Core rows, columns, headers, spans and original cell-content preservation.",
+          "fragments": [
+            "Core rows/columns and headers at P0. Retain imported spans and original cell content; reversible merged-cell editing at P1."
+          ],
+          "evidenceKind": "observation"
+        },
+        {
+          "id": "p1-2",
+          "release": "P1",
+          "targets": [
+            "darwin-arm64",
+            "windows-amd64",
+            "linux-amd64"
+          ],
+          "track": "release",
+          "context": "Reversible merged-cell editing.",
+          "fragments": [
+            "Core rows/columns and headers at P0. Retain imported spans and original cell content; reversible merged-cell editing at P1."
+          ],
+          "evidenceKind": "observation"
+        }
+      ]
+    },
+    "requirement:PRD-EDITOR-025:1": {
+      "sourceSha256": "36aff09d6cc12a96fe4066c1dae7d5324dffbb5eb8bd87b4e0702f78c717d137",
+      "rationale": "Same binding acceptance is independently qualified within each explicitly named release scope; preserving all original wording is intentional.",
+      "requiredParts": [
+        "p0-1",
+        "p1-2"
+      ],
+      "parts": [
+        {
+          "id": "p0-1",
+          "release": "P0",
+          "targets": [
+            "darwin-arm64",
+            "windows-amd64",
+            "linux-amd64"
+          ],
+          "track": "release",
+          "context": "Preserve imported tab structures as fallback; this does not claim native tab editing.",
+          "fragments": [
+            "Structured tab containers with stable child IDs; P0 preserves uneditable imported structures as fallback."
+          ],
+          "evidenceKind": "observation"
+        },
+        {
+          "id": "p1-2",
+          "release": "P1",
+          "targets": [
+            "darwin-arm64",
+            "windows-amd64",
+            "linux-amd64"
+          ],
+          "track": "release",
+          "context": "Native structured tab containers with stable child IDs.",
+          "fragments": [
+            "Structured tab containers with stable child IDs; P0 preserves uneditable imported structures as fallback."
+          ],
+          "evidenceKind": "observation"
+        }
+      ]
+    },
+    "requirement:TRD-BLOCK-013:1": {
+      "sourceSha256": "626c9a09ed50b0db1f85fc93244c729a0d898c28835dcbd1b8739abee3c1a52d",
+      "rationale": "Same binding acceptance is independently qualified within each explicitly named release scope; preserving all original wording is intentional.",
+      "requiredParts": [
+        "p0-1",
+        "p1-2"
+      ],
+      "parts": [
+        {
+          "id": "p0-1",
+          "release": "P0",
+          "targets": [
+            "darwin-arm64",
+            "windows-amd64",
+            "linux-amd64"
+          ],
+          "track": "release",
+          "context": "Rows/cells, headers/widths and retained row/column spans and pre-merge content.",
+          "fragments": [
+            "rows/cells, headers and widths; retain row_span/col_span plus pre-merge content. P0 preserves spans; P1 reversible merge/unmerge editing."
+          ],
+          "evidenceKind": "observation"
+        },
+        {
+          "id": "p1-2",
+          "release": "P1",
+          "targets": [
+            "darwin-arm64",
+            "windows-amd64",
+            "linux-amd64"
+          ],
+          "track": "release",
+          "context": "Reversible merge/unmerge editing with full original-content preservation.",
+          "fragments": [
+            "rows/cells, headers and widths; retain row_span/col_span plus pre-merge content. P0 preserves spans; P1 reversible merge/unmerge editing."
+          ],
+          "evidenceKind": "observation"
+        }
+      ]
+    },
+    "requirement:TRD-BLOCK-029:1": {
+      "sourceSha256": "9e7afd31c01ae35d36658f9521735eef1296b6c1309333e021539c933b7bcf7b",
+      "rationale": "Same binding acceptance is independently qualified within each explicitly named release scope; preserving all original wording is intentional.",
+      "requiredParts": [
+        "p0-1",
+        "p1-2"
+      ],
+      "parts": [
+        {
+          "id": "p0-1",
+          "release": "P0",
+          "targets": [
+            "darwin-arm64",
+            "windows-amd64",
+            "linux-amd64"
+          ],
+          "track": "release",
+          "context": "Preserve original imported tab structure as fallback.",
+          "fragments": [
+            "tabs[{id,title,icon?,children}], presentation state separate; preserve original imported structure at P0."
+          ],
+          "evidenceKind": "observation"
+        },
+        {
+          "id": "p1-2",
+          "release": "P1",
+          "targets": [
+            "darwin-arm64",
+            "windows-amd64",
+            "linux-amd64"
+          ],
+          "track": "release",
+          "context": "Native tabs with stable IDs/children and separate presentation state.",
+          "fragments": [
+            "tabs[{id,title,icon?,children}], presentation state separate; preserve original imported structure at P0."
+          ],
+          "evidenceKind": "observation"
+        }
+      ]
+    },
+    "requirement:PRD-MEDIA-008:1": {
+      "sourceSha256": "ecba0eb89343816ae71866b5970e2574b8ead9a7a82dbc805f8c472d0e8d31ef",
+      "rationale": "Same binding acceptance is independently qualified within each explicitly named release scope; preserving all original wording is intentional.",
+      "requiredParts": [
+        "p1-1",
+        "p2-2"
+      ],
+      "parts": [
+        {
+          "id": "p1-1",
+          "release": "P1",
+          "targets": [
+            "darwin-arm64",
+            "windows-amd64",
+            "linux-amd64"
+          ],
+          "track": "release",
+          "context": "Capture and save original image.",
+          "fragments": [
+            "Capture and save image at P1; local OCR/vision analysis remains P2."
+          ],
+          "evidenceKind": "observation"
+        },
+        {
+          "id": "p2-2",
+          "release": "P2",
+          "targets": [
+            "darwin-arm64",
+            "windows-amd64",
+            "linux-amd64"
+          ],
+          "track": "release",
+          "context": "Local OCR and the selected local image-understanding scope.",
+          "fragments": [
+            "Capture and save image at P1; local OCR/vision analysis remains P2."
+          ],
+          "evidenceKind": "observation"
+        }
+      ]
+    },
+    "requirement:TRD-CONSTRAINT-022:1": {
+      "sourceSha256": "77c6fef3c71a9e492debcfb849d97c98aac2f2eb0ef5530f6f7a4d561950bcb2",
+      "rationale": "Same binding acceptance is independently qualified within each explicitly named release scope; preserving all original wording is intentional.",
+      "requiredParts": [
+        "p0-1",
+        "p1-2"
+      ],
+      "parts": [
+        {
+          "id": "p0-1",
+          "release": "P0",
+          "targets": [
+            "darwin-arm64",
+            "windows-amd64",
+            "linux-amd64"
+          ],
+          "track": "release",
+          "context": "Versioned filter AST, stable sorts/groups/view settings and parameterized SQLite queries for the P0 contract.",
+          "fragments": [
+            "Versioned filter AST, stable sorts/groups and view settings; parameterized SQLite queries; P1 relation/rollup/formula behavior remains separately qualified."
+          ],
+          "evidenceKind": "observation"
+        },
+        {
+          "id": "p1-2",
+          "release": "P1",
+          "targets": [
+            "darwin-arm64",
+            "windows-amd64",
+            "linux-amd64"
+          ],
+          "track": "release",
+          "context": "Advanced P1 relation/rollup/formula behavior, independently qualified against its declared contract.",
+          "fragments": [
+            "Versioned filter AST, stable sorts/groups and view settings; parameterized SQLite queries; P1 relation/rollup/formula behavior remains separately qualified."
+          ],
+          "evidenceKind": "observation"
+        }
+      ]
+    },
+    "requirement:PRD-PROPERTY-017-P0:1": {
+      "sourceSha256": "8205f10928195b6e53d4699704c13199c14ffd63e073ee2e0b28cef7d5c1d947",
+      "rationale": "Same binding acceptance is independently qualified within each explicitly named release scope; preserving all original wording is intentional.",
+      "requiredParts": [
+        "p0-1"
+      ],
+      "parts": [
+        {
+          "id": "p0-1",
+          "release": "P0",
+          "targets": [
+            "darwin-arm64",
+            "windows-amd64",
+            "linux-amd64"
+          ],
+          "track": "release",
+          "context": "The authoritative P0 portion named by this source row. P0 requires preservation/core behavior; P1 requires its explicitly committed native editing controls. Shared exclusions and identity/provenance requirements remain binding.",
+          "fragments": [
+            "P0 portion of: Preserve Person/group and creator/editor labels and IDs at P0; editable controls at P1. No collaboration accounts."
+          ],
+          "evidenceKind": "observation"
+        }
+      ]
+    },
+    "requirement:PRD-PROPERTY-017-P1:1": {
+      "sourceSha256": "ea413a92f9a5dab47f6018ed73ec74a0ce7eebc7da21a31946cdb8075494e2cc",
+      "rationale": "Same binding acceptance is independently qualified within each explicitly named release scope; preserving all original wording is intentional.",
+      "requiredParts": [
+        "p1-1"
+      ],
+      "parts": [
+        {
+          "id": "p1-1",
+          "release": "P1",
+          "targets": [
+            "darwin-arm64",
+            "windows-amd64",
+            "linux-amd64"
+          ],
+          "track": "release",
+          "context": "The authoritative P1 portion named by this source row. P0 requires preservation/core behavior; P1 requires its explicitly committed native editing controls. Shared exclusions and identity/provenance requirements remain binding.",
+          "fragments": [
+            "P1 portion of: Preserve Person/group and creator/editor labels and IDs at P0; editable controls at P1. No collaboration accounts."
+          ],
+          "evidenceKind": "observation"
+        }
+      ]
+    },
+    "requirement:PRD-PROPERTY-018-P0:1": {
+      "sourceSha256": "bfdc6b808bd4739d45f55c35c2a248635e9033241964ae34f0f236dd8370ee96",
+      "rationale": "Same binding acceptance is independently qualified within each explicitly named release scope; preserving all original wording is intentional.",
+      "requiredParts": [
+        "p0-1"
+      ],
+      "parts": [
+        {
+          "id": "p0-1",
+          "release": "P0",
+          "targets": [
+            "darwin-arm64",
+            "windows-amd64",
+            "linux-amd64"
+          ],
+          "track": "release",
+          "context": "The authoritative P0 portion named by this source row. P0 requires preservation/core behavior; P1 requires its explicitly committed native editing controls. Shared exclusions and identity/provenance requirements remain binding.",
+          "fragments": [
+            "P0 portion of: Preserve source labels and supplied coordinates at P0; edit at P1. Online maps are a separate later feature."
+          ],
+          "evidenceKind": "observation"
+        }
+      ]
+    },
+    "requirement:PRD-PROPERTY-018-P1:1": {
+      "sourceSha256": "896fa32d4c46ee788c10a27f129e562a7a1ee02f8289bafebf681ee245fc79bc",
+      "rationale": "Same binding acceptance is independently qualified within each explicitly named release scope; preserving all original wording is intentional.",
+      "requiredParts": [
+        "p1-1"
+      ],
+      "parts": [
+        {
+          "id": "p1-1",
+          "release": "P1",
+          "targets": [
+            "darwin-arm64",
+            "windows-amd64",
+            "linux-amd64"
+          ],
+          "track": "release",
+          "context": "The authoritative P1 portion named by this source row. P0 requires preservation/core behavior; P1 requires its explicitly committed native editing controls. Shared exclusions and identity/provenance requirements remain binding.",
+          "fragments": [
+            "P1 portion of: Preserve source labels and supplied coordinates at P0; edit at P1. Online maps are a separate later feature."
+          ],
+          "evidenceKind": "observation"
+        }
+      ]
+    },
+    "requirement:TRD-BLOCK-002-P0:1": {
+      "sourceSha256": "8a59ad16e1bbea2e43ed4017d1c334537cd0bf4a4aff3f7db9ae62609ccb032b",
+      "rationale": "Same binding acceptance is independently qualified within each explicitly named release scope; preserving all original wording is intentional.",
+      "requiredParts": [
+        "p0-1"
+      ],
+      "parts": [
+        {
+          "id": "p0-1",
+          "release": "P0",
+          "targets": [
+            "darwin-arm64",
+            "windows-amd64",
+            "linux-amd64"
+          ],
+          "track": "release",
+          "context": "The authoritative P0 portion named by this source row. P0 requires preservation/core behavior; P1 requires its explicitly committed native editing controls. Shared exclusions and identity/provenance requirements remain binding.",
+          "fragments": [
+            "P0 portion of: H1-H3 editable P0; H4 preserved P0 and editable P1. Stable anchor and semantic level; validate outline/TOC behavior."
+          ],
+          "evidenceKind": "observation"
+        }
+      ]
+    },
+    "requirement:TRD-BLOCK-002-P1:1": {
+      "sourceSha256": "085eee22a28abff4eeb28929f98183ef888e5d37da81cb77e0c92f84ea719eae",
+      "rationale": "Same binding acceptance is independently qualified within each explicitly named release scope; preserving all original wording is intentional.",
+      "requiredParts": [
+        "p1-1"
+      ],
+      "parts": [
+        {
+          "id": "p1-1",
+          "release": "P1",
+          "targets": [
+            "darwin-arm64",
+            "windows-amd64",
+            "linux-amd64"
+          ],
+          "track": "release",
+          "context": "The authoritative P1 portion named by this source row. P0 requires preservation/core behavior; P1 requires its explicitly committed native editing controls. Shared exclusions and identity/provenance requirements remain binding.",
+          "fragments": [
+            "P1 portion of: H1-H3 editable P0; H4 preserved P0 and editable P1. Stable anchor and semantic level; validate outline/TOC behavior."
+          ],
+          "evidenceKind": "observation"
+        }
+      ]
+    },
+    "requirement:TRD-TYPE-018-P0:1": {
+      "sourceSha256": "4bef9df37403bd4ecba8833c490378079e8e4b6cf5ebe0e0424b0afcc25592d6",
+      "rationale": "Same binding acceptance is independently qualified within each explicitly named release scope; preserving all original wording is intentional.",
+      "requiredParts": [
+        "p0-1"
+      ],
+      "parts": [
+        {
+          "id": "p0-1",
+          "release": "P0",
+          "targets": [
+            "darwin-arm64",
+            "windows-amd64",
+            "linux-amd64"
+          ],
+          "track": "release",
+          "context": "The authoritative P0 portion named by this source row. P0 requires preservation/core behavior; P1 requires its explicitly committed native editing controls. Shared exclusions and identity/provenance requirements remain binding.",
+          "fragments": [
+            "P0 portion of: P0 retains source IDs, labels and provenance; P1 editable controls. No collaboration accounts."
+          ],
+          "evidenceKind": "observation"
+        }
+      ]
+    },
+    "requirement:TRD-TYPE-018-P1:1": {
+      "sourceSha256": "438bc44072094267e25c0d5d93a5b508751105ebf9f2c291f3dd559b3982d5f4",
+      "rationale": "Same binding acceptance is independently qualified within each explicitly named release scope; preserving all original wording is intentional.",
+      "requiredParts": [
+        "p1-1"
+      ],
+      "parts": [
+        {
+          "id": "p1-1",
+          "release": "P1",
+          "targets": [
+            "darwin-arm64",
+            "windows-amd64",
+            "linux-amd64"
+          ],
+          "track": "release",
+          "context": "The authoritative P1 portion named by this source row. P0 requires preservation/core behavior; P1 requires its explicitly committed native editing controls. Shared exclusions and identity/provenance requirements remain binding.",
+          "fragments": [
+            "P1 portion of: P0 retains source IDs, labels and provenance; P1 editable controls. No collaboration accounts."
+          ],
+          "evidenceKind": "observation"
+        }
+      ]
+    },
+    "requirement:TRD-TYPE-019-P0:1": {
+      "sourceSha256": "b5f48e960f7e0db811d8ff127db27f6682247298613dfbb9e7e1cf792a74e3fc",
+      "rationale": "Same binding acceptance is independently qualified within each explicitly named release scope; preserving all original wording is intentional.",
+      "requiredParts": [
+        "p0-1"
+      ],
+      "parts": [
+        {
+          "id": "p0-1",
+          "release": "P0",
+          "targets": [
+            "darwin-arm64",
+            "windows-amd64",
+            "linux-amd64"
+          ],
+          "track": "release",
+          "context": "The authoritative P0 portion named by this source row. P0 requires preservation/core behavior; P1 requires its explicitly committed native editing controls. Shared exclusions and identity/provenance requirements remain binding.",
+          "fragments": [
+            "P0 portion of: P0 raw source plus supplied label/address/coordinates; P1 edit. Maps separately scoped."
+          ],
+          "evidenceKind": "observation"
+        }
+      ]
+    },
+    "requirement:TRD-TYPE-019-P1:1": {
+      "sourceSha256": "72d71c7d4f7165b2bf3886a11f364b290e4f899bf9fec9e8d614dc28439d2e4c",
+      "rationale": "Same binding acceptance is independently qualified within each explicitly named release scope; preserving all original wording is intentional.",
+      "requiredParts": [
+        "p1-1"
+      ],
+      "parts": [
+        {
+          "id": "p1-1",
+          "release": "P1",
+          "targets": [
+            "darwin-arm64",
+            "windows-amd64",
+            "linux-amd64"
+          ],
+          "track": "release",
+          "context": "The authoritative P1 portion named by this source row. P0 requires preservation/core behavior; P1 requires its explicitly committed native editing controls. Shared exclusions and identity/provenance requirements remain binding.",
+          "fragments": [
+            "P1 portion of: P0 raw source plus supplied label/address/coordinates; P1 edit. Maps separately scoped."
+          ],
+          "evidenceKind": "observation"
+        }
+      ]
+    },
+    "requirement:V01:1": {
+      "sourceSha256": "e5534950a66613722996773bb2d781b619121262f67ffd193ffbc998ae992c24",
+      "rationale": "Same binding acceptance is independently qualified within each explicitly named release scope; preserving all original wording is intentional.",
+      "requiredParts": [
+        "p0-1",
+        "p1-2"
+      ],
+      "parts": [
+        {
+          "id": "p0-1",
+          "release": "P0",
+          "targets": [
+            "darwin-arm64",
+            "windows-amd64",
+            "linux-amd64"
+          ],
+          "track": "release",
+          "context": "P0 canonical identity, moves/retries and supported import sources.",
+          "fragments": [
+            "Multiple sources, linked views, moves and retries preserve one canonical record set."
+          ],
+          "evidenceKind": "observation"
+        },
+        {
+          "id": "p1-2",
+          "release": "P1",
+          "targets": [
+            "darwin-arm64",
+            "windows-amd64",
+            "linux-amd64"
+          ],
+          "track": "release",
+          "context": "P1 linked views and multiple API data sources.",
+          "fragments": [
+            "Multiple sources, linked views, moves and retries preserve one canonical record set."
+          ],
+          "evidenceKind": "observation"
+        }
+      ]
+    },
+    "requirement:V01:2": {
+      "sourceSha256": "0b773edb865e18e37cd937fe9d19dce40660fb8458d6d0b5559863aa3ca6d7bb",
+      "rationale": "Same binding acceptance is independently qualified within each explicitly named release scope; preserving all original wording is intentional.",
+      "requiredParts": [
+        "p0-1",
+        "p1-2"
+      ],
+      "parts": [
+        {
+          "id": "p0-1",
+          "release": "P0",
+          "targets": [
+            "darwin-arm64",
+            "windows-amd64",
+            "linux-amd64"
+          ],
+          "track": "release",
+          "context": "P0 canonical identity, moves/retries and supported import sources.",
+          "fragments": [
+            "Qualify P0 and P1 portions independently; a passing P0 subset cannot verify P1 behavior."
+          ],
+          "evidenceKind": "observation"
+        },
+        {
+          "id": "p1-2",
+          "release": "P1",
+          "targets": [
+            "darwin-arm64",
+            "windows-amd64",
+            "linux-amd64"
+          ],
+          "track": "release",
+          "context": "P1 linked views and multiple API data sources.",
+          "fragments": [
+            "Qualify P0 and P1 portions independently; a passing P0 subset cannot verify P1 behavior."
+          ],
+          "evidenceKind": "observation"
+        }
+      ]
+    },
+    "requirement:V02:1": {
+      "sourceSha256": "b844853f373257551b3a9aa5c311f2c7b6032b59c9b2befc20ab40f353c98607",
+      "rationale": "Same binding acceptance is independently qualified within each explicitly named release scope; preserving all original wording is intentional.",
+      "requiredParts": [
+        "p0-1",
+        "p1-2"
+      ],
+      "parts": [
+        {
+          "id": "p0-1",
+          "release": "P0",
+          "targets": [
+            "darwin-arm64",
+            "windows-amd64",
+            "linux-amd64"
+          ],
+          "track": "release",
+          "context": "P0 ZIP import inventories, restrictions and interruption.",
+          "fragments": [
+            "ZIP and P1 HTML/API fixtures account for items, pagination, restricted roots and interrupted downloads."
+          ],
+          "evidenceKind": "observation"
+        },
+        {
+          "id": "p1-2",
+          "release": "P1",
+          "targets": [
+            "darwin-arm64",
+            "windows-amd64",
+            "linux-amd64"
+          ],
+          "track": "release",
+          "context": "P1 HTML/API pagination, downloads, authorized roots and interruption.",
+          "fragments": [
+            "ZIP and P1 HTML/API fixtures account for items, pagination, restricted roots and interrupted downloads."
+          ],
+          "evidenceKind": "observation"
+        }
+      ]
+    },
+    "requirement:V02:2": {
+      "sourceSha256": "d1355084c9da5163d4d18d7ba40a1efd3ad7ff06ec64acb6392dad84afb2e1f2",
+      "rationale": "Same binding acceptance is independently qualified within each explicitly named release scope; preserving all original wording is intentional.",
+      "requiredParts": [
+        "p0-1",
+        "p1-2"
+      ],
+      "parts": [
+        {
+          "id": "p0-1",
+          "release": "P0",
+          "targets": [
+            "darwin-arm64",
+            "windows-amd64",
+            "linux-amd64"
+          ],
+          "track": "release",
+          "context": "P0 ZIP import inventories, restrictions and interruption.",
+          "fragments": [
+            "Qualify P0 and P1 portions independently; a passing P0 subset cannot verify P1 behavior."
+          ],
+          "evidenceKind": "observation"
+        },
+        {
+          "id": "p1-2",
+          "release": "P1",
+          "targets": [
+            "darwin-arm64",
+            "windows-amd64",
+            "linux-amd64"
+          ],
+          "track": "release",
+          "context": "P1 HTML/API pagination, downloads, authorized roots and interruption.",
+          "fragments": [
+            "Qualify P0 and P1 portions independently; a passing P0 subset cannot verify P1 behavior."
+          ],
+          "evidenceKind": "observation"
+        }
+      ]
+    },
+    "requirement:V03:1": {
+      "sourceSha256": "8accbb91316907d71081c6bc5289ad57694df0b06b95f14d4d282718ced53128",
+      "rationale": "Same binding acceptance is independently qualified within each explicitly named release scope; preserving all original wording is intentional.",
+      "requiredParts": [
+        "p0-1",
+        "p1-2"
+      ],
+      "parts": [
+        {
+          "id": "p0-1",
+          "release": "P0",
+          "targets": [
+            "darwin-arm64",
+            "windows-amd64",
+            "linux-amd64"
+          ],
+          "track": "release",
+          "context": "P0 source metadata and unsupported-value backup preservation.",
+          "fragments": [
+            "People, timestamps, places, comments and unsupported values survive backup without invented metadata."
+          ],
+          "evidenceKind": "observation"
+        },
+        {
+          "id": "p1-2",
+          "release": "P1",
+          "targets": [
+            "darwin-arm64",
+            "windows-amd64",
+            "linux-amd64"
+          ],
+          "track": "release",
+          "context": "P1 editable/captured metadata and comments, where committed, with the same preservation rule.",
+          "fragments": [
+            "People, timestamps, places, comments and unsupported values survive backup without invented metadata."
+          ],
+          "evidenceKind": "observation"
+        }
+      ]
+    },
+    "requirement:V03:2": {
+      "sourceSha256": "9cee8d3b4e2a591b3fae832eef1c7293112eb4171c77b1102a6722c93a8890c5",
+      "rationale": "Same binding acceptance is independently qualified within each explicitly named release scope; preserving all original wording is intentional.",
+      "requiredParts": [
+        "p0-1",
+        "p1-2"
+      ],
+      "parts": [
+        {
+          "id": "p0-1",
+          "release": "P0",
+          "targets": [
+            "darwin-arm64",
+            "windows-amd64",
+            "linux-amd64"
+          ],
+          "track": "release",
+          "context": "P0 source metadata and unsupported-value backup preservation.",
+          "fragments": [
+            "Qualify P0 and P1 portions independently; a passing P0 subset cannot verify P1 behavior."
+          ],
+          "evidenceKind": "observation"
+        },
+        {
+          "id": "p1-2",
+          "release": "P1",
+          "targets": [
+            "darwin-arm64",
+            "windows-amd64",
+            "linux-amd64"
+          ],
+          "track": "release",
+          "context": "P1 editable/captured metadata and comments, where committed, with the same preservation rule.",
+          "fragments": [
+            "Qualify P0 and P1 portions independently; a passing P0 subset cannot verify P1 behavior."
+          ],
+          "evidenceKind": "observation"
+        }
+      ]
+    },
+    "requirement:V04:1": {
+      "sourceSha256": "8b2a934e4ad774446244d07bf89b36a6c4968e46155d0b3cc384da44b964dba3",
+      "rationale": "Same binding acceptance is independently qualified within each explicitly named release scope; preserving all original wording is intentional.",
+      "requiredParts": [
+        "p0-1",
+        "p1-2"
+      ],
+      "parts": [
+        {
+          "id": "p0-1",
+          "release": "P0",
+          "targets": [
+            "darwin-arm64",
+            "windows-amd64",
+            "linux-amd64"
+          ],
+          "track": "release",
+          "context": "P0 core clipboard/composition/undo and preservation of imported spans/tabs.",
+          "fragments": [
+            "Mixed clipboard operations, input composition, spans, tabs and undo preserve canonical content."
+          ],
+          "evidenceKind": "observation"
+        },
+        {
+          "id": "p1-2",
+          "release": "P1",
+          "targets": [
+            "darwin-arm64",
+            "windows-amd64",
+            "linux-amd64"
+          ],
+          "track": "release",
+          "context": "P1 native span/tab/layout editing and the same clipboard/composition/undo rule.",
+          "fragments": [
+            "Mixed clipboard operations, input composition, spans, tabs and undo preserve canonical content."
+          ],
+          "evidenceKind": "observation"
+        }
+      ]
+    },
+    "requirement:V04:2": {
+      "sourceSha256": "0d04987bdb4c0e123e88248d6676e63dd08c61e807008de17cd2c6ccfe811b92",
+      "rationale": "Same binding acceptance is independently qualified within each explicitly named release scope; preserving all original wording is intentional.",
+      "requiredParts": [
+        "p0-1",
+        "p1-2"
+      ],
+      "parts": [
+        {
+          "id": "p0-1",
+          "release": "P0",
+          "targets": [
+            "darwin-arm64",
+            "windows-amd64",
+            "linux-amd64"
+          ],
+          "track": "release",
+          "context": "P0 core clipboard/composition/undo and preservation of imported spans/tabs.",
+          "fragments": [
+            "Qualify P0 and P1 portions independently; a passing P0 subset cannot verify P1 behavior."
+          ],
+          "evidenceKind": "observation"
+        },
+        {
+          "id": "p1-2",
+          "release": "P1",
+          "targets": [
+            "darwin-arm64",
+            "windows-amd64",
+            "linux-amd64"
+          ],
+          "track": "release",
+          "context": "P1 native span/tab/layout editing and the same clipboard/composition/undo rule.",
+          "fragments": [
+            "Qualify P0 and P1 portions independently; a passing P0 subset cannot verify P1 behavior."
+          ],
+          "evidenceKind": "observation"
+        }
+      ]
+    },
+    "requirement:V06:1": {
+      "sourceSha256": "2ccc98335ab8d38a6dcbead36befd3e4d832ad928d5257e3bad25c820343f46e",
+      "rationale": "Same binding acceptance is independently qualified within each explicitly named release scope; preserving all original wording is intentional.",
+      "requiredParts": [
+        "p0-1",
+        "p1-2"
+      ],
+      "parts": [
+        {
+          "id": "p0-1",
+          "release": "P0",
+          "targets": [
+            "darwin-arm64",
+            "windows-amd64",
+            "linux-amd64"
+          ],
+          "track": "release",
+          "context": "P0 page/trash/workspace recovery and supported record bodies/assets.",
+          "fragments": [
+            "Page/trash/workspace restoration respects boundaries and restores record bodies plus attachment hashes."
+          ],
+          "evidenceKind": "observation"
+        },
+        {
+          "id": "p1-2",
+          "release": "P1",
+          "targets": [
+            "darwin-arm64",
+            "windows-amd64",
+            "linux-amd64"
+          ],
+          "track": "release",
+          "context": "P1 advanced content/view recovery within the same explicit boundaries.",
+          "fragments": [
+            "Page/trash/workspace restoration respects boundaries and restores record bodies plus attachment hashes."
+          ],
+          "evidenceKind": "observation"
+        }
+      ]
+    },
+    "requirement:V06:2": {
+      "sourceSha256": "c8941ee090130939ee1d897f6841e627df928666e6d66b0ee80fad2f50434400",
+      "rationale": "Same binding acceptance is independently qualified within each explicitly named release scope; preserving all original wording is intentional.",
+      "requiredParts": [
+        "p0-1",
+        "p1-2"
+      ],
+      "parts": [
+        {
+          "id": "p0-1",
+          "release": "P0",
+          "targets": [
+            "darwin-arm64",
+            "windows-amd64",
+            "linux-amd64"
+          ],
+          "track": "release",
+          "context": "P0 page/trash/workspace recovery and supported record bodies/assets.",
+          "fragments": [
+            "Qualify P0 and P1 portions independently; a passing P0 subset cannot verify P1 behavior."
+          ],
+          "evidenceKind": "observation"
+        },
+        {
+          "id": "p1-2",
+          "release": "P1",
+          "targets": [
+            "darwin-arm64",
+            "windows-amd64",
+            "linux-amd64"
+          ],
+          "track": "release",
+          "context": "P1 advanced content/view recovery within the same explicit boundaries.",
+          "fragments": [
+            "Qualify P0 and P1 portions independently; a passing P0 subset cannot verify P1 behavior."
+          ],
+          "evidenceKind": "observation"
+        }
+      ]
+    },
+    "requirement:V08:1": {
+      "sourceSha256": "c7320130784d2284662eadec6541c1a0375ceefdf8dd51d80ebf2994e80a6b54",
+      "rationale": "Same binding acceptance is independently qualified within each explicitly named release scope; preserving all original wording is intentional.",
+      "requiredParts": [
+        "p0-1",
+        "p1-2"
+      ],
+      "parts": [
+        {
+          "id": "p0-1",
+          "release": "P0",
+          "targets": [
+            "darwin-arm64",
+            "windows-amd64",
+            "linux-amd64"
+          ],
+          "track": "release",
+          "context": "P0 offline workflows; later-tier schedules/features are not prerequisites.",
+          "fragments": [
+            "The release's editing, databases, search, models and local schedules work without network access."
+          ],
+          "evidenceKind": "observation"
+        },
+        {
+          "id": "p1-2",
+          "release": "P1",
+          "targets": [
+            "darwin-arm64",
+            "windows-amd64",
+            "linux-amd64"
+          ],
+          "track": "release",
+          "context": "P1 offline workflows including committed local schedules.",
+          "fragments": [
+            "The release's editing, databases, search, models and local schedules work without network access."
+          ],
+          "evidenceKind": "observation"
+        }
+      ]
+    },
+    "requirement:V08:2": {
+      "sourceSha256": "86b1b1e7ff26feff22929a0015196960221d16faae4153f1cd389b6a1ccb47ed",
+      "rationale": "Same binding acceptance is independently qualified within each explicitly named release scope; preserving all original wording is intentional.",
+      "requiredParts": [
+        "p0-1",
+        "p1-2"
+      ],
+      "parts": [
+        {
+          "id": "p0-1",
+          "release": "P0",
+          "targets": [
+            "darwin-arm64",
+            "windows-amd64",
+            "linux-amd64"
+          ],
+          "track": "release",
+          "context": "P0 offline workflows; later-tier schedules/features are not prerequisites.",
+          "fragments": [
+            "Qualify P0 and P1 portions independently; a passing P0 subset cannot verify P1 behavior."
+          ],
+          "evidenceKind": "observation"
+        },
+        {
+          "id": "p1-2",
+          "release": "P1",
+          "targets": [
+            "darwin-arm64",
+            "windows-amd64",
+            "linux-amd64"
+          ],
+          "track": "release",
+          "context": "P1 offline workflows including committed local schedules.",
+          "fragments": [
+            "Qualify P0 and P1 portions independently; a passing P0 subset cannot verify P1 behavior."
+          ],
+          "evidenceKind": "observation"
+        }
+      ]
+    },
+    "requirement:V09:1": {
+      "sourceSha256": "bf5f333272c7dfaacfe1f3830198b5a31a8bcc092416d61dd58c1a43ace0eaaf",
+      "rationale": "Same binding acceptance is independently qualified within each explicitly named release scope; preserving all original wording is intentional.",
+      "requiredParts": [
+        "p0-1",
+        "p1-2"
+      ],
+      "parts": [
+        {
+          "id": "p0-1",
+          "release": "P0",
+          "targets": [
+            "darwin-arm64",
+            "windows-amd64",
+            "linux-amd64"
+          ],
+          "track": "release",
+          "context": "P0 retrieval, memory and local-AI evidence/citation behavior.",
+          "fragments": [
+            "Stale, deleted and contradictory sources yield correct citations or explicit uncertainty."
+          ],
+          "evidenceKind": "observation"
+        },
+        {
+          "id": "p1-2",
+          "release": "P1",
+          "targets": [
+            "darwin-arm64",
+            "windows-amd64",
+            "linux-amd64"
+          ],
+          "track": "release",
+          "context": "P1 expanded AI modes and related-content evidence/citation behavior.",
+          "fragments": [
+            "Stale, deleted and contradictory sources yield correct citations or explicit uncertainty."
+          ],
+          "evidenceKind": "observation"
+        }
+      ]
+    },
+    "requirement:V09:2": {
+      "sourceSha256": "032b07b421924085316c635be2dc05833ce35475bde75ec7b0ec04e3ae0a102b",
+      "rationale": "Same binding acceptance is independently qualified within each explicitly named release scope; preserving all original wording is intentional.",
+      "requiredParts": [
+        "p0-1",
+        "p1-2"
+      ],
+      "parts": [
+        {
+          "id": "p0-1",
+          "release": "P0",
+          "targets": [
+            "darwin-arm64",
+            "windows-amd64",
+            "linux-amd64"
+          ],
+          "track": "release",
+          "context": "P0 retrieval, memory and local-AI evidence/citation behavior.",
+          "fragments": [
+            "Qualify P0 and P1 portions independently; a passing P0 subset cannot verify P1 behavior."
+          ],
+          "evidenceKind": "observation"
+        },
+        {
+          "id": "p1-2",
+          "release": "P1",
+          "targets": [
+            "darwin-arm64",
+            "windows-amd64",
+            "linux-amd64"
+          ],
+          "track": "release",
+          "context": "P1 expanded AI modes and related-content evidence/citation behavior.",
+          "fragments": [
+            "Qualify P0 and P1 portions independently; a passing P0 subset cannot verify P1 behavior."
+          ],
+          "evidenceKind": "observation"
+        }
+      ]
+    },
+    "requirement:V10:1": {
+      "sourceSha256": "550d897e006211bf35f39c4565a043c21eeac1f980b9751c973b6027fc854cb1",
+      "rationale": "Same binding acceptance is independently qualified within each explicitly named release scope; preserving all original wording is intentional.",
+      "requiredParts": [
+        "p0-1",
+        "p1-2"
+      ],
+      "parts": [
+        {
+          "id": "p0-1",
+          "release": "P0",
+          "targets": [
+            "darwin-arm64",
+            "windows-amd64",
+            "linux-amd64"
+          ],
+          "track": "release",
+          "context": "P0 local tools and guarded service mutation boundary.",
+          "fragments": [
+            "Local and external tools enforce scope, revisions and approval policy through the same mutation services."
+          ],
+          "evidenceKind": "observation"
+        },
+        {
+          "id": "p1-2",
+          "release": "P1",
+          "targets": [
+            "darwin-arm64",
+            "windows-amd64",
+            "linux-amd64"
+          ],
+          "track": "release",
+          "context": "P1 external clients/providers plus the unchanged local mutation boundary.",
+          "fragments": [
+            "Local and external tools enforce scope, revisions and approval policy through the same mutation services."
+          ],
+          "evidenceKind": "observation"
+        }
+      ]
+    },
+    "requirement:V10:2": {
+      "sourceSha256": "aad5f293e756135054aff8b8dde42f463e5aee4e9e16bee30d9a369940e50986",
+      "rationale": "Same binding acceptance is independently qualified within each explicitly named release scope; preserving all original wording is intentional.",
+      "requiredParts": [
+        "p0-1",
+        "p1-2"
+      ],
+      "parts": [
+        {
+          "id": "p0-1",
+          "release": "P0",
+          "targets": [
+            "darwin-arm64",
+            "windows-amd64",
+            "linux-amd64"
+          ],
+          "track": "release",
+          "context": "P0 local tools and guarded service mutation boundary.",
+          "fragments": [
+            "Qualify P0 and P1 portions independently; a passing P0 subset cannot verify P1 behavior."
+          ],
+          "evidenceKind": "observation"
+        },
+        {
+          "id": "p1-2",
+          "release": "P1",
+          "targets": [
+            "darwin-arm64",
+            "windows-amd64",
+            "linux-amd64"
+          ],
+          "track": "release",
+          "context": "P1 external clients/providers plus the unchanged local mutation boundary.",
+          "fragments": [
+            "Qualify P0 and P1 portions independently; a passing P0 subset cannot verify P1 behavior."
+          ],
+          "evidenceKind": "observation"
+        }
+      ]
+    },
+    "backlog:FIX-001": {
+      "sourceSha256": "6021c06ad6fa3a0753955e55f945a01bc39fbb10fcec16f00307b88109baa90f",
+      "rationale": "The existing export regression inspects actual archive entries and attachment bytes for both portable and HTML exports, including shared live references. This is service evidence, not a native UI claim.",
+      "requiredParts": [
+        "archive-bytes"
+      ],
+      "parts": [
+        {
+          "id": "archive-bytes",
+          "release": "P0",
+          "targets": [
+            "darwin-arm64",
+            "windows-amd64",
+            "linux-amd64"
+          ],
+          "track": "release",
+          "context": "Service export archive bytes for current Markdown/CSV and HTML content.",
+          "fragments": [
+            "A trashed-only or otherwise unreferenced private asset is absent from current-content exports; a shared asset still referenced by a live page remains present; Markdown/CSV and HTML exports behave consistently. Verify archive bytes, not just manifest counts."
+          ],
+          "evidenceKind": "service"
+        }
+      ]
+    },
+    "requirement:PH2-E:1": {
+      "sourceSha256": "a7836db24e8940a8ca297f565c4eafeac0d35a526d642f85ffdac1b3e36b215d",
+      "rationale": "Separate same-host canonical restore acceptance from the exact record/schema non-rewind invariant. Neither is an independent clean-machine claim.",
+      "requiredParts": [
+        "clean-directory-restore",
+        "unrelated-records"
+      ],
+      "parts": [
+        {
+          "id": "clean-directory-restore",
+          "release": "P0",
+          "targets": [
+            "darwin-arm64",
+            "windows-amd64",
+            "linux-amd64"
+          ],
+          "track": "release",
+          "context": "Canonical content and asset restoration into a clean directory; independent machine installation remains REL-005.",
+          "fragments": [
+            "A clean-directory restore preserves equivalent canonical bodies, databases, links, views, history and assets;"
+          ],
+          "evidenceKind": "observation"
+        },
+        {
+          "id": "unrelated-records",
+          "release": "P0",
+          "targets": [
+            "darwin-arm64",
+            "windows-amd64",
+            "linux-amd64"
+          ],
+          "track": "release",
+          "context": "Service page restoration preserves shared schemas and unrelated records.",
+          "fragments": [
+            "page restoration does not rewind unrelated records or schemas."
+          ],
+          "evidenceKind": "service"
+        }
+      ]
+    }
+  }
 }

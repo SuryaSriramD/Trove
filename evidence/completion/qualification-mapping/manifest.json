@@ -1,0 +1,47 @@
+{
+  "schemaVersion": 1,
+  "sourceBase": "26f71bb",
+  "package": "qualification-scope-and-mapping",
+  "checks": {
+    "focusedRunnerTests": {
+      "passed": 34,
+      "failed": 0,
+      "skipped": 0
+    },
+    "productRuns": 0,
+    "models": 0,
+    "performanceRuns": 0
+  },
+  "qualificationClaim": false,
+  "releaseApproved": false,
+  "files": {
+    "scripts/completion_qualification.py": {
+      "sha256": "1581ffbfae87ac5770eb1b6911716af826dfdefc5ef591725349066d83bc113e",
+      "size": 41906
+    },
+    "tests/test_completion_qualification.py": {
+      "sha256": "2cbdcbbc28d590079e68322879cd743691b2c9587caee236ba90dba75e8ffe5a",
+      "size": 26853
+    },
+    "docs/completion/qualification-policy.json": {
+      "sha256": "77b81771b8a2403c57d1372e2b5603ff7d4634871b9c659accc75f4c522d4367",
+      "size": 115125
+    },
+    "docs/completion/qualification.md": {
+      "sha256": "5e58906c3de0b826817ccd85d62cc4d873195d8d0f25e2a557fee90506b47cbd",
+      "size": 10175
+    },
+    "docs/completion/qualification-mapping.md": {
+      "sha256": "477cd323e97f705e166ab548288d08b540fa5a173d46cce886400e2f2040a97c",
+      "size": 7971
+    },
+    "evidence/completion/qualification-mapping/tests.txt": {
+      "sha256": "a5ddfd2a2065b9200c966f5637107dea053043978ec9ee3b65713bfe1f48c931",
+      "size": 5909
+    },
+    "evidence/completion/qualification-mapping/gaps.json": {
+      "sha256": "6f41f1f4fef0d5e4a7c37c8b00a70784caff6fdf4522d4a8e90967b021dda271",
+      "size": 110158
+    }
+  }
+}
