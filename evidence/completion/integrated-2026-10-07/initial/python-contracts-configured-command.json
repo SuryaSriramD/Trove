@@ -1,0 +1,16 @@
+{
+  "command": [
+    "/Users/suryasriramduvvuri/Library/Caches/Trove/completion/python/requirements-e99394c278ee/bin/python",
+    "-m",
+    "unittest",
+    "discover",
+    "-s",
+    "tests",
+    "-p",
+    "test_contracts.py",
+    "-v"
+  ],
+  "exitCode": 0,
+  "elapsedSeconds": 1.1185977458953857,
+  "configuredCache": "/Users/suryasriramduvvuri/Library/Caches/Trove/completion"
+}

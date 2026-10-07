@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "authority": "Accepted Trove completion roadmap C0\u2013C8; acceptance in docs/remaining-work.md remains binding",
+  "authority": "Accepted Trove completion roadmap C0–C8; acceptance in docs/remaining-work.md remains binding",
   "updatedAt": "2026-10-07",
   "baselineCommit": "632d0cd0141dc2dcdc7922274757e10083623616",
   "integrationBranch": "integration",
@@ -89,13 +89,13 @@
     },
     {
       "id": "evaluation-storage",
-      "status": "insufficient_at_last_attempt",
+      "status": "available_for_latest_run",
       "neededFor": [
         "AI-002",
         "AI-003",
         "OPT-003"
       ],
-      "description": "Expanded 7B run was interrupted by internal-disk exhaustion. Original logs are retained; runner requires at least 4 GiB free on its private temporary and evidence filesystems before retry. Only task-owned disposable artifacts were removed."
+      "description": "The fresh 74a6e35 full P0 run completed all 24 cases after satisfying the 4 GiB private-storage preflight; 21 passed and 3 failed quality rubrics, with no disk failure. Historical disk exhaustion is retained. Recheck headroom before later runs."
     }
   ],
   "items": [
@@ -1086,7 +1086,9 @@
       "evidence_target": "evidence/completion/CORE-010/",
       "implementation_evidence": [
         "docs/completion/recovery.md",
-        "docs/completion/pre-migration-snapshots.md"
+        "docs/completion/pre-migration-snapshots.md",
+        "docs/completion/windows-recovery-protocol.md",
+        "evidence/completion/windows-recovery/manifest.json"
       ],
       "followup_commits": [
         "a00d1b5"
@@ -1662,7 +1664,8 @@
         "evidence/completion/ai-modes/manifest.json",
         "docs/completion/expanded-evaluation.md",
         "evidence/completion/expanded-evaluation/manifest.json",
-        "evidence/completion/expanded-evaluation/full-p0-incomplete/reaccounted.json"
+        "evidence/completion/expanded-evaluation/full-p0-incomplete/reaccounted.json",
+        "evidence/completion/expanded-evaluation/full-p0-74a6e35/manifest.json"
       ],
       "followup_commits": [
         "4900d4b",
@@ -1671,7 +1674,7 @@
         "6fdd20d",
         "13a5750"
       ],
-      "remaining_qualification": "Representative long-context and mode task sets, actual user correction effort, controlled latency/concurrency/full application memory and native candidate/platform journeys remain open. The 14 fixed cases are not general quality approval.",
+      "remaining_qualification": "Representative long-context and mode task sets, actual user correction effort, controlled latency/concurrency/full application memory and native candidate/platform journeys remain open. The 14 fixed cases are not general quality approval. Fresh full 24-case P0 evaluation on 74a6e35 completed 21 passes and 3 quality failures (extra preference claim, duplicate fact, incorrect abstention on explicit negative evidence); canonical content unchanged in all 24. The earlier prompt clarification did not repair the repeated failure.",
       "evidence_target_status": "planned_destination_not_passing_evidence",
       "requirements_overlay_ids": [
         "FR-006",
@@ -1763,14 +1766,15 @@
         "evidence/completion/related-content-manifest.json",
         "docs/completion/expanded-evaluation.md",
         "evidence/completion/expanded-evaluation/manifest.json",
-        "evidence/completion/expanded-evaluation/full-p0-incomplete/reaccounted.json"
+        "evidence/completion/expanded-evaluation/full-p0-incomplete/reaccounted.json",
+        "evidence/completion/expanded-evaluation/full-p0-74a6e35/manifest.json"
       ],
       "followup_commits": [
         "4900d4b",
         "5140324",
         "6fdd20d"
       ],
-      "remaining_qualification": "Broader memory preferences/constraints/source edits/deletion/forgetting and semantic relevance across representative data remain open. Strict fixed and held-out passes with the optional 7B pack do not erase smaller-model failures or qualify native/platform behavior.",
+      "remaining_qualification": "Broader memory preferences/constraints/source edits/deletion/forgetting and semantic relevance across representative data remain open. Strict fixed and held-out passes with the optional 7B pack do not erase smaller-model failures or qualify native/platform behavior. Fresh full 24-case P0 evaluation on 74a6e35 completed 21 passes and 3 quality failures (extra preference claim, duplicate fact, incorrect abstention on explicit negative evidence); canonical content unchanged in all 24. The earlier prompt clarification did not repair the repeated failure.",
       "evidence_target_status": "planned_destination_not_passing_evidence",
       "requirements_overlay_ids": [
         "FR-016",
@@ -2493,7 +2497,11 @@
         "docs/completion/rollback-readiness.md",
         "evidence/completion/rollback-readiness-3f069dc/manifest.json",
         "docs/completion/macos-production-signing.md",
-        "evidence/completion/macos-production-signing/manifest.json"
+        "evidence/completion/macos-production-signing/manifest.json",
+        "docs/completion/windows-recovery-protocol.md",
+        "evidence/completion/windows-recovery/manifest.json",
+        "docs/completion/platform-publisher.md",
+        "evidence/completion/platform-publisher/manifest.json"
       ],
       "remaining_qualification": "Developer ID signing/notarization tooling is implemented and fixture-tested; no actual identity or notarization was used. Authenticated startup-ready/commit acknowledgement already has separate ad-hoc native evidence. Actual signed app pairs, public distribution, physical power-loss, independent clean-machine update/rollback and uninstall qualification remain open.",
       "evidence_target_status": "planned_destination_not_passing_evidence",
@@ -2648,7 +2656,14 @@
         "docs/completion/qualification-mapping.md",
         "evidence/completion/qualification-mapping/manifest.json",
         "docs/completion/operational-diagnostics.md",
-        "evidence/completion/operational-diagnostics/hardening-manifest.json"
+        "evidence/completion/operational-diagnostics/hardening-manifest.json",
+        "docs/completion/windows-recovery-protocol.md",
+        "evidence/completion/windows-recovery/manifest.json",
+        "docs/completion/platform-publisher.md",
+        "evidence/completion/platform-publisher/manifest.json",
+        "docs/completion/auth-cancel-regression.md",
+        "evidence/completion/auth-cancel-regression/manifest.json",
+        "evidence/completion/integrated-2026-10-07/manifest.json"
       ],
       "evidence_target_status": "planned_destination_not_passing_evidence",
       "requirements_overlay_ids": [
@@ -2772,9 +2787,13 @@
         "evidence/completion/portable-documents/manifest.json",
         "evidence/completion/document-containment/manifest.json",
         "docs/completion/linux-process-domain.md",
-        "evidence/completion/linux-process-domain/manifest.json"
+        "evidence/completion/linux-process-domain/manifest.json",
+        "docs/completion/windows-recovery-protocol.md",
+        "evidence/completion/windows-recovery/manifest.json",
+        "docs/completion/platform-publisher.md",
+        "evidence/completion/platform-publisher/manifest.json"
       ],
-      "remaining_qualification": "Actual Windows/Linux native builds and execution, device/screenshot capture, WebView/PDF behavior, provider containment, clean install/update/rollback/uninstall and full product matrix remain open. Windows new-workspace creation, migration, backup, restore and transfer explicitly unavailable pending directory/marker durability protocol. Linux native PDF extraction/export is disabled pending enforceable process containment; target evidence remains unavailable.",
+      "remaining_qualification": "Positive-completion recovery and platform publisher authentication foundations are integrated and independently reviewed with host tests and target cross-compiles only. Windows new-workspace creation, migration, backup, restore and transfer remain unavailable pending native durability proof and remaining producer integration. Windows/Linux product update selection, launch and rollback remain disabled with empty production trust pins. Actual target execution, provider containment, screenshot/device capture, WebView/PDF behavior, installation and backup portability remain open; Linux PDF extraction/export remains unavailable pending enforceable containment.",
       "evidence_target_status": "planned_destination_not_passing_evidence",
       "requirements_overlay_ids": [
         "FR-004",
@@ -3262,6 +3281,6 @@
     }
   ],
   "currentRequirementsOverlay": "docs/completion/requirements-overlay.json",
-  "reconciliationSourceCommit": "e481c6a7e602313be374785c49bc8ed73252ecad",
+  "reconciliationSourceCommit": "28da3df34a7d0c5090e3a2d342cbaaafb275ee79",
   "evidencePathPolicy": "evidence_target is only a planned directory. implementation_evidence and development_candidate_evidence are actual linked package records; their original source/candidate scope is binding. Overlay associations are coverage links, not full implementation or qualification."
 }

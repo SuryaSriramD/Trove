@@ -1,0 +1,17 @@
+{
+  "command": [
+    "/Users/suryasriramduvvuri/Library/Caches/Trove/completion/go/bin/go",
+    "test",
+    "-mod=readonly",
+    "-race",
+    "-tags",
+    "desktop production fts5 sqlite_omit_load_extension",
+    ".",
+    "-count=1",
+    "-timeout=10m",
+    "-json"
+  ],
+  "exitCode": 1,
+  "elapsedSeconds": 8.432476997375488,
+  "releaseQualified": false
+}
