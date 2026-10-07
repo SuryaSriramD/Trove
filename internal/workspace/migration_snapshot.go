@@ -653,6 +653,9 @@ func restoreMigrationSnapshotVerified(ctx context.Context, snapshotDir, newDesti
 	if err = checkMigrationDatabase(ctx, destination, m.Before, m.WorkspaceID); err != nil {
 		return m, err
 	}
+	if err = clearCopiedRecoveryBinding(ctx, destination, m.Database); err != nil {
+		return m, err
+	}
 	if err = syncRecoveryTree(destination); err != nil {
 		return m, err
 	}

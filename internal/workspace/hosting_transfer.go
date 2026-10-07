@@ -70,14 +70,14 @@ func transferWorkspaceWithFence(ctx context.Context, source, destination string,
 		return result, err
 	}
 	restored := filepath.Join(stage, "workspace")
-	result, err = RestoreBackupReviewed(ctx, backup, restored, manifest)
+	receipt := map[string]any{"schemaVersion": 1, "workspaceId": k.ID(), "backupId": manifest.BackupID, "databaseSHA256": manifest.Database.SHA256, "eventCursor": manifest.EventCursor, "destination": destination, "recoveryStage": stage, "transferredAt": now()}
+	result, err = restoreBackupVerifiedExtra(ctx, backup, restored, manifest, marshal(receipt))
 	if err != nil {
 		return result, err
 	}
 	if err = ctx.Err(); err != nil {
 		return result, err
 	}
-	receipt := map[string]any{"schemaVersion": 1, "workspaceId": k.ID(), "backupId": manifest.BackupID, "databaseSHA256": manifest.Database.SHA256, "eventCursor": manifest.EventCursor, "destination": destination, "recoveryStage": stage, "transferredAt": now()}
 	if err = writeFence(filepath.Join(source, "OWNER_TRANSFERRED"), marshal(receipt)); err != nil {
 		// Creation may have succeeded before a write/fsync/close failure. Any
 		// possibly published fence must retain the verified recovery snapshot.
@@ -94,41 +94,12 @@ func transferWorkspaceWithFence(ctx context.Context, source, destination string,
 	}
 	// Source can no longer open even after process death. Publish only after that
 	// fence is durable; failure retains the verified staging directory for recovery.
-	if err = os.Mkdir(destination, 0700); err != nil {
-		return result, fmt.Errorf("source fenced; recover verified stage %s: %w", stage, err)
-	}
-	if err = durableRecoveryFile(filepath.Join(destination, "INCOMPLETE"), []byte("Owner transfer publication in progress")); err != nil {
-		return result, err
-	}
-	if err = syncRecoveryDirectory(destination); err != nil {
-		return result, err
-	}
-	if err = syncRecoveryDirectory(filepath.Dir(destination)); err != nil {
-		return result, err
-	}
-	entries, err := os.ReadDir(restored)
+	operationID, err := readRecoveryOperation(ctx, restored)
 	if err != nil {
 		return result, err
 	}
-	for _, entry := range entries {
-		if err = os.Rename(filepath.Join(restored, entry.Name()), filepath.Join(destination, entry.Name())); err != nil {
-			return result, err
-		}
-	}
-	if err = durableRecoveryFile(filepath.Join(destination, "owner-transfer.json"), marshal(receipt)); err != nil {
-		return result, err
-	}
-	if err = syncRecoveryTree(destination); err != nil {
-		return result, err
-	}
-	if err = os.Remove(filepath.Join(destination, "INCOMPLETE")); err != nil {
-		return result, err
-	}
-	if err = syncRecoveryDirectory(destination); err != nil {
-		return result, err
-	}
-	if err = syncRecoveryDirectory(filepath.Dir(destination)); err != nil {
-		return result, err
+	if err = platformfs.RelocateRecoveryPublication(ctx, restored, destination, operationID); err != nil {
+		return result, fmt.Errorf("source fenced; recover verified stage %s: %w", stage, err)
 	}
 	result.Destination = destination
 	return result, nil
