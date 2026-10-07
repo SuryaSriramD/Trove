@@ -1,0 +1,73 @@
+{
+  "schemaVersion": 1,
+  "package": "linux-process-domain-foundation",
+  "baseSourceCommit": "26f71bb1b73e90b228d2d5cc3a293684a8c2564a",
+  "recordedAt": "2026-10-07T08:33:11.440738+00:00",
+  "host": {
+    "system": "Darwin",
+    "architecture": "arm64"
+  },
+  "sourceHashes": {
+    "internal/processdomain/counters.go": "2b97e364945a5b10f1ba4031f95142c0fde574b8f22f9692dfc868288ca26c6f",
+    "internal/processdomain/domain.go": "69e4e6eed3af75261fb34e4dc113d8a4e372c45ae60b0fb54f95bb3a3b6b4497",
+    "internal/processdomain/domain_linux.go": "57d5f4e8ee65b0f19735785b0ff17d3fbaaa961aeebc28632528685ff2caef1a",
+    "internal/processdomain/domain_linux_test.go": "cbb94993781a0572363b4039f3d3ef556b02d235ddaa3f883333db2aa1c5bc20",
+    "internal/processdomain/domain_other.go": "ced89bf5b1634e36b78d53f1eb371b820f824321814dec97d2b97c4e44879f53",
+    "internal/processdomain/domain_test.go": "e9ef1f674f7182de946f9c8f1953c3be2637e051063e0cc29df7ed170d26ea39",
+    "docs/completion/linux-process-domain.md": "0f1fc6aa45711141755fc00cd5b99846f5e81dd7362cbf6788d208b41c6f0f4f"
+  },
+  "evidenceHashes": {
+    "pdf-boundary.jsonl": "43ae50d45833f347b673fce22ae3dc6a1416d53e3d102cdf4b91c2905228fd93",
+    "host-contracts.jsonl": "baf8e95a7a79f318c93220e32cb014d6077a450a0ba1554e910a696d16077a00",
+    "linux-compile.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "checks": {
+    "hostRaceContracts": {
+      "topLevelPassed": 11,
+      "subcasesPassed": 4,
+      "failed": 0,
+      "skipped": 1,
+      "skipReason": "Native Linux cgroup enforcement cannot execute on macOS"
+    },
+    "existingLinuxPDFRefusal": {
+      "passed": 2,
+      "failed": 0
+    },
+    "linuxAMD64Compile": {
+      "passed": true,
+      "testBinarySha256": "78734ef70e107d4293aaf236ae353e2eec400668374ea8dfd965a393b677f7aa",
+      "executed": false
+    }
+  },
+  "commands": {
+    "host": "go test -count=1 -race -json ./internal/processdomain",
+    "pdfBoundary": "go test -count=1 -json -tags 'fts5 sqlite_omit_load_extension' ./internal/native -run 'TestDocument(LinuxCapabilityRefusesBeforeLookupStagingOrIO|PlatformEntryBeforeProcessLaunch)$'",
+    "linuxCompile": "GOOS=linux GOARCH=amd64 CGO_ENABLED=0 go test -c -o <scratch-test-binary> ./internal/processdomain"
+  },
+  "nativeQualification": {
+    "status": "pending",
+    "target": "Ubuntu 24.04 LTS x64 with explicit owned cgroup-v2 delegation",
+    "pendingScenarios": [
+      "invalid cgroup descriptor rejects before user code",
+      "ordinary filesystem delegation refused without mutation",
+      "child/grandchild/setsid membership and cancellation drain",
+      "successful parent drains orphan",
+      "aggregate PID enforcement",
+      "aggregate memory/OOM enforcement",
+      "CPU throttle enforcement",
+      "migration boundary reported without sandbox promotion"
+    ]
+  },
+  "productPDFEnabled": false,
+  "providerLaunchEnabled": false,
+  "containmentQualified": false,
+  "releaseQualified": false,
+  "limitations": [
+    "Trusted qualification fixtures only; no product consumer is wired to this backend.",
+    "Same-UID cgroup migration/control tampering and host filesystem access are not prevented.",
+    "Private namespace/filesystem isolation and appropriate privilege separation remain required.",
+    "Supervisor-crash ownership recovery/cleanup is not implemented.",
+    "No Linux runtime, machine, cgroup delegation or privileged service was installed/accessed.",
+    "Cross-compilation and host mocks are not native Linux enforcement evidence."
+  ]
+}

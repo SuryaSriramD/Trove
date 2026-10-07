@@ -1,0 +1,12 @@
+{"Time":"2026-10-07T14:00:36.202487+05:30","Action":"start","Package":"trove.local/phase0/internal/native"}
+{"Time":"2026-10-07T14:00:36.615115+05:30","Action":"run","Package":"trove.local/phase0/internal/native","Test":"TestDocumentLinuxCapabilityRefusesBeforeLookupStagingOrIO"}
+{"Time":"2026-10-07T14:00:36.615174+05:30","Action":"output","Package":"trove.local/phase0/internal/native","Test":"TestDocumentLinuxCapabilityRefusesBeforeLookupStagingOrIO","Output":"=== RUN   TestDocumentLinuxCapabilityRefusesBeforeLookupStagingOrIO\n","OutputType":"frame"}
+{"Time":"2026-10-07T14:00:36.615536+05:30","Action":"output","Package":"trove.local/phase0/internal/native","Test":"TestDocumentLinuxCapabilityRefusesBeforeLookupStagingOrIO","Output":"--- PASS: TestDocumentLinuxCapabilityRefusesBeforeLookupStagingOrIO (0.00s)\n","OutputType":"frame"}
+{"Time":"2026-10-07T14:00:36.615542+05:30","Action":"pass","Package":"trove.local/phase0/internal/native","Test":"TestDocumentLinuxCapabilityRefusesBeforeLookupStagingOrIO","Elapsed":0}
+{"Time":"2026-10-07T14:00:36.615558+05:30","Action":"run","Package":"trove.local/phase0/internal/native","Test":"TestDocumentPlatformEntryBeforeProcessLaunch"}
+{"Time":"2026-10-07T14:00:36.615561+05:30","Action":"output","Package":"trove.local/phase0/internal/native","Test":"TestDocumentPlatformEntryBeforeProcessLaunch","Output":"=== RUN   TestDocumentPlatformEntryBeforeProcessLaunch\n","OutputType":"frame"}
+{"Time":"2026-10-07T14:00:36.615572+05:30","Action":"output","Package":"trove.local/phase0/internal/native","Test":"TestDocumentPlatformEntryBeforeProcessLaunch","Output":"--- PASS: TestDocumentPlatformEntryBeforeProcessLaunch (0.00s)\n","OutputType":"frame"}
+{"Time":"2026-10-07T14:00:36.615579+05:30","Action":"pass","Package":"trove.local/phase0/internal/native","Test":"TestDocumentPlatformEntryBeforeProcessLaunch","Elapsed":0}
+{"Time":"2026-10-07T14:00:36.615583+05:30","Action":"output","Package":"trove.local/phase0/internal/native","Output":"PASS\n","OutputType":"frame"}
+{"Time":"2026-10-07T14:00:36.616103+05:30","Action":"output","Package":"trove.local/phase0/internal/native","Output":"ok  \ttrove.local/phase0/internal/native\t0.413s\n"}
+{"Time":"2026-10-07T14:00:36.616115+05:30","Action":"pass","Package":"trove.local/phase0/internal/native","Elapsed":0.414}
