@@ -63,7 +63,7 @@ The package's initial evidence is under `evidence/completion/expanded-evaluation
 - Two real 7B P0 canaries pass with networking denied, using the existing e481c6a helper bundle: `delivery-plain` and `delivery-memory`. Both retain canonical content and current citations. The observed 33.7s/17.5s latencies and 4.61/4.34 GB sampled worker RSS were collected during other development work; they are functional observations only.
 - The first structural attempt failed on the new fixture's incorrect `pages.page_id` lookup; the canonical schema uses `pages.id`. Only that test setup was corrected, with its log retained. The first native launch used the repository root instead of the package fixture directory and failed before inference; its log is retained. The corrected package-directory canaries passed.
 
-The complete 24-case and 42-case real-model sets have not yet passed or established quality. Full native-candidate journeys, representative authorized content, manual correction effort, independent installation and per-platform evidence remain separate gates.
+Neither the 24-case nor the 42-case real-model set has passed or established quality. The later complete P0 run below executed all 24 cases and retained three failures. Full native-candidate journeys, representative authorized content, manual correction effort, independent installation and per-platform evidence remain separate gates.
 
 ## First complete-corpus attempt: incomplete and failed
 
@@ -74,8 +74,22 @@ The 24-case attempt on source `bc964e2` began with a clean worktree, the verifie
 
 The raw logs and initial manifest are retained under `full-p0-incomplete/`. `reaccounted.json` parses the identical raw bytes with the repaired split-record accounting and explicitly fails the corpus. The initial parser missed the long research report because Go split its JSON across events; fixing that parser exposes the failure and does not relax the task oracle.
 
-The cited system instruction now clarifies that formatting preferences control presentation and should not become extra factual claims unless the user explicitly asks about them. No fixed claim count, fixture name, answer fact, grammar clipping or post-generation deletion was added. The failed original case and independent delivery/event memory cases must be rerun unchanged before calling this clarification an effective model-quality repair. **That real-model retry is pending adequate private temporary disk space.** Model-free checks can establish unaffected boundaries but cannot establish the repaired model outcome.
+The cited system instruction now clarifies that formatting preferences control presentation and should not become extra factual claims unless the user explicitly asks about them. No fixed claim count, fixture name, answer fact, grammar clipping or post-generation deletion was added. The later unchanged-fixture retry below repeats the original failure: this clarification is **not an effective repair**. Model-free checks establish unaffected boundaries, not a repaired model outcome.
 
 The affected model-free Go checks pass after the prompt clarification; the recorded report remains separate from real-model quality.
 
 The internal data volume showed only 410 MiB available at failure. Only this task's disposable 292 MiB Go build cache was removed; later free space measured 2.7 GiB. The external disk has ample space for build caches/evidence but does not substitute for native private runtime storage. The runner now refuses another inference run below its 4 GiB headroom check. No user workspace, model pack, unrelated cache or prior evidence was deleted.
+
+## Complete P0 retry on 74a6e35
+
+After private-storage headroom exceeded the unchanged preflight minimum, all **24 cases completed: 21 passed and three failed**. The full run took 596.9 seconds; this was functional evaluation, not a controlled performance qualification. It used the same locked corpus, verified 7B pack, e481c6a helper bundle and denied-network policy. Production/corpus/model/helper inputs remained unchanged, every case produced a report, and there were no malformed or missing outcomes. Exact identities and raw results are retained in [the new manifest](../../evidence/completion/expanded-evaluation/full-p0-74a6e35/manifest.json).
+
+| Failed case | Observed behavior | Unresolved acceptance |
+| --- | --- | --- |
+| `research-memory` | Correct facts and preferred title, followed by an extra factual claim explaining the heading preference. | Answer only the requested subject while applying relevant preferences. The earlier prompt clarification did not repair this failure. |
+| `service-plain` | Correct support window repeated twice, followed by the correct escalation owner. | Honor the requested structure without duplicate claims. This retry reached inference; its failure is distinct from the earlier disk failure. |
+| `project-negative` | Abstained even though the source explicitly stated that the project has no sponsor. | Distinguish explicit negative evidence from absent evidence. |
+
+All 24 cases preserved canonical content; generation and publication completed in the three failing cases. Valid source attribution and no-write behavior therefore do not imply answer quality. No oracle, source fact, claim count or failed output was changed to obtain a pass.
+
+Next repair should investigate typed memory-role separation in context construction, duplicate claim handling and explicit-negative reasoning with independent holdouts. A recommendation to preserve canonical memory kind separately from display titles has been reviewed as a direction only; it is not implemented or evaluated by this report. The 42 held-out mode cases and other unfinished families above remain pending.

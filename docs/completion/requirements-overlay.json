@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "title": "Current scoped implementation overlay for the historical PRD/TRD ledger",
-  "reviewedSourceCommit": "65a14ed41b05782cb808dbfd5fed0a1ebb51a7e9",
+  "reviewedSourceCommit": "28da3df34a7d0c5090e3a2d342cbaaafb275ee79",
   "recordedAt": "2026-10-07",
   "historicalLedger": "docs/phase-0/requirements-ledger.json",
   "historicalLedgerCanonicalSHA256": "8bda6faf8acdbfd5562c9de9e3e2481bafb1e89964c1670edcaea4e12b662a91",
@@ -396,21 +396,26 @@
         "CORE-010",
         "REL-006"
       ],
-      "coveredScope": "Page/trash/meeting restoration, historical-value mapping, incremental online backups and pre-migration snapshots.",
+      "coveredScope": "Page/trash/meeting restoration, historical-value mapping, incremental online backups and pre-migration snapshots. Positive-completion publication, mandatory startup admission, immutable compatibility before activation, exact restored inventory and transfer provenance.",
       "sourcePaths": [
         "internal/workspace/history.go",
         "internal/workspace/restore.go",
         "internal/workspace/backup.go",
         "internal/workspace/backup_online_test.go",
-        "internal/workspace/migration_snapshot.go"
+        "internal/workspace/migration_snapshot.go",
+        "internal/platformfs/recovery_publication.go",
+        "internal/workspace/recovery_admission.go",
+        "internal/workspace/hosting_transfer.go"
       ],
       "evidencePaths": [
         "docs/completion/recovery.md",
         "docs/completion/pre-migration-snapshots.md",
         "docs/completion/windows-storage.md",
-        "evidence/completion/windows-storage/manifest.json"
+        "evidence/completion/windows-storage/manifest.json",
+        "docs/completion/windows-recovery-protocol.md",
+        "evidence/completion/windows-recovery/manifest.json"
       ],
-      "remainingGates": "Independent clean-install restore, fault/power-loss and cross-platform portability remain open. Windows new-workspace, migration, backup, restore and transfer are explicitly unavailable.",
+      "remainingGates": "Independent clean-install restore, fault/power-loss and cross-platform portability remain open. Windows new-workspace, migration, backup, restore and transfer are explicitly unavailable. The protocol foundation is integrated and independently reviewed; host interruption simulations are not native Windows hardware durability proof. Remaining Windows producers stay gated.",
       "coverageStatus": "scoped_source_and_evidence",
       "releaseQualified": false
     },
@@ -456,9 +461,10 @@
         "evidence/completion/ai-modes/manifest.json",
         "docs/completion/reviewed-actions.md",
         "docs/completion/expanded-evaluation.md",
-        "evidence/completion/expanded-evaluation/manifest.json"
+        "evidence/completion/expanded-evaluation/manifest.json",
+        "evidence/completion/expanded-evaluation/full-p0-74a6e35/manifest.json"
       ],
-      "remainingGates": "All 14 predefined tasks passed on ab3ff13 with the optional 7B pack, not every task or native candidate. Earlier failures remain retained; broader quality, correction effort and controlled resource performance remain open. Expanded P0 attempt: seven reported passes, one extra-formatting-claim failure, one disk/runtime failure, fifteen missing outcomes. Prompt clarification requires unchanged failed-case and held-out real-model reruns; 42 held-out modes are not yet model-qualified.",
+      "remainingGates": "All 14 predefined tasks passed on ab3ff13 with the optional 7B pack, not every task or native candidate. Earlier failures remain retained; broader quality, correction effort and controlled resource performance remain open. Expanded P0 attempt: seven reported passes, one extra-formatting-claim failure, one disk/runtime failure, fifteen missing outcomes. Prompt clarification requires unchanged failed-case and held-out real-model reruns; 42 held-out modes are not yet model-qualified. Full24-case P0 run at 74a6e35 has 21 passes and 3 quality failures; unchanged canonical content is a separate passing boundary, not overall model-quality approval.",
       "coverageStatus": "scoped_source_and_evidence",
       "releaseQualified": false
     },
@@ -479,9 +485,10 @@
         "docs/completion/memory-capacity.md",
         "evidence/completion/memory-capacity/manifest.json",
         "docs/completion/expanded-evaluation.md",
-        "evidence/completion/expanded-evaluation/manifest.json"
+        "evidence/completion/expanded-evaluation/manifest.json",
+        "evidence/completion/expanded-evaluation/full-p0-74a6e35/manifest.json"
       ],
-      "remainingGates": "Optional 7B passes strict fixed/held-out cases; smaller-model failures remain. Representative quality, correction effort and platform/candidate evidence remain open. Expanded P0 attempt: seven reported passes, one extra-formatting-claim failure, one disk/runtime failure, fifteen missing outcomes. Prompt clarification requires unchanged failed-case and held-out real-model reruns; 42 held-out modes are not yet model-qualified.",
+      "remainingGates": "Optional 7B passes strict fixed/held-out cases; smaller-model failures remain. Representative quality, correction effort and platform/candidate evidence remain open. Expanded P0 attempt: seven reported passes, one extra-formatting-claim failure, one disk/runtime failure, fifteen missing outcomes. Prompt clarification requires unchanged failed-case and held-out real-model reruns; 42 held-out modes are not yet model-qualified. Full24-case P0 run at 74a6e35 has 21 passes and 3 quality failures; unchanged canonical content is a separate passing boundary, not overall model-quality approval.",
       "coverageStatus": "scoped_source_and_evidence",
       "releaseQualified": false
     },
@@ -776,7 +783,7 @@
         "REL-006",
         "REL-009"
       ],
-      "coveredScope": "Desktop packaging, verified updates, rollback and portable build/install source paths.",
+      "coveredScope": "Desktop packaging, verified updates, rollback and portable build/install source paths. Canonical platform publisher identities and authenticated complete portable inventories, with legacy macOS identity compatibility.",
       "sourcePaths": [
         "scripts/build-desktop.py",
         "scripts/build-desktop-portable.py",
@@ -785,7 +792,11 @@
         "internal/updates/rollback_wire.go",
         "internal/workspace/open_compatible.go",
         "scripts/macos_signing.py",
-        "scripts/notarize-macos.py"
+        "scripts/notarize-macos.py",
+        "internal/updates/publisher.go",
+        "internal/updates/portable.go",
+        "cmd/trove-release-manifest/main.go",
+        "packaging/update-publishers.json"
       ],
       "evidencePaths": [
         "docs/completion/verified-updates.md",
@@ -794,9 +805,11 @@
         "docs/completion/rollback-readiness.md",
         "evidence/completion/rollback-readiness-3f069dc/manifest.json",
         "docs/completion/macos-production-signing.md",
-        "evidence/completion/macos-production-signing/manifest.json"
+        "evidence/completion/macos-production-signing/manifest.json",
+        "docs/completion/platform-publisher.md",
+        "evidence/completion/platform-publisher/manifest.json"
       ],
-      "remainingGates": "Signing/notarization, clean installation, full offline model setup and Windows/Linux execution remain open. Ad-hoc update refusal is expected; Windows recovery is unavailable. Rollback readiness uses authenticated child/shell acknowledgement before preference commit; recorded local signed/ad-hoc fixture evidence is not clean-install/publisher/power-loss qualification.",
+      "remainingGates": "Signing/notarization, clean installation, full offline model setup and Windows/Linux execution remain open. Ad-hoc update refusal is expected; Windows recovery is unavailable. Rollback readiness uses authenticated child/shell acknowledgement before preference commit; recorded local signed/ad-hoc fixture evidence is not clean-install/publisher/power-loss qualification. Portable production trust pins are empty; trusted policy wiring and Windows/Linux selection, reviewed launch/readiness and rollback remain unavailable pending native qualification.",
       "coverageStatus": "scoped_source_and_evidence",
       "releaseQualified": false
     },
@@ -878,7 +891,8 @@
         "docs/completion/development-candidate-4900d4b.md",
         "evidence/completion/candidate-4900d4b/manifest.json",
         "docs/completion/development-candidate-be6fc81.md",
-        "evidence/completion/candidate-be6fc81/manifest.json"
+        "evidence/completion/candidate-be6fc81/manifest.json",
+        "evidence/completion/integrated-2026-10-07/manifest.json"
       ],
       "remainingGates": "Actual native UI/device, clean machines, signing, authorized representative data/accounts, hosted interoperability, startup/performance and per-platform gates remain open. Candidate be6fc81 fails the startup threshold and formatted-word search despite passing its recorded service/packaged journeys; later repairs cannot qualify that binary.",
       "coverageStatus": "scoped_source_and_evidence",

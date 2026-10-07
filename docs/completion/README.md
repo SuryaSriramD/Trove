@@ -22,7 +22,7 @@ C1 prevention work precedes P0 qualification. C2 editor, databases, recovery, re
 
 ## Current checkpoint
 
-The [7 October continuation](remaining-plan-execution.md) records new qualification, performance, diagnostics, signing and expanded-evaluation work, plus the Linux process-domain foundation. These source packages are later than the latest packaged application and do not qualify it retroactively.
+The [7 October continuation](remaining-plan-execution.md) records new qualification, performance, diagnostics, signing and expanded-evaluation work, plus Linux process-domain, platform publisher and recovery-publication foundations. Integrated source is `28da3df`; these packages are later than the latest packaged application and do not qualify it retroactively. The complete 24-case P0 AI retry has **21 passes and three unresolved quality failures**; all cases preserve canonical content.
 
 The registry currently records **34 items implemented at their stated source scope, 11 in progress, five open and one awaiting the external research report**. These are backlog implementation states, not release approval or a percentage of product readiness. All three platform release matrices remain unqualified.
 
@@ -51,7 +51,7 @@ The [60-launch instrumented startup investigation](startup-investigation.md) did
 
 ## External prerequisites
 
-The research report has not been supplied. A separate clean Mac is confirmed unavailable. Windows/Linux environments, authorized datasets, live integration accounts, reachable HTTPS and Apple signing access have not been established. The expanded 7B run also encountered internal-disk exhaustion; its partial outcomes remain recorded and a new storage preflight prevents a misleading retry. Independent implementation can continue. No credentials belong in this record.
+The research report has not been supplied. A separate clean Mac is confirmed unavailable. Windows/Linux environments, authorized datasets, live integration accounts, reachable HTTPS and Apple signing access have not been established. The earlier expanded 7B disk failure is preserved; after storage headroom recovered, a new full run completed with three quality failures. Future runs still require the same storage preflight. Independent implementation can continue. No credentials belong in this record.
 
 ## Item index
 

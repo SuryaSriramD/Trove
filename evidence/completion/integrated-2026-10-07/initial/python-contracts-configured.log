@@ -1,0 +1,13 @@
+test_all_schema_definitions_are_valid (test_contracts.ContractTests.test_all_schema_definitions_are_valid) ... ok
+test_generator_has_no_drift (test_contracts.ContractTests.test_generator_has_no_drift) ... ok
+test_protocol_authoring_has_no_drift (test_contracts.ContractTests.test_protocol_authoring_has_no_drift) ... ok
+test_protocol_examples_validate (test_contracts.ContractTests.test_protocol_examples_validate) ... ok
+test_tasks_and_memory_commands_share_domain_vocabulary (test_contracts.ContractTests.test_tasks_and_memory_commands_share_domain_vocabulary) ... ok
+test_title_value_is_projection_and_edits_use_page_update (test_contracts.ContractTests.test_title_value_is_projection_and_edits_use_page_update) ... ok
+test_wire_rejects_actor_injection_unsafe_revision_unknown_command_and_empty_batch (test_contracts.ContractTests.test_wire_rejects_actor_injection_unsafe_revision_unknown_command_and_empty_batch) ... ok
+test_worker_limits_and_citation_identity_are_structural (test_contracts.ContractTests.test_worker_limits_and_citation_identity_are_structural) ... ok
+
+----------------------------------------------------------------------
+Ran 8 tests in 0.895s
+
+OK

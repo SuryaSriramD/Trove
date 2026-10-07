@@ -1,0 +1,9 @@
+{
+  "command": [
+    "/opt/homebrew/bin/node",
+    "node_modules/typescript/bin/tsc",
+    "--noEmit"
+  ],
+  "exitCode": 0,
+  "elapsedSeconds": 24.417171001434326
+}

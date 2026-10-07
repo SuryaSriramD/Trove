@@ -1,0 +1,23 @@
+{
+  "command": [
+    "/opt/homebrew/bin/node",
+    "--experimental-strip-types",
+    "--test",
+    "tests/advanced-editor.test.ts",
+    "tests/code-presentation.test.ts",
+    "tests/codec.test.ts",
+    "tests/database.test.ts",
+    "tests/date-range.test.ts",
+    "tests/deep-links.test.ts",
+    "tests/editor-presentation.test.ts",
+    "tests/layout-structure.test.ts",
+    "tests/online-content.test.ts",
+    "tests/p2-database.test.ts",
+    "tests/phase5-editor.test.ts",
+    "tests/rich-colors.test.ts",
+    "tests/table-structure.test.ts",
+    "tests/timeline-model.test.ts"
+  ],
+  "exitCode": 0,
+  "elapsedSeconds": 2.9924328327178955
+}
