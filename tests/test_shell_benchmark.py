@@ -13,7 +13,7 @@ spec.loader.exec_module(benchmark)
 
 
 class ShellBenchmarkTests(unittest.TestCase):
-    def run_scenarios(self, scenarios, iterations):
+    def run_scenarios(self, scenarios, iterations, **options):
         temporary = tempfile.TemporaryDirectory()
         self.addCleanup(temporary.cleanup)
         root = Path(temporary.name)
@@ -38,7 +38,7 @@ class ShellBenchmarkTests(unittest.TestCase):
 
             def wait(self, timeout=None):
                 self.waits += 1
-                if self.scenario.get('timeout') and self.waits == 1:
+                if self.waits <= self.scenario.get('timeoutWaits', 1 if self.scenario.get('timeout') else 0):
                     raise subprocess.TimeoutExpired('synthetic app', timeout)
                 self.returncode = self.scenario.get('exitCode', 0)
                 return self.returncode
@@ -51,9 +51,11 @@ class ShellBenchmarkTests(unittest.TestCase):
             def kill(self):
                 self.returncode = -9
 
-        with patch.object(benchmark.subprocess, 'Popen', Process), patch.object(benchmark, 'capture_stalled_process'):
-            return benchmark.measure(app, [{'pages': 0, 'paragraphBlocks': 0, 'workspacePath': None}],
-                                     iterations, fixture, root / 'durable-diagnostics', timeout=.1)
+        with patch.object(benchmark.subprocess, 'Popen', Process), patch.object(benchmark, 'capture_stalled_process') as sampler:
+            result = benchmark.measure(app, [{'pages': 0, 'paragraphBlocks': 0, 'workspacePath': None}],
+                                     iterations, fixture, root / 'durable-diagnostics', timeout=.1, **options)
+            self.sample_calls = sampler.call_count
+            return result
 
     def test_partial_profile_never_claims_two_second_target(self):
         result = self.run_scenarios([{'report': {'usableShellMs': 1000}}, {}], 5)
@@ -79,11 +81,60 @@ class ShellBenchmarkTests(unittest.TestCase):
         self.assertTrue(result['measurementPassed'])
         self.assertTrue(result['profiles'][0]['approximatelyTwoSeconds'])
         self.assertEqual(result['profiles'][0]['medianMs'], 1150)
+        self.assertTrue(result['shellTargetPassed'])
+        self.assertFalse(result['instrumented'])
+        self.assertEqual(self.sample_calls, 0)
 
     def test_complete_slow_samples_are_valid_measurements_but_miss_target(self):
         result = self.run_scenarios([{'report': {'usableShellMs': 2700}}], 1)
         self.assertTrue(result['measurementPassed'])
         self.assertFalse(result['profiles'][0]['approximatelyTwoSeconds'])
+        self.assertFalse(result['shellTargetPassed'])
+
+    def test_cli_fails_a_complete_measurement_above_the_target(self):
+        with tempfile.TemporaryDirectory() as temp:
+            root = Path(temp)
+            profiles = root / 'profiles.json'
+            profiles.write_text('{"profiles": []}')
+            output = root / 'result.json'
+            result = {'measurementPassed': True, 'shellTargetPassed': False,
+                      'instrumented': False, 'profiles': [{'approximatelyTwoSeconds': False}]}
+            with patch('sys.argv', ['benchmark-shell', '--app', str(root / 'Trove.app'),
+                                   '--profiles', str(profiles), '--output', str(output)]), \
+                 patch.object(benchmark, 'measure', return_value=result):
+                self.assertEqual(benchmark.main(), 1)
+            self.assertEqual(json.loads(output.read_text()), result)
+
+    def test_diagnostic_sampling_is_not_a_passing_timing_run(self):
+        result = self.run_scenarios([{'timeout': True, 'report': {'usableShellMs': 1200}}], 1,
+                                    diagnostic_slow_ms=25)
+        self.assertTrue(result['measurementPassed'])
+        self.assertTrue(result['instrumented'])
+        self.assertFalse(result['shellTargetPassed'])
+        self.assertTrue(result['profiles'][0]['samples'][0]['diagnosticSamplingAttempted'])
+        self.assertFalse(result['releaseQualified'])
+        self.assertEqual(self.sample_calls, 1)
+
+    def test_diagnostic_mode_cannot_promote_even_without_sampling(self):
+        result = self.run_scenarios([{'report': {'usableShellMs': 1200}}], 1,
+                                    diagnostic_slow_ms=25)
+        self.assertTrue(result['measurementPassed'])
+        self.assertTrue(result['instrumented'])
+        self.assertFalse(result['shellTargetPassed'])
+        self.assertFalse(result['profiles'][0]['samples'][0]['diagnosticSamplingAttempted'])
+
+    def test_diagnostic_sampling_never_overwrites_its_first_sample_on_timeout(self):
+        result = self.run_scenarios([{'timeoutWaits': 2, 'report': {'usableShellMs': 1200}}], 1,
+                                    diagnostic_slow_ms=25)
+        self.assertFalse(result['measurementPassed'])
+        self.assertTrue(result['failures'][0]['timedOut'])
+        self.assertFalse(result['shellTargetPassed'])
+        self.assertEqual(self.sample_calls, 1)
+
+    def test_diagnostic_trigger_must_be_bounded_before_process_deadline(self):
+        for value in [0, -1, float('nan'), float('inf'), 100]:
+            with self.subTest(value=value), self.assertRaises(ValueError):
+                self.run_scenarios([], 1, diagnostic_slow_ms=value)
 
     def test_invalid_report_fails_without_discarding_prior_samples(self):
         for value in [float('nan'), -1, True, '1000']:

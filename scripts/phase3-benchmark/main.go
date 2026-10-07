@@ -168,7 +168,7 @@ func runLeased(k *workspace.Kernel, job contracts.JobsJob, handler func(context.
 		}
 	}
 }
-func profile(base string, pages, iterations int, modelRoot, bundle string, hybrid bool) map[string]any {
+func profile(base string, pages, iterations, hybridIterations int, modelRoot, bundle string, hybrid bool) map[string]any {
 	ctx := context.Background()
 	dir := filepath.Join(base, fmt.Sprintf("pages-%d", pages))
 	start := time.Now()
@@ -252,7 +252,7 @@ func profile(base string, pages, iterations int, modelRoot, bundle string, hybri
 		out["semanticIndexSeconds"] = time.Since(start).Seconds()
 		out["semanticJobs"] = jobs
 		out["embeddingPackId"] = "01990000-0000-7000-8000-000000000102"
-		out["hybrid"] = measure(k, e, "hybrid", 10)
+		out["hybrid"] = measure(k, e, "hybrid", hybridIterations)
 		out["embeddingWorkerBreakdown"] = embeddingBreakdown(supervisor, first)
 	}
 	out["workspaceBytesFinal"] = size(dir)
@@ -260,11 +260,12 @@ func profile(base string, pages, iterations int, modelRoot, bundle string, hybri
 }
 func main() {
 	pages := flag.String("pages", "100,1000,10000", "Comma-separated deterministic workspace profiles")
-	iterations := flag.Int("iterations", 100, "Measured keyword queries per profile")
+	iterations := flag.Int("iterations", 100, "Measured keyword queries per profile (5..1000)")
+	hybridIterations := flag.Int("hybrid-iterations", 30, "Measured real hybrid queries per profile (5..1000)")
 	root := flag.String("workspaces", "", "Disposable workspace parent (new directory)")
 	models := flag.String("models", "/private/tmp/trove-phase1-models", "Installed model cache")
 	bundle := flag.String("bundle", "build/native", "Native bundle")
-	hybrid := flag.Bool("hybrid", false, "Measure real native hybrid retrieval on the first profile")
+	hybrid := flag.Bool("hybrid", false, "Measure real native hybrid retrieval on every requested profile")
 	output := flag.String("output", "evidence/phase3/benchmark-service.json", "JSON evidence output")
 	flag.Parse()
 	var err error
@@ -272,9 +273,27 @@ func main() {
 	must(err)
 	*models, err = filepath.Abs(*models)
 	must(err)
-	if *iterations < 5 {
-		panic("at least five iterations required")
+	if *iterations < 5 || *iterations > 1000 || *hybridIterations < 5 || *hybridIterations > 1000 {
+		panic("keyword and hybrid iterations must be 5..1000")
 	}
+	counts := []int{}
+	seen := map[int]bool{}
+	for _, value := range strings.Split(*pages, ",") {
+		n, err := strconv.Atoi(value)
+		must(err)
+		if n < 1 || n > 100000 || seen[n] || len(counts) == 16 {
+			panic("profiles must contain 1..16 distinct page counts in 1..100000")
+		}
+		seen[n] = true
+		counts = append(counts, n)
+	}
+	// Reserve evidence before any expensive setup; direct invocations must also
+	// preserve existing reports, including dangling links. Failed runs may retain
+	// an empty reserved file, which cannot qualify as a successful measurement.
+	must(os.MkdirAll(filepath.Dir(*output), 0755))
+	report, err := os.OpenFile(*output, os.O_CREATE|os.O_EXCL|os.O_WRONLY, 0644)
+	must(err)
+	defer report.Close()
 	if *root == "" {
 		var err error
 		*root, err = os.MkdirTemp("", "trove-phase3-benchmark-")
@@ -283,19 +302,15 @@ func main() {
 		must(os.Mkdir(*root, 0700))
 	}
 	results := []any{}
-	for i, s := range strings.Split(*pages, ",") {
-		n, err := strconv.Atoi(s)
-		must(err)
-		if n < 1 {
-			panic("page count must be positive")
-		}
+	for _, n := range counts {
 		fmt.Fprintf(os.Stderr, "Benchmarking %d pages\n", n)
-		results = append(results, profile(*root, n, *iterations, *models, *bundle, *hybrid && i == 0))
+		results = append(results, profile(*root, n, *iterations, *hybridIterations, *models, *bundle, *hybrid))
 	}
-	out := map[string]any{"schemaVersion": 1, "recordedAt": time.Now().UTC().Format(time.RFC3339Nano), "fixtureVersion": "p0-pages-v1", "profiles": results, "limitations": []string{"Service timings exclude Wails bridge, browser paint and interaction latency.", "No physical disk cache flush: kernel reopen is warm, not cold application launch.", "Benchmark does not establish recording acoustics or model answer quality.", "Other qualification jobs may run on the same host; no thermal or power isolation is claimed."}}
-	must(os.MkdirAll(filepath.Dir(*output), 0755))
+	out := map[string]any{"schemaVersion": 1, "recordedAt": time.Now().UTC().Format(time.RFC3339Nano), "fixtureVersion": "p0-pages-v1", "profiles": results, "keywordIterations": *iterations, "hybridIterations": *hybridIterations, "hybridRequestedForEveryProfile": *hybrid, "limitations": []string{"Service timings exclude Wails bridge, browser paint and interaction latency.", "No physical disk cache flush: kernel reopen is warm, not cold application launch.", "Benchmark does not establish recording acoustics or model answer quality.", "Other qualification jobs may run on the same host; no thermal or power isolation is claimed."}}
 	raw, err := json.MarshalIndent(out, "", "  ")
 	must(err)
-	must(os.WriteFile(*output, append(raw, '\n'), 0644))
+	_, err = report.Write(append(raw, '\n'))
+	must(err)
+	must(report.Close())
 	fmt.Println(*output)
 }

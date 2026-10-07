@@ -1,0 +1,62 @@
+test_all_scales_request_explicit_hybrid_iteration_count (test_service_benchmark.ServiceBenchmarkTests.test_all_scales_request_explicit_hybrid_iteration_count) ... ok
+test_existing_evidence_is_refused_before_any_host_or_worker_command (test_service_benchmark.ServiceBenchmarkTests.test_existing_evidence_is_refused_before_any_host_or_worker_command) ... usage: benchmark-phase3 [-h] [--pages PAGES] [--iterations ITERATIONS]
+                        [--hybrid-iterations HYBRID_ITERATIONS]
+                        [--cache CACHE] [--models MODELS]
+                        [--native-bundle NATIVE_BUNDLE] [--skip-hybrid]
+                        [--output OUTPUT]
+benchmark-phase3: error: Evidence directory already exists; choose a new output directory
+ok
+test_first_profile_only_hybrid_is_an_incomplete_measurement (test_service_benchmark.ServiceBenchmarkTests.test_first_profile_only_hybrid_is_an_incomplete_measurement) ... ok
+test_wrong_sample_count_or_duplicate_profile_cannot_pass (test_service_benchmark.ServiceBenchmarkTests.test_wrong_sample_count_or_duplicate_profile_cannot_pass) ... ok
+test_cli_fails_a_complete_measurement_above_the_target (test_shell_benchmark.ShellBenchmarkTests.test_cli_fails_a_complete_measurement_above_the_target) ... ok
+test_complete_fast_samples_pass (test_shell_benchmark.ShellBenchmarkTests.test_complete_fast_samples_pass) ... {
+  "qualifiedMeasurement": true,
+  "exitCode": 0,
+  "metadataErrors": [],
+  "sourceChangedDuringRun": []
+}
+{
+  "qualifiedMeasurement": false,
+  "exitCode": 0,
+  "metadataErrors": [],
+  "sourceChangedDuringRun": []
+}
+{
+  "qualifiedMeasurement": false,
+  "exitCode": 0,
+  "metadataErrors": [],
+  "sourceChangedDuringRun": []
+}
+{
+  "qualifiedMeasurement": false,
+  "exitCode": 0,
+  "metadataErrors": [],
+  "sourceChangedDuringRun": []
+}
+pages=0: completed=2/2, maximum shell ms=1400
+ok
+test_complete_slow_samples_are_valid_measurements_but_miss_target (test_shell_benchmark.ShellBenchmarkTests.test_complete_slow_samples_are_valid_measurements_but_miss_target) ... pages=0: completed=1/1, maximum shell ms=2700
+ok
+test_diagnostic_mode_cannot_promote_even_without_sampling (test_shell_benchmark.ShellBenchmarkTests.test_diagnostic_mode_cannot_promote_even_without_sampling) ... pages=0: completed=1/1, maximum shell ms=1200
+ok
+test_diagnostic_sampling_is_not_a_passing_timing_run (test_shell_benchmark.ShellBenchmarkTests.test_diagnostic_sampling_is_not_a_passing_timing_run) ... pages=0: completed=1/1, maximum shell ms=1200
+ok
+test_diagnostic_sampling_never_overwrites_its_first_sample_on_timeout (test_shell_benchmark.ShellBenchmarkTests.test_diagnostic_sampling_never_overwrites_its_first_sample_on_timeout) ... pages=0: completed=0/1, maximum shell ms=FAILED
+ok
+test_diagnostic_trigger_must_be_bounded_before_process_deadline (test_shell_benchmark.ShellBenchmarkTests.test_diagnostic_trigger_must_be_bounded_before_process_deadline) ... ok
+test_existing_evidence_is_never_reused_or_overwritten (test_shell_benchmark.ShellBenchmarkTests.test_existing_evidence_is_never_reused_or_overwritten) ... ok
+test_invalid_report_fails_without_discarding_prior_samples (test_shell_benchmark.ShellBenchmarkTests.test_invalid_report_fails_without_discarding_prior_samples) ... pages=0: completed=1/2, maximum shell ms=1000
+pages=0: completed=1/2, maximum shell ms=1000
+pages=0: completed=1/2, maximum shell ms=1000
+pages=0: completed=1/2, maximum shell ms=1000
+ok
+test_no_requested_samples_is_invalid (test_shell_benchmark.ShellBenchmarkTests.test_no_requested_samples_is_invalid) ... ok
+test_partial_profile_never_claims_two_second_target (test_shell_benchmark.ShellBenchmarkTests.test_partial_profile_never_claims_two_second_target) ... pages=0: completed=1/5, maximum shell ms=1000
+ok
+test_timeout_is_failure_even_with_report_and_clean_exit (test_shell_benchmark.ShellBenchmarkTests.test_timeout_is_failure_even_with_report_and_clean_exit) ... pages=0: completed=0/1, maximum shell ms=FAILED
+ok
+
+----------------------------------------------------------------------
+Ran 16 tests in 0.038s
+
+OK
