@@ -3,9 +3,12 @@ package auth
 import (
 	"context"
 	"errors"
+	"io"
+	"net"
 	"net/http"
 	"net/url"
 	"sync"
+	"syscall"
 	"testing"
 	"time"
 
@@ -174,8 +177,38 @@ func TestSIWCCancelledCredentialCleanupSerializesNextSignIn(t *testing.T) {
 	}
 	var release sync.Once
 	t.Cleanup(func() { cancel(); release.Do(func() { close(s.release) }) })
+	// Cancel deliberately closes the callback server. Use a cancellation-aware
+	// result instead of the success helper, whose Fatal would exit this worker
+	// before its completion signal and manufacture a second timeout failure.
+	f.mu.Lock()
+	target, state := f.auth.Get("redirect_uri"), f.auth.Get("state")
+	f.mu.Unlock()
+	requestCtx, stopRequest := context.WithTimeout(context.Background(), 5*time.Second)
+	t.Cleanup(stopRequest)
+	request, err := http.NewRequestWithContext(requestCtx, http.MethodGet, target+"?"+url.Values{"state": {state}, "code": {"SYNTHETIC_CODE"}, "client_id": {"oaiapp_prompt"}}.Encode(), nil)
+	if err != nil {
+		t.Fatal(err)
+	}
+	type callbackResult struct {
+		status int
+		err    error
+	}
+	callbackOutcome := make(chan callbackResult, 1)
 	callbackDone := make(chan struct{})
-	go func() { f.callback(a, "oaiapp_prompt", nil); close(callbackDone) }()
+	go func() {
+		defer close(callbackDone)
+		response, err := http.DefaultClient.Do(request)
+		outcome := callbackResult{err: err}
+		if response != nil {
+			outcome.status = response.StatusCode
+			_, readErr := io.Copy(io.Discard, response.Body)
+			response.Body.Close()
+			if outcome.err == nil {
+				outcome.err = readErr
+			}
+		}
+		callbackOutcome <- outcome
+	}()
 	waitPromptSignal(t, s.started, "credential prompt")
 	s.mu.Lock()
 	registration := s.writing
@@ -203,6 +236,32 @@ func TestSIWCCancelledCredentialCleanupSerializesNextSignIn(t *testing.T) {
 	release.Do(func() { close(s.release) })
 	waitPromptSignal(t, callbackDone, "cancelled callback")
 	waitPromptSignal(t, cancelDone, "cancel")
+	// Transport closure is acceptable only after the independent product state
+	// and cleanup oracles show cancellation. Timeout and unrelated errors fail.
+	cancelled, err := f.manager.Attempt(a.ID)
+	if err != nil || cancelled.State != "cancelled" || cancelled.RegistrationID != registration {
+		t.Fatal("cancelled attempt was not preserved", cancelled, err)
+	}
+	s.mu.Lock()
+	cleanupOK := len(s.deleted) == 1 && s.deleted[0] == registration && s.cleanupContextValid
+	s.mu.Unlock()
+	if !cleanupOK {
+		t.Fatal("cancelled credential was not cleaned up exactly once with a bounded context")
+	}
+	if _, err := f.store.Get(context.Background(), registration); !errors.Is(err, ErrSecretMissing) {
+		t.Fatal("cancelled write retained credentials before the next callback", err)
+	}
+	outcome := <-callbackOutcome
+	if outcome.status != 0 && outcome.status != http.StatusBadRequest {
+		t.Fatalf("cancelled callback returned unexpected status %d", outcome.status)
+	}
+	if outcome.err != nil && !errors.Is(outcome.err, io.EOF) && !errors.Is(outcome.err, io.ErrUnexpectedEOF) && !errors.Is(outcome.err, net.ErrClosed) && !errors.Is(outcome.err, syscall.ECONNRESET) {
+		t.Fatal("cancelled callback returned an unrelated transport error", outcome.err)
+	}
+	if outcome.status == 0 && outcome.err == nil {
+		t.Fatal("callback returned neither a response nor a cancellation error")
+	}
+	t.Logf("cancelled callback outcome: HTTP status=%d, closed transport=%t", outcome.status, outcome.err != nil)
 	var next result
 	select {
 	case next = <-nextResult:
