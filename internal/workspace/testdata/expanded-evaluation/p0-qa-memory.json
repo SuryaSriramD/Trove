@@ -1,0 +1,631 @@
+{
+  "schemaVersion": 1,
+  "kind": "synthetic_predeclared_corpus",
+  "releaseQualified": false,
+  "cases": [
+    {
+      "id": "delivery-plain",
+      "family": "p0_qa_memory",
+      "title": "Current delivery plan",
+      "source": "The approved delivery budget is 18400 EUR. The current delivery month is November.",
+      "prompt": "Give exactly three lines: a heading using my approved preferred heading if available, otherwise Update; then the current delivery budget; then the current delivery month. Cite each factual line. Use current source facts over historical memories. Use simple sentences stating the field and value only.",
+      "heading": "Update",
+      "useMemory": false,
+      "memories": [],
+      "facts": [
+        {
+          "claimPattern": "(?i)^(?:the |current |the current |approved |the approved )?delivery\\ budget(?: is|:| equals)? 18400\\ EUR\\.?$",
+          "quotePattern": "(?i)\\b18400\\ EUR\\b",
+          "validClaim": "The delivery budget is 18400 EUR.",
+          "validQuote": "The approved delivery budget is 18400 EUR."
+        },
+        {
+          "claimPattern": "(?i)^(?:the |current |the current |approved |the approved )?delivery\\ month(?: is|:| equals)? November\\.?$",
+          "quotePattern": "(?i)\\bNovember\\b",
+          "validClaim": "The delivery month is November.",
+          "validQuote": "The current delivery month is November."
+        }
+      ],
+      "abstain": false
+    },
+    {
+      "id": "delivery-memory",
+      "family": "p0_qa_memory",
+      "title": "Current delivery plan",
+      "source": "The approved delivery budget is 18400 EUR. The current delivery month is November.",
+      "prompt": "Give exactly three lines: a heading using my approved preferred heading if available, otherwise Update; then the current delivery budget; then the current delivery month. Cite each factual line. Use current source facts over historical memories. Use simple sentences stating the field and value only.",
+      "heading": "Delivery review",
+      "useMemory": true,
+      "memories": [
+        {
+          "kind": "preference",
+          "content": "The preferred heading for these updates is exactly: Delivery review."
+        },
+        {
+          "kind": "decision",
+          "content": "The obsolete delivery budget was 9200 EUR and delivery month was May. These facts are historical and superseded."
+        }
+      ],
+      "facts": [
+        {
+          "claimPattern": "(?i)^(?:the |current |the current |approved |the approved )?delivery\\ budget(?: is|:| equals)? 18400\\ EUR\\.?$",
+          "quotePattern": "(?i)\\b18400\\ EUR\\b",
+          "validClaim": "The delivery budget is 18400 EUR.",
+          "validQuote": "The approved delivery budget is 18400 EUR."
+        },
+        {
+          "claimPattern": "(?i)^(?:the |current |the current |approved |the approved )?delivery\\ month(?: is|:| equals)? November\\.?$",
+          "quotePattern": "(?i)\\bNovember\\b",
+          "validClaim": "The delivery month is November.",
+          "validQuote": "The current delivery month is November."
+        }
+      ],
+      "abstain": false
+    },
+    {
+      "id": "research-plain",
+      "family": "p0_qa_memory",
+      "title": "Current research plan",
+      "source": "The approved research sample is 48 participants. The current research lead is Mira Patel.",
+      "prompt": "Give exactly three lines: a heading using my approved preferred heading if available, otherwise Update; then the current research sample; then the current research lead. Cite each factual line. Use current source facts over historical memories. Use simple sentences stating the field and value only.",
+      "heading": "Update",
+      "useMemory": false,
+      "memories": [],
+      "facts": [
+        {
+          "claimPattern": "(?i)^(?:the |current |the current |approved |the approved )?research\\ sample(?: is|:| equals)? 48\\ participants\\.?$",
+          "quotePattern": "(?i)\\b48\\ participants\\b",
+          "validClaim": "The research sample is 48 participants.",
+          "validQuote": "The approved research sample is 48 participants."
+        },
+        {
+          "claimPattern": "(?i)^(?:the |current |the current |approved |the approved )?research\\ lead(?: is|:| equals)? Mira\\ Patel\\.?$",
+          "quotePattern": "(?i)\\bMira\\ Patel\\b",
+          "validClaim": "The research lead is Mira Patel.",
+          "validQuote": "The current research lead is Mira Patel."
+        }
+      ],
+      "abstain": false
+    },
+    {
+      "id": "research-memory",
+      "family": "p0_qa_memory",
+      "title": "Current research plan",
+      "source": "The approved research sample is 48 participants. The current research lead is Mira Patel.",
+      "prompt": "Give exactly three lines: a heading using my approved preferred heading if available, otherwise Update; then the current research sample; then the current research lead. Cite each factual line. Use current source facts over historical memories. Use simple sentences stating the field and value only.",
+      "heading": "Research brief",
+      "useMemory": true,
+      "memories": [
+        {
+          "kind": "preference",
+          "content": "The preferred heading for these updates is exactly: Research brief."
+        },
+        {
+          "kind": "decision",
+          "content": "The superseded research sample was 24 participants and the research lead was Evan Cole. These facts are historical and superseded."
+        }
+      ],
+      "facts": [
+        {
+          "claimPattern": "(?i)^(?:the |current |the current |approved |the approved )?research\\ sample(?: is|:| equals)? 48\\ participants\\.?$",
+          "quotePattern": "(?i)\\b48\\ participants\\b",
+          "validClaim": "The research sample is 48 participants.",
+          "validQuote": "The approved research sample is 48 participants."
+        },
+        {
+          "claimPattern": "(?i)^(?:the |current |the current |approved |the approved )?research\\ lead(?: is|:| equals)? Mira\\ Patel\\.?$",
+          "quotePattern": "(?i)\\bMira\\ Patel\\b",
+          "validClaim": "The research lead is Mira Patel.",
+          "validQuote": "The current research lead is Mira Patel."
+        }
+      ],
+      "abstain": false
+    },
+    {
+      "id": "inventory-plain",
+      "family": "p0_qa_memory",
+      "title": "Current stock record",
+      "source": "The available stock is 73 units. The current storage room is East.",
+      "prompt": "Give exactly three lines: a heading using my approved preferred heading if available, otherwise Update; then the current available stock; then the current storage room. Cite each factual line. Use current source facts over historical memories. Use simple sentences stating the field and value only.",
+      "heading": "Update",
+      "useMemory": false,
+      "memories": [],
+      "facts": [
+        {
+          "claimPattern": "(?i)^(?:the |current |the current |approved |the approved )?available\\ stock(?: is|:| equals)? 73\\ units\\.?$",
+          "quotePattern": "(?i)\\b73\\ units\\b",
+          "validClaim": "The available stock is 73 units.",
+          "validQuote": "The available stock is 73 units."
+        },
+        {
+          "claimPattern": "(?i)^(?:the |current |the current |approved |the approved )?storage\\ room(?: is|:| equals)? East\\.?$",
+          "quotePattern": "(?i)\\bEast\\b",
+          "validClaim": "The storage room is East.",
+          "validQuote": "The current storage room is East."
+        }
+      ],
+      "abstain": false
+    },
+    {
+      "id": "inventory-memory",
+      "family": "p0_qa_memory",
+      "title": "Current stock record",
+      "source": "The available stock is 73 units. The current storage room is East.",
+      "prompt": "Give exactly three lines: a heading using my approved preferred heading if available, otherwise Update; then the current available stock; then the current storage room. Cite each factual line. Use current source facts over historical memories. Use simple sentences stating the field and value only.",
+      "heading": "Stock review",
+      "useMemory": true,
+      "memories": [
+        {
+          "kind": "preference",
+          "content": "The preferred heading for these updates is exactly: Stock review."
+        },
+        {
+          "kind": "decision",
+          "content": "The obsolete stock was 51 units and the storage room was West. These facts are historical and superseded."
+        }
+      ],
+      "facts": [
+        {
+          "claimPattern": "(?i)^(?:the |current |the current |approved |the approved )?available\\ stock(?: is|:| equals)? 73\\ units\\.?$",
+          "quotePattern": "(?i)\\b73\\ units\\b",
+          "validClaim": "The available stock is 73 units.",
+          "validQuote": "The available stock is 73 units."
+        },
+        {
+          "claimPattern": "(?i)^(?:the |current |the current |approved |the approved )?storage\\ room(?: is|:| equals)? East\\.?$",
+          "quotePattern": "(?i)\\bEast\\b",
+          "validClaim": "The storage room is East.",
+          "validQuote": "The current storage room is East."
+        }
+      ],
+      "abstain": false
+    },
+    {
+      "id": "travel-plain",
+      "family": "p0_qa_memory",
+      "title": "Current travel record",
+      "source": "The departure day is Thursday. The destination city is Lisbon.",
+      "prompt": "Give exactly three lines: a heading using my approved preferred heading if available, otherwise Update; then the current departure day; then the current destination city. Cite each factual line. Use current source facts over historical memories. Use simple sentences stating the field and value only.",
+      "heading": "Update",
+      "useMemory": false,
+      "memories": [],
+      "facts": [
+        {
+          "claimPattern": "(?i)^(?:the |current |the current |approved |the approved )?departure\\ day(?: is|:| equals)? Thursday\\.?$",
+          "quotePattern": "(?i)\\bThursday\\b",
+          "validClaim": "The departure day is Thursday.",
+          "validQuote": "The departure day is Thursday."
+        },
+        {
+          "claimPattern": "(?i)^(?:the |current |the current |approved |the approved )?destination\\ city(?: is|:| equals)? Lisbon\\.?$",
+          "quotePattern": "(?i)\\bLisbon\\b",
+          "validClaim": "The destination city is Lisbon.",
+          "validQuote": "The destination city is Lisbon."
+        }
+      ],
+      "abstain": false
+    },
+    {
+      "id": "travel-memory",
+      "family": "p0_qa_memory",
+      "title": "Current travel record",
+      "source": "The departure day is Thursday. The destination city is Lisbon.",
+      "prompt": "Give exactly three lines: a heading using my approved preferred heading if available, otherwise Update; then the current departure day; then the current destination city. Cite each factual line. Use current source facts over historical memories. Use simple sentences stating the field and value only.",
+      "heading": "Travel notes",
+      "useMemory": true,
+      "memories": [
+        {
+          "kind": "preference",
+          "content": "The preferred heading for these updates is exactly: Travel notes."
+        },
+        {
+          "kind": "decision",
+          "content": "The superseded departure day was Tuesday and destination was Porto. These facts are historical and superseded."
+        }
+      ],
+      "facts": [
+        {
+          "claimPattern": "(?i)^(?:the |current |the current |approved |the approved )?departure\\ day(?: is|:| equals)? Thursday\\.?$",
+          "quotePattern": "(?i)\\bThursday\\b",
+          "validClaim": "The departure day is Thursday.",
+          "validQuote": "The departure day is Thursday."
+        },
+        {
+          "claimPattern": "(?i)^(?:the |current |the current |approved |the approved )?destination\\ city(?: is|:| equals)? Lisbon\\.?$",
+          "quotePattern": "(?i)\\bLisbon\\b",
+          "validClaim": "The destination city is Lisbon.",
+          "validQuote": "The destination city is Lisbon."
+        }
+      ],
+      "abstain": false
+    },
+    {
+      "id": "service-plain",
+      "family": "p0_qa_memory",
+      "title": "Current service record",
+      "source": "The support window is 6 hours. The current escalation owner is Asha Rao.",
+      "prompt": "Give exactly three lines: a heading using my approved preferred heading if available, otherwise Update; then the current support window; then the current escalation owner. Cite each factual line. Use current source facts over historical memories. Use simple sentences stating the field and value only.",
+      "heading": "Update",
+      "useMemory": false,
+      "memories": [],
+      "facts": [
+        {
+          "claimPattern": "(?i)^(?:the |current |the current |approved |the approved )?support\\ window(?: is|:| equals)? 6\\ hours\\.?$",
+          "quotePattern": "(?i)\\b6\\ hours\\b",
+          "validClaim": "The support window is 6 hours.",
+          "validQuote": "The support window is 6 hours."
+        },
+        {
+          "claimPattern": "(?i)^(?:the |current |the current |approved |the approved )?escalation\\ owner(?: is|:| equals)? Asha\\ Rao\\.?$",
+          "quotePattern": "(?i)\\bAsha\\ Rao\\b",
+          "validClaim": "The escalation owner is Asha Rao.",
+          "validQuote": "The current escalation owner is Asha Rao."
+        }
+      ],
+      "abstain": false
+    },
+    {
+      "id": "service-memory",
+      "family": "p0_qa_memory",
+      "title": "Current service record",
+      "source": "The support window is 6 hours. The current escalation owner is Asha Rao.",
+      "prompt": "Give exactly three lines: a heading using my approved preferred heading if available, otherwise Update; then the current support window; then the current escalation owner. Cite each factual line. Use current source facts over historical memories. Use simple sentences stating the field and value only.",
+      "heading": "Service review",
+      "useMemory": true,
+      "memories": [
+        {
+          "kind": "preference",
+          "content": "The preferred heading for these updates is exactly: Service review."
+        },
+        {
+          "kind": "decision",
+          "content": "The obsolete support window was 12 hours and escalation owner was Leo Gray. These facts are historical and superseded."
+        }
+      ],
+      "facts": [
+        {
+          "claimPattern": "(?i)^(?:the |current |the current |approved |the approved )?support\\ window(?: is|:| equals)? 6\\ hours\\.?$",
+          "quotePattern": "(?i)\\b6\\ hours\\b",
+          "validClaim": "The support window is 6 hours.",
+          "validQuote": "The support window is 6 hours."
+        },
+        {
+          "claimPattern": "(?i)^(?:the |current |the current |approved |the approved )?escalation\\ owner(?: is|:| equals)? Asha\\ Rao\\.?$",
+          "quotePattern": "(?i)\\bAsha\\ Rao\\b",
+          "validClaim": "The escalation owner is Asha Rao.",
+          "validQuote": "The current escalation owner is Asha Rao."
+        }
+      ],
+      "abstain": false
+    },
+    {
+      "id": "design-plain",
+      "family": "p0_qa_memory",
+      "title": "Current design specification",
+      "source": "The approved accent color is teal. The approved canvas width is 1440 pixels.",
+      "prompt": "Give exactly three lines: a heading using my approved preferred heading if available, otherwise Update; then the current accent color; then the current canvas width. Cite each factual line. Use current source facts over historical memories. Use simple sentences stating the field and value only.",
+      "heading": "Update",
+      "useMemory": false,
+      "memories": [],
+      "facts": [
+        {
+          "claimPattern": "(?i)^(?:the |current |the current |approved |the approved )?accent\\ color(?: is|:| equals)? teal\\.?$",
+          "quotePattern": "(?i)\\bteal\\b",
+          "validClaim": "The accent color is teal.",
+          "validQuote": "The approved accent color is teal."
+        },
+        {
+          "claimPattern": "(?i)^(?:the |current |the current |approved |the approved )?canvas\\ width(?: is|:| equals)? 1440\\ pixels\\.?$",
+          "quotePattern": "(?i)\\b1440\\ pixels\\b",
+          "validClaim": "The canvas width is 1440 pixels.",
+          "validQuote": "The approved canvas width is 1440 pixels."
+        }
+      ],
+      "abstain": false
+    },
+    {
+      "id": "design-memory",
+      "family": "p0_qa_memory",
+      "title": "Current design specification",
+      "source": "The approved accent color is teal. The approved canvas width is 1440 pixels.",
+      "prompt": "Give exactly three lines: a heading using my approved preferred heading if available, otherwise Update; then the current accent color; then the current canvas width. Cite each factual line. Use current source facts over historical memories. Use simple sentences stating the field and value only.",
+      "heading": "Design brief",
+      "useMemory": true,
+      "memories": [
+        {
+          "kind": "preference",
+          "content": "The preferred heading for these updates is exactly: Design brief."
+        },
+        {
+          "kind": "decision",
+          "content": "The superseded accent color was amber and canvas width was 1280 pixels. These facts are historical and superseded."
+        }
+      ],
+      "facts": [
+        {
+          "claimPattern": "(?i)^(?:the |current |the current |approved |the approved )?accent\\ color(?: is|:| equals)? teal\\.?$",
+          "quotePattern": "(?i)\\bteal\\b",
+          "validClaim": "The accent color is teal.",
+          "validQuote": "The approved accent color is teal."
+        },
+        {
+          "claimPattern": "(?i)^(?:the |current |the current |approved |the approved )?canvas\\ width(?: is|:| equals)? 1440\\ pixels\\.?$",
+          "quotePattern": "(?i)\\b1440\\ pixels\\b",
+          "validClaim": "The canvas width is 1440 pixels.",
+          "validQuote": "The approved canvas width is 1440 pixels."
+        }
+      ],
+      "abstain": false
+    },
+    {
+      "id": "event-plain",
+      "family": "p0_qa_memory",
+      "title": "Current event plan",
+      "source": "The venue is Cedar Hall. The capacity is 320 guests.",
+      "prompt": "Give exactly three lines: a heading using my approved preferred heading if available, otherwise Update; then the current venue; then the current capacity. Cite each factual line. Use current source facts over historical memories. Use simple sentences stating the field and value only.",
+      "heading": "Update",
+      "useMemory": false,
+      "memories": [],
+      "facts": [
+        {
+          "claimPattern": "(?i)^(?:the |current |the current |approved |the approved )?venue(?: is|:| equals)? Cedar\\ Hall\\.?$",
+          "quotePattern": "(?i)\\bCedar\\ Hall\\b",
+          "validClaim": "The venue is Cedar Hall.",
+          "validQuote": "The venue is Cedar Hall."
+        },
+        {
+          "claimPattern": "(?i)^(?:the |current |the current |approved |the approved )?capacity(?: is|:| equals)? 320\\ guests\\.?$",
+          "quotePattern": "(?i)\\b320\\ guests\\b",
+          "validClaim": "The capacity is 320 guests.",
+          "validQuote": "The capacity is 320 guests."
+        }
+      ],
+      "abstain": false
+    },
+    {
+      "id": "event-memory",
+      "family": "p0_qa_memory",
+      "title": "Current event plan",
+      "source": "The venue is Cedar Hall. The capacity is 320 guests.",
+      "prompt": "Give exactly three lines: a heading using my approved preferred heading if available, otherwise Update; then the current venue; then the current capacity. Cite each factual line. Use current source facts over historical memories. Use simple sentences stating the field and value only.",
+      "heading": "Event review",
+      "useMemory": true,
+      "memories": [
+        {
+          "kind": "preference",
+          "content": "The preferred heading for these updates is exactly: Event review."
+        },
+        {
+          "kind": "decision",
+          "content": "The obsolete venue was Oak Hall and capacity was 180 guests. These facts are historical and superseded."
+        }
+      ],
+      "facts": [
+        {
+          "claimPattern": "(?i)^(?:the |current |the current |approved |the approved )?venue(?: is|:| equals)? Cedar\\ Hall\\.?$",
+          "quotePattern": "(?i)\\bCedar\\ Hall\\b",
+          "validClaim": "The venue is Cedar Hall.",
+          "validQuote": "The venue is Cedar Hall."
+        },
+        {
+          "claimPattern": "(?i)^(?:the |current |the current |approved |the approved )?capacity(?: is|:| equals)? 320\\ guests\\.?$",
+          "quotePattern": "(?i)\\b320\\ guests\\b",
+          "validClaim": "The capacity is 320 guests.",
+          "validQuote": "The capacity is 320 guests."
+        }
+      ],
+      "abstain": false
+    },
+    {
+      "id": "release-plain",
+      "family": "p0_qa_memory",
+      "title": "Current release decision",
+      "source": "The release channel is preview. The target platform is macOS.",
+      "prompt": "Give exactly three lines: a heading using my approved preferred heading if available, otherwise Update; then the current release channel; then the current target platform. Cite each factual line. Use current source facts over historical memories. Use simple sentences stating the field and value only.",
+      "heading": "Update",
+      "useMemory": false,
+      "memories": [],
+      "facts": [
+        {
+          "claimPattern": "(?i)^(?:the |current |the current |approved |the approved )?release\\ channel(?: is|:| equals)? preview\\.?$",
+          "quotePattern": "(?i)\\bpreview\\b",
+          "validClaim": "The release channel is preview.",
+          "validQuote": "The release channel is preview."
+        },
+        {
+          "claimPattern": "(?i)^(?:the |current |the current |approved |the approved )?target\\ platform(?: is|:| equals)? macOS\\.?$",
+          "quotePattern": "(?i)\\bmacOS\\b",
+          "validClaim": "The target platform is macOS.",
+          "validQuote": "The target platform is macOS."
+        }
+      ],
+      "abstain": false
+    },
+    {
+      "id": "release-memory",
+      "family": "p0_qa_memory",
+      "title": "Current release decision",
+      "source": "The release channel is preview. The target platform is macOS.",
+      "prompt": "Give exactly three lines: a heading using my approved preferred heading if available, otherwise Update; then the current release channel; then the current target platform. Cite each factual line. Use current source facts over historical memories. Use simple sentences stating the field and value only.",
+      "heading": "Release notes",
+      "useMemory": true,
+      "memories": [
+        {
+          "kind": "preference",
+          "content": "The preferred heading for these updates is exactly: Release notes."
+        },
+        {
+          "kind": "decision",
+          "content": "The superseded release channel was stable and target platform was Linux. These facts are historical and superseded."
+        }
+      ],
+      "facts": [
+        {
+          "claimPattern": "(?i)^(?:the |current |the current |approved |the approved )?release\\ channel(?: is|:| equals)? preview\\.?$",
+          "quotePattern": "(?i)\\bpreview\\b",
+          "validClaim": "The release channel is preview.",
+          "validQuote": "The release channel is preview."
+        },
+        {
+          "claimPattern": "(?i)^(?:the |current |the current |approved |the approved )?target\\ platform(?: is|:| equals)? macOS\\.?$",
+          "quotePattern": "(?i)\\bmacOS\\b",
+          "validClaim": "The target platform is macOS.",
+          "validQuote": "The target platform is macOS."
+        }
+      ],
+      "abstain": false
+    },
+    {
+      "id": "storage-plain",
+      "family": "p0_qa_memory",
+      "title": "Current retention policy",
+      "source": "The retention period is 90 days. The backup frequency is weekly.",
+      "prompt": "Give exactly three lines: a heading using my approved preferred heading if available, otherwise Update; then the current retention period; then the current backup frequency. Cite each factual line. Use current source facts over historical memories. Use simple sentences stating the field and value only.",
+      "heading": "Update",
+      "useMemory": false,
+      "memories": [],
+      "facts": [
+        {
+          "claimPattern": "(?i)^(?:the |current |the current |approved |the approved )?retention\\ period(?: is|:| equals)? 90\\ days\\.?$",
+          "quotePattern": "(?i)\\b90\\ days\\b",
+          "validClaim": "The retention period is 90 days.",
+          "validQuote": "The retention period is 90 days."
+        },
+        {
+          "claimPattern": "(?i)^(?:the |current |the current |approved |the approved )?backup\\ frequency(?: is|:| equals)? weekly\\.?$",
+          "quotePattern": "(?i)\\bweekly\\b",
+          "validClaim": "The backup frequency is weekly.",
+          "validQuote": "The backup frequency is weekly."
+        }
+      ],
+      "abstain": false
+    },
+    {
+      "id": "storage-memory",
+      "family": "p0_qa_memory",
+      "title": "Current retention policy",
+      "source": "The retention period is 90 days. The backup frequency is weekly.",
+      "prompt": "Give exactly three lines: a heading using my approved preferred heading if available, otherwise Update; then the current retention period; then the current backup frequency. Cite each factual line. Use current source facts over historical memories. Use simple sentences stating the field and value only.",
+      "heading": "Recovery brief",
+      "useMemory": true,
+      "memories": [
+        {
+          "kind": "preference",
+          "content": "The preferred heading for these updates is exactly: Recovery brief."
+        },
+        {
+          "kind": "decision",
+          "content": "The obsolete retention period was 30 days and backup frequency was daily. These facts are historical and superseded."
+        }
+      ],
+      "facts": [
+        {
+          "claimPattern": "(?i)^(?:the |current |the current |approved |the approved )?retention\\ period(?: is|:| equals)? 90\\ days\\.?$",
+          "quotePattern": "(?i)\\b90\\ days\\b",
+          "validClaim": "The retention period is 90 days.",
+          "validQuote": "The retention period is 90 days."
+        },
+        {
+          "claimPattern": "(?i)^(?:the |current |the current |approved |the approved )?backup\\ frequency(?: is|:| equals)? weekly\\.?$",
+          "quotePattern": "(?i)\\bweekly\\b",
+          "validClaim": "The backup frequency is weekly.",
+          "validQuote": "The backup frequency is weekly."
+        }
+      ],
+      "abstain": false
+    },
+    {
+      "id": "project-absent",
+      "family": "p0_qa_memory",
+      "title": "Current project record",
+      "source": "The current project budget is 6100 USD.",
+      "prompt": "What is the named project owner? Answer only if the supplied sources answer the question. Omit a heading. Do not invent an answer.",
+      "heading": "",
+      "useMemory": false,
+      "memories": [],
+      "facts": [],
+      "abstain": true
+    },
+    {
+      "id": "project-negative",
+      "family": "p0_qa_memory",
+      "title": "Current project record",
+      "source": "The current project budget is 6100 USD. The project owner has not been assigned.",
+      "prompt": "What is the named project owner? Answer only if the supplied sources answer the question. Omit a heading. Do not invent an answer.",
+      "heading": "",
+      "useMemory": false,
+      "memories": [],
+      "facts": [
+        {
+          "claimPattern": "(?i)^(?:the (?:named )?project owner|the (?:named )?owner(?: of this project)?) has not been assigned\\.$",
+          "quotePattern": "The\\ project\\ owner\\ has\\ not\\ been\\ assigned\\.",
+          "validClaim": "The project owner has not been assigned.",
+          "validQuote": "The project owner has not been assigned."
+        }
+      ],
+      "abstain": false
+    },
+    {
+      "id": "meeting-absent",
+      "family": "p0_qa_memory",
+      "title": "Current meeting record",
+      "source": "The current meeting budget is 6100 USD.",
+      "prompt": "What is the meeting location? Answer only if the supplied sources answer the question. Omit a heading. Do not invent an answer.",
+      "heading": "",
+      "useMemory": false,
+      "memories": [],
+      "facts": [],
+      "abstain": true
+    },
+    {
+      "id": "meeting-negative",
+      "family": "p0_qa_memory",
+      "title": "Current meeting record",
+      "source": "The current meeting budget is 6100 USD. The meeting location has not been selected.",
+      "prompt": "What is the meeting location? Answer only if the supplied sources answer the question. Omit a heading. Do not invent an answer.",
+      "heading": "",
+      "useMemory": false,
+      "memories": [],
+      "facts": [
+        {
+          "claimPattern": "(?i)^(?:the )?meeting location has not been selected\\.$",
+          "quotePattern": "The\\ meeting\\ location\\ has\\ not\\ been\\ selected\\.",
+          "validClaim": "The meeting location has not been selected.",
+          "validQuote": "The meeting location has not been selected."
+        }
+      ],
+      "abstain": false
+    },
+    {
+      "id": "publication-absent",
+      "family": "p0_qa_memory",
+      "title": "Current publication record",
+      "source": "The current publication budget is 6100 USD.",
+      "prompt": "What is the publication date? Answer only if the supplied sources answer the question. Omit a heading. Do not invent an answer.",
+      "heading": "",
+      "useMemory": false,
+      "memories": [],
+      "facts": [],
+      "abstain": true
+    },
+    {
+      "id": "publication-negative",
+      "family": "p0_qa_memory",
+      "title": "Current publication record",
+      "source": "The current publication budget is 6100 USD. The publication date has not been decided.",
+      "prompt": "What is the publication date? Answer only if the supplied sources answer the question. Omit a heading. Do not invent an answer.",
+      "heading": "",
+      "useMemory": false,
+      "memories": [],
+      "facts": [
+        {
+          "claimPattern": "(?i)^(?:the )?publication date has not been decided\\.$",
+          "quotePattern": "The\\ publication\\ date\\ has\\ not\\ been\\ decided\\.",
+          "validClaim": "The publication date has not been decided.",
+          "validQuote": "The publication date has not been decided."
+        }
+      ],
+      "abstain": false
+    }
+  ]
+}

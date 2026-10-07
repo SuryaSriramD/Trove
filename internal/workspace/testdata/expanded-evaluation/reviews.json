@@ -1,0 +1,79 @@
+{
+  "schemaVersion": 1,
+  "kind": "synthetic_predeclared_corpus",
+  "releaseQualified": false,
+  "cases": [
+    {
+      "id": "daily-summary",
+      "source": "The security review is incomplete. Launch cannot proceed until that review is approved.",
+      "expected": "Cited current work summary; no unapproved writes.",
+      "executionStatus": "runner_pending"
+    },
+    {
+      "id": "weekly-summary",
+      "source": "The security review is incomplete. Launch cannot proceed until that review is approved.",
+      "expected": "Aggregate selected sources; omissions disclosed.",
+      "executionStatus": "runner_pending"
+    },
+    {
+      "id": "unresolved-tasks",
+      "source": "The security review is incomplete. Launch cannot proceed until that review is approved.",
+      "expected": "Open canonical tasks are identified; completed tasks not mislabeled open.",
+      "executionStatus": "runner_pending"
+    },
+    {
+      "id": "changed-decision",
+      "source": "The security review is incomplete. Launch cannot proceed until that review is approved.",
+      "expected": "Current record overrides historical memory.",
+      "executionStatus": "runner_pending"
+    },
+    {
+      "id": "risk-suggestion",
+      "source": "The security review is incomplete. Launch cannot proceed until that review is approved.",
+      "expected": "Observed blocker cited; proposed next action labeled suggestion.",
+      "executionStatus": "runner_pending"
+    },
+    {
+      "id": "no-owner",
+      "source": "The security review is incomplete. Launch cannot proceed until that review is approved.",
+      "expected": "No invented person or task assignee.",
+      "executionStatus": "runner_pending"
+    },
+    {
+      "id": "categories",
+      "source": "The security review is incomplete. Launch cannot proceed until that review is approved.",
+      "expected": "Only owner-selected categories and actions produced.",
+      "executionStatus": "runner_pending"
+    },
+    {
+      "id": "stale-destination",
+      "source": "The security review is incomplete. Launch cannot proceed until that review is approved.",
+      "expected": "Changed destination invalidates pending proposal.",
+      "executionStatus": "runner_pending"
+    },
+    {
+      "id": "forgotten-memory",
+      "source": "The security review is incomplete. Launch cannot proceed until that review is approved.",
+      "expected": "Forget during generation invalidates review output.",
+      "executionStatus": "runner_pending"
+    },
+    {
+      "id": "cancel-retry",
+      "source": "The security review is incomplete. Launch cannot proceed until that review is approved.",
+      "expected": "Cancel leaves no effect; explicit bounded retry creates one reviewed outcome.",
+      "executionStatus": "runner_pending"
+    },
+    {
+      "id": "restart",
+      "source": "The security review is incomplete. Launch cannot proceed until that review is approved.",
+      "expected": "Interrupted occurrence becomes cancelled; no silent regeneration.",
+      "executionStatus": "runner_pending"
+    },
+    {
+      "id": "dedup-import",
+      "source": "The security review is incomplete. Launch cannot proceed until that review is approved.",
+      "expected": "Repeated occurrence cannot duplicate effect; portable import stays inactive.",
+      "executionStatus": "runner_pending"
+    }
+  ]
+}

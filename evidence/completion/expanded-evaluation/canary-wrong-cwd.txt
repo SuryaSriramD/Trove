@@ -1,0 +1,4 @@
+=== RUN   TestRealLocalExpandedP0QAMemory
+    ai_expanded_evaluation_test.go:235: open testdata/expanded-evaluation/p0-qa-memory.json: no such file or directory
+--- FAIL: TestRealLocalExpandedP0QAMemory (0.00s)
+FAIL

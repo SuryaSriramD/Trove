@@ -1,0 +1,115 @@
+{
+  "schemaVersion": 1,
+  "kind": "synthetic_predeclared_corpus",
+  "releaseQualified": false,
+  "cases": [
+    {
+      "id": "renewal",
+      "query": "keep the membership active",
+      "relevantSource": "The annual subscription expires next month.",
+      "irrelevantSource": "The office stationery inventory lists envelopes and staples.",
+      "inaccessibleNearerSource": "The annual subscription expires next month. PRIVATE SIBLING",
+      "expected": "Accessible conceptual source appears; private sibling and current page do not; semantic/lexical labels remain distinguishable.",
+      "executionStatus": "real_embedding_runner_pending"
+    },
+    {
+      "id": "recovery",
+      "query": "bring my lost notes back",
+      "relevantSource": "Restore the workspace from its verified backup.",
+      "irrelevantSource": "The office stationery inventory lists envelopes and staples.",
+      "inaccessibleNearerSource": "Restore the workspace from its verified backup. PRIVATE SIBLING",
+      "expected": "Accessible conceptual source appears; private sibling and current page do not; semantic/lexical labels remain distinguishable.",
+      "executionStatus": "real_embedding_runner_pending"
+    },
+    {
+      "id": "accessibility",
+      "query": "make the interface usable without sight",
+      "relevantSource": "Screen-reader labels and keyboard navigation need review.",
+      "irrelevantSource": "The office stationery inventory lists envelopes and staples.",
+      "inaccessibleNearerSource": "Screen-reader labels and keyboard navigation need review. PRIVATE SIBLING",
+      "expected": "Accessible conceptual source appears; private sibling and current page do not; semantic/lexical labels remain distinguishable.",
+      "executionStatus": "real_embedding_runner_pending"
+    },
+    {
+      "id": "latency",
+      "query": "why responses feel slow",
+      "relevantSource": "The query duration increased after the index rebuild.",
+      "irrelevantSource": "The office stationery inventory lists envelopes and staples.",
+      "inaccessibleNearerSource": "The query duration increased after the index rebuild. PRIVATE SIBLING",
+      "expected": "Accessible conceptual source appears; private sibling and current page do not; semantic/lexical labels remain distinguishable.",
+      "executionStatus": "real_embedding_runner_pending"
+    },
+    {
+      "id": "travel",
+      "query": "get to the conference",
+      "relevantSource": "Rail tickets to the venue are reserved.",
+      "irrelevantSource": "The office stationery inventory lists envelopes and staples.",
+      "inaccessibleNearerSource": "Rail tickets to the venue are reserved. PRIVATE SIBLING",
+      "expected": "Accessible conceptual source appears; private sibling and current page do not; semantic/lexical labels remain distinguishable.",
+      "executionStatus": "real_embedding_runner_pending"
+    },
+    {
+      "id": "budget",
+      "query": "how much can we spend",
+      "relevantSource": "The approved project allocation is18000EUR.",
+      "irrelevantSource": "The office stationery inventory lists envelopes and staples.",
+      "inaccessibleNearerSource": "The approved project allocation is18000EUR. PRIVATE SIBLING",
+      "expected": "Accessible conceptual source appears; private sibling and current page do not; semantic/lexical labels remain distinguishable.",
+      "executionStatus": "real_embedding_runner_pending"
+    },
+    {
+      "id": "retention",
+      "query": "when should old files be removed",
+      "relevantSource": "Archive retention ends after90days.",
+      "irrelevantSource": "The office stationery inventory lists envelopes and staples.",
+      "inaccessibleNearerSource": "Archive retention ends after90days. PRIVATE SIBLING",
+      "expected": "Accessible conceptual source appears; private sibling and current page do not; semantic/lexical labels remain distinguishable.",
+      "executionStatus": "real_embedding_runner_pending"
+    },
+    {
+      "id": "risk",
+      "query": "what could delay delivery",
+      "relevantSource": "A missing approval is blocking the release.",
+      "irrelevantSource": "The office stationery inventory lists envelopes and staples.",
+      "inaccessibleNearerSource": "A missing approval is blocking the release. PRIVATE SIBLING",
+      "expected": "Accessible conceptual source appears; private sibling and current page do not; semantic/lexical labels remain distinguishable.",
+      "executionStatus": "real_embedding_runner_pending"
+    },
+    {
+      "id": "learning",
+      "query": "practice before the exam",
+      "relevantSource": "Study sessions cover algebra and geometry.",
+      "irrelevantSource": "The office stationery inventory lists envelopes and staples.",
+      "inaccessibleNearerSource": "Study sessions cover algebra and geometry. PRIVATE SIBLING",
+      "expected": "Accessible conceptual source appears; private sibling and current page do not; semantic/lexical labels remain distinguishable.",
+      "executionStatus": "real_embedding_runner_pending"
+    },
+    {
+      "id": "health",
+      "query": "prepare for the appointment",
+      "relevantSource": "Bring the symptom diary to the clinic.",
+      "irrelevantSource": "The office stationery inventory lists envelopes and staples.",
+      "inaccessibleNearerSource": "Bring the symptom diary to the clinic. PRIVATE SIBLING",
+      "expected": "Accessible conceptual source appears; private sibling and current page do not; semantic/lexical labels remain distinguishable.",
+      "executionStatus": "real_embedding_runner_pending"
+    },
+    {
+      "id": "garden",
+      "query": "help the plants survive summer",
+      "relevantSource": "Water deeply during dry weather.",
+      "irrelevantSource": "The office stationery inventory lists envelopes and staples.",
+      "inaccessibleNearerSource": "Water deeply during dry weather. PRIVATE SIBLING",
+      "expected": "Accessible conceptual source appears; private sibling and current page do not; semantic/lexical labels remain distinguishable.",
+      "executionStatus": "real_embedding_runner_pending"
+    },
+    {
+      "id": "meeting",
+      "query": "follow up on the discussion",
+      "relevantSource": "Action items from the planning call need owners.",
+      "irrelevantSource": "The office stationery inventory lists envelopes and staples.",
+      "inaccessibleNearerSource": "Action items from the planning call need owners. PRIVATE SIBLING",
+      "expected": "Accessible conceptual source appears; private sibling and current page do not; semantic/lexical labels remain distinguishable.",
+      "executionStatus": "real_embedding_runner_pending"
+    }
+  ]
+}

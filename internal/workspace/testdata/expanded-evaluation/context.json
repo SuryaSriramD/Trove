@@ -1,0 +1,91 @@
+{
+  "schemaVersion": 1,
+  "kind": "synthetic_predeclared_corpus",
+  "releaseQualified": false,
+  "cases": [
+    {
+      "id": "short-source",
+      "scenario": "One current source well below capacity",
+      "expected": "All requested facts retained; no omission warning.",
+      "executionStatus": "runner_pending",
+      "modelRequired": true
+    },
+    {
+      "id": "near-budget",
+      "scenario": "Source evidence approaching 8192 positions including framing and512output",
+      "expected": "Actual tokenizer reserve respected; retained facts supported.",
+      "executionStatus": "runner_pending",
+      "modelRequired": true
+    },
+    {
+      "id": "overflow",
+      "scenario": "Evidence exceeds context capacity",
+      "expected": "Explicit shortened/omitted evidence; no claim of exhaustive reading.",
+      "executionStatus": "runner_pending",
+      "modelRequired": true
+    },
+    {
+      "id": "beginning-fact",
+      "scenario": "Relevant fact precedes long irrelevant content",
+      "expected": "Answer uses retained current fact with current citation.",
+      "executionStatus": "runner_pending",
+      "modelRequired": true
+    },
+    {
+      "id": "middle-fact",
+      "scenario": "Relevant fact lies in middle of source",
+      "expected": "Either cited retained fact or explicit evidence absence; no invented answer.",
+      "executionStatus": "runner_pending",
+      "modelRequired": true
+    },
+    {
+      "id": "ending-fact",
+      "scenario": "Relevant fact lies at end of source",
+      "expected": "Either cited retained fact or explicit evidence absence; omitted source is reported.",
+      "executionStatus": "runner_pending",
+      "modelRequired": true
+    },
+    {
+      "id": "exact-code",
+      "scenario": "Exact selection fits budget with CRLF and Unicode",
+      "expected": "Selection byte-preserved; unrelated code unchanged.",
+      "executionStatus": "runner_pending",
+      "modelRequired": false
+    },
+    {
+      "id": "oversized-code",
+      "scenario": "Exact selection alone exceeds context budget",
+      "expected": "Request rejected without truncating selection or preparing replacement.",
+      "executionStatus": "runner_pending",
+      "modelRequired": false
+    },
+    {
+      "id": "framing-cost",
+      "scenario": "Input fits only when chat framing incorrectly ignored",
+      "expected": "Actual token count rejects/shrinks safely before generation.",
+      "executionStatus": "runner_pending",
+      "modelRequired": true
+    },
+    {
+      "id": "during-tokenization",
+      "scenario": "Canonical source edited inside tokenizer callback",
+      "expected": "Preparation rejects stale snapshot; no persisted usable draft.",
+      "executionStatus": "runner_pending",
+      "modelRequired": false
+    },
+    {
+      "id": "during-generation",
+      "scenario": "Canonical source edited after preparation",
+      "expected": "Finish invalidates generated draft; proposal cannot be applied.",
+      "executionStatus": "runner_pending",
+      "modelRequired": false
+    },
+    {
+      "id": "truncated-output",
+      "scenario": "Model hits512outputcap before complete output",
+      "expected": "Failed/incomplete draft cannot create replacement proposal.",
+      "executionStatus": "runner_pending",
+      "modelRequired": false
+    }
+  ]
+}
