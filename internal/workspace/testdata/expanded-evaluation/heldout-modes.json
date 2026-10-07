@@ -1,0 +1,856 @@
+{
+  "schemaVersion": 1,
+  "kind": "synthetic_predeclared_corpus",
+  "releaseQualified": false,
+  "cases": [
+    {
+      "id": "summarize-1",
+      "mode": "summarize",
+      "source": "The Harbor project has an approved budget of 26500 GBP. Its current launch month is February. Accessibility testing must finish before launch. The team discussed this plan in detail and recorded it for everyone to consult.",
+      "prompt": "Summarize in three cited factual lines. State the amount and currency, launch month and accessibility requirement. Do not add dates or amounts.",
+      "oracle": "writing",
+      "required": [
+        "26500",
+        "GBP",
+        "February",
+        "accessibility"
+      ],
+      "forbidden": [
+        "May"
+      ],
+      "allowedNumbers": [
+        "26500"
+      ],
+      "golden": "The budget is 26500 GBP. Launch is in February. Accessibility testing must finish before launch.",
+      "manualSemanticReviewRequired": true
+    },
+    {
+      "id": "explain-1",
+      "mode": "explain",
+      "source": "The Harbor project has an approved budget of 26500 GBP. Its current launch month is February. Accessibility testing must finish before launch. The team discussed this plan in detail and recorded it for everyone to consult.",
+      "prompt": "Explain the budget, month and pre-launch requirement with citations. State the amount and currency, launch month and accessibility requirement. Do not add dates or amounts.",
+      "oracle": "writing",
+      "required": [
+        "26500",
+        "GBP",
+        "February",
+        "accessibility"
+      ],
+      "forbidden": [
+        "May"
+      ],
+      "allowedNumbers": [
+        "26500"
+      ],
+      "golden": "The budget is 26500 GBP. Launch is in February. Accessibility testing must finish before launch.",
+      "manualSemanticReviewRequired": true
+    },
+    {
+      "id": "rewrite-1",
+      "mode": "rewrite",
+      "source": "The Harbor project has an approved budget of 26500 GBP. Its current launch month is February. Accessibility testing must finish before launch. The team discussed this plan in detail and recorded it for everyone to consult.",
+      "prompt": "Rewrite in plain English retaining all facts and adding none. State the amount and currency, launch month and accessibility requirement. Do not add dates or amounts.",
+      "oracle": "writing",
+      "required": [
+        "26500",
+        "GBP",
+        "February",
+        "accessibility"
+      ],
+      "forbidden": [
+        "May"
+      ],
+      "allowedNumbers": [
+        "26500"
+      ],
+      "golden": "The budget is 26500 GBP. Launch is in February. Accessibility testing must finish before launch.",
+      "manualSemanticReviewRequired": true
+    },
+    {
+      "id": "shorten-1",
+      "mode": "shorten",
+      "source": "The Harbor project has an approved budget of 26500 GBP. Its current launch month is February. Accessibility testing must finish before launch. The team discussed this plan in detail and recorded it for everyone to consult.",
+      "prompt": "Shorten to fewer characters retaining all facts. State the amount and currency, launch month and accessibility requirement. Do not add dates or amounts.",
+      "oracle": "writing",
+      "required": [
+        "26500",
+        "GBP",
+        "February",
+        "accessibility"
+      ],
+      "forbidden": [
+        "May"
+      ],
+      "allowedNumbers": [
+        "26500"
+      ],
+      "golden": "The budget is 26500 GBP. Launch is in February. Accessibility testing must finish before launch.",
+      "manualSemanticReviewRequired": true
+    },
+    {
+      "id": "expand-1",
+      "mode": "expand",
+      "source": "The Harbor project has an approved budget of 26500 GBP. Its current launch month is February. Accessibility testing must finish before launch. The team discussed this plan in detail and recorded it for everyone to consult.",
+      "prompt": "Expand into two paragraphs, preserving all facts. Label any additional next steps as suggestions. State the amount and currency, launch month and accessibility requirement. Do not add dates or amounts.",
+      "oracle": "writing",
+      "required": [
+        "26500",
+        "GBP",
+        "February",
+        "accessibility"
+      ],
+      "forbidden": [
+        "May"
+      ],
+      "allowedNumbers": [
+        "26500"
+      ],
+      "golden": "The Harbor project has an approved budget of 26500 GBP. Its current launch month is February. Accessibility testing must finish before launch. The team discussed this plan in detail and recorded it for everyone to consult.\n\nSuggested next steps: review the accessibility test results and keep the plan available for the team.",
+      "manualSemanticReviewRequired": true
+    },
+    {
+      "id": "outline-1",
+      "mode": "outline",
+      "source": "The Harbor project has an approved budget of 26500 GBP. Its current launch month is February. Accessibility testing must finish before launch. The team discussed this plan in detail and recorded it for everyone to consult.",
+      "prompt": "Use Markdown headings and bullets retaining all facts. State the amount and currency, launch month and accessibility requirement. Do not add dates or amounts.",
+      "oracle": "writing",
+      "required": [
+        "26500",
+        "GBP",
+        "February",
+        "accessibility"
+      ],
+      "forbidden": [
+        "May"
+      ],
+      "allowedNumbers": [
+        "26500"
+      ],
+      "golden": "# Harbor\n- Budget: 26500 GBP\n- Launch: February\n- Accessibility testing before launch.",
+      "manualSemanticReviewRequired": true
+    },
+    {
+      "id": "generate-1",
+      "mode": "generate",
+      "source": "The Harbor project has an approved budget of 26500 GBP. Its current launch month is February. Accessibility testing must finish before launch. The team discussed this plan in detail and recorded it for everyone to consult.",
+      "prompt": "Draft a page titled Harbor delivery with Markdown headings retaining all facts. State the amount and currency, launch month and accessibility requirement. Do not add dates or amounts.",
+      "oracle": "writing",
+      "required": [
+        "26500",
+        "GBP",
+        "February",
+        "accessibility",
+        "Harbor delivery"
+      ],
+      "forbidden": [
+        "May"
+      ],
+      "allowedNumbers": [
+        "26500"
+      ],
+      "golden": "# Harbor delivery\nThe budget is 26500 GBP. Launch is in February. Accessibility testing must finish before launch.",
+      "manualSemanticReviewRequired": true
+    },
+    {
+      "id": "database-1",
+      "mode": "database",
+      "source": "",
+      "prompt": "Create a table database titled Harbor work with exactly Estimate as a decimal number and Done as a checkbox. No sample rows. Return the canonical schema.",
+      "oracle": "database",
+      "expectedTitle": "Harbor work",
+      "properties": [
+        {
+          "name": "Estimate",
+          "type": "number",
+          "config": {
+            "format": "decimal"
+          }
+        },
+        {
+          "name": "Done",
+          "type": "checkbox",
+          "config": {}
+        }
+      ],
+      "golden": "{\"title\": \"Harbor work\", \"properties\": [{\"name\": \"Estimate\", \"type\": \"number\", \"config\": {\"format\": \"decimal\"}}, {\"name\": \"Done\", \"type\": \"checkbox\", \"config\": {}}], \"view\": \"table\"}",
+      "proposal": "create_database",
+      "manualSemanticReviewRequired": false
+    },
+    {
+      "id": "schema-1",
+      "mode": "schema",
+      "source": "",
+      "prompt": "Create a table database titled Harbor costs with exactly Estimate as a decimal number and Done as a checkbox. No sample rows. Return the canonical schema.",
+      "oracle": "database",
+      "expectedTitle": "Harbor costs",
+      "properties": [
+        {
+          "name": "Estimate",
+          "type": "number",
+          "config": {
+            "format": "decimal"
+          }
+        },
+        {
+          "name": "Done",
+          "type": "checkbox",
+          "config": {}
+        }
+      ],
+      "golden": "{\"title\": \"Harbor costs\", \"properties\": [{\"name\": \"Estimate\", \"type\": \"number\", \"config\": {\"format\": \"decimal\"}}, {\"name\": \"Done\", \"type\": \"checkbox\", \"config\": {}}], \"view\": \"table\"}",
+      "proposal": "create_database",
+      "manualSemanticReviewRequired": false
+    },
+    {
+      "id": "mermaid-1",
+      "mode": "mermaid",
+      "source": "",
+      "prompt": "Create flowchart LR with exactly edges Input1 to Validate1 and Validate1 to Save1. Use these exact node IDs. No labels, links, styling, fences or extra nodes.",
+      "oracle": "mermaid",
+      "edges": [
+        [
+          "Input1",
+          "Validate1"
+        ],
+        [
+          "Validate1",
+          "Save1"
+        ]
+      ],
+      "golden": "flowchart LR\nInput1 --> Validate1\nValidate1 --> Save1",
+      "proposal": "mermaid",
+      "manualSemanticReviewRequired": false
+    },
+    {
+      "id": "code_explain-1",
+      "mode": "code_explain",
+      "source": "func Scale2(x int) int { return x + x }",
+      "prompt": "Explain the input, output and multiplication factor of Scale2; do not run it.",
+      "oracle": "code_explain",
+      "expectedCode": "func Scale2(x int) int { return x + x }",
+      "requireComment": false,
+      "required": [
+        "Scale2",
+        "int",
+        "2"
+      ],
+      "golden": "Scale2 takes an int and returns an int equal to 2 times its input.",
+      "proposal": "",
+      "manualSemanticReviewRequired": true
+    },
+    {
+      "id": "code_refactor-1",
+      "mode": "code_refactor",
+      "source": "func Scale2(x int) int { return x + x }",
+      "prompt": "Replace repeated addition with x * 2. Preserve name, parameter, return type and behavior. Return only the complete function.",
+      "oracle": "code",
+      "expectedCode": "func Scale2(x int) int { return x * 2 }",
+      "requireComment": false,
+      "required": [
+        "Scale2",
+        "int",
+        "2"
+      ],
+      "golden": "func Scale2(x int) int { return x * 2 }",
+      "proposal": "replace_code",
+      "manualSemanticReviewRequired": false
+    },
+    {
+      "id": "code_comment-1",
+      "mode": "code_comment",
+      "source": "func Scale2(x int) int { return x + x }",
+      "prompt": "Add a useful Go comment explaining Scale2; preserve all code logic and types. Return only the complete commented function.",
+      "oracle": "code",
+      "expectedCode": "func Scale2(x int) int { return x + x }",
+      "requireComment": true,
+      "required": [
+        "Scale2",
+        "int",
+        "2"
+      ],
+      "golden": "// Scale2 multiplies its input.\nfunc Scale2(x int) int { return x + x }",
+      "proposal": "replace_code",
+      "manualSemanticReviewRequired": false
+    },
+    {
+      "id": "organize-1",
+      "mode": "organize",
+      "source": "Harbor planning contains decisions. Harbor meetings contain questions. Harbor logs contain incidents.",
+      "prompt": "Suggest how to organize Harbor planning, meetings and logs. Give a reason for each and leave everything unapplied.",
+      "oracle": "organize",
+      "required": [
+        "planning",
+        "meetings",
+        "logs"
+      ],
+      "golden": "Group planning because it holds decisions; meetings because they hold questions; logs because they hold incidents.",
+      "manualSemanticReviewRequired": true
+    },
+    {
+      "id": "summarize-2",
+      "mode": "summarize",
+      "source": "The Orchid project has an approved budget of 9300 EUR. Its current launch month is August. Accessibility testing must finish before launch. The team discussed this plan in detail and recorded it for everyone to consult.",
+      "prompt": "Summarize in three cited factual lines. State the amount and currency, launch month and accessibility requirement. Do not add dates or amounts.",
+      "oracle": "writing",
+      "required": [
+        "9300",
+        "EUR",
+        "August",
+        "accessibility"
+      ],
+      "forbidden": [
+        "October"
+      ],
+      "allowedNumbers": [
+        "9300"
+      ],
+      "golden": "The budget is 9300 EUR. Launch is in August. Accessibility testing must finish before launch.",
+      "manualSemanticReviewRequired": true
+    },
+    {
+      "id": "explain-2",
+      "mode": "explain",
+      "source": "The Orchid project has an approved budget of 9300 EUR. Its current launch month is August. Accessibility testing must finish before launch. The team discussed this plan in detail and recorded it for everyone to consult.",
+      "prompt": "Explain the budget, month and pre-launch requirement with citations. State the amount and currency, launch month and accessibility requirement. Do not add dates or amounts.",
+      "oracle": "writing",
+      "required": [
+        "9300",
+        "EUR",
+        "August",
+        "accessibility"
+      ],
+      "forbidden": [
+        "October"
+      ],
+      "allowedNumbers": [
+        "9300"
+      ],
+      "golden": "The budget is 9300 EUR. Launch is in August. Accessibility testing must finish before launch.",
+      "manualSemanticReviewRequired": true
+    },
+    {
+      "id": "rewrite-2",
+      "mode": "rewrite",
+      "source": "The Orchid project has an approved budget of 9300 EUR. Its current launch month is August. Accessibility testing must finish before launch. The team discussed this plan in detail and recorded it for everyone to consult.",
+      "prompt": "Rewrite in plain English retaining all facts and adding none. State the amount and currency, launch month and accessibility requirement. Do not add dates or amounts.",
+      "oracle": "writing",
+      "required": [
+        "9300",
+        "EUR",
+        "August",
+        "accessibility"
+      ],
+      "forbidden": [
+        "October"
+      ],
+      "allowedNumbers": [
+        "9300"
+      ],
+      "golden": "The budget is 9300 EUR. Launch is in August. Accessibility testing must finish before launch.",
+      "manualSemanticReviewRequired": true
+    },
+    {
+      "id": "shorten-2",
+      "mode": "shorten",
+      "source": "The Orchid project has an approved budget of 9300 EUR. Its current launch month is August. Accessibility testing must finish before launch. The team discussed this plan in detail and recorded it for everyone to consult.",
+      "prompt": "Shorten to fewer characters retaining all facts. State the amount and currency, launch month and accessibility requirement. Do not add dates or amounts.",
+      "oracle": "writing",
+      "required": [
+        "9300",
+        "EUR",
+        "August",
+        "accessibility"
+      ],
+      "forbidden": [
+        "October"
+      ],
+      "allowedNumbers": [
+        "9300"
+      ],
+      "golden": "The budget is 9300 EUR. Launch is in August. Accessibility testing must finish before launch.",
+      "manualSemanticReviewRequired": true
+    },
+    {
+      "id": "expand-2",
+      "mode": "expand",
+      "source": "The Orchid project has an approved budget of 9300 EUR. Its current launch month is August. Accessibility testing must finish before launch. The team discussed this plan in detail and recorded it for everyone to consult.",
+      "prompt": "Expand into two paragraphs, preserving all facts. Label any additional next steps as suggestions. State the amount and currency, launch month and accessibility requirement. Do not add dates or amounts.",
+      "oracle": "writing",
+      "required": [
+        "9300",
+        "EUR",
+        "August",
+        "accessibility"
+      ],
+      "forbidden": [
+        "October"
+      ],
+      "allowedNumbers": [
+        "9300"
+      ],
+      "golden": "The Orchid project has an approved budget of 9300 EUR. Its current launch month is August. Accessibility testing must finish before launch. The team discussed this plan in detail and recorded it for everyone to consult.\n\nSuggested next steps: review the accessibility test results and keep the plan available for the team.",
+      "manualSemanticReviewRequired": true
+    },
+    {
+      "id": "outline-2",
+      "mode": "outline",
+      "source": "The Orchid project has an approved budget of 9300 EUR. Its current launch month is August. Accessibility testing must finish before launch. The team discussed this plan in detail and recorded it for everyone to consult.",
+      "prompt": "Use Markdown headings and bullets retaining all facts. State the amount and currency, launch month and accessibility requirement. Do not add dates or amounts.",
+      "oracle": "writing",
+      "required": [
+        "9300",
+        "EUR",
+        "August",
+        "accessibility"
+      ],
+      "forbidden": [
+        "October"
+      ],
+      "allowedNumbers": [
+        "9300"
+      ],
+      "golden": "# Orchid\n- Budget: 9300 EUR\n- Launch: August\n- Accessibility testing before launch.",
+      "manualSemanticReviewRequired": true
+    },
+    {
+      "id": "generate-2",
+      "mode": "generate",
+      "source": "The Orchid project has an approved budget of 9300 EUR. Its current launch month is August. Accessibility testing must finish before launch. The team discussed this plan in detail and recorded it for everyone to consult.",
+      "prompt": "Draft a page titled Orchid delivery with Markdown headings retaining all facts. State the amount and currency, launch month and accessibility requirement. Do not add dates or amounts.",
+      "oracle": "writing",
+      "required": [
+        "9300",
+        "EUR",
+        "August",
+        "accessibility",
+        "Orchid delivery"
+      ],
+      "forbidden": [
+        "October"
+      ],
+      "allowedNumbers": [
+        "9300"
+      ],
+      "golden": "# Orchid delivery\nThe budget is 9300 EUR. Launch is in August. Accessibility testing must finish before launch.",
+      "manualSemanticReviewRequired": true
+    },
+    {
+      "id": "database-2",
+      "mode": "database",
+      "source": "",
+      "prompt": "Create a table database titled Orchid work with exactly Estimate as a decimal number and Done as a checkbox. No sample rows. Return the canonical schema.",
+      "oracle": "database",
+      "expectedTitle": "Orchid work",
+      "properties": [
+        {
+          "name": "Estimate",
+          "type": "number",
+          "config": {
+            "format": "decimal"
+          }
+        },
+        {
+          "name": "Done",
+          "type": "checkbox",
+          "config": {}
+        }
+      ],
+      "golden": "{\"title\": \"Orchid work\", \"properties\": [{\"name\": \"Estimate\", \"type\": \"number\", \"config\": {\"format\": \"decimal\"}}, {\"name\": \"Done\", \"type\": \"checkbox\", \"config\": {}}], \"view\": \"table\"}",
+      "proposal": "create_database",
+      "manualSemanticReviewRequired": false
+    },
+    {
+      "id": "schema-2",
+      "mode": "schema",
+      "source": "",
+      "prompt": "Create a table database titled Orchid costs with exactly Estimate as a decimal number and Done as a checkbox. No sample rows. Return the canonical schema.",
+      "oracle": "database",
+      "expectedTitle": "Orchid costs",
+      "properties": [
+        {
+          "name": "Estimate",
+          "type": "number",
+          "config": {
+            "format": "decimal"
+          }
+        },
+        {
+          "name": "Done",
+          "type": "checkbox",
+          "config": {}
+        }
+      ],
+      "golden": "{\"title\": \"Orchid costs\", \"properties\": [{\"name\": \"Estimate\", \"type\": \"number\", \"config\": {\"format\": \"decimal\"}}, {\"name\": \"Done\", \"type\": \"checkbox\", \"config\": {}}], \"view\": \"table\"}",
+      "proposal": "create_database",
+      "manualSemanticReviewRequired": false
+    },
+    {
+      "id": "mermaid-2",
+      "mode": "mermaid",
+      "source": "",
+      "prompt": "Create flowchart LR with exactly edges Input2 to Validate2 and Validate2 to Save2. Use these exact node IDs. No labels, links, styling, fences or extra nodes.",
+      "oracle": "mermaid",
+      "edges": [
+        [
+          "Input2",
+          "Validate2"
+        ],
+        [
+          "Validate2",
+          "Save2"
+        ]
+      ],
+      "golden": "flowchart LR\nInput2 --> Validate2\nValidate2 --> Save2",
+      "proposal": "mermaid",
+      "manualSemanticReviewRequired": false
+    },
+    {
+      "id": "code_explain-2",
+      "mode": "code_explain",
+      "source": "func Scale3(x int) int { return x + x + x }",
+      "prompt": "Explain the input, output and multiplication factor of Scale3; do not run it.",
+      "oracle": "code_explain",
+      "expectedCode": "func Scale3(x int) int { return x + x + x }",
+      "requireComment": false,
+      "required": [
+        "Scale3",
+        "int",
+        "3"
+      ],
+      "golden": "Scale3 takes an int and returns an int equal to 3 times its input.",
+      "proposal": "",
+      "manualSemanticReviewRequired": true
+    },
+    {
+      "id": "code_refactor-2",
+      "mode": "code_refactor",
+      "source": "func Scale3(x int) int { return x + x + x }",
+      "prompt": "Replace repeated addition with x * 3. Preserve name, parameter, return type and behavior. Return only the complete function.",
+      "oracle": "code",
+      "expectedCode": "func Scale3(x int) int { return x * 3 }",
+      "requireComment": false,
+      "required": [
+        "Scale3",
+        "int",
+        "3"
+      ],
+      "golden": "func Scale3(x int) int { return x * 3 }",
+      "proposal": "replace_code",
+      "manualSemanticReviewRequired": false
+    },
+    {
+      "id": "code_comment-2",
+      "mode": "code_comment",
+      "source": "func Scale3(x int) int { return x + x + x }",
+      "prompt": "Add a useful Go comment explaining Scale3; preserve all code logic and types. Return only the complete commented function.",
+      "oracle": "code",
+      "expectedCode": "func Scale3(x int) int { return x + x + x }",
+      "requireComment": true,
+      "required": [
+        "Scale3",
+        "int",
+        "3"
+      ],
+      "golden": "// Scale3 multiplies its input.\nfunc Scale3(x int) int { return x + x + x }",
+      "proposal": "replace_code",
+      "manualSemanticReviewRequired": false
+    },
+    {
+      "id": "organize-2",
+      "mode": "organize",
+      "source": "Orchid planning contains decisions. Orchid meetings contain questions. Orchid logs contain incidents.",
+      "prompt": "Suggest how to organize Orchid planning, meetings and logs. Give a reason for each and leave everything unapplied.",
+      "oracle": "organize",
+      "required": [
+        "planning",
+        "meetings",
+        "logs"
+      ],
+      "golden": "Group planning because it holds decisions; meetings because they hold questions; logs because they hold incidents.",
+      "manualSemanticReviewRequired": true
+    },
+    {
+      "id": "summarize-3",
+      "mode": "summarize",
+      "source": "The Maple project has an approved budget of 41700 USD. Its current launch month is April. Accessibility testing must finish before launch. The team discussed this plan in detail and recorded it for everyone to consult.",
+      "prompt": "Summarize in three cited factual lines. State the amount and currency, launch month and accessibility requirement. Do not add dates or amounts.",
+      "oracle": "writing",
+      "required": [
+        "41700",
+        "USD",
+        "April",
+        "accessibility"
+      ],
+      "forbidden": [
+        "July"
+      ],
+      "allowedNumbers": [
+        "41700"
+      ],
+      "golden": "The budget is 41700 USD. Launch is in April. Accessibility testing must finish before launch.",
+      "manualSemanticReviewRequired": true
+    },
+    {
+      "id": "explain-3",
+      "mode": "explain",
+      "source": "The Maple project has an approved budget of 41700 USD. Its current launch month is April. Accessibility testing must finish before launch. The team discussed this plan in detail and recorded it for everyone to consult.",
+      "prompt": "Explain the budget, month and pre-launch requirement with citations. State the amount and currency, launch month and accessibility requirement. Do not add dates or amounts.",
+      "oracle": "writing",
+      "required": [
+        "41700",
+        "USD",
+        "April",
+        "accessibility"
+      ],
+      "forbidden": [
+        "July"
+      ],
+      "allowedNumbers": [
+        "41700"
+      ],
+      "golden": "The budget is 41700 USD. Launch is in April. Accessibility testing must finish before launch.",
+      "manualSemanticReviewRequired": true
+    },
+    {
+      "id": "rewrite-3",
+      "mode": "rewrite",
+      "source": "The Maple project has an approved budget of 41700 USD. Its current launch month is April. Accessibility testing must finish before launch. The team discussed this plan in detail and recorded it for everyone to consult.",
+      "prompt": "Rewrite in plain English retaining all facts and adding none. State the amount and currency, launch month and accessibility requirement. Do not add dates or amounts.",
+      "oracle": "writing",
+      "required": [
+        "41700",
+        "USD",
+        "April",
+        "accessibility"
+      ],
+      "forbidden": [
+        "July"
+      ],
+      "allowedNumbers": [
+        "41700"
+      ],
+      "golden": "The budget is 41700 USD. Launch is in April. Accessibility testing must finish before launch.",
+      "manualSemanticReviewRequired": true
+    },
+    {
+      "id": "shorten-3",
+      "mode": "shorten",
+      "source": "The Maple project has an approved budget of 41700 USD. Its current launch month is April. Accessibility testing must finish before launch. The team discussed this plan in detail and recorded it for everyone to consult.",
+      "prompt": "Shorten to fewer characters retaining all facts. State the amount and currency, launch month and accessibility requirement. Do not add dates or amounts.",
+      "oracle": "writing",
+      "required": [
+        "41700",
+        "USD",
+        "April",
+        "accessibility"
+      ],
+      "forbidden": [
+        "July"
+      ],
+      "allowedNumbers": [
+        "41700"
+      ],
+      "golden": "The budget is 41700 USD. Launch is in April. Accessibility testing must finish before launch.",
+      "manualSemanticReviewRequired": true
+    },
+    {
+      "id": "expand-3",
+      "mode": "expand",
+      "source": "The Maple project has an approved budget of 41700 USD. Its current launch month is April. Accessibility testing must finish before launch. The team discussed this plan in detail and recorded it for everyone to consult.",
+      "prompt": "Expand into two paragraphs, preserving all facts. Label any additional next steps as suggestions. State the amount and currency, launch month and accessibility requirement. Do not add dates or amounts.",
+      "oracle": "writing",
+      "required": [
+        "41700",
+        "USD",
+        "April",
+        "accessibility"
+      ],
+      "forbidden": [
+        "July"
+      ],
+      "allowedNumbers": [
+        "41700"
+      ],
+      "golden": "The Maple project has an approved budget of 41700 USD. Its current launch month is April. Accessibility testing must finish before launch. The team discussed this plan in detail and recorded it for everyone to consult.\n\nSuggested next steps: review the accessibility test results and keep the plan available for the team.",
+      "manualSemanticReviewRequired": true
+    },
+    {
+      "id": "outline-3",
+      "mode": "outline",
+      "source": "The Maple project has an approved budget of 41700 USD. Its current launch month is April. Accessibility testing must finish before launch. The team discussed this plan in detail and recorded it for everyone to consult.",
+      "prompt": "Use Markdown headings and bullets retaining all facts. State the amount and currency, launch month and accessibility requirement. Do not add dates or amounts.",
+      "oracle": "writing",
+      "required": [
+        "41700",
+        "USD",
+        "April",
+        "accessibility"
+      ],
+      "forbidden": [
+        "July"
+      ],
+      "allowedNumbers": [
+        "41700"
+      ],
+      "golden": "# Maple\n- Budget: 41700 USD\n- Launch: April\n- Accessibility testing before launch.",
+      "manualSemanticReviewRequired": true
+    },
+    {
+      "id": "generate-3",
+      "mode": "generate",
+      "source": "The Maple project has an approved budget of 41700 USD. Its current launch month is April. Accessibility testing must finish before launch. The team discussed this plan in detail and recorded it for everyone to consult.",
+      "prompt": "Draft a page titled Maple delivery with Markdown headings retaining all facts. State the amount and currency, launch month and accessibility requirement. Do not add dates or amounts.",
+      "oracle": "writing",
+      "required": [
+        "41700",
+        "USD",
+        "April",
+        "accessibility",
+        "Maple delivery"
+      ],
+      "forbidden": [
+        "July"
+      ],
+      "allowedNumbers": [
+        "41700"
+      ],
+      "golden": "# Maple delivery\nThe budget is 41700 USD. Launch is in April. Accessibility testing must finish before launch.",
+      "manualSemanticReviewRequired": true
+    },
+    {
+      "id": "database-3",
+      "mode": "database",
+      "source": "",
+      "prompt": "Create a table database titled Maple work with exactly Estimate as a decimal number and Done as a checkbox. No sample rows. Return the canonical schema.",
+      "oracle": "database",
+      "expectedTitle": "Maple work",
+      "properties": [
+        {
+          "name": "Estimate",
+          "type": "number",
+          "config": {
+            "format": "decimal"
+          }
+        },
+        {
+          "name": "Done",
+          "type": "checkbox",
+          "config": {}
+        }
+      ],
+      "golden": "{\"title\": \"Maple work\", \"properties\": [{\"name\": \"Estimate\", \"type\": \"number\", \"config\": {\"format\": \"decimal\"}}, {\"name\": \"Done\", \"type\": \"checkbox\", \"config\": {}}], \"view\": \"table\"}",
+      "proposal": "create_database",
+      "manualSemanticReviewRequired": false
+    },
+    {
+      "id": "schema-3",
+      "mode": "schema",
+      "source": "",
+      "prompt": "Create a table database titled Maple costs with exactly Estimate as a decimal number and Done as a checkbox. No sample rows. Return the canonical schema.",
+      "oracle": "database",
+      "expectedTitle": "Maple costs",
+      "properties": [
+        {
+          "name": "Estimate",
+          "type": "number",
+          "config": {
+            "format": "decimal"
+          }
+        },
+        {
+          "name": "Done",
+          "type": "checkbox",
+          "config": {}
+        }
+      ],
+      "golden": "{\"title\": \"Maple costs\", \"properties\": [{\"name\": \"Estimate\", \"type\": \"number\", \"config\": {\"format\": \"decimal\"}}, {\"name\": \"Done\", \"type\": \"checkbox\", \"config\": {}}], \"view\": \"table\"}",
+      "proposal": "create_database",
+      "manualSemanticReviewRequired": false
+    },
+    {
+      "id": "mermaid-3",
+      "mode": "mermaid",
+      "source": "",
+      "prompt": "Create flowchart LR with exactly edges Input3 to Validate3 and Validate3 to Save3. Use these exact node IDs. No labels, links, styling, fences or extra nodes.",
+      "oracle": "mermaid",
+      "edges": [
+        [
+          "Input3",
+          "Validate3"
+        ],
+        [
+          "Validate3",
+          "Save3"
+        ]
+      ],
+      "golden": "flowchart LR\nInput3 --> Validate3\nValidate3 --> Save3",
+      "proposal": "mermaid",
+      "manualSemanticReviewRequired": false
+    },
+    {
+      "id": "code_explain-3",
+      "mode": "code_explain",
+      "source": "func Scale4(x int) int { return x + x + x + x }",
+      "prompt": "Explain the input, output and multiplication factor of Scale4; do not run it.",
+      "oracle": "code_explain",
+      "expectedCode": "func Scale4(x int) int { return x + x + x + x }",
+      "requireComment": false,
+      "required": [
+        "Scale4",
+        "int",
+        "4"
+      ],
+      "golden": "Scale4 takes an int and returns an int equal to 4 times its input.",
+      "proposal": "",
+      "manualSemanticReviewRequired": true
+    },
+    {
+      "id": "code_refactor-3",
+      "mode": "code_refactor",
+      "source": "func Scale4(x int) int { return x + x + x + x }",
+      "prompt": "Replace repeated addition with x * 4. Preserve name, parameter, return type and behavior. Return only the complete function.",
+      "oracle": "code",
+      "expectedCode": "func Scale4(x int) int { return x * 4 }",
+      "requireComment": false,
+      "required": [
+        "Scale4",
+        "int",
+        "4"
+      ],
+      "golden": "func Scale4(x int) int { return x * 4 }",
+      "proposal": "replace_code",
+      "manualSemanticReviewRequired": false
+    },
+    {
+      "id": "code_comment-3",
+      "mode": "code_comment",
+      "source": "func Scale4(x int) int { return x + x + x + x }",
+      "prompt": "Add a useful Go comment explaining Scale4; preserve all code logic and types. Return only the complete commented function.",
+      "oracle": "code",
+      "expectedCode": "func Scale4(x int) int { return x + x + x + x }",
+      "requireComment": true,
+      "required": [
+        "Scale4",
+        "int",
+        "4"
+      ],
+      "golden": "// Scale4 multiplies its input.\nfunc Scale4(x int) int { return x + x + x + x }",
+      "proposal": "replace_code",
+      "manualSemanticReviewRequired": false
+    },
+    {
+      "id": "organize-3",
+      "mode": "organize",
+      "source": "Maple planning contains decisions. Maple meetings contain questions. Maple logs contain incidents.",
+      "prompt": "Suggest how to organize Maple planning, meetings and logs. Give a reason for each and leave everything unapplied.",
+      "oracle": "organize",
+      "required": [
+        "planning",
+        "meetings",
+        "logs"
+      ],
+      "golden": "Group planning because it holds decisions; meetings because they hold questions; logs because they hold incidents.",
+      "manualSemanticReviewRequired": true
+    }
+  ]
+}

@@ -1,0 +1,79 @@
+{
+  "schemaVersion": 1,
+  "kind": "synthetic_predeclared_corpus",
+  "releaseQualified": false,
+  "cases": [
+    {
+      "id": "preference-on",
+      "scenario": "Approved heading preference included",
+      "expected": "Preferred heading applied and current facts cited.",
+      "executionStatus": "runner_pending"
+    },
+    {
+      "id": "preference-off",
+      "scenario": "Same preference exists;UseMemoryfalse",
+      "expected": "No memory enters context; default heading used.",
+      "executionStatus": "runner_pending"
+    },
+    {
+      "id": "current-authority",
+      "scenario": "Old approved decision conflicts with current page",
+      "expected": "Current page facts win; old facts never used as current.",
+      "executionStatus": "runner_pending"
+    },
+    {
+      "id": "constraint",
+      "scenario": "Approved constraint disallows weekend due dates",
+      "expected": "Suggestions respect constraint without writing tasks.",
+      "executionStatus": "runner_pending"
+    },
+    {
+      "id": "source-edit",
+      "scenario": "Source supporting approved memory edited",
+      "expected": "Memory is stale and excluded until reviewed.",
+      "executionStatus": "runner_pending"
+    },
+    {
+      "id": "source-delete",
+      "scenario": "Source supporting memory deleted",
+      "expected": "Memory cannot supply facts or proposals.",
+      "executionStatus": "runner_pending"
+    },
+    {
+      "id": "forgotten",
+      "scenario": "Approved memory explicitly forgotten",
+      "expected": "Excluded from next preparation and related suggestions.",
+      "executionStatus": "runner_pending"
+    },
+    {
+      "id": "forget-stream",
+      "scenario": "Memory forgotten during streamed generation",
+      "expected": "Output invalidated and no proposal application possible.",
+      "executionStatus": "runner_pending"
+    },
+    {
+      "id": "restore-stale",
+      "scenario": "Backup restores a memory already marked stale",
+      "expected": "Restored stale state remains excluded.",
+      "executionStatus": "runner_pending"
+    },
+    {
+      "id": "restore-forgotten",
+      "scenario": "Backup restores a memory already marked forgotten",
+      "expected": "Restored forgotten state remains excluded.",
+      "executionStatus": "runner_pending"
+    },
+    {
+      "id": "older-backup",
+      "scenario": "Backup predates forgetting",
+      "expected": "Earlier memory state can recover; UI/history describes this boundary.",
+      "executionStatus": "runner_pending"
+    },
+    {
+      "id": "scope-revoke",
+      "scenario": "Read grant revoked during memory-backed request",
+      "expected": "No publication/application beyond live grant.",
+      "executionStatus": "runner_pending"
+    }
+  ]
+}

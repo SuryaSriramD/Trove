@@ -1,0 +1,127 @@
+{
+  "schemaVersion": 1,
+  "baseCommit": "317b78282f63b6150269b11166463d3ecc997b17",
+  "implementation": "new synthetic evaluation package; no production changes",
+  "releaseQualified": false,
+  "inputsAndEvidence": {
+    "evidence/completion/expanded-evaluation/canary-final.txt": {
+      "bytes": 2253,
+      "sha256": "5c20b292e471d9969e872ef6ad347b14a922d688bc40add23c7303fa928c748a"
+    },
+    "evidence/completion/expanded-evaluation/canary-wrong-cwd.txt": {
+      "bytes": 216,
+      "sha256": "6c28c1cfe8a72fda49c9e8a8d86c15e4c509911f729e4530ac07ff818d5b91ea"
+    },
+    "evidence/completion/expanded-evaluation/structural-final.jsonl": {
+      "bytes": 81071,
+      "sha256": "fac3a2f5e4c3429816ba589021a7de1d7fa1b7b5fef41dcc931e3b3cea8baa26"
+    },
+    "evidence/completion/expanded-evaluation/structural-initial.jsonl": {
+      "bytes": 49865,
+      "sha256": "593fc25ee920d48d985e2cddb6a34e5e77ff3552ca46105e43164e31658ebd72"
+    },
+    "internal/workspace/ai_expanded_evaluation_test.go": {
+      "bytes": 11229,
+      "sha256": "0e142c4c6b8acfc5d549d0c3e651d1946d5fd655ebef7c108880dc6e4ad0c2a9"
+    },
+    "internal/workspace/ai_expanded_modes_test.go": {
+      "bytes": 11342,
+      "sha256": "ea283f8c7c5ffb322df49197a87b9e0e06c8f3da9257bc477bf998ee3d403bce"
+    },
+    "internal/workspace/testdata/expanded-evaluation/context.json": {
+      "bytes": 3306,
+      "sha256": "d3da4f5548d485be162a5a52fcd3b9a76840f11224dfcaaeb188f4a0657f7529"
+    },
+    "internal/workspace/testdata/expanded-evaluation/heldout-modes.json": {
+      "bytes": 33902,
+      "sha256": "31f97f71107cc81e772a68d86d01acd6f5756ee68d2b9da46db6b936119ebf9a"
+    },
+    "internal/workspace/testdata/expanded-evaluation/image-boundary-1.png": {
+      "bytes": 311,
+      "sha256": "fd69ade16fed487a06129b5f071527f55e87e249d6d87f775449b4fb315fa7b6"
+    },
+    "internal/workspace/testdata/expanded-evaluation/image-boundary-2.png": {
+      "bytes": 300,
+      "sha256": "6a204a6dd39541c3b46779333153e0a883453fb4a38c03081c32928c0b553421"
+    },
+    "internal/workspace/testdata/expanded-evaluation/image-boundary-3.png": {
+      "bytes": 300,
+      "sha256": "2c5fb7c6f188f7f264da07eb97511eba3de4b9228ecbd75c5f78a542a6c2f9ee"
+    },
+    "internal/workspace/testdata/expanded-evaluation/image-boundary-4.png": {
+      "bytes": 316,
+      "sha256": "e4ceac3ac2fa99a4eb01985a81223d358975ed7795f2987857ebf8dff059549e"
+    },
+    "internal/workspace/testdata/expanded-evaluation/image-boundary-5.png": {
+      "bytes": 317,
+      "sha256": "7c95a6a9df0450db45c8e91a3cfb820c6bb8a7b483259c87e2b5f0a2d7f72755"
+    },
+    "internal/workspace/testdata/expanded-evaluation/image-boundary-6.png": {
+      "bytes": 332,
+      "sha256": "ccee59d034a77dd6a0a622ea8643db2861145a9c6c4e274053ff6e6b390bef7f"
+    },
+    "internal/workspace/testdata/expanded-evaluation/image-diagram-1.png": {
+      "bytes": 318,
+      "sha256": "5a66d839da185a654cbd089f1944770516688334ddd5149417b68ae5f36c1194"
+    },
+    "internal/workspace/testdata/expanded-evaluation/image-diagram-2.png": {
+      "bytes": 318,
+      "sha256": "2d5690be137f5f9ed9dcec909b84ba376b023dc6888174d59081203dc08b44a8"
+    },
+    "internal/workspace/testdata/expanded-evaluation/image-diagram-3.png": {
+      "bytes": 321,
+      "sha256": "57d027ea47444206b8cdf5c415643f75e150d71236b7627e28505292b773f96e"
+    },
+    "internal/workspace/testdata/expanded-evaluation/image-diagram-4.png": {
+      "bytes": 359,
+      "sha256": "a885e5dc35f0129700d54c11980d4667bfdb672ed4ec167e337271a7485668a1"
+    },
+    "internal/workspace/testdata/expanded-evaluation/image-diagram-5.png": {
+      "bytes": 359,
+      "sha256": "a885e5dc35f0129700d54c11980d4667bfdb672ed4ec167e337271a7485668a1"
+    },
+    "internal/workspace/testdata/expanded-evaluation/image-diagram-6.png": {
+      "bytes": 359,
+      "sha256": "a885e5dc35f0129700d54c11980d4667bfdb672ed4ec167e337271a7485668a1"
+    },
+    "internal/workspace/testdata/expanded-evaluation/images.json": {
+      "bytes": 8012,
+      "sha256": "f726da41e496636780c3402a78f2541bdee2fe3f07ff403fe803017c466b63c6"
+    },
+    "internal/workspace/testdata/expanded-evaluation/memory-lifecycle.json": {
+      "bytes": 2729,
+      "sha256": "0233ba4764b1c6826dc6e88c6a98278e285381531a21b6c26ed2c603f3ad9bbf"
+    },
+    "internal/workspace/testdata/expanded-evaluation/p0-qa-memory.json": {
+      "bytes": 30455,
+      "sha256": "3fdb5e0fc556620cda76a9e3c255dbdce35551bbe134cbfea17153eaabbd6fee"
+    },
+    "internal/workspace/testdata/expanded-evaluation/related.json": {
+      "bytes": 6659,
+      "sha256": "6c32fe55f48f96886b7c8da7e41dbb9f5c4f021080d840e0b48322556e50c6f0"
+    },
+    "internal/workspace/testdata/expanded-evaluation/reviews.json": {
+      "bytes": 3352,
+      "sha256": "d8937d240b34434834364b3741cc9e6d7fbdaf9d8075d043e39331c52e81c539"
+    },
+    "scripts/run-expanded-evaluation.py": {
+      "bytes": 7555,
+      "sha256": "dcc08daad09b0f42fc568eec61b23752eaf67d878cf0707abdecc23cd8e5713f"
+    },
+    "scripts/test-expanded-evaluation.py": {
+      "bytes": 1771,
+      "sha256": "97f42441da28533484edfb8d6b7df52929b27e7e56383026bc49380db21194f6"
+    }
+  },
+  "modelPackId": "01990000-0000-7000-8000-000000000106",
+  "modelSHA256": "a96b16179dc6cc9afdf0cf7a96a80c199cbd00b9be207c3465be21cb721cca5e",
+  "nativeBundle": "/private/tmp/trove-native-integrated-e481c6a",
+  "helperSHA256": "6bdae1f55891d9df40f40eb7ac9e4a5fccfb93fd22f30fda181554a1c2b2c9af",
+  "canaryTestBinarySHA256": "b593d64853e953725e111b1ec226dd4858ae4cbe0da310aed7a7e3f32ae0bead",
+  "canaryScope": [
+    "delivery-plain",
+    "delivery-memory"
+  ],
+  "fullCorpusExecuted": false,
+  "performanceQualified": false
+}
