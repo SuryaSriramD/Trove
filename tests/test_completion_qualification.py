@@ -100,12 +100,113 @@ class QualificationTests(unittest.TestCase):
         for target in self.policy['targets']:
             for tier in self.policy['tiers']:
                 catalog=q.acceptance_catalog(self.policy,target,tier)
-                self.assertEqual(sum(r['id'].startswith('backlog:') for r in catalog['rows']),51)
+                self.assertEqual(sum(r['id'].startswith('backlog:') and 'parentId' not in r for r in catalog['rows']),51)
                 self.assertEqual(len(catalog['rows']),len({r['id'] for r in catalog['rows']}))
                 coverage=q.acceptance_coverage(self.policy,catalog,{c['id']:'passed' for c in self.policy['checks']})
                 self.assertEqual(coverage['result'],'pending')
-                self.assertEqual(coverage['passedCriteria'],0)
+                self.assertEqual(coverage['passedCriteria'],2)
+                self.assertEqual(coverage['mappedCriteria'],2)
+                self.assertTrue(coverage['unmappedCriteria'])
                 self.assertGreater(coverage['requiredCriteria'],205)
+
+    def test_original_acceptance_text_and_all_sources_are_retained(self):
+        policy=copy.deepcopy(self.policy);policy['acceptanceDecomposition']={}
+        raw=q.acceptance_catalog(policy,'darwin-arm64','P0')
+        actual=q.acceptance_catalog(self.policy,'darwin-arm64','P0')
+        parents={r['id']:r for r in actual['rows'] if 'parentId' not in r}
+        self.assertEqual(set(parents),{r['id'] for r in raw['rows']})
+        for original in raw['rows']:
+            self.assertEqual(q.acceptance_source(parents[original['id']]),q.acceptance_source(original))
+
+    def test_mixed_scopes_and_platform_obligations_are_independent(self):
+        rows=lambda target,tier:{r['id']:r for r in q.acceptance_catalog(self.policy,target,tier)['rows']}
+        p0=rows('darwin-arm64','P0');p1=rows('darwin-arm64','P1')
+        self.assertEqual(p0['backlog:CORE-007']['applicability'],'decomposed')
+        self.assertEqual(p0['backlog:CORE-007/p0-1']['applicability'],'required')
+        self.assertEqual(p0['backlog:CORE-007/p1-2']['applicability'],'later_tier')
+        self.assertEqual(p1['backlog:CORE-007/p1-2']['applicability'],'required')
+        self.assertEqual(p0['backlog:CORE-001/merge-editing']['applicability'],'later_tier')
+        self.assertEqual(p0['requirement:FR-013:1/p1-2']['applicability'],'later_tier')
+        self.assertEqual(p0['requirement:PRD-EDITOR-025:1/p0-1']['applicability'],'required')
+        self.assertEqual(p0['backlog:REL-009/windows']['applicability'],'other_platform')
+        self.assertEqual(rows('windows-amd64','P0')['backlog:REL-009/windows']['applicability'],'required')
+        self.assertEqual(rows('windows-amd64','P0')['backlog:REL-009/linux']['applicability'],'other_platform')
+
+    def test_missing_research_remains_open_without_blocking_unrelated_release(self):
+        plan=q.pending_plan(self.policy,'darwin-arm64','P0')
+        self.assertNotIn('research-report',plan['prerequisites'])
+        self.assertEqual(plan['programmeReconciliation']['status'],'pending')
+        research=plan['programmeReconciliation']['checks'][0]
+        self.assertEqual(research['id'],'research-parity-reconciliation')
+        self.assertEqual(research['prerequisites']['research-report']['default'],'not_available')
+        self.assertEqual(plan['acceptanceCoverage']['researchParityCriteria'],['backlog:GOV-004/research-parity'])
+        self.assertFalse(plan['releaseQualified'])
+        # Accepted research amendments in the actual ledger stay product obligations.
+        self.assertIn('requirement:ADR-015:1',plan['acceptanceCoverage']['unmappedCriteria'])
+
+    def test_decomposition_cannot_drop_text_or_reviewed_scope(self):
+        for mutate in [lambda r:r['parts'].pop(),
+                       lambda r:r['parts'][0].update(fragments=['Users can grow and shrink tables']),
+                       lambda r:r.update(sourceSha256='f'*64)]:
+            policy=copy.deepcopy(self.policy)
+            mutate(policy['acceptanceDecomposition']['backlog:CORE-001'])
+            with self.assertRaises(ValueError):q.acceptance_catalog(policy,'darwin-arm64','P0')
+        policy=copy.deepcopy(self.policy)
+        # Even duplicate full-text contexts need every reviewed release scope.
+        policy['acceptanceDecomposition']['backlog:CORE-007']['parts'].pop()
+        with self.assertRaises(ValueError):q.acceptance_catalog(policy,'darwin-arm64','P0')
+
+    def test_source_or_scope_changes_invalidate_frozen_catalog_and_mapping(self):
+        policy=copy.deepcopy(self.policy)
+        policy['acceptanceDecomposition']['backlog:FIX-001']['parts'][0]['context']='Native UI on a clean installation'
+        catalog=q.acceptance_catalog(policy,'darwin-arm64','P0')
+        criterion=next(r for r in catalog['rows'] if r['id']=='backlog:FIX-001/archive-bytes')
+        # Rehashing the criterion is insufficient: its independently scoped test
+        # scenario must also agree, and a service proof cannot become native proof.
+        policy['acceptanceCases']['darwin-arm64/P0'][criterion['id']]['criterionSha256']=q.digest_value(criterion)
+        result=q.acceptance_coverage(policy,catalog,{'p0-service-regressions':'passed'})
+        self.assertEqual(next(r['result'] for r in result['criteria'] if r['id']==criterion['id']),'invalid')
+        self.assertTrue(q.validate_candidate(self.candidate,policy))
+
+    def test_fixture_service_checks_cannot_satisfy_native_acceptance(self):
+        catalog=q.acceptance_catalog(self.policy,'darwin-arm64','P0')
+        criterion=next(r for r in catalog['rows'] if r['id']=='backlog:REL-005')
+        policy=copy.deepcopy(self.policy)
+        check=next(c for c in policy['checks'] if c['id']=='p0-service-regressions')
+        scenario=copy.deepcopy(check['scenarios'][0])
+        scenario.update(id='misleading-clean-installation',expected=criterion['expected'],context=criterion['context'])
+        check['scenarios'].append(scenario)
+        policy['acceptanceCases']['darwin-arm64/P0'][criterion['id']]={'criterionSha256':q.digest_value(criterion),'cases':[{'checkId':check['id'],'scenarioId':scenario['id']}]}
+        for evidence_kind in ['service','observation']:
+            scenario['evidenceKind']=evidence_kind
+            result=q.acceptance_coverage(policy,catalog,{check['id']:'passed'})
+            self.assertEqual(next(r['result'] for r in result['criteria'] if r['id']==criterion['id']),'invalid')
+            self.assertEqual(result['result'],'pending')
+
+    def test_reviewed_test_assertions_and_source_hash_are_required(self):
+        base=copy.deepcopy(self.check('p0-service-regressions')['scenarios'][0])
+        for mutate in [lambda s:s['sourceProofs'][0].update(sha256='f'*64),
+                       lambda s:s['sourceProofs'][0].update(assertions=['an assertion that does not exist']),
+                       lambda s:s['sourceProofs'].clear(),
+                       lambda s:s.update(tests=['TestOther']),
+                       lambda s:s.update(evidenceKind='observation')]:
+            scenario=copy.deepcopy(base);mutate(scenario)
+            with self.assertRaises(ValueError):q.validate_scenario_proof(self.check('p0-service-regressions'),scenario)
+
+    def test_service_acceptance_requires_fresh_passing_check_and_full_coverage(self):
+        catalog=q.acceptance_catalog(self.policy,'darwin-arm64','P0')
+        for outcome in ['pending','skipped','failed','unqualified','not_available']:
+            coverage=q.acceptance_coverage(self.policy,catalog,{'p0-service-regressions':outcome})
+            self.assertEqual(coverage['passedCriteria'],0)
+            self.assertEqual(coverage['result'],'pending')
+        coverage=q.acceptance_coverage(self.policy,catalog,{'p0-service-regressions':'passed'})
+        self.assertEqual(coverage['passedCriteria'],2)
+        self.assertEqual(coverage['result'],'pending')
+        policy=copy.deepcopy(self.policy)
+        policy['acceptanceCases']['darwin-arm64/P0'].pop('backlog:FIX-001/archive-bytes')
+        coverage=q.acceptance_coverage(policy,catalog,{'p0-service-regressions':'passed'})
+        self.assertIn('backlog:FIX-001/archive-bytes',coverage['unmappedCriteria'])
+        self.assertEqual(coverage['result'],'pending')
 
     def test_acceptance_boolean_or_broad_scenario_cannot_bypass_unmapped_criteria(self):
         catalog=q.acceptance_catalog(self.policy,'darwin-arm64','P0')

@@ -113,7 +113,7 @@ def load_policy(path=POLICY):
         if not re.fullmatch(r'[a-z][a-z0-9-]+', check['id']) or check['id'] in seen:
             raise ValueError('invalid/duplicate check ID')
         seen.add(check['id'])
-        if check['tier'] not in policy['tiers'] or check['scope'] not in ('software', 'release'):
+        if check['tier'] not in policy['tiers'] or check['scope'] not in ('software', 'release', 'programme'):
             raise ValueError('invalid check scope/tier')
         if not check['targets'] or not set(check['targets']) <= set(policy['targets']):
             raise ValueError('invalid check targets')
@@ -132,23 +132,111 @@ def load_policy(path=POLICY):
                 raise ValueError('observation scenarios must be explicit and unique')
         else:
             raise ValueError('unknown check kind')
+        scenario_ids = [s['id'] for s in check['scenarios']]
+        if len(scenario_ids) != len(set(scenario_ids)) or any(not s['expected'] for s in check['scenarios']):
+            raise ValueError('acceptance scenarios must be unique and nonempty')
+        for scenario in check['scenarios']:
+            validate_scenario_proof(check, scenario)
     return policy
+
+
+def validate_scenario_proof(check, scenario):
+    """Source anchors identify reviewed assertions; they do not create run evidence."""
+    if check['kind'] != 'go':
+        if scenario.get('evidenceKind', 'observation') != 'observation':
+            raise ValueError('observation cannot stand in for an executable service case')
+        return
+    if scenario.get('evidenceKind') != 'service' or not scenario.get('context'):
+        raise ValueError('Go acceptance needs an explicit service scope')
+    tests = scenario.get('tests', [])
+    proofs = scenario.get('sourceProofs', [])
+    if not tests or len(tests) != len(set(tests)) or not set(tests) <= set(check['tests']):
+        raise ValueError('scenario tests must be exact executed selectors')
+    if len(proofs) != len(tests) or {p.get('test') for p in proofs} != set(tests):
+        raise ValueError('each scenario test needs its reviewed source proof')
+    for proof in proofs:
+        relative = Path(proof['path'])
+        if relative.parent.as_posix() != 'internal/workspace' or not relative.name.endswith('_test.go'):
+            raise ValueError('source proof must identify a workspace test file')
+        path = ROOT / relative
+        if file_identity(path)['sha256'] != proof['sha256']:
+            raise ValueError('reviewed test source changed: ' + str(relative))
+        source = path.read_text()
+        match = re.search(r'^func ' + re.escape(proof['test']) + r'\(.*?(?=^func |\Z)', source, re.M | re.S)
+        if not match or not proof.get('assertions') or any(not a or a not in match[0] for a in proof['assertions']):
+            raise ValueError('reviewed assertion missing from exact test body')
 
 
 def selected_checks(policy, target, tier):
     if target not in policy['targets'] or tier not in policy['tiers']:
         raise ValueError('unknown target/tier')
     tiers = policy['tiers'][:policy['tiers'].index(tier) + 1]
-    return [c for c in policy['checks'] if target in c['targets'] and c['tier'] in tiers]
+    return [c for c in policy['checks'] if target in c['targets'] and c['tier'] in tiers and c['scope'] != 'programme']
+
+
+def programme_plan(policy, target):
+    # Research parity has its own closure obligation. No release receipt closes it.
+    checks = [c for c in policy['checks'] if target in c['targets'] and c['scope'] == 'programme']
+    return {'status': 'pending' if checks else 'not_applicable',
+            'checks': [{'id': c['id'], 'status': 'pending', 'scenarios': c['scenarios'],
+                        'prerequisites': {p: policy['prerequisites'][p] for p in c['prerequisites']}} for c in checks],
+            'meaning': 'Separate programme/research reconciliation remains open; no product release pass closes these obligations.'}
+
+
+def acceptance_source(row):
+    return {key: row[key] for key in ('id', 'sourceId', 'release', 'expected', 'scopeText') if key in row}
+
+
+def decompose_acceptance(policy, originals, target, levels):
+    rules = policy.get('acceptanceDecomposition', {})
+    if not isinstance(rules, dict) or not set(rules) <= {r['id'] for r in originals}:
+        raise ValueError('unknown acceptance decomposition source')
+    rows = []
+    for original in originals:
+        rule = rules.get(original['id'])
+        if rule is None:
+            rows.append(original)
+            continue
+        if set(rule) != {'sourceSha256', 'rationale', 'requiredParts', 'parts'} or rule['sourceSha256'] != digest_value(acceptance_source(original)) or not rule['rationale'].strip() or not rule['parts']:
+            raise ValueError('decomposition source/rationale differs: ' + original['id'])
+        covered = set()
+        ids = set()
+        children = []
+        for part in rule['parts']:
+            if set(part) != {'id', 'release', 'targets', 'track', 'context', 'fragments', 'evidenceKind'}:
+                raise ValueError('invalid decomposition part fields')
+            if not re.fullmatch(r'[a-z][a-z0-9-]+', part['id']) or part['id'] in ids:
+                raise ValueError('duplicate/invalid decomposition part')
+            ids.add(part['id'])
+            if part['release'] not in policy['tiers'] or not part['targets'] or not set(part['targets']) <= set(policy['targets']) or part['track'] not in ('release', 'research_parity') or part['evidenceKind'] not in ('service', 'observation') or not part['context'].strip() or not part['fragments']:
+                raise ValueError('invalid decomposition scope')
+            for fragment in part['fragments']:
+                # Literal source coverage prevents shortened rewrites from dropping clauses.
+                if not fragment or original['expected'].count(fragment) != 1:
+                    raise ValueError('fragment must identify exact unique source wording')
+                start = original['expected'].index(fragment)
+                covered.update(range(start, start + len(fragment)))
+            applicability = ('research_parity' if part['track'] == 'research_parity' else
+                             'other_platform' if target not in part['targets'] else
+                             'required' if part['release'] in levels else 'later_tier')
+            children.append({'id': original['id'] + '/' + part['id'], 'sourceId': original['sourceId'],
+                             'parentId': original['id'], 'sourceSha256': rule['sourceSha256'],
+                             'release': part['release'], 'targets': part['targets'], 'track': part['track'],
+                             'applicability': applicability, 'expected': ' '.join(part['fragments']),
+                             'context': part['context'], 'evidenceKind': part['evidenceKind']})
+        if len(rule['requiredParts']) != len(set(rule['requiredParts'])) or ids != set(rule['requiredParts']):
+            raise ValueError('reviewed acceptance scope omitted or substituted: ' + original['id'])
+        if any(not c.isspace() and i not in covered for i, c in enumerate(original['expected'])):
+            raise ValueError('binding acceptance wording omitted: ' + original['id'])
+        # Parent text and all descendants remain visible, even for excluded scopes.
+        rows.append({**original, 'applicability': 'decomposed', 'children': [c['id'] for c in children],
+                     'decompositionRationale': rule['rationale']})
+        rows.extend(children)
+    return rows
 
 
 def acceptance_catalog(policy, target, tier):
-    """Read original acceptance text, never its stale implementation/pass flags.
-
-    Backlog scope is conservative at its earliest committed tier. Mixed-tier
-    criteria need explicit reviewed decomposition before adding acceptance cases;
-    a broad package link or status flag supplies no pass.
-    """
+    """Retain every source criterion and apply explicit reviewed scope only."""
     selected_checks(policy, target, tier)
     levels = policy['tiers'][:policy['tiers'].index(tier) + 1]
     ledger = read_json(ROOT / 'docs/phase-0/requirements-ledger.json')
@@ -162,7 +250,7 @@ def acceptance_catalog(policy, target, tier):
             rows.append({'id': 'requirement:' + requirement['id'] + ':' + str(number),
                          'sourceId': requirement['id'], 'release': requirement['release'],
                          'applicability': 'required' if requirement['release'] in levels else 'later_tier',
-                         'expected': expected})
+                         'evidenceKind': 'observation', 'context': '', 'expected': expected})
     sections = dict(re.findall(r'^### ((?:FIX|CORE|PARITY|AI|EXT|REL|GOV|OPT)-\d{3}) [^\n]+\n(.*?)(?=^### |\Z)', backlog, re.M | re.S))
     if len(registry['items']) != 51 or set(sections) != {i['id'] for i in registry['items']}:
         raise ValueError('acceptance inventory must account for all 51 backlog items')
@@ -174,10 +262,11 @@ def acceptance_catalog(policy, target, tier):
         if item['id'] == 'REL-009' and target == 'darwin-arm64':
             scope = 'other_platform'
         rows.append({'id': 'backlog:' + item['id'], 'sourceId': item['id'], 'release': first,
-                     'applicability': scope, 'scopeText': metadata,
+                     'applicability': scope, 'scopeText': metadata, 'evidenceKind': 'observation', 'context': '',
                      'expected': item['acceptance_scenario']})
+    rows = decompose_acceptance(policy, rows, target, levels)
     return {'target': target, 'tier': tier, 'rows': rows, 'backlogItems': 51,
-            'meaning': 'Unmapped criteria stay pending. Multi-release wording requires reviewed tier decomposition; broad package associations are not acceptance.'}
+            'meaning': 'Every original criterion is retained. Explicit child scopes preserve all source wording; unmapped criteria stay pending; research parity is a separate open programme obligation.'}
 
 
 def acceptance_coverage(policy, catalog, receipts=None):
@@ -208,7 +297,14 @@ def acceptance_coverage(policy, catalog, receipts=None):
                         outcomes.append('invalid'); continue
                     check = checks.get(case['checkId'])
                     scenario = next((s for s in check['scenarios'] if s['id'] == case['scenarioId']), None) if check else None
-                    if not scenario or scenario['expected'] != criterion['expected']:
+                    if (not scenario or scenario['expected'] != criterion['expected']
+                            or scenario.get('context', '') != criterion.get('context', '')
+                            or scenario.get('evidenceKind', 'observation') != criterion.get('evidenceKind', 'observation')
+                            or (check['kind'] == 'go' and criterion.get('evidenceKind') != 'service')):
+                        outcomes.append('invalid'); continue
+                    try:
+                        validate_scenario_proof(check, scenario)
+                    except (OSError, ValueError, KeyError, TypeError):
                         outcomes.append('invalid'); continue
                     outcomes.append(receipts.get(case['checkId'], 'pending'))
                 result = 'passed' if all(v == 'passed' for v in outcomes) else ('invalid' if 'invalid' in outcomes else 'pending')
@@ -216,7 +312,11 @@ def acceptance_coverage(policy, catalog, receipts=None):
     required = [r for r in rows if r['id'] in expected_ids]
     return {'result': 'complete' if required and all(r['result'] == 'passed' for r in required) and not errors else 'pending',
             'requiredCriteria': len(required), 'passedCriteria': sum(r['result'] == 'passed' for r in required),
-            'accountedBacklogItems': catalog['backlogItems'], 'errors': errors, 'criteria': rows}
+            'accountedBacklogItems': catalog['backlogItems'],
+            'mappedCriteria': sum(r['id'] in mappings for r in required),
+            'unmappedCriteria': [r['id'] for r in required if r['id'] not in mappings],
+            'researchParityCriteria': [r['id'] for r in catalog['rows'] if r['applicability'] == 'research_parity'],
+            'errors': errors, 'criteria': rows}
 
 
 def pending_plan(policy, target, tier):
@@ -225,6 +325,7 @@ def pending_plan(policy, target, tier):
     return {'target': target, 'tier': tier, 'mode': 'dry_run', 'status': 'pending',
             'softwareChecks': 'pending', 'releaseEligibility': 'pending', 'releaseQualified': False, 'releaseApproved': False,
             'acceptanceCoverage': acceptance_coverage(policy, acceptance_catalog(policy, target, tier)),
+            'programmeReconciliation': programme_plan(policy, target),
             'prerequisites': {p: {'status': policy['prerequisites'][p].get(target, policy['prerequisites'][p]['default']),
                                   'reason': policy['prerequisites'][p]['reason']} for p in needed},
             'checks': [{'id': c['id'], 'kind': c['kind'], 'group': c['group'], 'scope': c['scope'],
@@ -487,6 +588,7 @@ def status(record, policy):
     return {'candidateId': candidate['candidateId'], 'target': candidate['target'], 'tier': candidate['tier'],
             'status': 'evidence_complete' if eligible else 'unqualified', 'softwareChecks': 'passed' if software else 'pending_or_failed',
             'minimumGates': 'passed' if minimum else 'pending_or_failed', 'acceptanceCoverage': coverage,
+            'programmeReconciliation': programme_plan(policy, candidate['target']),
             'releaseEligibility': 'evidence_complete' if eligible else 'unqualified', 'releaseQualified': eligible, 'releaseApproved': False,
             'approval': 'Separate human release decision required; this tool never approves distribution.',
             'checks': rows, 'errors': errors}
