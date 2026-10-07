@@ -629,6 +629,9 @@ test("repeated splits and formatted paste preserve imported neighbors with compl
     // Place the caret within the imported rich link/date text, then exercise
     // actual browser split and clipboard transactions rather than JSON edits.
     await editor.locator(`[data-block-id="${blockID}"] .block-text`).evaluate((element, offset) => {
+      // Focusing can restore the editor's previous selection. Do it before
+      // installing the intended native range, and verify that range below.
+      element.closest<HTMLElement>('[contenteditable="true"]')!.focus();
       const text = document.createTreeWalker(element, NodeFilter.SHOW_TEXT).nextNode()!;
       const range = document.createRange();
       range.setStart(text, offset);
@@ -636,8 +639,16 @@ test("repeated splits and formatted paste preserve imported neighbors with compl
       const selection = window.getSelection()!;
       selection.removeAllRanges();
       selection.addRange(range);
-      element.closest<HTMLElement>('[contenteditable="true"]')!.focus();
     }, offset);
+    await expect.poll(() => editor.evaluate((element) => {
+      const selection = window.getSelection();
+      return {
+        focused: document.activeElement === element,
+        collapsed: selection?.isCollapsed,
+        blockID: selection?.anchorNode?.parentElement?.closest("[data-block-id]")?.getAttribute("data-block-id"),
+        offset: selection?.anchorOffset,
+      };
+    })).toEqual({ focused: true, collapsed: true, blockID, offset });
     await page.keyboard.press("Enter");
     await page.evaluate(async (label) => {
       await navigator.clipboard.write([new ClipboardItem({
@@ -1692,6 +1703,9 @@ test("Phase 4 surfaces expose scoped pairing, gated vendors and reviewed capture
    const r=JSON.parse(raw),ok=(result:any)=>JSON.stringify({ok:true,result});
    (window as any).phase4Calls.push(method);
    if(method==='providers.status')return ok({connections:[],capabilities:[{provider:'codex',authOwner:'Trove',route:'official SIWC',enabled:false,reason:'Runtime and containment qualification required'},{provider:'claude_code',authOwner:'Claude Code',route:'unchanged CLI',enabled:false,reason:'Runtime and containment qualification required'}]});
+   if(method==='providers.runs')return ok({runs:[],activeRunId:'',runtimes:[{provider:'codex',version:'',sha256:'',available:false,reason:'Runtime and containment qualification required'}]});
+   if(method==='providers.auth.list')return ok({available:false,reason:'Account storage is unavailable in this fixture.',registrations:[]});
+   if(method==='providers.remote.status')return ok({enabled:false,origin:'',bindAddress:'',certificateExpiresAt:'',connections:[],authorizations:[],message:''});
    if(method==='providers.proposals')return ok([]);
    if(method==='providers.preview')return ok({pages:r.pageIds.map((pageId:string)=>({pageId,title:'A garden of ideas',revision:'1'})),notice:'Only these pages are shared.'});
    if(method==='providers.connect')return ok({connection:{id:'paired',provider:'mcp',state:'connected',token:'fixture-only-token'},url:'http://127.0.0.1:4000/mcp',relayPath:'/fixture/trove-mcp'});
@@ -1712,14 +1726,19 @@ test("Phase 4 surfaces expose scoped pairing, gated vendors and reviewed capture
  await page.getByRole('button',{name:'Approve context and pair client'}).click();
  await expect(page.getByText('fixture-only-token',{exact:false})).toBeVisible();
  await page.getByLabel('Provider',{exact:true}).selectOption('codex');
- await expect(page.getByText('Unavailable in this build.',{exact:false})).toBeVisible();
+ const managed = page.getByRole('region',{name:'Managed Codex',exact:true});
+ await expect(managed.getByText('Runtime and containment qualification required',{exact:true})).toBeVisible();
+ await expect(managed.getByText('Account storage is unavailable in this fixture.',{exact:true})).toBeVisible();
+ await expect(managed.getByRole('button',{name:'Start with selected account and context',exact:true})).toBeDisabled();
+ await expect(page.getByRole('alert')).toHaveCount(0);
+ expect(await page.evaluate(()=>(window as any).phase4Calls.some((method:string)=>['providers.start','providers.auth.begin','providers.discover','providers.remote.enable'].includes(method)))).toBe(false);
  await navSurface(page,'Capture');
  await page.getByLabel('Shared selection').fill('A clipped offline note');
  await page.getByRole('button',{name:'Preview clip',exact:true}).click();
  await expect(page.getByRole('button',{name:'Save reviewed capture'})).toBeVisible();
  expect(await page.evaluate(()=>(window as any).phase4Calls.includes('imports.commit'))).toBe(false);
  await navSurface(page,'Automations');
- await expect(page.getByText(/while Trove is open/)).toBeVisible();
+ await expect(page.getByText(/^Rules run while Trove is open\./)).toBeVisible();
 });
 
 test("AI review rejects malformed Mermaid before approval", async ({ page }) => {

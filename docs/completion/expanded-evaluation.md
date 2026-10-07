@@ -88,7 +88,7 @@ After private-storage headroom exceeded the unchanged preflight minimum, all **2
 | --- | --- | --- |
 | `research-memory` | Correct facts and preferred title, followed by an extra factual claim explaining the heading preference. | Answer only the requested subject while applying relevant preferences. The earlier prompt clarification did not repair this failure. |
 | `service-plain` | Correct support window repeated twice, followed by the correct escalation owner. | Honor the requested structure without duplicate claims. This retry reached inference; its failure is distinct from the earlier disk failure. |
-| `project-negative` | Abstained even though the source explicitly stated that the project has no sponsor. | Distinguish explicit negative evidence from absent evidence. |
+| `project-negative` | Abstained even though the source explicitly stated that the project owner has not been assigned. | Distinguish explicit negative evidence from absent evidence. |
 
 All 24 cases preserved canonical content; generation and publication completed in the three failing cases. Valid source attribution and no-write behavior therefore do not imply answer quality. No oracle, source fact, claim count or failed output was changed to obtain a pass.
 

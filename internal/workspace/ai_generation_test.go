@@ -52,6 +52,97 @@ func TestAICitedDraftResolvesOnlyExactSuppliedQuotes(t *testing.T) {
 	}
 }
 
+func TestAICitedDraftRejectsRepeatedClaimsWithoutRepair(t *testing.T) {
+	for _, repeated := range []string{
+		"The meeting is Tuesday.",
+		"  The\tmeeting is\nTuesday.  ",
+		"The\u00a0meeting\u2003is Tuesday.",
+	} {
+		raw := string(marshal(map[string]any{"title": "Schedule", "claims": []any{
+			map[string]string{"text": "The meeting is Tuesday.", "quote": "The meeting is Tuesday in Hall A."},
+			map[string]string{"text": repeated, "quote": "The meeting is Tuesday in Hall A."},
+		}}))
+		sources := []AIEvidence{{Number: 1, Text: "The meeting is Tuesday in Hall A."}}
+		if text, err := renderAICitedClaims(raw, sources); err == nil || text != "" {
+			t.Fatal("repeated claim was published or silently repaired", text, err)
+		}
+	}
+	for _, mode := range []string{"answer", "summarize", "explain"} {
+		t.Run(mode, func(t *testing.T) {
+			prepared, err := prepareAIContext(context.Background(), AIRequest{Mode: mode, Prompt: "Describe the meeting."}, []AIEvidence{{Text: "The meeting is Tuesday in Hall A."}}, nil, "", wordBudget())
+			if err != nil {
+				t.Fatal(err)
+			}
+			calls := 0
+			_, err = GeneratePreparedAI(context.Background(), prepared, func(context.Context, string, string, int, string, func(string)) (string, error) {
+				calls++
+				return `{"title":"","claims":[{"text":"Tuesday","quote":"The meeting is Tuesday in Hall A."},{"text":"Tuesday","quote":"The meeting is Tuesday in Hall A."}]}`, nil
+			}, nil)
+			if err == nil || calls != 1 {
+				t.Fatal("duplicate was accepted or triggered a hidden regeneration", err, calls)
+			}
+		})
+	}
+}
+
+func TestAICitedDistinctClaimsMayShareAQuoteAndPreserveText(t *testing.T) {
+	sources := []AIEvidence{{Number: 1, Text: "The meeting is Tuesday in Hall A."}, {Number: 2, Text: "Tags include Work and work."}}
+	raw := `{"title":"","claims":[{"text":"The meeting is Tuesday.","quote":"The meeting is Tuesday in Hall A."},{"text":"The meeting is in Hall A.","quote":"The meeting is Tuesday in Hall A."},{"text":"The tag is Work.","quote":"Tags include Work and work."},{"text":"The tag is work.","quote":"Tags include Work and work."}]}`
+	text, err := renderAICitedClaims(raw, sources)
+	if err != nil || len(strings.Split(text, "\n")) != 4 || !strings.Contains(text, "The tag is Work.") || !strings.Contains(text, "The tag is work.") {
+		t.Fatal("distinct claim text was rejected or rewritten", text, err)
+	}
+}
+
+func TestAICitedAbstentionIsExclusiveAndNegativeEvidenceIsAnswerable(t *testing.T) {
+	sources := []AIEvidence{{Number: 1, Text: "The meeting location has not been selected."}, {Number: 2, Text: "The preferred heading is Team notes.", MemoryID: NewID(), MemoryKind: "preference"}}
+	for _, raw := range []string{
+		`{"title":"Update","claims":[{"text":"The supplied evidence does not answer this question.","quote":""}]}`,
+		`{"title":"","claims":[{"text":"The supplied evidence does not answer this question.","quote":"The meeting location has not been selected."}]}`,
+		`{"title":"","claims":[{"text":"The supplied evidence does not answer this question.","quote":" "}]}`,
+		`{"title":"","claims":[{"text":"The supplied evidence does not answer this question.","quote":""},{"text":"The meeting location has not been selected.","quote":"The meeting location has not been selected."}]}`,
+		`{"title":"","claims":[{"text":"The meeting location has not been selected.","quote":"The meeting location has not been selected."},{"text":"The supplied evidence does not answer this question.","quote":""}]}`,
+	} {
+		if text, err := renderAICitedClaims(raw, sources); err == nil || text != "" {
+			t.Fatal("nonexclusive abstention was published", text, err)
+		}
+	}
+	for _, tc := range []struct{ raw, want string }{
+		{`{"title":"","claims":[{"text":"The supplied evidence does not answer this question.","quote":""}]}`, "The supplied evidence does not answer this question."},
+		{`{"title":"","claims":[{"text":"The meeting location has not been selected.","quote":"The meeting location has not been selected."}]}`, "The meeting location has not been selected. [1]"},
+		{`{"title":"","claims":[{"text":"The preferred heading is Team notes.","quote":"The preferred heading is Team notes."}]}`, "The preferred heading is Team notes. [2]"},
+	} {
+		if text, err := renderAICitedClaims(tc.raw, sources); err != nil || text != tc.want {
+			t.Fatal("valid abstention, explicit negative or direct preference answer rejected", text, err)
+		}
+	}
+}
+
+func TestAICitedDirectPreferenceQuestionRetainsCapturedQuoteAndNumber(t *testing.T) {
+	for _, mode := range []string{"answer", "summarize", "explain"} {
+		t.Run(mode, func(t *testing.T) {
+			prepared, err := prepareAIContext(context.Background(), AIRequest{Mode: mode, Prompt: "What heading do I prefer? Omit a heading.", UseMemory: true}, []AIEvidence{
+				{Title: "Current schedule", Text: "The review is Tuesday."},
+				{Title: "My formatting", Text: "The preferred heading is Team notes.", MemoryID: NewID(), MemoryKind: "preference"},
+			}, nil, "", wordBudget())
+			if err != nil {
+				t.Fatal(err)
+			}
+			calls := 0
+			completion, err := GeneratePreparedAI(context.Background(), prepared, func(_ context.Context, _, prompt string, _ int, grammar string, _ func(string)) (string, error) {
+				calls++
+				if !strings.Contains(prompt, "\nPRESENTATION PREFERENCES\n") || !strings.Contains(grammar, fmt.Sprintf("%q", `"The preferred heading is Team notes."`)) {
+					t.Fatal("preference separated by removing its source or quote choice")
+				}
+				return `{"title":"","claims":[{"text":"The preferred heading is Team notes.","quote":"The preferred heading is Team notes."}]}`, nil
+			}, nil)
+			if err != nil || calls != 1 || completion.Text != "The preferred heading is Team notes. [2]" {
+				t.Fatal("direct preference answer identity changed or regeneration occurred", completion, calls, err)
+			}
+		})
+	}
+}
+
 func TestAIQuoteCannotChangeNumbersOrSliceUnicodeWords(t *testing.T) {
 	for _, tc := range []struct{ source, quote, want string }{
 		{"Budget: 12000 USD", "2000 USD", ""},

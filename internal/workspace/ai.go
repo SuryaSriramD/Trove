@@ -32,6 +32,7 @@ type AIEvidence struct {
 	Location       contracts.DomainLocation `json:"location"`
 	MemoryID       string                   `json:"memoryId,omitempty"`
 	MemoryRevision string                   `json:"memoryRevision,omitempty"`
+	MemoryKind     string                   `json:"memoryKind,omitempty"`
 	State          string                   `json:"state,omitempty"`
 }
 type AICitation struct {
@@ -361,7 +362,7 @@ func (k *Kernel) aiSources(ctx context.Context, e contracts.ServiceExecutionCont
 				}
 				rows.Close()
 			}
-			prefix = append(prefix, AIEvidence{Title: "Approved " + m.Kind + ": " + title, Text: text, Location: loc, MemoryID: string(m.Id), MemoryRevision: string(m.Revision)})
+			prefix = append(prefix, AIEvidence{Title: "Approved " + m.Kind + ": " + title, Text: text, Location: loc, MemoryID: string(m.Id), MemoryRevision: string(m.Revision), MemoryKind: m.Kind})
 		}
 		out = append(out, prefix...)
 	}
@@ -479,11 +480,13 @@ func (k *Kernel) aiEvidenceValid(ctx context.Context, e contracts.ServiceExecuti
 		return err
 	}
 	if s.MemoryID != "" {
-		var status, revision string
-		if err := k.db.QueryRowContext(ctx, "SELECT status,revision FROM memory_entries WHERE id=?", s.MemoryID).Scan(&status, &revision); err != nil {
+		var status, revision, kind string
+		if err := k.db.QueryRowContext(ctx, "SELECT status,revision,kind FROM memory_entries WHERE id=?", s.MemoryID).Scan(&status, &revision, &kind); err != nil {
 			return err
 		}
-		if status != "active" || revision != s.MemoryRevision {
+		// Older saved runs have no kind. Their identity/revision checks remain
+		// authoritative; never infer a missing kind from a display title.
+		if status != "active" || revision != s.MemoryRevision || (s.MemoryKind != "" && kind != s.MemoryKind) {
 			return Fail("STALE_CITATION", "Memory is no longer approved and current")
 		}
 		return memoryEvidenceCurrent(ctx, k.db, s.MemoryID)

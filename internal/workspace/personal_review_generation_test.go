@@ -198,6 +198,15 @@ func TestPersonalReviewMemoryForgettingDuringGeneration(t *testing.T) {
 	if len(r.Memories) != 1 {
 		t.Fatal("missing approved memory", r.Memories)
 	}
+	foundKind := false
+	for _, evidence := range r.Evidence {
+		if evidence.MemoryID == memory {
+			foundKind = evidence.MemoryKind == "decision"
+		}
+	}
+	if !foundKind {
+		t.Fatal("review capture lost canonical memory kind", r.Evidence)
+	}
 	_, err = k.GeneratePersonalReview(context.Background(), e, r.ID, AIBudget{ContextTokens: 8192, OutputTokens: 1024}, func(ctx context.Context, system, prompt string, n int, g string, stream func(string)) (string, error) {
 		if !strings.Contains(prompt, "Use concise prose") {
 			t.Fatal("approved memory omitted")

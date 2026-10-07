@@ -131,3 +131,96 @@ func TestAICitedContextDelimitsMetadataAndPrioritizesContent(t *testing.T) {
 		}
 	}
 }
+
+func TestAICitedContextPreservesCanonicalMemoryRoles(t *testing.T) {
+	sources := []AIEvidence{
+		{Title: "Approved preference", Text: "The current review date is Tuesday.", MemoryKind: "preference"},
+		{Title: "Historical decision", Text: "The preferred heading is Review notes.", MemoryID: NewID(), MemoryKind: "preference"},
+		{Title: "Approved preference", Text: "The reviewed decision is to retain the current scope.", MemoryID: NewID(), MemoryKind: "decision"},
+		{Title: "Approved decision", Text: "The project context includes the design team.", MemoryID: NewID(), MemoryKind: "project_context"},
+		{Title: "Approved preference", Text: "Legacy approved context without a captured kind.", MemoryID: NewID()},
+	}
+	for _, mode := range []string{"answer", "summarize", "explain"} {
+		t.Run(mode, func(t *testing.T) {
+			prepared, err := prepareAIContext(context.Background(), AIRequest{Mode: mode, Prompt: "What heading do I prefer?", UseMemory: true}, sources, nil, "", wordBudget())
+			if err != nil {
+				t.Fatal(err)
+			}
+			contextBody, _, _ := strings.Cut(strings.TrimPrefix(prepared.Prompt, "EVIDENCE\n"), "\nUSER REQUEST")
+			body, preferences, hasPreferenceSection := strings.Cut(contextBody, "\nPRESENTATION PREFERENCES\n")
+			if !hasPreferenceSection {
+				t.Fatal("canonical preferences were not separated from factual evidence", contextBody)
+			}
+			for _, section := range []struct {
+				text    string
+				numbers []int
+			}{{body, []int{1, 3, 4, 5}}, {preferences, []int{2}}} {
+				lines := strings.Split(strings.TrimSpace(section.text), "\n")
+				if len(lines) != len(section.numbers) {
+					t.Fatal("source omitted, repeated or assigned to the wrong role", section.text)
+				}
+				for j, line := range lines {
+					i := section.numbers[j] - 1
+					var row map[string]any
+					if err := json.Unmarshal([]byte(line), &row); err != nil {
+						t.Fatal(err)
+					}
+					wantKind, wantMemoryKind := "approved_memory", sources[i].MemoryKind
+					if sources[i].MemoryID == "" {
+						wantKind, wantMemoryKind = "current_content", ""
+					}
+					if row["kind"] != wantKind || row["source"] != float64(i+1) || row["text"] != sources[i].Text || prepared.Run.Sources[i].Number != i+1 {
+						t.Fatal("source authority or identity changed", row)
+					}
+					if wantMemoryKind == "" {
+						if _, present := row["memoryKind"]; present {
+							t.Fatal("memory role inferred without canonical identity/kind", row)
+						}
+					} else if row["memoryKind"] != wantMemoryKind {
+						t.Fatal("canonical memory kind lost or inferred from title", row)
+					}
+				}
+			}
+			spans, err := aiEvidenceQuoteSpans(prepared.Run.Sources)
+			if err != nil {
+				t.Fatal(err)
+			}
+			found := false
+			for _, span := range spans {
+				found = found || span == sources[1].Text
+			}
+			if !found {
+				t.Fatal("direct questions about preferences lost their supporting quote")
+			}
+		})
+	}
+}
+
+func TestAICitedPreferenceSectionUsesTheMeasuredContextBudget(t *testing.T) {
+	sources := []AIEvidence{
+		{Title: "Current facts", Text: strings.Repeat("The current task remains pending. ", 80)},
+		{Title: "Formatting", Text: "The preferred heading is Delivery notes.", MemoryID: NewID(), MemoryKind: "preference"},
+	}
+	budget := wordBudget()
+	budget.ContextTokens = 1024
+	budget.OutputTokens = 256
+	count := budget.CountTokens
+	measured := map[string]int{}
+	budget.CountTokens = func(ctx context.Context, prompts []AIPrompt) ([]int, error) {
+		counts, err := count(ctx, prompts)
+		for i, prompt := range prompts {
+			measured[prompt.System+prompt.User] = counts[i]
+		}
+		return counts, err
+	}
+	prepared, err := prepareAIContext(context.Background(), AIRequest{Mode: "answer", Prompt: "Summarize the current task using my preferred heading.", UseMemory: true}, sources, nil, "", budget)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if strings.Count(prepared.Prompt, "\nPRESENTATION PREFERENCES\n") != 1 || !strings.Contains(prepared.Prompt, sources[1].Text) {
+		t.Fatal("preference missing or section repeated", prepared.Prompt)
+	}
+	if measured[prepared.System+prepared.Prompt] != prepared.PromptTokens || prepared.PromptTokens+prepared.OutputTokens+16 > budget.ContextTokens {
+		t.Fatal("presentation section was added after tokenization or exceeded the budget")
+	}
+}

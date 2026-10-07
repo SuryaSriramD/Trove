@@ -48,6 +48,19 @@ class QualificationTests(unittest.TestCase):
     def check(self, name):
         return next(c for c in self.policy['checks'] if c['id']==name)
 
+    def synthetic_procedure(self, criterion, scenario):
+        """Real pinned bytes for isolated predicate tests, never product evidence."""
+        path=self.root/'docs/completion/synthetic-procedure.json'
+        path.parent.mkdir(parents=True,exist_ok=True)
+        value={'fixtureProfiles':{'fixture':{'assets':[],'prerequisites':[]}},'cases':{
+            criterion['id']:{'criterionId':criterion['id'],'criterionSha256':q.digest_value(criterion),
+                'expected':criterion['expected'],'context':criterion.get('context',''),'fixtureProfile':'fixture',
+                'steps':['Exercise isolated synthetic input.'],'assertions':['Compare fixed expected fixture bytes.'],
+                'evidenceRequirements':['Actual isolated fixture artifact.']}}}
+        path.write_text(json.dumps(value))
+        scenario['procedure']={'path':'docs/completion/synthetic-procedure.json',
+                               'sha256':q.file_identity(path)['sha256'],'caseId':criterion['id']}
+
     def observation(self, name='p0-native-editor'):
         check = self.check(name)
         raw = self.root / (name+'.txt')
@@ -55,7 +68,7 @@ class QualificationTests(unittest.TestCase):
         return dict(candidateId=self.candidate['candidateId'],policySha256=q.digest_value(self.policy),
                     checkId=name,observedAt=q.stamp(),observer='unit test fixture',
                     environment={'target':self.candidate['target'],**self.candidate['environment']},
-                    scenarios=[dict(**s,result='passed',observed='Synthetic independently expected fixture outcome.',artifactIds=['raw']) for s in check['scenarios']],
+                    scenarios=[dict(id=s['id'],expected=s['expected'],result='passed',observed='Synthetic independently expected fixture outcome.',artifactIds=['raw']) for s in check['scenarios']],
                     prerequisites={p:dict(status='available',description='Synthetic test availability.',artifactIds=['raw']) for p in check['prerequisites']},
                     artifacts={'raw':q.bind_path(raw)})
 
@@ -76,7 +89,7 @@ class QualificationTests(unittest.TestCase):
 
     def test_policy_go_selectors_exist_exactly_in_source(self):
         import re
-        source='\n'.join(p.read_text() for p in (ROOT/'internal/workspace').glob('*_test.go'))
+        source='\n'.join(p.read_text() for p in (ROOT/'internal/workspace').glob('*_test.go') if not p.name.startswith('._'))
         names=set(re.findall(r'^func (Test\w+)\(',source,re.M))
         for c in self.policy['checks']:
             if c['kind']=='go':
@@ -102,11 +115,15 @@ class QualificationTests(unittest.TestCase):
                 catalog=q.acceptance_catalog(self.policy,target,tier)
                 self.assertEqual(sum(r['id'].startswith('backlog:') and 'parentId' not in r for r in catalog['rows']),51)
                 self.assertEqual(len(catalog['rows']),len({r['id'] for r in catalog['rows']}))
-                coverage=q.acceptance_coverage(self.policy,catalog,{c['id']:'passed' for c in self.policy['checks']})
+                coverage=q.acceptance_coverage(self.policy,catalog,{'p0-service-regressions':'passed'})
                 self.assertEqual(coverage['result'],'pending')
                 self.assertEqual(coverage['passedCriteria'],2)
-                self.assertEqual(coverage['mappedCriteria'],2)
-                self.assertTrue(coverage['unmappedCriteria'])
+                if (target,tier)==('darwin-arm64','P0'):
+                    self.assertEqual(coverage['mappedCriteria'],395)
+                    self.assertEqual(coverage['unmappedCriteria'],[])
+                else:
+                    self.assertEqual(coverage['mappedCriteria'],2)
+                    self.assertTrue(coverage['unmappedCriteria'])
                 self.assertGreater(coverage['requiredCriteria'],205)
 
     def test_original_acceptance_text_and_all_sources_are_retained(self):
@@ -142,7 +159,7 @@ class QualificationTests(unittest.TestCase):
         self.assertEqual(plan['acceptanceCoverage']['researchParityCriteria'],['backlog:GOV-004/research-parity'])
         self.assertFalse(plan['releaseQualified'])
         # Accepted research amendments in the actual ledger stay product obligations.
-        self.assertIn('requirement:ADR-015:1',plan['acceptanceCoverage']['unmappedCriteria'])
+        self.assertIn({'id':'requirement:ADR-015:1','result':'pending'},plan['acceptanceCoverage']['criteria'])
 
     def test_decomposition_cannot_drop_text_or_reviewed_scope(self):
         for mutate in [lambda r:r['parts'].pop(),
@@ -225,12 +242,105 @@ class QualificationTests(unittest.TestCase):
         policy=copy.deepcopy(self.policy)
         check=next(c for c in policy['checks'] if c['id']=='p0-native-editor')
         check['scenarios'].append({'id':'exact-criterion','expected':criterion['expected']})
+        self.synthetic_procedure(criterion,check['scenarios'][-1])
         policy['acceptanceCases']={'darwin-arm64/P0':{criterion['id']:{'criterionSha256':q.digest_value(criterion),'cases':[{'checkId':check['id'],'scenarioId':'exact-criterion'}]}}}
-        for state in ['pending','skipped','failed','unqualified']:
-            self.assertEqual(q.acceptance_coverage(policy,catalog,{check['id']:state})['passedCriteria'],0)
-        result=q.acceptance_coverage(policy,catalog,{check['id']:'passed'})
+        with patch.object(q,'ROOT',self.root):
+            for state in ['pending','skipped','failed','unqualified']:
+                self.assertEqual(q.acceptance_coverage(policy,catalog,{check['id']:state})['passedCriteria'],0)
+            result=q.acceptance_coverage(policy,catalog,{check['id']:'passed'})
         self.assertEqual(result['passedCriteria'],1)
         self.assertEqual(result['result'],'pending')
+
+    def test_macos_p0_exact_procedures_cover_every_gap_without_passing_evidence(self):
+        catalog=q.acceptance_catalog(self.policy,'darwin-arm64','P0')
+        required={r['id']:r for r in catalog['rows'] if r['applicability']=='required'}
+        checks={c['id']:c for c in q.selected_checks(self.policy,'darwin-arm64','P0')}
+        mappings=self.policy['acceptanceCases']['darwin-arm64/P0']
+        self.assertEqual(set(mappings),set(required))
+        procedure_ids=set()
+        for criterion_id,mapping in mappings.items():
+            for case in mapping['cases']:
+                check=checks[case['checkId']]
+                scenario=next(s for s in check['scenarios'] if s['id']==case['scenarioId'])
+                if check['kind']=='go':
+                    continue
+                procedure=q.observation_procedure(scenario)
+                self.assertEqual(procedure['criterionId'],criterion_id)
+                self.assertEqual(procedure['criterionSha256'],q.digest_value(required[criterion_id]))
+                self.assertEqual(procedure['expected'],required[criterion_id]['expected'])
+                self.assertGreaterEqual(len(procedure['assertions']),3)
+                self.assertNotEqual(procedure['assertions'][1],procedure['expected'])
+                self.assertGreaterEqual(len(procedure['steps']),4)
+                self.assertGreaterEqual(len(procedure['evidenceRequirements']),4)
+                self.assertNotIn('result',procedure)
+                procedure_ids.add(criterion_id)
+        self.assertEqual(len(procedure_ids),393)
+        coverage=q.acceptance_coverage(self.policy,catalog)
+        self.assertEqual(coverage['mappedCriteria'],395)
+        self.assertEqual(coverage['passedCriteria'],0)
+        self.assertEqual(coverage['result'],'pending')
+        self.assertFalse(q.status(self.record,self.policy)['releaseQualified'])
+
+    def test_broad_gates_cannot_supply_the_new_exact_observation_results(self):
+        broad={c['id']:'passed' for c in self.policy['checks'] if not c['id'].startswith('p0-acceptance-')}
+        coverage=q.acceptance_coverage(self.policy,q.acceptance_catalog(self.policy,'darwin-arm64','P0'),broad)
+        self.assertEqual(coverage['passedCriteria'],2)
+        self.assertEqual(coverage['result'],'pending')
+        for name in ('installation','distribution'):
+            self.assertIn('independent-clean-target',self.check('p0-acceptance-'+name)['prerequisites'])
+        self.assertNotIn('independent-clean-target',self.check('p0-acceptance-editor-text')['prerequisites'])
+        for name in ('ai-generation','ai-memory','speech-workflows'):
+            self.assertNotIn('representative-datasets',self.check('p0-acceptance-'+name)['prerequisites'])
+        for name in ('ai-generation-quality','ai-memory-quality','speech-files'):
+            self.assertIn('representative-datasets',self.check('p0-acceptance-'+name)['prerequisites'])
+        for criterion,group in [('backlog:REL-004/p0-1','representative-io'),
+                                ('backlog:REL-002/p0-1','native-integration'),
+                                ('backlog:AI-002/p0-1','ai-generation-quality'),
+                                ('backlog:AI-003/memory','ai-memory-quality')]:
+            case=self.policy['acceptanceCases']['darwin-arm64/P0'][criterion]['cases'][0]
+            self.assertEqual(case['checkId'],'p0-acceptance-'+group)
+
+    def test_procedure_hash_and_exact_criterion_cannot_be_substituted(self):
+        scenario=copy.deepcopy(self.check('p0-acceptance-editor-text')['scenarios'][0])
+        with self.assertRaises(ValueError):
+            wrong=copy.deepcopy(scenario);wrong['procedure']['sha256']='f'*64
+            q.observation_procedure(wrong)
+        # Verify a cached parsed catalog never hides changed bytes.
+        path=self.root/'docs/completion/qualification-procedures.json'
+        path.parent.mkdir(parents=True)
+        path.write_bytes((ROOT/scenario['procedure']['path']).read_bytes())
+        with patch.object(q,'ROOT',self.root):
+            q.observation_procedure(scenario)
+            path.write_bytes(path.read_bytes()+b' ')
+            with self.assertRaises(ValueError):q.observation_procedure(scenario)
+        policy=copy.deepcopy(self.policy)
+        check=next(c for c in policy['checks'] if c['id']=='p0-acceptance-editor-text')
+        # Paired claim-separation expectations intentionally repeat across sources;
+        # even identical words cannot substitute a sibling criterion's procedure.
+        repeated=[s for s in check['scenarios'] if s['expected']=='Do not treat retained imported data as native editing support.']
+        first,second=repeated[:2]
+        criterion_id=first['procedure']['caseId']
+        first['procedure']=copy.deepcopy(second['procedure'])
+        coverage=q.acceptance_coverage(policy,q.acceptance_catalog(policy,'darwin-arm64','P0'),{check['id']:'passed'})
+        self.assertIn({'id':criterion_id,'result':'invalid'},coverage['criteria'])
+
+    def test_mapped_observation_cannot_drop_procedure_or_required_fixture_resources(self):
+        for group,mutate in [('editor-text',lambda check:check['scenarios'][0].pop('procedure')),
+                             ('search-models',lambda check:check.update(assets=['fixtures'])),
+                             ('representative-imports',lambda check:check.update(prerequisites=[])),
+                             ('installation-device',lambda check:check['prerequisites'].remove('physical-devices'))]:
+            policy=copy.deepcopy(self.policy)
+            check=next(c for c in policy['checks'] if c['id']=='p0-acceptance-'+group)
+            criterion_id=check['scenarios'][0]['procedure']['caseId']
+            mutate(check)
+            coverage=q.acceptance_coverage(policy,q.acceptance_catalog(policy,'darwin-arm64','P0'),{check['id']:'passed'})
+            self.assertIn({'id':criterion_id,'result':'invalid'},coverage['criteria'])
+
+    def test_procedure_parses_the_hashed_bytes_without_a_second_source_read(self):
+        scenario=self.check('p0-acceptance-editor-text')['scenarios'][0]
+        with patch.object(q,'_PROCEDURE_CATALOGS',{}), patch.object(q,'read_json',side_effect=AssertionError('unverified second read')):
+            procedure=q.observation_procedure(scenario)
+        self.assertEqual(procedure['criterionId'],scenario['procedure']['caseId'])
 
     def test_qualified_predicate_requires_full_coverage_and_every_exact_record(self):
         # Isolated synthetic policy/catalog, never persisted as product evidence.
@@ -239,6 +349,7 @@ class QualificationTests(unittest.TestCase):
         self.policy=copy.deepcopy(self.policy)
         base=copy.deepcopy(self.check('p0-native-editor'))
         base.update(id='synthetic-release',prerequisites=[],assets=[],scenarios=[{'id':'exact','expected':criterion['expected']}])
+        self.synthetic_procedure(criterion,base['scenarios'][0])
         software=copy.deepcopy(base);software.update(id='synthetic-software',scope='software')
         self.policy['checks']=[base,software]
         self.policy['acceptanceCases']={'darwin-arm64/P0':{criterion['id']:{'criterionSha256':q.digest_value(criterion),'cases':[{'checkId':base['id'],'scenarioId':'exact'}]}}}
@@ -250,7 +361,7 @@ class QualificationTests(unittest.TestCase):
             directory=self.root/'checks'/check['id'];directory.mkdir()
             raw=directory/'observation.json';q.write_new(raw,value)
             q.write_new(directory/'receipt.json',q.receipt(self.candidate,self.policy,check,'passed',[q.bind_path(raw)]))
-        with patch.object(q,'acceptance_catalog',return_value=catalog):
+        with patch.object(q,'acceptance_catalog',return_value=catalog),patch.object(q,'ROOT',self.root):
             result=q.status(self.record,self.policy)
             self.assertTrue(result['releaseQualified'])
             self.assertFalse(result['releaseApproved'])
@@ -378,6 +489,27 @@ class QualificationTests(unittest.TestCase):
         self.assertTrue(all(s['result']=='pending' for s in value['scenarios']))
         self.assertEqual(value['artifacts'],{})
         self.assertTrue(q.validate_observation(value,self.candidate,self.policy,self.check('p0-native-editor')))
+
+    def test_mapped_observation_template_excludes_policy_metadata_and_round_trips(self):
+        from types import SimpleNamespace
+        import jsonschema
+        check=self.check('p0-acceptance-editor-tables')
+        self.assertTrue(all('context' in s and 'evidenceKind' in s and 'procedure' in s for s in check['scenarios']))
+        value=q.observation_template(SimpleNamespace(record=self.record,check=check['id']),self.policy)
+        expected_fields={'id','expected','result','observed','artifactIds'}
+        self.assertTrue(all(set(s)==expected_fields for s in value['scenarios']))
+        self.assertTrue(q.validate_observation(value,self.candidate,self.policy,check))
+        # Fill only observation wire fields with isolated synthetic test evidence.
+        filled=self.observation(check['id'])
+        value.update(observedAt=filled['observedAt'],observer=filled['observer'],
+                     scenarios=filled['scenarios'],prerequisites=filled['prerequisites'],artifacts=filled['artifacts'])
+        schema=json.loads((ROOT/'docs/completion/qualification.schema.json').read_text())
+        jsonschema.Draft202012Validator(schema).validate(value)
+        self.assertEqual(q.validate_observation(value,self.candidate,self.policy,check),[])
+        changed=copy.deepcopy(value);changed['scenarios'][0]['expected']='weakened expectation'
+        self.assertTrue(q.validate_observation(changed,self.candidate,self.policy,check))
+        Path(value['artifacts']['raw']['path']).write_text('substituted artifact')
+        self.assertTrue(q.validate_observation(value,self.candidate,self.policy,check))
 
     def test_receipt_reparse_prevents_result_or_candidate_substitution(self):
         observation=self.observation();check=self.check(observation['checkId'])

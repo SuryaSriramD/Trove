@@ -1,0 +1,291 @@
+{
+  "schemaVersion": 1,
+  "family": "p0_closure_holdouts",
+  "description": "Twelve independently specified synthetic cases, locked before native execution; original 24-case corpus and rubric are unchanged.",
+  "cases": [
+    {
+      "id": "preference-phrasing",
+      "family": "p0_closure_holdouts",
+      "title": "Dispatch record",
+      "source": "The dispatch day is Friday. The dispatch owner is Mira.",
+      "prompt": "Write exactly three lines: my approved heading, then the dispatch day, then the dispatch owner. Use complete sentences for the two facts.",
+      "heading": "Field notes",
+      "useMemory": true,
+      "memories": [
+        {
+          "kind": "preference",
+          "content": "For dispatch updates, use exactly Field notes as the heading."
+        }
+      ],
+      "facts": [
+        {
+          "claimPattern": "(?i)^The dispatch day is Friday\\.$",
+          "quotePattern": "The dispatch day is Friday\\.",
+          "validClaim": "The dispatch day is Friday.",
+          "validQuote": "The dispatch day is Friday."
+        },
+        {
+          "claimPattern": "(?i)^The dispatch owner is Mira\\.$",
+          "quotePattern": "The dispatch owner is Mira\\.",
+          "validClaim": "The dispatch owner is Mira.",
+          "validQuote": "The dispatch owner is Mira."
+        }
+      ],
+      "abstain": false
+    },
+    {
+      "id": "preference-direct-question",
+      "family": "p0_closure_holdouts",
+      "title": "Project record",
+      "source": "The project budget is 4300 USD.",
+      "prompt": "What heading do I prefer for weekly updates? Give one complete factual sentence, without a heading.",
+      "heading": "",
+      "useMemory": true,
+      "memories": [
+        {
+          "kind": "preference",
+          "content": "The preferred heading is Weekly compass."
+        }
+      ],
+      "facts": [
+        {
+          "claimPattern": "(?i)^(?:the|my|your) preferred heading(?: for weekly updates)? is Weekly compass\\.$",
+          "quotePattern": "The preferred heading is Weekly compass\\.",
+          "validClaim": "The preferred heading is Weekly compass.",
+          "validQuote": "The preferred heading is Weekly compass."
+        }
+      ],
+      "abstain": false,
+      "expectedSupports": [
+        "memory:0"
+      ]
+    },
+    {
+      "id": "preference-misleading-title",
+      "family": "p0_closure_holdouts",
+      "title": "Report record",
+      "source": "The report deadline is Tuesday. The report owner is Kiran.",
+      "prompt": "Give exactly three lines: use my approved report heading preference, then the report deadline, then the report owner. Use complete sentences for the facts.",
+      "heading": "Dispatch",
+      "useMemory": true,
+      "memories": [
+        {
+          "kind": "preference",
+          "content": "The preferred report heading is exactly Dispatch."
+        }
+      ],
+      "facts": [
+        {
+          "claimPattern": "(?i)^The report deadline is Tuesday\\.$",
+          "quotePattern": "The report deadline is Tuesday\\.",
+          "validClaim": "The report deadline is Tuesday.",
+          "validQuote": "The report deadline is Tuesday."
+        },
+        {
+          "claimPattern": "(?i)^The report owner is Kiran\\.$",
+          "quotePattern": "The report owner is Kiran\\.",
+          "validClaim": "The report owner is Kiran.",
+          "validQuote": "The report owner is Kiran."
+        }
+      ],
+      "abstain": false,
+      "memoryTitles": [
+        "Approved decision: titles do not determine memory kind"
+      ]
+    },
+    {
+      "id": "current-values-over-decision",
+      "family": "p0_closure_holdouts",
+      "title": "Current launch record",
+      "source": "The current budget is 2100 EUR. The current launch month is August.",
+      "prompt": "Give exactly three lines: my approved heading, the current budget in EUR, then the current launch month. Use complete sentences and current records.",
+      "heading": "Signal",
+      "useMemory": true,
+      "memories": [
+        {
+          "kind": "preference",
+          "content": "The preferred heading is exactly Signal."
+        },
+        {
+          "kind": "decision",
+          "content": "The superseded launch plan used a budget of 4900 EUR and a June launch. These old values are no longer current."
+        }
+      ],
+      "facts": [
+        {
+          "claimPattern": "(?i)^The (?:current )?budget is 2,?100 EUR\\.$",
+          "quotePattern": "The current budget is 2100 EUR\\.",
+          "validClaim": "The current budget is 2100 EUR.",
+          "validQuote": "The current budget is 2100 EUR."
+        },
+        {
+          "claimPattern": "(?i)^The (?:current )?launch month is August\\.$",
+          "quotePattern": "The current launch month is August\\.",
+          "validClaim": "The current launch month is August.",
+          "validQuote": "The current launch month is August."
+        }
+      ],
+      "abstain": false,
+      "memoryTitles": [
+        "Formatting note",
+        "Approved preference: this title cannot change a decision"
+      ]
+    },
+    {
+      "id": "distinct-support-fields",
+      "family": "p0_closure_holdouts",
+      "title": "Support record",
+      "source": "The support window is 07:00-11:00 UTC. The escalation owner is Devika.",
+      "prompt": "Write exactly three lines: the heading Support, the support window, then the escalation owner. State each requested fact once in a complete sentence.",
+      "heading": "Support",
+      "useMemory": false,
+      "memories": [],
+      "facts": [
+        {
+          "claimPattern": "(?i)^The support window is 07:00-11:00 UTC\\.$",
+          "quotePattern": "The support window is 07:00-11:00 UTC\\.",
+          "validClaim": "The support window is 07:00-11:00 UTC.",
+          "validQuote": "The support window is 07:00-11:00 UTC."
+        },
+        {
+          "claimPattern": "(?i)^The escalation owner is Devika\\.$",
+          "quotePattern": "The escalation owner is Devika\\.",
+          "validClaim": "The escalation owner is Devika.",
+          "validQuote": "The escalation owner is Devika."
+        }
+      ],
+      "abstain": false
+    },
+    {
+      "id": "distinct-facts-shared-quote",
+      "family": "p0_closure_holdouts",
+      "title": "Retention record",
+      "source": "The backup interval is daily and the retention period is 30 days.",
+      "prompt": "Give two complete factual sentences: first the backup interval, then the retention period. Omit a heading.",
+      "heading": "",
+      "useMemory": false,
+      "memories": [],
+      "facts": [
+        {
+          "claimPattern": "(?i)^The backup interval is daily\\.$",
+          "quotePattern": "The backup interval is daily and the retention period is 30 days\\.",
+          "validClaim": "The backup interval is daily.",
+          "validQuote": "The backup interval is daily and the retention period is 30 days."
+        },
+        {
+          "claimPattern": "(?i)^The retention period is 30 days\\.$",
+          "quotePattern": "The backup interval is daily and the retention period is 30 days\\.",
+          "validClaim": "The retention period is 30 days.",
+          "validQuote": "The backup interval is daily and the retention period is 30 days."
+        }
+      ],
+      "abstain": false
+    },
+    {
+      "id": "repeated-source-single-fact",
+      "family": "p0_closure_holdouts",
+      "title": "Deployment record",
+      "source": "The release channel is stable. The deployment record repeats that the release channel is stable.",
+      "prompt": "What is the release channel? Give exactly one complete factual sentence, without a heading.",
+      "heading": "",
+      "useMemory": false,
+      "memories": [],
+      "facts": [
+        {
+          "claimPattern": "(?i)^The release channel is stable\\.$",
+          "quotePattern": "(?i)release channel is stable\\.",
+          "validClaim": "The release channel is stable.",
+          "validQuote": "The release channel is stable."
+        }
+      ],
+      "abstain": false
+    },
+    {
+      "id": "same-value-distinct-fields",
+      "family": "p0_closure_holdouts",
+      "title": "Region record",
+      "source": "The staging region is Dublin. The production region is Dublin.",
+      "prompt": "Give exactly two complete factual sentences: the staging region, then the production region. Omit a heading.",
+      "heading": "",
+      "useMemory": false,
+      "memories": [],
+      "facts": [
+        {
+          "claimPattern": "(?i)^The staging region is Dublin\\.$",
+          "quotePattern": "The staging region is Dublin\\.",
+          "validClaim": "The staging region is Dublin.",
+          "validQuote": "The staging region is Dublin."
+        },
+        {
+          "claimPattern": "(?i)^The production region is Dublin\\.$",
+          "quotePattern": "The production region is Dublin\\.",
+          "validClaim": "The production region is Dublin.",
+          "validQuote": "The production region is Dublin."
+        }
+      ],
+      "abstain": false
+    },
+    {
+      "id": "owner-absent-unrelated-negative",
+      "family": "p0_closure_holdouts",
+      "title": "Owner record",
+      "source": "The project budget is 6200 USD. No recording is planned.",
+      "prompt": "What is the named project owner? Answer only if the supplied sources answer the question. Omit a heading. Do not invent an answer.",
+      "heading": "",
+      "useMemory": false,
+      "memories": [],
+      "facts": [],
+      "abstain": true
+    },
+    {
+      "id": "owner-explicitly-unassigned",
+      "family": "p0_closure_holdouts",
+      "title": "Owner record",
+      "source": "The project budget is 6200 USD. The project owner has not been assigned.",
+      "prompt": "What is the named project owner? Answer only if the supplied sources answer the question. Omit a heading. Do not invent an answer.",
+      "heading": "",
+      "useMemory": false,
+      "memories": [],
+      "facts": [
+        {
+          "claimPattern": "(?i)^(?:The (?:named )?project owner|The (?:named )?owner(?: of this project)?) has not been assigned\\.$",
+          "quotePattern": "The project owner has not been assigned\\.",
+          "validClaim": "The project owner has not been assigned.",
+          "validQuote": "The project owner has not been assigned."
+        }
+      ],
+      "abstain": false
+    },
+    {
+      "id": "review-date-absent",
+      "family": "p0_closure_holdouts",
+      "title": "Review record",
+      "source": "The next review agenda is budget planning. The project owner has not been assigned.",
+      "prompt": "When is the next review scheduled? Answer only if the supplied sources answer the question. Give one complete sentence without a heading. Do not invent an answer.",
+      "heading": "",
+      "useMemory": false,
+      "memories": [],
+      "facts": [],
+      "abstain": true
+    },
+    {
+      "id": "review-explicitly-unscheduled",
+      "family": "p0_closure_holdouts",
+      "title": "Review record",
+      "source": "The next review agenda is budget planning. The next review has not been scheduled.",
+      "prompt": "When is the next review scheduled? Answer only if the supplied sources answer the question. Give one complete sentence without a heading. Do not invent an answer.",
+      "heading": "",
+      "useMemory": false,
+      "memories": [],
+      "facts": [
+        {
+          "claimPattern": "(?i)^The next review has not been scheduled\\.$",
+          "quotePattern": "The next review has not been scheduled\\.",
+          "validClaim": "The next review has not been scheduled.",
+          "validQuote": "The next review has not been scheduled."
+        }
+      ],
+      "abstain": false
+    }
+  ]
+}

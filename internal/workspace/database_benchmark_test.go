@@ -504,6 +504,55 @@ func TestDatabasePerformance10K(t *testing.T) {
 	report["endingGoSysBytes"] = peak.Sys
 	report["canonicalMutationCursorInvalidation"] = true
 	report["providerRevocationChecked"] = true
+	if destination := os.Getenv("TROVE_DATABASE_BENCHMARK_RETAIN"); destination != "" {
+		closedDigest, retainErr := retainDatabaseBenchmarkFixture(k, destination)
+		if retainErr != nil {
+			t.Fatal(retainErr)
+		}
+		reopened, openErr := Open(destination)
+		if openErr != nil {
+			t.Fatal(openErr)
+		}
+		defer reopened.Close()
+		retainedContext, retainedCancel := context.WithTimeout(context.Background(), time.Minute)
+		defer retainedCancel()
+		retainedOwner := reopened.OwnerContext()
+		var integrity string
+		if err = reopened.db.QueryRowContext(retainedContext, "PRAGMA integrity_check").Scan(&integrity); err != nil || integrity != "ok" {
+			reopened.Close()
+			retainedCancel()
+			t.Fatal("retained fixture integrity", err, integrity)
+		}
+		var retainedCount int
+		if err = reopened.db.QueryRowContext(retainedContext, "SELECT COUNT(*) FROM records WHERE collection_id=?", f.collection).Scan(&retainedCount); err != nil || retainedCount != count {
+			reopened.Close()
+			retainedCancel()
+			t.Fatal("retained fixture record count", err, retainedCount)
+		}
+		for _, c := range cases {
+			if c.Name == "provider_bridge_99_selected_rows" {
+				continue
+			}
+			request := map[string]any{"contractVersion": 1, "requestId": NewID(), "workspaceId": reopened.ID(), "collectionId": f.collection, "viewId": c.View, "limit": 200}
+			var observed dbBenchEnvelope
+			if err = json.Unmarshal(reopened.Dispatch(retainedContext, retainedOwner, "queryRecords", marshal(request)), &observed); err != nil {
+				reopened.Close()
+				retainedCancel()
+				t.Fatal(err)
+			}
+			want := expected(c, false)
+			validate(observed, want[:min(200, len(want))], false)
+		}
+		retainedCancel()
+		if err = reopened.Close(); err != nil {
+			t.Fatal(err)
+		}
+		finalDigest, digestErr := databaseBenchmarkFixtureDigest(destination)
+		if digestErr != nil {
+			t.Fatal(digestErr)
+		}
+		report["retainedFixture"] = map[string]any{"ready": true, "workspacePath": destination, "closedSourceSha256": closedDigest, "afterReopenSha256": finalDigest, "outsideTimedSamples": true, "records": count, "independentFirstPagesChecked": len(cases) - 1}
+	}
 	report["completed"] = true
 	report["wallSeconds"] = time.Since(started).Seconds()
 	report["finishedAt"] = time.Now().UTC().Format(time.RFC3339)

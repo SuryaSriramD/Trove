@@ -5,6 +5,7 @@ import argparse, hashlib, json, os, pathlib, platform, re, shutil, subprocess, s
 ROOT = pathlib.Path(__file__).resolve().parent.parent
 FAMILIES = {
     'p0': ('p0-qa-memory.json', 'TestRealLocalExpandedP0QAMemory', 24),
+    'p0-holdouts': ('p0-closure-holdouts.json', 'TestRealLocalP0ClosureHoldouts', 12),
     'modes': ('heldout-modes.json', 'TestRealLocalExpandedModes', 42),
 }
 
@@ -123,6 +124,7 @@ def main():
     reserve.write_bytes(bytes(1024 * 1024))
     bundle, models = pathlib.Path(args.bundle).resolve(), pathlib.Path(args.models).resolve()
     paths = [corpus_dir / corpus_file, ROOT / 'internal/workspace/ai_expanded_evaluation_test.go',
+             ROOT / 'internal/workspace/ai_p0_closure_holdouts_test.go',
              ROOT / 'internal/workspace/ai_expanded_modes_test.go', pathlib.Path(__file__),
              bundle / 'manifest.json', bundle / 'llama-worker', models / (args.pack + '.json'),
              models / (args.pack + '.model')]

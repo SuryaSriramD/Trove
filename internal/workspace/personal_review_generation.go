@@ -239,7 +239,7 @@ func (k *Kernel) capturePersonalReviewGeneration(ctx context.Context, e contract
 		if err = tx.QueryRowContext(ctx, "SELECT m.page_id,p.revision,COALESCE(m.content,''),m.kind FROM memory_entries m JOIN pages p ON p.id=m.page_id WHERE m.id=?", memory.ID).Scan(&page, &rev, &content, &kind); err != nil {
 			return err
 		}
-		v = AIEvidence{Title: "Approved " + kind, Text: content, MemoryID: memory.ID, MemoryRevision: memory.Revision, Location: contracts.DomainLocation{PageId: contracts.DomainId(page), SourceRevision: contracts.DomainRevision(rev)}}
+		v = AIEvidence{Title: "Approved " + kind, Text: content, MemoryID: memory.ID, MemoryRevision: memory.Revision, MemoryKind: kind, Location: contracts.DomainLocation{PageId: contracts.DomainId(page), SourceRevision: contracts.DomainRevision(rev)}}
 		appendEvidence(v, 0)
 	}
 	r.Warning = "Analysis uses at most four source excerpts per selected page, with record fields read from current canonical values and ten approved relevant memories; it is not a complete workspace audit."

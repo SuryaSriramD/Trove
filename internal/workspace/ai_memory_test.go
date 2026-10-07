@@ -87,6 +87,54 @@ func TestAIComparisonMemoryAndLiveAuthority(t *testing.T) {
 		t.Fatal("forgotten memory survived retrieval")
 	}
 }
+
+func TestAIMemoryKindPersistsAndLegacyEvidenceRemainsValid(t *testing.T) {
+	k, e := testKernel(t)
+	ctx := context.Background()
+	source := createPage(t, k, e, "Reviewers asked for concise prose")
+	id, _ := memoryFixture(t, k, e, source)
+	prepared, err := k.PrepareAIWithBudget(ctx, e, AIRequest{PageID: source, Mode: "answer", Prompt: "What did reviewers decide?", UseMemory: true}, wordBudget())
+	if err != nil {
+		t.Fatal(err)
+	}
+	loaded, err := k.AIRun(ctx, e, prepared.Run.ID)
+	if err != nil {
+		t.Fatal(err)
+	}
+	found := false
+	for i, evidence := range loaded.Sources {
+		if evidence.MemoryID != id {
+			continue
+		}
+		found = true
+		if evidence.MemoryKind != "decision" || evidence.State != "current" {
+			t.Fatal("canonical memory kind did not survive run persistence", evidence)
+		}
+		mismatched := evidence
+		mismatched.MemoryKind = "preference"
+		if err := k.aiEvidenceValid(ctx, e, mismatched); err == nil {
+			t.Fatal("a different captured memory kind was accepted")
+		}
+		loaded.Sources[i].MemoryKind = ""
+		loaded.Sources[i].Title = "Approved preference: misleading legacy display title"
+	}
+	if !found {
+		t.Fatal("approved memory missing")
+	}
+	// Simulate the persisted source JSON from before memoryKind existed.
+	if _, err := k.db.Exec("UPDATE ai_runs SET sources_json=? WHERE id=?", string(marshal(loaded.Sources)), loaded.ID); err != nil {
+		t.Fatal(err)
+	}
+	legacy, err := k.AIRun(ctx, e, loaded.ID)
+	if err != nil {
+		t.Fatal(err)
+	}
+	for _, evidence := range legacy.Sources {
+		if evidence.MemoryID == id && (evidence.MemoryKind != "" || evidence.State != "current") {
+			t.Fatal("legacy memory kind was inferred or compatibility lost", evidence)
+		}
+	}
+}
 func TestAIValidatedCitationsAndReviewedAction(t *testing.T) {
 	k, e := testKernel(t)
 	ctx := context.Background()

@@ -1,5 +1,6 @@
 import type * as D from "../../contracts/generated/domain";
 import type * as S from "../../contracts/generated/service";
+import { bridgeMetric, qualificationStart, qualificationRecord } from "./qualificationPerformance";
 export type { D, S };
 export type WorkspaceSnapshot = D.DomainSnapshot & {
   scopeGrantId: string;
@@ -17,6 +18,8 @@ declare global {
           PickModelPack?(packId: string): Promise<void>;
           SetEditing?(active: boolean): Promise<void>;
           ShellReady?(): Promise<void>;
+          QualificationPerformanceEnabled?(): Promise<boolean>;
+          RecordQualificationPerformance?(metric: string, milliseconds: number): Promise<boolean>;
           PendingDeepLink?(): Promise<string>;
           StageUpload?(
             name: string,
@@ -61,9 +64,14 @@ export async function dispatch<T>(
     throw new Error(
       "Open Trove in the desktop application to connect to a workspace.",
     );
-  const response = JSON.parse(
-    await bridge.Dispatch(method, JSON.stringify(request)),
-  );
+  const metric = bridgeMetric(method);
+  const started = metric ? qualificationStart() : undefined;
+  let response;
+  try {
+    response = JSON.parse(await bridge.Dispatch(method, JSON.stringify(request)));
+  } finally {
+    qualificationRecord(metric, started);
+  }
   if (response.ok === false) throw new ServiceError(response.error);
   return response.result ?? response;
 }

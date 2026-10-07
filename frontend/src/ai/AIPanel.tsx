@@ -21,7 +21,11 @@ type Citation = {
   location: Location;
   state: string;
 };
-type Source = Citation & { text: string; memoryId?: string };
+type Source = Citation & {
+  text: string;
+  memoryId?: string;
+  memoryKind?: "preference" | "decision" | "project_context";
+};
 type Run = {
   id: string;
   conversationId: string;

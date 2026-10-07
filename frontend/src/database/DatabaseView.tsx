@@ -1,4 +1,5 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
+import { qualificationFrames, qualificationStart } from "../qualificationPerformance";
 import {
   batch,
   dispatch,
@@ -77,6 +78,7 @@ export default function DatabaseView({
   const [selected, setSelected] = useState(collectionId ?? "");
   const [active, setActive] = useState("");
   const [records, setRecords] = useState<D.Record[]>([]);
+  const qualificationLoad = useRef<{ started: number; returned: number; records: D.Record[] } | null>(null);
   const [pager, setPager] = useState<{
     key: string;
     index: number;
@@ -90,6 +92,15 @@ export default function DatabaseView({
     return () => clearInterval(timer);
   }, []);
   const [loading, setLoading] = useState(false);
+  useLayoutEffect(() => {
+    const observed = qualificationLoad.current;
+    if (loading || !observed || records !== observed.records) return;
+    qualificationLoad.current = null;
+    return qualificationFrames([
+      ["database_load_to_frames", observed.started],
+      ["database_response_to_frames", observed.returned],
+    ]);
+  }, [records, loading]);
   const [busy, setBusy] = useState(false);
   const [settings, setSettings] = useState(false);
   const [p2Buttons, setP2Buttons] = useState<P2Button[]>([]);
@@ -122,6 +133,7 @@ export default function DatabaseView({
   }, [collectionId]);
   useEffect(() => {
     let live = true;
+    qualificationLoad.current = null;
     if (!collection) {
       setRecords([]);
       return;
@@ -130,6 +142,7 @@ export default function DatabaseView({
     setRecords([]);
     setNextCursor(undefined);
     setLoadError("");
+    const qualificationStarted = qualificationStart();
     const load = windowed
       ? loadRecordPage(w, collection.id, view?.id, pageHistory[pageIndex]).then(
           (result) => ({
@@ -143,6 +156,10 @@ export default function DatabaseView({
     load
       .then((r) => {
         if (live) {
+          const returned = qualificationStart();
+          if (qualificationStarted !== undefined && returned !== undefined) {
+            qualificationLoad.current = { started: qualificationStarted, returned, records: r.records };
+          }
           setRecords(r.records);
           setNextCursor(r.nextCursor);
         }

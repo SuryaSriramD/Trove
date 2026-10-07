@@ -2,6 +2,14 @@ import importlib.util,pathlib,unittest
 spec=importlib.util.spec_from_file_location('evaluation',pathlib.Path(__file__).with_name('run-expanded-evaluation.py'))
 m=importlib.util.module_from_spec(spec);spec.loader.exec_module(m)
 class EvidenceAccounting(unittest.TestCase):
+ def test_locked_holdout_family_has_distinct_inventory(self):
+  import json
+  name,parent,count=m.FAMILIES['p0-holdouts']
+  corpus=json.loads((m.ROOT/'internal/workspace/testdata/expanded-evaluation'/name).read_text())
+  self.assertEqual(count,12);self.assertEqual(parent,'TestRealLocalP0ClosureHoldouts')
+  self.assertEqual(len(corpus['cases']),count)
+  self.assertEqual(len({c['id'] for c in corpus['cases']}),count)
+  self.assertEqual(m.FAMILIES['p0'],('p0-qa-memory.json','TestRealLocalExpandedP0QAMemory',24))
  def events(self,status='pass',passed=True):
   return [{'Test':'Runner/a','Action':'output','Output':'fixture.go:1: '+__import__('json').dumps({'fixture':'a','passed':passed,'canonicalUnchanged':True})+'\n'},{'Test':'Runner/a','Action':status}]
  def test_complete(self): self.assertTrue(m.summarize(self.events(),['a'],'Runner')['automatedCorpusPassed'])

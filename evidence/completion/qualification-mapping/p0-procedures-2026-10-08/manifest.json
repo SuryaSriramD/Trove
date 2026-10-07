@@ -1,0 +1,180 @@
+{
+  "schemaVersion": 1,
+  "recordedAt": "2026-10-07T18:47:54.083159+00:00",
+  "scope": "Reviewed exact macOS P0 observation procedures and tooling regressions; no product candidate/model/device/native observation performed.",
+  "sourceCommit": "0bff6edd970e97b8ea9f6d89ec264ed6cae982a6",
+  "sourceState": "Working-tree implementation; exact changed-file hashes below. No commit or release approval created by this package.",
+  "filesSha256": {
+    "scripts/completion_qualification.py": "fd1f89774eec9103bb892936ea1854e9fbf0e170eb8899fedd8f7379e101c740",
+    "tests/test_completion_qualification.py": "8ac7927498f4ce92b3faf4588705dd87c7f37ebcde1ddf6a4b6e4ddb9e67bae0",
+    "docs/completion/qualification-policy.json": "88fd9d974cd010fdf557eae5d52b59b5bfbef9ad4c51096a70fdddfbf2f9269e",
+    "docs/completion/qualification-procedures.json": "03a76edd685e6ab5d22275c6efe633111ba5eb314e11dd022fe335d6a740ab33",
+    "docs/completion/qualification.md": "e23c0c8850c0de14d3799c1c7ac93cfd88f852b384c9d719db350f19adb76a8a",
+    "docs/completion/qualification-mapping.md": "1ddd8ca0274b86f22cd3ddb41a80f0b51a6106169466e6e4c6388f4fbc17270b"
+  },
+  "policySha256": "e0d2b0776cb4ef9fe4b34200e38d86b385db9d43c7afe01d97c406cc0bb2fb7d",
+  "reviewedDecompositions": 54,
+  "observationProcedures": 393,
+  "observationGroups": 40,
+  "checks": [
+    {
+      "name": "qualification-tests",
+      "command": [
+        "/Users/suryasriramduvvuri/Library/Caches/Trove/completion/python/requirements-e99394c278ee/bin/python",
+        "-m",
+        "unittest",
+        "discover",
+        "-s",
+        "tests",
+        "-p",
+        "test_completion_qualification.py",
+        "-v"
+      ],
+      "exitCode": 1,
+      "elapsedSeconds": 31.961456291,
+      "log": "evidence/completion/qualification-mapping/p0-procedures-2026-10-08/qualification-tests.log",
+      "logSha256": "11008ef28de1148314bb903c101c1abf7a5801d31f4b688c854f227c96f34a7b"
+    },
+    {
+      "name": "completion-validation",
+      "command": [
+        "/Users/suryasriramduvvuri/Library/Caches/Trove/completion/python/requirements-e99394c278ee/bin/python",
+        "scripts/validate-completion.py"
+      ],
+      "exitCode": 0,
+      "elapsedSeconds": 0.19513150000000223,
+      "log": "evidence/completion/qualification-mapping/p0-procedures-2026-10-08/completion-validation.log",
+      "logSha256": "4f8a54a9724ed2f145c8f0e393cc9c5b7336560ec5262cd9db3e22b1032e2b47"
+    }
+  ],
+  "plans": [
+    {
+      "target": "darwin-arm64",
+      "tier": "P0",
+      "catalogSha256": "3fcf8af3728ddc956f836eb562b910a2141619d14c9d17abef03b4ac02024399",
+      "originalCatalogUnchanged": true,
+      "requiredCriteria": 395,
+      "mappedCriteria": 395,
+      "unmappedCriteria": 0,
+      "passedCriteria": 0,
+      "releaseQualified": false,
+      "releaseApproved": false
+    },
+    {
+      "target": "darwin-arm64",
+      "tier": "P1",
+      "catalogSha256": "6de8eee0bf78fcbcd21fd85fea79aa82a1e1b8c217c68b7a868c70dfafeeff73",
+      "originalCatalogUnchanged": true,
+      "requiredCriteria": 623,
+      "mappedCriteria": 2,
+      "unmappedCriteria": 621,
+      "passedCriteria": 0,
+      "releaseQualified": false,
+      "releaseApproved": false
+    },
+    {
+      "target": "darwin-arm64",
+      "tier": "P2",
+      "catalogSha256": "d969f6b04c1d3866cbed8f5213d4fad68a6b1f55e4e6b3856767e33a9bc31ed5",
+      "originalCatalogUnchanged": true,
+      "requiredCriteria": 661,
+      "mappedCriteria": 2,
+      "unmappedCriteria": 659,
+      "passedCriteria": 0,
+      "releaseQualified": false,
+      "releaseApproved": false
+    },
+    {
+      "target": "windows-amd64",
+      "tier": "P0",
+      "catalogSha256": "fd96017ed7532f89574f70ae497788d18e9dfa80e93e65ba265e2173f3207bb2",
+      "originalCatalogUnchanged": true,
+      "requiredCriteria": 396,
+      "mappedCriteria": 2,
+      "unmappedCriteria": 394,
+      "passedCriteria": 0,
+      "releaseQualified": false,
+      "releaseApproved": false
+    },
+    {
+      "target": "windows-amd64",
+      "tier": "P1",
+      "catalogSha256": "d24bcb0ac92b57cc49f0176863321203b4e300ef1357c7f9b3c047a7ee379eaa",
+      "originalCatalogUnchanged": true,
+      "requiredCriteria": 624,
+      "mappedCriteria": 2,
+      "unmappedCriteria": 622,
+      "passedCriteria": 0,
+      "releaseQualified": false,
+      "releaseApproved": false
+    },
+    {
+      "target": "windows-amd64",
+      "tier": "P2",
+      "catalogSha256": "8f3f012dc327bd5fd4a910371af3df0ecca33f90ea373ca8ee47daa0c381f3df",
+      "originalCatalogUnchanged": true,
+      "requiredCriteria": 662,
+      "mappedCriteria": 2,
+      "unmappedCriteria": 660,
+      "passedCriteria": 0,
+      "releaseQualified": false,
+      "releaseApproved": false
+    },
+    {
+      "target": "linux-amd64",
+      "tier": "P0",
+      "catalogSha256": "cfd2de531fbd49bc31446d27fd7d2acbe898ef800d953b6da0521616303dcaf4",
+      "originalCatalogUnchanged": true,
+      "requiredCriteria": 396,
+      "mappedCriteria": 2,
+      "unmappedCriteria": 394,
+      "passedCriteria": 0,
+      "releaseQualified": false,
+      "releaseApproved": false
+    },
+    {
+      "target": "linux-amd64",
+      "tier": "P1",
+      "catalogSha256": "01cfd11cf4369f4c956e4a7b473f5490a3e17b792868f99c85200385f818921f",
+      "originalCatalogUnchanged": true,
+      "requiredCriteria": 624,
+      "mappedCriteria": 2,
+      "unmappedCriteria": 622,
+      "passedCriteria": 0,
+      "releaseQualified": false,
+      "releaseApproved": false
+    },
+    {
+      "target": "linux-amd64",
+      "tier": "P2",
+      "catalogSha256": "beb8c35e6729ffb8369dbfdc608af31115b61da2ebdd833561e656cc7e463b21",
+      "originalCatalogUnchanged": true,
+      "requiredCriteria": 662,
+      "mappedCriteria": 2,
+      "unmappedCriteria": 660,
+      "passedCriteria": 0,
+      "releaseQualified": false,
+      "releaseApproved": false
+    }
+  ],
+  "reviewCorrections": [
+    "Template now projects only observation wire fields.",
+    "Mapped observations require exact byte-pinned procedure and criterion hash.",
+    "Procedure parsing uses the same bounded byte buffer that was hashed; cached contents still require matching current bytes.",
+    "Declared fixture asset/prerequisite requirements cannot be omitted by checks.",
+    "Independent review added IME, deep hierarchy, external service-client capabilities, composite editor/model/import-speech/device-install/integration fixtures.",
+    "Local functional AI and speech checks are separate from representative quality/improvement prerequisites."
+  ],
+  "priorTestIssues": [
+    "Initial 34-test run had two expected stale-count assertions after adding mappings, and the source selector inventory tried to decode an AppleDouble sidecar. Counts now distinguish mapping from evidence and selectors exclude sidecars. Subsequent 38-test and 40-test focused runs passed before this retained final run."
+  ],
+  "limitations": [
+    "All 395 macOS P0 criteria remain pending without fresh candidate-bound observations.",
+    "Fixture recipes and independent-oracle requirements are preparation specifications, not actual external dataset/model/device availability.",
+    "Observation content remains observer-attested; hashed artifacts and exact expectations do not cryptographically prove visual or semantic correctness.",
+    "Other target/tier acceptance mappings remain at their earlier two service cases.",
+    "Independent clean Mac, signing/distribution, representative data and physical-device gates remain required as applicable."
+  ],
+  "releaseQualified": false,
+  "releaseApproved": false
+}

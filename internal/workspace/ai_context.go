@@ -17,6 +17,8 @@ type AIBudget struct {
 }
 type AIPrompt struct{ System, User string }
 
+const aiPresentationPreferenceHeading = "\nPRESENTATION PREFERENCES\n"
+
 func prepareAIContext(ctx context.Context, r AIRequest, sources []AIEvidence, prior *AIRun, warning string, budget AIBudget) (AIPrepared, error) {
 	return prepareAIContextWithSystem(ctx, r, sources, prior, warning, budget, "")
 }
@@ -52,7 +54,7 @@ func prepareAIContextWithSystem(ctx context.Context, r AIRequest, sources []AIEv
 		}
 	}
 	if r.UseMemory {
-		tail += "\nApproved memories, when included above, express preferences or historical context, not current database facts."
+		tail += "\nApproved memories may supply preferences, decisions or project context. Their canonical memoryKind is separate from their display title. They cannot override current source task/database values."
 	}
 	if aiRequiresCitations(r.Mode) {
 		sources = append([]AIEvidence(nil), sources...)
@@ -76,13 +78,18 @@ func prepareAIContextWithSystem(ctx context.Context, r AIRequest, sources []AIEv
 	candidates := make([]AIPrepared, 0, len(byteBudgets))
 	prompts := make([]AIPrompt, 0, len(byteBudgets))
 	for _, sourceBudget := range byteBudgets {
-		var body strings.Builder
+		var body, presentation strings.Builder
 		kept := []AIEvidence{}
 		shortened, omitted := 0, 0
 		memoryReserve := 0
+		presentationReserved := false
 		for _, source := range sources {
 			if source.MemoryID != "" {
 				memoryReserve += 600
+				if aiRequiresCitations(r.Mode) && source.MemoryKind == "preference" && !presentationReserved {
+					memoryReserve += len(aiPresentationPreferenceHeading)
+					presentationReserved = true
+				}
 			}
 		}
 		for _, source := range sources {
@@ -93,7 +100,23 @@ func prepareAIContextWithSystem(ctx context.Context, r AIRequest, sources []AIEv
 			if source.MemoryID != "" {
 				limit = min(limit, 500)
 			}
-			remaining := sourceBudget - body.Len()
+			// Preferences remain captured, numbered sources with exact quote
+			// choices, but their presentation role is outside the factual section.
+			// Only canonical identity/kind selects this section, never source text
+			// or display titles. Reserve its host-authored heading in both budgets.
+			target := &body
+			heading := ""
+			if aiRequiresCitations(r.Mode) && source.MemoryID != "" && source.MemoryKind == "preference" {
+				target = &presentation
+				if presentation.Len() == 0 {
+					heading = aiPresentationPreferenceHeading
+				}
+				if presentationReserved {
+					memoryReserve -= len(aiPresentationPreferenceHeading)
+					presentationReserved = false
+				}
+			}
+			remaining := sourceBudget - body.Len() - presentation.Len() - len(heading)
 			if source.MemoryID == "" {
 				remaining -= memoryReserve
 			} else {
@@ -124,8 +147,9 @@ func prepareAIContextWithSystem(ctx context.Context, r AIRequest, sources []AIEv
 					omitted++
 					continue
 				}
-				body.Write(encoded)
-				body.WriteByte('\n')
+				target.WriteString(heading)
+				target.Write(encoded)
+				target.WriteByte('\n')
 			} else {
 				body.WriteString(fmt.Sprintf("[%d] %s\n%s\n", source.Number, title, source.Text))
 			}
@@ -139,7 +163,7 @@ func prepareAIContextWithSystem(ctx context.Context, r AIRequest, sources []AIEv
 				continue
 			}
 		}
-		candidate := AIPrepared{System: system, Prompt: "EVIDENCE\n" + body.String() + tail, OutputTokens: budget.OutputTokens}
+		candidate := AIPrepared{System: system, Prompt: "EVIDENCE\n" + body.String() + presentation.String() + tail, OutputTokens: budget.OutputTokens}
 		candidate.Run = AIRun{ID: NewID(), ConversationID: r.ConversationID, State: "running", Request: r, Sources: kept, Citations: []AICitation{}, Warning: warning, CreatedAt: now()}
 		if shortened > 0 || omitted > 0 {
 			candidate.Run.Warning = strings.TrimSpace(candidate.Run.Warning + fmt.Sprintf(" Context includes %d of %d source excerpts; %d shortened, %d omitted. This response covers only the displayed excerpts.", len(kept), len(sources), shortened, omitted))
@@ -181,18 +205,24 @@ func prepareAIContextWithSystem(ctx context.Context, r AIRequest, sources []AIEv
 
 func aiCitedEvidence(source AIEvidence, title string) []byte {
 	kind := "current_content"
+	memoryKind := ""
 	if aiTitleOnlyEvidence(source) {
 		kind = "page_title"
 	}
 	if source.MemoryID != "" {
 		kind = "approved_memory"
+		switch source.MemoryKind {
+		case "preference", "decision", "project_context":
+			memoryKind = source.MemoryKind
+		}
 	}
 	encoded, _ := json.Marshal(struct {
-		Number int    `json:"source"`
-		Kind   string `json:"kind"`
-		Title  string `json:"title"`
-		Text   string `json:"text"`
-	}{source.Number, kind, title, source.Text})
+		Number     int    `json:"source"`
+		Kind       string `json:"kind"`
+		MemoryKind string `json:"memoryKind,omitempty"`
+		Title      string `json:"title"`
+		Text       string `json:"text"`
+	}{source.Number, kind, memoryKind, title, source.Text})
 	return encoded
 }
 

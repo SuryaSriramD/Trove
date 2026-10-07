@@ -13,7 +13,7 @@ import (
 type AIGenerator func(context.Context, string, string, int, string, func(string)) (string, error)
 type AICompletion struct{ Text string }
 
-const aiCitedInstructions = ` Return only JSON {"title":"the requested heading","claims":[{"text":"one requested factual line","quote":"its exact supporting source span"}]}. Follow the requested format exactly: title counts as one line and each claim counts as one further line. Never duplicate a claim. Use the user's specified default heading verbatim unless the user requests an available approved heading preference. Use an approved formatting preference only to format the requested answer. Do not turn headings, format preferences, or presentation instructions into extra factual claims unless the user explicitly asks about them. Write every requested fact in claim text. Each claim's quote must support ALL its facts. Quote only exact words from one evidence text field; do not change or insert words. The quote grammar restricts you to supplied source spans. Evidence title and source numbers are metadata, not supporting facts. A page_title entry supports only a page name. Current content overrides historical memories for current facts. Do not add numbered citations yourself. If evidence is insufficient, return {"title":"","claims":[{"text":"The supplied evidence does not answer this question.","quote":""}]}.`
+const aiCitedInstructions = ` Return only JSON {"title":"the requested heading","claims":[{"text":"one requested factual line","quote":"its exact supporting source span"}]}. Follow the requested format exactly: title counts as one line and each claim counts as one further line. Include each requested fact once, in the requested order; never duplicate a claim. When complete sentences are requested, include terminal sentence punctuation. State field values plainly without adding decorative quotation marks unless requested or part of the value. Use the user's specified default heading verbatim unless the user requests an available approved heading preference. An approved_memory entry's memoryKind identifies its canonical role; never infer that role from its title. The separate PRESENTATION PREFERENCES section supplies approved presentation context, not extra requested facts: apply relevant formatting in the title or answer layout without adding a claim about the preference, unless the user asks about the preference itself. In that case answer from and quote the preference. Decisions and project context may inform the answer but cannot override current source task/database values. Missing memoryKind means unspecified memory context; do not infer its role from its display title. Do not turn headings or presentation instructions into unrequested factual claims. Write every requested fact in claim text. Each claim's quote must support ALL its facts. Quote only exact words from one evidence text field; do not change or insert words. The quote grammar restricts you to supplied source spans. Evidence title and source numbers are metadata, not supporting facts. Never use a source display title as the answer heading unless the user asks for that page name. A page_title entry supports only a page name. Do not add numbered citations yourself. Distinguish missing evidence from an explicit negative answer: when a source states that the requested value is absent, unassigned or not scheduled, report that state with its supporting quote. Do not infer a negative answer from silence or unrelated negative statements. Only when the sources do not answer the question, return exactly {"title":"","claims":[{"text":"The supplied evidence does not answer this question.","quote":""}]}, with no other claims or heading.`
 
 func aiRequiresCitations(mode string) bool {
 	return mode == "answer" || mode == "summarize" || mode == "explain"
@@ -149,6 +149,19 @@ func renderAICitedClaims(raw string, sources []AIEvidence) (string, error) {
 	}
 	if len(result.Claims) == 0 || len(result.Claims) > 32 {
 		return "", Fail("WORKER_FAILED", "Invalid cited answer claim count")
+	}
+	seenClaims := map[string]bool{}
+	for _, claim := range result.Claims {
+		// Collapse whitespace only. Preserve case, punctuation and wording;
+		// this rejects repeated text, not purported semantic equivalents.
+		key := strings.Join(strings.Fields(claim.Text), " ")
+		if seenClaims[key] {
+			return "", Fail("WORKER_FAILED", "The cited answer repeats a claim")
+		}
+		seenClaims[key] = true
+		if claim.Text == "The supplied evidence does not answer this question." && (len(result.Claims) != 1 || result.Title != "" || claim.Quote != "") {
+			return "", Fail("WORKER_FAILED", "An abstention must be the only claim, without a heading or supporting quote")
+		}
 	}
 	lines := []string{}
 	if len(result.Title) > 512 {

@@ -21,6 +21,7 @@ ROOT = Path(__file__).resolve().parents[1]
 POLICY = ROOT / 'docs/completion/qualification-policy.json'
 STATES = {'passed', 'failed', 'skipped', 'pending', 'not_available', 'unqualified'}
 HEX = re.compile(r'^[0-9a-f]{64}$')
+_PROCEDURE_CATALOGS = {}
 
 
 def stamp():
@@ -145,6 +146,8 @@ def validate_scenario_proof(check, scenario):
     if check['kind'] != 'go':
         if scenario.get('evidenceKind', 'observation') != 'observation':
             raise ValueError('observation cannot stand in for an executable service case')
+        if 'procedure' in scenario:
+            observation_procedure(scenario, check)
         return
     if scenario.get('evidenceKind') != 'service' or not scenario.get('context'):
         raise ValueError('Go acceptance needs an explicit service scope')
@@ -165,6 +168,53 @@ def validate_scenario_proof(check, scenario):
         match = re.search(r'^func ' + re.escape(proof['test']) + r'\(.*?(?=^func |\Z)', source, re.M | re.S)
         if not match or not proof.get('assertions') or any(not a or a not in match[0] for a in proof['assertions']):
             raise ValueError('reviewed assertion missing from exact test body')
+
+
+def observation_procedure(scenario, check=None):
+    """Resolve reviewed instructions, never outcomes or prefilled evidence."""
+    reference = scenario['procedure']
+    if not isinstance(reference, dict) or set(reference) != {'path', 'sha256', 'caseId'}:
+        raise ValueError('observation procedure needs a pinned path and exact case')
+    relative = Path(reference['path'])
+    if relative.parent.as_posix() != 'docs/completion' or relative.suffix != '.json':
+        raise ValueError('observation procedure must be a completion JSON document')
+    path = ROOT / relative
+    if path.is_symlink() or not path.is_file():
+        raise ValueError('observation procedure must be a regular non-symlink file')
+    # Parse exactly the bytes whose hash was checked. A separate read after
+    # hashing could cache a replacement document under the old expected digest.
+    with path.open('rb') as source:
+        raw = source.read((32 << 20) + 1)
+    if len(raw) > 32 << 20:
+        raise ValueError('observation procedure exceeds 32 MiB')
+    if hashlib.sha256(raw).hexdigest() != reference['sha256']:
+        raise ValueError('reviewed observation procedure changed: ' + str(relative))
+    # Recheck bytes on every use, but avoid reparsing the shared reviewed catalog
+    # for hundreds of scenarios. The cache contains only already verified data.
+    identity = reference['sha256']
+    catalog = _PROCEDURE_CATALOGS.get(identity)
+    if catalog is None:
+        catalog = json.loads(raw, object_pairs_hook=_pairs)
+        _PROCEDURE_CATALOGS[identity] = catalog
+    procedure = catalog['cases'].get(reference['caseId'])
+    required = {'criterionId', 'criterionSha256', 'expected', 'context', 'fixtureProfile',
+                'steps', 'assertions', 'evidenceRequirements'}
+    if (not isinstance(procedure, dict) or set(procedure) != required
+            or procedure['criterionId'] != reference['caseId']
+            or not HEX.fullmatch(procedure['criterionSha256'])
+            or procedure['expected'] != scenario['expected']
+            or procedure['context'] != scenario.get('context', '')
+            or procedure['fixtureProfile'] not in catalog['fixtureProfiles']):
+        raise ValueError('observation procedure differs from exact criterion scenario')
+    profile = catalog['fixtureProfiles'][procedure['fixtureProfile']]
+    if check is not None and (not set(profile['prerequisites']) <= set(check['prerequisites'])
+                              or not set(profile['assets']) <= set(check['assets'])):
+        raise ValueError('observation check omits procedure fixture resources')
+    for name in ('steps', 'assertions', 'evidenceRequirements'):
+        if not isinstance(procedure[name], list) or not procedure[name] or any(
+                not isinstance(value, str) or not value.strip() for value in procedure[name]):
+            raise ValueError('observation procedure lacks independent ' + name)
+    return procedure
 
 
 def selected_checks(policy, target, tier):
@@ -304,6 +354,13 @@ def acceptance_coverage(policy, catalog, receipts=None):
                         outcomes.append('invalid'); continue
                     try:
                         validate_scenario_proof(check, scenario)
+                        if check['kind'] == 'observation':
+                            if 'procedure' not in scenario:
+                                raise ValueError('mapped observations require a pinned procedure')
+                            procedure = observation_procedure(scenario, check)
+                            if (procedure['criterionId'] != criterion['id']
+                                    or procedure['criterionSha256'] != digest_value(criterion)):
+                                raise ValueError('observation procedure criterion differs')
                     except (OSError, ValueError, KeyError, TypeError):
                         outcomes.append('invalid'); continue
                     outcomes.append(receipts.get(case['checkId'], 'pending'))
@@ -611,7 +668,8 @@ def observation_template(args, policy):
         raise ValueError('automated checks do not accept manual substitutes')
     return {'candidateId': candidate['candidateId'], 'policySha256': digest_value(policy), 'checkId': check['id'],
             'observedAt': '', 'observer': '', 'environment': {'target': candidate['target'], **candidate['environment']},
-            'scenarios': [{**s, 'result': 'pending', 'observed': '', 'artifactIds': []} for s in check['scenarios']],
+            'scenarios': [{'id': s['id'], 'expected': s['expected'], 'result': 'pending',
+                           'observed': '', 'artifactIds': []} for s in check['scenarios']],
             'prerequisites': {p: {'status': candidate['prerequisites'][p]['status'], 'description': candidate['prerequisites'][p]['reason'], 'artifactIds': []} for p in check['prerequisites']},
             'artifacts': {}}
 

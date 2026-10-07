@@ -39,10 +39,11 @@ type App struct {
 	shutdownDone    chan struct{}
 	shutdownOnce    sync.Once
 	rollback        *rollbackChildState
+	performance     *qualificationPerformance
 }
 
 func NewApp() *App {
-	return &App{uploadGate: make(chan struct{}, 2), startupDone: make(chan struct{}), shutdownDone: make(chan struct{})}
+	return &App{uploadGate: make(chan struct{}, 2), startupDone: make(chan struct{}), shutdownDone: make(chan struct{}), performance: newQualificationPerformance(os.Getenv("TROVE_PERFORMANCE_REPORT"))}
 }
 func defaultWorkspacePath() (string, error) {
 	if p := os.Getenv("TROVE_WORKSPACE"); p != "" {
@@ -159,6 +160,7 @@ func (a *App) waitForStartup(ctx context.Context) error {
 }
 
 func (a *App) shutdown(context.Context) {
+	defer a.performance.close()
 	markStartupStage("shutdown_begin")
 	defer markStartupStage("shutdown_complete")
 	a.shutdownOnce.Do(func() { close(a.shutdownDone) })
@@ -256,6 +258,9 @@ func errorEnvelope(code, message string) string {
 	return string(b)
 }
 func (a *App) Dispatch(method, raw string) string {
+	if finish := a.performance.dispatch(method); finish != nil {
+		defer finish()
+	}
 	if err := a.requireRollbackCommitted(); err != nil && method != "workspace.snapshot" {
 		return errorEnvelope("WORKSPACE_LOCKED", err.Error())
 	}
