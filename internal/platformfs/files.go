@@ -56,6 +56,15 @@ func AcquireRootLock(root *os.Root, name string) (*os.File, error) {
 	if err != nil {
 		return nil, err
 	}
+	protected, err := protectLockHandle(f)
+	if err != nil {
+		f.Close()
+		return nil, err
+	}
+	if protected != f {
+		f.Close()
+		f = protected
+	}
 	if err = AuditPrivateHandle(f, false); err != nil {
 		f.Close()
 		return nil, err
