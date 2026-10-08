@@ -43,23 +43,30 @@ func prepareAIContextWithSystem(ctx context.Context, r AIRequest, sources []AIEv
 	if prior != nil {
 		tail += "\nPREVIOUS USER QUESTION (conversation context only)\n" + truncateAI(prior.Request.Prompt, 400)
 	}
-	tail += "\nUSER REQUEST\n" + r.Prompt
 	// The exact selection is indivisible. It is either fully supplied or rejected.
+	selection := ""
 	if r.Selection != "" {
 		if r.Mode == "code_refactor" || r.Mode == "code_comment" {
 			encoded, _ := json.Marshal(r.Selection)
-			tail += "\nSELECTED SOURCE (JSON string; replace only this source)\n" + string(encoded)
+			selection = "\nSELECTED SOURCE (JSON string; replace only this source)\n" + string(encoded)
 		} else {
-			tail += "\nSELECTED TEXT\n" + r.Selection
+			selection = "\nSELECTED TEXT\n" + r.Selection
 		}
 	}
+	memoryContext := ""
 	if r.UseMemory {
-		tail += "\nApproved memories may supply preferences, decisions or project context. Their canonical memoryKind is separate from their display title. They cannot override current source task/database values."
+		memoryContext = "\nApproved memories may supply preferences, decisions or project context. Their canonical memoryKind is separate from their display title. They cannot override current source task/database values."
 	}
+	request := "\nUSER REQUEST\n" + r.Prompt
 	if trustedSystem == "" && aiRequiresCitations(r.Mode) && len(sources) > 0 {
 		// Include the host-authored response contract in every candidate before
-		// counting tokens. Never derive instructions or answers from source data.
-		tail += aiCitedResponseContract
+		// counting tokens. Keep the exact current request last so generic rules
+		// cannot displace its requested facts or presentation. Neither source
+		// data nor the request is interpreted to construct a generated answer.
+		tail += memoryContext + aiCitedResponseContract + selection + request
+	} else {
+		// Other output protocols retain their original ordering.
+		tail += request + selection + memoryContext
 	}
 	if aiRequiresCitations(r.Mode) {
 		sources = append([]AIEvidence(nil), sources...)
@@ -225,8 +232,10 @@ func aiCitedEvidence(source AIEvidence, title string) []byte {
 		Number     int    `json:"source"`
 		Kind       string `json:"kind"`
 		MemoryKind string `json:"memoryKind,omitempty"`
-		Title      string `json:"title"`
-		Text       string `json:"text"`
+		// Keep input display metadata distinct from the generated answer's
+		// title. The captured/API source still retains its original Title.
+		Title string `json:"sourceDisplayTitle"`
+		Text  string `json:"text"`
 	}{source.Number, kind, memoryKind, title, source.Text})
 	return encoded
 }

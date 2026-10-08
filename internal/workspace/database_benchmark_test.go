@@ -529,10 +529,8 @@ func TestDatabasePerformance10K(t *testing.T) {
 			retainedCancel()
 			t.Fatal("retained fixture record count", err, retainedCount)
 		}
+		checkedFirstPages := 0
 		for _, c := range cases {
-			if c.Name == "provider_bridge_99_selected_rows" {
-				continue
-			}
 			request := map[string]any{"contractVersion": 1, "requestId": NewID(), "workspaceId": reopened.ID(), "collectionId": f.collection, "viewId": c.View, "limit": 200}
 			var observed dbBenchEnvelope
 			if err = json.Unmarshal(reopened.Dispatch(retainedContext, retainedOwner, "queryRecords", marshal(request)), &observed); err != nil {
@@ -542,6 +540,7 @@ func TestDatabasePerformance10K(t *testing.T) {
 			}
 			want := expected(c, false)
 			validate(observed, want[:min(200, len(want))], false)
+			checkedFirstPages++
 		}
 		retainedCancel()
 		if err = reopened.Close(); err != nil {
@@ -551,7 +550,7 @@ func TestDatabasePerformance10K(t *testing.T) {
 		if digestErr != nil {
 			t.Fatal(digestErr)
 		}
-		report["retainedFixture"] = map[string]any{"ready": true, "workspacePath": destination, "closedSourceSha256": closedDigest, "afterReopenSha256": finalDigest, "outsideTimedSamples": true, "records": count, "independentFirstPagesChecked": len(cases) - 1}
+		report["retainedFixture"] = map[string]any{"ready": true, "workspacePath": destination, "closedSourceSha256": closedDigest, "afterReopenSha256": finalDigest, "outsideTimedSamples": true, "records": count, "independentFirstPagesChecked": checkedFirstPages}
 	}
 	report["completed"] = true
 	report["wallSeconds"] = time.Since(started).Seconds()

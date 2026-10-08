@@ -60,9 +60,15 @@ func TestAICodeContextSeparatesMetadataAndLiteralSelection(t *testing.T) {
 		t.Fatal(err)
 	}
 	line := strings.SplitN(strings.TrimPrefix(p.Prompt, "EVIDENCE\n"), "\n", 2)[0]
-	var evidence struct{ Title, Text, Kind string }
+	var evidence struct {
+		Title      string `json:"sourceDisplayTitle"`
+		Text, Kind string
+	}
 	if err = json.Unmarshal([]byte(line), &evidence); err != nil || evidence.Text != source || evidence.Title != "Metadata is not source" {
 		t.Fatal(line, err)
+	}
+	if len(p.Run.Sources) != 1 || p.Run.Sources[0].Title != "Metadata is not source" || p.Run.Sources[0].Text != source {
+		t.Fatal("prompt metadata label changed the captured source")
 	}
 	encoded, _ := json.Marshal(selection)
 	if !strings.Contains(p.Prompt, "SELECTED SOURCE (JSON string; replace only this source)\n"+string(encoded)) {

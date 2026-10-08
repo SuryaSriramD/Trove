@@ -284,3 +284,72 @@ func TestAICodeDraftPreservesActualMarkdownFenceThroughReview(t *testing.T) {
 		})
 	}
 }
+
+// This is a prompt/control-flow regression, not a simulated model-quality pass.
+// Native holdouts must still prove that the model obeys the requested format.
+func TestAICitedRequestContractsPreserveEvidenceBudgetAndRawTitle(t *testing.T) {
+	for _, mode := range []string{"answer", "summarize", "explain"} {
+		t.Run(mode, func(t *testing.T) {
+			for _, request := range []string{
+				"What heading do I prefer? Give one factual sentence without a heading.",
+				"What is the current region? Give one factual sentence without a heading.",
+				"Use my approved preferred heading above one factual sentence about the region.",
+				"What is the inspection frequency? Answer only if the evidence supplies that information.",
+			} {
+				sources := []AIEvidence{
+					{Title: "A record title", Text: "The current region is North."},
+					{Title: "Stored formatting", Text: "The preferred heading is Progress report.", MemoryID: NewID(), MemoryKind: "preference"},
+				}
+				budget := wordBudget()
+				budget.OutputTokens = 512
+				counter := budget.CountTokens
+				measured := map[string]int{}
+				budget.CountTokens = func(ctx context.Context, prompts []AIPrompt) ([]int, error) {
+					counts, err := counter(ctx, prompts)
+					for i, prompt := range prompts {
+						if strings.Count(prompt.User, aiCitedResponseContract) != 1 || strings.Count(prompt.User, "\nUSER REQUEST\n"+request) != 1 || !strings.HasSuffix(prompt.User, "\nUSER REQUEST\n"+request) || strings.Count(prompt.User, "\nTITLE:") != 1 || strings.Count(prompt.User, "\nCLAIMS:") != 1 || strings.Count(prompt.User, "\nEVIDENCE:") != 1 {
+							t.Fatal("structured title, claim and evidence rules must be included in the measured response tail")
+						}
+						measured[prompt.System+prompt.User] = counts[i]
+					}
+					return counts, err
+				}
+				prepared, err := prepareAIContext(context.Background(), AIRequest{Mode: mode, Prompt: request, UseMemory: true}, sources, nil, "", budget)
+				if err != nil {
+					t.Fatal(err)
+				}
+				if !strings.Contains(prepared.Prompt, "\nUSER REQUEST\n"+request) || strings.Count(prepared.Prompt, aiCitedResponseContract) != 1 || !strings.HasSuffix(prepared.Prompt, "\nUSER REQUEST\n"+request) || !strings.Contains(prepared.Prompt, "\nPRESENTATION PREFERENCES\n") || len(prepared.Run.Sources) != 2 {
+					t.Fatal("format request or canonical preference context was lost", prepared)
+				}
+				for i, source := range sources {
+					if prepared.Run.Sources[i].Text != source.Text || prepared.Run.Sources[i].Number != i+1 {
+						t.Fatal("heading policy interpreted or rewrote the captured source")
+					}
+				}
+				if measured[prepared.System+prepared.Prompt] != prepared.PromptTokens || prepared.OutputTokens != 512 || prepared.PromptTokens+prepared.OutputTokens+16 > budget.ContextTokens {
+					t.Fatal("heading contract bypassed the fixed output/context budget")
+				}
+				// No request parsing, hidden retry or renderer rewriting may turn
+				// an unwanted model title into a passing no-heading answer.
+				for _, title := range []string{"", "A record title"} {
+					calls := 0
+					raw := string(marshal(map[string]any{"title": title, "claims": []any{map[string]string{"text": "The current region is North.", "quote": "The current region is North."}}}))
+					completion, err := GeneratePreparedAI(context.Background(), prepared, func(_ context.Context, system, prompt string, tokens int, grammar string, _ func(string)) (string, error) {
+						calls++
+						if system != prepared.System || prompt != prepared.Prompt || tokens != 512 || !strings.Contains(grammar, fmt.Sprintf("%q", `"The preferred heading is Progress report."`)) {
+							t.Fatal("generation lost the measured prompt, budget or preference quote choice")
+						}
+						return raw, nil
+					}, nil)
+					want := "The current region is North. [1]"
+					if title != "" {
+						want = title + "\n" + want
+					}
+					if err != nil || calls != 1 || completion.Text != want {
+						t.Fatal("model title was rewritten or generation retried", completion, calls, err)
+					}
+				}
+			}
+		})
+	}
+}
