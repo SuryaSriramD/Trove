@@ -1,0 +1,222 @@
+{
+  "schemaVersion": 1,
+  "recordedAt": "2026-10-08T10:36:24.801308+00:00",
+  "kind": "macOS P0 integrated development candidate checkpoint; incomplete acceptance",
+  "sourceCommit": "d9471a880a58c19cf2a0542a2db883e77f935df9",
+  "sourceTree": "788f68661c76f94b95104440dc79cc11c11883e7",
+  "candidateId": "610d39013b828724d6c30f02e708e0e748028db51ba6a7b455a941eb4de9ef7e",
+  "target": "darwin-arm64",
+  "tier": "P0",
+  "applicationBinarySha256": "f74379c3d941153690ab58293e72478a10bcf4cfd842deb4c0a48f9513bcba07",
+  "applicationPath": "/Users/suryasriramduvvuri/.codex/visualizations/2026/10/07/01a11771-2f4b-7551-8ea0-b738e67080db/trove-p0-checkpoint-20261007/candidate-1/Trove.app",
+  "artifactRoot": "/Users/suryasriramduvvuri/.codex/visualizations/2026/10/07/01a11771-2f4b-7551-8ea0-b738e67080db/trove-p0-checkpoint-20261007",
+  "releaseQualified": false,
+  "releaseApproved": false,
+  "gateCounts": {
+    "passed": 2,
+    "pending": 50,
+    "unqualified": 2,
+    "failed": 1
+  },
+  "acceptanceCoverage": {
+    "result": "pending",
+    "requiredCriteria": 395,
+    "passedCriteria": 2,
+    "accountedBacklogItems": 51,
+    "mappedCriteria": 395,
+    "unmappedCriteria": [],
+    "researchParityCriteria": [
+      "backlog:GOV-004/research-parity"
+    ],
+    "errors": []
+  },
+  "artifacts": {
+    "qualification-candidate-1/candidate.json": {
+      "path": "/Users/suryasriramduvvuri/.codex/visualizations/2026/10/07/01a11771-2f4b-7551-8ea0-b738e67080db/trove-p0-checkpoint-20261007/qualification-candidate-1/candidate.json",
+      "kind": "file",
+      "sha256": "f56b38879fff80572f7d3d1fae3f27400f5baf8ab8959988c627798427c16092",
+      "size": 139795
+    },
+    "candidate-1-final-status.json": {
+      "path": "/Users/suryasriramduvvuri/.codex/visualizations/2026/10/07/01a11771-2f4b-7551-8ea0-b738e67080db/trove-p0-checkpoint-20261007/candidate-1-final-status.json",
+      "kind": "file",
+      "sha256": "f9db4f0256f50397d2a764bdfadf02778a7c1da71e33734ff1fd2a63c70d6b09",
+      "size": 75065
+    },
+    "source-validation-summary.json": {
+      "path": "/Users/suryasriramduvvuri/.codex/visualizations/2026/10/07/01a11771-2f4b-7551-8ea0-b738e67080db/trove-p0-checkpoint-20261007/source-validation-summary.json",
+      "kind": "file",
+      "sha256": "5e9efc7a6423d4efb9ffe577728851e42c2fb29db57639391ce5049782830547",
+      "size": 615922
+    },
+    "candidate-1-build-start.json": {
+      "path": "/Users/suryasriramduvvuri/.codex/visualizations/2026/10/07/01a11771-2f4b-7551-8ea0-b738e67080db/trove-p0-checkpoint-20261007/candidate-1-build-start.json",
+      "kind": "file",
+      "sha256": "98412079a3bf5bed461f11f88268a588ea3a343b544e47faf64597e735abcff3",
+      "size": 1551
+    },
+    "candidate-1-build-end.json": {
+      "path": "/Users/suryasriramduvvuri/.codex/visualizations/2026/10/07/01a11771-2f4b-7551-8ea0-b738e67080db/trove-p0-checkpoint-20261007/candidate-1-build-end.json",
+      "kind": "file",
+      "sha256": "4158f4584854b7355c29abdb8cbad6e48bd21ceb34564aaf68cfcfab10915741",
+      "size": 259
+    },
+    "predeclared-fixtures.json": {
+      "path": "/Users/suryasriramduvvuri/.codex/visualizations/2026/10/07/01a11771-2f4b-7551-8ea0-b738e67080db/trove-p0-checkpoint-20261007/predeclared-fixtures.json",
+      "kind": "file",
+      "sha256": "44be90c3692b3d17b4098570f7e5a1fa95e143f3275db336a2ab5e0666a32e87",
+      "size": 2456
+    },
+    "ai-p0-candidate-1/manifest.json": {
+      "path": "/Users/suryasriramduvvuri/.codex/visualizations/2026/10/07/01a11771-2f4b-7551-8ea0-b738e67080db/trove-p0-checkpoint-20261007/ai-p0-candidate-1/manifest.json",
+      "kind": "file",
+      "sha256": "c1dc95e068b57a8993f1c278edd91c97ef9beb1a052424705edd2ecc61a79cf6",
+      "size": 166163
+    },
+    "ai-holdouts-candidate-1/manifest.json": {
+      "path": "/Users/suryasriramduvvuri/.codex/visualizations/2026/10/07/01a11771-2f4b-7551-8ea0-b738e67080db/trove-p0-checkpoint-20261007/ai-holdouts-candidate-1/manifest.json",
+      "kind": "file",
+      "sha256": "b19a3a6469689e512a26e45c598011c47e9a7d1f81e4795dfad6678eca72601c",
+      "size": 166113
+    },
+    "ai-canonical-measurement-correction-candidate-1.json": {
+      "path": "/Users/suryasriramduvvuri/.codex/visualizations/2026/10/07/01a11771-2f4b-7551-8ea0-b738e67080db/trove-p0-checkpoint-20261007/ai-canonical-measurement-correction-candidate-1.json",
+      "kind": "file",
+      "sha256": "5f4188d07770965f8bf8f9d8190a0f4572e07ec2e7d3c66eac03b4537f8fec6e",
+      "size": 2422
+    },
+    "p0-local-ai-observation.json": {
+      "path": "/Users/suryasriramduvvuri/.codex/visualizations/2026/10/07/01a11771-2f4b-7551-8ea0-b738e67080db/trove-p0-checkpoint-20261007/p0-local-ai-observation.json",
+      "kind": "file",
+      "sha256": "a18b974e0d2b183f41e79425e7f3bf8fbe4f316ed679d84f31c547c94b789a87",
+      "size": 10174
+    },
+    "p0-native-editor-observation.json": {
+      "path": "/Users/suryasriramduvvuri/.codex/visualizations/2026/10/07/01a11771-2f4b-7551-8ea0-b738e67080db/trove-p0-checkpoint-20261007/p0-native-editor-observation.json",
+      "kind": "file",
+      "sha256": "ae165d00511fab6c993331489c0e0820cd264f826d619e3455b3d6998670dde9",
+      "size": 11591
+    },
+    "p0-performance-observation.json": {
+      "path": "/Users/suryasriramduvvuri/.codex/visualizations/2026/10/07/01a11771-2f4b-7551-8ea0-b738e67080db/trove-p0-checkpoint-20261007/p0-performance-observation.json",
+      "kind": "file",
+      "sha256": "d37aafacb24d555a1d889fe4ced0407f0885c95b46ebd48ca0f7c4de39f882d4",
+      "size": 29217
+    },
+    "search-retained-attempt-3-independent-review.json": {
+      "path": "/Users/suryasriramduvvuri/.codex/visualizations/2026/10/07/01a11771-2f4b-7551-8ea0-b738e67080db/trove-p0-checkpoint-20261007/search-retained-attempt-3-independent-review.json",
+      "kind": "file",
+      "sha256": "32edf5fe10deb672b18f8108bb40e49944cf3c38e895bf4386b02f77dbb507fd",
+      "size": 22120
+    },
+    "search-retention-rerun-failure-diagnosis.json": {
+      "path": "/Users/suryasriramduvvuri/.codex/visualizations/2026/10/07/01a11771-2f4b-7551-8ea0-b738e67080db/trove-p0-checkpoint-20261007/search-retention-rerun-failure-diagnosis.json",
+      "kind": "file",
+      "sha256": "edc9bdf748369df33807c269324092ac6afb80af46d3e0af57e25ef473fe4300",
+      "size": 10285
+    },
+    "search-retention-rerun-power-events.json": {
+      "path": "/Users/suryasriramduvvuri/.codex/visualizations/2026/10/07/01a11771-2f4b-7551-8ea0-b738e67080db/trove-p0-checkpoint-20261007/search-retention-rerun-power-events.json",
+      "kind": "file",
+      "sha256": "9ed75e0f6825bb40fa8c8df11d534284273a7e2c33e9bb80650a792ede99503f",
+      "size": 4351
+    },
+    "startup-candidate-1.json": {
+      "path": "/Users/suryasriramduvvuri/.codex/visualizations/2026/10/07/01a11771-2f4b-7551-8ea0-b738e67080db/trove-p0-checkpoint-20261007/startup-candidate-1.json",
+      "kind": "file",
+      "sha256": "6bf3e6373b77e27b7bd5b69acfd607aff95681d5682ef7862a02b7810b9afe0a",
+      "size": 28941
+    },
+    "database-candidate-1/results.json": {
+      "path": "/Users/suryasriramduvvuri/.codex/visualizations/2026/10/07/01a11771-2f4b-7551-8ea0-b738e67080db/trove-p0-checkpoint-20261007/database-candidate-1/results.json",
+      "kind": "file",
+      "sha256": "eb640337f0aee15a254a96c61e77a526b6588fce26dce8d4353145a5b798d79a",
+      "size": 38283
+    },
+    "native-ui-observations-summary-candidate-1.json": {
+      "path": "/Users/suryasriramduvvuri/.codex/visualizations/2026/10/07/01a11771-2f4b-7551-8ea0-b738e67080db/trove-p0-checkpoint-20261007/native-ui-observations-summary-candidate-1.json",
+      "kind": "file",
+      "sha256": "e4d4b3f1ca6666aae13c1eb8288dfa371ef170ee105c6285d4cc5be08f2fd2ac",
+      "size": 16564
+    },
+    "native-ui-operator-observation-candidate-1.json": {
+      "path": "/Users/suryasriramduvvuri/.codex/visualizations/2026/10/07/01a11771-2f4b-7551-8ea0-b738e67080db/trove-p0-checkpoint-20261007/native-ui-operator-observation-candidate-1.json",
+      "kind": "file",
+      "sha256": "b73be260922f9f650c5eadc426e2c67d3b769a3eab5c26402ef5db916e3a60f4",
+      "size": 5395
+    },
+    "native-table-render-source-analysis-candidate-1.json": {
+      "path": "/Users/suryasriramduvvuri/.codex/visualizations/2026/10/07/01a11771-2f4b-7551-8ea0-b738e67080db/trove-p0-checkpoint-20261007/native-table-render-source-analysis-candidate-1.json",
+      "kind": "file",
+      "sha256": "541fe36b360f75eee1fc76cffcabb04eb4d056139ebacf7d62b0a778d5941a03",
+      "size": 7195
+    },
+    "retained-native-ui-workspaces.json": {
+      "path": "/Users/suryasriramduvvuri/.codex/visualizations/2026/10/07/01a11771-2f4b-7551-8ea0-b738e67080db/trove-p0-checkpoint-20261007/retained-native-ui-workspaces.json",
+      "kind": "file",
+      "sha256": "620a50b665a7acd4d9af9ef643b5e6e35cca58fee34d337e77b6b1874c75fb34",
+      "size": 22521
+    },
+    "retained-packaged-fixtures.json": {
+      "path": "/Users/suryasriramduvvuri/.codex/visualizations/2026/10/07/01a11771-2f4b-7551-8ea0-b738e67080db/trove-p0-checkpoint-20261007/retained-packaged-fixtures.json",
+      "kind": "file",
+      "sha256": "1a7f2e87514434eda042c81eb07dfa22dd14ab2a293396ba8ea21f24bf5d3459",
+      "size": 69683
+    },
+    "documentation-catalog-invariance.json": {
+      "path": "/Users/suryasriramduvvuri/.codex/visualizations/2026/10/07/01a11771-2f4b-7551-8ea0-b738e67080db/trove-p0-checkpoint-20261007/documentation-catalog-invariance.json",
+      "kind": "file",
+      "sha256": "2abc7868aa9c00a8b797bea565f2f6188c270443f75b50e8fa60ca19d6e0dadc",
+      "size": 2063
+    }
+  },
+  "retainedReportInventory": {
+    "path": "/Users/suryasriramduvvuri/.codex/visualizations/2026/10/07/01a11771-2f4b-7551-8ea0-b738e67080db/trove-p0-checkpoint-20261007/retained-report-inventory-final.json",
+    "kind": "file",
+    "sha256": "3362dbd84c45d1c5375a4f89f5e034db90891f29f16e6dafd40c9ef64cbe7365",
+    "size": 119611
+  },
+  "ai": {
+    "original": {
+      "passed": 24,
+      "total": 24
+    },
+    "newHoldouts": {
+      "passed": 11,
+      "total": 12
+    },
+    "priorRegressions": {
+      "passed": 20,
+      "total": 21
+    },
+    "contextTokens": 8192,
+    "outputTokens": 512,
+    "attemptsPerCase": 1,
+    "canonicalCheckLimit": "Unchanged mutation-history counts; not full canonical row/blob comparison."
+  },
+  "syntheticSearch": {
+    "keywordSamples": 300,
+    "hybridSamples": 90,
+    "keywordMaxMs": 38.344292,
+    "hybridMaxMs": 237.761625,
+    "retainedWorkspaceFiles": 12,
+    "retainedWorkspaceBytes": 221877803
+  },
+  "remaining": [
+    "Two AI failures with locked oracles unchanged",
+    "Native table rendering and paging investigation",
+    "Fresh startup run with durable fixtures on an unlocked Mac",
+    "Complete native editor, clipboard, IME, diagnostics, model/memory, concurrency and recovery workflows",
+    "Physical microphone and representative authorized datasets",
+    "Independent clean-Mac installation and production signing/notarization",
+    "P1 live providers/Notion/MCP, expanded P2, Windows/Linux qualification and research reconciliation"
+  ],
+  "limits": [
+    "Historical receipts were not transferred to this candidate.",
+    "Original search/startup and first-table temporary runtime inputs disappeared; failures and raw surviving reports remain.",
+    "Third search attempt used process-scoped idle-sleep prevention and fresh retained fixtures; this does not repair or qualify product sleep recovery.",
+    "Native frame timings are scheduling proxies; application and owned-worker RSS exclude WebKit/GPU/shared memory and unsampled peaks.",
+    "Database/native UI observations do not establish a pass against an unagreed numerical latency limit.",
+    "Later documentation/registry publication does not change the clean committed source from which the candidate was built."
+  ]
+}

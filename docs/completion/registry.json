@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "authority": "Accepted Trove completion roadmap C0–C8; acceptance in docs/remaining-work.md remains binding",
-  "updatedAt": "2026-10-07",
+  "updatedAt": "2026-10-08",
   "baselineCommit": "632d0cd0141dc2dcdc7922274757e10083623616",
   "integrationBranch": "integration",
   "ownerRoles": {
@@ -3277,6 +3277,20 @@
       "packagedJourneys": "passed_for_recorded_P0_P1_P2_service_scope_without_models",
       "startupReliability": "not_controlled_on_this_candidate_prior_failure_remains_open",
       "nativeInterface": "support_default_save_and_optional_preview_discard_passed_after_expired_first_attempt",
+      "laterPackagesDoNotChangeThisCandidate": true
+    },
+    {
+      "sourceCommit": "d9471a880a58c19cf2a0542a2db883e77f935df9",
+      "candidateId": "610d39013b828724d6c30f02e708e0e748028db51ba6a7b455a941eb4de9ef7e",
+      "manifest": "evidence/completion/macos-p0-candidate-d9471a8/manifest.json",
+      "assessment": "docs/completion/development-candidate-d9471a8.md",
+      "releaseApproved": false,
+      "releaseQualified": false,
+      "packagedJourneys": "passed_for_recorded_P0_service_and_installed_runtime_scope",
+      "localAI": "original_24_of_24_holdouts_11_of_12_prior_20_of_21_gate_failed",
+      "startupReliability": "80_numerical_passes_but_generated_fixture_inputs_missing",
+      "searchPerformance": "300_keyword_and_90_hybrid_samples_pass_with_retained_exact_synthetic_fixtures",
+      "nativeInterface": "partial_saved_edits_and_table_observations_only_locked_session_and_responsiveness_unresolved",
       "laterPackagesDoNotChangeThisCandidate": true
     }
   ],
