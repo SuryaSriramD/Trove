@@ -3292,6 +3292,20 @@
       "searchPerformance": "300_keyword_and_90_hybrid_samples_pass_with_retained_exact_synthetic_fixtures",
       "nativeInterface": "partial_saved_edits_and_table_observations_only_locked_session_and_responsiveness_unresolved",
       "laterPackagesDoNotChangeThisCandidate": true
+    },
+    {
+      "sourceCommit": "d9e045c25bd534077ce2a109ebfc93c992fe27e8",
+      "candidateId": "d442e286954d24509817e9b0b87846ce3267da7497a23216359886d4508cd898",
+      "manifest": "evidence/completion/macos-p0-candidate-d9e045c/manifest.json",
+      "assessment": "docs/completion/development-candidate-d9e045c.md",
+      "releaseApproved": false,
+      "releaseQualified": false,
+      "packagedJourneys": "passed_for_recorded_P0_service_and_installed_runtime_scope_with_independent_retained_content_audit",
+      "localAI": "all65_collected_existing_predicates56_of57_new8_execution8_of8_manual_writing10_of15_gate_failed",
+      "startupReliability": "two_preflight_failures_zero_measurements_sandbox_process_read_then_busy_host",
+      "searchPerformance": "not_run_candidate4_busy_host",
+      "nativeInterface": "editor_existing_data_preserved_but_new_content_history_oracle_failed_no_derived_fixture_table_paging_partial_missing_scroll_chooser_frame_proof_unqualified",
+      "laterPackagesDoNotChangeThisCandidate": true
     }
   ],
   "currentRequirementsOverlay": "docs/completion/requirements-overlay.json",
