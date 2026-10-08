@@ -57,6 +57,11 @@ func TestRealLocalMemoryPreferenceAndCurrentAuthority(t *testing.T) {
 	for _, useMemory := range []bool{false, true} {
 		t.Run("memory="+strconv.FormatBool(useMemory), func(t *testing.T) {
 			req.UseMemory = useMemory
+			canonicalAudit := beginAICanonicalObservation(t, k)
+			defer func() {
+				report, _ := json.Marshal(map[string]any{"canonicalInventory": canonicalAudit.finish(t, k), "phase": "memory-evaluation", "useMemory": useMemory})
+				t.Log(string(report))
+			}()
 			start := time.Now()
 			prepared, err := k.PrepareAIWithBudget(ctx, e, req, budget)
 			if err != nil {
@@ -151,6 +156,11 @@ func TestRealLocalMemoryPreferenceAndCurrentAuthority(t *testing.T) {
 	// published after its approved memory has ceased to be current.
 	t.Run("forget-during-stream", func(t *testing.T) {
 		req.UseMemory = true
+		canonicalAudit := beginAICanonicalObservation(t, k)
+		defer func() {
+			report, _ := json.Marshal(map[string]any{"canonicalInventory": canonicalAudit.finish(t, k), "phase": "after-explicit-forget"})
+			t.Log(string(report))
+		}()
 		prepared, err := k.PrepareAIWithBudget(ctx, e, req, budget)
 		if err != nil {
 			t.Fatal(err)
@@ -159,7 +169,10 @@ func TestRealLocalMemoryPreferenceAndCurrentAuthority(t *testing.T) {
 		answer, err := s.GenerateText(ctx, pack, native.ChatPrompt(prepared.System, prepared.Prompt), 512, func(string) {
 			if !forgotten {
 				forgotten = true
+				report, _ := json.Marshal(map[string]any{"canonicalInventory": canonicalAudit.finish(t, k), "phase": "before-explicit-forget"})
+				t.Log(string(report))
 				testOK(t, dbBatch(t, k, e, []any{map[string]any{"kind": "memory.forget", "memoryId": preference}}, "page", preferencePage, "memory", preference))
+				canonicalAudit = beginAICanonicalObservation(t, k)
 			}
 		})
 		state, failure := "completed", ""
@@ -216,6 +229,7 @@ func TestRealLocalNamedWorkspacePlan(t *testing.T) {
 		}
 		return supervisor.CountTokens(ctx, pack, texts)
 	}}
+	canonicalAudit := beginAICanonicalObservation(t, k)
 	prepared, err := k.PrepareAIWithBudget(ctx, e, AIRequest{PageID: page, Mode: "workspace_agent", Prompt: "Create one page titled Backup checklist under Launch. Its body must be the single sentence: Verify the restored files. Do not propose any other changes.", ModelPackID: pack}, budget)
 	if err != nil {
 		t.Fatal(err)
@@ -244,6 +258,8 @@ func TestRealLocalNamedWorkspacePlan(t *testing.T) {
 	if count != 0 {
 		t.Fatal("generation changed content before review")
 	}
+	canonicalReport, _ := json.Marshal(map[string]any{"canonicalInventory": canonicalAudit.finish(t, k), "phase": "before-approved-plan-apply"})
+	t.Log(string(canonicalReport))
 	if _, err = applyAIAction(ctx, k, e, map[string]any{"proposalId": proposal.ID}); err != nil {
 		t.Fatal(err)
 	}

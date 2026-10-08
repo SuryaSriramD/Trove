@@ -165,6 +165,7 @@ func TestRealLocalExposedModes(t *testing.T) {
 				}
 				testOK(t, dbBatch(t, k, e, []any{map[string]any{"kind": "block.insert", "block": map[string]any{"blockId": block, "pageId": page, "type": kind, "schemaVersion": 1, "data": data}}}, "page", page, "block", block))
 			}
+			canonicalAudit := beginAICanonicalObservation(t, k)
 			var before int
 			if err := k.db.QueryRow("SELECT count(*) FROM mutation_history").Scan(&before); err != nil {
 				t.Fatal(err)
@@ -208,14 +209,16 @@ func TestRealLocalExposedModes(t *testing.T) {
 			if err := k.db.QueryRow("SELECT count(*) FROM mutation_history").Scan(&after); err != nil {
 				t.Fatal(err)
 			}
+			latencyMS := time.Since(start).Milliseconds() // exclude canonical evidence capture/fsync
+			canonicalInventory := canonicalAudit.finish(t, k)
 			unchanged := before == after
 			var peakRSS any
 			if rss := metrics.PeakRSSBytes.Load(); rss > 0 {
 				peakRSS = rss
 			}
-			report, _ := json.Marshal(map[string]any{"mode": tc.mode, "modelPackId": pack, "taskPassed": taskPass, "canonicalUnchanged": unchanged, "promptTokens": prepared.PromptTokens, "outputCap": prepared.OutputTokens, "latencyMs": time.Since(start).Milliseconds(), "source": tc.source, "prompt": tc.prompt, "draft": raw, "displayed": run.Text, "generationError": fmt.Sprint(generationErr), "finishError": fmt.Sprint(finishErr), "proposalError": proposalError, "peakWorkerRSS": peakRSS, "rssMeasurementAvailable": peakRSS != nil, "releaseQualified": false})
+			report, _ := json.Marshal(map[string]any{"mode": tc.mode, "modelPackId": pack, "taskPassed": taskPass, "canonicalUnchanged": unchanged, "mutationHistoryCountUnchanged": unchanged, "canonicalInventory": canonicalInventory, "promptTokens": prepared.PromptTokens, "outputCap": prepared.OutputTokens, "latencyMs": latencyMS, "source": tc.source, "prompt": tc.prompt, "draft": raw, "displayed": run.Text, "generationError": fmt.Sprint(generationErr), "finishError": fmt.Sprint(finishErr), "proposalError": proposalError, "peakWorkerRSS": peakRSS, "rssMeasurementAvailable": peakRSS != nil, "releaseQualified": false})
 			t.Log(string(report))
-			if !taskPass || !unchanged {
+			if !taskPass || !unchanged || !canonicalInventory.Unchanged {
 				t.Error("predefined mode task or unapplied-write boundary failed")
 			}
 		})

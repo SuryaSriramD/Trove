@@ -224,3 +224,51 @@ func TestAICitedPreferenceSectionUsesTheMeasuredContextBudget(t *testing.T) {
 		t.Fatal("presentation section was added after tokenization or exceeded the budget")
 	}
 }
+
+func TestAICitedResponseContractIsMeasuredWithoutInterpretingTheEvidence(t *testing.T) {
+	for _, mode := range []string{"answer", "summarize", "explain"} {
+		t.Run(mode, func(t *testing.T) {
+			request := AIRequest{Mode: mode, Prompt: "Return two complete sentences in the requested order.", Selection: "Selected source remains unchanged."}
+			sources := []AIEvidence{{Text: "The room has not been selected. The meeting day is Monday."}}
+			budget := wordBudget()
+			budget.OutputTokens = 512
+			count := budget.CountTokens
+			measured := map[string]int{}
+			budget.CountTokens = func(ctx context.Context, prompts []AIPrompt) ([]int, error) {
+				counts, err := count(ctx, prompts)
+				for i, prompt := range prompts {
+					if !strings.HasSuffix(prompt.User, aiCitedResponseContract) {
+						t.Fatal("response contract was not part of the measured prompt")
+					}
+					measured[prompt.System+prompt.User] = counts[i]
+				}
+				return counts, err
+			}
+			prepared, err := prepareAIContext(context.Background(), request, sources, nil, "", budget)
+			if err != nil {
+				t.Fatal(err)
+			}
+			if !strings.Contains(prepared.Prompt, "\nUSER REQUEST\n"+request.Prompt) || !strings.Contains(prepared.Prompt, "\nSELECTED TEXT\n"+request.Selection) || len(prepared.Run.Sources) != 1 || prepared.Run.Sources[0].Text != sources[0].Text {
+				t.Fatal("source or request was interpreted or rewritten", prepared)
+			}
+			if measured[prepared.System+prepared.Prompt] != prepared.PromptTokens || prepared.OutputTokens != 512 || prepared.PromptTokens+prepared.OutputTokens+16 > budget.ContextTokens {
+				t.Fatal("contract bypassed the token budget", prepared)
+			}
+			// The same policy applies when a different field is absent, known,
+			// or not mentioned. No source keyword can decide answerability here.
+			for _, source := range []string{"The meeting is Monday.", "The meeting location has not been selected.", "No budget was approved; the meeting day is unknown."} {
+				sources[0].Text = source
+				next, err := prepareAIContext(context.Background(), request, sources, nil, "", budget)
+				if err != nil || !strings.HasSuffix(next.Prompt, aiCitedResponseContract) || next.Run.Sources[0].Text != source {
+					t.Fatal("response policy depends on an extracted answer", next, err)
+				}
+			}
+		})
+	}
+	for _, tc := range []struct{ mode, system string }{{"rewrite", ""}, {"answer", "Private review contract."}} {
+		prepared, err := prepareAIContextWithSystem(context.Background(), AIRequest{Mode: tc.mode, Prompt: "Review this source."}, []AIEvidence{{Text: "The meeting is Monday."}}, nil, "", wordBudget(), tc.system)
+		if err != nil || strings.Contains(prepared.Prompt, aiCitedResponseContract) {
+			t.Fatal("cited contract leaked into a different output protocol", prepared, err)
+		}
+	}
+}

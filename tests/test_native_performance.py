@@ -2,12 +2,14 @@ import fcntl
 import importlib.util
 import json
 import os
+import sys
 from pathlib import Path
 import tempfile
 import unittest
 from unittest.mock import patch
 
 ROOT = Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(ROOT / 'scripts'))
 spec = importlib.util.spec_from_file_location('native_performance', ROOT / 'scripts/record-native-performance.py')
 driver = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(driver)
@@ -75,6 +77,25 @@ class NativePerformanceTests(unittest.TestCase):
             before = driver.clone_closed_workspace(source, root / 'copy')
             self.assertEqual(driver.inventory(source), before)
             self.assertEqual(driver.inventory(root / 'copy'), before)
+            retained = driver.retain_closed_workspace(root / 'copy')
+            self.assertEqual(retained['inventory'], before)
+            self.assertTrue(retained['fsynced'])
+
+    def test_retention_refuses_live_and_linked_workspaces(self):
+        with tempfile.TemporaryDirectory() as temp:
+            root = Path(temp)
+            source = driver.private_directory(root / 'runtime')
+            (source / '.owner.lock').write_bytes(b'')
+            (source / 'workspace.db').write_bytes(b'bytes which must remain unchanged')
+            before = driver.inventory(source)
+            with (source / '.owner.lock').open('rb') as lock:
+                fcntl.flock(lock, fcntl.LOCK_EX | fcntl.LOCK_NB)
+                with self.assertRaises(BlockingIOError):
+                    driver.retain_closed_workspace(source)
+            alias = root / 'alias'; alias.symlink_to(source, target_is_directory=True)
+            with self.assertRaises(ValueError): driver.retain_closed_workspace(alias)
+            with self.assertRaises(FileExistsError): driver.private_directory(source)
+            self.assertEqual(driver.inventory(source), before)
 
 
 if __name__ == '__main__':

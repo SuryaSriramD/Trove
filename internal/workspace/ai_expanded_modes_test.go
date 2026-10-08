@@ -264,6 +264,7 @@ func TestRealLocalExpandedModes(t *testing.T) {
 				}
 				testOK(t, dbBatch(t, k, e, []any{map[string]any{"kind": "block.insert", "block": map[string]any{"blockId": block, "pageId": page, "type": kind, "schemaVersion": 1, "data": data}}}, "page", page, "block", block))
 			}
+			canonicalAudit := beginAICanonicalObservation(t, k)
 			var before int
 			if err = k.db.QueryRow("SELECT count(*) FROM mutation_history").Scan(&before); err != nil {
 				t.Fatal(err)
@@ -304,12 +305,14 @@ func TestRealLocalExpandedModes(t *testing.T) {
 			if err = k.db.QueryRow("SELECT count(*) FROM mutation_history").Scan(&after); err != nil {
 				t.Fatal(err)
 			}
-			passed := prepareErr == nil && generationErr == nil && finishErr == nil && oracleErr == nil && proposalErr == nil && run.State == "completed" && before == after
+			latencyMS := time.Since(started).Milliseconds() // exclude canonical evidence capture/fsync
+			canonicalInventory := canonicalAudit.finish(t, k)
+			passed := prepareErr == nil && generationErr == nil && finishErr == nil && oracleErr == nil && proposalErr == nil && run.State == "completed" && before == after && canonicalInventory.Unchanged
 			var rss any
 			if n := metrics.PeakRSSBytes.Load(); n > 0 {
 				rss = n
 			}
-			report, _ := json.Marshal(map[string]any{"fixture": tc.ID, "mode": tc.Mode, "modelPackId": pack, "automatedTaskPassed": passed, "manualSemanticReviewRequired": tc.ManualSemanticReviewRequired, "canonicalUnchanged": before == after, "latencyMs": time.Since(started).Milliseconds(), "promptTokens": p.PromptTokens, "outputCap": p.OutputTokens, "peakWorkerRSSBytes": rss, "prepareError": fmt.Sprint(prepareErr), "generationError": fmt.Sprint(generationErr), "finishError": fmt.Sprint(finishErr), "rubricError": fmt.Sprint(oracleErr), "proposalError": fmt.Sprint(proposalErr), "rawDraft": raw, "displayed": run.Text, "releaseQualified": false})
+			report, _ := json.Marshal(map[string]any{"fixture": tc.ID, "mode": tc.Mode, "modelPackId": pack, "automatedTaskPassed": passed, "manualSemanticReviewRequired": tc.ManualSemanticReviewRequired, "canonicalUnchanged": before == after, "mutationHistoryCountUnchanged": before == after, "canonicalInventory": canonicalInventory, "latencyMs": latencyMS, "promptTokens": p.PromptTokens, "outputCap": p.OutputTokens, "peakWorkerRSSBytes": rss, "prepareError": fmt.Sprint(prepareErr), "generationError": fmt.Sprint(generationErr), "finishError": fmt.Sprint(finishErr), "rubricError": fmt.Sprint(oracleErr), "proposalError": fmt.Sprint(proposalErr), "rawDraft": raw, "displayed": run.Text, "releaseQualified": false})
 			t.Log(string(report))
 			if !passed {
 				t.Error("independent mode outcome or no-write boundary failed")

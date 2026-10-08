@@ -102,6 +102,12 @@
 .db-virtual-viewport { max-height: 560px; height: min(560px, 65vh); overflow: auto; overflow-anchor: none; }
 .db-virtual-viewport thead { position: sticky; top: 0; z-index: 1; background: var(--panel, #fff); }
 .db-pager { display: flex; align-items: center; gap: 12px; margin: 12px 0; }
+.db-relation-value { text-align: left; width: 100%; overflow-wrap: anywhere; }
+.db-relation-dialog { width: min(520px, 90vw); max-height: 85vh; overflow: auto; padding: 22px; color: var(--text); background: var(--panel, #fff); border: 1px solid var(--line, #e4e3df); border-radius: 10px; }
+.db-relation-dialog::backdrop { background: #0006; }
+.db-relation-options { border: 0; padding: 0; margin: 0; max-height: 40vh; overflow: auto; }
+.database .db-relation-check { display: flex; flex-direction: row; align-items: center; gap: 10px; padding: 7px 0; color: inherit; font-size: 14px; overflow-wrap: anywhere; }
+.db-relation-check input { flex: 0 0 auto; }
 .db-gallery-window-row { display: grid; gap: 16px; padding: 8px 0; }
 .db-table {
   border-collapse: collapse;

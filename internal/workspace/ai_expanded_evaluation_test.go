@@ -193,6 +193,7 @@ func TestExpandedQACanonicalSeedAndPublication(t *testing.T) {
 		t.Run(tc.ID, func(t *testing.T) {
 			k, e := testKernel(t)
 			page := seedExpandedQA(t, k, e, tc)
+			canonicalAudit := beginAICanonicalObservation(t, k)
 			p, err := k.PrepareAIWithBudget(context.Background(), e, AIRequest{PageID: page, Mode: "answer", Prompt: tc.Prompt, UseMemory: tc.UseMemory, ModelPackID: NewID()}, wordBudget())
 			if err != nil {
 				t.Fatal(err)
@@ -215,6 +216,7 @@ func TestExpandedQACanonicalSeedAndPublication(t *testing.T) {
 			if err = k.db.QueryRow("SELECT count(*) FROM mutation_history").Scan(&after); err != nil {
 				t.Fatal(err)
 			}
+			canonicalAudit.finish(t, k)
 			if before != after {
 				t.Fatal("draft modified canonical content")
 			}
@@ -245,6 +247,7 @@ func TestRealLocalExpandedP0QAMemory(t *testing.T) {
 		t.Run(tc.ID, func(t *testing.T) {
 			k, e := testKernel(t)
 			page := seedExpandedQA(t, k, e, tc)
+			canonicalAudit := beginAICanonicalObservation(t, k)
 			var before int
 			if err := k.db.QueryRow("SELECT count(*) FROM mutation_history").Scan(&before); err != nil {
 				t.Fatal(err)
@@ -282,7 +285,9 @@ func TestRealLocalExpandedP0QAMemory(t *testing.T) {
 			if err := k.db.QueryRow("SELECT count(*) FROM mutation_history").Scan(&after); err != nil {
 				t.Fatal(err)
 			}
-			passed := prepareErr == nil && generationErr == nil && finishErr == nil && oracleErr == nil && run.State == "completed" && before == after
+			latencyMS := time.Since(started).Milliseconds() // exclude canonical evidence capture/fsync
+			canonicalInventory := canonicalAudit.finish(t, k)
+			passed := prepareErr == nil && generationErr == nil && finishErr == nil && oracleErr == nil && run.State == "completed" && before == after && canonicalInventory.Unchanged
 			if !tc.Abstain && len(run.Citations) == 0 {
 				passed = false
 			}
@@ -290,7 +295,7 @@ func TestRealLocalExpandedP0QAMemory(t *testing.T) {
 			if n := metrics.PeakRSSBytes.Load(); n > 0 {
 				rss = n
 			}
-			report, _ := json.Marshal(map[string]any{"fixture": tc.ID, "corpusSHA256": corpusHash, "modelPackId": pack, "passed": passed, "canonicalUnchanged": before == after, "latencyMs": time.Since(started).Milliseconds(), "promptTokens": p.PromptTokens, "outputCap": p.OutputTokens, "warning": p.Run.Warning, "peakWorkerRSSBytes": rss, "prepareError": fmt.Sprint(prepareErr), "generationError": fmt.Sprint(generationErr), "finishError": fmt.Sprint(finishErr), "rubricError": fmt.Sprint(oracleErr), "rawDraft": raw, "displayed": run.Text, "releaseQualified": false})
+			report, _ := json.Marshal(map[string]any{"fixture": tc.ID, "corpusSHA256": corpusHash, "modelPackId": pack, "passed": passed, "canonicalUnchanged": before == after, "mutationHistoryCountUnchanged": before == after, "canonicalInventory": canonicalInventory, "latencyMs": latencyMS, "promptTokens": p.PromptTokens, "outputCap": p.OutputTokens, "warning": p.Run.Warning, "peakWorkerRSSBytes": rss, "prepareError": fmt.Sprint(prepareErr), "generationError": fmt.Sprint(generationErr), "finishError": fmt.Sprint(finishErr), "rubricError": fmt.Sprint(oracleErr), "rawDraft": raw, "displayed": run.Text, "releaseQualified": false})
 			t.Log(string(report))
 			if !passed {
 				t.Error("expanded P0 task or canonical-write boundary failed")

@@ -1,5 +1,8 @@
 import { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
-import { qualificationFrames, qualificationStart } from "../qualificationPerformance";
+import {
+  qualificationFrames,
+  qualificationStart,
+} from "../qualificationPerformance";
 import {
   batch,
   dispatch,
@@ -35,6 +38,12 @@ import "./database.css";
 import { VirtualRows } from "./VirtualRows";
 import { Timeline } from "./Timeline";
 import { FormulaEditor } from "./FormulaEditor";
+import {
+  RelationPicker,
+  indexRelationTargets,
+  type RelationTargets,
+} from "./RelationPicker";
+import { loadRecordWindow } from "./recordWindow";
 import { calendarDay, resizeDateRange } from "./dateRange";
 import { P2DatabasePanel, P2RowButtons } from "./P2Database";
 import type { P2Button, P2Config } from "./P2Model";
@@ -78,19 +87,41 @@ export default function DatabaseView({
   const [selected, setSelected] = useState(collectionId ?? "");
   const [active, setActive] = useState("");
   const [records, setRecords] = useState<D.Record[]>([]);
-  const qualificationLoad = useRef<{ started: number; returned: number; records: D.Record[] } | null>(null);
+  const qualificationLoad = useRef<{
+    started: number;
+    returned: number;
+    records: D.Record[];
+  } | null>(null);
   const [pager, setPager] = useState<{
     key: string;
     index: number;
     history: string[];
-  }>({ key: "", index: 0, history: [""] });
+    clock: number;
+  }>({ key: "", index: 0, history: [""], clock: -1 });
   const [nextCursor, setNextCursor] = useState<string>();
   const [loadError, setLoadError] = useState("");
   const [clockTick, setClockTick] = useState(0);
   useEffect(() => {
-    const timer = setInterval(() => setClockTick((x) => x + 1), 60000);
-    return () => clearInterval(timer);
+    // Cursor clock identity changes at the UTC minute boundary, rather than
+    // sixty seconds after this component happened to mount.
+    let timer: ReturnType<typeof setTimeout>;
+    const schedule = () => {
+      timer = setTimeout(
+        () => {
+          setClockTick((x) => x + 1);
+          schedule();
+        },
+        60000 - (Date.now() % 60000) + 1,
+      );
+    };
+    schedule();
+    return () => clearTimeout(timer);
   }, []);
+  const settledWindow = useRef<{
+    key: string;
+    index: number;
+    clock: number;
+  } | null>(null);
   const [loading, setLoading] = useState(false);
   useLayoutEffect(() => {
     const observed = qualificationLoad.current;
@@ -117,7 +148,8 @@ export default function DatabaseView({
   // A saved view belongs to a page independently of its shared collection.
   // Page embeds must not pick a default/filter from another page's placement.
   const views = w.views.filter(
-    (v) => v.collectionId === collection?.id &&
+    (v) =>
+      v.collectionId === collection?.id &&
       (!owningPageId || v.owningPageId === owningPageId),
   );
   const view = views.find((v) => v.id === active) ?? views[0];
@@ -125,40 +157,82 @@ export default function DatabaseView({
     (!view || view.type === "table" || view.type === "gallery") &&
     !view?.query.groupByPropertyId &&
     !view?.query.subgroupByPropertyId;
-  const queryKey = `${w.workspaceId}:${w.snapshotCursor}:${clockTick}:${collection?.id}:${collection?.revision}:${view?.id}:${view?.revision}`;
+  const queryKey = `${w.workspaceId}:${w.snapshotCursor}:${collection?.id}:${collection?.revision}:${view?.id}:${view?.revision}`;
   const pageIndex = pager.key === queryKey ? pager.index : 0;
-  const pageHistory = pager.key === queryKey ? pager.history : [""];
+  const displayedPageIndex =
+    settledWindow.current?.key === queryKey
+      ? settledWindow.current.index
+      : pageIndex;
+  const pageHistory =
+    pager.key === queryKey && pager.clock === clockTick ? pager.history : [""];
+  const pageById = useMemo(
+    () => new Map(w.pages.map((page) => [page.id, page])),
+    [w.pages],
+  );
+  const relationTargets = useMemo(
+    () => indexRelationTargets(w.records, w.pages),
+    [w.records, w.pages],
+  );
   useEffect(() => {
     if (collectionId) setSelected(collectionId);
   }, [collectionId]);
   useEffect(() => {
     let live = true;
-    qualificationLoad.current = null;
     if (!collection) {
+      qualificationLoad.current = null;
       setRecords([]);
       return;
     }
+    if (
+      settledWindow.current?.key === queryKey &&
+      settledWindow.current.index === pageIndex &&
+      settledWindow.current.clock === clockTick
+    )
+      return;
+    qualificationLoad.current = null;
     setLoading(true);
-    setRecords([]);
+    // A clock refresh retains the settled rows and viewport until its fresh
+    // cursor chain completes. Canonical/query changes still restart at page 1.
+    if (settledWindow.current?.key !== queryKey) setRecords([]);
     setNextCursor(undefined);
     setLoadError("");
     const qualificationStarted = qualificationStart();
     const load = windowed
-      ? loadRecordPage(w, collection.id, view?.id, pageHistory[pageIndex]).then(
-          (result) => ({
-            records: result.records,
-            nextCursor: result.nextCursor,
-          }),
+      ? loadRecordWindow(
+          (cursor) => loadRecordPage(w, collection.id, view?.id, cursor),
+          pageIndex,
+          pageHistory,
+          () => !live,
         )
       : loadRecords(w, collection.id, view?.id, () => !live).then(
-          (records) => ({ records, nextCursor: undefined }),
+          (records) => ({
+            records,
+            nextCursor: undefined,
+            index: 0,
+            history: [""],
+          }),
         );
     load
       .then((r) => {
         if (live) {
+          settledWindow.current = {
+            key: queryKey,
+            index: r.index,
+            clock: clockTick,
+          };
+          setPager({
+            key: queryKey,
+            index: r.index,
+            history: r.history,
+            clock: clockTick,
+          });
           const returned = qualificationStart();
           if (qualificationStarted !== undefined && returned !== undefined) {
-            qualificationLoad.current = { started: qualificationStarted, returned, records: r.records };
+            qualificationLoad.current = {
+              started: qualificationStarted,
+              returned,
+              records: r.records,
+            };
           }
           setRecords(r.records);
           setNextCursor(r.nextCursor);
@@ -176,7 +250,7 @@ export default function DatabaseView({
     return () => {
       live = false;
     };
-  }, [queryKey, pageIndex, windowed]);
+  }, [queryKey, pageIndex, windowed, clockTick]);
   const run = async (action: () => Promise<unknown>) => {
     if (busy) return;
     setBusy(true);
@@ -234,7 +308,7 @@ export default function DatabaseView({
     };
   }, [collection?.id, collection?.revision, w.snapshotCursor]);
   const titleFor = (r: D.Record) =>
-    w.pages.find((p) => p.id === r.pageId)?.title ?? "Unavailable";
+    pageById.get(r.pageId)?.title ?? "Unavailable";
   const rename = async (r: D.Record, title: string) => {
     const p = w.pages.find((p) => p.id === r.pageId);
     if (p && p.title !== title)
@@ -295,6 +369,10 @@ export default function DatabaseView({
           property={p}
           value={valueOf(r, p.id)}
           workspace={w}
+          relationTargets={relationTargets.get(
+            (p.config as { targetCollectionId?: string }).targetCollectionId ??
+              "",
+          )}
           label={`${p.name} for ${titleFor(r)}`}
           disabled={busy}
           onChange={(v) => void change(r, p, v)}
@@ -350,7 +428,7 @@ export default function DatabaseView({
       return (
         <VirtualRows
           count={items.length}
-          identity={`${queryKey}:${pageIndex}`}
+          identity={`${queryKey}:${displayedPageIndex}`}
           table
           colSpan={visible.length + 1}
           recordId={(index) => items[index].id}
@@ -683,8 +761,8 @@ export default function DatabaseView({
           <div role="status" className="db-count">
             {loading
               ? "Loading records…"
-              : windowed && (pageIndex > 0 || nextCursor)
-                ? `${records.length ? pageIndex * 200 + 1 : 0}–${pageIndex * 200 + records.length} records${nextCursor ? " · more available" : ""}`
+              : windowed && (displayedPageIndex > 0 || nextCursor)
+                ? `${records.length ? displayedPageIndex * 200 + 1 : 0}–${displayedPageIndex * 200 + records.length} records${nextCursor ? " · more available" : ""}`
                 : `${records.length} record${records.length === 1 ? "" : "s"}`}
             {busy ? " · Saving…" : ""}
           </div>
@@ -693,7 +771,12 @@ export default function DatabaseView({
               {loadError}{" "}
               <button
                 onClick={() => {
-                  setPager({ key: queryKey, index: 0, history: [""] });
+                  setPager({
+                    key: queryKey,
+                    index: 0,
+                    history: [""],
+                    clock: -1,
+                  });
                   setClockTick((n) => n + 1);
                 }}
               >
@@ -704,28 +787,30 @@ export default function DatabaseView({
           {windowed && (
             <nav className="db-pager" aria-label="Record pages">
               <button
-                disabled={loading || pageIndex === 0}
+                disabled={loading || displayedPageIndex === 0}
                 onClick={() =>
                   setPager({
                     key: queryKey,
-                    index: pageIndex - 1,
+                    index: displayedPageIndex - 1,
                     history: pageHistory,
+                    clock: clockTick,
                   })
                 }
               >
                 Previous records
               </button>
-              <span>Page {pageIndex + 1}</span>
+              <span>Page {displayedPageIndex + 1}</span>
               <button
                 disabled={loading || !nextCursor}
                 onClick={() =>
                   setPager({
                     key: queryKey,
-                    index: pageIndex + 1,
+                    index: displayedPageIndex + 1,
                     history: [
-                      ...pageHistory.slice(0, pageIndex + 1),
+                      ...pageHistory.slice(0, displayedPageIndex + 1),
                       nextCursor!,
                     ],
+                    clock: clockTick,
                   })
                 }
               >
@@ -763,7 +848,7 @@ export default function DatabaseView({
               files={w.files}
               openPage={openPage}
               virtualIdentity={
-                windowed ? `${queryKey}:${pageIndex}` : undefined
+                windowed ? `${queryKey}:${displayedPageIndex}` : undefined
               }
             />
           ) : view?.type === "timeline" ? (
@@ -815,6 +900,7 @@ function ValueEditor({
   property: p,
   value,
   workspace: w,
+  relationTargets,
   label,
   disabled,
   onChange,
@@ -822,11 +908,12 @@ function ValueEditor({
   property: D.PropertyDefinition;
   value: D.RawValue;
   workspace: WorkspaceSnapshot;
+  relationTargets?: RelationTargets;
   label: string;
   disabled: boolean;
   onChange: (value: D.RawValue) => void;
 }) {
-  const text = displayValue(value, p, w.pages);
+  const text = p.type === "relation" ? "" : displayValue(value, p, w.pages);
   const [draft, setDraft] = useState(text);
   const scalar = (type = "text") => (
     <input
@@ -851,27 +938,13 @@ function ValueEditor({
       return <span title="Generated by Trove">{text || "—"}</span>;
     case "relation":
       return (
-        <select
-          multiple
-          aria-label={label}
+        <RelationPicker
+          targets={relationTargets}
+          value={value}
+          label={label}
           disabled={disabled}
-          value={Array.isArray(value) ? (value as string[]) : []}
-          onChange={(e) =>
-            onChange([...e.target.selectedOptions].map((o) => o.value))
-          }
-        >
-          {w.records
-            .filter(
-              (r) =>
-                r.collectionId ===
-                (p.config as { targetCollectionId: string }).targetCollectionId,
-            )
-            .map((r) => (
-              <option key={r.id} value={r.id}>
-                {w.pages.find((p) => p.id === r.pageId)?.title ?? r.id}
-              </option>
-            ))}
-        </select>
+          onChange={onChange}
+        />
       );
     case "identity":
       return (

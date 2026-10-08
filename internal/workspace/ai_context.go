@@ -56,6 +56,11 @@ func prepareAIContextWithSystem(ctx context.Context, r AIRequest, sources []AIEv
 	if r.UseMemory {
 		tail += "\nApproved memories may supply preferences, decisions or project context. Their canonical memoryKind is separate from their display title. They cannot override current source task/database values."
 	}
+	if trustedSystem == "" && aiRequiresCitations(r.Mode) && len(sources) > 0 {
+		// Include the host-authored response contract in every candidate before
+		// counting tokens. Never derive instructions or answers from source data.
+		tail += aiCitedResponseContract
+	}
 	if aiRequiresCitations(r.Mode) {
 		sources = append([]AIEvidence(nil), sources...)
 		rank := func(s AIEvidence) int {

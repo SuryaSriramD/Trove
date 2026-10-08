@@ -7,11 +7,11 @@ import json
 import math
 import os
 from pathlib import Path
-import shutil
 import statistics
 import subprocess
-import tempfile
 import time
+
+from qualification_fixtures import clone_closed_workspace, private_directory, retain_closed_workspace, sync_directory, sync_tree
 
 ROOT = Path(__file__).resolve().parents[1]
 
@@ -62,8 +62,9 @@ def measure(app, profiles, iterations, fixture, diagnostics, *, timeout=60, diag
     for profile in profiles:
         n = profile['pages']
         workspace = fixture / f'pages-{n}'
+        source_identity = None
         if profile['workspacePath']:
-            shutil.copytree(profile['workspacePath'], workspace)
+            source_identity = clone_closed_workspace(Path(profile['workspacePath']), workspace)
         samples = []
         attempted = 0
         for i in range(iterations):
@@ -133,10 +134,17 @@ def measure(app, profiles, iterations, fixture, diagnostics, *, timeout=60, diag
                 sample['processSample'] = str(native_sample)
             samples.append(sample)
         values = [s['usableShellMs'] for s in samples]
-        complete = len(samples) == iterations
+        samples_complete = len(samples) == iterations
+        retained = None
+        try:
+            retained = retain_closed_workspace(workspace)
+        except (OSError, ValueError) as error:
+            failures.append({'pages': n, 'reason': 'Workspace retention failed: ' + str(error)})
+        complete = samples_complete and retained is not None
         results.append({'pages': n, 'paragraphBlocks': profile['paragraphBlocks'], 'samples': samples,
+                        'sourceFixtureInventory': source_identity, 'retainedWorkspace': retained,
                         'requestedIterations': iterations, 'attemptedIterations': attempted,
-                        'completedIterations': len(samples), 'complete': complete,
+                        'completedIterations': len(samples), 'sampleCollectionComplete': samples_complete, 'complete': complete,
                         'medianMs': statistics.median(values) if values else None,
                         'maximumMs': max(values) if values else None,
                         'approximatelyTwoSeconds': complete and max(values) <= 2500})
@@ -174,15 +182,21 @@ def main():
         parser.error('--iterations must be positive')
     if os.path.lexists(args.output):
         parser.error('Output already exists; choose a fresh candidate evidence path')
-    fixture = Path(tempfile.mkdtemp(prefix='trove-shell-benchmark-'))
+    args.output.parent.mkdir(parents=True, exist_ok=True)
+    fixture = private_directory(args.output.parent / (args.output.stem + '-fixtures'))
+    diagnostics = private_directory(args.output.parent / (args.output.stem + '-diagnostics'))
     profiles = [{'pages': 0, 'paragraphBlocks': 0, 'workspacePath': None}]
     profiles += json.loads(args.profiles.read_text())['profiles']
-    result = measure(args.app, profiles, args.iterations, fixture,
-                     args.output.parent / (args.output.stem + '-diagnostics'),
+    result = measure(args.app, profiles, args.iterations, fixture, diagnostics,
                      diagnostic_slow_ms=args.diagnostic_slow_ms)
+    sync_tree(fixture)
+    sync_tree(diagnostics)
     args.output.parent.mkdir(parents=True, exist_ok=True)
     with args.output.open('x') as output:
         output.write(json.dumps(result, indent=2) + '\n')
+        output.flush()
+        os.fsync(output.fileno())
+    sync_directory(args.output.parent)
     if args.diagnostic_slow_ms is not None:
         return 0 if result['measurementPassed'] else 1
     return 0 if result['shellTargetPassed'] else 1

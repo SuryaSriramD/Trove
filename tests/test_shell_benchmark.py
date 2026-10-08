@@ -2,11 +2,13 @@ import importlib.util
 import json
 from pathlib import Path
 import subprocess
+import sys
 import tempfile
 import unittest
 from unittest.mock import patch
 
 ROOT = Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(ROOT / 'scripts'))
 spec = importlib.util.spec_from_file_location('shell_benchmark', ROOT / 'scripts/benchmark-shell.py')
 benchmark = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(benchmark)
@@ -32,6 +34,10 @@ class ShellBenchmarkTests(unittest.TestCase):
                 self.scenario = next(remaining)
                 self.returncode = None
                 self.waits = 0
+                workspace = Path(env['TROVE_WORKSPACE'])
+                workspace.mkdir(mode=0o700, exist_ok=True)
+                (workspace / '.owner.lock').touch()
+                (workspace / 'workspace.db').write_bytes(b'closed synthetic workspace')
                 if 'report' in self.scenario:
                     Path(env['TROVE_SHELL_REPORT']).write_text(json.dumps(self.scenario['report']))
                 stdout.write('synthetic native log\n')
@@ -84,6 +90,22 @@ class ShellBenchmarkTests(unittest.TestCase):
         self.assertTrue(result['shellTargetPassed'])
         self.assertFalse(result['instrumented'])
         self.assertEqual(self.sample_calls, 0)
+        retained = result['profiles'][0]['retainedWorkspace']
+        self.assertTrue(retained['fsynced'])
+        self.assertTrue(retained['unchangedDuringRetention'])
+        self.assertEqual(retained['inventory']['bytes'], len(b'closed synthetic workspace'))
+
+    def test_retention_failure_does_not_promote_fast_samples(self):
+        with patch.object(benchmark, 'retain_closed_workspace', side_effect=ValueError('changed fixture')):
+            result = self.run_scenarios([{'report': {'usableShellMs': 1000}}], 1)
+        self.assertFalse(result['measurementPassed'])
+        self.assertFalse(result['shellTargetPassed'])
+        self.assertEqual(result['profiles'][0]['completedIterations'], 1)
+        self.assertTrue(result['profiles'][0]['sampleCollectionComplete'])
+        self.assertFalse(result['profiles'][0]['complete'])
+        self.assertFalse(result['profiles'][0]['approximatelyTwoSeconds'])
+        self.assertIsNone(result['profiles'][0]['retainedWorkspace'])
+        self.assertIn('changed fixture', result['failures'][0]['reason'])
 
     def test_complete_slow_samples_are_valid_measurements_but_miss_target(self):
         result = self.run_scenarios([{'report': {'usableShellMs': 2700}}], 1)
@@ -104,6 +126,16 @@ class ShellBenchmarkTests(unittest.TestCase):
                  patch.object(benchmark, 'measure', return_value=result):
                 self.assertEqual(benchmark.main(), 1)
             self.assertEqual(json.loads(output.read_text()), result)
+            fixtures = root / 'result-fixtures'
+            self.assertTrue(fixtures.is_dir())
+            self.assertEqual(fixtures.stat().st_mode & 0o777, 0o700)
+            output.unlink()
+            with patch('sys.argv', ['benchmark-shell', '--app', str(root / 'Trove.app'),
+                                   '--profiles', str(profiles), '--output', str(output)]), \
+                 patch.object(benchmark, 'measure') as measure:
+                with self.assertRaises(FileExistsError):
+                    benchmark.main()
+                measure.assert_not_called()
 
     def test_diagnostic_sampling_is_not_a_passing_timing_run(self):
         result = self.run_scenarios([{'timeout': True, 'report': {'usableShellMs': 1200}}], 1,

@@ -7,20 +7,17 @@ accounts or recording permission are activated by this script.
 """
 import argparse
 from datetime import datetime, timezone
-import fcntl
-import hashlib
 import json
 import math
 import os
 from pathlib import Path
 import platform
-import shutil
 import statistics
-import stat
 import subprocess
 import sys
-import tempfile
 import time
+
+from qualification_fixtures import clone_closed_workspace, inventory, private_directory, retain_closed_workspace, sync_directory
 
 METRICS = {
     'database_dispatch', 'snapshot_dispatch', 'mutation_dispatch', 'search_dispatch',
@@ -41,45 +38,9 @@ def private_json(path, value):
     with open(os.open(path, os.O_CREAT | os.O_EXCL | os.O_WRONLY, 0o600), 'w') as output:
         json.dump(value, output, indent=2, allow_nan=False)
         output.write('\n')
-
-
-def inventory(root):
-    """Bind an input without emitting its filenames, paths or content."""
-    if root.is_symlink() or not root.is_dir():
-        raise ValueError('input must be an existing unlinked directory')
-    h = hashlib.sha256()
-    count = size = 0
-    for path in sorted(root.rglob('*')):
-        info = path.lstat()
-        if stat.S_ISLNK(info.st_mode) or not (stat.S_ISREG(info.st_mode) or stat.S_ISDIR(info.st_mode)):
-            raise ValueError('input contains a link or special object')
-        name = path.relative_to(root).as_posix().encode()
-        h.update(len(name).to_bytes(8, 'big') + name + (b'd' if path.is_dir() else b'f'))
-        if path.is_file():
-            file_hash = hashlib.sha256()
-            with path.open('rb') as source:
-                while chunk := source.read(1024 * 1024):
-                    file_hash.update(chunk)
-            h.update(info.st_size.to_bytes(8, 'big') + file_hash.digest())
-            count += 1
-            size += info.st_size
-    return {'sha256': h.hexdigest(), 'files': count, 'bytes': size}
-
-
-def clone_closed_workspace(source, destination):
-    """Hold the existing product owner lock while copying a closed fixture."""
-    fd = os.open(source / '.owner.lock', os.O_RDONLY | os.O_NOFOLLOW)
-    with os.fdopen(fd, 'rb') as lock:
-        info = os.fstat(lock.fileno())
-        if not stat.S_ISREG(info.st_mode) or info.st_nlink != 1 or info.st_uid != os.getuid():
-            raise ValueError('fixture owner lock is unsafe')
-        fcntl.flock(lock, fcntl.LOCK_EX | fcntl.LOCK_NB)
-        before = inventory(source)
-        shutil.copytree(source, destination)
-        after = inventory(source)
-        if before != after or inventory(destination) != before:
-            raise ValueError('fixture changed during copy')
-        return before
+        output.flush()
+        os.fsync(output.fileno())
+    sync_directory(path.parent)
 
 
 def owned_memory(text, root_pid):
@@ -176,7 +137,9 @@ def main():
     output.mkdir(mode=0o700, exist_ok=False)
     if output.stat().st_mode & 0o077:
         raise ValueError('evidence_directory_not_private')
-    scratch = Path(tempfile.mkdtemp(prefix='trove-native-performance-', dir='/private/tmp')).resolve()
+    # Keep the actual observed bytes with the immutable evidence, rather than
+    # relying on a system temporary directory surviving sleep or cleanup.
+    scratch = private_directory(output / 'runtime')
     home, temporary, workspace = scratch / 'home', scratch / 'temporary', scratch / 'workspace'
     home.mkdir(mode=0o700); temporary.mkdir(mode=0o700)
     if args.workspace and args.workspace.is_symlink():
@@ -239,14 +202,20 @@ def main():
     available = [row for row in samples if row['available']]
     workers_seen = any(row['workerCount'] > 0 for row in available)
     unchanged = inventory(app) == before and inventory(models) == model_before
+    retained, retention_error = None, None
+    try:
+        retained = retain_closed_workspace(workspace)
+    except (OSError, ValueError) as error:
+        retention_error = str(error)
     capped = any(entry['dropped'] > 0 for entry in metrics.values())
     memory_failed = any(not row['available'] and not row.get('processExitedDuringSample') for row in samples)
     complete = (process.returncode == 0 and not timed_out and not interrupted and trace is not None and unchanged
-                and bool(available) and not memory_failed and not missing and not capped
+                and bool(available) and not memory_failed and not missing and not capped and retained is not None
                 and (args.scenario != 'concurrent' or workers_seen))
     result = {'schemaVersion': 1, 'scenario': args.scenario, 'recordedAt': datetime.now(timezone.utc).isoformat(),
               'processExitCode': process.returncode, 'timedOut': timed_out, 'interrupted': interrupted,
               'appAndModelsUnchanged': unchanged, 'traceError': trace_error, 'metrics': metrics,
+              'retainedWorkspace': retained, 'retentionError': retention_error,
               'belowMinimumScenarioMetrics': missing, 'minimumSamplesPerRequiredMetric': args.minimum_samples,
               'observationMinimaMet': not missing, 'sampleCoverageCapped': capped, 'workerObserved': workers_seen,
               'memory': {'requestedIntervalMs': 250, 'samples': samples,
