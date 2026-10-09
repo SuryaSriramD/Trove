@@ -138,9 +138,33 @@ def validate_canonical_inventory(report, root, test_name):
         return str(error)
 
 
-def summarize(events, expected, parent, canonical_root=None):
+def validate_request_report(report, expected):
+    """Qualify only explicit controls captured from the actual Go request.
+
+    A legacy missing field is neither false nor evidence of a single attempt.
+    Keep its original report readable, but do not qualify it under this contract.
+    """
+    if type(expected.get('useMemory')) is not bool:
+        return 'locked useMemory expectation is not a boolean'
+    if type(report.get('useMemory')) is not bool:
+        return 'useMemory is missing or not a boolean'
+    if report['useMemory'] is not expected['useMemory']:
+        return 'useMemory differs from the locked request'
+    if type(report.get('generationAttempts')) is not int or report['generationAttempts'] != 1:
+        return 'generationAttempts must record exactly one actual attempt'
+    for field in ('modelPackId', 'corpusSHA256'):
+        if not isinstance(expected.get(field), str) or not expected[field]:
+            return 'locked ' + field + ' expectation is missing'
+        if report.get(field) != expected[field]:
+            return field + ' differs from the locked input'
+    return None
+
+
+def summarize(events, expected, parent, canonical_root=None, expected_requests=None):
     """Require exactly the independently declared cases and their task reports."""
     terminals, reports, errors, buffers = {}, {}, [], {}
+    if parent in (FAMILIES['p0'][1], FAMILIES['p0-holdouts'][1]) and expected_requests is None:
+        errors.append('P0 qualification requires locked request controls')
     for event in events:
         name = event.get('Test', '')
         prefix = parent + '/'
@@ -179,6 +203,13 @@ def summarize(events, expected, parent, canonical_root=None):
     unexpected = sorted(set(terminals) - set(expected))
     for case in expected:
         r = reports.get(case, {})
+        if expected_requests is not None:
+            if case not in expected_requests:
+                errors.append('request contract missing for case: ' + case)
+            else:
+                request_error = validate_request_report(r, expected_requests[case])
+                if request_error:
+                    errors.append('request contract ' + case + ': ' + request_error)
         passed = r.get('passed', r.get('automatedTaskPassed')) is True
         canonical_error = validate_canonical_inventory(r, canonical_root, parent + '/' + case)
         if canonical_error:
@@ -187,6 +218,8 @@ def summarize(events, expected, parent, canonical_root=None):
             errors.append('required case did not pass: ' + case)
     if set(reports) != set(expected):
         errors.append('task-report inventory differs from locked corpus')
+    if expected_requests is not None and set(expected_requests) != set(expected):
+        errors.append('request-contract inventory differs from locked case selection')
     return {'reportedTaskPasses': sorted(k for k, v in reports.items() if v.get('passed', v.get('automatedTaskPassed')) is True),
             'reportedTaskFailures': sorted(k for k, v in reports.items() if v.get('passed', v.get('automatedTaskPassed')) is False),
             'expectedCases': len(expected), 'passedCases': sum(terminals.get(k) == 'pass' for k in expected),
@@ -305,7 +338,12 @@ def main():
     for number, line in enumerate((out / 'results.jsonl').read_text().splitlines(), 1):
         try: events.append(json.loads(line))
         except json.JSONDecodeError: malformed.append(number)
-    summary = summarize(events, expected, test, out / 'canonical')
+    expected_requests = None
+    if args.family in ('p0', 'p0-holdouts'):
+        expected_requests = {case['id']: {'useMemory': case['useMemory'], 'modelPackId': args.pack,
+                             'corpusSHA256': before[str(corpus_dir / corpus_file)]['sha256']}
+                             for case in corpus['cases'] if case['id'] in expected}
+    summary = summarize(events, expected, test, out / 'canonical', expected_requests)
     after = {str(x): {'sha256': digest(x), 'bytes': x.stat().st_size} for x in paths}
     summary['inputsUnchanged'] = before == after
     summary['malformedLogLines'] = malformed

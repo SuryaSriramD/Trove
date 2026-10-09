@@ -20,6 +20,7 @@ declare global {
           ShellReady?(): Promise<void>;
           QualificationPerformanceEnabled?(): Promise<boolean>;
           RecordQualificationPerformance?(metric: string, milliseconds: number): Promise<boolean>;
+          RecordQualificationPerformanceDiagnostics?(raw: string): Promise<boolean>;
           PendingDeepLink?(): Promise<string>;
           StageUpload?(
             name: string,

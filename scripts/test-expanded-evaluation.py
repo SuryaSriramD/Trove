@@ -109,4 +109,54 @@ class EvidenceAccounting(unittest.TestCase):
  def test_false_inventory_boolean_cannot_override_equality(self):
   audit=self.canonical();audit['assetsUnchanged']=False
   self.assertIsNotNone(m.validate_canonical_inventory({'canonicalInventory':audit},self.root,'Runner/a'))
+ def request_report(self,use_memory=False):
+  return {'fixture':'a','passed':True,'canonicalUnchanged':True,'mutationHistoryCountUnchanged':True,
+   'canonicalInventory':self.canonical(),'useMemory':use_memory,'generationAttempts':1,
+   'modelPackId':'locked-model','corpusSHA256':'locked-corpus'}
+ def request_expectation(self,use_memory=False):
+  return {'useMemory':use_memory,'modelPackId':'locked-model','corpusSHA256':'locked-corpus'}
+ def request_summary(self,report,expected=None):
+  if expected is None:expected={'a':self.request_expectation()}
+  return m.summarize([self.report_event(report),{'Test':'Runner/a','Action':'pass'}],['a'],'Runner',self.root,expected)
+ def test_actual_request_controls_accept_explicit_false_and_true(self):
+  for value in (False,True):
+   with self.subTest(useMemory=value):
+    self.assertTrue(self.request_summary(self.request_report(value),{'a':self.request_expectation(value)})['automatedCorpusPassed'])
+ def test_legacy_missing_control_cannot_qualify(self):
+  for key in ('useMemory','generationAttempts','modelPackId','corpusSHA256'):
+   with self.subTest(field=key):
+    report=self.request_report();report.pop(key)
+    result=self.request_summary(report)
+    self.assertFalse(result['automatedCorpusPassed'])
+    self.assertTrue(any('request contract a:' in error for error in result['errors']))
+ def test_memory_control_wrong_type_or_value_cannot_qualify(self):
+  for value in (None,0,1,'false',True):
+   with self.subTest(value=value):
+    report=self.request_report();report['useMemory']=value
+    self.assertFalse(self.request_summary(report)['automatedCorpusPassed'])
+ def test_generation_count_is_observed_integer_one(self):
+  for value in (None,False,True,0,2,'1',1.0):
+   with self.subTest(value=value):
+    report=self.request_report();report['generationAttempts']=value
+    self.assertFalse(self.request_summary(report)['automatedCorpusPassed'])
+ def test_wrong_model_or_corpus_cannot_qualify(self):
+  for key in ('modelPackId','corpusSHA256'):
+   with self.subTest(field=key):
+    report=self.request_report();report[key]='different-input'
+    self.assertFalse(self.request_summary(report)['automatedCorpusPassed'])
+ def test_request_controls_cannot_use_foreign_case(self):
+  result=self.request_summary(self.request_report(),{'b':self.request_expectation()})
+  self.assertFalse(result['automatedCorpusPassed'])
+  self.assertIn('request contract missing for case: a',result['errors'])
+  self.assertIn('request-contract inventory differs from locked case selection',result['errors'])
+ def test_request_controls_cannot_cover_unselected_cases(self):
+  self.assertFalse(self.request_summary(self.request_report(),{'a':self.request_expectation(),'b':self.request_expectation()})['automatedCorpusPassed'])
+ def test_invalid_locked_memory_control_cannot_qualify(self):
+  expected=self.request_expectation();expected['useMemory']=0
+  self.assertFalse(self.request_summary(self.request_report(),{'a':expected})['automatedCorpusPassed'])
+ def test_p0_families_cannot_omit_request_contract(self):
+  for family in ('p0','p0-holdouts'):
+   result=m.summarize([],[],m.FAMILIES[family][1],self.root)
+   self.assertFalse(result['automatedCorpusPassed'])
+   self.assertIn('P0 qualification requires locked request controls',result['errors'])
 if __name__=='__main__':unittest.main()

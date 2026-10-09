@@ -33,11 +33,12 @@ type performanceSamples struct {
 // enter this fixed-label report. Samples stay in bounded memory until shutdown.
 // An empty reserved file means collection did not finish, never a passing run.
 type qualificationPerformance struct {
-	mu      sync.Mutex
-	root    *os.Root
-	file    *os.File
-	name    string
-	samples map[string]*performanceSamples
+	mu          sync.Mutex
+	root        *os.Root
+	file        *os.File
+	name        string
+	samples     map[string]*performanceSamples
+	diagnostics *qualificationDiagnostics
 }
 
 func newQualificationPerformance(path string) *qualificationPerformance {
@@ -150,6 +151,7 @@ func (p *qualificationPerformance) close() {
 	if p == nil {
 		return
 	}
+	p.diagnostics.close()
 	p.mu.Lock()
 	defer p.mu.Unlock()
 	if p.file == nil {

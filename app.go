@@ -43,7 +43,11 @@ type App struct {
 }
 
 func NewApp() *App {
-	return &App{uploadGate: make(chan struct{}, 2), startupDone: make(chan struct{}), shutdownDone: make(chan struct{}), performance: newQualificationPerformance(os.Getenv("TROVE_PERFORMANCE_REPORT"))}
+	performance := newQualificationPerformance(os.Getenv("TROVE_PERFORMANCE_REPORT"))
+	if performance != nil {
+		performance.diagnostics = newQualificationDiagnostics(os.Getenv("TROVE_PERFORMANCE_DIAGNOSTICS"))
+	}
+	return &App{uploadGate: make(chan struct{}, 2), startupDone: make(chan struct{}), shutdownDone: make(chan struct{}), performance: performance}
 }
 func defaultWorkspacePath() (string, error) {
 	if p := os.Getenv("TROVE_WORKSPACE"); p != "" {

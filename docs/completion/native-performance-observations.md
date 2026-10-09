@@ -47,8 +47,24 @@ An empty timing file means the app did not flush a valid report. No report,
 fixture or prior failure is overwritten. `started.json` retains exact input
 inventory digests and the private scratch location for canonical inspection.
 Neither process arguments nor workspace filenames/content enter timing or
-memory samples; process names/PIDs used for ownership are not saved. Application
+memory samples; process names/PIDs used for sampling are not saved in those samples. Application
 stdout/stderr is discarded by this narrow timing driver.
+
+The driver now also reserves a separate private `renderer-diagnostics.jsonl`
+sidecar through `TROVE_PERFORMANCE_DIAGNOSTICS`; it is enabled only together with
+the existing `TROVE_PERFORMANCE_REPORT` timing sink. Before qualification
+gestures, wait for `readiness.json`: it records
+that a newly received renderer snapshot was ready, visible and focused while
+the unreaped owned child matched the exact selected executable. Independently
+observe that candidate's actual foreground window as well; renderer focus and
+an accessibility tree do not establish that observation. `process.json` retains
+the owned launch PID and exact executable in private orchestration metadata,
+separate from content-free timing and memory samples. Do not select or reacquire
+the app after this process exits, because that may reopen a default workspace.
+Every reopen uses a new driver invocation with an explicit fixture. If native
+automation reports `noWindowsAvailable`, use the predeclared operator-assisted
+gesture on the existing bound window and verify its result; do not infer an
+application defect or manufacture input samples.
 
 ## Repeatable visible scenarios
 
@@ -100,6 +116,27 @@ native report's `finalized` field means only that its collector flushed. The
 driver always reports `sampleAccountingComplete: false`; its predeclared sample
 minima establish only that those observations were recorded. No complete
 workflow, latency or release acceptance follows from `localObservationRecorded`.
+
+The separate diagnostic stream contains only fixed readiness/visibility/focus
+booleans, pending counts and saturated counters for probes and transport
+acknowledgements. It distinguishes hidden, cancelled, limited and missing-start
+probes from rejected/failed metric delivery. It sends at most one report in
+flight, normally every 500 ms; the native collector accepts at most 4,096
+snapshots plus a final boundary and rejects malformed, decreasing or unknown
+counters. No DOM content, input values, keys, selectors, paths or raw errors
+enter this stream. Missing/invalid finalization, capped diagnostics or absent
+live readiness keep collection incomplete. Diagnostic counters do not restore
+omitted timing observations or establish complete event accounting. The final
+boundary means the backend collector closed, not that the renderer drained or
+that every event was sampled. Both instrumentation paths remain disabled in
+ordinary application runs without their explicit private output configuration.
+Each JSONL record has `schemaVersion: 1`, monotonic `sequence`, `finalized` and
+`capped` flags; `ready`, `visible`, `focused`, `stopped`; `pendingFrames` and
+`pendingTransports`; and the fixed `counters` object. The collector accepts no
+additional fields. This separate wire shape does not change `timings.json` or
+the qualification observation schema. `readiness.json` is a historical live
+witness, so the operator still checks the current window before each workflow;
+its `actualForegroundWindowIndependentlyObserved` is deliberately false.
 
 The external sampler targets a 250 ms interval and records actual acquisition
 time and spacing. It starts after the app reserves its timing sink, checks the

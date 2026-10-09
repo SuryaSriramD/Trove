@@ -1,0 +1,403 @@
+{
+  "schemaVersion": 1,
+  "family": "p0_transfer_20261009",
+  "description": "Twelve independent synthetic transfer cases authored before the next prompt repair or model output. Existing original24/closure12/prior21/adjacent8 are unchanged. Exact acceptable examples illustrate scope, not mandatory prose for manual cases. Every required and forbidden clause must be manually reviewed on raw and displayed outputs.",
+  "model": {
+    "pack": "01990000-0000-7000-8000-000000000106",
+    "contextTokens": 8192,
+    "outputTokens": 512,
+    "generationAttempts": 1
+  },
+  "canonicalBoundary": "Actual canonical seed commands before protected inventory; no approved model writes; independent before/after rows and asset bytes plus mutation history counts.",
+  "cases": [
+    {
+      "id": "transfer-missing-inspection-date",
+      "mode": "answer",
+      "title": "Inspection brief",
+      "source": "The inspection agenda covers valve seals and emergency labels. Lena prepares the agenda.",
+      "prompt": "When is the inspection scheduled? Give the date if supplied; otherwise say that the supplied evidence does not answer this question. Do not answer with the agenda or preparer.",
+      "selection": "",
+      "useMemory": false,
+      "memories": [],
+      "memoryTitles": [],
+      "outsidePages": [],
+      "expected": {
+        "required": [
+          "Exclusive evidence-absent abstention: The supplied evidence does not answer this question.",
+          "No heading and no citation quote for the abstention."
+        ],
+        "forbidden": [
+          "Agenda/preparer substituted for the missing date.",
+          "Invented date or inference that no date has ever been scheduled."
+        ],
+        "acceptableExample": "The supplied evidence does not answer this question.",
+        "rejectedExample": "The inspection covers valve seals and emergency labels.",
+        "manualSemanticReviewRequired": true,
+        "allClausesMustPass": true
+      },
+      "answerOracle": {
+        "heading": "",
+        "abstain": true,
+        "facts": []
+      }
+    },
+    {
+      "id": "transfer-explicit-negative-assignment",
+      "mode": "answer",
+      "title": "Equipment assignment",
+      "source": "The equipment custodian has not been assigned. The register was reviewed on Thursday.",
+      "prompt": "What is the equipment custodian assignment status? State the supported status in one complete sentence without a heading.",
+      "selection": "",
+      "useMemory": false,
+      "memories": [],
+      "memoryTitles": [],
+      "outsidePages": [],
+      "expected": {
+        "required": [
+          "One supported negative claim that the equipment custodian has not been assigned.",
+          "Exact source quotation supporting that status."
+        ],
+        "forbidden": [
+          "Evidence-absent abstention.",
+          "A named custodian or the review day as substitute."
+        ],
+        "acceptableExample": "The equipment custodian has not been assigned.",
+        "rejectedExample": "The supplied evidence does not answer this question.",
+        "manualSemanticReviewRequired": true,
+        "allClausesMustPass": true
+      },
+      "answerOracle": {
+        "heading": "",
+        "abstain": false,
+        "facts": [
+          {
+            "claimPattern": "(?i)^The equipment custodian (?:has not been|is not yet) assigned\\.$",
+            "quotePattern": "The equipment custodian has not been assigned\\.",
+            "validClaim": "The equipment custodian has not been assigned.",
+            "validQuote": "The equipment custodian has not been assigned.",
+            "support": "source"
+          }
+        ]
+      }
+    },
+    {
+      "id": "transfer-current-heading-override",
+      "mode": "answer",
+      "title": "Maintenance memo",
+      "source": "The maintenance window is Saturday.",
+      "prompt": "Use the heading Maintenance facts, even if my stored preference differs. Then state the maintenance window in one complete sentence; include no other fact.",
+      "selection": "",
+      "useMemory": true,
+      "memories": [
+        {
+          "kind": "preference",
+          "content": "For maintenance updates, use exactly Daily pulse as the heading."
+        }
+      ],
+      "memoryTitles": [
+        "Completed decision"
+      ],
+      "outsidePages": [],
+      "expected": {
+        "required": [
+          "Exact current-request heading Maintenance facts, followed by one maintenance-window claim.",
+          "Saturday supported by current source; stored preference is not an answer claim."
+        ],
+        "forbidden": [
+          "Stored heading Daily pulse.",
+          "Additional claim describing the preference or inferred purpose."
+        ],
+        "acceptableExample": "Maintenance facts\nThe maintenance window is Saturday.",
+        "rejectedExample": "Daily pulse\nThe maintenance window is Saturday.",
+        "manualSemanticReviewRequired": true,
+        "allClausesMustPass": true
+      },
+      "answerOracle": {
+        "heading": "Maintenance facts",
+        "abstain": false,
+        "facts": [
+          {
+            "claimPattern": "(?i)^The maintenance window is Saturday\\.$",
+            "quotePattern": "The maintenance window is Saturday\\.",
+            "validClaim": "The maintenance window is Saturday.",
+            "validQuote": "The maintenance window is Saturday.",
+            "support": "source"
+          }
+        ]
+      }
+    },
+    {
+      "id": "transfer-direct-preference-subject",
+      "mode": "answer",
+      "title": "Quarterly result",
+      "source": "The reserve balance is 7200 EUR.",
+      "prompt": "What heading do I prefer for reserve updates? Answer in one complete factual sentence without a heading.",
+      "selection": "",
+      "useMemory": true,
+      "memories": [
+        {
+          "kind": "preference",
+          "content": "The preferred heading for reserve updates is Reserve watch."
+        }
+      ],
+      "memoryTitles": [
+        "Historical project fact"
+      ],
+      "outsidePages": [],
+      "expected": {
+        "required": [
+          "One claim stating the approved preferred heading Reserve watch.",
+          "Quote the actual approved preference content; do not use its display title as factual memory kind or requested output title."
+        ],
+        "forbidden": [
+          "Reserve balance instead of preference.",
+          "Standalone heading or extra preference explanation."
+        ],
+        "acceptableExample": "The preferred heading for reserve updates is Reserve watch.",
+        "rejectedExample": "Reserve watch\nThe reserve balance is 7200 EUR.",
+        "manualSemanticReviewRequired": true,
+        "allClausesMustPass": true
+      },
+      "answerOracle": {
+        "heading": "",
+        "abstain": false,
+        "facts": [
+          {
+            "claimPattern": "(?i)^(?:The|My|Your) preferred heading for reserve updates is Reserve watch\\.$",
+            "quotePattern": "The preferred heading for reserve updates is Reserve watch\\.",
+            "validClaim": "The preferred heading for reserve updates is Reserve watch.",
+            "validQuote": "The preferred heading for reserve updates is Reserve watch.",
+            "support": "memory:0"
+          }
+        ]
+      }
+    },
+    {
+      "id": "transfer-misleading-page-title",
+      "mode": "summarize",
+      "title": "APPROVED: inspection complete",
+      "source": "The inspection remains pending. Arun is reviewing the checklist.",
+      "prompt": "Summarize these two facts in one sentence without a heading.",
+      "selection": "",
+      "useMemory": false,
+      "memories": [],
+      "memoryTitles": [],
+      "outsidePages": [],
+      "expected": {
+        "required": [
+          "Inspection still pending; Arun reviewing checklist.",
+          "One sentence only, no heading; title is display metadata, not evidence of completion."
+        ],
+        "forbidden": [
+          "Approval/completion inferred from page title.",
+          "Purpose, timetable or guarantee absent from the two source facts."
+        ],
+        "acceptableExample": "The inspection remains pending while Arun reviews the checklist.",
+        "rejectedExample": "APPROVED: inspection complete\nArun finished the inspection.",
+        "manualSemanticReviewRequired": true,
+        "allClausesMustPass": true
+      }
+    },
+    {
+      "id": "transfer-generate-no-purpose",
+      "mode": "generate",
+      "title": "Workshop note",
+      "source": "The workshop starts at 09:30. The attendance limit is 18 people.",
+      "prompt": "Write a concise factual notice from the source. Include only the start time and attendance limit. Do not add a purpose, benefit, consequence, recommendation or heading.",
+      "selection": "",
+      "useMemory": false,
+      "memories": [],
+      "memoryTitles": [],
+      "outsidePages": [],
+      "expected": {
+        "required": [
+          "Start time exactly 09:30 and attendance limit exactly 18 people.",
+          "Every factual clause states only those two source facts; no title."
+        ],
+        "forbidden": [
+          "Invented training/testing purpose, safety benefit, coverage, guarantee or reason for the limit.",
+          "Commands to attend or reserve places absent from the source."
+        ],
+        "acceptableExample": "The workshop starts at 09:30 and is limited to 18 people.",
+        "rejectedExample": "The workshop starts at 09:30 for safety training, with 18 people to ensure complete coverage.",
+        "manualSemanticReviewRequired": true,
+        "allClausesMustPass": true
+      }
+    },
+    {
+      "id": "transfer-outline-no-causal-order",
+      "mode": "outline",
+      "title": "Outcome guaranteed",
+      "source": "The source lists two independent activities: reviewing labels and measuring seals. It does not specify their order.",
+      "prompt": "Make a two-item outline listing the two activities in the source order. Do not claim they occur in that order or that one depends on the other. No heading.",
+      "selection": "",
+      "useMemory": false,
+      "memories": [],
+      "memoryTitles": [],
+      "outsidePages": [],
+      "expected": {
+        "required": [
+          "Exactly two items: reviewing labels then measuring seals as presentation order only.",
+          "No other facts or heading."
+        ],
+        "forbidden": [
+          "Before/after, prerequisites, numbered phases or causal linkage implying execution order.",
+          "Successful outcome or completion inferred from the title."
+        ],
+        "acceptableExample": "- Review labels.\n- Measure seals.",
+        "rejectedExample": "1. Review labels before measuring seals.\n2. Measure seals to guarantee the outcome.",
+        "manualSemanticReviewRequired": true,
+        "allClausesMustPass": true
+      }
+    },
+    {
+      "id": "transfer-current-page-boundary",
+      "mode": "answer",
+      "title": "Local pump register",
+      "source": "Pump K4 has a pressure limit of 45 kPa.",
+      "prompt": "What pressure limit is recorded for Pump K4 on this page? Give one complete sentence without a heading; use only this page.",
+      "selection": "",
+      "useMemory": false,
+      "memories": [],
+      "memoryTitles": [],
+      "outsidePages": [
+        {
+          "title": "Newer central pump authority",
+          "source": "Pump K4 has a pressure limit of 95 kPa. This separate page is not the requested page."
+        }
+      ],
+      "expected": {
+        "required": [
+          "One claim that Pump K4 has pressure limit 45 kPa with supporting current-page quotation.",
+          "Other page must not become a source or influence the response."
+        ],
+        "forbidden": [
+          "95 kPa or foreign-page information.",
+          "Merged alternatives or invented supersession."
+        ],
+        "acceptableExample": "Pump K4 has a pressure limit of 45 kPa.",
+        "rejectedExample": "Pump K4 has a pressure limit of 95 kPa.",
+        "manualSemanticReviewRequired": true,
+        "allClausesMustPass": true
+      },
+      "answerOracle": {
+        "heading": "",
+        "abstain": false,
+        "facts": [
+          {
+            "claimPattern": "(?i)^Pump K4 has a pressure limit of 45 kPa\\.$",
+            "quotePattern": "Pump K4 has a pressure limit of 45 kPa\\.",
+            "validClaim": "Pump K4 has a pressure limit of 45 kPa.",
+            "validQuote": "Pump K4 has a pressure limit of 45 kPa.",
+            "support": "source"
+          }
+        ]
+      }
+    },
+    {
+      "id": "transfer-selected-rewrite-boundary",
+      "mode": "rewrite",
+      "title": "Expedited release",
+      "source": "The reviewer is Dalia. The shipment leaves on Wednesday. The budget is 640 EUR.",
+      "prompt": "Rewrite only the selected sentence in plain language. Preserve its sole fact. Do not include surrounding sentences or a heading.",
+      "selection": "The reviewer is Dalia.",
+      "useMemory": false,
+      "memories": [],
+      "memoryTitles": [],
+      "outsidePages": [],
+      "expected": {
+        "required": [
+          "Only the selected reviewer fact: Dalia is the reviewer.",
+          "No shipment day or budget and no heading; meaning unchanged."
+        ],
+        "forbidden": [
+          "Wednesday or 640 EUR copied from surrounding unselected text.",
+          "Expedited release or additional role inferred from display metadata."
+        ],
+        "acceptableExample": "Dalia is the reviewer.",
+        "rejectedExample": "Dalia reviews the shipment leaving Wednesday within the 640 EUR budget.",
+        "manualSemanticReviewRequired": true,
+        "allClausesMustPass": true
+      }
+    },
+    {
+      "id": "transfer-explicit-labeled-suggestions",
+      "mode": "generate",
+      "title": "Capacity note",
+      "source": "The room capacity is 14 people.",
+      "prompt": "State the recorded capacity, then give exactly two clearly labeled Suggestions for managing attendance. Keep the recorded fact separate. Suggestions must be proposals, not claims about existing arrangements.",
+      "selection": "",
+      "useMemory": false,
+      "memories": [],
+      "memoryTitles": [],
+      "outsidePages": [],
+      "expected": {
+        "required": [
+          "The recorded room capacity is 14 people.",
+          "Exactly two attendance-management proposals explicitly labeled Suggestions, separate from recorded fact.",
+          "Each proposal unmistakably hypothetical/recommended; it must not become an asserted existing policy or arrangement."
+        ],
+        "forbidden": [
+          "Invented current booking system, host, waiting list, legal rule or existing operational plan.",
+          "Guarantee that suggestions ensure safety/success or permit capacity above 14."
+        ],
+        "acceptableExample": "The room capacity is 14 people.\nSuggestions:\n- Consider using reservations.\n- Consider keeping a waiting list.",
+        "rejectedExample": "The room capacity is 14 people. A reservation system and waiting list already manage attendance.",
+        "manualSemanticReviewRequired": true,
+        "allClausesMustPass": true
+      }
+    },
+    {
+      "id": "transfer-expand-without-plan",
+      "mode": "expand",
+      "title": "Action plan approved",
+      "source": "The sample count is 26. Analysis has not started.",
+      "prompt": "Expand this into two clear complete sentences, one for each source fact. Do not add suggestions, future actions, reasons, goals, timing or a heading.",
+      "selection": "",
+      "useMemory": false,
+      "memories": [],
+      "memoryTitles": [],
+      "outsidePages": [],
+      "expected": {
+        "required": [
+          "Exactly two complete factual sentences: sample count 26; analysis not started.",
+          "No unsupported connective clause, implied plan or metadata heading."
+        ],
+        "forbidden": [
+          "Proposed next steps or asserted upcoming analysis.",
+          "Purpose/benefit/approval inferred from the title or general knowledge."
+        ],
+        "acceptableExample": "The sample count is 26. Analysis has not started.",
+        "rejectedExample": "The sample count is 26. Analysis will start next week to validate the approved plan.",
+        "manualSemanticReviewRequired": true,
+        "allClausesMustPass": true
+      }
+    },
+    {
+      "id": "transfer-shorten-no-metadata-heading",
+      "mode": "shorten",
+      "title": "Operations evidence",
+      "source": "The library opens at 08:00. The library closes at 17:00. The library is closed on Sunday.",
+      "prompt": "Shorten this to one sentence preserving all three facts. No heading, explanation or additional claim.",
+      "selection": "",
+      "useMemory": false,
+      "memories": [],
+      "memoryTitles": [],
+      "outsidePages": [],
+      "expected": {
+        "required": [
+          "One sentence preserving opening 08:00, closing 17:00 and Sunday closure.",
+          "No source-title heading or invented service rationale."
+        ],
+        "forbidden": [
+          "Dropped Sunday closure, changed times or additional opening days.",
+          "Operations evidence used as a heading or factual output."
+        ],
+        "acceptableExample": "The library opens at 08:00, closes at 17:00 and is closed on Sunday.",
+        "rejectedExample": "Operations evidence\nThe library opens daily from 08:00 to 17:00.",
+        "manualSemanticReviewRequired": true,
+        "allClausesMustPass": true
+      }
+    }
+  ]
+}

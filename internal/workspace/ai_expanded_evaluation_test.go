@@ -262,13 +262,19 @@ func TestRealLocalExpandedP0QAMemory(t *testing.T) {
 				}
 				return supervisor.CountTokens(ctx, pack, texts)
 			}}
-			p, prepareErr := k.PrepareAIWithBudget(ctx, e, AIRequest{PageID: page, Mode: "answer", Prompt: tc.Prompt, UseMemory: tc.UseMemory, ModelPackID: pack}, budget)
+			request := AIRequest{PageID: page, Mode: "answer", Prompt: tc.Prompt, UseMemory: tc.UseMemory, ModelPackID: pack}
+			p, prepareErr := k.PrepareAIWithBudget(ctx, e, request, budget)
 			raw := ""
+			attempts := 0
 			metrics := &native.RunMetrics{}
 			var generationErr, finishErr, oracleErr error
 			var run AIRun
 			if prepareErr == nil {
 				completion, err := GeneratePreparedAI(ctx, p, func(ctx context.Context, system, prompt string, tokens int, grammar string, stream func(string)) (string, error) {
+					attempts++
+					if attempts != 1 {
+						return "", fmt.Errorf("expanded P0 requires a single generation attempt")
+					}
 					out, err := supervisor.GenerateTextWithGrammarMetrics(ctx, pack, native.ChatPrompt(system, prompt), tokens, grammar, metrics, stream)
 					raw = out
 					return out, err
@@ -287,7 +293,7 @@ func TestRealLocalExpandedP0QAMemory(t *testing.T) {
 			}
 			latencyMS := time.Since(started).Milliseconds() // exclude canonical evidence capture/fsync
 			canonicalInventory := canonicalAudit.finish(t, k)
-			passed := prepareErr == nil && generationErr == nil && finishErr == nil && oracleErr == nil && run.State == "completed" && before == after && canonicalInventory.Unchanged
+			passed := prepareErr == nil && generationErr == nil && finishErr == nil && oracleErr == nil && attempts == 1 && run.State == "completed" && before == after && canonicalInventory.Unchanged
 			if !tc.Abstain && len(run.Citations) == 0 {
 				passed = false
 			}
@@ -295,7 +301,7 @@ func TestRealLocalExpandedP0QAMemory(t *testing.T) {
 			if n := metrics.PeakRSSBytes.Load(); n > 0 {
 				rss = n
 			}
-			report, _ := json.Marshal(map[string]any{"fixture": tc.ID, "corpusSHA256": corpusHash, "modelPackId": pack, "passed": passed, "canonicalUnchanged": before == after, "mutationHistoryCountUnchanged": before == after, "canonicalInventory": canonicalInventory, "latencyMs": latencyMS, "promptTokens": p.PromptTokens, "outputCap": p.OutputTokens, "warning": p.Run.Warning, "peakWorkerRSSBytes": rss, "prepareError": fmt.Sprint(prepareErr), "generationError": fmt.Sprint(generationErr), "finishError": fmt.Sprint(finishErr), "rubricError": fmt.Sprint(oracleErr), "rawDraft": raw, "displayed": run.Text, "releaseQualified": false})
+			report, _ := json.Marshal(aiEvaluationRequestReport(request, attempts, map[string]any{"fixture": tc.ID, "corpusSHA256": corpusHash, "passed": passed, "canonicalUnchanged": before == after, "mutationHistoryCountUnchanged": before == after, "canonicalInventory": canonicalInventory, "latencyMs": latencyMS, "promptTokens": p.PromptTokens, "outputCap": p.OutputTokens, "warning": p.Run.Warning, "peakWorkerRSSBytes": rss, "prepareError": fmt.Sprint(prepareErr), "generationError": fmt.Sprint(generationErr), "finishError": fmt.Sprint(finishErr), "rubricError": fmt.Sprint(oracleErr), "rawDraft": raw, "displayed": run.Text, "releaseQualified": false}))
 			t.Log(string(report))
 			if !passed {
 				t.Error("expanded P0 task or canonical-write boundary failed")

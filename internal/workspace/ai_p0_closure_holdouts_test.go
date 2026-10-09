@@ -234,7 +234,8 @@ func TestRealLocalP0ClosureHoldouts(t *testing.T) {
 				}
 				return supervisor.CountTokens(ctx, pack, texts)
 			}}
-			p, prepareErr := k.PrepareAIWithBudget(ctx, e, AIRequest{PageID: page, Mode: "answer", Prompt: tc.Prompt, UseMemory: tc.UseMemory, ModelPackID: pack}, budget)
+			request := AIRequest{PageID: page, Mode: "answer", Prompt: tc.Prompt, UseMemory: tc.UseMemory, ModelPackID: pack}
+			p, prepareErr := k.PrepareAIWithBudget(ctx, e, request, budget)
 			raw := ""
 			attempts := 0
 			metrics := &native.RunMetrics{}
@@ -271,7 +272,7 @@ func TestRealLocalP0ClosureHoldouts(t *testing.T) {
 			if n := metrics.PeakRSSBytes.Load(); n > 0 {
 				rss = n
 			}
-			report, _ := json.Marshal(map[string]any{"fixture": tc.ID, "corpusSHA256": corpusHash, "modelPackId": pack, "passed": passed, "canonicalUnchanged": before == after, "mutationHistoryCountUnchanged": before == after, "canonicalInventory": canonicalInventory, "latencyMs": latencyMS, "promptTokens": p.PromptTokens, "outputCap": p.OutputTokens, "generationAttempts": attempts, "warning": p.Run.Warning, "peakWorkerRSSBytes": rss, "prepareError": fmt.Sprint(prepareErr), "generationError": fmt.Sprint(generationErr), "finishError": fmt.Sprint(finishErr), "rubricError": fmt.Sprint(oracleErr), "rawDraft": raw, "displayed": run.Text, "releaseQualified": false})
+			report, _ := json.Marshal(aiEvaluationRequestReport(request, attempts, map[string]any{"fixture": tc.ID, "corpusSHA256": corpusHash, "passed": passed, "canonicalUnchanged": before == after, "mutationHistoryCountUnchanged": before == after, "canonicalInventory": canonicalInventory, "latencyMs": latencyMS, "promptTokens": p.PromptTokens, "outputCap": p.OutputTokens, "warning": p.Run.Warning, "peakWorkerRSSBytes": rss, "prepareError": fmt.Sprint(prepareErr), "generationError": fmt.Sprint(generationErr), "finishError": fmt.Sprint(finishErr), "rubricError": fmt.Sprint(oracleErr), "rawDraft": raw, "displayed": run.Text, "releaseQualified": false}))
 			t.Log(string(report))
 			if !passed {
 				t.Error("P0 closure holdout or canonical-write boundary failed")

@@ -47,3 +47,66 @@ test("fixed metrics reject content and invalid durations; traffic and pending fr
   for (let i = 0; i < 100; i++) f.recorder.afterFrames([["input_to_frames", 0]]);
   assert.equal(f.frames.size, 16);
 });
+
+test("separate diagnostics distinguish hidden, cancelled, limited and acknowledged probes without content", async () => {
+  let visible = true, focus = true, next = 0;
+  const frames = new Map<number, FrameRequestCallback>();
+  const states: any[] = [];
+  const recorder = createQualificationRecorder({
+    QualificationPerformanceEnabled: async () => true,
+    RecordQualificationPerformance: async () => true,
+    RecordQualificationPerformanceDiagnostics: async raw => { states.push(JSON.parse(raw)); return true; },
+  }, () => 10, cb => { frames.set(++next, cb); return next; }, id => { frames.delete(id); }, () => visible, () => focus);
+  await recorder.ready;
+  assert.equal(await recorder.diagnostics(), true);
+  assert.equal(states[0].ready, true); assert.equal(states[0].focused, true);
+  recorder.event("input_trusted");
+  const cancel = recorder.afterFrames([["input_to_frames", 1]]); cancel(); cancel();
+  visible = false; recorder.afterFrames([["scroll_to_frames", 1]]);
+  visible = true; recorder.afterFrames([["input_to_frames", undefined]]);
+  for (let i = 0; i < 17; i++) recorder.afterFrames([["input_to_frames", 1]]);
+  for (let i = 0; i < 2; i++) { const callbacks = [...frames.values()]; frames.clear(); callbacks.forEach(fn => fn(10)); }
+  await new Promise(resolve => setImmediate(resolve));
+  focus = false;
+  await recorder.diagnostics();
+  const final = states.at(-1);
+  assert.equal(final.focused, false); assert.equal(final.pendingFrames, 0); assert.equal(final.pendingTransports, 0);
+  assert.equal(final.counters.probes_cancelled, 1); assert.equal(final.counters.probes_hidden, 1);
+  assert.equal(final.counters.probes_missing_start, 1); assert.equal(final.counters.probes_limited, 1);
+  assert.equal(final.counters.probes_completed, 16); assert.equal(final.counters.records_accepted, 16);
+  assert.equal(final.counters.input_trusted, 1);
+  assert.deepEqual(Object.keys(final).sort(), ["counters", "focused", "pendingFrames", "pendingTransports", "ready", "stopped", "visible"]);
+  recorder.stop(); await recorder.diagnostics();
+  assert.equal(states.at(-1).stopped, true); assert.equal(states.at(-1).ready, false);
+});
+
+test("diagnostics preserve rejected and failed transports and bound in-flight reporting", async () => {
+  let mode = "reject", release: (value: boolean) => void = () => {};
+  const states: any[] = [];
+  const recorder = createQualificationRecorder({
+    QualificationPerformanceEnabled: async () => true,
+    RecordQualificationPerformance: async () => { if (mode === "fail") throw new Error("private payload"); return false; },
+    RecordQualificationPerformanceDiagnostics: raw => {
+      states.push(JSON.parse(raw)); return new Promise(resolve => { release = resolve; });
+    },
+  }, () => 10, () => 1, () => {}, () => true);
+  await recorder.ready;
+  recorder.record("database_bridge", 1); await new Promise(resolve => setImmediate(resolve));
+  mode = "fail"; recorder.record("mutation_bridge", 1); await new Promise(resolve => setImmediate(resolve));
+  const pending = recorder.diagnostics();
+  assert.equal(await recorder.diagnostics(), false); assert.equal(states.length, 1);
+  assert.equal(states[0].counters.records_rejected, 1); assert.equal(states[0].counters.records_failed, 1);
+  assert.equal(JSON.stringify(states).includes("private"), false);
+  release(true); assert.equal(await pending, true);
+  recorder.stop();
+});
+
+test("disabled recorder does not emit diagnostic traffic", async () => {
+  let calls = 0;
+  const recorder = createQualificationRecorder({
+    QualificationPerformanceEnabled: async () => false,
+    RecordQualificationPerformanceDiagnostics: async () => { calls++; return true; },
+  }, () => 0, () => 1, () => {}, () => true);
+  await recorder.ready; recorder.event("input_trusted"); recorder.stop();
+  assert.equal(await recorder.diagnostics(), false); assert.equal(calls, 0);
+});
