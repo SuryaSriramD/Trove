@@ -25,7 +25,7 @@ func TestAICitedStreamHidesProtocolAndRejectsUnmatchedQuotes(t *testing.T) {
 		}
 		return result, nil
 	}, func(token string) { streamed.WriteString(token) })
-	if err != nil || result.Text != "Friday — “The meeting is Friday.” [1]" || streamed.String() != "Friday" {
+	if err != nil || result.Text != "Friday [1]" || streamed.String() != "Friday" {
 		t.Fatal(result, streamed.String(), err)
 	}
 	_, err = GeneratePreparedAI(context.Background(), prepared, func(context.Context, string, string, int, string, func(string)) (string, error) {
@@ -42,12 +42,52 @@ func TestAICitedStreamHidesProtocolAndRejectsUnmatchedQuotes(t *testing.T) {
 func TestAICitedDraftResolvesOnlyExactSuppliedQuotes(t *testing.T) {
 	sources := []AIEvidence{{Number: 1, Text: "The current budget is 12000 USD."}, {Number: 2, Text: "The preferred heading is Status for review."}}
 	text, err := renderAICitedClaims(`{"title":"","claims":[{"text":"Status for review","quote":"The preferred heading is Status for review."},{"text":"Budget: 12000 USD","quote":"The current budget is 12000 USD."}]}`, sources)
-	if err != nil || text != "Status for review — “The preferred heading is Status for review.” [2]\nBudget: 12000 USD — “The current budget is 12000 USD.” [1]" {
+	if err != nil || text != "Status for review [2]\nBudget: 12000 USD [1]" {
 		t.Fatal(text, err)
 	}
 	for _, raw := range []string{`{"title":"","claims":[]}`, `{"title":"","claims":[{"text":"Unsupported","quote":"An invented supporting quote"}]}`, `{"title":"","claims":[{"text":"Unattributed","quote":""}]}`, `{"title":"","claims":[{"text":"Budget","quote":"The current budget is 12000 USD.","execute":true}]}`} {
 		if _, err := renderAICitedClaims(raw, sources); err == nil {
 			t.Fatal("malformed or unsupplied citation was accepted", raw)
+		}
+	}
+}
+
+func TestAICitedRenderingPreservesAuthoredProseAndCapturedEvidence(t *testing.T) {
+	const source = "The permit is awaiting review. The proposed fee is 75 EUR."
+	for _, mode := range []string{"answer", "summarize", "explain"} {
+		t.Run(mode, func(t *testing.T) {
+			prepared, err := prepareAIContext(context.Background(), AIRequest{Mode: mode, Prompt: "State the status and fee in one sentence."}, []AIEvidence{{Title: "Permit record", Text: source}}, nil, "", wordBudget())
+			if err != nil {
+				t.Fatal(err)
+			}
+			for _, claim := range []string{
+				"The permit is awaiting review, with a proposed fee of 75 EUR.",
+				// Literal source quotations in the authored text must remain intact.
+				"The record says: “" + source + "”",
+			} {
+				calls := 0
+				raw := string(marshal(map[string]any{"title": "Requested heading", "claims": []any{map[string]string{"text": claim, "quote": source}}}))
+				completion, err := GeneratePreparedAI(context.Background(), prepared, func(context.Context, string, string, int, string, func(string)) (string, error) {
+					calls++
+					return raw, nil
+				}, nil)
+				if err != nil || calls != 1 || completion.Text != "Requested heading\n"+claim+" [1]" || prepared.Run.Sources[0].Text != source {
+					t.Fatal("authored title, claim, attribution or captured source changed", completion, calls, err)
+				}
+			}
+		})
+	}
+	// Full-draft validation still precedes publication, including later claims.
+	for _, bad := range []struct{ text, quote string }{
+		{"The fee is 76 EUR.", source},
+		{"The permit is approved.", "The permit has been approved."},
+	} {
+		raw := string(marshal(map[string]any{"title": "", "claims": []any{
+			map[string]string{"text": "The permit is awaiting review.", "quote": source},
+			map[string]string{"text": bad.text, "quote": bad.quote},
+		}}))
+		if text, err := renderAICitedClaims(raw, []AIEvidence{{Number: 1, Text: source}}); err == nil || text != "" {
+			t.Fatal("invalid later claim bypassed whole-draft validation", text, err)
 		}
 	}
 }

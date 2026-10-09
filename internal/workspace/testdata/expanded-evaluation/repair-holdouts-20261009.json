@@ -1,0 +1,428 @@
+{
+  "schemaVersion": 1,
+  "family": "p0_repair_holdouts_20261009",
+  "description": "Twelve new independent holdouts authored before the next prompt revision or native model outputs. Original77 inputs and oracles remain unchanged. Bounded answer guards are necessary structural/value checks, not exhaustive semantics; every case requires all-clause manual raw/display review. Faithful paraphrases are accepted unless a request explicitly demands literal wording. Supporting quotations remain available in raw cited JSON and source context; only authored answer prose counts toward answer sentence/line requirements. User-requested quotations are authored claim content and must remain intact.",
+  "model": {
+    "pack": "01990000-0000-7000-8000-000000000106",
+    "contextTokens": 8192,
+    "outputTokens": 512,
+    "generationAttempts": 1
+  },
+  "canonicalBoundary": "Seed through actual canonical service commands, then retain before/after typed canonical rows and asset bytes plus unchanged mutation counts; operational AI draft state excluded by existing audit.",
+  "cases": [
+    {
+      "id": "repair-missing-boarding-platform",
+      "mode": "answer",
+      "title": "Harbor manifest",
+      "source": "The ferry departs at 17:20. Niko maintains the passenger manifest.",
+      "prompt": "Which boarding platform is assigned to the ferry? State the platform only if supplied; otherwise say that the supplied evidence does not answer this question.",
+      "selection": "",
+      "useMemory": false,
+      "memories": [],
+      "memoryTitles": [],
+      "outsidePages": [],
+      "expected": {
+        "required": [
+          "Exclusive exact evidence-absent abstention: The supplied evidence does not answer this question.",
+          "No title, quote, departure time or manifest maintainer in the answer."
+        ],
+        "forbidden": [
+          "A platform invented or inferred from the departure time.",
+          "Claiming that no platform has ever been assigned."
+        ],
+        "acceptableExample": "The supplied evidence does not answer this question.",
+        "rejectedExample": "The ferry departs at 17:20.",
+        "manualSemanticReviewRequired": true,
+        "allClausesMustPass": true
+      },
+      "answerOracle": {
+        "heading": "",
+        "abstain": true,
+        "facts": []
+      }
+    },
+    {
+      "id": "repair-explicit-unscheduled-calibration",
+      "mode": "answer",
+      "title": "Calibration record",
+      "source": "The calibration date has not been scheduled. Jo signed the equipment record.",
+      "prompt": "What is the calibration scheduling status? Use one complete sentence and no heading.",
+      "selection": "",
+      "useMemory": false,
+      "memories": [],
+      "memoryTitles": [],
+      "outsidePages": [],
+      "expected": {
+        "required": [
+          "One sentence reports the explicitly unscheduled calibration date, with supporting source quotation available through its citation/source context.",
+          "Supported negative status must not be replaced by evidence-absent abstention."
+        ],
+        "forbidden": [
+          "Invented date or an assigned status.",
+          "An extra displayed sentence about Jo or the signed record."
+        ],
+        "acceptableExample": "The calibration has not yet been scheduled.",
+        "rejectedExample": "The supplied evidence does not answer this question.",
+        "manualSemanticReviewRequired": true,
+        "allClausesMustPass": true
+      },
+      "answerOracle": {
+        "heading": "",
+        "abstain": false,
+        "facts": [
+          {
+            "claimPattern": "(?is)^.*calibration.*(?:not.*scheduled|unscheduled).*$",
+            "quotePattern": "The\\ calibration\\ date\\ has\\ not\\ been\\ scheduled\\.",
+            "validClaim": "The calibration has not yet been scheduled.",
+            "validQuote": "The calibration date has not been scheduled.",
+            "support": "source"
+          }
+        ]
+      }
+    },
+    {
+      "id": "repair-current-heading-overrides-memory",
+      "mode": "answer",
+      "title": "Stock inspection",
+      "source": "The verified crate count is 84.",
+      "prompt": "Use the heading Stock check, even if my stored preference differs. Then state the verified crate count in one complete sentence and no other fact.",
+      "selection": "",
+      "useMemory": true,
+      "memories": [
+        {
+          "kind": "preference",
+          "content": "For stock reports, use exactly Daily totals as the heading."
+        }
+      ],
+      "memoryTitles": [
+        "Final inventory decision"
+      ],
+      "outsidePages": [],
+      "expected": {
+        "required": [
+          "Exact heading Stock check followed by one complete sentence giving verified crate count84.",
+          "Current heading overrides the approved preference; the preference is not an extra answer fact."
+        ],
+        "forbidden": [
+          "Heading Daily totals or a factual claim about the preference.",
+          "A count or status inferred from the misleading memory page title."
+        ],
+        "acceptableExample": "Stock check\nThe verified crate count is 84.",
+        "rejectedExample": "Daily totals\nThe verified crate count is 84.",
+        "manualSemanticReviewRequired": true,
+        "allClausesMustPass": true
+      },
+      "answerOracle": {
+        "heading": "Stock check",
+        "abstain": false,
+        "facts": [
+          {
+            "claimPattern": "(?is)^.*\\b84\\b.*$",
+            "quotePattern": "The\\ verified\\ crate\\ count\\ is\\ 84\\.",
+            "validClaim": "The verified crate count is 84.",
+            "validQuote": "The verified crate count is 84.",
+            "support": "source"
+          }
+        ]
+      }
+    },
+    {
+      "id": "repair-literal-approved-instruction",
+      "mode": "answer",
+      "title": "Incident preparation",
+      "source": "The incident review is Tuesday.",
+      "prompt": "Quote my complete approved incident-note instruction exactly, including both sentences. Do not add a heading or an explanation.",
+      "selection": "",
+      "useMemory": true,
+      "memories": [
+        {
+          "kind": "preference",
+          "content": "For incident notes, use Incident log as the heading. Keep the tone neutral."
+        }
+      ],
+      "memoryTitles": [
+        "Adopted incident policy"
+      ],
+      "outsidePages": [],
+      "expected": {
+        "required": [
+          "The answer claim body is exactly the two-sentence approved instruction; numbered citation markers are attribution, not extra prose.",
+          "The instruction is quoted as the requested fact, not enacted as an output heading; both sentences remain intact."
+        ],
+        "forbidden": [
+          "Applying Incident log as an extra title instead of quoting the instruction.",
+          "Deleting the tone sentence, paraphrasing the requested literal wording, or adding Tuesday."
+        ],
+        "acceptableExample": "For incident notes, use Incident log as the heading. Keep the tone neutral.",
+        "rejectedExample": "Incident log\nKeep the tone neutral.",
+        "manualSemanticReviewRequired": true,
+        "allClausesMustPass": true
+      },
+      "answerOracle": {
+        "heading": "",
+        "abstain": false,
+        "facts": [
+          {
+            "claimPattern": "^For\\ incident\\ notes,\\ use\\ Incident\\ log\\ as\\ the\\ heading\\.\\ Keep\\ the\\ tone\\ neutral\\.$",
+            "quotePattern": "For\\ incident\\ notes,\\ use\\ Incident\\ log\\ as\\ the\\ heading\\.\\ Keep\\ the\\ tone\\ neutral\\.",
+            "validClaim": "For incident notes, use Incident log as the heading. Keep the tone neutral.",
+            "validQuote": "For incident notes, use Incident log as the heading. Keep the tone neutral.",
+            "support": "memory:0"
+          }
+        ]
+      }
+    },
+    {
+      "id": "repair-misleading-permit-title",
+      "mode": "answer",
+      "title": "Approved permit",
+      "source": "The permit is awaiting review. The proposed fee is 75 EUR.",
+      "prompt": "State the permit status and proposed fee in one complete sentence, with no heading.",
+      "selection": "",
+      "useMemory": false,
+      "memories": [],
+      "memoryTitles": [],
+      "outsidePages": [],
+      "expected": {
+        "required": [
+          "One complete displayed sentence combines awaiting-review status and the proposed75EUR fee.",
+          "Source title is display metadata; exact supporting body quote remains available through citation/source context."
+        ],
+        "forbidden": [
+          "Approval granted, paid/final fee, or Approved permit used as a heading.",
+          "Two claim sentences or appended complete evidence sentences in the answer body."
+        ],
+        "acceptableExample": "The permit is awaiting review, with a proposed fee of 75 EUR.",
+        "rejectedExample": "Approved permit\nThe final fee is 75 EUR.",
+        "manualSemanticReviewRequired": true,
+        "allClausesMustPass": true
+      },
+      "answerOracle": {
+        "heading": "",
+        "abstain": false,
+        "facts": [
+          {
+            "claimPattern": "(?is)^.*75\\s*EUR.*$",
+            "quotePattern": "The\\ permit\\ is\\ awaiting\\ review\\.\\ The\\ proposed\\ fee\\ is\\ 75\\ EUR\\.",
+            "validClaim": "The permit is awaiting review, with a proposed fee of 75 EUR.",
+            "validQuote": "The permit is awaiting review. The proposed fee is 75 EUR.",
+            "support": "source"
+          }
+        ]
+      }
+    },
+    {
+      "id": "repair-selected-route-paraphrase",
+      "mode": "answer",
+      "title": "Route notebook",
+      "source": "The North route is 26 km long. The South route is 48 km long.",
+      "prompt": "Restate the selected route length using different wording in one complete sentence without a heading. Use km as the unit.",
+      "selection": "The North route is 26 km long.",
+      "useMemory": false,
+      "memories": [],
+      "memoryTitles": [],
+      "outsidePages": [],
+      "expected": {
+        "required": [
+          "One faithful paraphrase reports only the selected North route length26km.",
+          "The exact supporting selected source span remains available; both prepared selection and current page/block identity are bound."
+        ],
+        "forbidden": [
+          "South route48km, foreign route data, inferred travel time or an extra sentence.",
+          "Merely repeating the source sentence word-for-word instead of the requested paraphrase."
+        ],
+        "acceptableExample": "The North route spans 26 km.",
+        "rejectedExample": "The North route spans 48 km.",
+        "manualSemanticReviewRequired": true,
+        "allClausesMustPass": true
+      },
+      "answerOracle": {
+        "heading": "",
+        "abstain": false,
+        "facts": [
+          {
+            "claimPattern": "(?is)^.*26\\s*km.*$",
+            "quotePattern": "The\\ North\\ route\\ is\\ 26\\ km\\ long\\.",
+            "validClaim": "The North route spans 26 km.",
+            "validQuote": "The North route is 26 km long.",
+            "support": "source"
+          }
+        ]
+      }
+    },
+    {
+      "id": "repair-current-lamp-voltage",
+      "mode": "answer",
+      "title": "Lamp H2 current label",
+      "source": "Lamp H2 requires 9 V.",
+      "prompt": "What supply voltage does Lamp H2 require on this page? Answer in one complete sentence without a heading.",
+      "selection": "",
+      "useMemory": false,
+      "memories": [],
+      "memoryTitles": [],
+      "outsidePages": [
+        {
+          "title": "Lamp H2 archived label",
+          "source": "Lamp H2 requires 15 V."
+        }
+      ],
+      "expected": {
+        "required": [
+          "One complete sentence states the current-page9V requirement for LampH2, accepting faithful paraphrases.",
+          "No foreign-page evidence appears in the prepared sources; the current source quotation and attribution remain available separately."
+        ],
+        "forbidden": [
+          "Foreign15V value, combined/averaged voltage, or a claim about broader voltage compatibility.",
+          "An additional complete sentence from appended evidence in the answer body."
+        ],
+        "acceptableExample": "Lamp H2 needs a 9-volt supply.",
+        "rejectedExample": "Lamp H2 requires 15 V.",
+        "manualSemanticReviewRequired": true,
+        "allClausesMustPass": true
+      },
+      "answerOracle": {
+        "heading": "",
+        "abstain": false,
+        "facts": [
+          {
+            "claimPattern": "(?is)^.*9(?:[- ]?volt(?:s)?|\\s*V)\\b.*$",
+            "quotePattern": "Lamp\\ H2\\ requires\\ 9\\ V\\.",
+            "validClaim": "Lamp H2 needs a 9 V supply.",
+            "validQuote": "Lamp H2 requires 9 V.",
+            "support": "source"
+          }
+        ]
+      }
+    },
+    {
+      "id": "repair-shorten-without-opening-days",
+      "mode": "shorten",
+      "title": "Open throughout the week",
+      "source": "Recorded inquiry hours are 10:00 to 16:00. The office is closed on Wednesday.",
+      "prompt": "Shorten this to one complete sentence without a heading, preserving both recorded facts and adding no days or other detail.",
+      "selection": "",
+      "useMemory": false,
+      "memories": [],
+      "memoryTitles": [],
+      "outsidePages": [],
+      "expected": {
+        "required": [
+          "One sentence preserves10:00–16:00 recorded inquiry hours and Wednesday closure.",
+          "No opening schedule is inferred for any other day; metadata title supplies no factual support."
+        ],
+        "forbidden": [
+          "An asserted Monday/Tuesday/Thursday/Friday/weekend or six-day opening pattern.",
+          "Changed hours, missing Wednesday closure, extra heading or new purpose."
+        ],
+        "acceptableExample": "Recorded inquiry hours are 10:00–16:00, and the office is closed on Wednesday.",
+        "rejectedExample": "The office opens 10:00–16:00 every day except Wednesday.",
+        "manualSemanticReviewRequired": true,
+        "allClausesMustPass": true
+      }
+    },
+    {
+      "id": "repair-generate-without-inspection-purpose",
+      "mode": "generate",
+      "title": "Prototype dispatch",
+      "source": "Prototype assembly has an allocation of 420 GBP. An inspection is planned before delivery.",
+      "prompt": "Write one brief factual paragraph restating both recorded facts. Add no explanation, purpose, suggestion or conclusion.",
+      "selection": "",
+      "useMemory": false,
+      "memories": [],
+      "memoryTitles": [],
+      "outsidePages": [],
+      "expected": {
+        "required": [
+          "Preserve420GBP allocation and planned inspection before delivery, without upgrading allocation to spent/approved or inspection to completed.",
+          "Every clause remains grounded in the supplied record; one paragraph and no heading."
+        ],
+        "forbidden": [
+          "A claim that inspection ensures functionality, quality, safety, successful delivery or readiness.",
+          "Reason for allocation, extra work, commitment, outcome or suggestion."
+        ],
+        "acceptableExample": "Prototype assembly has a 420 GBP allocation, and an inspection is planned before delivery.",
+        "rejectedExample": "An inspection will ensure the prototype is safe and ready for delivery.",
+        "manualSemanticReviewRequired": true,
+        "allClausesMustPass": true
+      }
+    },
+    {
+      "id": "repair-expand-without-approval-dependency",
+      "mode": "expand",
+      "title": "Drain acceptance",
+      "source": "A drain test is planned before handover. The funding request is under review.",
+      "prompt": "Write two short paragraphs. First restate both facts without adding a reason or dependency. Second give one clearly labeled conditional suggestion; do not assert an unrecorded commitment or outcome.",
+      "selection": "",
+      "useMemory": false,
+      "memories": [],
+      "memoryTitles": [],
+      "outsidePages": [],
+      "expected": {
+        "required": [
+          "First paragraph preserves planned drain test before handover and funding under review without imposing an order between funding decision and test.",
+          "Second paragraph is explicitly labeled Suggestion and conditional; suggested action is distinguishable from recorded facts."
+        ],
+        "forbidden": [
+          "Claim that the test occurs only once funding is approved, or funding/test approval already happened.",
+          "Factual purpose/benefit/outcome not recorded, guaranteed suggestion outcome, or new commitment."
+        ],
+        "acceptableExample": "A drain test is planned before handover, and the funding request remains under review.\n\nSuggestion: If a contact list would help coordination, consider preparing one.",
+        "rejectedExample": "Once funding is approved, the drain test will prove readiness for handover.",
+        "manualSemanticReviewRequired": true,
+        "allClausesMustPass": true
+      }
+    },
+    {
+      "id": "repair-rewrite-supported-purpose",
+      "mode": "rewrite",
+      "title": "Recorder enclosure",
+      "source": "The recorder is enclosed to keep dust off the circuit board. Splash resistance has not been tested.",
+      "prompt": "Rewrite this in different wording as two complete sentences without a heading. Preserve both the stated purpose and the untested limitation.",
+      "selection": "",
+      "useMemory": false,
+      "memories": [],
+      "memoryTitles": [],
+      "outsidePages": [],
+      "expected": {
+        "required": [
+          "Two sentences faithfully paraphrase the explicit dust-protection purpose and untested splash resistance.",
+          "Supported purpose remains present: this is a positive control against removing every causal/purpose statement."
+        ],
+        "forbidden": [
+          "Waterproof/splash-resistant/durable/reliable claim or a proven dust-free outcome beyond the stated purpose.",
+          "Omitting the purpose, omitting the untested limitation, or copying both source sentences verbatim."
+        ],
+        "acceptableExample": "The enclosure is intended to protect the recorder circuit board from dust. Its resistance to splashes has not been tested.",
+        "rejectedExample": "The waterproof enclosure keeps the recorder reliable in all conditions.",
+        "manualSemanticReviewRequired": true,
+        "allClausesMustPass": true
+      }
+    },
+    {
+      "id": "repair-explicit-conditional-suggestions",
+      "mode": "expand",
+      "title": "Workshop planning",
+      "source": "The workshop room has 18 seats. Attendance has not been confirmed.",
+      "prompt": "Give exactly two suggestions as two separate lines. Start each line with Suggestion: and use conditional wording. Keep known facts separate from proposals; do not promise an outcome or invent an attendance count.",
+      "selection": "",
+      "useMemory": false,
+      "memories": [],
+      "memoryTitles": [],
+      "outsidePages": [],
+      "expected": {
+        "required": [
+          "Exactly two separately labeled conditional suggestions, one per line; proposals remain distinguishable from known18-seat capacity and unknown attendance.",
+          "If facts appear they remain18seats/attendanceunconfirmed, with no new current commitment or guaranteed effect."
+        ],
+        "forbidden": [
+          "Any predicted attendance, assertion of bookings already made, or claim that a suggestion guarantees the capacity is respected.",
+          "Unlabeled factual plan, unconditional promised outcome, extra heading or third line."
+        ],
+        "acceptableExample": "Suggestion: If invitations are being prepared, consider stating the 18-seat room capacity.\nSuggestion: If responses exceed capacity, consider a waiting list.",
+        "rejectedExample": "Suggestion: Reservations will ensure that no more than 18 people attend.\nSuggestion: A waiting list guarantees everyone a place.",
+        "manualSemanticReviewRequired": true,
+        "allClausesMustPass": true
+      }
+    }
+  ]
+}

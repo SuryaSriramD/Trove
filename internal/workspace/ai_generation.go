@@ -215,8 +215,8 @@ func renderAICitedClaims(raw string, sources []AIEvidence) (string, error) {
 		}
 		labels := []string{}
 		canonicalQuote := ""
-		// Case changes and whitespace wrapping do not alter the words, numbers or
-		// punctuation. Display the original matched bytes, not a normalized quote.
+		// Resolve case and wrapping against captured source bytes before checking
+		// support. Citation navigation and source context retain that evidence.
 		for _, source := range sources {
 			if matched := canonicalAIQuote(source.Text, quote); matched != "" {
 				labels = append(labels, strconv.Itoa(source.Number))
@@ -229,7 +229,7 @@ func renderAICitedClaims(raw string, sources []AIEvidence) (string, error) {
 			return "", Fail("WORKER_FAILED", "The answer's supporting quote is absent from supplied evidence")
 		}
 		if !aiQuoteSupportsNumbers(claim.Text, canonicalQuote) {
-			return "", Fail("WORKER_FAILED", "A numeric claim is not supported by its displayed quote")
+			return "", Fail("WORKER_FAILED", "A numeric claim is not supported by its supporting quote")
 		}
 		// The model supplies readable evidence, never authoritative source identities.
 		// A repeated exact quote can cite every supplied occurrence, up to three.
@@ -237,9 +237,9 @@ func renderAICitedClaims(raw string, sources []AIEvidence) (string, error) {
 			return "", Fail("WORKER_FAILED", "The supporting quote is too ambiguous; use a longer quote")
 		}
 		line := strings.TrimSpace(claim.Text)
-		if !strings.Contains(strings.ToLower(line), strings.ToLower(canonicalQuote)) {
-			line += " — “" + canonicalQuote + "”"
-		}
+		// Publish the authored claim with attribution, without injecting additional
+		// source sentences into its requested prose. This never removes or repairs
+		// a generated claim, including any quotation the model wrote in that claim.
 		for _, label := range labels {
 			line += " [" + label + "]"
 		}

@@ -16,7 +16,7 @@ spec.loader.exec_module(benchmark)
 
 
 class ServiceBenchmarkTests(unittest.TestCase):
-    def invoke(self, result, *, existing=False):
+    def invoke(self, result, *, existing=False, native_setup=None, during_run=None):
         temporary = tempfile.TemporaryDirectory()
         self.addCleanup(temporary.cleanup)
         root = Path(temporary.name)
@@ -32,6 +32,10 @@ class ServiceBenchmarkTests(unittest.TestCase):
             'id': 'embedding', 'kind': 'embedding',
             'sha256': benchmark.sha(models / 'embedding.model')
         }]))
+        if native_setup:
+            native_setup(native)
+        snapshot_root = root / 'snapshot'
+        snapshot_root.mkdir()
         output = root / 'evidence'
         if existing:
             output.mkdir()
@@ -40,6 +44,8 @@ class ServiceBenchmarkTests(unittest.TestCase):
         def run(command, **kwargs):
             calls.append(command)
             if 'go' == command[0]:
+                if during_run:
+                    during_run(native, Path(command[command.index('-bundle') + 1]))
                 Path(command[command.index('-output') + 1]).write_text(json.dumps(result))
             return subprocess.CompletedProcess(command, 0, stdout='fixture host', stderr='')
         args = ['benchmark-phase3', '--native-bundle', str(native), '--models', str(models),
@@ -50,6 +56,7 @@ class ServiceBenchmarkTests(unittest.TestCase):
              patch.object(benchmark, 'models_dir', return_value=models), \
              patch.object(benchmark, 'go_binary', return_value='go'), \
              patch.object(benchmark, 'build_env', return_value={}), \
+             patch.object(benchmark.tempfile, 'mkdtemp', return_value=str(snapshot_root)), \
              patch.object(benchmark.subprocess, 'run', side_effect=run):
             try:
                 code = benchmark.main()
@@ -99,6 +106,55 @@ class ServiceBenchmarkTests(unittest.TestCase):
         self.assertNotEqual(code, 0)
         self.assertEqual(calls, [])
         self.assertEqual((output / 'benchmark-service.json').read_bytes(), b'prior evidence')
+
+    def test_complete_copy_matches_frozen_inventory_including_appledouble_and_dot_executable(self):
+        from qualification_helpers import helper_inventory, validate_helper_copy
+        def setup(native):
+            for name in ('._catalog.json', '._provenance.json'):
+                (native / 'models' / name).write_bytes(bytes.fromhex('0005160700020000') + bytes(4088))
+            (native / '._worker').write_bytes(b'executable content with a misleading metadata name')
+            (native / '.DS_Store').write_bytes(b'Finder metadata is also retained')
+        code, _, output = self.invoke(self.profiles(), native_setup=setup)
+        self.assertEqual(code, 0)
+        report = json.loads((output / 'benchmark-environment.json').read_text())
+        frozen = helper_inventory(Path(report['nativeBundleSource']))
+        validate_helper_copy(report['nativeBundleCopy'], frozen)
+        self.assertEqual(report['nativeResourceSha256'], {p: v['sha256'] for p, v in frozen['files'].items()})
+        self.assertEqual(report['nativeBundleCopy']['sourceInventory'], frozen)
+        self.assertEqual(report['nativeBundleCopy']['snapshotInventory'], frozen)
+        for name in ('models/._catalog.json', 'models/._provenance.json', '._worker', '.DS_Store'):
+            self.assertIn(name, report['nativeResourceSha256'])
+
+    def test_source_or_snapshot_changes_make_zero_exit_run_unqualified(self):
+        for target, mutation in [('source', 'change'), ('snapshot', 'change'),
+                                 ('snapshot', 'remove'), ('snapshot', 'add'), ('snapshot', 'link')]:
+            with self.subTest(target=target, mutation=mutation):
+                def mutate(source, snapshot):
+                    root = source if target == 'source' else snapshot
+                    worker = root / '._worker'
+                    if mutation == 'change':
+                        worker.write_bytes(b'changed worker')
+                    elif mutation == 'remove':
+                        worker.unlink()
+                    elif mutation == 'add':
+                        (root / 'unexpected-worker').write_bytes(b'new executable')
+                    else:
+                        worker.unlink()
+                        worker.symlink_to(source / 'manifest.json')
+                code, _, output = self.invoke(self.profiles(),
+                    native_setup=lambda native: (native / '._worker').write_bytes(b'original worker'),
+                    during_run=mutate)
+                self.assertEqual(code, 1)
+                report = json.loads((output / 'benchmark-environment.json').read_text())
+                self.assertEqual(report['exitCode'], 0)
+                self.assertFalse(report['qualifiedMeasurement'])
+                self.assertTrue(report['metadataErrors'])
+                copy = report['nativeBundleCopy']
+                if mutation == 'link':
+                    self.assertEqual(copy['validationErrors'], ['snapshot_inventory_unreadable_or_unsafe'])
+                else:
+                    expected = 'unexpected-worker' if mutation == 'add' else '._worker'
+                    self.assertIn(expected, copy[target + 'Changes'])
 
 
 if __name__ == '__main__':

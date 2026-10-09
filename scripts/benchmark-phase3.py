@@ -7,11 +7,11 @@ import json
 import math
 import os
 from pathlib import Path
-import shutil
 import subprocess
 import tempfile
 
 from devtools import build_env, cache_dir, go_binary, models_dir
+from qualification_helpers import copy_helper_bundle, check_helper_bundle, validate_helper_copy
 
 ROOT = Path(__file__).resolve().parents[1]
 
@@ -26,7 +26,8 @@ def sha(path):
 
 def inputs():
     paths = [ROOT / s for s in ['go.mod', 'go.sum', 'native/models/catalog.json',
-                               'scripts/benchmark-phase3.py', 'scripts/devtools.py', 'scripts/phase3-benchmark/main.go']]
+                               'scripts/benchmark-phase3.py', 'scripts/devtools.py', 'scripts/phase3-benchmark/main.go',
+                               'scripts/qualification_helpers.py', 'scripts/completion_qualification.py']]
     for directory in ['internal', 'contracts', 'schemas', 'native']:
         paths += [p for p in (ROOT / directory).rglob('*') if p.is_file() and not p.name.startswith('._')
                   and p.suffix in ('.go', '.json', '.sql', '.c', '.h', '.tmpl', '.cpp', '.hpp', '.swift') and not p.name.endswith('_test.go')]
@@ -101,8 +102,8 @@ def main():
                     failures.append({'modelPackId': pack['id'], 'error': 'Model hash verification failed'})
     before = inputs()
     snapshot = Path(tempfile.mkdtemp(prefix='trove-benchmark-native-')) / 'native'
-    shutil.copytree(args.native_bundle, snapshot, ignore=shutil.ignore_patterns('._*', '.DS_Store'))
-    resource_hashes = {str(p.relative_to(snapshot)): sha(p) for p in sorted(snapshot.rglob('*')) if p.is_file()}
+    copied = copy_helper_bundle(args.native_bundle, snapshot)
+    resource_hashes = {p: value['sha256'] for p, value in copied['snapshotInventory']['files'].items()}
     result_path = args.output / 'benchmark-service.json'
     go = go_binary(args.cache)
     env = build_env(args.cache)
@@ -121,12 +122,16 @@ def main():
         incomplete = ['Missing or invalid service result: ' + str(error)]
     after = inputs()
     changed = sorted(p for p in before.keys() | after.keys() if before.get(p) != after.get(p))
-    resources_after = {str(p.relative_to(snapshot)): sha(p) for p in sorted(snapshot.rglob('*')) if p.is_file()}
-    resource_changes = sorted(p for p in resource_hashes.keys() | resources_after.keys() if resource_hashes.get(p) != resources_after.get(p))
+    copy_record = check_helper_bundle(args.native_bundle, snapshot, copied)
+    resource_changes = copy_record['snapshotChanges']
+    try:
+        validate_helper_copy(copy_record, copied['sourceInventory'])
+    except ValueError as error:
+        failures.append({'nativeBundleCopy': str(error)})
     report = {'schemaVersion': 1, 'recordedAt': datetime.now(timezone.utc).isoformat(), 'host': host,
               'modelPacks': model_records, 'sourceBeforeSha256': before, 'sourceChangedDuringRun': changed,
               'nativeBundleSource': str(args.native_bundle), 'nativeBundleSnapshot': str(snapshot), 'nativeResourceSha256': resource_hashes,
-              'nativeResourcesChangedDuringRun': resource_changes,
+              'nativeResourcesChangedDuringRun': resource_changes, 'nativeBundleCopy': copy_record,
               'command': command, 'exitCode': process.returncode, 'logSha256': sha(log_path),
               'serviceResultSha256': sha(result_path) if process.returncode == 0 and result_path.exists() else None,
               'requestedProfiles': pages, 'keywordIterations': args.iterations,
