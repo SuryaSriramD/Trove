@@ -1,0 +1,482 @@
+{
+  "schemaVersion": 1,
+  "family": "p0_display_context_transfer_holdouts_20261011",
+  "description": "Twelve independently authored transfer holdouts, locked before a context-layout implementation or model generation. New subjects and materials do not replace the earlier 89 inputs, oracles, or canonical safeguards. Automated claim patterns are bounded literal-value guards, not semantic acceptance; every clause, sentence count, line count, heading, exact support identity, raw draft, and displayed response requires manual review. Faithful paraphrases are accepted except exact page names, requested headings, and the explicit abstention. Citation markers do not count as prose; supporting quotations remain in raw cited JSON and source context, not appended as extra answer sentences.",
+  "model": {
+    "pack": "01990000-0000-7000-8000-000000000106",
+    "contextTokens": 8192,
+    "outputTokens": 512,
+    "generationAttempts": 1
+  },
+  "canonicalBoundary": "Seed through actual canonical service commands. Retain before/after typed canonical rows and asset bytes and unchanged mutation counts, using the existing canonical audit without reducing its protected inventory. Operational AI draft state remains subject to the existing exclusion only.",
+  "cases": [
+    {
+      "id": "display-chess-venue-body-over-title",
+      "mode": "answer",
+      "title": "Chess final at Hill House",
+      "source": "The chess final is at Linden Club. Elin is recording the moves.",
+      "prompt": "Where is the chess final taking place? Give one complete sentence without a heading and include no other fact.",
+      "selection": "",
+      "useMemory": false,
+      "memories": [],
+      "memoryTitles": [],
+      "outsidePages": [],
+      "expected": {
+        "required": [
+          "One complete sentence identifies Linden Club as the venue of the chess final.",
+          "The displayed page name does not override the body venue; an exact supporting body quotation is retained with its citation."
+        ],
+        "forbidden": [
+          "Hill House as the venue, uncertainty between two venues, or treating the page name as a second factual record.",
+          "An output heading, a sentence about Elin, or any additional factual clause."
+        ],
+        "acceptableExample": "The chess final is taking place at Linden Club.",
+        "rejectedExample": "The chess final is taking place at Hill House.",
+        "manualSemanticReviewRequired": true,
+        "allClausesMustPass": true
+      },
+      "answerOracle": {
+        "heading": "",
+        "abstain": false,
+        "facts": [
+          {
+            "claimPattern": "(?is)^.*Linden Club.*$",
+            "quotePattern": "The\\ chess\\ final\\ is\\ at\\ Linden\\ Club\\.",
+            "validClaim": "The chess final is taking place at Linden Club.",
+            "validQuote": "The chess final is at Linden Club.",
+            "support": "source"
+          }
+        ]
+      }
+    },
+    {
+      "id": "display-actual-manuscript-page-name",
+      "mode": "answer",
+      "title": "All manuscripts digitized",
+      "source": "The linen manuscript has not been scanned. The vellum manuscript has been scanned.",
+      "prompt": "What is the exact display name of this page? Answer with one complete sentence that identifies it as the page name, without an output heading or any claim about scanning status.",
+      "selection": "",
+      "useMemory": false,
+      "memories": [],
+      "memoryTitles": [],
+      "outsidePages": [],
+      "expected": {
+        "required": [
+          "One complete sentence identifies the exact page name All manuscripts digitized, preserving spelling and case inside the name.",
+          "The name is reported as metadata and cited to the actual current page title; the source body is not the evidence for the name."
+        ],
+        "forbidden": [
+          "Asserting that all manuscripts have been digitized, answering with a body scanning status, or abstaining despite the available page name.",
+          "Using the requested page name as an output heading instead of reporting it in a factual sentence."
+        ],
+        "acceptableExample": "The page is named \"All manuscripts digitized\".",
+        "rejectedExample": "All manuscripts have been digitized.",
+        "manualSemanticReviewRequired": true,
+        "allClausesMustPass": true
+      },
+      "answerOracle": {
+        "heading": "",
+        "abstain": false,
+        "facts": [
+          {
+            "claimPattern": "(?s)^.*All manuscripts digitized.*$",
+            "quotePattern": "All\\ manuscripts\\ digitized",
+            "validClaim": "The page is named \"All manuscripts digitized\".",
+            "validQuote": "All manuscripts digitized",
+            "support": "page-title"
+          }
+        ]
+      }
+    },
+    {
+      "id": "display-bell-page-name-and-location",
+      "mode": "answer",
+      "title": "Bracken bell removed",
+      "source": "The bell named Bracken hangs in the west tower.",
+      "prompt": "Give exactly two complete sentences on two separate lines without a heading. First identify this page by its exact display name. Then state where the Bracken bell hangs according to the page body.",
+      "selection": "",
+      "useMemory": false,
+      "memories": [],
+      "memoryTitles": [],
+      "outsidePages": [],
+      "expected": {
+        "required": [
+          "First sentence identifies the exact page name Bracken bell removed as a name, not as evidence of removal.",
+          "Second sentence attributes the west tower location to the Bracken bell; there are exactly two factual sentences on two lines, each supported by its distinct title or body source."
+        ],
+        "forbidden": [
+          "Claiming the bell has been removed, omitting the available page name, or using the name as an output heading.",
+          "Using the page-title quotation to support the bell location, or using a body quotation to support the page name."
+        ],
+        "acceptableExample": "The page is named \"Bracken bell removed\".\nThe Bracken bell hangs in the west tower.",
+        "rejectedExample": "The Bracken bell has been removed.\nThe Bracken bell hangs in the west tower.",
+        "manualSemanticReviewRequired": true,
+        "allClausesMustPass": true
+      },
+      "answerOracle": {
+        "heading": "",
+        "abstain": false,
+        "facts": [
+          {
+            "claimPattern": "(?s)^.*Bracken bell removed.*$",
+            "quotePattern": "Bracken\\ bell\\ removed",
+            "validClaim": "The page is named \"Bracken bell removed\".",
+            "validQuote": "Bracken bell removed",
+            "support": "page-title"
+          },
+          {
+            "claimPattern": "(?is)^.*west tower.*$",
+            "quotePattern": "The\\ bell\\ named\\ Bracken\\ hangs\\ in\\ the\\ west\\ tower\\.",
+            "validClaim": "The Bracken bell hangs in the west tower.",
+            "validQuote": "The bell named Bracken hangs in the west tower.",
+            "support": "source"
+          }
+        ]
+      }
+    },
+    {
+      "id": "display-dye-summary-no-heading",
+      "mode": "summarize",
+      "title": "Dye test passed",
+      "source": "The dye wash test is pending. Sora prepared the swatch.",
+      "prompt": "Summarize both recorded facts in one complete sentence with no heading. Do not add a result or a reason.",
+      "selection": "",
+      "useMemory": false,
+      "memories": [],
+      "memoryTitles": [],
+      "outsidePages": [],
+      "expected": {
+        "required": [
+          "One complete sentence preserves that the dye wash test is pending and Sora prepared the swatch.",
+          "The page name supplies no test result and does not become an output heading; faithful paraphrases are accepted."
+        ],
+        "forbidden": [
+          "Claiming the test passed, failed, is complete, or was performed by Sora.",
+          "Adding a purpose for the swatch, a test date, another sentence, or an output heading."
+        ],
+        "acceptableExample": "The dye wash test is pending, and Sora prepared the swatch.",
+        "rejectedExample": "The dye wash test passed after Sora prepared the swatch.",
+        "manualSemanticReviewRequired": true,
+        "allClausesMustPass": true
+      }
+    },
+    {
+      "id": "display-moss-explicit-requested-heading",
+      "mode": "generate",
+      "title": "Moss exhibit closed",
+      "source": "The moss exhibit is open by appointment.",
+      "prompt": "Write the exact heading Visitor facts on the first line. On the second line, give one complete sentence stating the recorded visiting arrangement for the moss exhibit. Add nothing else.",
+      "selection": "",
+      "useMemory": false,
+      "memories": [],
+      "memoryTitles": [],
+      "outsidePages": [],
+      "expected": {
+        "required": [
+          "Exactly two displayed lines: the literal heading Visitor facts, followed by one complete factual sentence about visiting by appointment.",
+          "The requested heading is retained even though source display metadata is not a requested heading; the arrangement comes from the page body."
+        ],
+        "forbidden": [
+          "Omitting the requested heading, replacing it with Moss exhibit closed, or adding a third line.",
+          "Claiming the exhibit is closed, open without an appointment, or subject to unstated opening hours."
+        ],
+        "acceptableExample": "Visitor facts\nThe moss exhibit is open by appointment.",
+        "rejectedExample": "Moss exhibit closed\nThe moss exhibit is open by appointment.",
+        "manualSemanticReviewRequired": true,
+        "allClausesMustPass": true
+      }
+    },
+    {
+      "id": "display-sourdough-explicit-no-heading",
+      "mode": "answer",
+      "title": "Batch A sourdough",
+      "source": "The sourdough jar is labeled Batch C.",
+      "prompt": "What label is on the sourdough jar? Give one complete sentence without a heading, even if an approved formatting preference requests one.",
+      "selection": "",
+      "useMemory": true,
+      "memories": [
+        {
+          "kind": "preference",
+          "content": "For sourdough notes, use exactly Culture sheet as the heading."
+        }
+      ],
+      "memoryTitles": [
+        "Kitchen decision: rye only"
+      ],
+      "outsidePages": [],
+      "expected": {
+        "required": [
+          "One complete sentence reports the actual jar label Batch C from the body.",
+          "The explicit no-heading request controls the output; the approved preference remains available but contributes no extra answer fact."
+        ],
+        "forbidden": [
+          "Batch A as the jar label, Culture sheet as an output heading, or asserting a rye-only recipe from the memory page name.",
+          "An extra statement about the preference or any invented ingredient or fermentation status."
+        ],
+        "acceptableExample": "The sourdough jar is labeled Batch C.",
+        "rejectedExample": "Culture sheet\nThe sourdough jar is labeled Batch C.",
+        "manualSemanticReviewRequired": true,
+        "allClausesMustPass": true
+      },
+      "answerOracle": {
+        "heading": "",
+        "abstain": false,
+        "facts": [
+          {
+            "claimPattern": "(?s)^.*Batch C.*$",
+            "quotePattern": "The\\ sourdough\\ jar\\ is\\ labeled\\ Batch\\ C\\.",
+            "validClaim": "The sourdough jar is labeled Batch C.",
+            "validQuote": "The sourdough jar is labeled Batch C.",
+            "support": "source"
+          }
+        ]
+      }
+    },
+    {
+      "id": "display-seed-direct-preference-question",
+      "mode": "answer",
+      "title": "Seed journal index",
+      "source": "The pea seeds are stored in a paper envelope.",
+      "prompt": "What heading do I prefer for seed journals? State the preferred heading in one complete factual sentence without using it as an output heading.",
+      "selection": "",
+      "useMemory": true,
+      "memories": [
+        {
+          "kind": "preference",
+          "content": "For seed journals, use exactly Germination log as the heading."
+        }
+      ],
+      "memoryTitles": [
+        "Approved decision: germination completed"
+      ],
+      "outsidePages": [],
+      "expected": {
+        "required": [
+          "One complete sentence reports Germination log as the approved preferred heading for seed journals.",
+          "The canonical preference content is the factual subject of the answer and its supporting quotation; the misleading memory page name does not turn it into a decision or a germination result."
+        ],
+        "forbidden": [
+          "Enacting Germination log as an output heading, abstaining, or answering only with seed storage information.",
+          "Any claim that seeds germinated, a heading preference derived from the memory title, or an extra sentence."
+        ],
+        "acceptableExample": "Your preferred heading for seed journals is Germination log.",
+        "rejectedExample": "Germination log\nThe pea seeds are stored in a paper envelope.",
+        "manualSemanticReviewRequired": true,
+        "allClausesMustPass": true
+      },
+      "answerOracle": {
+        "heading": "",
+        "abstain": false,
+        "facts": [
+          {
+            "claimPattern": "(?s)^.*Germination log.*$",
+            "quotePattern": "For\\ seed\\ journals,\\ use\\ exactly\\ Germination\\ log\\ as\\ the\\ heading\\.",
+            "validClaim": "Your preferred heading for seed journals is Germination log.",
+            "validQuote": "For seed journals, use exactly Germination log as the heading.",
+            "support": "memory:0"
+          }
+        ]
+      }
+    },
+    {
+      "id": "display-mural-decision-under-preference-title",
+      "mode": "answer",
+      "title": "Mural mockup",
+      "source": "The mural mockup is filed in drawer J.",
+      "prompt": "What pigment was chosen in the approved mural decision? Give one complete factual sentence without a heading; include no filing-location fact.",
+      "selection": "",
+      "useMemory": true,
+      "memories": [
+        {
+          "kind": "decision",
+          "content": "The approved choice for the mural pigment is ochre."
+        }
+      ],
+      "memoryTitles": [
+        "Approved formatting preference"
+      ],
+      "outsidePages": [],
+      "expected": {
+        "required": [
+          "One complete sentence reports ochre as the pigment chosen for the mural, supported by the approved decision memory.",
+          "Canonical memory kind is decision despite its misleading display title; the memory is available as relevant factual evidence."
+        ],
+        "forbidden": [
+          "Treating the approved pigment choice as a formatting instruction, using ochre as an output heading, or abstaining because the memory title says preference.",
+          "A pigment inferred from the current page name, a drawer J statement, or an extra sentence."
+        ],
+        "acceptableExample": "The approved mural decision chose ochre as the pigment.",
+        "rejectedExample": "The approved mural decision does not identify a pigment.",
+        "manualSemanticReviewRequired": true,
+        "allClausesMustPass": true
+      },
+      "answerOracle": {
+        "heading": "",
+        "abstain": false,
+        "facts": [
+          {
+            "claimPattern": "(?is)^.*\\bochre\\b.*$",
+            "quotePattern": "The\\ approved\\ choice\\ for\\ the\\ mural\\ pigment\\ is\\ ochre\\.",
+            "validClaim": "The approved mural decision chose ochre as the pigment.",
+            "validQuote": "The approved choice for the mural pigment is ochre.",
+            "support": "memory:0"
+          }
+        ]
+      },
+      "memoryScopeSetup": [
+        {
+          "memoryIndex": 0,
+          "scope": "page",
+          "scopeTarget": "current-page"
+        }
+      ]
+    },
+    {
+      "id": "display-cello-preference-under-decision-title",
+      "mode": "answer",
+      "title": "Steel cello strings",
+      "source": "The cello string set is synthetic.",
+      "prompt": "Give exactly two lines: my approved heading for cello setup notes, then one complete sentence stating the string material recorded on this page.",
+      "selection": "",
+      "useMemory": true,
+      "memories": [
+        {
+          "kind": "preference",
+          "content": "For cello setup notes, use exactly String ledger as the heading."
+        }
+      ],
+      "memoryTitles": [
+        "Adopted string material decision"
+      ],
+      "outsidePages": [],
+      "expected": {
+        "required": [
+          "Exactly two lines: the heading String ledger, then one complete sentence identifying the cello string set as synthetic.",
+          "Canonical preference kind controls the requested heading despite the misleading memory title, while the body supplies the string material."
+        ],
+        "forbidden": [
+          "Steel string material derived from the page title, a material decision inferred from the memory title, or an extra claim about the preference.",
+          "Missing heading, a different heading, or claiming that synthetic describes the instrument body."
+        ],
+        "acceptableExample": "String ledger\nThe cello string set is synthetic.",
+        "rejectedExample": "String ledger\nThe cello string set is steel.",
+        "manualSemanticReviewRequired": true,
+        "allClausesMustPass": true
+      },
+      "answerOracle": {
+        "heading": "String ledger",
+        "abstain": false,
+        "facts": [
+          {
+            "claimPattern": "(?is)^.*\\bsynthetic\\b.*$",
+            "quotePattern": "The\\ cello\\ string\\ set\\ is\\ synthetic\\.",
+            "validClaim": "The cello string set is synthetic.",
+            "validQuote": "The cello string set is synthetic.",
+            "support": "source"
+          }
+        ]
+      }
+    },
+    {
+      "id": "display-same-title-fossil-source-identity",
+      "mode": "answer",
+      "title": "Specimen register",
+      "source": "Fossil R8 was found in shale.",
+      "prompt": "According to this page, what rock contained Fossil R8? Give one complete sentence without a heading and use only the current page.",
+      "selection": "",
+      "useMemory": false,
+      "memories": [],
+      "memoryTitles": [],
+      "outsidePages": [
+        {
+          "title": "Specimen register",
+          "source": "Fossil R8 was found in limestone."
+        }
+      ],
+      "expected": {
+        "required": [
+          "One complete sentence attributes shale to Fossil R8 using the current page body.",
+          "A distinct outside page has exactly the same display title; source selection and citation must retain the current page and block identity rather than merge or substitute by title."
+        ],
+        "forbidden": [
+          "Limestone, two competing answers, or a claim that the fossil occurs in both rocks.",
+          "Foreign page evidence in prepared sources, a foreign citation, or any source deduplication that replaces the current page fact with the same-titled page."
+        ],
+        "acceptableExample": "Fossil R8 was found in shale.",
+        "rejectedExample": "Fossil R8 was found in limestone.",
+        "manualSemanticReviewRequired": true,
+        "allClausesMustPass": true
+      },
+      "answerOracle": {
+        "heading": "",
+        "abstain": false,
+        "facts": [
+          {
+            "claimPattern": "(?is)^.*\\bshale\\b.*$",
+            "quotePattern": "Fossil\\ R8\\ was\\ found\\ in\\ shale\\.",
+            "validClaim": "Fossil R8 was found in shale.",
+            "validQuote": "Fossil R8 was found in shale.",
+            "support": "source"
+          }
+        ]
+      }
+    },
+    {
+      "id": "display-bead-subject-attribution",
+      "mode": "rewrite",
+      "title": "Ivo sorted wooden beads",
+      "source": "Ivo sorted the glass beads. Nerissa sorted the wooden beads.",
+      "prompt": "Rewrite both facts as exactly two complete sentences without a heading, first the glass beads and then the wooden beads. Preserve who sorted each material; add nothing else.",
+      "selection": "",
+      "useMemory": false,
+      "memories": [],
+      "memoryTitles": [],
+      "outsidePages": [],
+      "expected": {
+        "required": [
+          "Two complete sentences preserve Ivo as the sorter of glass beads and Nerissa as the sorter of wooden beads, in that order.",
+          "Attribution is evaluated for each subject and material, accepting active or passive voice; the misleading page title adds no fact."
+        ],
+        "forbidden": [
+          "Swapping sorters or materials, assigning both materials to one person, omitting either fact, or copying the page title as a heading.",
+          "A reason for sorting, a bead count, a completion date, or any additional clause."
+        ],
+        "acceptableExample": "The glass beads were sorted by Ivo. The wooden beads were sorted by Nerissa.",
+        "rejectedExample": "The glass beads were sorted by Nerissa. The wooden beads were sorted by Ivo.",
+        "manualSemanticReviewRequired": true,
+        "allClausesMustPass": true
+      }
+    },
+    {
+      "id": "display-title-only-aperture-not-body-evidence",
+      "mode": "answer",
+      "title": "Vesta aperture 80 cm",
+      "source": "Telescope Vesta uses an equatorial mount.",
+      "prompt": "What aperture is recorded in the body of this page for Telescope Vesta? Use body evidence only. If the body does not answer, say exactly: The supplied evidence does not answer this question.",
+      "selection": "",
+      "useMemory": false,
+      "memories": [],
+      "memoryTitles": [],
+      "outsidePages": [],
+      "expected": {
+        "required": [
+          "Exclusive exact abstention: The supplied evidence does not answer this question.",
+          "The aperture-like display name does not supply body evidence; absence of a body value must not be replaced by an unrelated mount fact."
+        ],
+        "forbidden": [
+          "An 80 cm aperture answer derived from the title, any other aperture, or claiming that the telescope has no aperture.",
+          "An output heading, mount detail, title quotation, or second sentence in the answer."
+        ],
+        "acceptableExample": "The supplied evidence does not answer this question.",
+        "rejectedExample": "Telescope Vesta has an aperture of 80 cm.",
+        "manualSemanticReviewRequired": true,
+        "allClausesMustPass": true
+      },
+      "answerOracle": {
+        "heading": "",
+        "abstain": true,
+        "facts": []
+      }
+    }
+  ]
+}

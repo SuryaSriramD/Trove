@@ -57,6 +57,8 @@ func TestRealLocalMemoryPreferenceAndCurrentAuthority(t *testing.T) {
 	for _, useMemory := range []bool{false, true} {
 		t.Run("memory="+strconv.FormatBool(useMemory), func(t *testing.T) {
 			req.UseMemory = useMemory
+			controls := newAIEvaluationGenerationControls(req)
+			defer controls.log(t)
 			canonicalAudit := beginAICanonicalObservation(t, k)
 			defer func() {
 				report, _ := json.Marshal(map[string]any{"canonicalInventory": canonicalAudit.finish(t, k), "phase": "memory-evaluation", "useMemory": useMemory})
@@ -69,7 +71,9 @@ func TestRealLocalMemoryPreferenceAndCurrentAuthority(t *testing.T) {
 			}
 			rawDraft := ""
 			completion, err := GeneratePreparedAI(ctx, prepared, func(ctx context.Context, system, prompt string, tokens int, grammar string, stream func(string)) (string, error) {
-				text, err := s.GenerateTextWithGrammar(ctx, pack, native.ChatPrompt(system, prompt), tokens, grammar, stream)
+				text, err := controls.generate(func() (string, error) {
+					return s.GenerateTextWithGrammar(ctx, pack, native.ChatPrompt(system, prompt), tokens, grammar, stream)
+				})
 				rawDraft = text
 				t.Logf("synthetic fixture generated claims: %s", text)
 				return text, err
@@ -156,6 +160,8 @@ func TestRealLocalMemoryPreferenceAndCurrentAuthority(t *testing.T) {
 	// published after its approved memory has ceased to be current.
 	t.Run("forget-during-stream", func(t *testing.T) {
 		req.UseMemory = true
+		controls := newAIEvaluationGenerationControls(req)
+		defer controls.log(t)
 		canonicalAudit := beginAICanonicalObservation(t, k)
 		defer func() {
 			report, _ := json.Marshal(map[string]any{"canonicalInventory": canonicalAudit.finish(t, k), "phase": "after-explicit-forget"})
@@ -166,14 +172,16 @@ func TestRealLocalMemoryPreferenceAndCurrentAuthority(t *testing.T) {
 			t.Fatal(err)
 		}
 		forgotten := false
-		answer, err := s.GenerateText(ctx, pack, native.ChatPrompt(prepared.System, prepared.Prompt), 512, func(string) {
-			if !forgotten {
-				forgotten = true
-				report, _ := json.Marshal(map[string]any{"canonicalInventory": canonicalAudit.finish(t, k), "phase": "before-explicit-forget"})
-				t.Log(string(report))
-				testOK(t, dbBatch(t, k, e, []any{map[string]any{"kind": "memory.forget", "memoryId": preference}}, "page", preferencePage, "memory", preference))
-				canonicalAudit = beginAICanonicalObservation(t, k)
-			}
+		answer, err := controls.generate(func() (string, error) {
+			return s.GenerateText(ctx, pack, native.ChatPrompt(prepared.System, prepared.Prompt), 512, func(string) {
+				if !forgotten {
+					forgotten = true
+					report, _ := json.Marshal(map[string]any{"canonicalInventory": canonicalAudit.finish(t, k), "phase": "before-explicit-forget"})
+					t.Log(string(report))
+					testOK(t, dbBatch(t, k, e, []any{map[string]any{"kind": "memory.forget", "memoryId": preference}}, "page", preferencePage, "memory", preference))
+					canonicalAudit = beginAICanonicalObservation(t, k)
+				}
+			})
 		})
 		state, failure := "completed", ""
 		if err != nil {
