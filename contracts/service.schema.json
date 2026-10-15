@@ -6121,6 +6121,118 @@
       ],
       "additionalProperties": false
     },
+    "ConfigureImportRequest": {
+      "type": "object",
+      "properties": {
+        "contractVersion": {
+          "const": 1
+        },
+        "requestId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "workspaceId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "planId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "planHash": {
+          "$ref": "domain.schema.json#/$defs/Hash"
+        },
+        "columns": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "sourceLocator": {
+                "type": "string"
+              },
+              "index": {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 9007199254740991
+              },
+              "type": {
+                "type": "string",
+                "enum": [
+                  "text",
+                  "number",
+                  "checkbox",
+                  "date",
+                  "url",
+                  "email"
+                ]
+              }
+            },
+            "required": [
+              "sourceLocator",
+              "index",
+              "type"
+            ],
+            "additionalProperties": false
+          },
+          "maxItems": 256
+        },
+        "choices": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "sourceLocator": {
+                "type": "string"
+              },
+              "choice": {
+                "type": "string",
+                "enum": [
+                  "keep_local",
+                  "replace",
+                  "duplicate",
+                  "merge"
+                ]
+              }
+            },
+            "required": [
+              "sourceLocator",
+              "choice"
+            ],
+            "additionalProperties": false
+          },
+          "maxItems": 10000
+        },
+        "resolutions": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "sourceLocator": {
+                "type": "string"
+              },
+              "fields": {
+                "type": "array",
+                "items": {
+                  "$ref": "domain.schema.json#/$defs/ImportFieldResolution"
+                },
+                "maxItems": 10000
+              }
+            },
+            "required": [
+              "sourceLocator",
+              "fields"
+            ],
+            "additionalProperties": false
+          },
+          "maxItems": 10000
+        }
+      },
+      "required": [
+        "contractVersion",
+        "requestId",
+        "workspaceId",
+        "planId",
+        "planHash"
+      ],
+      "additionalProperties": false
+    },
     "GetImportReportRequest": {
       "type": "object",
       "properties": {

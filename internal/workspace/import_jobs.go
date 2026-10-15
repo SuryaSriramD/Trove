@@ -105,13 +105,7 @@ func previewCanonicalImport(ctx context.Context, k *Kernel, e contracts.ServiceE
 		if item.MappingID == "" {
 			continue
 		}
-		resolution := "no_change"
-		outcome := "unchanged"
-		if item.Conflict != "" {
-			resolution = "needs_review"
-			outcome = "conflict"
-		}
-		plans = append(plans, map[string]any{"id": item.MappingID, "mappingId": item.MappingID, "expectedLocalRevision": item.ExpectedRevision, "incomingSourceRevision": item.Hash, "identityStatus": "matched", "sourceCompleteness": p.SourceCompleteness, "fields": []any{map[string]any{"path": "/body", "outcome": outcome, "base": map[string]any{"present": false}, "local": map[string]any{"present": true, "value": map[string]any{"pageId": item.PageID, "revision": item.ExpectedRevision}}, "incoming": map[string]any{"present": true, "value": map[string]any{"rawFileId": item.RawFileID, "blocks": item.Blocks}}}}, "sourceDeleted": false, "localDeleted": false, "resolution": resolution})
+		plans = append(plans, importMergeContract(item, p))
 		guards = append(guards, required("page", item.PageID, item.ExpectedRevision))
 	}
 	return map[string]any{"planId": p.ID, "planHash": p.Hash, "report": portableImportReport(p), "reimportPlans": plans, "requiredRevisions": guards}, nil

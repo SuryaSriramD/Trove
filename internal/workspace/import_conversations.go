@@ -204,7 +204,9 @@ func ParseConversationExport(raw []byte, source ImportItem) ([]ImportItem, bool,
 				ancestry[id] = true
 			}
 		}
+		item.BlockSources = map[string]string{}
 		item.Blocks = append(item.Blocks, ImportBlock{ID: NewID(), Type: "paragraph", Data: map[string]any{"richText": richImport(fmt.Sprintf("Imported %s conversation · source ID %s · %d nodes. Every branch is retained below; parent and reply links preserve navigation. Non-text payloads remain in the original JSON.", provider, id, len(nodes)))}})
+		item.BlockSources[item.Blocks[len(item.Blocks)-1].ID] = "conversation-node:summary"
 		for _, i := range order {
 			n := nodes[i]
 			label := n.Role + " · " + n.ID
@@ -215,6 +217,7 @@ func ParseConversationExport(raw []byte, source ImportItem) ([]ImportItem, bool,
 				label += " · selected source branch"
 			}
 			item.Blocks = append(item.Blocks, ImportBlock{ID: n.BlockID, Type: "heading_3", Data: map[string]any{"richText": richImport(label)}})
+			item.BlockSources[n.BlockID] = "conversation-node:" + n.ID + ":heading"
 			links := []any{}
 			if p, exists := byID[n.Parent]; exists {
 				links = append(links, map[string]any{"text": "Parent: " + n.Parent, "link": canonicalPageLink(item.PageID, nodes[p].BlockID)})
@@ -227,12 +230,14 @@ func ParseConversationExport(raw []byte, source ImportItem) ([]ImportItem, bool,
 			}
 			if len(links) > 0 {
 				item.Blocks = append(item.Blocks, ImportBlock{ID: NewID(), Type: "paragraph", Data: map[string]any{"richText": links}})
+				item.BlockSources[item.Blocks[len(item.Blocks)-1].ID] = "conversation-node:" + n.ID + ":links"
 			}
 			text := n.Text
 			if text == "" {
 				text = "[No readable text in this node; exact source payload retained.]"
 			}
 			item.Blocks = append(item.Blocks, ImportBlock{ID: NewID(), Type: "paragraph", Data: map[string]any{"richText": richImport(text)}})
+			item.BlockSources[item.Blocks[len(item.Blocks)-1].ID] = "conversation-node:" + n.ID + ":text"
 		}
 		item.Provenance = map[string]any{"format": "conversation-export-v1", "provider": provider, "conversationId": id, "createdAt": c["create_time"], "updatedAt": c["update_time"], "currentNode": c["current_node"], "nodes": nodes, "sourceLocator": source.Locator, "rawFileId": source.RawFileID, "nonTextPolicy": "Exact original JSON retained; only explicit text is projected"}
 		if provider == "claude" {
