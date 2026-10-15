@@ -94,8 +94,19 @@ commands.update({
  'AcceptPersonalReview':tagged('review.accept',{'pageId':D('Id'),'runId':D('Id'),'blockId':D('Id'),'approved':{'const':True}}),
  'DismissPersonalReview':tagged('review.dismiss',{'pageId':D('Id'),'runId':D('Id')}),
 })
+# Record layouts contain stable references only; values remain canonical record data.
+defs['RecordLayoutSection']=obj({'id':D('Id'),'title':{'type':'string','maxLength':120},'placement':enum('header','sidebar'),'propertyIds':{**arr(D('Id'),256),'uniqueItems':True}})
+defs['RecordLayout']=obj({'version':{'const':1},'sections':arr(R('RecordLayoutSection'),32),'hiddenPropertyIds':{**arr(D('Id'),256),'uniqueItems':True}})
+nullable_layout={'oneOf':[R('RecordLayout'),{'type':'null'}]}
+commands['SetCollectionLayout']=tagged('collection.layout.set',{'collectionId':D('Id'),'layout':nullable_layout})
+commands['SetRecordLayout']=tagged('record.layout.set',{'recordId':D('Id'),'layout':nullable_layout})
+defs['SchedulingPolicy']=obj({'version':{'const':1},'calendar':enum('calendar_days','working_week'),'timezone':{'type':'string','minLength':1,'maxLength':128},'weekdays':{'type':'array','items':{'type':'integer','minimum':0,'maximum':6},'maxItems':7,'uniqueItems':True}})
+defs['SchedulingInput']=obj({'collectionId':D('Id'),'datePropertyId':D('Id'),'recordId':D('Id'),'newStart':{'type':'string','minLength':10,'maxLength':40},'policy':R('SchedulingPolicy')})
+defs['SchedulingRecord']=obj({'recordId':D('Id'),'pageId':D('Id'),'title':S,'before':D('property_date_v1'),'after':D('property_date_v1'),'dependencyRecordIds':arr(D('Id'),128),'reason':enum('requested','dependency','slack_preserved','prerequisite'),'changed':B,'duration':S,'dstEffects':arr(S,8)})
+defs['SchedulingPlan']=obj({'version':{'const':1},'id':D('Id'),'hash':D('Hash'),'input':R('SchedulingInput'),'requiredRevisions':arr(R('ExpectedRevision'),1000),'records':arr(R('SchedulingRecord'),450)})
+commands['ApplyScheduling']=tagged('scheduling.apply',{'plan':R('SchedulingPlan')})
 journal_value=tagged('record.setValue',{'recordId':D('Id'),'propertyId':D('Id'),'value':obj({'type':enum('text','number','select','multi_select','status','checkbox','date','url','email','phone'),'schemaVersion':{'type':'integer','minimum':1},'value':json_value})})
-defs['JournalAction']={'oneOf':[journal_value,commands['ClearValue'],tagged('page.update',{'pageId':D('Id'),'title':S}),commands['SetPageDisplay']]}
+defs['JournalAction']={'oneOf':[journal_value,commands['ClearValue'],tagged('page.update',{'pageId':D('Id'),'title':S}),commands['SetPageDisplay'],commands['SetCollectionLayout'],commands['SetRecordLayout']]}
 commands['ApplyOperation']=tagged('operation.apply',{'operationId':D('Id'),'label':{'type':'string','minLength':1,'maxLength':200},'actions':{**arr(R('JournalAction'),128),'minItems':1}})
 commands['UndoOperation']=tagged('operation.undo',{'operationId':D('Id')})
 commands['RunRowButton']['properties']['operationId']=D('Id')
@@ -128,6 +139,9 @@ commands['ApplyAutofill']=tagged('autofill.applyReviewed',autofill_selection)
 defs.update(commands)
 defs['Command']={'oneOf':[R(n) for n in commands]}
 header={'contractVersion':{'const':1},'requestId':D('Id'),'workspaceId':D('Id')}
+defs['SchedulingPreviewRequest']=obj({**header,'input':R('SchedulingInput')})
+defs['RecordLayoutRequest']=obj({**header,'collectionId':D('Id'),'recordId':D('Id')},[*header,'collectionId'])
+defs['RecordLayoutResult']=obj({'collectionId':D('Id'),'recordId':D('Id'),'defaultLayout':nullable_layout,'overrideLayout':nullable_layout,'effectiveLayout':R('RecordLayout'),'missingPropertyIds':arr(D('Id'),8448)},['collectionId','defaultLayout','overrideLayout','effectiveLayout','missingPropertyIds'])
 defs['MeetingExtractionResult']=obj({'version':{'const':1},'proposalId':D('Id'),'itemId':{'type':'string','minLength':1,'maxLength':128},'meetingId':D('Id'),'evidenceHash':{'type':'string','pattern':'^[0-9a-f]{64}$'},'kind':enum('page','task'),'title':S,'body':S,'pageId':D('Id'),'recordId':D('Id'),'appliedAt':D('Timestamp'),'stale':B},['version','proposalId','itemId','meetingId','evidenceHash','kind','title','body','pageId','stale'])
 defs['MeetingExtractionApplyResult']=obj({'pageId':D('Id'),'recordId':S,'kind':enum('page','task'),'proposalId':D('Id'),'itemId':S,'reused':B})
 defs['MeetingExtractionPrepareRequest']=obj({**header,'meetingId':D('Id'),'kind':enum('page','task'),'draftId':D('Id'),'itemIndex':{'type':'integer','minimum':0,'maximum':249}},[*header,'meetingId','kind'])

@@ -1,4 +1,5 @@
 import { SkillsPanel } from "./ai/SkillsPanel";
+import { RecordLayout } from "./database/RecordLayout";
 import { OperationHistory } from "./OperationHistory";
 import { PageFreshness, ReviewQueue } from "./PageFreshness";
 import { TaskEditor } from "./tasks/TaskEditor";
@@ -1143,6 +1144,7 @@ export default function App() {
                     <p>Review approval and evidence in Local AI below.</p>
                   </aside>
                 ))}
+              {w.records.filter(r => r.pageId === page.id).map(r => <RecordLayout key={r.id} workspace={w} collectionId={r.collectionId} recordId={r.id} onCommitted={refresh} onError={errorHandler} />)}
               {pageReady ? (
                 <PageEditor
                   key={`${page.id}-${editorKey}`}

@@ -15,6 +15,7 @@ import (
 )
 
 type recoverySnapshot struct {
+	RecordLayouts      *recoveryLayouts        `json:"recordLayouts,omitempty"`
 	DisplayPreferences *PageDisplayPreferences `json:"displayPreferences,omitempty"`
 	contracts.ServiceReadPageResult
 	Record          *contracts.DomainRecord              `json:"record,omitempty"`
@@ -28,12 +29,17 @@ type recoverySnapshot struct {
 }
 
 func captureRecoverySnapshot(ctx context.Context, q querier, page string, result contracts.ServiceReadPageResult) (json.RawMessage, error) {
-	out := recoverySnapshot{ServiceReadPageResult: result, MetadataVersion: 4}
+	out := recoverySnapshot{ServiceReadPageResult: result, MetadataVersion: 5}
 	display, displayErr := readPageDisplay(ctx, q, page)
 	if displayErr != nil {
 		return nil, displayErr
 	}
 	out.DisplayPreferences = &display
+	var layoutErr error
+	out.RecordLayouts, layoutErr = captureRecoveryLayouts(ctx, q, page)
+	if layoutErr != nil {
+		return nil, layoutErr
+	}
 	var collection string
 	err := q.QueryRowContext(ctx, "SELECT collection_id FROM records WHERE page_id=?", page).Scan(&collection)
 	if err == nil {
@@ -297,6 +303,13 @@ func restoreGuards(ctx context.Context, k *Kernel, q querier, e contracts.Servic
 	} else if snap.Record != nil {
 		return nil, nil, Fail("CONFLICT", "Historical record identity is no longer available")
 	}
+	if snap.RecordLayouts != nil {
+		for _, entry := range snap.RecordLayouts.Collections {
+			if err = add("collection", entry.CollectionID); err != nil {
+				return nil, nil, err
+			}
+		}
+	}
 	if err = addRecoveryDatabaseGuards(ctx, q, snap, add); err != nil {
 		return nil, nil, err
 	}
@@ -513,6 +526,9 @@ func restoreHistory(m *Mutation, c map[string]any) error {
 		return err
 	}
 	if _, err = m.Exec("INSERT INTO page_metadata(page_id,archived,icon,cover_file_id,archived_at) VALUES(?,?,?,?,?) ON CONFLICT(page_id) DO UPDATE SET archived=excluded.archived,icon=excluded.icon,cover_file_id=excluded.cover_file_id,archived_at=excluded.archived_at", page, snap.Page.ArchivedAt != nil, snap.Page.Icon, snap.Page.CoverFileId, snap.Page.ArchivedAt); err != nil {
+		return err
+	}
+	if err = restoreRecoveryLayouts(m, snap); err != nil {
 		return err
 	}
 	if snap.DisplayPreferences != nil {

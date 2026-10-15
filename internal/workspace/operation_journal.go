@@ -75,6 +75,22 @@ func journalCurrent(ctx context.Context, q querier, action map[string]any) (jour
 			return entry, err
 		}
 		entry.Before = map[string]any{"kind": "record.setValue", "recordId": record, "propertyId": property, "value": map[string]any{"type": typ, "schemaVersion": version, "value": value}}
+	case "collection.layout.set", "record.layout.set":
+		owner, id, key := "record", str(action["recordId"]), "recordId"
+		if kind == "collection.layout.set" {
+			owner, id, key = "collection", str(action["collectionId"]), "collectionId"
+		}
+		page, _, err := layoutOwner(ctx, q, owner, id)
+		if err != nil {
+			return entry, err
+		}
+		layout, err := readRecordLayout(ctx, q, owner, id)
+		if err != nil {
+			return entry, err
+		}
+		entry.PageID = page
+		entry.Target = "layout:" + owner + ":" + id
+		entry.Before = map[string]any{"kind": kind, key: id, "layout": layout}
 	case "page.update":
 		entry.PageID = str(action["pageId"])
 		entry.Target = "title:" + entry.PageID
@@ -94,9 +110,21 @@ func journalCurrent(ctx context.Context, q querier, action map[string]any) (jour
 	default:
 		return entry, Fail("INVALID_REQUEST", "Unsupported journal action")
 	}
+	var normalized map[string]any
+	if err := json.Unmarshal(marshal(entry.Before), &normalized); err != nil {
+		return entry, err
+	}
+	entry.Before = normalized
 	return entry, nil
 }
 func runJournalAction(m *Mutation, action map[string]any) error {
+	// Internal planners and retained inverse entries must use the same decoded
+	// JSON representation as dispatcher commands (including numeric versions).
+	var decoded map[string]any
+	if err := json.Unmarshal(marshal(action), &decoded); err != nil {
+		return err
+	}
+	action = decoded
 	if err := contracts.Validate("service", "JournalAction", marshal(action)); err != nil {
 		return Fail("INVALID_REQUEST", "Invalid grouped action")
 	}
@@ -272,6 +300,11 @@ func previewUndoJournal(ctx context.Context, k *Kernel, e contracts.ServiceExecu
 		}
 		if property := str(entry.Before["propertyId"]); property != "" {
 			if err = add("property", property); err != nil {
+				return nil, err
+			}
+		}
+		if collection := str(entry.Before["collectionId"]); collection != "" {
+			if err = add("collection", collection); err != nil {
 				return nil, err
 			}
 		}
