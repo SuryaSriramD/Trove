@@ -141,6 +141,10 @@ func capturePageExternalContextPolicy(ctx context.Context, q querier, page strin
 func retainAIExternalContextPolicy(m *Mutation, sources []AIEvidence) error {
 	restricted := false
 	for _, s := range sources {
+		if s.Connected != nil {
+			restricted = restricted || s.Connected.Provider == "gmail"
+			continue
+		}
 		r, err := pageExternalContextRestricted(m.Context, m.Tx, string(s.Location.PageId))
 		if err != nil {
 			return err

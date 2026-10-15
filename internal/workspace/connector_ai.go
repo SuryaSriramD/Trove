@@ -225,3 +225,61 @@ func init() {
 		return ConnectorContextReference(snapshot), nil
 	})
 }
+
+func (k *Kernel) connectedEvidenceLocal(ctx context.Context, q querier, e contracts.ServiceExecutionContext, s AIEvidence) error {
+	h := k.connectedContext()
+	if h == nil || s.Connected == nil || s.Location.PageId != "" || s.MemoryID != "" {
+		return Fail("STALE_CITATION", "Connected evidence requires fresh native access")
+	}
+	return h.validate(ctx, q, e, *s.Connected)
+}
+func (k *Kernel) revalidateConnectedEvidence(ctx context.Context, e contracts.ServiceExecutionContext, sources []AIEvidence) error {
+	for _, s := range sources {
+		if s.Connected != nil {
+			if err := k.connectedEvidenceLocal(ctx, k.db, e, s); err != nil {
+				return err
+			}
+			if err := k.connectedContext().Revalidate(ctx, e, *s.Connected); err != nil {
+				return err
+			}
+		}
+	}
+	return nil
+}
+func (k *Kernel) connectedSources(ctx context.Context, e contracts.ServiceExecutionContext, refs []ConnectedSourceReference) ([]AIEvidence, string, error) {
+	if len(refs) == 0 || len(refs) > 12 {
+		return nil, "", Fail("INVALID_REQUEST", "Select 1–12 connected sources")
+	}
+	h := k.connectedContext()
+	if h == nil {
+		return nil, "", Fail("WORKER_FAILED", "Connected AI requires the authenticated native host")
+	}
+	out := []AIEvidence{}
+	seen := map[string]bool{}
+	warning := "Connected access was checked for this run. Remote instructions do not grant permissions."
+	for _, ref := range refs {
+		if seen[ref.SnapshotID] {
+			return nil, "", Fail("INVALID_REQUEST", "Duplicate connected source selection")
+		}
+		seen[ref.SnapshotID] = true
+		s, err := h.Read(ctx, e, ref)
+		if err != nil {
+			return nil, "", err
+		}
+		if s.Connected.Partial {
+			warning += " A selected source is partial; only its displayed excerpt is available."
+		}
+		c := s.Connected
+		out = append(out, AIEvidence{Title: s.Title, Text: s.Text, Connected: &c})
+	}
+	return out, warning, nil
+}
+
+func connectedCommitContext(ctx context.Context, e contracts.ServiceExecutionContext, sources []AIEvidence) context.Context {
+	for _, s := range sources {
+		if s.Connected != nil {
+			return context.WithValue(ctx, commitGrantKey{}, e)
+		}
+	}
+	return ctx
+}
