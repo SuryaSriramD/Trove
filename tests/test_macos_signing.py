@@ -121,7 +121,7 @@ class SigningTests(unittest.TestCase):
             {'name': name, 'sha256': signing.digest(native / name), 'architecture': 'arm64'} for name in self.helper_names[:4]]}
         (native / 'manifest.json').write_text(json.dumps(self.manifest))
         (native / 'microphone-worker.json').write_text(json.dumps({'schemaVersion': 1, 'platform': 'darwin', 'testOnly': False,
-            'deviceBackendCompiled': True, 'capabilities': ['record'], 'helper': copy.deepcopy(self.manifest['helpers'][2])}))
+            'deviceBackendCompiled': True, 'capabilities': ['record', 'capture_controls_v1', 'input_devices_v1'], 'helper': copy.deepcopy(self.manifest['helpers'][2])}))
         for name, runtime in [('document-extractor', 'PDFKit'), ('audio-decoder', 'FFmpeg'), ('pdf-renderer', 'WebKit/AppKit/PDFKit')]:
             (native / (name + '.json')).write_text(json.dumps({'schemaVersion': 1, 'name': name, 'architecture': 'arm64', 'runtime': runtime, 'sha256': signing.digest(native / name)}))
         (native / 'ocr-worker.sha256').write_text(signing.digest(native / 'ocr-worker') + '\n')
@@ -136,6 +136,26 @@ class SigningTests(unittest.TestCase):
         for name in ['document-extractor', 'audio-decoder', 'pdf-renderer']:
             self.assertEqual(json.loads((native / (name + '.json')).read_text())['sha256'], signing.digest(native / name))
         self.assertEqual((native / 'ocr-worker.sha256').read_text().strip(), signing.digest(native / 'ocr-worker'))
+
+    def test_current_microphone_capabilities_are_accepted(self):
+        native = self.prepare()
+        sidecar = native / 'microphone-worker.json'
+        current = json.loads(sidecar.read_text())
+        current['capabilities'] = ['record', 'capture_controls_v1', 'input_devices_v1']
+        sidecar.write_text(json.dumps(current))
+        self.assertIn('microphone-worker', signing.native_bindings(self.app)[2])
+
+    def test_microphone_capabilities_cannot_be_missing_or_extended(self):
+        native = self.prepare()
+        sidecar = native / 'microphone-worker.json'
+        current = json.loads(sidecar.read_text())
+        required = ['record', 'capture_controls_v1', 'input_devices_v1']
+        for capabilities in [[], ['record'], *[[c for c in required if c != missing] for missing in required], required + ['unreviewed']]:
+            with self.subTest(capabilities=capabilities):
+                current['capabilities'] = capabilities
+                sidecar.write_text(json.dumps(current))
+                with self.assertRaisesRegex(signing.SigningBlocked, 'production helper'):
+                    signing.native_bindings(self.app)
 
     def test_incomplete_production_flags_fail_before_build_or_account_commands(self):
         script = signing.ROOT / 'scripts/build-desktop.py'

@@ -142,7 +142,7 @@ def native_bindings(app):
     mic_path = native / 'microphone-worker.json'
     mic = read_json(mic_path)
     if (not isinstance(mic, dict) or mic.get('schemaVersion') != 1 or mic.get('platform') != 'darwin' or mic.get('testOnly') is not False
-            or mic.get('deviceBackendCompiled') is not True or mic.get('capabilities') != ['record']
+            or mic.get('deviceBackendCompiled') is not True or mic.get('capabilities') != ['record', 'capture_controls_v1', 'input_devices_v1']
             or not isinstance(mic.get('helper'), dict) or mic['helper'].get('name') != 'microphone-worker'
             or (native / 'microphone-fixture.json').exists()):
         raise SigningBlocked('The microphone must be a production helper, never a synthetic fixture.')
