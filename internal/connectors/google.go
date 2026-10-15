@@ -305,6 +305,9 @@ func googleBytes(ctx context.Context, s Session, method, target, mediaType strin
 	}
 	defer resp.Body.Close()
 	if resp.StatusCode < 200 || resp.StatusCode >= 300 {
+		if resp.StatusCode == 403 && googleMediaRateLimit(resp.Body) {
+			return nil, resp.Header, &Failure{Code: "RATE_LIMITED", Message: "Google rate limit reached", RetryAfter: time.Minute}
+		}
 		switch {
 		case mutating && resp.StatusCode >= 500:
 			return nil, resp.Header, Unknown("Google upload outcome is uncertain; reconcile before retrying")
@@ -334,6 +337,26 @@ func googleBytes(ctx context.Context, s Session, method, target, mediaType strin
 		return nil, resp.Header, fail("ACQUISITION_LIMIT", "Download was interrupted or exceeds 32 MiB")
 	}
 	return b, resp.Header, nil
+}
+
+func googleMediaRateLimit(body io.Reader) bool {
+	var v struct {
+		Error struct {
+			Errors []struct {
+				Reason string `json:"reason"`
+			} `json:"errors"`
+		} `json:"error"`
+	}
+	data, err := io.ReadAll(io.LimitReader(body, 65537))
+	if err != nil || len(data) > 65536 || json.Unmarshal(data, &v) != nil {
+		return false
+	}
+	for _, entry := range v.Error.Errors {
+		if entry.Reason == "rateLimitExceeded" || entry.Reason == "userRateLimitExceeded" || entry.Reason == "sharingRateLimitExceeded" {
+			return true
+		}
+	}
+	return false
 }
 func googleSafeID(s string) bool {
 	return nonempty(s) && len(s) <= 2048 && !strings.ContainsAny(s, "\r\n\x00/") && s != "." && s != ".."

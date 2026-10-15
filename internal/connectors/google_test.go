@@ -657,3 +657,13 @@ func TestGoogleHTMLOnlyMessageKeepsTextWithoutActiveContent(t *testing.T) {
 		t.Fatalf("inert message %+v %v", snapshot, err)
 	}
 }
+
+func TestGoogleMedia403RateLimitIsNotRevocation(t *testing.T) {
+	s := googleTestSession(GoogleDrive, func(r *http.Request) (*http.Response, error) {
+		return googleTestResponse(403, `{"error":{"errors":[{"reason":"userRateLimitExceeded"}],"message":"private provider text"}}`), nil
+	})
+	_, _, err := googleBytes(context.Background(), s, "GET", googleAPI+"/drive/v3/files/selected?alt=media", "", nil, nil)
+	if !googleError(err, "RATE_LIMITED") || strings.Contains(err.Error(), "private") {
+		t.Fatalf("403 misclassified or exposed: %v", err)
+	}
+}
