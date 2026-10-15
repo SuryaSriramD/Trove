@@ -304,7 +304,7 @@ func TestNotionDatabaseSourcesLinkedViewsAndResumableProperties(t *testing.T) {
 	secondPlan := finishNotionDatabaseFixture(t, k, e, second, false)
 	for _, item := range secondPlan.Items {
 		if notionGraphPage(item) && item.Choice != "keep_local" {
-			t.Fatalf("identical graph was not stable: %s %s %s", item.Locator, item.Choice, item.Conflict)
+			t.Fatalf("identical graph was not stable: %s %s %s %s", item.Locator, item.Choice, item.Conflict, marshal(item.Merge))
 		}
 	}
 	completeImportFixture(t, k, e, secondPlan)
@@ -331,6 +331,56 @@ func TestNotionDatabaseSourcesLinkedViewsAndResumableProperties(t *testing.T) {
 	count("SELECT count(*) FROM records", 4)
 	count("SELECT count(*) FROM collections", 4)
 }
+func TestNotionReimportPartialPropertyRetainsBaselineAndLocalEdit(t *testing.T) {
+	k, e := testKernel(t)
+	f := &notionDatabaseFixture{fileDenied: true}
+	first := finishNotionDatabaseFixture(t, k, e, runNotionDatabaseFixture(t, k, e, startNotionDatabaseFixture(t, k, e), f), false)
+	completeImportFixture(t, k, e, first)
+	var collection, record, page, property string
+	if err := k.db.QueryRow("SELECT r.collection_id,r.id,r.page_id,p.id FROM records r JOIN properties p ON p.collection_id=r.collection_id WHERE p.name='Notes'").Scan(&collection, &record, &page, &property); err != nil {
+		t.Fatal(err)
+	}
+	testOK(t, setValue(t, k, e, databaseFixture{collection: collection}, record, page, property, "text", richImport("local complete notes")))
+	f.denyProperty = true
+	f.changed = true
+	partial := finishNotionDatabaseFixture(t, k, e, runNotionDatabaseFixture(t, k, e, startNotionDatabaseFixture(t, k, e), f), true)
+	path := "/values/" + record + "/" + property
+	retained := false
+	for _, item := range partial.Items {
+		if item.Merge == nil {
+			continue
+		}
+		for _, field := range item.Merge.Fields {
+			if field.Path == path {
+				retained = field.Outcome == "keep_local" && equalImportPresence(field.Base, field.Incoming) && strings.Contains(string(field.Base.Value), "second")
+			}
+		}
+	}
+	if !retained {
+		t.Fatal("partial property replaced a retained complete baseline with missing data")
+	}
+	// This review keeps source-page bodies while applying the independently
+	// reviewed typed values. Partial capture notices are separate page edits.
+	choices := []any{}
+	for _, item := range partial.Items {
+		if item.Kind != "portable_collection" && item.Merge != nil {
+			choices = append(choices, map[string]any{"sourceLocator": item.Locator, "choice": "keep_local"})
+		}
+	}
+	configured, err := configurePortableImport(context.Background(), k, e, map[string]any{"planId": partial.ID, "planHash": partial.Hash, "choices": choices})
+	if err != nil {
+		t.Fatal(err)
+	}
+	partial = configured.(ImportPlan)
+	partial = reviewDatabasePreview(t, k, partial, nil)
+	completeImportFixture(t, k, e, partial)
+	var value string
+	k.db.QueryRow("SELECT value_json FROM property_values WHERE record_id=? AND property_id=?", record, property).Scan(&value)
+	if !strings.Contains(value, "local complete notes") {
+		t.Fatal("partial capture overwrote the local value", value)
+	}
+}
+
 func TestNotionPartialPropertyAndUnsupportedViewNeverInventValues(t *testing.T) {
 	k, e := testKernel(t)
 	f := &notionDatabaseFixture{denyProperty: true}

@@ -27,17 +27,21 @@ import (
 const importSchema = `
 CREATE TABLE IF NOT EXISTS import_runs(id TEXT PRIMARY KEY,plan_hash TEXT NOT NULL,plan_json TEXT NOT NULL CHECK(json_valid(plan_json)),created_at TEXT NOT NULL,updated_at TEXT NOT NULL);
 CREATE TABLE IF NOT EXISTS import_mapping_state(mapping_id TEXT PRIMARY KEY REFERENCES import_mappings(id),local_revision TEXT NOT NULL);
+CREATE TABLE IF NOT EXISTS import_baselines(mapping_id TEXT PRIMARY KEY REFERENCES import_mappings(id),normalizer_version INTEGER NOT NULL,snapshot_json TEXT NOT NULL CHECK(json_valid(snapshot_json)),source_revision TEXT NOT NULL,raw_file_id TEXT NOT NULL REFERENCES files(id),import_run_id TEXT NOT NULL REFERENCES import_runs(id));
+CREATE TABLE IF NOT EXISTS import_entity_ids(source_system TEXT NOT NULL,source_namespace TEXT NOT NULL,entity_kind TEXT NOT NULL,source_identity TEXT NOT NULL,local_id TEXT NOT NULL,PRIMARY KEY(source_system,source_namespace,entity_kind,source_identity));
+CREATE TABLE IF NOT EXISTS import_csv_bindings(source_system TEXT NOT NULL,source_namespace TEXT NOT NULL,source_identity TEXT NOT NULL,binding_json TEXT NOT NULL CHECK(json_valid(binding_json)),PRIMARY KEY(source_system,source_namespace,source_identity));
 `
 const maxImportEntries = 10000
 const maxImportEntryBytes int64 = 64 * 1024 * 1024
 const maxImportTotalBytes int64 = 1024 * 1024 * 1024
 
 type ImportColumn struct {
-	Name       string   `json:"name"`
-	Type       string   `json:"type"`
-	PropertyID string   `json:"propertyId"`
-	Samples    []string `json:"samples"`
-	Warning    string   `json:"warning,omitempty"`
+	SourceHeader *string  `json:"sourceHeader,omitempty"`
+	Name         string   `json:"name"`
+	Type         string   `json:"type"`
+	PropertyID   string   `json:"propertyId"`
+	Samples      []string `json:"samples"`
+	Warning      string   `json:"warning,omitempty"`
 }
 type ImportBlock struct {
 	ID   string         `json:"id"`
@@ -45,36 +49,47 @@ type ImportBlock struct {
 	Data map[string]any `json:"data"`
 }
 type ImportItem struct {
-	SourceSystem       string                  `json:"sourceSystem,omitempty"`
-	DisplayPreferences *PageDisplayPreferences `json:"displayPreferences,omitempty"`
-	Locator            string                  `json:"sourceLocator"`
-	Kind               string                  `json:"kind"`
-	Outcome            string                  `json:"outcome"`
-	Reason             string                  `json:"reason"`
-	RawFileID          string                  `json:"retainedFileId,omitempty"`
-	Hash               string                  `json:"hash,omitempty"`
-	Size               int64                   `json:"sizeBytes"`
-	PageID             string                  `json:"pageId,omitempty"`
-	ParentID           string                  `json:"parentPageId,omitempty"`
-	Title              string                  `json:"title,omitempty"`
-	ExternalID         string                  `json:"externalId,omitempty"`
-	IdentityKind       string                  `json:"identityKind,omitempty"`
-	MappingID          string                  `json:"mappingId,omitempty"`
-	ExpectedRevision   string                  `json:"expectedRevision,omitempty"`
-	Conflict           string                  `json:"conflict,omitempty"`
-	Choice             string                  `json:"choice,omitempty"`
-	Committed          bool                    `json:"committed"`
-	Blocks             []ImportBlock           `json:"blocks,omitempty"`
-	BlockParents       map[string]string       `json:"blockParents,omitempty"`
-	BlockSources       map[string]string       `json:"blockSources,omitempty"`
-	Columns            []ImportColumn          `json:"columns,omitempty"`
-	Cells              []string                `json:"cells,omitempty"`
-	CollectionID       string                  `json:"collectionId,omitempty"`
-	RecordID           string                  `json:"recordId,omitempty"`
-	CSVSource          string                  `json:"csvSource,omitempty"`
-	Provenance         any                     `json:"provenance,omitempty"`
+	AttachmentsComplete     bool                                    `json:"attachmentsComplete,omitempty"`
+	AttachmentRelationships map[string]ImportAttachmentRelationship `json:"attachmentRelationships,omitempty"`
+	CSVKeyColumn            string                                  `json:"csvKeyColumn,omitempty"`
+	MergeGuards             map[string]string                       `json:"mergeGuards,omitempty"`
+	ResolvedFields          map[string]json.RawMessage              `json:"resolvedFields,omitempty"`
+	Merge                   *ImportMergeReview                      `json:"merge,omitempty"`
+	Incoming                *ImportSnapshot                         `json:"incomingSnapshot,omitempty"`
+	SourceSystem            string                                  `json:"sourceSystem,omitempty"`
+	DisplayPreferences      *PageDisplayPreferences                 `json:"displayPreferences,omitempty"`
+	Locator                 string                                  `json:"sourceLocator"`
+	Kind                    string                                  `json:"kind"`
+	Outcome                 string                                  `json:"outcome"`
+	Reason                  string                                  `json:"reason"`
+	RawFileID               string                                  `json:"retainedFileId,omitempty"`
+	Hash                    string                                  `json:"hash,omitempty"`
+	Size                    int64                                   `json:"sizeBytes"`
+	PageID                  string                                  `json:"pageId,omitempty"`
+	ParentID                string                                  `json:"parentPageId,omitempty"`
+	Title                   string                                  `json:"title,omitempty"`
+	ExternalID              string                                  `json:"externalId,omitempty"`
+	IdentityKind            string                                  `json:"identityKind,omitempty"`
+	MappingID               string                                  `json:"mappingId,omitempty"`
+	ExpectedRevision        string                                  `json:"expectedRevision,omitempty"`
+	Conflict                string                                  `json:"conflict,omitempty"`
+	Choice                  string                                  `json:"choice,omitempty"`
+	Committed               bool                                    `json:"committed"`
+	Blocks                  []ImportBlock                           `json:"blocks,omitempty"`
+	BlockParents            map[string]string                       `json:"blockParents,omitempty"`
+	BlockSources            map[string]string                       `json:"blockSources,omitempty"`
+	Columns                 []ImportColumn                          `json:"columns,omitempty"`
+	Cells                   []string                                `json:"cells,omitempty"`
+	CollectionID            string                                  `json:"collectionId,omitempty"`
+	RecordID                string                                  `json:"recordId,omitempty"`
+	CSVSource               string                                  `json:"csvSource,omitempty"`
+	Provenance              any                                     `json:"provenance,omitempty"`
 }
 type ImportPlan struct {
+	CSVBindings             []ImportCSVBinding      `json:"csvBindings,omitempty"`
+	EntityIdentities        []ImportEntityIdentity  `json:"entityIdentities,omitempty"`
+	TypedDatabaseMerge      bool                    `json:"typedDatabaseMerge,omitempty"`
+	NormalizerVersion       int                     `json:"normalizerVersion,omitempty"`
 	NotionGraph             bool                    `json:"notionGraph,omitempty"`
 	NotionKeepGraph         bool                    `json:"notionKeepGraph,omitempty"`
 	NotionCopyGraph         bool                    `json:"notionCopyGraph,omitempty"`
@@ -515,6 +530,41 @@ func configurePortableImport(ctx context.Context, k *Kernel, e contracts.Service
 				return Fail("NOT_FOUND", "CSV source not found")
 			}
 		}
+		for _, raw := range asList(r["csvKeys"]) {
+			binding := asObject(raw)
+			found := false
+			for i := range p.Items {
+				if p.Items[i].Locator == str(binding["sourceLocator"]) && p.Items[i].Kind == "csv" {
+					if err := configureCSVKey(ctx, tx, &p, i, int(number(binding["index"])), true); err != nil {
+						return err
+					}
+					found = true
+					break
+				}
+			}
+			if !found {
+				return Fail("INVALID_REQUEST", "Select a key before this CSV is converted into a typed import")
+			}
+		}
+		resolutions, _ := r["resolutions"].([]any)
+		for _, raw := range resolutions {
+			resolution, _ := raw.(map[string]any)
+			found := false
+			for i := range p.Items {
+				item := &p.Items[i]
+				if item.Locator != str(resolution["sourceLocator"]) {
+					continue
+				}
+				fields, _ := resolution["fields"].([]any)
+				if err := configureImportMerge(item, fields); err != nil {
+					return err
+				}
+				found = true
+			}
+			if !found {
+				return Fail("NOT_FOUND", "Merge source not found")
+			}
+		}
 		choices, _ := r["choices"].([]any)
 		for _, raw := range choices {
 			c, ok := raw.(map[string]any)
@@ -528,13 +578,22 @@ func configurePortableImport(ctx context.Context, k *Kernel, e contracts.Service
 					continue
 				}
 				choice := str(c["choice"])
-				if choice != "keep_local" && choice != "replace" && choice != "duplicate" {
-					return Fail("INVALID_REQUEST", "Choose keep_local, replace, or duplicate")
+				if choice != "keep_local" && choice != "replace" && choice != "duplicate" && choice != "merge" {
+					return Fail("INVALID_REQUEST", "Choose merge, keep_local, replace, or duplicate")
 				}
 				if (item.Kind == "csv" || item.Kind == "portable_collection" || p.NotionGraph && notionGraphPage(*item)) && choice == "replace" {
 					return Fail("INVALID_REQUEST", "Database schema replacement requires a separate reviewed schema migration; keep local or import a copy")
 				}
-				item.Choice = choice
+				if choice == "merge" {
+					if err := configureImportMerge(item, nil); err != nil {
+						return err
+					}
+					if item.Choice != "merge" {
+						return Fail("CONFLICT", "Resolve every conflicting field first")
+					}
+				} else {
+					item.Choice = choice
+				}
 				found = true
 			}
 			if !found {

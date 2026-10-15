@@ -1,3 +1,5 @@
+import { SkillsPanel } from "./ai/SkillsPanel";
+import { RecordLayout } from "./database/RecordLayout";
 import { OperationHistory } from "./OperationHistory";
 import { PageFreshness, ReviewQueue } from "./PageFreshness";
 import { TaskEditor } from "./tasks/TaskEditor";
@@ -34,6 +36,7 @@ import { parseDeepLink } from "./deepLinks";
 import { SearchPanel } from "./search/SearchPanel";
 import { MeetingPanel } from "./meetings/MeetingPanel";
 import { ReminderPanel } from "./reminders/ReminderPanel";
+import { ConnectorsPanel } from "./connectors/ConnectorsPanel";
 import { ImportExportPanel } from "./imports/ImportExportPanel";
 import { JobsPanel } from "./JobsPanel";
 import { AIPanel } from "./ai/AIPanel";
@@ -51,10 +54,12 @@ type Surface =
   | "Search"
   | "Import"
   | "Jobs"
+  | "Skills"
   | "AI"
   | "Intelligence"
   | "Automations"
   | "Capture"
+  | "Connections"
   | "Providers"
   | "Settings";
 const nav: [Surface, string][] = [
@@ -68,7 +73,9 @@ const nav: [Surface, string][] = [
   ["Import", "↓"],
   ["Jobs", "↻"],
   ["AI", "✧"],
+  ["Skills", "✎"],
   ["Providers", "⇄"],
+  ["Connections", "↗"],
   ["Capture", "⊕"],
   ["Automations", "◷"],
   ["Intelligence", "◇"],
@@ -1143,6 +1150,7 @@ export default function App() {
                     <p>Review approval and evidence in Local AI below.</p>
                   </aside>
                 ))}
+              {w.records.filter(r => r.pageId === page.id).map(r => <RecordLayout key={r.id} workspace={w} collectionId={r.collectionId} recordId={r.id} onCommitted={refresh} onError={errorHandler} />)}
               {pageReady ? (
                 <PageEditor
                   key={`${page.id}-${editorKey}`}
@@ -1368,6 +1376,8 @@ export default function App() {
                   onChanged={refresh}
                   onOpenPage={navigate}
                 />
+              ) : surface === "Skills" ? (
+                <SkillsPanel workspace={w} onCommitted={refresh} onNavigate={navigateSource}/>
               ) : surface === "AI" ? (
                 <AIPanel
                   workspace={w}
@@ -1393,6 +1403,8 @@ export default function App() {
                   onChanged={refresh}
                   onOpenPage={navigate}
                 />
+              ) : surface === "Connections" ? (
+                <ConnectorsPanel workspace={w} onChanged={refresh} onOpenPage={navigate} />
               ) : surface === "Providers" ? (
                 <ProviderPanel workspace={w} onCommitted={refresh} />
               ) : surface === "Jobs" ? (

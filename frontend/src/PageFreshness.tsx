@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
   batch,
   dispatch,
@@ -10,6 +10,18 @@ import {
 } from "./api";
 
 export function freshnessLabel(f: D.PageFreshness): string {
+  if (
+    f.state === "reviewed" &&
+    f.review?.expiresAt &&
+    Date.parse(f.review.expiresAt) <= Date.now()
+  )
+    return "Review overdue";
+  if (
+    f.state === "stale" &&
+    f.review &&
+    f.review.contentIdentity.version !== f.contentIdentity.version
+  )
+    return "Review coverage changed";
   return {
     never_reviewed: "Never reviewed",
     reviewed: "Human reviewed",
@@ -17,7 +29,7 @@ export function freshnessLabel(f: D.PageFreshness): string {
     expired: "Review overdue",
   }[f.state];
 }
-function useReviewClock() {
+export function useReviewClock() {
   const [tick, setTick] = useState(0);
   useEffect(() => {
     const timer = setInterval(() => setTick((t) => t + 1), 30000);
@@ -61,7 +73,15 @@ export function PageFreshness({
     return () => {
       active = false;
     };
-  }, [workspace.workspaceId, page.id, page.revision, tick]);
+  }, [
+    workspace.workspaceId,
+    workspace.scopeGrantId,
+    workspace.snapshotCursor,
+    page.id,
+    page.revision,
+    tick,
+  ]);
+  useEffect(() => setExpiry(""), [workspace.workspaceId, page.id]);
   async function review() {
     if (!result) return;
     setBusy(true);
@@ -95,6 +115,15 @@ export function PageFreshness({
         A human review covers this page’s content and record values. It does not
         verify that every statement is true.
       </p>
+      {result?.freshness.review &&
+        result.freshness.review.contentIdentity.version !==
+          result.freshness.contentIdentity.version && (
+          <p>
+            Review coverage now includes additional knowledge. The earlier
+            review remains in history; inspect the current content before
+            recording another review.
+          </p>
+        )}
       {result?.freshness.review && (
         <p>
           Last reviewed{" "}
@@ -145,12 +174,16 @@ export function ReviewQueue({
   onNavigate: (pageId: string) => unknown;
 }) {
   const tick = useReviewClock();
+  const generation = useRef(0);
   const [items, setItems] = useState<S.ReviewQueueResult["items"]>([]);
   const [cursor, setCursor] = useState<string>();
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
   useEffect(() => {
     let active = true;
+    generation.current++;
+    setItems([]);
+    setCursor(undefined);
     setBusy(true);
     dispatch<S.ReviewQueueResult>("page.reviewQueue", {
       ...envelope(workspace),
@@ -171,9 +204,16 @@ export function ReviewQueue({
       });
     return () => {
       active = false;
+      generation.current++;
     };
-  }, [workspace.workspaceId, workspace.snapshotCursor, tick]);
+  }, [
+    workspace.workspaceId,
+    workspace.scopeGrantId,
+    workspace.snapshotCursor,
+    tick,
+  ]);
   async function more() {
+    const requestGeneration = generation.current;
     setBusy(true);
     try {
       const r = await dispatch<S.ReviewQueueResult>("page.reviewQueue", {
@@ -181,13 +221,18 @@ export function ReviewQueue({
         limit: 30,
         afterPageId: cursor,
       });
-      setItems((previous) => [...previous, ...r.items]);
+      if (requestGeneration !== generation.current) return;
+      setItems((previous) => [
+        ...new Map(
+          [...previous, ...r.items].map((item) => [item.pageId, item]),
+        ).values(),
+      ]);
       setCursor(r.nextPageId);
       setError("");
     } catch (e) {
-      setError(String(e));
+      if (requestGeneration === generation.current) setError(String(e));
     } finally {
-      setBusy(false);
+      if (requestGeneration === generation.current) setBusy(false);
     }
   }
   return (

@@ -1,3 +1,5 @@
+import { RecordLayout } from "./RecordLayout";
+import { SchedulingPanel } from "./SchedulingPanel";
 import { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import {
   qualificationFrames,
@@ -35,6 +37,7 @@ import {
   type RecordGroup,
 } from "./model";
 import "./database.css";
+import { AutofillPanel } from "./AutofillPanel";
 import { VirtualRows } from "./VirtualRows";
 import { Timeline } from "./Timeline";
 import { FormulaEditor } from "./FormulaEditor";
@@ -572,6 +575,7 @@ export default function DatabaseView({
           onError={onError}
         />
       )}
+      {collection && <><RecordLayout workspace={w} collectionId={collection.id} onCommitted={onCommitted} onError={onError} /><SchedulingPanel key={collection.id} workspace={w} collection={collection} records={records} onCommitted={onCommitted} onError={onError} /></>}
       <div className="db-header">
         <div>
           {!collectionId && (
@@ -683,6 +687,7 @@ export default function DatabaseView({
             <label>Due property<select aria-label="Task promotion due property" value={promotion.dueId} onChange={e => setPromotion({ ...promotion, dueId: e.target.value })}><option value="">No due property</option>{properties.filter(p => p.type === "date").map(p => <option key={p.id} value={p.id}>{p.name}</option>)}</select></label>
             <p>The record, page and existing property values stay in this database.</p><button disabled={busy} onClick={() => void confirmPromotion()}>Confirm task</button><button disabled={busy} onClick={() => setPromotion(null)}>Cancel</button>
           </div>}
+          <AutofillPanel workspace={w} collection={collection} records={records} onCommitted={onCommitted} onError={onError} openPage={openPage} />
           <AdvancedDatabasePanel
             workspace={w}
             collection={collection}
@@ -893,7 +898,7 @@ export default function DatabaseView({
     </section>
   );
 }
-function ValueEditor({
+export function ValueEditor({
   property: p,
   value,
   workspace: w,

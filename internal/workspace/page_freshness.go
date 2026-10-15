@@ -11,10 +11,12 @@ import (
 	"trove.local/phase0/contracts"
 )
 
-// Version 1 covers owned knowledge, not revisions, decoration, or review state.
+// Version 2 adds meeting speaker/timing/audio-binding knowledge. Version 1
+// review events remain readable; an older coverage version requires review.
+// The projection excludes revisions, decoration, and review state.
 // A change to this projection requires a new version, never silent reinterpretation.
 func semanticContentIdentity(ctx context.Context, q querier, page string) (contracts.DomainSemanticContentIdentity, error) {
-	out := contracts.DomainSemanticContentIdentity{Version: 1}
+	out := contracts.DomainSemanticContentIdentity{Version: 2}
 	p, err := readPageTx(ctx, q, page)
 	if err != nil {
 		return out, err
@@ -108,7 +110,45 @@ func semanticContentIdentity(ctx context.Context, q querier, page string) (contr
 		return out, err
 	}
 	var projection any
-	decoder := json.NewDecoder(bytes.NewReader(marshal(map[string]any{"version": 1, "title": p.Page.Title, "blocks": blocks, "values": values, "assets": assets, "reusableSources": dependencies, "referencedTasks": tasks, "taskFacet": facet})))
+	payload := map[string]any{"version": out.Version, "title": p.Page.Title, "blocks": blocks, "values": values, "assets": assets, "reusableSources": dependencies, "referencedTasks": tasks, "taskFacet": facet}
+	meeting := recoverySnapshot{}
+	if err = captureRecoveryMeeting(ctx, q, page, &meeting); err != nil {
+		return out, err
+	}
+	if meeting.Meeting != nil {
+		segments := []any{}
+		for _, segment := range meeting.Segments {
+			segments = append(segments, map[string]any{"id": segment.Id, "blockId": segment.BlockId, "startMs": segment.StartMs, "endMs": segment.EndMs, "text": segment.Text, "speakerLabel": segment.SpeakerLabel})
+		}
+		payload["meeting"] = map[string]any{"id": meeting.Meeting.Id, "startedAt": meeting.Meeting.StartedAt, "durationMs": meeting.Meeting.DurationMs, "recordingFileId": meeting.Meeting.RecordingFileId, "segments": segments}
+	}
+	skillRows, err := q.QueryContext(ctx, "SELECT s.skill_id,s.definition_json FROM skill_versions s WHERE s.page_id=? AND s.version=(SELECT max(version) FROM skill_versions WHERE skill_id=s.skill_id) ORDER BY s.skill_id", page)
+	if err != nil {
+		return out, err
+	}
+	skillDefinitions := map[string]any{}
+	for skillRows.Next() {
+		var id, raw string
+		if err = skillRows.Scan(&id, &raw); err != nil {
+			skillRows.Close()
+			return out, err
+		}
+		var definition any
+		if err = json.Unmarshal([]byte(raw), &definition); err != nil {
+			skillRows.Close()
+			return out, err
+		}
+		skillDefinitions[id] = definition
+	}
+	err = skillRows.Err()
+	skillRows.Close()
+	if err != nil {
+		return out, err
+	}
+	if len(skillDefinitions) > 0 {
+		payload["skillDefinitions"] = skillDefinitions
+	}
+	decoder := json.NewDecoder(bytes.NewReader(marshal(payload)))
 	decoder.UseNumber()
 	if err = decoder.Decode(&projection); err != nil {
 		return out, err
@@ -200,6 +240,26 @@ func reviewPage(m *Mutation, c map[string]any) error {
 	}
 	for source := range recordPages {
 		sourcePages[source] = true
+	}
+	// Direct todo occurrences display canonical task facts even when this page
+	// is not itself a record or reusable source. The review must cover only
+	// knowledge the user is authorized to inspect.
+	taskRows, err := m.Tx.QueryContext(m.Context, `SELECT DISTINCT r.page_id FROM todo_references t JOIN blocks b ON b.id=t.block_id JOIN records r ON r.id=t.task_record_id WHERE b.page_id=?`, page)
+	if err != nil {
+		return err
+	}
+	for taskRows.Next() {
+		var source string
+		if err = taskRows.Scan(&source); err != nil {
+			taskRows.Close()
+			return err
+		}
+		sourcePages[source] = true
+	}
+	err = taskRows.Err()
+	taskRows.Close()
+	if err != nil {
+		return err
 	}
 	for source := range sourcePages {
 		if err = m.AuthorizePage(source); err != nil {
@@ -526,7 +586,7 @@ func reviewRecordKnowledge(ctx context.Context, q querier, page string) (map[str
 		pages[p] = true
 		fields := []any{}
 		relations := []string{}
-		hasRollup := false
+		hasDerived := false
 		rows, err := q.QueryContext(ctx, `SELECT p.id,p.schema_version,p.name,p.type,p.config_json,v.value_json FROM records r JOIN properties p ON p.collection_id=r.collection_id LEFT JOIN property_values v ON v.record_id=r.id AND v.property_id=p.id WHERE r.id=? ORDER BY p.id`, id)
 		if err != nil {
 			return nil, nil, err
@@ -544,8 +604,8 @@ func reviewRecordKnowledge(ctx context.Context, q querier, page string) (map[str
 				field["value"] = reviewPropertyValue(kind, value.String)
 			}
 			fields = append(fields, field)
-			if kind == "rollup" {
-				hasRollup = true
+			if kind == "rollup" || kind == "formula" {
+				hasDerived = true
 			}
 			if kind == "relation" && value.Valid {
 				var ids []string
@@ -559,8 +619,18 @@ func reviewRecordKnowledge(ctx context.Context, q querier, page string) (map[str
 		if err != nil {
 			return nil, nil, err
 		}
-		graph[id] = map[string]any{"title": title, "deleted": deleted.Valid, "fields": fields}
-		if hasRollup {
+		facet := map[string]any{}
+		var status string
+		var due sql.NullString
+		err = q.QueryRowContext(ctx, "SELECT status_property_id,due_property_id FROM task_facets WHERE record_id=?", id).Scan(&status, &due)
+		if err == nil {
+			facet["statusPropertyId"] = status
+			facet["duePropertyId"] = due.String
+		} else if !errors.Is(err, sql.ErrNoRows) {
+			return nil, nil, err
+		}
+		graph[id] = map[string]any{"title": title, "deleted": deleted.Valid, "fields": fields, "taskFacet": facet}
+		if hasDerived {
 			pending = append(pending, relations...)
 		}
 	}

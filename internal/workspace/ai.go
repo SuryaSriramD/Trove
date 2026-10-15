@@ -15,15 +15,16 @@ import (
 )
 
 type AIRequest struct {
-	ConversationID string `json:"conversationId,omitempty"`
-	PageID         string `json:"pageId,omitempty"`
-	BlockID        string `json:"blockId,omitempty"`
-	ProjectID      string `json:"projectId,omitempty"`
-	Mode           string `json:"mode"`
-	Prompt         string `json:"prompt"`
-	Selection      string `json:"selection,omitempty"`
-	UseMemory      bool   `json:"useMemory"`
-	ModelPackID    string `json:"modelPackId"`
+	Skill          *SkillRunReference `json:"skill,omitempty"`
+	ConversationID string             `json:"conversationId,omitempty"`
+	PageID         string             `json:"pageId,omitempty"`
+	BlockID        string             `json:"blockId,omitempty"`
+	ProjectID      string             `json:"projectId,omitempty"`
+	Mode           string             `json:"mode"`
+	Prompt         string             `json:"prompt"`
+	Selection      string             `json:"selection,omitempty"`
+	UseMemory      bool               `json:"useMemory"`
+	ModelPackID    string             `json:"modelPackId"`
 }
 type AIEvidence struct {
 	Freshness      *contracts.DomainPageFreshness `json:"freshness,omitempty"`
@@ -91,6 +92,17 @@ func (k *Kernel) PrepareAIWithBudget(ctx context.Context, e contracts.ServiceExe
 	}()
 	if err := k.authorize(e); err != nil {
 		return out, err
+	}
+	if r.Skill != nil {
+		skill, err := k.ResolveSkillRun(ctx, e, *r.Skill, "local")
+		if err != nil {
+			return out, err
+		}
+		r.Prompt, r.Mode = skill.Prompt, skill.Skill.Definition.Mode
+		r.PageID, r.BlockID, r.ProjectID, r.ConversationID, r.Selection, r.UseMemory = "", "", "", "", "", false
+		if len(r.Skill.SourcePageIDs) == 1 {
+			r.PageID = r.Skill.SourcePageIDs[0]
+		}
 	}
 	switch r.Mode {
 	case "answer", "rewrite", "summarize", "explain", "shorten", "expand", "outline", "generate":
@@ -180,6 +192,15 @@ func (k *Kernel) PrepareAIWithBudget(ctx context.Context, e contracts.ServiceExe
 		}
 	}
 	err = k.write(ctx, func(tx *sql.Tx) error {
+		if r.Skill != nil {
+			preview, err := k.previewSkillTx(ctx, tx, e, *r.Skill, "local")
+			if err != nil {
+				return err
+			}
+			if preview.Hash != r.Skill.PreviewHash {
+				return Fail("CONFLICT", "Reviewed skill sources changed while preparing the run")
+			}
+		}
 		_, err := tx.ExecContext(ctx, "INSERT INTO ai_runs(id,conversation_id,actor_id,state,request_json,sources_json,warning,created_at) VALUES(?,?,?,'running',?,?,?,?)", run.ID, run.ConversationID, e.Actor.ActorId, string(marshal(r)), string(marshal(kept)), run.Warning, run.CreatedAt)
 		return err
 	})
@@ -196,6 +217,29 @@ func truncateAI(s string, n int) string {
 	return s[:n] + "…"
 }
 func (k *Kernel) aiSources(ctx context.Context, e contracts.ServiceExecutionContext, r AIRequest) ([]AIEvidence, string, error) {
+	if r.Skill != nil {
+		sources := []AIEvidence{}
+		warnings := []string{}
+		for _, page := range r.Skill.SourcePageIDs {
+			if err := k.authorizePage(ctx, k.db, e, page); err != nil {
+				return nil, "", err
+			}
+			part := r
+			part.Skill = nil
+			part.PageID = page
+			part.UseMemory = false
+			current, warning, err := k.aiSources(ctx, e, part)
+			if err != nil {
+				return nil, "", err
+			}
+			sources = append(sources, current...)
+			if warning != "" {
+				warnings = append(warnings, warning)
+			}
+		}
+		return sources, strings.Join(warnings, " "), nil
+	}
+
 	if err := k.FlushSearch(ctx); err != nil {
 		return nil, "", err
 	}
@@ -208,7 +252,10 @@ func (k *Kernel) aiSources(ctx context.Context, e contracts.ServiceExecutionCont
 		if n > 0 {
 			return
 		}
-		key := string(marshal(loc))
+		// Distinct indexed excerpts of one block share a navigation location.
+		// Deduplicate exact evidence, not the location: otherwise later chunks
+		// silently disappear before the measured context can report omissions.
+		key := string(marshal(loc)) + ":" + searchDigest(text)
 		if !seen[key] && len(strings.TrimSpace(text)) > 0 {
 			seen[key] = true
 			out = append(out, AIEvidence{Title: title, Text: text, Location: loc})
@@ -249,6 +296,11 @@ func (k *Kernel) aiSources(ctx context.Context, e contracts.ServiceExecutionCont
 			}
 			var loc contracts.DomainLocation
 			json.Unmarshal([]byte(raw), &loc)
+			// The selected block above was loaded in full. Its indexed fragments
+			// would duplicate the literal source and cannot replace that full copy.
+			if r.BlockID != "" && loc.BlockId != nil && string(*loc.BlockId) == r.BlockID {
+				continue
+			}
 			add(title, text, loc)
 		}
 		err = rows.Err()

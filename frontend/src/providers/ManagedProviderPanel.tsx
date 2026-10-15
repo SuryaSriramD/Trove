@@ -1,3 +1,4 @@
+import type { SkillExecution } from "../ai/SkillsPanel";
 import { useEffect, useState } from "react";
 import { dispatch, envelope, type WorkspaceSnapshot } from "../api";
 import { ProviderAccounts } from "./ProviderAccounts";
@@ -11,6 +12,7 @@ type Runtime = {
   reason: string;
 };
 type Run = {
+  skill?: SkillExecution["reference"];
   id: string;
   provider: string;
   account: string;
@@ -43,9 +45,11 @@ const allowedTools: Record<string, string> = {
 };
 
 export function ManagedProviderPanel({
+  skill,
   workspace,
   provider = "codex",
 }: {
+  skill?: SkillExecution;
   workspace: WorkspaceSnapshot;
   provider?: "codex" | "claude_code";
 }) {
@@ -61,10 +65,14 @@ export function ManagedProviderPanel({
   const [registration, setRegistration] = useState("");
   const [models, setModels] = useState<{ id: string; name: string }[]>([]);
   const [model, setModel] = useState("");
-  const [pages, setPages] = useState<string[]>([]);
-  const [tools, setTools] = useState(["readPage", "search.query"]);
+  const [pages, setPages] = useState<string[]>(
+    skill?.reference.sourcePageIds ?? [],
+  );
+  const [tools, setTools] = useState<string[]>(
+    skill?.reference.tools ?? ["readPage", "search.query"],
+  );
   const [preview, setPreview] = useState<Preview | null>(null);
-  const [prompt, setPrompt] = useState("");
+  const [prompt, setPrompt] = useState(skill?.prompt ?? "");
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
   async function load() {
@@ -126,6 +134,7 @@ export function ManagedProviderPanel({
     await dispatch("providers.start", {
       ...envelope(workspace),
       provider,
+      ...(skill ? { skill: skill.reference } : {}),
       registrationId: registration,
       billingMode: billing,
       model,
@@ -252,6 +261,7 @@ export function ManagedProviderPanel({
               <label key={p.id} style={{ display: "block" }}>
                 <input
                   type="checkbox"
+                  disabled={!!skill}
                   checked={pages.includes(p.id)}
                   onChange={(e) => {
                     setPages(
@@ -272,6 +282,7 @@ export function ManagedProviderPanel({
             <label key={id} style={{ display: "block" }}>
               <input
                 type="checkbox"
+                disabled={!!skill}
                 checked={tools.includes(id)}
                 onChange={(e) => {
                   setTools(
@@ -319,6 +330,7 @@ export function ManagedProviderPanel({
           Request to {name}
           <textarea
             aria-label={`Request to ${name}`}
+            readOnly={!!skill}
             maxLength={65536}
             value={prompt}
             onChange={(e) => setPrompt(e.target.value)}
@@ -346,7 +358,11 @@ export function ManagedProviderPanel({
       {error && <p role="alert">{error}</p>}
       <h4>Provider runs</h4>
       {status.runs
-        .filter((r) => r.provider === provider)
+        .filter(
+          (r) =>
+            r.provider === provider &&
+            (!skill || r.skill?.skillId === skill.reference.skillId),
+        )
         .map((run) => (
           <article key={run.id}>
             <h4>
@@ -366,6 +382,14 @@ export function ManagedProviderPanel({
               <pre style={{ whiteSpace: "pre-wrap" }}>{run.text}</pre>
             )}
             {run.message && <p role="status">{run.message}</p>}
+            {skill && run.skill && (
+              <button
+                disabled={running}
+                onClick={() => skill.onRetry?.(run.skill!)}
+              >
+                Review retry with original skill scope
+              </button>
+            )}
             {!!run.checkpoint && (
               <button
                 disabled={

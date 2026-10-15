@@ -1,6 +1,8 @@
 package workspace
 
 import (
+	"crypto/sha256"
+	"encoding/hex"
 	"encoding/json"
 	"fmt"
 	"sort"
@@ -18,10 +20,11 @@ type portableDatabaseSource struct {
 	Views          []portableViewSource                 `json:"views"`
 }
 type portableRecordSource struct {
-	ID       string         `json:"id"`
-	PageID   string         `json:"pageId"`
-	PagePath string         `json:"pagePath"`
-	Values   map[string]any `json:"values"`
+	KnownProperties []string       `json:"knownProperties,omitempty"`
+	ID              string         `json:"id"`
+	PageID          string         `json:"pageId"`
+	PagePath        string         `json:"pagePath"`
+	Values          map[string]any `json:"values"`
 }
 type portableViewSource struct {
 	ContainerID    string         `json:"containerId,omitempty"`
@@ -35,13 +38,14 @@ type portableViewSource struct {
 	Config         map[string]any `json:"config"`
 }
 type PortableCollectionImport struct {
-	CollectionID string                               `json:"collectionId"`
-	PageID       string                               `json:"pageId"`
-	Title        string                               `json:"title"`
-	Locator      string                               `json:"sourceLocator"`
-	Properties   []contracts.DomainPropertyDefinition `json:"properties"`
-	Records      []portableRecordSource               `json:"records"`
-	Views        []portableViewSource                 `json:"views"`
+	SchemaComplete bool                                 `json:"schemaComplete,omitempty"`
+	CollectionID   string                               `json:"collectionId"`
+	PageID         string                               `json:"pageId"`
+	Title          string                               `json:"title"`
+	Locator        string                               `json:"sourceLocator"`
+	Properties     []contracts.DomainPropertyDefinition `json:"properties"`
+	Records        []portableRecordSource               `json:"records"`
+	Views          []portableViewSource                 `json:"views"`
 }
 
 // restorePortableDatabase freezes only supplied, validated canonical definitions.
@@ -102,13 +106,14 @@ func (k *Kernel) restorePortableDatabase(p *ImportPlan, manifest portableHierarc
 		fail("canonical graph exceeds 5000 entities")
 		return
 	}
-	fresh := func(old string) (string, bool) {
+	fresh := func(kind, old string) (string, bool) {
 		if contracts.Validate("domain", "Id", marshal(old)) != nil || used[old] {
 			return "", false
 		}
 		used[old] = true
 		id := NewID()
 		ids[old] = id
+		trackImportIdentity(p, kind, old, id)
 		return id, true
 	}
 	// Allocate the graph before rewriting any cross-collection references.
@@ -117,7 +122,7 @@ func (k *Kernel) restorePortableDatabase(p *ImportPlan, manifest portableHierarc
 			fail("collection identity, schemas or owning page are missing")
 			return
 		}
-		if _, ok := fresh(c.ID); !ok {
+		if _, ok := fresh("collection", c.ID); !ok {
 			fail("duplicate or invalid collection identity")
 			return
 		}
@@ -126,7 +131,7 @@ func (k *Kernel) restorePortableDatabase(p *ImportPlan, manifest portableHierarc
 				fail("property belongs to another source collection")
 				return
 			}
-			if _, ok := fresh(string(prop.Id)); !ok {
+			if _, ok := fresh("property", string(prop.Id)); !ok {
 				fail("duplicate or invalid property identity")
 				return
 			}
@@ -135,7 +140,7 @@ func (k *Kernel) restorePortableDatabase(p *ImportPlan, manifest portableHierarc
 			if options, ok := cfg["options"].([]any); ok {
 				for _, raw := range options {
 					if option, ok := raw.(map[string]any); ok {
-						if _, ok = fresh(str(option["id"])); !ok {
+						if _, ok = fresh("option", str(option["id"])); !ok {
 							fail("invalid option identity")
 							return
 						}
@@ -148,14 +153,14 @@ func (k *Kernel) restorePortableDatabase(p *ImportPlan, manifest portableHierarc
 				fail("record body page is absent")
 				return
 			}
-			if _, ok := fresh(r.ID); !ok {
+			if _, ok := fresh("record", r.ID); !ok {
 				fail("invalid record identity")
 				return
 			}
 			ids[r.PageID] = pages[r.PagePath]
 		}
 		for _, v := range c.Views {
-			if _, ok := fresh(v.ID); !ok {
+			if _, ok := fresh("view", v.ID); !ok {
 				fail("invalid view identity")
 				return
 			}
@@ -178,7 +183,7 @@ func (k *Kernel) restorePortableDatabase(p *ImportPlan, manifest portableHierarc
 			fail("readable CSV source is unavailable")
 			return
 		}
-		plan := PortableCollectionImport{CollectionID: ids[source.ID], PageID: pages[source.OwningPagePath], Title: csv.Title, Locator: source.Path, Properties: []contracts.DomainPropertyDefinition{}, Records: []portableRecordSource{}, Views: []portableViewSource{}}
+		plan := PortableCollectionImport{SchemaComplete: true, CollectionID: ids[source.ID], PageID: pages[source.OwningPagePath], Title: csv.Title, Locator: source.Path, Properties: []contracts.DomainPropertyDefinition{}, Records: []portableRecordSource{}, Views: []portableViewSource{}}
 		if source.Title != "" {
 			plan.Title = source.Title
 		}
@@ -243,6 +248,11 @@ func (k *Kernel) restorePortableDatabase(p *ImportPlan, manifest portableHierarc
 					return
 				}
 				local.Values[property] = value
+			}
+			for _, prop := range plan.Properties {
+				if prop.Type != "title" {
+					local.KnownProperties = append(local.KnownProperties, string(prop.Id))
+				}
 			}
 			plan.Records = append(plan.Records, local)
 		}
@@ -381,7 +391,7 @@ func rewritePortableDatabaseValue(v any, ids map[string]string, key string) any 
 			}
 			return x
 		}
-		references := map[string]bool{"id": true, "targetCollectionId": true, "bidirectionalPropertyId": true, "relationPropertyId": true, "targetPropertyId": true, "propertyId": true, "defaultOptionId": true, "doneOptionId": true, "reopenOptionId": true, "groupPropertyId": true, "datePropertyId": true, "coverPropertyId": true, "groupByPropertyId": true, "subgroupByPropertyId": true, "visiblePropertyIds": true, "fileId": true, "pageId": true, "recordId": true, "optionId": true}
+		references := map[string]bool{"id": true, "collectionId": true, "targetCollectionId": true, "bidirectionalPropertyId": true, "relationPropertyId": true, "targetPropertyId": true, "propertyId": true, "defaultOptionId": true, "doneOptionId": true, "reopenOptionId": true, "groupPropertyId": true, "datePropertyId": true, "coverPropertyId": true, "groupByPropertyId": true, "subgroupByPropertyId": true, "visiblePropertyIds": true, "fileId": true, "pageId": true, "recordId": true, "optionId": true}
 		if references[key] {
 			if id := ids[x]; id != "" {
 				return id
@@ -407,6 +417,15 @@ func rewritePortableDatabaseValue(v any, ids map[string]string, key string) any 
 		out := map[string]any{}
 		for k, v := range x {
 			out[k] = rewritePortableDatabaseValue(v, ids, k)
+		}
+		// Version-two AST/hash metadata is derived from the translated
+		// expression. Remapping property IDs must regenerate those references.
+		// Original source text and captured results remain retained evidence.
+		if expression := str(out["translatedExpression"]); expression != "" && number(out["evaluatorVersion"]) == 2 {
+			if ast, _, err := formulaCompileV2(expression); err == nil {
+				hash := sha256.Sum256([]byte(expression))
+				out["translatedAST"], out["expressionHash"] = ast, hex.EncodeToString(hash[:])
+			}
 		}
 		return out
 	}
@@ -439,6 +458,9 @@ func remapPortableDatabasePages(p *ImportPlan, ids map[string]string) {
 // commitPortableDatabase is one atomic final import unit. Canonical commands run
 // through their normal handlers and the frozen import plan's guarded IDs.
 func commitPortableDatabase(m *Mutation, p *ImportPlan) error {
+	if p.TypedDatabaseMerge {
+		return commitMergedImportDatabases(m, p)
+	}
 	if p.NotionKeepGraph {
 		return nil
 	}

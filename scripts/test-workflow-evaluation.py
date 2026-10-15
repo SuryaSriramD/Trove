@@ -1,0 +1,153 @@
+"""Independent consumer counterexamples for the declared workflow runners."""
+import copy
+import importlib.util
+import json
+import pathlib
+import unittest
+
+spec = importlib.util.spec_from_file_location('evaluation', pathlib.Path(__file__).with_name('run-expanded-evaluation.py'))
+m = importlib.util.module_from_spec(spec)
+spec.loader.exec_module(m)
+
+class WorkflowAccounting(unittest.TestCase):
+    def context(self):
+        contract = {'family': 'context', 'modelPackId': 'chosen', 'corpusSHA256': 'frozen'}
+        fact = 'Project Marigold launches on 14 April 2031.'
+        report = dict(contract, engineMode='native', releaseQualified=False, generationAttempts=1,
+            assertions={key: True for key in m.CONTEXT_ASSERTIONS['short-source']},
+            promptTokens=1000, outputCap=512, contextTokens=8192, retainedFact=True,
+            request={'pageId': 'source'}, sources=[{'text': fact}],
+            rawDraft=json.dumps({'title': '', 'claims': [{'text': fact, 'quote': fact}]}),
+            citations=[{'location': {'pageId': 'source'}, 'state': 'current'}])
+        return report, contract
+
+    def related(self):
+        contract = {'family': 'related', 'modelPackId': 'chosen', 'corpusSHA256': 'frozen'}
+        report = dict(contract, engineMode='native', releaseQualified=False,
+            assertions={key: True for key in m.RELATED_ASSERTIONS}, embeddingIdentity='a'*64,
+            embeddingCalls=3, sourceBindings={'current': 'self', 'relevant': 'yes', 'irrelevant': 'no', 'restricted': 'private'},
+            semanticResults={'mode': 'semantic', 'hits': [{'location': {'pageId': 'yes', 'sourceRevision': '2'}, 'excerpt': 'current'}]},
+            keywordFallback={'mode': 'keyword', 'warning': 'Semantic disabled'})
+        return report, contract
+
+    def memory(self, case='preference-on'):
+        contract = {'family': 'memory-lifecycle', 'modelPackId': 'chosen', 'corpusSHA256': 'frozen'}
+        included = case not in m.MEMORY_EXCLUDED_CASES
+        content = 'Use the heading Launch note for answers about Project Marigold.'
+        fact = 'Project Marigold launches on 14 April 2031.'
+        sources = [{'text': fact, 'location': {'pageId': 'primary'}}]
+        if included: sources.append({'text': content, 'memoryId': 'memory', 'location': {'pageId': 'support'}})
+        report = dict(contract, engineMode='native', releaseQualified=False,
+            generationAttempts=int(case in m.MEMORY_GENERATION_CASES),
+            assertions={key: True for key in m.MEMORY_ASSERTIONS[case]},
+            promptTokens=1000, outputCap=512, contextTokens=8192,
+            request={'pageId': 'primary', 'useMemory': case != 'preference-off', 'modelPackId': 'chosen'},
+            sources=sources, memoryId='memory', memoryPageId='backing', supportingPageId='support',
+            memoryContent=content, memoryIncluded=included, memoryStatus='active', preparedPrompt=content if included else fact,
+            rawDraft=json.dumps({'title': 'Launch note' if case == 'preference-on' else '', 'claims': [{'text': fact, 'quote': fact}]}),
+            citations=[{'location': {'pageId': 'primary'}, 'state': 'current'}])
+        return report, contract
+
+    def test_memory_generation_and_request_counterexamples(self):
+        for case in ('preference-on', 'preference-off'):
+            r, c = self.memory(case)
+            self.assertEqual(m.validate_workflow_report(r, case, c), [])
+            changes = [{'engineMode': 'deterministic'}, {'memoryIncluded': not r['memoryIncluded']},
+                {'memoryStatus': 'forgotten'}, {'sources': []}, {'generationAttempts': 0},
+                {'rawDraft': '{}'}, {'rawDraft': r['rawDraft'].replace('2031', '2032')},
+                {'citations': []}, {'promptTokens': -1}, {'outputCap': 0}, {'assertions': {}}]
+            for change in changes:
+                self.assertTrue(m.validate_workflow_report(dict(r, **change), case, c), change)
+            bad = copy.deepcopy(r)
+            bad['request']['useMemory'] = not bad['request']['useMemory']
+            self.assertTrue(m.validate_workflow_report(bad, case, c))
+        r, c = self.memory('preference-off')
+        r['preparedPrompt'] += r['memoryContent']
+        self.assertTrue(m.validate_workflow_report(r, 'preference-off', c))
+
+    def test_memory_forget_and_restore_boundary_counterexamples(self):
+        r, c = self.memory('forget-stream')
+        r.update(finishState='failed', finishText='', finishRejected=False, proposalRejected=True)
+        self.assertEqual(m.validate_workflow_report(r, 'forget-stream', c), [])
+        for change in ({'finishText': 'old memory'}, {'finishState': 'completed'}, {'proposalRejected': False}, {'generationAttempts': 1}):
+            self.assertTrue(m.validate_workflow_report(dict(r, **change), 'forget-stream', c))
+        r, c = self.memory('restore-forgotten')
+        r.update(memoryStatus='forgotten', relatedRejected=True, backupWorkspaceId='workspace', restoredWorkspaceId='workspace', restoredIndexRebuilt=True)
+        self.assertEqual(m.validate_workflow_report(r, 'restore-forgotten', c), [])
+        for change in ({'memoryStatus': 'active'}, {'relatedRejected': False}, {'restoredWorkspaceId': 'other'}, {'restoredIndexRebuilt': False}):
+            self.assertTrue(m.validate_workflow_report(dict(r, **change), 'restore-forgotten', c))
+        r, c = self.memory('older-backup')
+        r.update(backupWorkspaceId='workspace', restoredWorkspaceId='workspace', restoredIndexRebuilt=True,
+            sourceAfterBackupStatus='forgotten', restoreBoundary='A backup predating Forget retains the earlier approved memory state.',
+            nativeRestoreWarningAcceptancePending=True, manualSemanticReviewRequired=True)
+        self.assertEqual(m.validate_workflow_report(r, 'older-backup', c), [])
+        self.assertTrue(m.validate_workflow_report(dict(r, nativeRestoreWarningAcceptancePending=False), 'older-backup', c))
+
+    def test_case_inventory_is_complete_and_frozen(self):
+        root = m.ROOT / 'internal/workspace/testdata/expanded-evaluation'
+        for family in ('context', 'related', 'memory-lifecycle'):
+            filename, _, count = m.FAMILIES[family]
+            cases = json.loads((root/filename).read_text())['cases']
+            self.assertEqual(count, 12)
+            self.assertEqual(len({c['id'] for c in cases}), count)
+        self.assertEqual(set(m.MEMORY_ASSERTIONS), {c['id'] for c in json.loads((root/'memory-lifecycle.json').read_text())['cases']})
+        self.assertEqual(set(m.CONTEXT_ASSERTIONS), {c['id'] for c in json.loads((root/'context.json').read_text())['cases']})
+
+    def test_context_positive_and_absent_fact(self):
+        r, c = self.context()
+        self.assertEqual(m.validate_workflow_report(r, 'short-source', c), [])
+        r['assertions'] = {key: True for key in m.CONTEXT_ASSERTIONS['ending-fact']}
+        r.update(sources=[{'text': 'Unrelated evidence'}], retainedFact=False, citations=[],
+            rawDraft=json.dumps({'title': '', 'claims': [{'text': 'The supplied evidence does not answer this question.', 'quote': ''}]}))
+        self.assertEqual(m.validate_workflow_report(r, 'ending-fact', c), [])
+
+    def test_context_false_success_cannot_pass(self):
+        r, c = self.context()
+        changes = [
+            {'engineMode': 'deterministic'}, {'assertions': {}}, {'generationAttempts': 0},
+            {'generationAttempts': True}, {'modelPackId': 'substitute'}, {'corpusSHA256': 'changed'},
+            {'retainedFact': False}, {'sources': []}, {'promptTokens': 8192}, {'citations': []},
+            {'releaseQualified': True}, {'rawDraft': '{}'},
+            {'promptTokens': -100, 'outputCap': -512, 'contextTokens': 0},
+            {'outputCap': 1}, {'contextTokens': 9999}, {'promptTokens': -1},
+            {'rawDraft': r['rawDraft'].replace('2031', '2032')},
+            {'rawDraft': r['rawDraft'].replace('2031.', '2031. The launch is guaranteed to succeed.', 1)},
+        ]
+        for change in changes:
+            with self.subTest(change=change):
+                bad = dict(r, **change)
+                self.assertTrue(m.validate_workflow_report(bad, 'short-source', c))
+
+    def test_boundary_requires_no_generation_and_its_own_checks(self):
+        _, c = self.context()
+        r = dict(c, engineMode='native', releaseQualified=False, generationAttempts=0,
+            assertions={key: True for key in m.CONTEXT_ASSERTIONS['framing-cost']},
+            unframedTokens=200, framedTokens=220, contextTokens=728)
+        self.assertEqual(m.validate_workflow_report(r, 'framing-cost', c), [])
+        for change in ({'generationAttempts': 1}, {'framedTokens': 200}, {'contextTokens': 750}, {'unframedTokens': -600, 'framedTokens': -599, 'contextTokens': -72}):
+            self.assertTrue(m.validate_workflow_report(dict(r, **change), 'framing-cost', c))
+
+    def test_related_positive(self):
+        r, c = self.related()
+        self.assertEqual(m.validate_workflow_report(r, 'renewal', c), [])
+
+    def test_related_rejects_mock_scope_staleness_and_fallback_conflation(self):
+        r, c = self.related()
+        changes = [
+            {'embeddingIdentity': 'injected-provider:chosen'}, {'embeddingCalls': 0},
+            {'engineMode': 'deterministic'}, {'assertions': {}},
+            {'keywordFallback': {'mode': 'semantic', 'warning': ''}},
+            {'semanticResults': {'mode': 'keyword', 'hits': []}},
+        ]
+        for change in changes:
+            self.assertTrue(m.validate_workflow_report(dict(r, **change), 'renewal', c))
+        for page in ('private', 'self', 'no'):
+            bad = copy.deepcopy(r)
+            bad['semanticResults']['hits'].insert(0, {'location': {'pageId': page, 'sourceRevision': '2'}, 'excerpt': 'secret'})
+            self.assertTrue(m.validate_workflow_report(bad, 'renewal', c))
+        bad = copy.deepcopy(r)
+        bad['semanticResults']['hits'][0]['location']['sourceRevision'] = '1'
+        self.assertTrue(m.validate_workflow_report(bad, 'renewal', c))
+
+if __name__ == '__main__':
+    unittest.main()

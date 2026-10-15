@@ -166,3 +166,25 @@ func TestPageFreshnessReusableSourceAndFormattedRecordValues(t *testing.T) {
 		t.Fatal("formula definition change hidden", got)
 	}
 }
+
+func TestPageFreshnessReusableTodoTracksDueBinding(t *testing.T) {
+	k, e := testKernel(t)
+	f := newDatabase(t, k, e)
+	record, taskPage := newRecord(t, k, e, f, "Task")
+	secondDue := NewID()
+	testOK(t, dbBatch(t, k, e, []any{map[string]any{"kind": "collection.addProperty", "collectionId": f.collection, "propertyId": secondDue, "name": "Alternate due", "type": "date", "schemaVersion": 1, "config": map[string]any{}}}, "collection", f.collection, "property", secondDue))
+	promote := func(due string) {
+		testOK(t, dbBatch(t, k, e, []any{map[string]any{"kind": "task.promote", "recordId": record, "statusPropertyId": f.status, "duePropertyId": due}}, "page", taskPage, "record", record, "collection", f.collection, "property", f.status, "property", due))
+	}
+	promote(f.date)
+	sourcePage := createPage(t, k, e, "Source task reference")
+	page := createPage(t, k, e, "Shared task reference")
+	todo, synced := NewID(), NewID()
+	testOK(t, dbBatch(t, k, e, []any{map[string]any{"kind": "block.insert", "block": map[string]any{"blockId": todo, "pageId": sourcePage, "type": "todo", "schemaVersion": 1, "data": map[string]any{"taskRecordId": record}}}, map[string]any{"kind": "block.insert", "block": map[string]any{"blockId": synced, "pageId": page, "type": "synced_block", "schemaVersion": 1, "data": map[string]any{"contentSourceId": todo}}}}, "page", sourcePage, "page", page, "block", todo, "block", synced))
+	identity := testFreshness(t, k, page).ContentIdentity
+	testOK(t, dbBatch(t, k, e, []any{map[string]any{"kind": "page.review", "pageId": page, "contentIdentity": identity}}, "page", page))
+	promote(secondDue)
+	if got := testFreshness(t, k, page); got.State != "stale" {
+		t.Fatal("reused todo binding change hidden", got)
+	}
+}

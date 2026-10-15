@@ -75,6 +75,40 @@ export function OperationHistory({
   }
   if (!operations.length && !error) return null;
   function describe(action: S.OperationPreviewUndoResult["actions"][number]) {
+    if (action.kind === "collection.property.restore") {
+      const collection = workspace.collections.find((c) => c.id === action.collectionId)?.title ?? "Collection";
+      if (!action.definition) {
+        const name = workspace.properties.find((p) => p.id === action.propertyId)?.name ?? action.propertyId;
+        return `${collection}: remove unused property “${name}”.`;
+      }
+      return `${collection}: restore unused property “${action.definition.name}” as ${action.definition.type}, with its saved configuration ${JSON.stringify(action.definition.config)}.`;
+    }
+    if (
+      action.kind === "collection.layout.set" ||
+      action.kind === "record.layout.set"
+    ) {
+      const title =
+        action.kind === "collection.layout.set"
+          ? (workspace.collections.find((c) => c.id === action.collectionId)
+              ?.title ?? "Collection")
+          : (workspace.pages.find(
+              (p) =>
+                p.id ===
+                workspace.records.find((r) => r.id === action.recordId)?.pageId,
+            )?.title ?? "Record");
+      if (!action.layout)
+        return `${title}: ${action.kind === "collection.layout.set" ? "restore standard record layout" : "use collection layout"}`;
+      const name = (id: string) =>
+        workspace.properties.find((p) => p.id === id)?.name ??
+        `unavailable property ${id}`;
+      const sections = action.layout.sections
+        .map(
+          (s) =>
+            `${s.title || "Untitled section"} (${s.placement}): ${s.propertyIds.map(name).join(", ") || "empty"}`,
+        )
+        .join("; ");
+      return `${title}: ${sections || "no custom sections"}; hidden: ${action.layout.hiddenPropertyIds.map(name).join(", ") || "none"}. Unplaced properties remain visible.`;
+    }
     const pageId =
       "pageId" in action
         ? action.pageId

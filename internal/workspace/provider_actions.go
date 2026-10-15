@@ -28,7 +28,7 @@ func (b *ProviderBridge) proposeActions(ctx context.Context, c *providerConnecti
 	}
 	digest := sha256.Sum256(marshal(plan))
 	planHash := hex.EncodeToString(digest[:])
-	sum := sha256.Sum256([]byte(c.info.ID + ":" + key))
+	sum := sha256.Sum256([]byte(providerProposalNamespace(c) + ":" + key))
 	id := hex.EncodeToString(sum[:])
 	// Retry must return the already resolved plan even if names changed after its
 	// commit. It must never allocate a second set of canonical identities.
@@ -42,6 +42,9 @@ func (b *ProviderBridge) proposeActions(ctx context.Context, c *providerConnecti
 		}
 		if previous.PlanHash != planHash {
 			return nil, Fail("IDEMPOTENCY_CONFLICT", "Proposal retry changed its reviewed actions")
+		}
+		if c.skillInvocation != "" && previous.ConnectionID != c.info.ID && !result.Valid {
+			return b.persistProposal(ctx, c, map[string]any{"idempotencyKey": key, "commands": previous.Request.Commands, "expectedRevisions": previous.Request.Mutation.ExpectedRevisions}, planHash, previous.Changes)
 		}
 		previous.State = state
 		if result.Valid {
