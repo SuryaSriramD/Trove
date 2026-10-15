@@ -5,6 +5,7 @@ import {
   envelope,
   fileGuard,
   pageGuards,
+  requestID,
   type S,
   type WorkspaceSnapshot,
 } from "../api";
@@ -65,6 +66,7 @@ function Connections({
   const [error, setError] = useState("");
   const [notice, setNotice] = useState("");
   const [busy, setBusy] = useState(false);
+  const [sourceOperation, setSourceOperation] = useState("");
   const [manual, setManual] = useState("");
   const [destination, setDestination] = useState("");
   const [acquired, setAcquired] = useState<S.PrepareFileResult>();
@@ -73,6 +75,20 @@ function Connections({
   const account = accounts.find((a) => a.id === selected);
   const request = <T,>(method: string, data: object = {}) =>
     dispatch<T>(method, { ...envelope(workspace), ...data });
+  async function sourceRequest<T>(method: string, data: object) {
+    const operationId = requestID();
+    setSourceOperation(operationId);
+    try {
+      return await dispatch<T>(method, {
+        ...envelope(workspace),
+        ...data,
+        requestId: operationId,
+      });
+    } finally {
+      if (alive.current)
+        setSourceOperation((id) => (id === operationId ? "" : id));
+    }
+  }
   const current = (stamp: number) => alive.current && epoch.current === stamp;
   useEffect(() => {
     alive.current = true;
@@ -250,7 +266,7 @@ function Connections({
     });
   const showSource = (source: Source) =>
     act(async (stamp) => {
-      const result = await request<Source>("connectors.native.preview", {
+      const result = await sourceRequest<Source>("connectors.native.preview", {
         snapshotId: source.id,
       });
       if (current(stamp)) {
@@ -269,6 +285,24 @@ function Connections({
         Choose accounts and sources, refresh their local evidence, then review
         anything you import or send.
       </p>
+      {busy && <p role="status">Working on the selected connection…</p>}
+      {sourceOperation && (
+        <button
+          onClick={() =>
+            void request("connectors.native.cancel", {
+              operationId: sourceOperation,
+            })
+              .then(() =>
+                setNotice(
+                  "Cancellation requested. A completed result may still be retained.",
+                ),
+              )
+              .catch((e) => setError(message(e)))
+          }
+        >
+          Cancel source operation
+        </button>
+      )}
       {error && <p role="alert">{error}</p>}
       {notice && <p role="status">{notice}</p>}
       <div className="connection-columns">
@@ -804,7 +838,7 @@ function Connections({
             disabled={busy}
             onClick={() =>
               void act(async (stamp) => {
-                const plan = await request<{ planId: string }>(
+                const plan = await sourceRequest<{ planId: string }>(
                   "connectors.native.import",
                   {
                     snapshotId: preview.id,
@@ -823,7 +857,7 @@ function Connections({
               disabled={busy}
               onClick={() =>
                 void act(async (stamp) => {
-                  const file = await request<S.PrepareFileResult>(
+                  const file = await sourceRequest<S.PrepareFileResult>(
                     "connectors.native.acquire",
                     {
                       snapshotId: preview.id,

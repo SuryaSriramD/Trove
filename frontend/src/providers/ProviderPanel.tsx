@@ -40,7 +40,13 @@ type Proposal = {
   }[];
   result?: unknown;
 };
-export function ProviderPanel({
+export function ProviderPanel(
+  props: Parameters<typeof ProviderPanelContent>[0],
+) {
+  return <ProviderPanelContent key={props.workspace.workspaceId} {...props} />;
+}
+
+function ProviderPanelContent({
   skill,
   skillProvider,
   workspace,

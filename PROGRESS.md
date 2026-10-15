@@ -2,7 +2,7 @@
 
 **The single current development and progress tracker for this project.** Read and update this file for every meaningful implementation change, investigation, test result, decision, blocker and handoff. This is not an automatically running monitor.
 
-Last updated: **2026-10-15 20:25 IST**. User-facing dates use **Asia/Kolkata (IST, UTC+05:30)**; source artifacts may retain UTC timestamps.
+Last updated: **2026-10-15 20:43 IST**. User-facing dates use **Asia/Kolkata (IST, UTC+05:30)**; source artifacts may retain UTC timestamps.
 
 This file consolidates the original 51-item backlog, the newly selected desktop scope, current qualification, next actions and development history. Earlier status pages are historical snapshots. Machine-readable contracts, the legacy registry and immutable qualification records remain supporting inputs/evidence; they are not additional human progress dashboards. Their frozen bytes must not be rewritten to make a status look current.
 
@@ -33,7 +33,7 @@ Candidate 7's focused 22-case prompt experiment was rejected and production prom
 
 | Location | Branch / source | Current interpretation |
 | --- | --- | --- |
-| Primary project: `/Volumes/HD-B1/HD-Projects/Trove` | `codex/macos-feature-completion`, current integrated source `12911e2` | Baseline `ee14f0c`; shared foundations `0ed5350`, G02 `2b421a4`, G03 `950cea5`/`6e713bc` and G01 page merge `2279bf0`/`a3f9e54` integrated. See the development log for subsequent commits and current verification. |
+| Primary project: `/Volumes/HD-B1/HD-Projects/Trove` | `codex/macos-feature-completion`, current integrated source `29f67f8` | Baseline `ee14f0c`; shared foundations `0ed5350`, G02 `2b421a4`, G03 `950cea5`/`6e713bc` and G01 page merge `2279bf0`/`a3f9e54` integrated. See the development log for subsequent commits and current verification. |
 | Latest development worktree: `/Users/suryasriramduvvuri/.codex/worktrees/macos-p0-title-context/Trove` | `codex/macos-p0-title-context`, `299e43df9b716f771125d939ad320c3cb595f2c7` | Candidate 7 source. One descendant commit containing tests, fixtures, telemetry and execution documentation. |
 
 Keep candidate 7's execution in its declared worktree. Review and integrate the descendant commit separately; do not rebuild a package just to align a checkout. A product/binary/policy change requires a new candidate and affected fresh evidence.
@@ -62,8 +62,8 @@ Scope-addendum validation at DEV-007: **passed for documentation only**. Checks 
 | 2 | GOV-001 / GOV-003: source alignment | Integrated baseline | Continue implementation from merge `ee14f0c`; retain candidate-7 evidence/worktree | Reviewed diff, source identity and affected validation; candidate-7 artifacts preserved |
 | 3 | G01 / G02 / G08–10: shared foundations | In progress | Implement real three-way merge, canonical task editing/extraction identity, grouped undo and semantic freshness identity | Meaningful conflict/retry/preservation tests and versioned contracts |
 | 4 | G03 / G05 / G06 | G03/G05/G06 integrated; native acceptance pending | Encrypted portable backup, recording controls/correction/retention and reminder-only helper | Usable native workflow plus failure/recovery evidence |
-| 5 | G07–10 / AI-* / EVAL-* | Planned / partial foundations | Skills/autofill/freshness/layouts/rescheduling; repair demonstrated AI failures and complete evaluation runners | Focused current-source checks; full historical candidate-7 baseline is not a prerequisite |
-| 6 | CONN-00–06 / EXT-* / P2-01–09 | Planned / existing foundations | Complete adapters, managed providers/MCP and existing P2 packages | Production integration; real-account/device prerequisites tracked separately |
+| 5 | G07–10 / AI-* / EVAL-* | G07–10 integrated; evaluation repairs in progress | Verify integrated skills/autofill/freshness/layouts/rescheduling; complete remaining evaluation runners | Focused current-source checks; full historical candidate-7 baseline is not a prerequisite |
+| 6 | CONN-00–06 / EXT-* / P2-01–09 | Six initial adapters and Connections UI integrated; gaps active | Complete Gmail origin propagation, Notion capture depth, managed providers/MCP and existing P2 workflows | Production integration; real-account/device prerequisites tracked separately |
 | 7 | REL-001–008: macOS release | After functionality integration | Complete final candidate, native/device, signing/install/recovery and bounded performance qualification | Exact signed artifact with all applicable criteria satisfied |
 | 8 | WIN-* / LIN-* / G11 | Subsequent platforms; mobile deferred | Implement/qualify Windows and Linux after full macOS functionality; revisit mobile only after desktop | Independent platform evidence and explicit later mobile decision |
 
@@ -107,8 +107,8 @@ The October 12 report covers 39 Notion feature labels and 12 recommendations. It
 | M0 — Consolidated project | Source alignment, this tracker, requirements and new scope | In progress | One current source baseline and progress record; evidence/owners/acceptance mapped |
 | M1 — Core correctness | Existing FIX/CORE, AI defects, preservation, missing evaluation runners | In progress | Actual failures repaired with independent regressions and no dropped acceptance |
 | M2 — macOS P0 | Native workflows, real migration/audio, meeting controls, backup/install/recovery/distribution | Unqualified | Final macOS P0 candidate and all applicable criteria pass |
-| M3 — Full personal desktop | Existing PARITY/AI actions plus G06–G10 | Source foundations; new features planned | Packaged native behavior, history, restart and recovery verified |
-| M4 — Live integrations | Existing managed providers/inbound MCP and CONN-00–06 | Partial existing implementation; new adapters planned | Authorized live flows, revocation, resume and reviewed effects verified |
+| M3 — Full personal desktop | Existing PARITY/AI actions plus G06–G10 | Integrated source; focused verification and acceptance pending | Packaged native behavior, history, restart and recovery verified |
+| M4 — Live integrations | Existing managed providers/inbound MCP and CONN-00–06 | Initial adapters/interface integrated; remaining gaps and live acceptance pending | Authorized live flows, revocation, resume and reviewed effects verified |
 | M5 — P2 packages | P2-01–09 and expanded model/image/review work | Source foundations; qualification pending | Each package passes its declared persistence, authority and recovery scope |
 | M6 — Windows | Windows 11 x64 native implementation and release | Foundation only | Native durability, containment, devices, installation/update and portability pass |
 | M7 — Linux | Ubuntu 24.04 x64 native implementation and release | Foundation only | Native containment, PDF/providers, devices, installation/update and portability pass |
@@ -957,6 +957,16 @@ Final autofill workspace and protocol suite passed **37 tests/subtests, zero ski
 **Verification:** Coordinator import/service bridge campaign `/private/tmp/trove-connectors-ui-bridge-race-v1.jsonl` passed eight tests/subtests, zero failures/skips; root/contracts compiled with no matching tests. Earlier connector import-only rerun passed seven after correcting the test's nonexistent page.rename command. Current TypeScript check passed. Actual-component browser fixture `/private/tmp/trove-connectors-browser-v3.json` passed all three cases: source selection and exact write review, unknown reconciliation without a resend, stale-preview rejection, late response isolation after workspace switch, and native authorization cancellation. The first browser run had two passes and one locator timeout; corrected to the rendered combobox role, with all three passing in both subsequent runs. New Drive-content regression initially used a calendar-kind fixture selection; corrected to file selection and rerunning. These use mocked provider/bridge boundaries and do not establish live account acceptance.
 
 **Next:** Integrate the completed memory-lifecycle runner; persist Gmail asset/derived-context restrictions before exposing its acquisition; finish schema recovery/conversion, remaining evaluation runners, managed-provider and desktop/P2 gaps. Complete feature integration remains in progress. Full native notification/account, representative-data, model-family, performance, signing/install and release acceptance remain pending.
+
+### DEV-027 — 15 October 2026, 20:43 IST: memory evaluation, connection cancellation and workspace isolation
+
+**Source:** `8552b57` checkpoints the Connections interface/native bridge and local composition/recovery work. `acc33d0` adds the memory-lifecycle runner and independent consumers: worker evidence records 18 focused Go passes, 42 Python passes and four selected real-model cases, with unchanged canonical before/after snapshots. Evidence is retained at `evidence/completion/workflow-memory-20261015-v1`; `fullFamilyRun=false` and `automatedCorpusPassed=false`. `29f67f8` integrates ordered model-operation progress, reopen recovery and stale-response rejection. Worker model UI checks failed three cases before repair and passed four afterward; four focused native model checks passed. These are focused results, not full-family or release acceptance.
+
+**Repairs in this checkpoint:** Authenticated connector previews/import preparation/acquisition now share the bounded native flight registry, expose cancellation and retain honest completion-race outcomes. Managed-provider UI is remounted per workspace so pairing tokens, scoped context and proposals cannot remain visible after switching workspaces. A synthetic actual-component regression reproduced the retained pairing token before repair; a separate late-response test passed before repair and is not claimed as a second reproduced failure.
+
+**Current checks:** `/private/tmp/trove-source-cancellation-model-progress-race.jsonl` records **12 tests/subtests passed, zero failures/skips**. TypeScript and **56 frontend unit tests** passed. `/private/tmp/trove-connections-providers-models-browser-v4.json` records **15 browser tests passed, zero skips** across Connections, managed-provider workflows, model acquisition recovery, workspace isolation and scoped remote MCP consent. An earlier combined browser run had six passes and one remote-MCP fixture failure; its cause was not established, and its evidence is preserved. The final run completed with source edits paused. `/private/tmp/trove-connectors-content-race-v2.jsonl` passed 41 Notion/Google/Drive tests/subtests, zero failures/skips after correcting the previously recorded selection-kind fixture. The frontend production build passed at the preceding Connections checkpoint; that artifact predates the latest provider/cancellation/model UI changes and is not current-build evidence.
+
+**Next:** Integrate schema recovery only after the independently found evaluator-v1 formula-dependency guard is repaired. Complete Gmail attachment/derived-content policy and portable recovery before enabling its acquisition. Continue populated schema conversion, deeper Notion capture, capture/P2 workflow repairs, and the remaining image/personal-review evaluation runners. No aggregate feature-completion percentage, live-account/device acceptance, final candidate or release approval is claimed.
 
 <a id="commit-history"></a>
 ## Recorded source-development history

@@ -134,7 +134,9 @@ window.go = {
               message: "External content changed; inspect its latest preview",
             },
           });
-        } else if (method === "connectors.native.authBegin")
+        } else if (method === "connectors.native.cancel")
+          result = { state: "cancellation_requested" };
+        else if (method === "connectors.native.authBegin")
           result = {
             id: id(6),
             kind: r.registration.kind,

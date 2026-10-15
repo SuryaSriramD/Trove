@@ -98,3 +98,30 @@ test("native authorization can be cancelled", async ({ page }) => {
   expect(request.registration.kind).toBe("google_drive");
   expect(JSON.stringify(request)).not.toContain("password");
 });
+
+test("source cancellation targets the active request and creates no import", async ({
+  page,
+}) => {
+  await page.goto(url);
+  await page.getByRole("button", { name: "Search", exact: true }).click();
+  await page.evaluate(() => {
+    (window as any).holdConnectorPreview = true;
+  });
+  await page.getByRole("button", { name: /Remote issue/ }).click();
+  await page.getByRole("button", { name: "Cancel source operation" }).click();
+  await expect(
+    page.getByRole("status").filter({ hasText: "Cancellation requested" }),
+  ).toBeVisible();
+  const calls = await page.evaluate(() => (window as any).connectorCalls);
+  expect(
+    calls.find((c: any) => c.method === "connectors.native.cancel").request
+      .operationId,
+  ).toBe(
+    calls.find((c: any) => c.method === "connectors.native.preview").request
+      .requestId,
+  );
+  expect(calls.some((c: any) => c.method === "connectors.native.import")).toBe(
+    false,
+  );
+  await page.evaluate(() => (window as any).resolveConnectorPreview());
+});
