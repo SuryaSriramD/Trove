@@ -252,7 +252,10 @@ func (k *Kernel) aiSources(ctx context.Context, e contracts.ServiceExecutionCont
 		if n > 0 {
 			return
 		}
-		key := string(marshal(loc))
+		// Distinct indexed excerpts of one block share a navigation location.
+		// Deduplicate exact evidence, not the location: otherwise later chunks
+		// silently disappear before the measured context can report omissions.
+		key := string(marshal(loc)) + ":" + searchDigest(text)
 		if !seen[key] && len(strings.TrimSpace(text)) > 0 {
 			seen[key] = true
 			out = append(out, AIEvidence{Title: title, Text: text, Location: loc})
@@ -293,6 +296,11 @@ func (k *Kernel) aiSources(ctx context.Context, e contracts.ServiceExecutionCont
 			}
 			var loc contracts.DomainLocation
 			json.Unmarshal([]byte(raw), &loc)
+			// The selected block above was loaded in full. Its indexed fragments
+			// would duplicate the literal source and cannot replace that full copy.
+			if r.BlockID != "" && loc.BlockId != nil && string(*loc.BlockId) == r.BlockID {
+				continue
+			}
 			add(title, text, loc)
 		}
 		err = rows.Err()

@@ -1,0 +1,25 @@
+{
+  "purpose": "Private evaluation-only helper assembly; no device or release qualification",
+  "candidate7HelpersSource": "/Users/suryasriramduvvuri/.codex/visualizations/2026/10/07/01a11771-2f4b-7551-8ea0-b738e67080db/trove-p0-next-20261011-1810/candidate-7/Trove.app/Contents/Resources/native",
+  "microphoneSource": "/private/tmp/trove-g05-followup-production",
+  "inputs": {
+    "/Users/suryasriramduvvuri/.codex/visualizations/2026/10/07/01a11771-2f4b-7551-8ea0-b738e67080db/trove-p0-next-20261011-1810/candidate-7/Trove.app/Contents/Resources/native/manifest.json": "c622006085c69956fefd947966c6198a3373d1be3f0590ef37624a2495ec951f",
+    "/Users/suryasriramduvvuri/.codex/visualizations/2026/10/07/01a11771-2f4b-7551-8ea0-b738e67080db/trove-p0-next-20261011-1810/candidate-7/Trove.app/Contents/Resources/native/llama-worker": "6bdae1f55891d9df40f40eb7ac9e4a5fccfb93fd22f30fda181554a1c2b2c9af",
+    "/private/tmp/trove-g05-followup-production/microphone-worker.json": "f467028caddcb324b59c4a692d89c418d09a657e397249e27362d8e22acf08df",
+    "/private/tmp/trove-g05-followup-production/microphone-worker": "1227b1506c50426fe3579f1232697b07f6f31ecad7f51f5220bb510893ba1624"
+  },
+  "files": {
+    "microphone-worker": "1227b1506c50426fe3579f1232697b07f6f31ecad7f51f5220bb510893ba1624",
+    "pdf-renderer": "6329e8e63df8cb3cb2c4043e490a8f1a0007d5c704c7bbf4034d8722745b9964",
+    "whisper-worker": "5b6996956ca7412bf3cd79aedb225eda7d98ab08eb7415f754362e257302f488",
+    "document-extractor": "ef7f2543226846f39283ba325f4699c10b92b22fcf19828b11c1fbcf2b80f75d",
+    "audio-decoder.json": "82b73182fd7f973903cb08219e8b64b6c1a53dabedac6ab45b5817af4a87a5cb",
+    "document-extractor.json": "fae8680d007214f5e6769aa6205a2f88941f4287474d34b00adcd205695e2425",
+    "llama-worker": "6bdae1f55891d9df40f40eb7ac9e4a5fccfb93fd22f30fda181554a1c2b2c9af",
+    "manifest.json": "200af0d30a315188c56359fe7d6b7eb75f08042ee2bf5d8d3430c8d2783e6d4b",
+    "vision-worker": "edb38d66cfbc7e8feacdebc422cc55cbd914f7ce32fdabaf251be902c8bb1744",
+    "pdf-renderer.json": "2d7c6a0ea0de7b38d4d05e33f056fd7e206308f39a98727c2722e07ac5a0708b",
+    "audio-decoder": "8e582101947184849b89596568f89394ba5c88a654511d8f5b2974f290e70719",
+    "microphone-worker.json": "f467028caddcb324b59c4a692d89c418d09a657e397249e27362d8e22acf08df"
+  }
+}
