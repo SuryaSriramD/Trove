@@ -24,6 +24,13 @@ CLAIMS: Give the requested facts once each, in order. A direct question about a 
 EVIDENCE: Match the requested entity and attribute to its evidence. A recorded value or explicit absent, unassigned or unscheduled state supports that same attribute even when no positive value can be named; sharing only the subject or topic is insufficient. When supported, cite the exact supporting span. Otherwise use the exclusive abstention defined above. Return only the cited JSON.
 `
 
+// Answer-mode guidance is separate from citation validity: an exact source
+// quotation can still answer a different question. The example is policy only;
+// it never enters captured sources or the permitted evidence-quote grammar.
+const aiAnswerabilityContract = `
+ANSWERABILITY EXAMPLE (guidance, not evidence): Asked for Lift Orin's maximum load, "painted blue" requires abstention; "load unspecified" supports that state; "maximum load 800 kg" supports 800 kg. Do not substitute unrelated facts.
+`
+
 // Source-grounded prose may elaborate the writing, but not the underlying
 // record. Keep proposed additions visibly separate from asserted source facts.
 const aiProseResponseContract = `

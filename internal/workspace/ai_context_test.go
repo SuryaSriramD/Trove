@@ -269,6 +269,10 @@ func TestAICitedPreferenceSectionUsesTheMeasuredContextBudget(t *testing.T) {
 func TestAICitedResponseContractIsMeasuredWithoutInterpretingTheEvidence(t *testing.T) {
 	for _, mode := range []string{"answer", "summarize", "explain"} {
 		t.Run(mode, func(t *testing.T) {
+			answerabilityCount := 0
+			if mode == "answer" {
+				answerabilityCount = 1
+			}
 			request := AIRequest{Mode: mode, Prompt: "Return two complete sentences in the requested order.", Selection: "Selected source remains unchanged."}
 			sources := []AIEvidence{{Text: "The room has not been selected. The meeting day is Monday."}}
 			budget := wordBudget()
@@ -280,6 +284,9 @@ func TestAICitedResponseContractIsMeasuredWithoutInterpretingTheEvidence(t *test
 				for i, prompt := range prompts {
 					if strings.Count(prompt.User, aiCitedResponseContract) != 1 || strings.Count(prompt.User, "\nUSER REQUEST\n"+request.Prompt) != 1 || !strings.HasSuffix(prompt.User, "\nUSER REQUEST\n"+request.Prompt) || strings.Index(prompt.User, aiCitedResponseContract) > strings.Index(prompt.User, "\nSELECTED TEXT\n"+request.Selection) {
 						t.Fatal("measured contract and exact selection must precede the final complete request")
+					}
+					if strings.Count(prompt.User, aiAnswerabilityContract) != answerabilityCount || strings.Contains(prompt.System, aiAnswerabilityContract) {
+						t.Fatal("answerability guidance escaped its measured answer-mode scope")
 					}
 					measured[prompt.System+prompt.User] = counts[i]
 				}
@@ -295,6 +302,10 @@ func TestAICitedResponseContractIsMeasuredWithoutInterpretingTheEvidence(t *test
 			if measured[prepared.System+prepared.Prompt] != prepared.PromptTokens || prepared.OutputTokens != 512 || prepared.PromptTokens+prepared.OutputTokens+16 > budget.ContextTokens {
 				t.Fatal("contract bypassed the token budget", prepared)
 			}
+			grammar, err := aiCitedGrammarForSources(prepared.Run.Sources)
+			if err != nil || strings.Contains(grammar, "Lift Orin") {
+				t.Fatal("illustrative guidance became answer evidence", err)
+			}
 			// The same policy applies when a different field is absent, known,
 			// or not mentioned. No source keyword can decide answerability here.
 			for _, source := range []string{"The meeting is Monday.", "The meeting location has not been selected.", "No budget was approved; the meeting day is unknown."} {
@@ -309,7 +320,7 @@ func TestAICitedResponseContractIsMeasuredWithoutInterpretingTheEvidence(t *test
 	for _, tc := range []struct{ mode, system string }{{"code_explain", ""}, {"answer", "Private review contract."}} {
 		request := AIRequest{Mode: tc.mode, Prompt: "Review this source.", Selection: "Complete selected bytes.", UseMemory: true}
 		prepared, err := prepareAIContextWithSystem(context.Background(), request, []AIEvidence{{Text: "The meeting is Monday."}}, nil, "", wordBudget(), tc.system)
-		if err != nil || strings.Contains(prepared.Prompt, aiCitedResponseContract) {
+		if err != nil || strings.Contains(prepared.Prompt, aiCitedResponseContract) || strings.Contains(prepared.System+prepared.Prompt, aiAnswerabilityContract) {
 			t.Fatal("cited contract leaked into a different output protocol", prepared, err)
 		}
 		if !strings.Contains(prepared.Prompt, "\nUSER REQUEST\n"+request.Prompt+"\nSELECTED TEXT\n"+request.Selection+"\nApproved memories may supply preferences") {
