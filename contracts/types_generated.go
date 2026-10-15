@@ -3075,6 +3075,12 @@ type ServiceOCRRunRequest struct {
 	WorkspaceId     DomainId `json:"workspaceId"`
 	FileId          DomainId `json:"fileId"`
 }
+type ServiceOCRCancelRequest struct {
+	ContractVersion int64    `json:"contractVersion"`
+	RequestId       DomainId `json:"requestId"`
+	WorkspaceId     DomainId `json:"workspaceId"`
+	RunRequestId    DomainId `json:"runRequestId"`
+}
 type ServicePlanCreatePage struct {
 	Kind        string  `json:"kind"`
 	Destination string  `json:"destination"`

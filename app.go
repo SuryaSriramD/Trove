@@ -175,6 +175,8 @@ func (a *App) shutdown(context.Context) {
 	a.cancelBackupOperation()
 	a.closeBackupPreviews()
 	a.stopReminderLoop()
+	resumeOCR := a.cancelOCRForLifecycle()
+	defer resumeOCR()
 	a.lifecycle.Lock()
 	defer a.lifecycle.Unlock()
 	a.stopClipper()
@@ -208,10 +210,21 @@ func (a *App) shutdown(context.Context) {
 		k.Close()
 	}
 }
+func (a *App) cancelOCRForLifecycle() func() {
+	a.mu.RLock()
+	k := a.kernel
+	a.mu.RUnlock()
+	if k != nil {
+		return k.SuspendOCR()
+	}
+	return func() {}
+}
 func (a *App) open(path string, create bool) error {
 	if err := a.requireRollbackCommitted(); err != nil {
 		return err
 	}
+	resumeOCR := a.cancelOCRForLifecycle()
+	defer resumeOCR()
 	a.lifecycle.Lock()
 	defer a.lifecycle.Unlock()
 	return a.openLocked(path, create)

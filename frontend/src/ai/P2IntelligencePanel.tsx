@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react";
+import { useRequestLifetime } from "../requestLifetime";
 import { ImageUnderstanding } from "./ImageUnderstanding";
 import {
   batch,
@@ -99,7 +100,17 @@ type OCR = {
   acceptedLines: number;
   rejectedLines: number;
 };
-export function P2IntelligencePanel({
+export function P2IntelligencePanel(
+  props: Parameters<typeof P2IntelligenceContent>[0],
+) {
+  return (
+    <P2IntelligenceContent
+      key={`${props.workspace.workspaceId}:${props.workspace.scopeGrantId}`}
+      {...props}
+    />
+  );
+}
+function P2IntelligenceContent({
   workspace,
   refresh,
   onNavigate,
@@ -115,10 +126,16 @@ export function P2IntelligencePanel({
   const [focus, setFocus] = useState(pageId ?? workspace.pages[0]?.id ?? "");
   const [tab, setTab] = useState("graph"),
     [busy, setBusy] = useState(false);
-  const [graph, setGraph] = useState<Graph | null>(null),
+  const [graphResult, setGraphResult] = useState<{
+      key: string;
+      value: Graph;
+    } | null>(null),
     [semantic, setSemantic] = useState(false),
     [query, setQuery] = useState("");
-  const [reviews, setReviews] = useState<Reviews | null>(null),
+  const [reviewResult, setReviewResult] = useState<{
+      key: string;
+      value: Reviews;
+    } | null>(null),
     [reviewName, setReviewName] = useState("Personal review"),
     [time, setTime] = useState("09:00"),
     [frequency, setFrequency] = useState("daily"),
@@ -136,10 +153,41 @@ export function P2IntelligencePanel({
   const [ocrStatus, setOCRStatus] = useState<OCRStatus | null>(null),
     [ocr, setOCR] = useState<OCR | null>(null),
     [imageId, setImageId] = useState("");
+  const scopeKey = `${workspace.workspaceId}:${workspace.scopeGrantId}:${workspace.snapshotCursor}`;
+  const currentScope = useRequestLifetime(scopeKey);
+  const graphKey = JSON.stringify([scopeKey, focus, semantic, query]);
+  const currentGraph = useRequestLifetime(graphKey);
+  const graph = graphResult?.key === graphKey ? graphResult.value : null;
+  const reviews = reviewResult?.key === scopeKey ? reviewResult.value : null;
+  const graphRequest = useRef(0),
+    reviewRequest = useRef(0),
+    actionRequest = useRef(0);
+  const [ocrPending, setOCRPending] = useState("");
+  const [ocrNotice, setOCRNotice] = useState("");
+  const [ocrCancelling, setOCRCancelling] = useState(false);
+  const ocrFlight = useRef<
+    { id: string; workspace: WorkspaceSnapshot } | undefined
+  >(undefined);
   const ocrRequest = useRef(0);
+  useEffect(() => {
+    actionRequest.current++;
+    setBusy(false);
+  }, [scopeKey]);
+  useEffect(
+    () => () => {
+      const flight = ocrFlight.current;
+      if (flight)
+        void dispatch("ocr.cancel", {
+          ...envelope(flight.workspace),
+          runRequestId: flight.id,
+        }).catch(() => {});
+    },
+    [],
+  );
   useEffect(() => {
     ocrRequest.current += 1;
     setOCR(null);
+    setOCRNotice("");
     return () => {
       ocrRequest.current += 1;
     };
@@ -150,78 +198,122 @@ export function P2IntelligencePanel({
     imageId,
   ]);
   const extractOCR = async () => {
+    if (ocrFlight.current) return;
     const request = ++ocrRequest.current;
-    const result = await dispatch<OCR>("ocr.run", {
-      ...envelope(workspace),
-      fileId: imageId,
-    });
-    if (request === ocrRequest.current) setOCR(result);
+    const input = { ...envelope(workspace), fileId: imageId };
+    ocrFlight.current = { id: input.requestId, workspace };
+    setOCRPending(input.requestId);
+    setOCRNotice("Extracting image text locally…");
+    setOCRCancelling(false);
+    try {
+      const result = await dispatch<OCR>("ocr.run", input);
+      if (currentScope() && request === ocrRequest.current) {
+        setOCR(result);
+        setOCRNotice("Image text extracted.");
+      }
+    } catch (error) {
+      if (currentScope() && request === ocrRequest.current) {
+        if (error instanceof Error && error.name === "CANCELLED")
+          setOCRNotice(
+            "Extraction cancelled. Earlier extracted text is preserved.",
+          );
+        else {
+          setOCRNotice(
+            "Extraction failed. Earlier extracted text is preserved.",
+          );
+          onError(error);
+        }
+      }
+    } finally {
+      if (ocrFlight.current?.id === input.requestId) {
+        ocrFlight.current = undefined;
+        setOCRPending("");
+        setOCRCancelling(false);
+      }
+    }
+  };
+  const cancelOCR = async () => {
+    const flight = ocrFlight.current;
+    if (!flight) return;
+    setOCRCancelling(true);
+    try {
+      await dispatch("ocr.cancel", {
+        ...envelope(flight.workspace),
+        runRequestId: flight.id,
+      });
+    } catch (error) {
+      if (currentScope()) {
+        setOCRCancelling(false);
+        onError(error);
+      }
+    }
   };
   const page = workspace.pages.find((p) => p.id === focus);
   const imageFiles = workspace.files.filter((f) =>
     ["image/png", "image/jpeg"].includes(f.mediaType),
   );
   const run = async (fn: () => Promise<void>) => {
+    const request = ++actionRequest.current;
     setBusy(true);
     try {
       await fn();
-    } catch (e) {
-      onError(e);
+    } catch (error) {
+      if (currentScope() && request === actionRequest.current) onError(error);
     } finally {
-      setBusy(false);
+      if (currentScope() && request === actionRequest.current) setBusy(false);
     }
   };
-  const loadReviews = async () =>
-    setReviews(await dispatch<Reviews>("review.list", envelope(workspace)));
+  const loadReviews = async () => {
+    if (!currentScope()) return;
+    const request = ++reviewRequest.current;
+    try {
+      const value = await dispatch<Reviews>("review.list", envelope(workspace));
+      if (currentScope() && request === reviewRequest.current)
+        setReviewResult({ key: scopeKey, value });
+    } catch (error) {
+      if (currentScope() && request === reviewRequest.current) throw error;
+    }
+  };
   useEffect(() => {
-    let active = true;
-    Promise.all([
-      dispatch<OCRStatus>("ocr.status", envelope(workspace)),
-      dispatch<Reviews>("review.list", envelope(workspace)),
-    ])
-      .then(([status, r]) => {
-        if (active) {
-          setOCRStatus(status);
-          setReviews(r);
-        }
+    void loadReviews().catch(onError);
+    void dispatch<OCRStatus>("ocr.status", envelope(workspace))
+      .then((status) => {
+        if (currentScope()) setOCRStatus(status);
       })
-      .catch(onError);
-    return () => {
-      active = false;
-    };
-  }, [workspace.workspaceId, workspace.scopeGrantId, workspace.snapshotCursor]);
+      .catch((error) => {
+        if (currentScope()) onError(error);
+      });
+  }, [scopeKey]);
   useEffect(() => {
     if (pageId) {
       setFocus(pageId);
       setSource(pageId);
     }
   }, [pageId]);
-  const loadGraph = async () =>
-    setGraph(
-      await dispatch<Graph>("graph.query", {
+  const loadGraph = async () => {
+    const request = ++graphRequest.current;
+    try {
+      const value = await dispatch<Graph>("graph.query", {
         ...envelope(workspace),
         pageId: focus,
         includeSemantic: semantic,
         query,
         limit: 60,
-      }),
-    );
+      });
+      if (currentGraph() && request === graphRequest.current)
+        setGraphResult({ key: graphKey, value });
+    } catch (error) {
+      if (currentGraph() && request === graphRequest.current) throw error;
+    }
+  };
   useEffect(() => {
     if (!reviews?.runs.some((r) => ["queued", "generating"].includes(r.status)))
       return;
-    let active = true;
     const timer = setInterval(() => {
-      dispatch<Reviews>("review.list", envelope(workspace))
-        .then((r) => {
-          if (active) setReviews(r);
-        })
-        .catch(onError);
+      void loadReviews().catch(onError);
     }, 2000);
-    return () => {
-      active = false;
-      clearInterval(timer);
-    };
-  }, [reviews?.runs, workspace.workspaceId]);
+    return () => clearInterval(timer);
+  }, [reviews?.runs, scopeKey]);
   const createPlan = async () => {
     if (
       !page ||
@@ -486,7 +578,7 @@ export function P2IntelligencePanel({
                     <button
                       onClick={() => {
                         setFocus(n.id);
-                        setGraph(null);
+                        setGraphResult(null);
                       }}
                     >
                       Focus here
@@ -545,6 +637,7 @@ export function P2IntelligencePanel({
             Attached image{" "}
             <select
               value={imageId}
+              disabled={Boolean(ocrPending)}
               onChange={(e) => setImageId(e.target.value)}
             >
               <option value="">Choose image</option>
@@ -556,11 +649,21 @@ export function P2IntelligencePanel({
             </select>
           </label>
           <button
-            disabled={busy || !ocrStatus?.available || !imageId}
-            onClick={() => void run(extractOCR)}
+            disabled={
+              busy || Boolean(ocrPending) || !ocrStatus?.available || !imageId
+            }
+            onClick={() => void extractOCR()}
           >
             Extract image text locally
           </button>
+          {ocrPending && (
+            <button disabled={ocrCancelling} onClick={() => void cancelOCR()}>
+              {ocrCancelling
+                ? "Cancelling extraction…"
+                : "Cancel image text extraction"}
+            </button>
+          )}
+          {ocrNotice && <p role="status">{ocrNotice}</p>}
           <p>
             Text below 0.5 confidence is omitted. Verify handwriting, columns
             and low contrast text against the image. Image description models
@@ -838,7 +941,9 @@ export function P2IntelligencePanel({
                 onRefresh={refresh}
                 onNavigate={onNavigate}
                 onDismiss={() => decide(r, false)}
-                onError={onError}
+                onError={(error) => {
+                  if (currentScope()) onError(error);
+                }}
               />
             ) : (
               <article key={r.id}>

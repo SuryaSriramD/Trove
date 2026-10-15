@@ -186,6 +186,7 @@ export type PageDisplayGetRequest = { "contractVersion": 1; "requestId": domain.
 export type GraphQueryRequest = { "contractVersion": 1; "requestId": domain.Id; "workspaceId": domain.Id; "pageId"?: domain.Id; "query"?: string; "includeSemantic"?: boolean; "limit"?: number; };
 export type OCRStatusRequest = { "contractVersion": 1; "requestId": domain.Id; "workspaceId": domain.Id; };
 export type OCRRunRequest = { "contractVersion": 1; "requestId": domain.Id; "workspaceId": domain.Id; "fileId": domain.Id; };
+export type OCRCancelRequest = { "contractVersion": 1; "requestId": domain.Id; "workspaceId": domain.Id; "runRequestId": domain.Id; };
 export type PlanCreatePage = { "kind": "create_page"; "destination": string; "title": string; "body"?: string; };
 export type PlanCreateDatabase = { "kind": "create_database"; "destination": string; "title": string; "body"?: string; "properties"?: Array<{ "name": string; "type": "text" | "number" | "checkbox" | "date" | "url" | "email" | "phone"; }>; };
 export type PlanUpdatePage = { "kind": "update_page"; "target": string; "title"?: string; "body"?: string; };

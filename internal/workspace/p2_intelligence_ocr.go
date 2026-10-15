@@ -37,7 +37,11 @@ type OCRProvider func(context.Context, *os.File) (OCRResult, error)
 type ocrRuntime struct {
 	provider   OCRProvider
 	capability OCRCapability
-	active     chan struct{}
+	mu         sync.Mutex
+	flight     *ocrFlight
+	cancelled  map[string]time.Time
+	closed     bool
+	suspended  int
 }
 
 var ocrProviders sync.Map
@@ -46,11 +50,12 @@ func (k *Kernel) SetOCRProvider(p OCRProvider) {
 	k.SetOCRProviderWithCapability(p, OCRCapability{Engine: "Apple Vision (local)", ExtractorVersion: OCRExtractorVersion, Languages: []string{"Automatic detection (OS-supported languages)"}})
 }
 func (k *Kernel) SetOCRProviderWithCapability(p OCRProvider, capability OCRCapability) {
-	if p == nil {
-		ocrProviders.Delete(k)
-	} else {
+	if old, ok := ocrProviders.LoadAndDelete(k); ok {
+		old.(*ocrRuntime).stop()
+	}
+	if p != nil {
 		capability.Languages = append([]string(nil), capability.Languages...)
-		ocrProviders.Store(k, &ocrRuntime{provider: p, capability: capability, active: make(chan struct{}, 1)})
+		ocrProviders.Store(k, &ocrRuntime{provider: p, capability: capability, cancelled: map[string]time.Time{}})
 	}
 }
 func init() {
@@ -63,6 +68,7 @@ func init() {
 		return map[string]any{"available": ready, "engine": capability.Engine, "languages": capability.Languages, "limitations": capability.Limitations, "extractorVersion": capability.ExtractorVersion, "modelSha256": capability.ModelSHA256, "maxBytes": 20 << 20, "maxPixels": 20000000, "timeoutSeconds": 60, "minimumConfidence": 0.5, "formats": []string{"image/png", "image/jpeg"}, "visionDescriptionAvailable": false}, nil
 	})
 	RegisterQuery("ocr.run", runOCR)
+	RegisterQuery("ocr.cancel", cancelOCR)
 }
 func runOCR(ctx context.Context, k *Kernel, e contracts.ServiceExecutionContext, r map[string]any) (any, error) {
 	if e.Origin != "user" || e.Actor.Kind != "user" {
@@ -96,24 +102,22 @@ func runOCR(ctx context.Context, k *Kernel, e contracts.ServiceExecutionContext,
 		return nil, Fail("WORKER_FAILED", "The compatible local OCR helper is unavailable; install the OCR-enabled native bundle")
 	}
 	runtime := p.(*ocrRuntime)
-	select {
-	case runtime.active <- struct{}{}:
-		defer func() { <-runtime.active }()
-	default:
-		return nil, Fail("RESOURCE_EXHAUSTED", "One local OCR operation is already running")
-	}
-	bounded, cancel := context.WithTimeout(ctx, 60*time.Second)
-	defer cancel()
-	result, err := runtime.provider(bounded, f)
+	bounded, finish, err := runtime.begin(ctx, e, str(r["requestId"]))
 	if err != nil {
 		return nil, err
 	}
-	if err = bounded.Err(); err != nil {
+	defer finish()
+	ctx = context.WithValue(bounded, commitGrantKey{}, e)
+	result, err := runtime.provider(bounded, f)
+	if err != nil {
 		return nil, err
 	}
 	current, stillRegistered := ocrProviders.Load(k)
 	if !stillRegistered || current != p {
 		return nil, Fail("CONFLICT", "OCR engine changed during extraction")
+	}
+	if err = bounded.Err(); err != nil {
+		return nil, err
 	}
 	if !utf8.ValidString(result.Warning) || len(result.Warning) > 4096 {
 		return nil, Fail("WORKER_FAILED", "OCR returned invalid warning")
