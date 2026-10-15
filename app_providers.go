@@ -35,9 +35,9 @@ var providerHosts sync.Map
 func (a *App) stopProviders() {
 	if v, ok := providerHosts.LoadAndDelete(a); ok {
 		h := v.(*providerHost)
+		h.bridge.Close()
 		h.stopPreparations()
 		h.stopManaged()
-		h.bridge.Close()
 		if h.listener != nil {
 			_ = h.listener.Close()
 		}

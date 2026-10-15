@@ -93,3 +93,36 @@ func (h *providerHost) stopPreparations() {
 		<-done
 	}
 }
+
+// Admission is suspended before waiting for the exclusive workspace lifecycle
+// lock. Otherwise an admitted source read can delay cancellation until timeout,
+// or a new preparation can enter between cancellation and the lock request.
+func (a *App) suspendProviderPreparations() func() {
+	a.providerPreparationMu.Lock()
+	a.providerPreparationSuspensions++
+	if value, ok := providerHosts.Load(a); ok {
+		h := value.(*providerHost)
+		h.mu.Lock()
+		for _, flight := range h.preparations {
+			flight.cancel()
+		}
+		h.mu.Unlock()
+	}
+	a.providerPreparationMu.Unlock()
+	var once sync.Once
+	return func() {
+		once.Do(func() {
+			a.providerPreparationMu.Lock()
+			a.providerPreparationSuspensions--
+			a.providerPreparationMu.Unlock()
+		})
+	}
+}
+func (a *App) beginProviderPreparation(h *providerHost, ctx context.Context, owner, id string) (context.Context, *providerPreparation, error) {
+	a.providerPreparationMu.Lock()
+	defer a.providerPreparationMu.Unlock()
+	if a.providerPreparationSuspensions > 0 {
+		return nil, nil, context.Canceled
+	}
+	return h.beginPreparation(ctx, owner, id)
+}

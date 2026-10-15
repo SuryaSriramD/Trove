@@ -113,7 +113,7 @@ func (a *App) managedProviderDispatch(method string, raw json.RawMessage) string
 	handedOff := false
 	if method == "providers.start" || method == "providers.connectedPreview" {
 		var prepareErr error
-		flow, preparation, prepareErr = h.beginPreparation(ctx, string(execution.ScopeGrantId), req.RequestID)
+		flow, preparation, prepareErr = a.beginProviderPreparation(h, ctx, string(execution.ScopeGrantId), req.RequestID)
 		if prepareErr != nil {
 			if errors.Is(prepareErr, context.Canceled) {
 				return errorEnvelope("CANCELLED", "Provider preparation was cancelled before admission")
