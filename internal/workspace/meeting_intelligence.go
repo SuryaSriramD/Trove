@@ -178,7 +178,7 @@ func (k *Kernel) MeetingDrafts(ctx context.Context, e contracts.ServiceExecution
 	if err != nil {
 		return nil, err
 	}
-	rows, err := k.db.QueryContext(ctx, "SELECT id,meeting_id,page_id,evidence_hash,state,body_json,created_at FROM meeting_intelligence WHERE meeting_id=? ORDER BY created_at DESC", meeting)
+	rows, err := k.db.QueryContext(ctx, "SELECT id,meeting_id,page_id,evidence_hash,state,body_json,created_at FROM meeting_intelligence WHERE meeting_id=? AND id NOT IN(SELECT draft_id FROM meeting_archived_proposals_v1) ORDER BY created_at DESC", meeting)
 	if err != nil {
 		return nil, err
 	}

@@ -1,6 +1,8 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { dispatch, envelope, fileURL, requestID, type D, type WorkspaceSnapshot } from "../api";
 import "./meetings.css";
+import { MeetingRetentionControls } from "./MeetingRetentionControls";
+import { TranscriptCorrection } from "./TranscriptCorrection";
 import type { NativeAudioInput, NativeRecordingDraft } from "../../../contracts/generated/service";
 
 type Recording = NativeRecordingDraft;
@@ -10,7 +12,7 @@ type Claim = { text: string; segmentIds: string[] };
 type Intelligence = { summary: Claim[]; keyPoints: Claim[]; decisions: Claim[]; questions: Claim[]; actionItems: Claim[] };
 type Draft = { id: string; state: string; stale: boolean; evidenceHash: string; body: Intelligence };
 type Extraction = { version: 1; proposalId: string; itemId: string; meetingId: string; evidenceHash: string; title: string; body: string; kind: "page" | "task"; pageId: string; appliedAt?: string; stale: boolean };
-type Bridge = { StartMeetingRecordingWithOptions(title: string, inputDeviceId: string, disclosureAcknowledged: boolean): Promise<Recording>; MeetingAudioInputs(): Promise<NativeAudioInput[]>; ControlMeetingRecording(id: string, action: "pause" | "resume"): Promise<Recording>; StopMeetingRecording(id: string): Promise<Recording>; SaveMeetingRecording(id: string): Promise<Recording>; MeetingRecordings(): Promise<Recording[]>; PickMeetingAudio(title: string): Promise<Recording> };
+type Bridge = { MeetingRecordingDetails?(meetingId: string): Promise<Recording | null>; StartMeetingRecordingWithOptions(title: string, inputDeviceId: string, disclosureAcknowledged: boolean): Promise<Recording>; MeetingAudioInputs(): Promise<NativeAudioInput[]>; ControlMeetingRecording(id: string, action: "pause" | "resume"): Promise<Recording>; StopMeetingRecording(id: string): Promise<Recording>; SaveMeetingRecording(id: string): Promise<Recording>; MeetingRecordings(): Promise<Recording[]>; PickMeetingAudio(title: string): Promise<Recording> };
 const bridge = () => window.go?.main.App as unknown as Bridge | undefined;
 const timestamp = (ms: number) => `${Math.floor(ms / 60000)}:${String(Math.floor(ms / 1000) % 60).padStart(2, "0")}`;
 
@@ -19,6 +21,7 @@ export function MeetingPanel({ workspace: w, onRefresh, onNavigate, pageId }: { 
   const [inputs, setInputs] = useState<NativeAudioInput[]>([]);
   const [inputDeviceId, setInputDeviceId] = useState("");
   const [disclosed, setDisclosed] = useState(false);
+  const [savedCapture, setSavedCapture] = useState<Recording | null>(null);
   const [recordings, setRecordings] = useState<Recording[]>([]);
   const [jobs, setJobs] = useState<Job[]>([]);
   const [packs, setPacks] = useState<Pack[]>([]);
@@ -46,6 +49,11 @@ export function MeetingPanel({ workspace: w, onRefresh, onNavigate, pageId }: { 
   const visibleDrafts = draftScope === scope ? drafts : [];
   const visibleExtractions = draftScope === scope ? extractions : [];
   useEffect(() => { setReview(null); return () => { draftEpoch.current++; refreshEpoch.current++; }; }, [scope]);
+  useEffect(() => {
+    let active = true; setSavedCapture(null);
+    if (meeting) void bridge()?.MeetingRecordingDetails?.(meeting.id).then(result => { if (active) setSavedCapture(result); }).catch(() => undefined);
+    return () => { active = false; };
+  }, [scope]);
   const page = w.pages.find(p => p.id === meeting?.pageId);
   const segments = w.transcriptSegments.filter(s => s.meetingId === meeting?.id).sort((a, b) => a.startMs - b.startMs);
   const live = recordings.find(r => r.state === "recording" || r.state === "paused");
@@ -152,6 +160,9 @@ export function MeetingPanel({ workspace: w, onRefresh, onNavigate, pageId }: { 
     {error && <p className="meeting-error" role="alert">{error}</p>}{notice && <p role="status">{notice}</p>}
     {meeting && page && <div className="meeting-detail">
       {!pageId && <h2>{page.title}</h2>}
+      {savedCapture?.meetingId === meeting.id && <div aria-label="Capture history"><p>{timestamp(savedCapture.durationMs)} captured · {savedCapture.inputDeviceId ? "Selected microphone" : "System default microphone"}{savedCapture.disclosureAcknowledgedAt ? " · Participant disclosure acknowledged" : ""}</p>{savedCapture.gaps?.map(gap => <p key={gap.id}>{gap.kind} at {timestamp(gap.sampleOffset / 16)} · {gap.durationMs === undefined ? "duration unknown" : `${timestamp(gap.durationMs)} gap`}{gap.reason ? ` · ${gap.reason}` : ""}</p>)}</div>}
+      <MeetingRetentionControls key={`retention:${scope}`} workspace={w} meetingId={meeting.id} onCommitted={onRefresh}/>
+
       {meeting.recordingFileId && <audio key={`${w.workspaceId}:${meeting.recordingFileId}`} ref={audio} controls preload="metadata" data-meeting-id={meeting.id} src={playbackSource?.fileId === meeting.recordingFileId ? playbackSource.url : undefined} aria-busy={playbackLoading} onError={() => setPlaybackError("Saved audio could not be played. The original recording remains available for transcription and backup.")} aria-label={`Recording of ${page.title}`}/>}
       {playbackLoading && <p role="status">Loading saved audio…</p>}
       {playbackError && <p role="alert">{playbackError}</p>}
@@ -162,9 +173,9 @@ export function MeetingPanel({ workspace: w, onRefresh, onNavigate, pageId }: { 
       </div>
       {!speech && <p className="meeting-help">Install a speech pack in Settings to transcribe. Saved audio and notes remain available.</p>}
       {activeJobs.slice(0, 5).map(job => <div className="meeting-job" key={job.jobId}><span>{job.kind === "TRANSCRIBE_AUDIO" ? "Transcription" : "Meeting notes"}: {job.state}</span>{job.progress?.total ? <progress max={job.progress.total} value={job.progress.completed} aria-label="Processing progress"/> : null}<small>{job.error?.message ?? job.progress?.message}</small>{["queued", "running", "retry_wait"].includes(job.state) && <button onClick={() => void run(async () => { await dispatch("cancelJob", { ...envelope(w), jobId: job.jobId, expectedRevision: job.revision }); })}>Cancel processing</button>}</div>)}
-      <div className="meeting-transcript"><h3>Transcript</h3>{segments.length ? segments.map(segment => <div className="transcript-segment" key={segment.id}><button onClick={() => navigate(segment.startMs, segment.id, segment.blockId)} title="Play from this timestamp">{timestamp(segment.startMs)}</button><p>{segment.text}</p></div>) : <p>Timestamped text appears here as each audio segment finishes. You can continue editing while it runs.</p>}</div>
+      <div className="meeting-transcript"><h3>Transcript</h3>{segments.length ? segments.map(segment => <div className="transcript-segment" key={segment.id}><button onClick={() => navigate(segment.startMs, segment.id, segment.blockId)} title="Play from this timestamp">{timestamp(segment.startMs)}</button><p>{segment.text}</p><TranscriptCorrection key={`${scope}:${segment.id}`} workspace={w} meeting={meeting} segment={segment} onCommitted={onRefresh}/></div>) : <p>Timestamped text appears here as each audio segment finishes. You can continue editing while it runs.</p>}</div>
       <div className="meeting-actions"><label>Summary model<select value={chat} onChange={e => setChat(e.target.value)}><option value="">Choose an instruction model</option>{packs.filter(p => p.kind === "chat" && !p.qualificationOnly).map(p => <option key={p.id} value={p.id}>{p.name}</option>)}</select></label><button disabled={busy || !chat || !segments.length || meeting.state !== "ready" || activeJobs.some(j => j.kind === "SUMMARIZE_MEETING" && ["running", "queued", "retry_wait"].includes(j.state))} onClick={() => void run(async () => { await dispatch("enqueueJob", { ...envelope(w), kind: "SUMMARIZE_MEETING", idempotencyKey: requestID(), payload: { kind: "summarize", meetingId: meeting.id, sourceRevision: page.revision, modelPackId: chat } }); })}>Generate meeting notes for review</button></div>
-      {visibleExtractions.length > 0 && <section aria-label="Saved extraction reviews"><h3>Extracted pages and tasks</h3>{visibleExtractions.map(item => <div key={`${item.proposalId}:${item.itemId}`}><span>{item.title} · {item.appliedAt ? "Applied" : item.stale ? "Source changed" : "Awaiting review"}</span>{item.appliedAt ? <button onClick={() => onNavigate({ pageId: item.pageId, sourceRevision: w.pages.find(page => page.id === item.pageId)?.revision ?? "1" })}>Open existing {item.kind}</button> : <button disabled={busy || item.stale} onClick={() => setReview(item)}>Resume review</button>}</div>)}</section>}
+      {visibleExtractions.length > 0 && <section aria-label="Saved extraction reviews"><h3>Extracted pages and tasks</h3>{visibleExtractions.map(item => <div key={`${item.proposalId}:${item.itemId}`}><span>{item.title} · {item.appliedAt ? (item.stale ? "Applied · source changed; review evidence" : "Applied") : item.stale ? "Source changed" : "Awaiting review"}</span>{item.appliedAt ? <button onClick={() => onNavigate({ pageId: item.pageId, sourceRevision: w.pages.find(page => page.id === item.pageId)?.revision ?? "1" })}>Open existing {item.kind}</button> : <button disabled={busy || item.stale} onClick={() => setReview(item)}>Resume review</button>}</div>)}</section>}
       {visibleDrafts.map(draft => <div className="meeting-draft" key={draft.id}><h3>{draft.state === "applied" ? "Approved meeting notes" : "Review proposed meeting notes"}</h3>{draft.stale && <p role="alert">Transcript evidence changed. Generate a fresh draft before approval.</p>}
         {([ ["Summary", "summary"], ["Key points", "keyPoints"], ["Decisions", "decisions"], ["Questions", "questions"], ["Proposed action items", "actionItems"] ] as const).map(([name, key]) => draft.body[key]?.length > 0 && <div key={key}><h4>{name}</h4>{draft.body[key].map((claim, index) => <p key={index}>{claim.text}{claim.segmentIds.map(id => { const s = segments.find(s => s.id === id); return s && <button className="meeting-citation" key={id} onClick={() => navigate(s.startMs, s.id, s.blockId)}>[{timestamp(s.startMs)}]</button>; })}{key === "actionItems" && !draft.stale && <button disabled={busy} onClick={() => void run(() => convert("task", draft.id, index))}>Review task</button>}</p>)}</div>)}
         {draft.state === "draft" && <button className="primary" disabled={busy || draft.stale} onClick={() => void run(async () => { await dispatch("meetings.applyDraft", { ...envelope(w), draftId: draft.id }); await loadDrafts(); })}>Approve and add notes to page</button>}

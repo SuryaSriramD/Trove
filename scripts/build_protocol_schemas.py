@@ -61,6 +61,8 @@ commands={
 'SetTaskStatus':tagged('task.setStatus',{'recordId':D('Id'),'statusOptionId':D('Id')}),
 'AttachFile':tagged('file.attach',{'fileId':D('Id'),'ingestHandle':D('Id'),'pageId':D('Id'),'blockId':D('Id')},['fileId','ingestHandle','pageId']),
 'RecordMeetingExtraction':tagged('meeting.extraction.record',{'proposalId':D('Id'),'itemId':{'type':'string','minLength':1,'maxLength':128},'title':{'type':'string','minLength':1,'maxLength':512},'body':{'type':'string','maxLength':100000}}),
+ 'CorrectMeetingSegment':tagged('meeting.correctSegment',{'meetingId':D('Id'),'segmentId':D('Id'),'text':{'type':'string','minLength':1,'maxLength':16000},'startMs':N,'endMs':N}),
+ 'ApplyMeetingRetention':tagged('meeting.retention.apply',{'meetingId':D('Id'),'selected':{**arr(enum('audio','transcripts','generated','indexes','memory'),5),'uniqueItems':True},'previewHash':{'type':'string','pattern':'^[0-9a-f]{64}$'}}),
 'CreateMeeting':tagged('meeting.create',{'meetingId':D('Id'),'pageId':D('Id'),'recordingFileId':D('Id'),'startedAt':D('Timestamp')}),
 'AppendTranscript':tagged('meeting.appendSegments',{'meetingId':D('Id'),'segments':arr(obj({'segmentId':D('Id'),'blockId':D('Id'),'startMs':N,'endMs':N,'text':S,'speakerLabel':S},['segmentId','blockId','startMs','endMs','text']),256)}),
 'FinalizeMeeting':tagged('meeting.finalize',{'meetingId':D('Id'),'durationMs':N}),
@@ -142,6 +144,9 @@ header={'contractVersion':{'const':1},'requestId':D('Id'),'workspaceId':D('Id')}
 defs['SchedulingPreviewRequest']=obj({**header,'input':R('SchedulingInput')})
 defs['RecordLayoutRequest']=obj({**header,'collectionId':D('Id'),'recordId':D('Id')},[*header,'collectionId'])
 defs['RecordLayoutResult']=obj({'collectionId':D('Id'),'recordId':D('Id'),'defaultLayout':nullable_layout,'overrideLayout':nullable_layout,'effectiveLayout':R('RecordLayout'),'missingPropertyIds':arr(D('Id'),8448)},['collectionId','defaultLayout','overrideLayout','effectiveLayout','missingPropertyIds'])
+defs['MeetingRetentionPreviewRequest']=obj({**header,'meetingId':D('Id'),'selected':{**arr(enum('audio','transcripts','generated','indexes','memory'),5),'uniqueItems':True}})
+defs['MeetingRetentionCategory']=obj({'id':enum('audio','transcripts','generated','indexes','memory','history','backups'),'count':N,'action':S,'detail':S,'selectable':B})
+defs['MeetingRetentionPreview']=obj({'version':{'const':1},'meetingId':D('Id'),'pageId':D('Id'),'categories':arr(R('MeetingRetentionCategory'),7),'selected':arr(enum('audio','transcripts','generated','indexes','memory'),5),'expectedRevisions':arr(R('ExpectedRevision'),1000),'command':R('ApplyMeetingRetention'),'warnings':arr(S,16),'canApply':B})
 defs['MeetingExtractionResult']=obj({'version':{'const':1},'proposalId':D('Id'),'itemId':{'type':'string','minLength':1,'maxLength':128},'meetingId':D('Id'),'evidenceHash':{'type':'string','pattern':'^[0-9a-f]{64}$'},'kind':enum('page','task'),'title':S,'body':S,'pageId':D('Id'),'recordId':D('Id'),'appliedAt':D('Timestamp'),'stale':B},['version','proposalId','itemId','meetingId','evidenceHash','kind','title','body','pageId','stale'])
 defs['MeetingExtractionApplyResult']=obj({'pageId':D('Id'),'recordId':S,'kind':enum('page','task'),'proposalId':D('Id'),'itemId':S,'reused':B})
 defs['MeetingExtractionPrepareRequest']=obj({**header,'meetingId':D('Id'),'kind':enum('page','task'),'draftId':D('Id'),'itemIndex':{'type':'integer','minimum':0,'maximum':249}},[*header,'meetingId','kind'])
