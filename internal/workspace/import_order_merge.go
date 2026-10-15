@@ -6,19 +6,43 @@ import (
 	"strings"
 )
 
-// D002 treats a sibling reorder as one list edit. Stable-membership lists can
-// be derived from every known snapshot without changing the stored normalizer
-// or fabricating identity for inserted, omitted or moved source blocks.
+// D002 treats sibling ordering as one list edit, including stable identified
+// insertions, removals and moves. Each final list must exactly match the separately
+// reviewed content/parent membership; no UUID tie-break or positional identity is
+// invented when the source changes membership.
 func mergeImportContentFields(base, local, incoming map[string]json.RawMessage, known bool) []ImportFieldDecision {
 	if !known {
 		return mergeImportFields(base, local, incoming, false)
 	}
 	base, local, incoming = copyImportFields(base), copyImportFields(local), copyImportFields(incoming)
 	b, l, r := importSiblingLists(base), importSiblingLists(local), importSiblingLists(incoming)
-	for parent, order := range b {
-		if len(order) < 2 || !sameImportMembers(order, l[parent]) || !sameImportMembers(order, r[parent]) {
-			continue
+	for _, side := range []struct {
+		fields map[string]json.RawMessage
+		groups map[string][]string
+	}{{base, b}, {local, l}, {incoming, r}} {
+		count := 0
+		for path := range side.fields {
+			if strings.HasPrefix(path, "/blocks/") && strings.HasSuffix(path, "/content") {
+				count++
+			}
 		}
+		total := 0
+		for _, ids := range side.groups {
+			total += len(ids)
+		}
+		// Malformed or partial placement evidence keeps the existing explicit scalar
+		// fields and materialization veto, never a fabricated empty sibling list.
+		if total != count {
+			return mergeImportFields(base, local, incoming, true)
+		}
+	}
+	parents := map[string]bool{}
+	for _, groups := range []map[string][]string{b, l, r} {
+		for parent := range groups {
+			parents[parent] = true
+		}
+	}
+	for parent := range parents {
 		path := "/siblingOrder/" + parent
 		if parent == "" {
 			path = "/siblingOrder/root"
@@ -26,8 +50,12 @@ func mergeImportContentFields(base, local, incoming map[string]json.RawMessage, 
 		for _, side := range []struct {
 			fields map[string]json.RawMessage
 			order  []string
-		}{{base, order}, {local, l[parent]}, {incoming, r[parent]}} {
-			side.fields[path] = marshal(side.order)
+		}{{base, b[parent]}, {local, l[parent]}, {incoming, r[parent]}} {
+			order := side.order
+			if order == nil {
+				order = []string{}
+			}
+			side.fields[path] = marshal(order)
 			for _, id := range order {
 				delete(side.fields, "/blocks/"+id+"/order")
 			}
@@ -106,14 +134,36 @@ func expandImportSiblingOrders(fields map[string]json.RawMessage, review *Import
 		if !strings.HasPrefix(field.Path, "/siblingOrder/") {
 			continue
 		}
-		var expected, selected []string
-		if json.Unmarshal(field.Base.Value, &expected) != nil || json.Unmarshal(fields[field.Path], &selected) != nil || !sameImportMembers(expected, selected) {
-			return Fail("CONFLICT", "A reviewed sibling order must contain every affected block exactly once")
-		}
 		parent := strings.TrimPrefix(field.Path, "/siblingOrder/")
 		if parent == "root" {
 			parent = ""
 		}
+		expected := []string{}
+		for path := range fields {
+			if !strings.HasPrefix(path, "/blocks/") || !strings.HasSuffix(path, "/content") {
+				continue
+			}
+			parts := strings.Split(path, "/")
+			if len(parts) != 4 {
+				return Fail("CONFLICT", "Invalid retained block identity")
+			}
+			var actual *string
+			if json.Unmarshal(fields["/blocks/"+parts[2]+"/parent"], &actual) != nil {
+				return Fail("CONFLICT", "Sibling order requires a valid block parent")
+			}
+			actualID := ""
+			if actual != nil {
+				actualID = *actual
+			}
+			if actualID == parent {
+				expected = append(expected, parts[2])
+			}
+		}
+		var selected []string
+		if json.Unmarshal(fields[field.Path], &selected) != nil || !sameImportMembers(expected, selected) {
+			return Fail("CONFLICT", "A reviewed sibling order must contain every final retained block exactly once; review additions, removals and parent moves together")
+		}
+
 		for index, id := range selected {
 			if _, ok := fields["/blocks/"+id+"/content"]; !ok {
 				return Fail("CONFLICT", "Sibling order references a removed block; review its complete placement")
