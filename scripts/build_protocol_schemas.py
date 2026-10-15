@@ -257,6 +257,7 @@ defs['PageDisplayGetRequest']=obj({**header,'pageId':D('Id')})
 defs['GraphQueryRequest']=obj({**header,'pageId':D('Id'),'query':{'type':'string','maxLength':8192},'includeSemantic':B,'limit':{'type':'integer','minimum':1,'maximum':100}},list(header))
 defs['OCRStatusRequest']=obj(header)
 defs['OCRRunRequest']=obj({**header,'fileId':D('Id')})
+defs['OCRCancelRequest']=obj({**header,'runRequestId':D('Id')})
 # Human references and values become canonical commands only in the trusted planner.
 plan_name={'type':'string','minLength':1,'maxLength':512}
 plan_body={'type':'string','maxLength':16000}

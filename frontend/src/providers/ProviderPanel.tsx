@@ -78,7 +78,8 @@ function ProviderPanelContent({
       relayPath: string;
     } | null>(null),
     [error, setError] = useState(""),
-    [busy, setBusy] = useState(false),
+    [working, setBusy] = useState(false),
+    [revoking, setRevoking] = useState<string[]>([]),
     [provider, setProvider] = useState<string>(
       skillProvider ?? (connectedSources.length ? "codex" : "mcp"),
     ),
@@ -87,6 +88,8 @@ function ProviderPanelContent({
   const active = useRef(true);
   const latestRead = useRef(0);
   const changing = useRef(false);
+  const revokingIds = useRef(new Set<string>());
+  const busy = working || revoking.length > 0;
   async function load() {
     const read = ++latestRead.current;
     try {
@@ -118,7 +121,7 @@ function ProviderPanelContent({
     };
   }, []);
   async function act(fn: () => Promise<void>) {
-    if (changing.current || !active.current) return;
+    if (changing.current || revokingIds.current.size || !active.current) return;
     changing.current = true;
     latestRead.current++;
     setBusy(true);
@@ -131,6 +134,28 @@ function ProviderPanelContent({
     } finally {
       changing.current = false;
       if (active.current) setBusy(false);
+    }
+  }
+  async function disconnect(connectionId: string) {
+    if (!active.current || revokingIds.current.has(connectionId)) return;
+    revokingIds.current.add(connectionId);
+    setRevoking([...revokingIds.current]);
+    latestRead.current++;
+    setError("");
+    try {
+      await dispatch("providers.disconnect", {
+        ...envelope(workspace),
+        connectionId,
+      });
+      if (active.current) {
+        if (pair?.connection.id === connectionId) setPair(null);
+        await load();
+      }
+    } catch (error) {
+      if (active.current) setError(String(error));
+    } finally {
+      revokingIds.current.delete(connectionId);
+      if (active.current) setRevoking([...revokingIds.current]);
     }
   }
   return (
@@ -325,16 +350,8 @@ function ProviderPanelContent({
             {c.tools.map((t) => toolLabels[t] || t).join(", ")}
           </p>
           <button
-            disabled={busy || c.state !== "connected"}
-            onClick={() =>
-              act(async () => {
-                await dispatch("providers.disconnect", {
-                  ...envelope(workspace),
-                  connectionId: c.id,
-                });
-                if (pair?.connection.id === c.id) setPair(null);
-              })
-            }
+            disabled={revoking.includes(c.id) || c.state !== "connected"}
+            onClick={() => void disconnect(c.id)}
           >
             Disconnect and revoke local access
           </button>

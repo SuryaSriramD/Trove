@@ -43,6 +43,10 @@ type App struct {
 	reminders         *reminderDesktop
 	reminderBootstrap sync.Once
 
+	ocrAdmissionMu sync.Mutex
+	ocrSuspensions int
+	ocrReads       map[*nativeOCRRead]struct{}
+
 	providerPreparationMu          sync.Mutex
 	providerPreparationSuspensions int
 }
@@ -180,6 +184,8 @@ func (a *App) shutdown(context.Context) {
 	a.stopReminderLoop()
 	resumeProviderPreparations := a.suspendProviderPreparations()
 	defer resumeProviderPreparations()
+	resumeOCR := a.cancelOCRForLifecycle()
+	defer resumeOCR()
 	a.lifecycle.Lock()
 	defer a.lifecycle.Unlock()
 	a.stopClipper()
@@ -219,6 +225,8 @@ func (a *App) open(path string, create bool) error {
 	}
 	resumeProviderPreparations := a.suspendProviderPreparations()
 	defer resumeProviderPreparations()
+	resumeOCR := a.cancelOCRForLifecycle()
+	defer resumeOCR()
 	a.lifecycle.Lock()
 	defer a.lifecycle.Unlock()
 	return a.openLocked(path, create)
@@ -345,6 +353,14 @@ func (a *App) Dispatch(method, raw string) string {
 	a.mu.RUnlock()
 	if k == nil {
 		return errorEnvelope("WORKSPACE_LOCKED", "Workspace is not open")
+	}
+	if method == "ocr.run" {
+		bounded, done, err := a.beginOCRRead(serviceContext)
+		if err != nil {
+			return errorEnvelope("CANCELLED", "Workspace transition cancelled OCR admission")
+		}
+		defer done()
+		serviceContext = bounded
 	}
 	// Bootstrap is a trusted adapter operation: the renderer does not know the
 	// workspace ID until the first snapshot. All later requests carry headers.

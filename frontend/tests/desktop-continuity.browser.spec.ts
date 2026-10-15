@@ -206,3 +206,24 @@ test("search and completed AI evidence show elapsed review deadlines without ano
     "Review overdue · human review status",
   );
 });
+
+test("unavailable review coverage retains history without allowing a fabricated review", async ({
+  page,
+}) => {
+  await page.goto(url() + "?unavailable=1");
+  const panel = page.locator(".page-review");
+  await expect(panel.locator("summary").first()).toHaveText(
+    "Review status unavailable",
+  );
+  await panel.locator("summary").first().click();
+  await expect(panel.getByRole("status")).toContainText(
+    "Review individual records",
+  );
+  await expect(
+    panel.getByRole("button", { name: "I reviewed the current content" }),
+  ).toBeDisabled();
+  await expect(panel).toContainText("Last reviewed");
+  await expect(
+    panel.getByText("Review history", { exact: true }),
+  ).toBeVisible();
+});

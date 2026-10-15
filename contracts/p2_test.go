@@ -19,6 +19,7 @@ func TestP2StrictContracts(t *testing.T) {
 		{"RunRowButton", map[string]any{"kind": "database.rowButtonRun", "collectionId": id, "recordId": id, "buttonId": id, "confirmed": false}, "commands", []any{}},
 		{"GraphQueryRequest", map[string]any{"contractVersion": 1, "requestId": id, "workspaceId": id, "limit": 100}, "limit", 101},
 		{"OCRRunRequest", map[string]any{"contractVersion": 1, "requestId": id, "workspaceId": id, "fileId": id}, "path", "/private/file.png"},
+		{"OCRCancelRequest", map[string]any{"contractVersion": 1, "requestId": id, "workspaceId": id, "runRequestId": id}, "runRequestId", ""},
 	}
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {

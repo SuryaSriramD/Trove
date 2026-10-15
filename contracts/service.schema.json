@@ -7744,6 +7744,30 @@
       ],
       "additionalProperties": false
     },
+    "OCRCancelRequest": {
+      "type": "object",
+      "properties": {
+        "contractVersion": {
+          "const": 1
+        },
+        "requestId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "workspaceId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "runRequestId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        }
+      },
+      "required": [
+        "contractVersion",
+        "requestId",
+        "workspaceId",
+        "runRequestId"
+      ],
+      "additionalProperties": false
+    },
     "PlanCreatePage": {
       "type": "object",
       "properties": {

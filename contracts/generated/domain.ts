@@ -130,5 +130,5 @@ export type ImportResolution = { "id": Id; "planId": Id; "mappingId": Id; "expec
 export type ColorToken = "gray" | "brown" | "orange" | "yellow" | "green" | "blue" | "purple" | "pink" | "red";
 export type SemanticContentIdentity = { "version": 1 | 2 | 3; "digest": string; };
 export type HumanReviewEvent = { "id": Id; "pageId": Id; "actorId": Id; "reviewedAt": Timestamp; "expiresAt"?: Timestamp; "contentIdentity": SemanticContentIdentity; };
-export type PageFreshness = { "state": "never_reviewed" | "reviewed" | "stale" | "expired"; "contentIdentity": SemanticContentIdentity; "review"?: HumanReviewEvent; };
+export type PageFreshness = { "state": "never_reviewed" | "reviewed" | "stale" | "expired" | "unavailable"; "contentIdentity"?: SemanticContentIdentity; "review"?: HumanReviewEvent; "message"?: string; };
 export type ImportNormalizedSnapshot = { "version": 1; "sourceRevision"?: string; "fields": { [key: string]: unknown }; "blockSources": { [key: string]: unknown }; "sourceScope"?: string; "pageSourceScope"?: string; "portableIdentity"?: string; "collectionSourceScope"?: string; };

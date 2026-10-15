@@ -497,7 +497,7 @@ test("shell navigation, focus, quick switcher, page metadata", async ({
   await expect(
     page.getByRole("heading", { name: "Make room for your ideas." }),
   ).toBeVisible();
-  await page.screenshot({ path: `${process.env.TROVE_BROWSER_SCREENSHOTS ?? "../evidence"}/phase1-home.png` });
+  await page.screenshot({ path: `${process.env.TROVE_BROWSER_SCREENSHOTS ?? "test-results/screenshots"}/phase1-home.png` });
   await open(page);
   await page
     .getByRole("textbox", { name: "Page title" })
@@ -567,7 +567,7 @@ test("Unicode composition, RTL, emoji, undo/redo, reopen, raw preservation", asy
       ),
     )
     .toEqual({ original: "keep" });
-  await page.screenshot({ path: `${process.env.TROVE_BROWSER_SCREENSHOTS ?? "../evidence"}/phase1-editor.png` });
+  await page.screenshot({ path: `${process.env.TROVE_BROWSER_SCREENSHOTS ?? "test-results/screenshots"}/phase1-editor.png` });
 });
 test("mixed clipboard retains block structure and allocates distinct IDs", async ({
   page,
@@ -1805,7 +1805,7 @@ test("Phase 4 surfaces expose scoped pairing, gated vendors and reviewed capture
    if(method==='index.roots')return ok([]);
    if(method==='automationHistory')return ok({rules:[],runs:[]});
    if(method==='automationOptions')return ok({templates:[],templatesTruncated:false,events:[]});
-   if(method==='capture.preview')return ok({planId:'clip',planHash:'fixture',state:'previewed',items:[{sourceLocator:'selection',outcome:'adapted',reason:'Reviewed text retained'}]});
+   if(method==='capture.preview')return ok({planId:'clip',planHash:'fixture',state:'preview',items:[{sourceLocator:'selection',outcome:'adapted',reason:'Reviewed text retained'}]});
    return previous(method,raw);
   };
  });
@@ -1815,7 +1815,7 @@ test("Phase 4 surfaces expose scoped pairing, gated vendors and reviewed capture
  await page.getByRole('button',{name:'Preview shared context'}).click();
  await expect(page.getByText('Only these pages are shared.',{exact:false})).toBeVisible();
  expect(await page.evaluate(()=>(window as any).phase4Calls.includes('providers.connect'))).toBe(false);
- await page.screenshot({path:`${process.env.TROVE_BROWSER_SCREENSHOTS ?? '../evidence/phase4'}/providers-preview.png`,fullPage:true});
+ await page.screenshot({path:`${process.env.TROVE_BROWSER_SCREENSHOTS ?? 'test-results/screenshots'}/providers-preview.png`,fullPage:true});
  await page.getByRole('button',{name:'Approve context and pair client'}).click();
  await expect(page.getByText('fixture-only-token',{exact:false})).toBeVisible();
  await page.getByLabel('Provider',{exact:true}).selectOption('codex');

@@ -33,7 +33,7 @@ func TestNotionCaptureResumesPaginationDownloadsOfflineAndRequiresReview(t *test
 				t.Fatal("missing authenticated version")
 			}
 			if strings.Contains(r.URL.Path, "/pages/") {
-				return notionResponse(200, `{"id":"`+root+`","properties":{"title":{"type":"title","title":[{"plain_text":"API page"}]},"formula":{"type":"formula","formula":{"number":42}}}}`), nil
+				return notionResponse(200, `{"object":"page","in_trash":false,"id":"`+root+`","properties":{"title":{"type":"title","title":[{"plain_text":"API page"}]},"formula":{"type":"formula","formula":{"number":42}}}}`), nil
 			}
 			if !retried {
 				retried = true

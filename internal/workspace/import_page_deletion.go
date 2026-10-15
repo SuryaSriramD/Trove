@@ -256,7 +256,14 @@ func reviewedPageDeletionActions(ctx context.Context, q querier, p *ImportPlan) 
 		if item.Choice == "keep_local" {
 			continue
 		}
-		if item.Choice != "merge" || item.Merge == nil || item.PageSourceScope == "" || item.PageSourceScope != p.PageEnumerationScope {
+		if item.SourceDeletionProof != nil {
+			if err := validateNotionDeletionProof(ctx, q, p, item); err != nil {
+				return nil, err
+			}
+		} else if item.PageSourceScope == "" || item.PageSourceScope != p.PageEnumerationScope {
+			return nil, Fail("CONFLICT", "Source deletion requires bound inventory or direct object evidence")
+		}
+		if item.Choice != "merge" || item.Merge == nil {
 			return nil, Fail("CONFLICT", "Review every source page deletion explicitly")
 		}
 		take := false

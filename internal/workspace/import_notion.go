@@ -354,7 +354,13 @@ func (k *Kernel) CaptureNotionStep(ctx context.Context, e contracts.ServiceExecu
 		return s, err
 	}
 	provenance := map[string]any{"channel": "notion_api", "apiVersion": version, "sourceId": task.ID, "cursor": task.Cursor, "capturedAt": now(), "responseFileId": rawID}
-	if task.Kind != "page" && task.Kind != "children" {
+	trashed, err := captureNotionDeletion(&s, &p, task, response, raw, rawID, provenance)
+	if err != nil {
+		return s, err
+	}
+	if trashed {
+		// Direct trash evidence never hydrates a page or enumerates its children.
+	} else if task.Kind != "page" && task.Kind != "children" {
 		if err = k.captureNotionObject(ctx, &s, &p, task, response, raw, rawID, provenance); err != nil {
 			return s, err
 		}
@@ -379,6 +385,9 @@ func (k *Kernel) CaptureNotionStep(ctx context.Context, e contracts.ServiceExecu
 			}
 		}
 		item := ImportItem{Locator: "notion/pages/" + task.ID, Kind: "notion_page", Outcome: "partial", Reason: "Page title and descendants captured; every supplied property and metadata field retained in response evidence", RawFileID: rawID, Hash: importDigest(raw), Size: int64(len(raw)), PageID: task.PageID, ParentID: task.ParentID, Title: title, IdentityKind: "external_id", ExternalID: task.ID, Provenance: provenance, Blocks: []ImportBlock{}}
+		if _, known, _ := notionTrashStatus(response); known {
+			item.PageSourceScope = notionObjectScope(task.Kind, task.ID)
+		}
 		if len(properties) > 0 && task.SourceID == "" {
 			item.Blocks = append(item.Blocks, fallbackImportBlock(&item, "Captured property values (source snapshots, not freshly calculated results):\n"+string(marshal(properties))))
 		}
@@ -657,6 +666,9 @@ func finishNotionCapture(ctx context.Context, k *Kernel, e contracts.ServiceExec
 			if err := prepareImportMerge(ctx, tx, &p, &p.Items[i]); err != nil {
 				return err
 			}
+		}
+		if err := appendNotionSourceDeletions(ctx, tx, &s, &p); err != nil {
+			return err
 		}
 		setNotionGraphConflicts(&p)
 		for _, task := range s.Pending {
