@@ -1,5 +1,5 @@
 import { test, expect } from "@playwright/test";
-const base = process.env.TROVE_SUPPORT_TEST_URL ?? "http://127.0.0.1:4193";
+const base = process.env.TROVE_SUPPORT_TEST_URL ?? process.env.TROVE_TEST_URL ?? "http://127.0.0.1:4193";
 test("metadata is default and exact preview precedes opaque native save", async ({
   page,
 }) => {

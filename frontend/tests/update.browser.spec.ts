@@ -1,5 +1,5 @@
 import { test, expect } from "@playwright/test";
-const base = process.env.TROVE_UPDATE_TEST_URL ?? "http://127.0.0.1:4177";
+const base = process.env.TROVE_UPDATE_TEST_URL ?? process.env.TROVE_TEST_URL ?? "http://127.0.0.1:4177";
 test("requires review, then reveals only the prepared native kit", async ({ page }) => {
   await page.goto(`${base}/tests/update-fixture.html`);
   await page.getByRole("button", { name: "Choose update to verify…", exact: true }).click();
