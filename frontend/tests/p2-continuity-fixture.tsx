@@ -119,6 +119,8 @@ w.go = {
         else if (method === "ocr.cancel") {
           if (request.runRequestId !== w.ocrStarted)
             throw Error("Wrong cancellation identity");
+          if (w.holdOCRCancellation)
+            return ok({ state: "cancellation_requested" });
           if (w.ocrSaved) w.finishSavedOCR();
           else w.cancelOCR();
           return ok({ state: "cancellation_requested" });
