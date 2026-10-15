@@ -102,6 +102,9 @@ func (k *Kernel) portableAssets(ctx context.Context, tx *sql.Tx, pages map[strin
 		if _, exported := pages[page]; !exported {
 			continue
 		}
+		if kind == "import_evidence" {
+			continue
+		}
 		if kind != "explicit" || !automatic[page][file] {
 			selected[file] = true
 		}

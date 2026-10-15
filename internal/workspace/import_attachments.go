@@ -23,7 +23,14 @@ func attachmentReference(r ImportAttachmentRelationship) (string, string) {
 	if r.BlockID != "" {
 		return "explicit_block", r.BlockID
 	}
-	return "explicit", r.FileID
+	return "explicit_user", r.FileID
+}
+
+func attachmentLegacyKind(r ImportAttachmentRelationship) string {
+	if r.BlockID != "" {
+		return "explicit_block"
+	}
+	return "explicit"
 }
 
 func restorePortableAttachments(p *ImportPlan, manifest portableHierarchy) error {
@@ -117,7 +124,7 @@ func prepareImportAttachmentFields(ctx context.Context, q querier, item *ImportI
 			}
 			kind, source := attachmentReference(r)
 			var count int
-			if err := q.QueryRowContext(ctx, "SELECT count(*) FROM file_references WHERE page_id=? AND source_kind=? AND source_id=? AND file_id=?", item.PageID, kind, source, r.FileID).Scan(&count); err != nil {
+			if err := q.QueryRowContext(ctx, "SELECT count(*) FROM file_references WHERE page_id=? AND source_kind IN (?,?) AND source_id=? AND file_id=?", item.PageID, kind, attachmentLegacyKind(r), source, r.FileID).Scan(&count); err != nil {
 				return err
 			}
 			if count != 0 {
@@ -185,7 +192,7 @@ func applyImportAttachments(m *Mutation, item *ImportItem) error {
 			continue
 		}
 		kind, source := attachmentReference(r)
-		if _, err := m.Exec("DELETE FROM file_references WHERE page_id=? AND source_kind=? AND source_id=? AND file_id=?", item.PageID, kind, source, r.FileID); err != nil {
+		if _, err := m.Exec("DELETE FROM file_references WHERE page_id=? AND source_kind IN (?,?) AND source_id=? AND file_id=?", item.PageID, kind, attachmentLegacyKind(r), source, r.FileID); err != nil {
 			return err
 		}
 	}
@@ -234,12 +241,13 @@ func portableAttachmentRelationships(ctx context.Context, q querier, allowed map
 	if err != nil {
 		return nil, err
 	}
-	rows, err = q.QueryContext(ctx, "SELECT page_id,source_kind,source_id,file_id FROM file_references WHERE source_kind IN ('explicit','explicit_block') ORDER BY page_id,source_kind,source_id,file_id")
+	rows, err = q.QueryContext(ctx, "SELECT page_id,source_kind,source_id,file_id FROM file_references WHERE source_kind IN ('explicit','explicit_user','explicit_block') ORDER BY page_id,source_kind,source_id,file_id")
 	if err != nil {
 		return nil, err
 	}
 	defer rows.Close()
 	out := map[string][]ImportAttachmentRelationship{}
+	seen := map[string]map[ImportAttachmentRelationship]bool{}
 	for rows.Next() {
 		var page, kind, source, file string
 		if err = rows.Scan(&page, &kind, &source, &file); err != nil {
@@ -252,6 +260,13 @@ func portableAttachmentRelationships(ctx context.Context, q querier, allowed map
 		if kind == "explicit_block" {
 			r.BlockID = source
 		}
+		if seen[page] == nil {
+			seen[page] = map[ImportAttachmentRelationship]bool{}
+		}
+		if seen[page][r] {
+			continue
+		}
+		seen[page][r] = true
 		out[page] = append(out[page], r)
 	}
 	return out, rows.Err()

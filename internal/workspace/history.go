@@ -15,9 +15,9 @@ import (
 )
 
 type recoverySnapshot struct {
-	AttachmentRelationships *[]ImportAttachmentRelationship `json:"attachmentRelationships,omitempty"`
-	RecordLayouts           *recoveryLayouts                `json:"recordLayouts,omitempty"`
-	DisplayPreferences      *PageDisplayPreferences         `json:"displayPreferences,omitempty"`
+	AttachmentRelationships *[]recoveryAttachmentReference `json:"attachmentRelationships,omitempty"`
+	RecordLayouts           *recoveryLayouts               `json:"recordLayouts,omitempty"`
+	DisplayPreferences      *PageDisplayPreferences        `json:"displayPreferences,omitempty"`
 	contracts.ServiceReadPageResult
 	Record          *contracts.DomainRecord              `json:"record,omitempty"`
 	Task            *contracts.DomainTaskFacet           `json:"task,omitempty"`
@@ -349,6 +349,9 @@ func restoreGuards(ctx context.Context, k *Kernel, q querier, e contracts.Servic
 			blocks[string(block.Id)] = true
 		}
 		for _, relationship := range *snap.AttachmentRelationships {
+			if _, err := recoveryAttachmentKind(relationship); err != nil {
+				return nil, nil, err
+			}
 			if _, err := decodeAttachment(marshal(relationship)); err != nil {
 				return nil, nil, err
 			}
@@ -610,7 +613,11 @@ func restoreHistory(m *Mutation, c map[string]any) error {
 	}
 	if snap.AttachmentRelationships != nil {
 		for _, relationship := range *snap.AttachmentRelationships {
-			kind, source := attachmentReference(relationship)
+			kind, kindErr := recoveryAttachmentKind(relationship)
+			if kindErr != nil {
+				return kindErr
+			}
+			_, source := attachmentReference(relationship.ImportAttachmentRelationship)
 			if _, err = m.Exec("INSERT OR IGNORE INTO file_references VALUES(?,?,?,?)", page, kind, source, relationship.FileID); err != nil {
 				return err
 			}
