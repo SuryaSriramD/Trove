@@ -3,6 +3,7 @@ package workspace
 import (
 	"context"
 	"encoding/json"
+	"fmt"
 	"path/filepath"
 	"testing"
 
@@ -205,5 +206,21 @@ func TestSchemaGroupRejectsOwnPopulatedValueWithoutMigration(t *testing.T) {
 	definition, err := propertyDefinition(context.Background(), k.db, property)
 	if err != nil || definition.Type != "text" {
 		t.Fatal("rejected group changed schema", definition, err)
+	}
+}
+
+func TestSchemaMutationRejectsFormulaExpressionDependencies(t *testing.T) {
+	for _, version := range []int{1, 2} {
+		t.Run(fmt.Sprint(version), func(t *testing.T) {
+			k, e := testKernel(t)
+			f := newDatabase(t, k, e)
+			property := addImportTextProperty(t, k, e, f, "Unused but referenced")
+			formula := NewID()
+			cfg := derivedConfig("formula", map[string]any{"translatedExpression": fmt.Sprintf("prop(%q)", property), "evaluatorVersion": version})
+			testOK(t, dbBatch(t, k, e, []any{map[string]any{"kind": "collection.addProperty", "collectionId": f.collection, "propertyId": formula, "name": "Dependent", "type": "formula", "schemaVersion": 1, "config": cfg}}, "page", f.page, "collection", f.collection, "property", formula))
+			for _, definition := range []any{nil, schemaDefinition("Changed", "number", map[string]any{"format": "decimal"})} {
+				testCode(t, dbBatch(t, k, e, []any{schemaAction(f.collection, property, definition)}, "page", f.page, "collection", f.collection, "property", property), "CONFLICT")
+			}
+		})
 	}
 }
