@@ -1,4 +1,5 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
+import { useRequestLifetime } from "../requestLifetime";
 import { dispatch, envelope, fileURL, type WorkspaceSnapshot } from "../api";
 type Run = {
   id: string;
@@ -27,7 +28,17 @@ type State = {
   images: { id: string; originalName: string }[];
   imagesTruncated: boolean;
 };
-export function ImageUnderstanding({
+export function ImageUnderstanding(
+  props: Parameters<typeof ImageUnderstandingContent>[0],
+) {
+  return (
+    <ImageUnderstandingContent
+      key={`${props.workspace.workspaceId}:${props.workspace.scopeGrantId}:${props.pageId}`}
+      {...props}
+    />
+  );
+}
+function ImageUnderstandingContent({
   workspace,
   pageId,
   onNavigate,
@@ -38,34 +49,45 @@ export function ImageUnderstanding({
   onNavigate: (id: string) => void;
   onError: (error: unknown) => void;
 }) {
-  const [data, setData] = useState<State>({
+  const [storedData, setStoredData] = useState<{ key: string; value: State }>();
+  const empty: State = {
     runs: [],
     truncated: false,
     images: [],
     imagesTruncated: false,
-  });
+  };
   const [packs, setPacks] = useState<{ id: string; name: string }[]>([]),
     [available, setAvailable] = useState(false),
     [pack, setPack] = useState(""),
     [image, setImage] = useState(""),
     [question, setQuestion] = useState("Describe the visible content briefly."),
     [busy, setBusy] = useState(false);
-  const load = () =>
-    dispatch<State>("image.list", { ...envelope(workspace), pageId }).then(
-      setData,
-    );
+  const scopeKey = `${workspace.workspaceId}:${workspace.scopeGrantId}:${pageId}:${workspace.snapshotCursor}`;
+  const current = useRequestLifetime(scopeKey);
+  const data = storedData?.key === scopeKey ? storedData.value : empty;
+  const reads = useRef(0);
+  const load = async () => {
+    if (!current()) return;
+    const request = ++reads.current;
+    try {
+      const value = await dispatch<State>("image.list", {
+        ...envelope(workspace),
+        pageId,
+      });
+      if (current() && request === reads.current)
+        setStoredData({ key: scopeKey, value });
+    } catch (error) {
+      if (current() && request === reads.current) throw error;
+    }
+  };
   useEffect(() => {
-    let live = true;
     setImage("");
-    setData({ runs: [], truncated: false, images: [], imagesTruncated: false });
+    setBusy(false);
     if (!pageId) return;
-    Promise.all([
-      dispatch<State>("image.list", { ...envelope(workspace), pageId }),
-      dispatch<any>("models.list"),
-    ])
-      .then(([s, m]) => {
-        if (!live) return;
-        setData(s);
+    void load().catch(onError);
+    void dispatch<any>("models.list")
+      .then((m) => {
+        if (!current()) return;
         setAvailable(Boolean(m.runtime?.visionAvailable));
         const ready = m.packs
           .filter((p: any) => p.state === "ready" && p.pack.kind === "vision")
@@ -77,35 +99,26 @@ export function ImageUnderstanding({
             : (ready[0]?.id ?? ""),
         );
       })
-      .catch(onError);
-    return () => {
-      live = false;
-    };
-  }, [workspace.workspaceId, pageId, workspace.snapshotCursor]);
+      .catch((error) => {
+        if (current()) onError(error);
+      });
+  }, [scopeKey]);
   useEffect(() => {
     if (!data.runs.some((r) => r.state === "running")) return;
-    let live = true;
     const timer = setInterval(() => {
-      dispatch<State>("image.list", { ...envelope(workspace), pageId })
-        .then((s) => {
-          if (live) setData(s);
-        })
-        .catch(onError);
+      void load().catch(onError);
     }, 1500);
-    return () => {
-      live = false;
-      clearInterval(timer);
-    };
-  }, [data.runs, pageId, workspace.workspaceId]);
+    return () => clearInterval(timer);
+  }, [data.runs, scopeKey]);
   const action = async (method: string, input: object) => {
     setBusy(true);
     try {
       await dispatch(method, { ...envelope(workspace), ...input });
-      await load();
-    } catch (e) {
-      onError(e);
+      if (current()) await load();
+    } catch (error) {
+      if (current()) onError(error);
     } finally {
-      setBusy(false);
+      if (current()) setBusy(false);
     }
   };
   return (
