@@ -5557,6 +5557,115 @@
       ],
       "additionalProperties": false
     },
+    "ConnectedSharingTarget": {
+      "type": "object",
+      "properties": {
+        "provider": {
+          "type": "string",
+          "enum": [
+            "codex",
+            "claude_code",
+            "mcp"
+          ]
+        },
+        "account": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 512
+        }
+      },
+      "required": [
+        "provider",
+        "account"
+      ],
+      "additionalProperties": false
+    },
+    "ConnectedSharingPreview": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "hash": {
+          "$ref": "domain.schema.json#/$defs/Hash"
+        },
+        "target": {
+          "$ref": "#/$defs/ConnectedSharingTarget"
+        },
+        "sources": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/ConnectedSource"
+          },
+          "maxItems": 12,
+          "minItems": 1
+        },
+        "expiresAt": {
+          "$ref": "domain.schema.json#/$defs/Timestamp"
+        },
+        "notice": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "hash",
+        "target",
+        "sources",
+        "expiresAt",
+        "notice"
+      ],
+      "additionalProperties": false
+    },
+    "ConnectedSharingPreviewRequest": {
+      "type": "object",
+      "properties": {
+        "contractVersion": {
+          "const": 1
+        },
+        "requestId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "workspaceId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "target": {
+          "$ref": "#/$defs/ConnectedSharingTarget"
+        },
+        "sources": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/ConnectedSourceReference"
+          },
+          "maxItems": 12,
+          "minItems": 1
+        }
+      },
+      "required": [
+        "contractVersion",
+        "requestId",
+        "workspaceId",
+        "target",
+        "sources"
+      ],
+      "additionalProperties": false
+    },
+    "ConnectedSharingApproval": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "hash": {
+          "$ref": "domain.schema.json#/$defs/Hash"
+        }
+      },
+      "required": [
+        "id",
+        "hash"
+      ],
+      "additionalProperties": false
+    },
     "ConnectorRegistration": {
       "type": "object",
       "properties": {
