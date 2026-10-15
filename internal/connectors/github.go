@@ -11,6 +11,7 @@ import (
 	"net/url"
 	"strconv"
 	"strings"
+	"unicode/utf8"
 
 	"github.com/google/uuid"
 )
@@ -78,11 +79,17 @@ func (g *githubAdapter) Identity(ctx context.Context, s Session) (Identity, erro
 }
 
 type githubDiscovery struct {
+	Version       int      `json:"version"`
+	Binding       string   `json:"binding"`
 	InstallPage   int      `json:"installPage"`
 	Installations []string `json:"installations"`
 	InstallIndex  int      `json:"installIndex"`
 	RepoPage      int      `json:"repoPage"`
 	MoreInstalls  bool     `json:"moreInstalls"`
+}
+
+func githubCursorBinding(s Session, sel Selection) string {
+	return remoteHash([]any{s.Account.ID, s.Account.Kind, s.Account.Identity, s.Account.Revision, sel})
 }
 
 func opaqueCursor(v any) string { return base64.RawURLEncoding.EncodeToString([]byte(stringify(v))) }
@@ -94,10 +101,14 @@ func decodeCursor(raw string, v any) error {
 	return nil
 }
 func (g *githubAdapter) Discover(ctx context.Context, s Session, cursor string) ([]Selection, string, error) {
-	c := githubDiscovery{InstallPage: 1, RepoPage: 1}
+	binding := githubCursorBinding(s, Selection{})
+	c := githubDiscovery{Version: 1, Binding: binding, InstallPage: 1, RepoPage: 1}
 	if cursor != "" {
 		if err := decodeCursor(cursor, &c); err != nil {
 			return nil, "", err
+		}
+		if c.Version != 1 || c.Binding != binding {
+			return nil, "", fail("STALE_CURSOR", "Discovery cursor belongs to another account or selection revision")
 		}
 	}
 	if c.InstallPage < 1 || c.InstallPage > 100 || c.RepoPage < 1 || c.RepoPage > 100 || c.InstallIndex < 0 || c.InstallIndex > len(c.Installations) {
@@ -202,6 +213,8 @@ func githubSelected(ctx context.Context, s Session, id string) (Selection, strin
 }
 
 type githubRefresh struct {
+	Version  int    `json:"version"`
+	Binding  string `json:"binding"`
 	Stage    string `json:"stage"`
 	Page     int    `json:"page"`
 	Document int    `json:"document"`
@@ -213,7 +226,11 @@ func githubSnapshot(item map[string]any, kind, id string) Snapshot {
 	if title == "" {
 		title = kind + " " + id
 	}
-	return Snapshot{RemoteID: kind + ":" + id, Kind: kind, Title: bounded(title, 2000), Text: bounded(text, 256<<10), URL: remoteString(item["html_url"]), RemoteRevision: remoteHash(item), Content: json.RawMessage(stringify(item))}
+	state := "present"
+	if len(title) > 2000 || len(text) > 256<<10 {
+		state = "partial"
+	}
+	return Snapshot{RemoteID: kind + ":" + id, Kind: kind, Title: bounded(title, 2000), Text: bounded(text, 256<<10), State: state, URL: remoteString(item["html_url"]), RemoteRevision: remoteHash(item), Content: json.RawMessage(stringify(item))}
 }
 func githubDocuments(sel Selection) ([]string, error) {
 	if strings.TrimSpace(sel.Query) == "" {
@@ -238,14 +255,18 @@ func githubDocuments(sel Selection) ([]string, error) {
 	return docs, nil
 }
 func (g *githubAdapter) Refresh(ctx context.Context, s Session, sel Selection, cursor string) (RefreshPage, error) {
-	_, path, err := githubSelected(ctx, s, sel.ID)
+	sel, path, err := githubSelected(ctx, s, sel.ID)
 	if err != nil {
 		return RefreshPage{}, err
 	}
-	c := githubRefresh{Stage: "issues", Page: 1}
+	binding := githubCursorBinding(s, sel)
+	c := githubRefresh{Version: 1, Binding: binding, Stage: "issues", Page: 1}
 	if cursor != "" {
 		if err = decodeCursor(cursor, &c); err != nil {
 			return RefreshPage{}, err
+		}
+		if c.Version != 1 || c.Binding != binding {
+			return RefreshPage{}, fail("STALE_CURSOR", "Refresh cursor belongs to another account or selection revision")
 		}
 	}
 	if c.Page < 1 || c.Page > 100 || c.Document < 0 {
@@ -314,6 +335,9 @@ func (g *githubAdapter) Refresh(ctx context.Context, s Session, sel Selection, c
 			data, decodeErr := base64.StdEncoding.DecodeString(strings.ReplaceAll(encoded, "\n", ""))
 			if decodeErr != nil || len(data) > 256<<10 || remoteString(file["encoding"]) != "base64" || remoteString(file["type"]) != "file" {
 				return out, fail("RESOURCE_EXHAUSTED", "Selected documentation is not a supported text file of at most 256 KiB")
+			}
+			if !utf8.Valid(data) || strings.ContainsRune(string(data), 0) {
+				return out, fail("UNSUPPORTED_CONTENT", "Selected documentation must be UTF-8 text without binary content")
 			}
 			out.Items = append(out.Items, Snapshot{RemoteID: "document:" + doc, Kind: "document", Title: remoteString(file["path"]), Text: string(data), URL: remoteString(file["html_url"]), RemoteRevision: remoteString(file["sha"]), Content: json.RawMessage(stringify(map[string]any{"path": file["path"], "sha": file["sha"]}))})
 		}
@@ -595,7 +619,7 @@ func (g *githubAdapter) Reconcile(ctx context.Context, s Session, p Proposal) (R
 }
 
 func (g *githubAdapter) Preview(ctx context.Context, s Session, sel Selection, remoteID string) (Snapshot, error) {
-	_, path, err := githubSelected(ctx, s, sel.ID)
+	sel, path, err := githubSelected(ctx, s, sel.ID)
 	if err != nil {
 		return Snapshot{}, err
 	}
@@ -617,7 +641,7 @@ func (g *githubAdapter) Preview(ctx context.Context, s Session, sel Selection, r
 		if index < 0 {
 			return Snapshot{}, fail("SELECTION_DENIED", "Documentation path is not selected")
 		}
-		page, err := g.Refresh(ctx, s, sel, opaqueCursor(githubRefresh{Stage: "documents", Page: 1, Document: index}))
+		page, err := g.Refresh(ctx, s, sel, opaqueCursor(githubRefresh{Version: 1, Binding: githubCursorBinding(s, sel), Stage: "documents", Page: 1, Document: index}))
 		if err != nil {
 			return Snapshot{}, err
 		}

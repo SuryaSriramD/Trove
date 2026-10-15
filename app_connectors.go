@@ -334,11 +334,14 @@ func (a *App) connectorDispatch(method string, raw json.RawMessage) string {
 			if account.Kind == connectors.Gmail {
 				return errorEnvelope("SCOPE_DENIED", "Gmail attachment acquisition is awaiting provenance integration")
 			}
+			if !connectorAcquisitionAllowed(account.Kind, fresh, r.RemoteID) {
+				return errorEnvelope("SCOPE_DENIED", "Choose a file from the authenticated source preview")
+			}
 			file, err := acquirer.Acquire(ctx, session, selection, r.RemoteID, r.Format)
 			if err != nil {
 				return connectorError(err)
 			}
-			if account.Kind == connectors.GoogleDrive && file.RemoteRevision != fresh.RemoteRevision {
+			if file.RemoteRevision == "" || file.RemoteRevision != fresh.RemoteRevision {
 				return errorEnvelope("CONFLICT", "File changed during acquisition; inspect its latest preview")
 			}
 			result, err := k.PrepareConnectorAcquired(ctx, e, account, selection.ID, file)
@@ -373,6 +376,27 @@ func (a *App) connectorDispatch(method string, raw json.RawMessage) string {
 		return connectorSuccessOrError(receipt, err)
 	}
 	return errorEnvelope("INVALID_REQUEST", "Unknown connector operation")
+}
+
+func connectorAcquisitionAllowed(kind connectors.Kind, source connectors.Snapshot, remote string) bool {
+	if remote == "" {
+		return false
+	}
+	if kind != connectors.Gmail {
+		return remote == source.RemoteID
+	}
+	var content struct {
+		AttachmentKeys []string `json:"attachmentKeys"`
+	}
+	if json.Unmarshal(source.Content, &content) != nil {
+		return false
+	}
+	for _, key := range content.AttachmentKeys {
+		if key == remote {
+			return true
+		}
+	}
+	return false
 }
 func connectorSuccessOrError(result any, err error) string {
 	if err != nil {

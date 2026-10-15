@@ -284,6 +284,7 @@ func (a *mcpAdapter) Refresh(ctx context.Context, s Session, sel Selection, curs
 	defer cs.Close()
 	var content any
 	text := ""
+	state := "present"
 	switch sel.Kind {
 	case "resource":
 		res, err := cs.ReadResource(ctx, &mcp.ReadResourceParams{URI: name})
@@ -298,7 +299,12 @@ func (a *mcpAdapter) Refresh(ctx context.Context, s Session, sel Selection, curs
 				return RefreshPage{}, fail("SELECTION_DENIED", "MCP returned content outside the selected resource")
 			}
 			if len(c.Blob) > 0 {
-				return RefreshPage{}, fail("UNSUPPORTED_CONTENT", "This MCP resource is binary; select a text resource")
+				if c.Text != "" {
+					return RefreshPage{}, fail("INVALID_RESPONSE", "MCP resource has conflicting text and binary representations")
+				}
+				state = "partial"
+				text += "Binary resource; acquire its exact representation to retain the content.\n"
+				continue
 			}
 			text += c.Text + "\n"
 		}
@@ -317,7 +323,11 @@ func (a *mcpAdapter) Refresh(ctx context.Context, s Session, sel Selection, curs
 	if err != nil || len(data) > MaxResponseBytes || len(text) > MaxResponseBytes {
 		return RefreshPage{}, fail("INVALID_RESPONSE", "MCP evidence exceeded its bound")
 	}
-	return RefreshPage{Items: []Snapshot{{RemoteID: sel.ID, Kind: "mcp_" + sel.Kind, Title: bounded(sel.Label, 2000), Text: text, URL: s.Account.Endpoint, RemoteRevision: remoteHash(content), Content: data}}, Complete: true, FullEnumeration: true}, nil
+	if len(text) > 256<<10 || len(sel.Label) > 2000 {
+		text = bounded(text, 256<<10)
+		state = "partial"
+	}
+	return RefreshPage{Items: []Snapshot{{RemoteID: sel.ID, Kind: "mcp_" + sel.Kind, Title: bounded(sel.Label, 2000), Text: text, State: state, URL: s.Account.Endpoint, RemoteRevision: remoteHash(content), Content: data}}, Complete: true, FullEnumeration: true}, nil
 }
 func validateMCPArguments(schema any, raw json.RawMessage) error {
 	if len(raw) == 0 || len(raw) > 1<<20 {
