@@ -129,6 +129,10 @@ defs['MeetingExtractionCreateRequest']=obj({**header,'meetingId':D('Id'),'eviden
 defs['MeetingExtractionCreateRequest']['dependentRequired']={'proposalId':['itemId'],'itemId':['proposalId']}
 # Native-only backup output. Passphrases deliberately have no dispatcher/job
 # request definition and never enter a persisted request or model payload.
+defs['NativeAudioInput']=obj({'id':{'type':'string','minLength':1,'maxLength':1024},'name':{'type':'string','minLength':1,'maxLength':1024},'isDefault':B})
+defs['NativeCaptureControlAck']=obj({'controlId':D('Id'),'action':enum('pause','resume','stop'),'state':enum('paused','recording','stopped'),'bytes':N,'capturedSamples':N,'durationMs':N})
+defs['NativeRecordingGap']=obj({'id':D('Id'),'kind':enum('pause','interruption'),'sampleOffset':N,'startedAt':D('Timestamp'),'endedAt':D('Timestamp'),'durationMs':N,'reason':S},['id','kind','sampleOffset','startedAt'])
+defs['NativeRecordingDraft']=obj({'version':{'const':1},'id':D('Id'),'title':S,'actorId':D('Id'),'startedAt':D('Timestamp'),'state':enum('recording','paused','captured','interrupted','saved'),'bytes':N,'durationMs':N,'pageId':D('Id'),'meetingId':D('Id'),'fileId':D('Id'),'error':S,'inputDeviceId':S,'disclosureAcknowledgedAt':D('Timestamp'),'lastControlId':D('Id'),'gaps':arr(R('NativeRecordingGap'),10000),'segments':arr(obj({'startByte':N,'endByte':N,'sha256':{'type':'string','pattern':'^[0-9a-f]{64}$'}}),100000)},['id','title','actorId','startedAt','state','bytes','durationMs','pageId','meetingId','segments'])
 defs['NativeBackupProgress']=obj({'version':{'const':1},'phase':enum('idle','choosing','snapshot','encrypting','authenticating','verifying','review','restoring','complete'),'bytes':{'type':'string','pattern':'^(0|[1-9][0-9]*)$'},'totalBytes':{'type':'string','pattern':'^(0|[1-9][0-9]*)$'}})
 defs['NativeBackupSummary']=obj({'version':{'const':1},'format':{'const':'age-passphrase/native-tar-v1'},'included':arr(S,32),'excluded':arr(S,32),'restoration':arr(S,32)})
 defs['AutomationOptionsRequest']=obj({**header,'pageId':D('Id')})

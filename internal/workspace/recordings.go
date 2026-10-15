@@ -16,6 +16,7 @@ import (
 	"regexp"
 	"strings"
 	"sync"
+	"time"
 
 	"trove.local/phase0/contracts"
 	"trove.local/phase0/internal/platformfs"
@@ -27,18 +28,32 @@ type RecordingSegment struct {
 	SHA256    string `json:"sha256"`
 }
 type RecordingDraft struct {
-	ID         string             `json:"id"`
-	Title      string             `json:"title"`
-	ActorID    string             `json:"actorId"`
-	StartedAt  string             `json:"startedAt"`
-	State      string             `json:"state"`
-	Bytes      int64              `json:"bytes"`
-	DurationMS int64              `json:"durationMs"`
-	PageID     string             `json:"pageId"`
-	MeetingID  string             `json:"meetingId"`
-	FileID     string             `json:"fileId,omitempty"`
-	Error      string             `json:"error,omitempty"`
-	Segments   []RecordingSegment `json:"segments"`
+	Version                  int                `json:"version,omitempty"`
+	InputDeviceID            string             `json:"inputDeviceId,omitempty"`
+	DisclosureAcknowledgedAt string             `json:"disclosureAcknowledgedAt,omitempty"`
+	LastControlID            string             `json:"lastControlId,omitempty"`
+	Gaps                     []RecordingGap     `json:"gaps,omitempty"`
+	ID                       string             `json:"id"`
+	Title                    string             `json:"title"`
+	ActorID                  string             `json:"actorId"`
+	StartedAt                string             `json:"startedAt"`
+	State                    string             `json:"state"`
+	Bytes                    int64              `json:"bytes"`
+	DurationMS               int64              `json:"durationMs"`
+	PageID                   string             `json:"pageId"`
+	MeetingID                string             `json:"meetingId"`
+	FileID                   string             `json:"fileId,omitempty"`
+	Error                    string             `json:"error,omitempty"`
+	Segments                 []RecordingSegment `json:"segments"`
+}
+type RecordingGap struct {
+	ID           string `json:"id"`
+	Kind         string `json:"kind"`
+	SampleOffset int64  `json:"sampleOffset"`
+	StartedAt    string `json:"startedAt"`
+	EndedAt      string `json:"endedAt,omitempty"`
+	DurationMS   *int64 `json:"durationMs,omitempty"`
+	Reason       string `json:"reason,omitempty"`
 }
 
 var recordingID = regexp.MustCompile(`^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$`)
@@ -110,6 +125,23 @@ func (k *Kernel) readRecording(e contracts.ServiceExecutionContext, id string) (
 // BeginRecording creates the recovery journal before the microphone process is
 // admitted. The returned descriptor is workspace-owned and never a /tmp file.
 func (k *Kernel) BeginRecording(ctx context.Context, e contracts.ServiceExecutionContext, title string) (RecordingDraft, *os.File, error) {
+	return k.beginRecording(ctx, e, title, "", false)
+}
+
+// BeginDisclosedRecording is the native microphone boundary. Audio imports and
+// historical journals remain readable without inventing participant disclosure.
+func (k *Kernel) BeginDisclosedRecording(ctx context.Context, e contracts.ServiceExecutionContext, title, input string, disclosed bool) (RecordingDraft, *os.File, error) {
+	if !disclosed || len(input) > 1024 {
+		return RecordingDraft{}, nil, Fail("APPROVAL_REQUIRED", "Acknowledge participant disclosure before recording")
+	}
+	if available, err := platformfs.AvailableBytes(k.path); err != nil {
+		return RecordingDraft{}, nil, err
+	} else if available < 64<<20 {
+		return RecordingDraft{}, nil, Fail("INVALID_REQUEST", "Free at least 64 MiB before recording; existing audio remains recoverable")
+	}
+	return k.beginRecording(ctx, e, title, input, disclosed)
+}
+func (k *Kernel) beginRecording(ctx context.Context, e contracts.ServiceExecutionContext, title, input string, disclosed bool) (RecordingDraft, *os.File, error) {
 	lock := recordingLock(k)
 	lock.Lock()
 	defer lock.Unlock()
@@ -124,7 +156,10 @@ func (k *Kernel) BeginRecording(ctx context.Context, e contracts.ServiceExecutio
 	if len(title) > 512 {
 		return d, nil, Fail("INVALID_REQUEST", "Recording title is too long")
 	}
-	d = RecordingDraft{ID: NewID(), Title: title, ActorID: string(e.Actor.ActorId), StartedAt: now(), State: "recording", PageID: NewID(), MeetingID: NewID(), Segments: []RecordingSegment{}}
+	d = RecordingDraft{Version: 1, InputDeviceID: input, ID: NewID(), Title: title, ActorID: string(e.Actor.ActorId), StartedAt: now(), State: "recording", PageID: NewID(), MeetingID: NewID(), Segments: []RecordingSegment{}}
+	if disclosed {
+		d.DisclosureAcknowledgedAt = now()
+	}
 	path, err := k.recordingPath(d.ID, ".f32le")
 	if err != nil {
 		return d, nil, err
@@ -184,14 +219,84 @@ func (k *Kernel) CheckpointRecording(ctx context.Context, e contracts.ServiceExe
 		d.DurationMS = size / 64
 	}
 	if terminal {
+		if captureError == "" && d.Error == "" {
+			closeRecordingPause(&d)
+		}
 		d.State = "captured"
 		if captureError != "" {
 			d.Error = captureError
 		}
 		if d.Error != "" {
+			if len(d.Gaps) == 0 || d.Gaps[len(d.Gaps)-1].Kind != "interruption" {
+				d.Gaps = append(d.Gaps, RecordingGap{ID: NewID(), Kind: "interruption", SampleOffset: d.Bytes / 4, StartedAt: now(), Reason: d.Error})
+			}
 			d.State = "interrupted"
 		}
 	}
+	return d, k.writeRecording(d)
+}
+
+func closeRecordingPause(d *RecordingDraft) {
+	if len(d.Gaps) == 0 {
+		return
+	}
+	g := &d.Gaps[len(d.Gaps)-1]
+	if g.Kind != "pause" || g.EndedAt != "" {
+		return
+	}
+	g.EndedAt = now()
+	start, e1 := time.Parse(time.RFC3339Nano, g.StartedAt)
+	end, e2 := time.Parse(time.RFC3339Nano, g.EndedAt)
+	if e1 == nil && e2 == nil && end.After(start) {
+		ms := end.Sub(start).Milliseconds()
+		g.DurationMS = &ms
+	}
+}
+
+// AcknowledgeRecordingControl persists only a native acknowledgement after its
+// flushed bytes have been checkpointed. Repeating the same receipt is inert.
+func (k *Kernel) AcknowledgeRecordingControl(ctx context.Context, e contracts.ServiceExecutionContext, id, controlID, action string, samples int64) (RecordingDraft, error) {
+	lock := recordingLock(k)
+	lock.Lock()
+	defer lock.Unlock()
+	d, err := k.readRecording(e, id)
+	if err != nil {
+		return d, err
+	}
+	if !recordingID.MatchString(controlID) || samples < 0 || samples > d.Bytes/4 {
+		return d, Fail("INVALID_REQUEST", "Invalid acknowledged capture boundary")
+	}
+	if d.LastControlID == controlID {
+		return d, nil
+	}
+	if d.State == "saved" || d.State == "interrupted" {
+		return d, Fail("CONFLICT", "Recording is no longer controllable")
+	}
+	switch action {
+	case "pause":
+		if len(d.Gaps) >= 10000 {
+			return d, Fail("RESOURCE_EXHAUSTED", "Recording gap journal is full; stop and save this meeting")
+		}
+		if d.State != "recording" && d.State != "paused" {
+			return d, Fail("CONFLICT", "Recording has ended")
+		}
+		if d.State != "paused" {
+			d.Gaps = append(d.Gaps, RecordingGap{ID: controlID, Kind: "pause", SampleOffset: samples, StartedAt: now()})
+		}
+		d.State = "paused"
+	case "resume":
+		if d.State != "recording" && d.State != "paused" {
+			return d, Fail("CONFLICT", "Recording has ended")
+		}
+		closeRecordingPause(&d)
+		d.State = "recording"
+	case "stop":
+		closeRecordingPause(&d)
+		d.State = "captured"
+	default:
+		return d, Fail("INVALID_REQUEST", "Invalid capture control")
+	}
+	d.LastControlID = controlID
 	return d, k.writeRecording(d)
 }
 func (k *Kernel) ListRecordings(ctx context.Context, e contracts.ServiceExecutionContext) ([]RecordingDraft, error) {
@@ -568,9 +673,10 @@ func init() {
 			if err != nil {
 				return err
 			}
-			if draft.State != "recording" {
+			if draft.State != "recording" && draft.State != "paused" {
 				continue
 			}
+			draft.Gaps = append(draft.Gaps, RecordingGap{ID: NewID(), Kind: "interruption", SampleOffset: draft.Bytes / 4, StartedAt: now(), Reason: "Capture process exited; gap duration is unknown"})
 			draft.State = "interrupted"
 			if draft.Error == "" {
 				draft.Error = "Capture was interrupted before completion; flushed audio is retained for recovery"

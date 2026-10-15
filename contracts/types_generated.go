@@ -2023,6 +2023,51 @@ type ServiceMeetingExtractionCreateRequest struct {
 	ProposalId      *DomainId `json:"proposalId,omitempty"`
 	ItemId          *string   `json:"itemId,omitempty"`
 }
+type ServiceNativeAudioInput struct {
+	Id        string `json:"id"`
+	Name      string `json:"name"`
+	IsDefault bool   `json:"isDefault"`
+}
+type ServiceNativeCaptureControlAck struct {
+	ControlId       DomainId `json:"controlId"`
+	Action          string   `json:"action"`
+	State           string   `json:"state"`
+	Bytes           int64    `json:"bytes"`
+	CapturedSamples int64    `json:"capturedSamples"`
+	DurationMs      int64    `json:"durationMs"`
+}
+type ServiceNativeRecordingGap struct {
+	Id           DomainId         `json:"id"`
+	Kind         string           `json:"kind"`
+	SampleOffset int64            `json:"sampleOffset"`
+	StartedAt    DomainTimestamp  `json:"startedAt"`
+	EndedAt      *DomainTimestamp `json:"endedAt,omitempty"`
+	DurationMs   *int64           `json:"durationMs,omitempty"`
+	Reason       *string          `json:"reason,omitempty"`
+}
+type ServiceNativeRecordingDraft struct {
+	Version                  *int64                      `json:"version,omitempty"`
+	Id                       DomainId                    `json:"id"`
+	Title                    string                      `json:"title"`
+	ActorId                  DomainId                    `json:"actorId"`
+	StartedAt                DomainTimestamp             `json:"startedAt"`
+	State                    string                      `json:"state"`
+	Bytes                    int64                       `json:"bytes"`
+	DurationMs               int64                       `json:"durationMs"`
+	PageId                   DomainId                    `json:"pageId"`
+	MeetingId                DomainId                    `json:"meetingId"`
+	FileId                   *DomainId                   `json:"fileId,omitempty"`
+	Error                    *string                     `json:"error,omitempty"`
+	InputDeviceId            *string                     `json:"inputDeviceId,omitempty"`
+	DisclosureAcknowledgedAt *DomainTimestamp            `json:"disclosureAcknowledgedAt,omitempty"`
+	LastControlId            *DomainId                   `json:"lastControlId,omitempty"`
+	Gaps                     []ServiceNativeRecordingGap `json:"gaps,omitempty"`
+	Segments                 []struct {
+		StartByte int64  `json:"startByte"`
+		EndByte   int64  `json:"endByte"`
+		Sha256    string `json:"sha256"`
+	} `json:"segments"`
+}
 type ServiceNativeBackupProgress struct {
 	Version    int64  `json:"version"`
 	Phase      string `json:"phase"`

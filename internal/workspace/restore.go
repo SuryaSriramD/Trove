@@ -137,7 +137,7 @@ func validateRecordingInventory(ctx context.Context, root string, objects []Back
 		if e != nil {
 			return e
 		}
-		if path != "recordings/"+d.ID+".json" || d.State == "recording" || d.Bytes < 0 {
+		if path != "recordings/"+d.ID+".json" || d.State == "recording" || d.State == "paused" || d.Bytes < 0 {
 			return Fail("INVALID_REQUEST", "Invalid recording journal")
 		}
 		if d.State == "saved" {
