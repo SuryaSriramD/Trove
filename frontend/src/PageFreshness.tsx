@@ -19,10 +19,11 @@ export function freshnessLabel(f: D.PageFreshness): string {
   if (
     f.state === "stale" &&
     f.review &&
-    f.review.contentIdentity.version !== f.contentIdentity.version
+    f.review.contentIdentity.version !== f.contentIdentity?.version
   )
     return "Review coverage changed";
   return {
+    unavailable: "Review status unavailable",
     never_reviewed: "Never reviewed",
     reviewed: "Human reviewed",
     stale: "Changed since review",
@@ -83,7 +84,11 @@ export function PageFreshness({
   ]);
   useEffect(() => setExpiry(""), [workspace.workspaceId, page.id]);
   async function review() {
-    if (!result) return;
+    if (
+      !result?.freshness.contentIdentity ||
+      result.freshness.state === "unavailable"
+    )
+      return;
     setBusy(true);
     try {
       await batch(
@@ -115,7 +120,11 @@ export function PageFreshness({
         A human review covers this page’s content and record values. It does not
         verify that every statement is true.
       </p>
+      {result?.freshness.message && (
+        <p role="status">{result.freshness.message}</p>
+      )}
       {result?.freshness.review &&
+        result.freshness.contentIdentity &&
         result.freshness.review.contentIdentity.version !==
           result.freshness.contentIdentity.version && (
           <p>
@@ -145,7 +154,14 @@ export function PageFreshness({
           onChange={(e) => setExpiry(e.target.value)}
         />
       </label>
-      <button disabled={busy || !result} onClick={() => void review()}>
+      <button
+        disabled={
+          busy ||
+          !result?.freshness.contentIdentity ||
+          result.freshness.state === "unavailable"
+        }
+        onClick={() => void review()}
+      >
         {busy ? "Recording review…" : "I reviewed the current content"}
       </button>
       {!!result?.history.length && (

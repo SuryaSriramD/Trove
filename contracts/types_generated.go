@@ -881,9 +881,10 @@ type DomainHumanReviewEvent struct {
 	ContentIdentity DomainSemanticContentIdentity `json:"contentIdentity"`
 }
 type DomainPageFreshness struct {
-	State           string                        `json:"state"`
-	ContentIdentity DomainSemanticContentIdentity `json:"contentIdentity"`
-	Review          *DomainHumanReviewEvent       `json:"review,omitempty"`
+	State           string                         `json:"state"`
+	ContentIdentity *DomainSemanticContentIdentity `json:"contentIdentity,omitempty"`
+	Review          *DomainHumanReviewEvent        `json:"review,omitempty"`
+	Message         *string                        `json:"message,omitempty"`
 }
 type DomainImportNormalizedSnapshot struct {
 	Version               int64                      `json:"version"`
@@ -4092,19 +4093,29 @@ type ServiceProviderDiscoverRequest struct {
 	Provider        string   `json:"provider"`
 }
 type ServiceProviderManagedStartRequest struct {
-	ContractVersion int64                     `json:"contractVersion"`
-	RequestId       DomainId                  `json:"requestId"`
-	WorkspaceId     DomainId                  `json:"workspaceId"`
-	Provider        string                    `json:"provider"`
-	RegistrationId  string                    `json:"registrationId"`
-	BillingMode     string                    `json:"billingMode"`
-	Model           string                    `json:"model"`
-	Prompt          string                    `json:"prompt"`
-	PageIds         []DomainId                `json:"pageIds"`
-	Tools           []string                  `json:"tools"`
-	PreviewHash     string                    `json:"previewHash"`
-	ResumeRunId     *DomainId                 `json:"resumeRunId,omitempty"`
-	Skill           *ServiceSkillRunReference `json:"skill,omitempty"`
+	ContractVersion  int64                            `json:"contractVersion"`
+	RequestId        DomainId                         `json:"requestId"`
+	WorkspaceId      DomainId                         `json:"workspaceId"`
+	Provider         string                           `json:"provider"`
+	RegistrationId   string                           `json:"registrationId"`
+	BillingMode      string                           `json:"billingMode"`
+	Model            string                           `json:"model"`
+	Prompt           string                           `json:"prompt"`
+	PageIds          []DomainId                       `json:"pageIds"`
+	Tools            []string                         `json:"tools"`
+	PreviewHash      string                           `json:"previewHash"`
+	ResumeRunId      *DomainId                        `json:"resumeRunId,omitempty"`
+	Skill            *ServiceSkillRunReference        `json:"skill,omitempty"`
+	ConnectedSharing *ServiceConnectedSharingApproval `json:"connectedSharing,omitempty"`
+}
+type ServiceProviderConnectedPreviewRequest struct {
+	ContractVersion int64                             `json:"contractVersion"`
+	RequestId       DomainId                          `json:"requestId"`
+	WorkspaceId     DomainId                          `json:"workspaceId"`
+	Provider        string                            `json:"provider"`
+	RegistrationId  string                            `json:"registrationId"`
+	BillingMode     string                            `json:"billingMode"`
+	Sources         []ServiceConnectedSourceReference `json:"sources"`
 }
 type ServiceProviderManagedCancelRequest struct {
 	ContractVersion int64    `json:"contractVersion"`

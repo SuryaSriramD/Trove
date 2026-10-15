@@ -117,7 +117,13 @@ window.go = {
         const r = JSON.parse(raw);
         calls.push({ method, request: r });
         let result: any;
-        if (method === "connectors.list")
+        if (method === "providers.status") result = { connections: [] };
+        else if (method === "providers.proposals") result = [];
+        else if (method === "providers.runs")
+          result = { runs: [], activeRunId: "", runtimes: [] };
+        else if (method === "providers.auth.list")
+          result = { available: true, reason: "", registrations: [] };
+        else if (method === "connectors.list")
           result = r.workspaceId === id(9) ? [] : [account];
         else if (method === "connectors.contextReference")
           result = {

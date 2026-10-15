@@ -48,11 +48,30 @@ class DesktopPackageTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError,'baseline'):d.validate_native(root,'linux-amd64',self.lock)
     def test_microphone_sidecar_must_match_production_record(self):
         root=self.bundle('linux-amd64');path=root/'microphone-worker';self.binary(path,'linux-amd64')
-        helper=dict(name='microphone-worker',sha256=d.digest(path),architecture='amd64',runtime='microphone',runtimeCommit='miniaudio-0.11.25-trove-microphone-v1')
+        helper=dict(name='microphone-worker',sha256=d.digest(path),architecture='amd64',runtime='microphone',runtimeCommit=json.loads((d.ROOT/'native/microphone.lock.json').read_text())['runtimeCommit'])
         manifest=json.loads((root/'manifest.json').read_text());manifest['helpers'].append(helper);(root/'manifest.json').write_text(json.dumps(manifest))
-        sidecar=dict(schemaVersion=1,platform='linux',helper=helper,testOnly=False,deviceBackendCompiled=True)
+        sidecar=dict(schemaVersion=1,platform='linux',helper=helper,testOnly=False,deviceBackendCompiled=True,capabilities=['record','capture_controls_v1','input_devices_v1'])
         (root/'microphone-worker.json').write_text(json.dumps(sidecar));d.validate_native(root,'linux-amd64',self.lock)
         sidecar['helper']=dict(helper,sha256='different');(root/'microphone-worker.json').write_text(json.dumps(sidecar))
+        with self.assertRaisesRegex(ValueError,'provenance'):d.validate_native(root,'linux-amd64',self.lock)
+
+    def test_microphone_old_runtime_and_missing_controls_are_rejected(self):
+        root=self.bundle('linux-amd64');path=root/'microphone-worker';self.binary(path,'linux-amd64')
+        pin=json.loads((d.ROOT/'native/microphone.lock.json').read_text())
+        helper=dict(name='microphone-worker',sha256=d.digest(path),architecture='amd64',runtime='microphone',runtimeCommit=pin['runtimeCommit'])
+        manifest=json.loads((root/'manifest.json').read_text());manifest['helpers'].append(helper)
+        (root/'manifest.json').write_text(json.dumps(manifest))
+        sidecar=dict(schemaVersion=1,platform='linux',helper=helper,testOnly=False,deviceBackendCompiled=True,capabilities=['record','capture_controls_v1','input_devices_v1'])
+        variants=[{k:v for k,v in sidecar.items() if k!='capabilities'}]
+        variants += [{**sidecar,'capabilities':caps} for caps in [[],['record'],['record','capture_controls_v1'],['record','input_devices_v1']]]
+        for index,variant in enumerate(variants):
+            with self.subTest(variant=index):
+                (root/'microphone-worker.json').write_text(json.dumps(variant))
+                with self.assertRaisesRegex(ValueError,'provenance'):d.validate_native(root,'linux-amd64',self.lock)
+        old_helper={**helper,'runtimeCommit':'miniaudio-0.11.25-trove-microphone-v1'}
+        manifest['helpers'][-1]=old_helper
+        (root/'manifest.json').write_text(json.dumps(manifest))
+        (root/'microphone-worker.json').write_text(json.dumps({**sidecar,'helper':old_helper}))
         with self.assertRaisesRegex(ValueError,'provenance'):d.validate_native(root,'linux-amd64',self.lock)
 
     def test_path_escape_reserved_names_and_checksum_injection(self):

@@ -139,3 +139,63 @@ test("old-source completion cannot enter a newly selected revision", async ({
   ).toBeVisible();
   await expect(page.locator(".ai-prose")).toHaveCount(0);
 });
+
+test("Gmail remains available locally but cannot open external sharing", async ({
+  page,
+}) => {
+  await selectSource(page, "gmail");
+  await expect(
+    page.getByRole("button", {
+      name: "Review sharing with an external provider",
+    }),
+  ).toBeDisabled();
+  await expect(
+    page.getByText(
+      "Gmail-derived context remains local. Remove Gmail sources to review external sharing.",
+    ),
+  ).toBeVisible();
+  expect(
+    await page.evaluate(() =>
+      (window as any).connectorCalls.some((c: any) =>
+        c.method.startsWith("providers."),
+      ),
+    ),
+  ).toBe(false);
+});
+
+test("Connections opens a separate external review without starting or sharing", async ({
+  page,
+}) => {
+  await selectSource(page, "github");
+  await page
+    .getByRole("button", { name: "Review sharing with an external provider" })
+    .click();
+  await expect(
+    page.getByRole("region", { name: "Managed Codex", exact: true }),
+  ).toBeVisible();
+  await expect(page.getByText("No saved ChatGPT accounts.")).toBeVisible();
+  await expect(page.getByLabel("Provider", { exact: true })).toHaveValue(
+    "codex",
+  );
+  await expect(
+    page.getByRole("option", { name: "Paired local MCP client" }),
+  ).toHaveCount(0);
+  await expect(page.getByRole("alert")).toHaveCount(0);
+  expect(
+    await page.evaluate(() =>
+      (window as any).connectorCalls.some((c: any) =>
+        [
+          "providers.start",
+          "providers.connectedPreview",
+          "providers.connect",
+        ].includes(c.method),
+      ),
+    ),
+  ).toBe(false);
+  await page
+    .getByRole("button", { name: "Remove Remote issue", exact: true })
+    .click();
+  await expect(
+    page.getByRole("region", { name: "Managed Codex", exact: true }),
+  ).toHaveCount(0);
+});

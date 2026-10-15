@@ -16,16 +16,18 @@ import (
 )
 
 type providerHost struct {
-	mu       sync.Mutex
-	bridge   *workspace.ProviderBridge
-	server   *http.Server
-	listener net.Listener
-	url      string
-	runtimes map[string]providers.Runtime
-	managed  *managedExecution
-	starting bool
-	models   map[string]accountModels
-	unsaved  map[string]workspace.ManagedRun
+	preparations         map[string]*providerPreparation
+	preparationCancelled map[string]time.Time
+	mu                   sync.Mutex
+	bridge               *workspace.ProviderBridge
+	server               *http.Server
+	listener             net.Listener
+	url                  string
+	runtimes             map[string]providers.Runtime
+	managed              *managedExecution
+	starting             bool
+	models               map[string]accountModels
+	unsaved              map[string]workspace.ManagedRun
 }
 
 var providerHosts sync.Map
@@ -34,6 +36,7 @@ func (a *App) stopProviders() {
 	if v, ok := providerHosts.LoadAndDelete(a); ok {
 		h := v.(*providerHost)
 		h.bridge.Close()
+		h.stopPreparations()
 		h.stopManaged()
 		if h.listener != nil {
 			_ = h.listener.Close()
@@ -53,12 +56,15 @@ func (a *App) providerDispatch(method string, raw json.RawMessage) string {
 	if strings.HasPrefix(method, "providers.auth.") {
 		return a.providerAuthDispatch(method, raw)
 	}
-	if method == "providers.models" || method == "providers.discover" || method == "providers.runs" || method == "providers.start" || method == "providers.cancel" {
+	if method == "providers.connectedPreview" || method == "providers.models" || method == "providers.discover" || method == "providers.runs" || method == "providers.start" || method == "providers.cancel" {
 		return a.managedProviderDispatch(method, raw)
 	}
+	// Dispatch holds the workspace lifecycle lock. Do not retain app.mu across
+	// bridge calls: connected-source approval reenters the authenticated host.
 	a.mu.RLock()
-	defer a.mu.RUnlock()
-	if a.kernel == nil {
+	k, execution, ctx := a.kernel, a.execution, a.ctx
+	a.mu.RUnlock()
+	if k == nil {
 		return errorEnvelope("WORKSPACE_LOCKED", "No workspace open")
 	}
 	var r struct {
@@ -73,14 +79,13 @@ func (a *App) providerDispatch(method string, raw json.RawMessage) string {
 		Result          string   `json:"result"`
 		Pending         string   `json:"pending"`
 	}
-	if json.Unmarshal(raw, &r) != nil || r.WorkspaceID != a.kernel.ID() || r.ContractVersion != 1 {
+	if json.Unmarshal(raw, &r) != nil || r.WorkspaceID != k.ID() || r.ContractVersion != 1 {
 		return errorEnvelope("INVALID_REQUEST", "Invalid provider request")
 	}
-	ctx := a.ctx
 	if ctx == nil {
 		ctx = context.Background()
 	}
-	v, _ := providerHosts.LoadOrStore(a, &providerHost{bridge: workspace.NewProviderBridge(a.kernel, a.execution)})
+	v, _ := providerHosts.LoadOrStore(a, &providerHost{bridge: workspace.NewProviderBridge(k, execution)})
 	h := v.(*providerHost)
 	var result any
 	var err error

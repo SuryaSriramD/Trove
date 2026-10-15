@@ -42,6 +42,9 @@ type App struct {
 	performance       *qualificationPerformance
 	reminders         *reminderDesktop
 	reminderBootstrap sync.Once
+
+	providerPreparationMu          sync.Mutex
+	providerPreparationSuspensions int
 }
 
 func NewApp() *App {
@@ -175,6 +178,8 @@ func (a *App) shutdown(context.Context) {
 	a.cancelBackupOperation()
 	a.closeBackupPreviews()
 	a.stopReminderLoop()
+	resumeProviderPreparations := a.suspendProviderPreparations()
+	defer resumeProviderPreparations()
 	resumeOCR := a.cancelOCRForLifecycle()
 	defer resumeOCR()
 	a.lifecycle.Lock()
@@ -223,6 +228,8 @@ func (a *App) open(path string, create bool) error {
 	if err := a.requireRollbackCommitted(); err != nil {
 		return err
 	}
+	resumeProviderPreparations := a.suspendProviderPreparations()
+	defer resumeProviderPreparations()
 	resumeOCR := a.cancelOCRForLifecycle()
 	defer resumeOCR()
 	a.lifecycle.Lock()

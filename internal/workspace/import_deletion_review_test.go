@@ -22,7 +22,7 @@ func TestImportSourceBlockDeletionRequiresExplicitReviewedFields(t *testing.T) {
 			fields = append(fields, map[string]any{"path": field.Path, "choice": "take_incoming"})
 		}
 	}
-	if len(fields) != 3 {
+	if len(fields) != 2 {
 		t.Fatal("incomplete block deletion review", fields)
 	}
 	if _, err := commitPortableImport(context.Background(), k, e, map[string]any{"planId": preview.ID, "planHash": preview.Hash}); err == nil {

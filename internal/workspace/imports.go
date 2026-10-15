@@ -49,6 +49,7 @@ type ImportBlock struct {
 	Data map[string]any `json:"data"`
 }
 type ImportItem struct {
+	SourceDeletionProof     *ImportSourceDeletionProof              `json:"sourceDeletionProof,omitempty"`
 	CollectionSourceScope   string                                  `json:"collectionSourceScope,omitempty"`
 	PortableIdentity        string                                  `json:"portableIdentity,omitempty"`
 	PageSourceScope         string                                  `json:"pageSourceScope,omitempty"`

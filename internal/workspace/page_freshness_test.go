@@ -39,7 +39,7 @@ func TestPageFreshnessContentPresentationAndHistory(t *testing.T) {
 		t.Fatal("replay created reviews", count)
 	}
 	testOK(t, dbBatch(t, k, e, []any{map[string]any{"kind": "page.display.set", "pageId": page, "fullWidth": true, "presentation": true}, map[string]any{"kind": "block.update", "blockId": block, "type": "paragraph", "schemaVersion": 1, "data": map[string]any{"richText": []any{map[string]any{"text": "stable ", "marks": []string{"bold"}}, map[string]any{"text": "words", "marks": []string{"italic"}}}}}}, "page", page, "block", block))
-	if got := testFreshness(t, k, page); got.State != "reviewed" || got.ContentIdentity != first.ContentIdentity {
+	if got := testFreshness(t, k, page); got.State != "reviewed" || *got.ContentIdentity != *first.ContentIdentity {
 		t.Fatal("presentation invalidated review", got)
 	}
 	testOK(t, dbBatch(t, k, e, []any{map[string]any{"kind": "page.update", "pageId": page, "title": "Changed knowledge"}}, "page", page))

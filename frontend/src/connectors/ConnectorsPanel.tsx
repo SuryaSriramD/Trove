@@ -11,6 +11,7 @@ import {
 } from "../api";
 import { ImportExportPanel } from "../imports/ImportExportPanel";
 import { NotionCapturePanel } from "../imports/NotionCapturePanel";
+import { ProviderPanel } from "../providers/ProviderPanel";
 import { AIPanel } from "../ai/AIPanel";
 import "./connectors.css";
 
@@ -119,9 +120,10 @@ function Connections({
   const [sources, setSources] = useState<Source[]>([]);
   const [preview, setPreview] = useState<Source>();
   const [aiSources, setAISources] = useState<
-    { reference: S.ConnectedSourceReference; title: string }[]
+    { reference: S.ConnectedSourceReference; title: string; provider: string }[]
   >([]);
   const [aiOpen, setAIOpen] = useState(false);
+  const [externalOpen, setExternalOpen] = useState(false);
   const [planId, setPlanId] = useState("");
   const [proposal, setProposal] = useState<Proposal>();
   const [error, setError] = useState("");
@@ -213,6 +215,7 @@ function Connections({
     setPreview(undefined);
     setAISources([]);
     setAIOpen(false);
+    setExternalOpen(false);
     setProposal(undefined);
     setAcquired(undefined);
     setAcquisitionFormat("");
@@ -1021,9 +1024,14 @@ function Connections({
                     ...old.filter(
                       (s) => s.reference.snapshotId !== reference.snapshotId,
                     ),
-                    { reference, title: preview.title },
+                    {
+                      reference,
+                      title: preview.title,
+                      provider: previewKind ?? "",
+                    },
                   ]);
                   setAIOpen(false);
+                  setExternalOpen(false);
                 }
               })
             }
@@ -1173,6 +1181,7 @@ function Connections({
                       ),
                     );
                     setAIOpen(false);
+                    setExternalOpen(false);
                   }}
                 >
                   Remove {source.title}
@@ -1183,6 +1192,29 @@ function Connections({
           <button onClick={() => setAIOpen((open) => !open)}>
             {aiOpen ? "Close local AI" : "Ask local AI about selected sources"}
           </button>
+          <button
+            disabled={aiSources.some(
+              (s) => !s.provider || s.provider === "gmail",
+            )}
+            onClick={() => setExternalOpen((open) => !open)}
+          >
+            {externalOpen
+              ? "Close external sharing"
+              : "Review sharing with an external provider"}
+          </button>
+          {aiSources.some((s) => s.provider === "gmail") && (
+            <p>
+              Gmail-derived context remains local. Remove Gmail sources to
+              review external sharing.
+            </p>
+          )}
+          {externalOpen && (
+            <ProviderPanel
+              workspace={workspace}
+              connectedSources={aiSources}
+              onCommitted={onChanged}
+            />
+          )}
           {aiOpen && (
             <AIPanel
               workspace={workspace}

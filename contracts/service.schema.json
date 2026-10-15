@@ -10490,7 +10490,7 @@
             "$ref": "domain.schema.json#/$defs/Id"
           },
           "maxItems": 100,
-          "minItems": 1,
+          "minItems": 0,
           "uniqueItems": true
         },
         "tools": {
@@ -10504,10 +10504,11 @@
               "resolveCitation",
               "allocateIds",
               "proposeChanges",
-              "proposeActions"
+              "proposeActions",
+              "readConnectedSource"
             ]
           },
-          "maxItems": 7,
+          "maxItems": 8,
           "minItems": 1,
           "uniqueItems": true
         },
@@ -10520,6 +10521,9 @@
         },
         "skill": {
           "$ref": "#/$defs/SkillRunReference"
+        },
+        "connectedSharing": {
+          "$ref": "#/$defs/ConnectedSharingApproval"
         }
       },
       "required": [
@@ -10534,6 +10538,58 @@
         "pageIds",
         "tools",
         "previewHash"
+      ],
+      "additionalProperties": false
+    },
+    "ProviderConnectedPreviewRequest": {
+      "type": "object",
+      "properties": {
+        "contractVersion": {
+          "const": 1
+        },
+        "requestId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "workspaceId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "provider": {
+          "type": "string",
+          "enum": [
+            "codex",
+            "claude_code"
+          ]
+        },
+        "registrationId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 256
+        },
+        "billingMode": {
+          "type": "string",
+          "enum": [
+            "chatgpt_plan",
+            "claude_subscription",
+            "anthropic_api"
+          ]
+        },
+        "sources": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/ConnectedSourceReference"
+          },
+          "maxItems": 12,
+          "minItems": 1
+        }
+      },
+      "required": [
+        "contractVersion",
+        "requestId",
+        "workspaceId",
+        "provider",
+        "registrationId",
+        "billingMode",
+        "sources"
       ],
       "additionalProperties": false
     },

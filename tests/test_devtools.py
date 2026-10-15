@@ -173,7 +173,7 @@ class DeveloperToolsTests(unittest.TestCase):
                     (native / 'microphone-worker').write_bytes(content)
                     pin = json.loads((SCRIPTS.parent / 'native/microphone.lock.json').read_text())
                     helper = {'name': 'microphone-worker', 'runtime': 'microphone', 'runtimeCommit': pin['runtimeCommit'], 'architecture': 'arm64', 'sha256': hashlib.sha256(content).hexdigest()}
-                    (native / 'microphone-worker.json').write_text(json.dumps({'schemaVersion': 1, 'platform': 'darwin', 'testOnly': False, 'deviceBackendCompiled': True, 'capabilities': ['record'], 'helper': helper}))
+                    (native / 'microphone-worker.json').write_text(json.dumps({'schemaVersion': 1, 'platform': 'darwin', 'testOnly': False, 'deviceBackendCompiled': True, 'capabilities': ['record', 'capture_controls_v1', 'input_devices_v1'], 'helper': helper}))
                 if argv[0] == '/pinned/go' and '-o' in argv:
                     Path(argv[argv.index('-o') + 1]).write_bytes(b'fixture binary')
 
@@ -188,10 +188,14 @@ class DeveloperToolsTests(unittest.TestCase):
             children = [argv for argv, _ in commands if argv[0] == sys.executable]
             self.assertEqual({Path(argv[1]).name for argv in children}, {
                 'build-microphone.py', 'build-document-extractor.py', 'build-audio-decoder.py', 'build-pdf-renderer.py',
-                'build-vision.py', 'build-ocr-worker.py'})
+                'build-vision.py', 'build-ocr-worker.py', 'build-reminder-helper.py'})
             for argv in children:
                 self.assertEqual(argv[argv.index('--cache') + 1], str(root / 'custom cache'))
-                self.assertEqual(argv[argv.index('--output') + 1], str(native))
+                expected_output = root / 'Trove.app/Contents/Library/LoginItems/TroveReminders.app' if Path(argv[1]).name == 'build-reminder-helper.py' else native
+                self.assertEqual(argv[argv.index('--output') + 1], str(expected_output))
+                if Path(argv[1]).name == 'build-reminder-helper.py':
+                    self.assertEqual(argv[argv.index('--version') + 1], '1.2.3')
+                    self.assertEqual(argv[argv.index('--build-number') + 1], '42')
             for _, env in commands:
                 self.assertEqual(env['TROVE_CACHE_DIR'], str(root / 'custom cache'))
             with (root / 'Trove.app/Contents/Info.plist').open('rb') as f:

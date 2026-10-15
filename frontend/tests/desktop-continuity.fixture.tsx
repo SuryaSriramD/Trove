@@ -80,11 +80,21 @@ const review = {
   expiresAt: new Date(Date.now() + 60000).toISOString(),
   contentIdentity: identity,
 };
-const freshness = () => ({
-  state: stale ? "stale" : "reviewed",
-  contentIdentity: stale ? { ...identity, digest: "b".repeat(64) } : identity,
-  review,
-});
+const freshness = () =>
+  new URLSearchParams(location.search).has("unavailable")
+    ? {
+        state: "unavailable",
+        message:
+          "Review coverage exceeds the bounded collection size. Review individual records.",
+        review,
+      }
+    : {
+        state: stale ? "stale" : "reviewed",
+        contentIdentity: stale
+          ? { ...identity, digest: "b".repeat(64) }
+          : identity,
+        review,
+      };
 const item = (title: string, n: number) => ({
   pageId: id(n),
   title,
