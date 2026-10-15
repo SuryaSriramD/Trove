@@ -1158,6 +1158,15 @@ type ServiceSkillRunReference struct {
 	Tools         []string   `json:"tools"`
 	PreviewHash   *string    `json:"previewHash,omitempty"`
 }
+type ServiceAutofillInput struct {
+	CollectionId      DomainId   `json:"collectionId"`
+	RecordIds         []DomainId `json:"recordIds"`
+	SourcePropertyIds []DomainId `json:"sourcePropertyIds"`
+	TargetPropertyIds []DomainId `json:"targetPropertyIds"`
+	Instructions      string     `json:"instructions"`
+	ModelPackId       DomainId   `json:"modelPackId"`
+	IncludeNonempty   bool       `json:"includeNonempty"`
+}
 type ServiceCreatePage struct {
 	Kind         string    `json:"kind"`
 	PageId       DomainId  `json:"pageId"`
@@ -1539,6 +1548,12 @@ type ServiceSaveSkill struct {
 	Archived        bool                   `json:"archived"`
 	Imported        bool                   `json:"imported"`
 }
+type ServiceApplyAutofill struct {
+	Kind             string     `json:"kind"`
+	BatchId          DomainId   `json:"batchId"`
+	CellIds          []DomainId `json:"cellIds"`
+	OverwriteCellIds []DomainId `json:"overwriteCellIds"`
+}
 type ServiceCommandValue interface{ isServiceCommand() }
 type ServiceCommand struct{ Value ServiceCommandValue }
 
@@ -1594,6 +1609,7 @@ func (ServiceApplyOperation) isServiceCommand()          {}
 func (ServiceUndoOperation) isServiceCommand()           {}
 func (ServiceReviewPage) isServiceCommand()              {}
 func (ServiceSaveSkill) isServiceCommand()               {}
+func (ServiceApplyAutofill) isServiceCommand()           {}
 func (v ServiceCommand) MarshalJSON() ([]byte, error)    { return json.Marshal(v.Value) }
 func (v *ServiceCommand) UnmarshalJSON(data []byte) error {
 	var fields map[string]json.RawMessage
@@ -2016,6 +2032,14 @@ func (v *ServiceCommand) UnmarshalJSON(data []byte) error {
 		v.Value = result
 		return nil
 	}
+	if matchesVariant(fields, []string{"kind", "batchId", "cellIds", "overwriteCellIds"}, map[string]string{"kind": "\"autofill.applyReviewed\""}, map[string][]string{}, []string{"kind", "batchId", "cellIds", "overwriteCellIds"}) {
+		var result ServiceApplyAutofill
+		if err := json.Unmarshal(data, &result); err != nil {
+			return err
+		}
+		v.Value = result
+		return nil
+	}
 	return fmt.Errorf("unknown or incomplete ServiceCommand variant")
 }
 
@@ -2125,6 +2149,32 @@ type ServiceNativeBackupSummary struct {
 	Included    []string `json:"included"`
 	Excluded    []string `json:"excluded"`
 	Restoration []string `json:"restoration"`
+}
+type ServiceAutofillCreateRequest struct {
+	ContractVersion int64                `json:"contractVersion"`
+	RequestId       DomainId             `json:"requestId"`
+	WorkspaceId     DomainId             `json:"workspaceId"`
+	Input           ServiceAutofillInput `json:"input"`
+}
+type ServiceAutofillControlRequest struct {
+	ContractVersion int64    `json:"contractVersion"`
+	RequestId       DomainId `json:"requestId"`
+	WorkspaceId     DomainId `json:"workspaceId"`
+	BatchId         DomainId `json:"batchId"`
+}
+type ServiceAutofillListRequest struct {
+	ContractVersion int64    `json:"contractVersion"`
+	RequestId       DomainId `json:"requestId"`
+	WorkspaceId     DomainId `json:"workspaceId"`
+	CollectionId    DomainId `json:"collectionId"`
+}
+type ServiceAutofillApplyRequest struct {
+	ContractVersion  int64      `json:"contractVersion"`
+	RequestId        DomainId   `json:"requestId"`
+	WorkspaceId      DomainId   `json:"workspaceId"`
+	BatchId          DomainId   `json:"batchId"`
+	CellIds          []DomainId `json:"cellIds"`
+	OverwriteCellIds []DomainId `json:"overwriteCellIds"`
 }
 type ServiceSkillsListRequest struct {
 	ContractVersion int64     `json:"contractVersion"`

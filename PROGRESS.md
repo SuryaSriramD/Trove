@@ -2,7 +2,7 @@
 
 **The single current development and progress tracker for this project.** Read and update this file for every meaningful implementation change, investigation, test result, decision, blocker and handoff. This is not an automatically running monitor.
 
-Last updated: **2026-10-15 18:24 IST**. User-facing dates use **Asia/Kolkata (IST, UTC+05:30)**; source artifacts may retain UTC timestamps.
+Last updated: **2026-10-15 18:34 IST**. User-facing dates use **Asia/Kolkata (IST, UTC+05:30)**; source artifacts may retain UTC timestamps.
 
 This file consolidates the original 51-item backlog, the newly selected desktop scope, current qualification, next actions and development history. Earlier status pages are historical snapshots. Machine-readable contracts, the legacy registry and immutable qualification records remain supporting inputs/evidence; they are not additional human progress dashboards. Their frozen bytes must not be rewritten to make a status look current.
 
@@ -33,7 +33,7 @@ Candidate 7's focused 22-case prompt experiment was rejected and production prom
 
 | Location | Branch / source | Current interpretation |
 | --- | --- | --- |
-| Primary project: `/Volumes/HD-B1/HD-Projects/Trove` | `codex/macos-feature-completion`, current integrated source `a3f9e54` | Baseline `ee14f0c`; shared foundations `0ed5350`, G02 `2b421a4`, G03 `950cea5`/`6e713bc` and G01 page merge `2279bf0`/`a3f9e54` integrated. See the development log for subsequent commits and current verification. |
+| Primary project: `/Volumes/HD-B1/HD-Projects/Trove` | `codex/macos-feature-completion`, current integrated source `5cb0951` | Baseline `ee14f0c`; shared foundations `0ed5350`, G02 `2b421a4`, G03 `950cea5`/`6e713bc` and G01 page merge `2279bf0`/`a3f9e54` integrated. See the development log for subsequent commits and current verification. |
 | Latest development worktree: `/Users/suryasriramduvvuri/.codex/worktrees/macos-p0-title-context/Trove` | `codex/macos-p0-title-context`, `299e43df9b716f771125d939ad320c3cb595f2c7` | Candidate 7 source. One descendant commit containing tests, fixtures, telemetry and execution documentation. |
 
 Keep candidate 7's execution in its declared worktree. Review and integrate the descendant commit separately; do not rebuild a package just to align a checkout. A product/binary/policy change requires a new candidate and affected fresh evidence.
@@ -888,6 +888,22 @@ This section begins with reconstructed milestones from retained evidence and the
 
 | 2026-10-15 18:24 IST | DEV-018 / G07 / EXT-005 | G07 now has versioned create/edit/duplicate/archive/import, selected source/tool preview, local-default and explicit managed-provider execution, cancellation/history/retry controls, exact version/input/scope binding, review-only proposals and durable retry receipts. Independent review found preview-to-generation races and trashed-skill execution; corrected with a final transaction-bound preview check in local and managed run persistence and an explicit live-skill check. Provider reconnect retains stable proposal keys and committed receipts; pending proposals require fresh approval under the new connection | Uncommitted primary at `a3f9e54`: 18 focused skills/provider/freshness race passes, zero failed/skipped (`/private/tmp/trove-skills-provider-race.jsonl`), eight selected native/provider/backup/contract race passes (`/private/tmp/trove-skills-native-race.jsonl`), TypeScript and contract drift pass. One mocked-bridge skills browser workflow passed after sandbox Chrome launch failure and missing memory fixture correction; final import assertion now verifies saved persistence. Initial unit command incorrectly assumed Vitest; repository uses Node tests; corrected run passed 56 tests, zero failed/skipped. Worker review found no remaining confirmed blocker; no independent real-model/account acceptance. G05 capture commit `d3a84df` reviewed for integration; G01 typed follow-up validation pending |
 
+### DEV-019 — 15 October 2026, 18:34 IST: meeting capture and typed re-import integrated
+
+**Source:** `codex/macos-feature-completion`; G07 committed as `3e8fc20`, G05 capture worker `d3a84df` integrated as `97201e7`, and reviewed G01 typed/historical changes `a26a96b`/`a8e2bc8` integrated as `45ef173`/`5cb0951`. Generated-domain conflict was resolved by regeneration from the merged schema. Candidate 7 remains untouched.
+
+**Implemented:** Meeting input selection, disclosure acknowledgement, acknowledged pause/resume/stop, sample-derived duration, retained pause/interruption gaps, low-space checks and inert interrupted-capture recovery. Typed collection imports retain stable property/option/record identities and review independent schema/value fields; complete derived graphs are preflighted before resumable writes. Historical baselines reconstruct only from retained matching source revision/raw identity with a known normalizer; absent evidence still requires explicit review. Unsupported schema conversions/deletions remain explicit conflicts, not silent destructive merges.
+
+**Evidence:** Integrated capture/recovery/contract race run at `97201e7`: **130 test/subtest passes, zero failures, one skip**, `/private/tmp/trove-g05-integrated-race.jsonl`. The skipped startup-deadline test needs a separate compile-time stalled-startup fixture; worker is building it. This corrects the earlier worker broad-run summary, which did not expose that skip. Import worker reports **58 affected race passes, zero failures/skips**, `/private/tmp/trove-import-known-baseline-race.jsonl`; integrated follow-up checks remain next. G07 evidence remains scoped at DEV-018. No physical microphone/device, live model, real-account, signing or release acceptance is claimed.
+
+**Next:** Integrate G10 layout/scheduling with its grouped-undo normalization repair; finish G05 transcript correction/retention then G06 reminder helper. Continue G01 explicit CSV row identity. Coordinator starts G08 persisted per-cell generation, explicit overwrite review, typed validation, resumable outcomes and atomic grouped application. Other full macOS, connector, AI and P2 scope remains active.
+
+### DEV-020 — 15 October 2026, 18:45 IST: autofill implementation checkpoint
+
+**Source:** Primary `5cb0951` plus coordinator G08 changes, being checkpointed before G10/CSV integration. Added persisted bounded batch/cell suggestions, source/property snapshots, manual local generation with shared cancellation, per-cell checkpoints, explicit overwrite selection, reviewed atomic command and journal integration, plus usable database review/history controls. An independent worker review prompted per-cell source/permission rechecks before generation and persistence and selected option-label evidence in the prompt.
+
+**Evidence/limitations:** Service/root/contracts compilation and frontend TypeScript passed at the initial checkpoint. New focused regressions initially exposed a typed-ID-to-string bug in journal preparation (corrected); existing-value grouped undo also depends on G10's pending shared normalization repair. These checks are not a G08 pass or feature acceptance. Tests and browser workflow verification continue after integration. No real model was invoked. Initial implementation provenance records prompt version and selected model-pack identity; exact model artifact provenance and further stale/retry review remain next.
+
 <a id="commit-history"></a>
 ## Recorded source-development history
 
@@ -1040,6 +1056,10 @@ Complete reachable primary + candidate-7 lineage at initial consolidation: **133
 | `5e2fab1` | 2026-10-15 18:01 | Record integration and complete freshness dependencies |
 | `2279bf0` | 2026-10-15 18:02 | Integrate retained three-way page merge |
 | `a3f9e54` | 2026-10-15 18:02 | Preserve import identity and local presentation |
+| `3e8fc20` | 2026-10-15 18:25 | Add versioned manual skills with scoped execution |
+| `97201e7` | 2026-10-15 18:25 | Integrate acknowledged meeting capture controls |
+| `45ef173` | 2026-10-15 18:33 | Integrate typed collection re-import |
+| `5cb0951` | 2026-10-15 18:33 | Preflight import graphs and reconstruct evidenced baselines |
 
 </details>
 

@@ -1210,6 +1210,62 @@
       ],
       "additionalProperties": false
     },
+    "AutofillInput": {
+      "type": "object",
+      "properties": {
+        "collectionId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "recordIds": {
+          "type": "array",
+          "items": {
+            "$ref": "domain.schema.json#/$defs/Id"
+          },
+          "maxItems": 128,
+          "minItems": 1,
+          "uniqueItems": true
+        },
+        "sourcePropertyIds": {
+          "type": "array",
+          "items": {
+            "$ref": "domain.schema.json#/$defs/Id"
+          },
+          "maxItems": 32,
+          "minItems": 1,
+          "uniqueItems": true
+        },
+        "targetPropertyIds": {
+          "type": "array",
+          "items": {
+            "$ref": "domain.schema.json#/$defs/Id"
+          },
+          "maxItems": 32,
+          "minItems": 1,
+          "uniqueItems": true
+        },
+        "instructions": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 4000
+        },
+        "modelPackId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "includeNonempty": {
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "collectionId",
+        "recordIds",
+        "sourcePropertyIds",
+        "targetPropertyIds",
+        "instructions",
+        "modelPackId",
+        "includeNonempty"
+      ],
+      "additionalProperties": false
+    },
     "CreatePage": {
       "type": "object",
       "properties": {
@@ -2789,6 +2845,41 @@
       ],
       "additionalProperties": false
     },
+    "ApplyAutofill": {
+      "type": "object",
+      "properties": {
+        "kind": {
+          "const": "autofill.applyReviewed"
+        },
+        "batchId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "cellIds": {
+          "type": "array",
+          "items": {
+            "$ref": "domain.schema.json#/$defs/Id"
+          },
+          "maxItems": 128,
+          "minItems": 1,
+          "uniqueItems": true
+        },
+        "overwriteCellIds": {
+          "type": "array",
+          "items": {
+            "$ref": "domain.schema.json#/$defs/Id"
+          },
+          "maxItems": 128,
+          "uniqueItems": true
+        }
+      },
+      "required": [
+        "kind",
+        "batchId",
+        "cellIds",
+        "overwriteCellIds"
+      ],
+      "additionalProperties": false
+    },
     "Command": {
       "oneOf": [
         {
@@ -2946,6 +3037,9 @@
         },
         {
           "$ref": "#/$defs/SaveSkill"
+        },
+        {
+          "$ref": "#/$defs/ApplyAutofill"
         }
       ]
     },
@@ -3479,6 +3573,121 @@
         "included",
         "excluded",
         "restoration"
+      ],
+      "additionalProperties": false
+    },
+    "AutofillCreateRequest": {
+      "type": "object",
+      "properties": {
+        "contractVersion": {
+          "const": 1
+        },
+        "requestId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "workspaceId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "input": {
+          "$ref": "#/$defs/AutofillInput"
+        }
+      },
+      "required": [
+        "contractVersion",
+        "requestId",
+        "workspaceId",
+        "input"
+      ],
+      "additionalProperties": false
+    },
+    "AutofillControlRequest": {
+      "type": "object",
+      "properties": {
+        "contractVersion": {
+          "const": 1
+        },
+        "requestId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "workspaceId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "batchId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        }
+      },
+      "required": [
+        "contractVersion",
+        "requestId",
+        "workspaceId",
+        "batchId"
+      ],
+      "additionalProperties": false
+    },
+    "AutofillListRequest": {
+      "type": "object",
+      "properties": {
+        "contractVersion": {
+          "const": 1
+        },
+        "requestId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "workspaceId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "collectionId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        }
+      },
+      "required": [
+        "contractVersion",
+        "requestId",
+        "workspaceId",
+        "collectionId"
+      ],
+      "additionalProperties": false
+    },
+    "AutofillApplyRequest": {
+      "type": "object",
+      "properties": {
+        "contractVersion": {
+          "const": 1
+        },
+        "requestId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "workspaceId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "batchId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "cellIds": {
+          "type": "array",
+          "items": {
+            "$ref": "domain.schema.json#/$defs/Id"
+          },
+          "maxItems": 128,
+          "minItems": 1,
+          "uniqueItems": true
+        },
+        "overwriteCellIds": {
+          "type": "array",
+          "items": {
+            "$ref": "domain.schema.json#/$defs/Id"
+          },
+          "maxItems": 128,
+          "uniqueItems": true
+        }
+      },
+      "required": [
+        "contractVersion",
+        "requestId",
+        "workspaceId",
+        "batchId",
+        "cellIds",
+        "overwriteCellIds"
       ],
       "additionalProperties": false
     },

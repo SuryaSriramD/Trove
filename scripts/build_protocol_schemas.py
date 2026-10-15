@@ -121,6 +121,10 @@ commands['SaveAutomation']['properties']['rule']=R('AutomationRule')
 defs['SkillDefinition']=obj({'name':{'type':'string','minLength':1,'maxLength':200},'purpose':{'type':'string','maxLength':1000},'instructions':{'type':'string','minLength':1,'maxLength':4000},'inputDescription':{'type':'string','maxLength':500},'expectedOutput':{'type':'string','maxLength':1000},'mode':enum('answer','summarize','generate','workspace_agent'),'sourcePageIds':{**arr(D('Id'),32),'uniqueItems':True},'tools':{**arr(enum('readPage','search.query','queryRecords','resolveCitation','allocateIds','proposeChanges','proposeActions'),7),'uniqueItems':True}})
 defs['SkillRunReference']=obj({'skillId':D('Id'),'version':{'type':'integer','minimum':1},'invocationId':D('Id'),'input':{'type':'string','maxLength':1000},'sourcePageIds':{**arr(D('Id'),32),'uniqueItems':True},'tools':{**arr(enum('readPage','search.query','queryRecords','resolveCitation','allocateIds','proposeChanges','proposeActions'),7),'uniqueItems':True},'previewHash':{'type':'string','pattern':'^[0-9a-f]{64}$'}},['skillId','version','invocationId','input','sourcePageIds','tools'])
 commands['SaveSkill']=tagged('skill.save',{'skillId':D('Id'),'pageId':D('Id'),'expectedVersion':N,'definition':R('SkillDefinition'),'archived':B,'imported':B})
+# Selected-row autofill persists proposals; only reviewed scalar effects commit.
+defs['AutofillInput']=obj({'collectionId':D('Id'),'recordIds':{**arr(D('Id'),128),'minItems':1,'uniqueItems':True},'sourcePropertyIds':{**arr(D('Id'),32),'minItems':1,'uniqueItems':True},'targetPropertyIds':{**arr(D('Id'),32),'minItems':1,'uniqueItems':True},'instructions':{'type':'string','minLength':1,'maxLength':4000},'modelPackId':D('Id'),'includeNonempty':B})
+autofill_selection={'batchId':D('Id'),'cellIds':{**arr(D('Id'),128),'minItems':1,'uniqueItems':True},'overwriteCellIds':{**arr(D('Id'),128),'uniqueItems':True}}
+commands['ApplyAutofill']=tagged('autofill.applyReviewed',autofill_selection)
 defs.update(commands)
 defs['Command']={'oneOf':[R(n) for n in commands]}
 header={'contractVersion':{'const':1},'requestId':D('Id'),'workspaceId':D('Id')}
@@ -139,6 +143,10 @@ defs['NativeRecordingGap']=obj({'id':D('Id'),'kind':enum('pause','interruption')
 defs['NativeRecordingDraft']=obj({'version':{'const':1},'id':D('Id'),'title':S,'actorId':D('Id'),'startedAt':D('Timestamp'),'state':enum('recording','paused','captured','interrupted','saved'),'bytes':N,'durationMs':N,'pageId':D('Id'),'meetingId':D('Id'),'fileId':D('Id'),'error':S,'inputDeviceId':S,'disclosureAcknowledgedAt':D('Timestamp'),'lastControlId':D('Id'),'gaps':arr(R('NativeRecordingGap'),10000),'segments':arr(obj({'startByte':N,'endByte':N,'sha256':{'type':'string','pattern':'^[0-9a-f]{64}$'}}),100000)},['id','title','actorId','startedAt','state','bytes','durationMs','pageId','meetingId','segments'])
 defs['NativeBackupProgress']=obj({'version':{'const':1},'phase':enum('idle','choosing','snapshot','encrypting','authenticating','verifying','review','restoring','complete'),'bytes':{'type':'string','pattern':'^(0|[1-9][0-9]*)$'},'totalBytes':{'type':'string','pattern':'^(0|[1-9][0-9]*)$'}})
 defs['NativeBackupSummary']=obj({'version':{'const':1},'format':{'const':'age-passphrase/native-tar-v1'},'included':arr(S,32),'excluded':arr(S,32),'restoration':arr(S,32)})
+defs['AutofillCreateRequest']=obj({**header,'input':R('AutofillInput')})
+defs['AutofillControlRequest']=obj({**header,'batchId':D('Id')})
+defs['AutofillListRequest']=obj({**header,'collectionId':D('Id')})
+defs['AutofillApplyRequest']=obj({**header,**autofill_selection})
 defs['SkillsListRequest']=obj({**header,'skillId':D('Id')},list(header))
 defs['SkillPreviewRequest']=obj({**header,'skill':R('SkillRunReference'),'provider':enum('local','codex','claude_code')})
 defs['AutomationOptionsRequest']=obj({**header,'pageId':D('Id')})
