@@ -148,7 +148,7 @@ func (a *App) launchApplicationRollback(ctx context.Context, id string, deps rol
 	}
 	return err
 }
-func (a *App) launchApplicationRollbackLocked(ctx context.Context, id string, deps rollbackLaunchDependencies) error {
+func (a *App) launchApplicationRollbackLocked(ctx context.Context, id string, deps rollbackLaunchDependencies) (result error) {
 	review, err := a.takeRollbackLaunchReview(id)
 	if err != nil {
 		return err
@@ -203,6 +203,15 @@ func (a *App) launchApplicationRollbackLocked(ctx context.Context, id string, de
 	if !reflect.DeepEqual(inventory, review.application.Inventory) {
 		return errors.New("saved previous application changed during workspace verification")
 	}
+	if err = a.suspendReminderWorkspace(); err != nil {
+		return err
+	}
+	a.reminderHandoff(true)
+	defer func() {
+		if result != nil && !errors.Is(result, updates.ErrRollbackCleanupUnverified) {
+			a.reminderHandoff(false)
+		}
+	}()
 	selected, previous, existed, err := selectWorkspaceForRollback(ctx, deps.preference, review.destination)
 	if err != nil {
 		if selected != nil {
