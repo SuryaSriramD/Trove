@@ -121,7 +121,6 @@ func (k *Kernel) parseImportPlan(ctx context.Context, p *ImportPlan) error {
 	}
 	pages := map[string]string{}
 	assets := map[string]string{}
-	seenIDs := map[string]bool{}
 	manifest := portableHierarchy{}
 	for _, item := range p.Items {
 		if item.Locator == "trove-manifest.json" && item.RawFileID != "" {
@@ -232,6 +231,7 @@ func (k *Kernel) parseImportPlan(ctx context.Context, p *ImportPlan) error {
 	if manifest.SourceCompleteness == "partial" {
 		p.SourceCompleteness = "partial"
 	}
+	identityGroups := prepareImportIdentityGroups(p, canonicalIdentities)
 	for i := range p.Items {
 		item := &p.Items[i]
 		if item.Kind == "directory" || item.Kind == "rejected" {
@@ -256,16 +256,16 @@ func (k *Kernel) parseImportPlan(ctx context.Context, p *ImportPlan) error {
 				item.IdentityKind, item.ExternalID = importIdentity(item.Locator)
 			}
 			originalPageID := item.PageID
-			key := item.IdentityKind + ":" + item.ExternalID
-			if seenIDs[key] {
-				item.Outcome = "partial"
-				item.Reason += "; repeated source identity uses its locator"
-				item.IdentityKind = "derived_locator"
-				item.ExternalID = item.Locator
+			manual, err := prepareImportIdentityReview(ctx, k.db, p, item, identityGroups)
+			if err != nil {
+				return err
 			}
-			seenIDs[key] = true
+			if manual {
+				pages[item.Locator] = item.PageID
+				continue
+			}
 			var id, local, hash, revision string
-			err := k.db.QueryRowContext(ctx, `SELECT m.id,m.local_id,m.base_content_hash,COALESCE(p.revision,'0') FROM import_mappings m LEFT JOIN pages p ON p.id=m.local_id WHERE m.workspace_id=? AND m.source_system=? AND m.source_namespace=? AND m.external_kind='page' AND m.identity_kind=? AND m.identity_value=?`, k.id, importItemSourceSystem(p, item), p.Namespace, item.IdentityKind, item.ExternalID).Scan(&id, &local, &hash, &revision)
+			err = k.db.QueryRowContext(ctx, `SELECT m.id,m.local_id,m.base_content_hash,COALESCE(p.revision,'0') FROM import_mappings m LEFT JOIN pages p ON p.id=m.local_id WHERE m.workspace_id=? AND m.source_system=? AND m.source_namespace=? AND m.external_kind='page' AND m.identity_kind=? AND m.identity_value=?`, k.id, importItemSourceSystem(p, item), p.Namespace, item.IdentityKind, item.ExternalID).Scan(&id, &local, &hash, &revision)
 			if retained, ok := retainedMappings[canonicalIdentities[item.Locator]]; ok {
 				// Keep the exact historic mapping address; the explicit canonical
 				// key above has already prevented rendition identity collisions.

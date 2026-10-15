@@ -278,7 +278,7 @@ func prepareImportMerge(ctx context.Context, q querier, p *ImportPlan, item *Imp
 	if item.PageID == "" || item.Kind == "row" || item.Kind == "csv" {
 		return nil
 	}
-	if item.MappingID == "" {
+	if item.MappingID == "" || item.IdentityReview != nil && item.IdentityReview.Choice == "create_new" {
 		s := snapshotImportItem(item)
 		if c := importCollectionFor(p, item); c != nil {
 			addIncomingDatabaseFields(&s, c)
