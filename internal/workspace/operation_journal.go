@@ -338,8 +338,24 @@ func previewUndoJournal(ctx context.Context, k *Kernel, e contracts.ServiceExecu
 			return nil, err
 		}
 		if str(inverse["kind"]) == "collection.property.restore" {
-			if err := validateUnusedPropertyRestore(ctx, tx, inverse); err != nil {
+			if err := validateReviewedPropertyRestore(ctx, tx, inverse); err != nil {
 				return nil, err
+			}
+			for _, record := range schemaValueRecords(entry.After, inverse) {
+				var page, collection string
+				var deleted sql.NullString
+				if err := tx.QueryRowContext(ctx, "SELECT r.page_id,r.collection_id,p.deleted_at FROM records r JOIN pages p ON p.id=r.page_id WHERE r.id=?", record).Scan(&page, &collection, &deleted); err != nil {
+					return nil, err
+				}
+				if deleted.Valid || collection != str(inverse["collectionId"]) {
+					return nil, Fail("CONFLICT", "An affected record is trashed or moved outside the reviewed collection")
+				}
+				if err := add("record", record); err != nil {
+					return nil, err
+				}
+				if err := add("page", page); err != nil {
+					return nil, err
+				}
 			}
 		}
 		actions = append(actions, inverse)
@@ -391,7 +407,17 @@ func listJournal(ctx context.Context, k *Kernel, e contracts.ServiceExecutionCon
 
 func journalInverse(ctx context.Context, q querier, entry journalEntry) (map[string]any, error) {
 	if len(entry.ChangedFields) == 0 {
-		return entry.Before, nil
+		inverse := map[string]any{}
+		for key, value := range entry.Before {
+			inverse[key] = value
+		}
+		if str(inverse["kind"]) == "collection.property.restore" {
+			if _, present := inverse["values"]; !present && len(asList(entry.After["values"])) > 0 {
+				inverse["values"] = []any{}
+				inverse["valueInventoryVersion"] = 1
+			}
+		}
+		return inverse, nil
 	}
 	current, err := journalCurrent(ctx, q, entry.After)
 	if err != nil {

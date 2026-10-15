@@ -46,7 +46,7 @@ func TestImportSourceBlockDeletionRequiresExplicitReviewedFields(t *testing.T) {
 	}
 }
 
-func TestImportSchemaTypeChangeRequiresReviewAndUnsupportedConversionWritesNothing(t *testing.T) {
+func TestImportSchemaTypeChangeRequiresReviewAndInvalidValueChoiceWritesNothing(t *testing.T) {
 	source, se := testKernel(t)
 	f := newDatabase(t, source, se)
 	property := addImportTextProperty(t, source, se, f, "Changing type")
@@ -83,15 +83,16 @@ func TestImportSchemaTypeChangeRequiresReviewAndUnsupportedConversionWritesNothi
 	if !found {
 		t.Fatal("schema type change absent from review")
 	}
-	preview = reviewDatabasePreview(t, target, preview, map[string]string{path: "take_incoming"})
-	if _, err := commitPortableImport(context.Background(), target, te, map[string]any{"planId": preview.ID, "planHash": preview.Hash}); err == nil || !strings.Contains(err.Error(), "conversion") {
-		t.Fatal("unsupported type conversion was not rejected explicitly", err)
+	localRecord := importedEntity(t, target, "record", r)
+	preview = reviewDatabasePreview(t, target, preview, map[string]string{path: "take_incoming", "/values/" + localRecord + "/" + localProperty: "keep_local"})
+	if _, err := commitPortableImport(context.Background(), target, te, map[string]any{"planId": preview.ID, "planHash": preview.Hash}); err == nil || !strings.Contains(err.Error(), "incompatible reviewed values") {
+		t.Fatal("incompatible reviewed type conversion was not rejected explicitly", err)
 	}
 	if unchanged, err := loadImportPlan(context.Background(), target.db, preview.ID); err != nil || unchanged.Initialized {
-		t.Fatal("unsupported conversion partially initialized", err)
+		t.Fatal("incompatible conversion partially initialized", err)
 	}
 	definition, err := propertyDefinition(context.Background(), target.db, localProperty)
 	if err != nil || definition.Type != "text" {
-		t.Fatal("unsupported conversion changed schema", err)
+		t.Fatal("incompatible conversion changed schema", err)
 	}
 }

@@ -1047,7 +1047,7 @@ func (v *ServiceJournalAction) UnmarshalJSON(data []byte) error {
 	if err := json.Unmarshal(data, &fields); err != nil {
 		return err
 	}
-	if matchesVariant(fields, []string{"kind", "collectionId", "propertyId", "definition"}, map[string]string{"kind": "\"collection.property.restore\""}, map[string][]string{}, []string{"kind", "collectionId", "propertyId", "definition"}) {
+	if matchesVariant(fields, []string{"kind", "collectionId", "propertyId", "definition"}, map[string]string{"kind": "\"collection.property.restore\""}, map[string][]string{}, []string{"kind", "collectionId", "propertyId", "definition", "valueInventoryVersion", "values"}) {
 		var result ServiceJournalActionVariant1
 		if err := json.Unmarshal(data, &result); err != nil {
 			return err
@@ -1649,10 +1649,15 @@ type ServiceApplyScheduling struct {
 	Plan ServiceSchedulingPlan `json:"plan"`
 }
 type ServiceRestoreProperty struct {
-	Kind         string                            `json:"kind"`
-	CollectionId DomainId                          `json:"collectionId"`
-	PropertyId   DomainId                          `json:"propertyId"`
-	Definition   *ServicePropertyRestoreDefinition `json:"definition"`
+	Kind                  string                            `json:"kind"`
+	CollectionId          DomainId                          `json:"collectionId"`
+	PropertyId            DomainId                          `json:"propertyId"`
+	Definition            *ServicePropertyRestoreDefinition `json:"definition"`
+	ValueInventoryVersion *int64                            `json:"valueInventoryVersion,omitempty"`
+	Values                []struct {
+		RecordId DomainId        `json:"recordId"`
+		Value    json.RawMessage `json:"value"`
+	} `json:"values,omitempty"`
 }
 type ServiceApplyOperation struct {
 	Kind        string                 `json:"kind"`
@@ -2195,7 +2200,7 @@ func (v *ServiceCommand) UnmarshalJSON(data []byte) error {
 		v.Value = result
 		return nil
 	}
-	if matchesVariant(fields, []string{"kind", "collectionId", "propertyId", "definition"}, map[string]string{"kind": "\"collection.property.restore\""}, map[string][]string{}, []string{"kind", "collectionId", "propertyId", "definition"}) {
+	if matchesVariant(fields, []string{"kind", "collectionId", "propertyId", "definition"}, map[string]string{"kind": "\"collection.property.restore\""}, map[string][]string{}, []string{"kind", "collectionId", "propertyId", "definition", "valueInventoryVersion", "values"}) {
 		var result ServiceRestoreProperty
 		if err := json.Unmarshal(data, &result); err != nil {
 			return err
@@ -4616,10 +4621,15 @@ type DomainImportIdentityResolutionVariant2 struct {
 	Choice string `json:"choice"`
 }
 type ServiceJournalActionVariant1 struct {
-	Kind         string                            `json:"kind"`
-	CollectionId DomainId                          `json:"collectionId"`
-	PropertyId   DomainId                          `json:"propertyId"`
-	Definition   *ServicePropertyRestoreDefinition `json:"definition"`
+	Kind                  string                            `json:"kind"`
+	CollectionId          DomainId                          `json:"collectionId"`
+	PropertyId            DomainId                          `json:"propertyId"`
+	Definition            *ServicePropertyRestoreDefinition `json:"definition"`
+	ValueInventoryVersion *int64                            `json:"valueInventoryVersion,omitempty"`
+	Values                []struct {
+		RecordId DomainId        `json:"recordId"`
+		Value    json.RawMessage `json:"value"`
+	} `json:"values,omitempty"`
 }
 type ServiceJournalActionVariant2 struct {
 	Kind       string   `json:"kind"`

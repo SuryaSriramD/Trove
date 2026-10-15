@@ -5,13 +5,15 @@ import (
 	"database/sql"
 	"encoding/json"
 	"errors"
+	"fmt"
+	"strings"
 
 	"trove.local/phase0/contracts"
 )
 
 // Schema inverses are deliberately separate from page restoration: changing a
 // shared property must not rewind unrelated record values or page content.
-func init() { RegisterCommand("collection.property.restore", restoreUnusedProperty) }
+func init() { RegisterCommand("collection.property.restore", restoreReviewedProperty) }
 func schemaJournalCurrent(ctx context.Context, q querier, action map[string]any) (journalEntry, error) {
 	entry := journalEntry{Target: "schema:" + str(action["propertyId"])}
 	collection, id := str(action["collectionId"]), str(action["propertyId"])
@@ -32,14 +34,39 @@ func schemaJournalCurrent(ctx context.Context, q querier, action map[string]any)
 	} else if !errors.Is(err, sql.ErrNoRows) {
 		return entry, err
 	}
-	var count int
-	if err = q.QueryRowContext(ctx, "SELECT count(*) FROM property_values WHERE property_id=?", id).Scan(&count); err != nil {
+	values := []any{}
+	rows, err := q.QueryContext(ctx, "SELECT record_id,value_json FROM property_values WHERE property_id=? ORDER BY record_id LIMIT 129", id)
+	if err != nil {
 		return entry, err
 	}
-	if count != 0 {
-		return entry, Fail("CONFLICT", "This schema change requires an explicit populated-value migration")
+	for rows.Next() {
+		var record, encoded string
+		if err = rows.Scan(&record, &encoded); err != nil {
+			rows.Close()
+			return entry, err
+		}
+		var v any
+		if err = json.Unmarshal([]byte(encoded), &v); err != nil {
+			rows.Close()
+			return entry, err
+		}
+		values = append(values, map[string]any{"recordId": record, "value": v})
+	}
+	err = rows.Err()
+	rows.Close()
+	if err != nil {
+		return entry, err
+	}
+	if len(values) > 128 {
+		return entry, Fail("RESOURCE_EXHAUSTED", "A reviewed property migration supports at most 128 populated rows")
 	}
 	entry.Before = map[string]any{"kind": "collection.property.restore", "collectionId": collection, "propertyId": id, "definition": value}
+	// Omit the empty inventory for compatibility with pre-migration journals.
+	// An explicit null value is retained as a row entry, never as absence.
+	if len(values) > 0 {
+		entry.Before["values"] = values
+		entry.Before["valueInventoryVersion"] = 1
+	}
 	return entry, nil
 }
 func schemaReference(value any, id string) bool {
@@ -168,12 +195,11 @@ func unusedPropertyDependencies(ctx context.Context, q querier, collection, id s
 	}
 	return nil
 }
-func validateUnusedPropertyRestore(ctx context.Context, q querier, action map[string]any) error {
+func validateReviewedPropertyRestore(ctx context.Context, q querier, action map[string]any) error {
 	entry, err := schemaJournalCurrent(ctx, q, action)
 	if err != nil {
 		return err
 	}
-	_ = entry
 	collection, id := str(action["collectionId"]), str(action["propertyId"])
 	if err = unusedPropertyDependencies(ctx, q, collection, id); err != nil {
 		return err
@@ -185,7 +211,20 @@ func validateUnusedPropertyRestore(ctx context.Context, q querier, action map[st
 	if err != nil && !errors.Is(err, sql.ErrNoRows) {
 		return err
 	}
+	values := asList(action["values"])
+	oldValues := asList(entry.Before["values"])
+	if len(oldValues) > 0 {
+		if string(marshal(action["valueInventoryVersion"])) != "1" {
+			return Fail("CONFLICT", "A populated schema change requires an explicit complete reviewed value inventory")
+		}
+		if !schemaMigrationScalar(current.Type) {
+			return Fail("CONFLICT", "Populated option, phone and derived properties require a separate value migration")
+		}
+	}
 	if action["definition"] == nil {
+		if len(values) > 0 {
+			return Fail("CONFLICT", "A deleted property cannot retain reviewed row values; resolve each value before deleting the schema")
+		}
 		return nil
 	}
 	var def struct {
@@ -200,13 +239,83 @@ func validateUnusedPropertyRestore(ctx context.Context, q querier, action map[st
 	if contracts.Validate("domain", "property_"+def.Type+"_config_v1", def.Config) != nil {
 		return Fail("INVALID_REQUEST", "Invalid reviewed property configuration")
 	}
+	if len(values) > 128 {
+		return Fail("RESOURCE_EXHAUSTED", "A reviewed property migration supports at most 128 populated rows")
+	}
+	if len(values) > 0 && !schemaMigrationScalar(def.Type) {
+		return Fail("CONFLICT", "Populated schema migration supports text, number, checkbox, date, URL and email properties")
+	}
+	failures := []string{}
+	seen := map[string]bool{}
+	for _, raw := range values {
+		value := asObject(raw)
+		record := str(value["recordId"])
+		if seen[record] {
+			return Fail("INVALID_REQUEST", "Duplicate reviewed record identity")
+		}
+		seen[record] = true
+		if _, present := value["value"]; !present {
+			return Fail("INVALID_REQUEST", "A reviewed value must distinguish null from an absent row")
+		}
+		if err := validateSchemaScalar(def.Type, value["value"]); err != nil {
+			failures = append(failures, fmt.Sprintf("record %s: %s", record, err))
+		}
+	}
+	if len(failures) > 0 {
+		return Fail("CONFLICT", "No schema changes applied; incompatible reviewed values: "+strings.Join(failures, "; "))
+	}
 	return nil
 }
-func restoreUnusedProperty(m *Mutation, action map[string]any) error {
-	if err := validateUnusedPropertyRestore(m.Context, m.Tx, action); err != nil {
+func schemaMigrationScalar(kind string) bool {
+	switch kind {
+	case "text", "number", "checkbox", "date", "url", "email":
+		return true
+	}
+	return false
+}
+func validateSchemaScalar(kind string, value any) error {
+	// These scalar validators do not access a transaction. The common validator
+	// also enforces calendar validity and accepted URL/email semantics.
+	return validatePropertyValue(&Mutation{}, contracts.DomainPropertyDefinition{Type: kind}, value)
+}
+func schemaValueRecords(actions ...map[string]any) []string {
+	seen := map[string]bool{}
+	out := []string{}
+	for _, action := range actions {
+		for _, raw := range asList(action["values"]) {
+			id := str(asObject(raw)["recordId"])
+			if !seen[id] {
+				seen[id] = true
+				out = append(out, id)
+			}
+		}
+	}
+	return out
+}
+func restoreReviewedProperty(m *Mutation, action map[string]any) error {
+	if err := validateReviewedPropertyRestore(m.Context, m.Tx, action); err != nil {
 		return err
 	}
 	collection, id := str(action["collectionId"]), str(action["propertyId"])
+	before, err := schemaJournalCurrent(m.Context, m.Tx, action)
+	if err != nil {
+		return err
+	}
+	// Capture and guard every affected record before replacing any value, so the
+	// preimage includes the old schema and all rows fail atomically on stale scope.
+	for _, record := range schemaValueRecords(before.Before, action) {
+		var page, owner string
+		var deleted sql.NullString
+		if err = m.Tx.QueryRowContext(m.Context, "SELECT r.page_id,r.collection_id,p.deleted_at FROM records r JOIN pages p ON p.id=r.page_id WHERE r.id=?", record).Scan(&page, &owner, &deleted); err != nil {
+			return err
+		}
+		if owner != collection || deleted.Valid {
+			return Fail("CONFLICT", "An affected record is missing, trashed or outside the reviewed collection")
+		}
+		if err = m.TouchPage(page); err != nil {
+			return err
+		}
+	}
 	var page string
 	if err := m.Tx.QueryRowContext(m.Context, "SELECT owning_page_id FROM collections WHERE id=?", collection).Scan(&page); err != nil {
 		return err
@@ -218,6 +327,11 @@ func restoreUnusedProperty(m *Mutation, action map[string]any) error {
 		return err
 	}
 	if err := m.Touch("property", id); err != nil {
+		return err
+	}
+	// Remove values before changing the composite schema foreign key. They are
+	// restored with the reviewed target type within this same writer transaction.
+	if _, err := m.Exec("DELETE FROM property_values WHERE property_id=?", id); err != nil {
 		return err
 	}
 	if _, err := m.Exec("DELETE FROM property_options WHERE property_id=?", id); err != nil {
@@ -271,6 +385,12 @@ func restoreUnusedProperty(m *Mutation, action map[string]any) error {
 			if !ok || key == "doneOptionId" && group != "done" || key == "reopenOptionId" && group == "done" {
 				return Fail("INVALID_REQUEST", "Reviewed option mapping is incompatible")
 			}
+		}
+	}
+	for _, raw := range asList(action["values"]) {
+		value := asObject(raw)
+		if _, err := m.Exec("INSERT INTO property_values(record_id,collection_id,property_id,property_type,schema_version,value_json) VALUES(?,?,?,?,?,?)", value["recordId"], collection, id, def["type"], 1, string(marshal(value["value"]))); err != nil {
+			return err
 		}
 	}
 	return nil
