@@ -24,13 +24,14 @@ type ProviderBridge struct {
 	connections map[string]*providerConnection
 }
 type providerConnection struct {
-	mcp       *providerMCP
-	execution contracts.ServiceExecutionContext
-	token     string
-	tools     map[string]bool
-	info      ProviderConnection
-	cancel    context.CancelFunc
-	ctx       context.Context
+	skillInvocation string
+	mcp             *providerMCP
+	execution       contracts.ServiceExecutionContext
+	token           string
+	tools           map[string]bool
+	info            ProviderConnection
+	cancel          context.CancelFunc
+	ctx             context.Context
 }
 type ProviderConnection struct {
 	ID             string   `json:"id"`
@@ -285,7 +286,7 @@ func (b *ProviderBridge) persistProposal(ctx context.Context, c *providerConnect
 	if err != nil {
 		return nil, err
 	}
-	sum := sha256.Sum256([]byte(c.info.ID + ":" + key))
+	sum := sha256.Sum256([]byte(providerProposalNamespace(c) + ":" + key))
 	id := hex.EncodeToString(sum[:])
 	p := ProviderProposal{ID: id, ConnectionID: c.info.ID, State: "pending", Request: req, PlanHash: planHash, Changes: changes}
 	err = b.kernel.write(ctx, func(tx *sql.Tx) error {
@@ -297,9 +298,20 @@ func (b *ProviderBridge) persistProposal(ctx context.Context, c *providerConnect
 			if err = json.Unmarshal([]byte(previous), &old); err != nil {
 				return err
 			}
-			h, _ := commandHash(old.Request, true)
+			compare := old.Request
+			compare.Mutation.ScopeGrantId = req.Mutation.ScopeGrantId
+			h, _ := commandHash(compare, true)
 			if (planHash == "" && (old.PlanHash != "" || h != hash)) || (planHash != "" && old.PlanHash != planHash) {
 				return Fail("IDEMPOTENCY_CONFLICT", "Proposal retry changed its reviewed content")
+			}
+			if c.skillInvocation != "" && old.ConnectionID != c.info.ID && !previousResult.Valid {
+				old.ConnectionID = c.info.ID
+				old.Request.Mutation.ScopeGrantId = c.execution.ScopeGrantId
+				old.Request.Mutation.ApprovalId = nil
+				previousState = "pending"
+				if _, err = tx.ExecContext(ctx, "UPDATE provider_proposals SET connection_id=?,body_json=?,state='pending' WHERE id=?", c.info.ID, string(marshal(old)), id); err != nil {
+					return err
+				}
 			}
 			p = old
 			p.State = previousState
@@ -342,6 +354,9 @@ func (b *ProviderBridge) Proposals(ctx context.Context) ([]ProviderProposal, err
 	return out, rows.Err()
 }
 func (b *ProviderBridge) Approve(ctx context.Context, id string) (json.RawMessage, error) {
+	if err := requireOwnerScope(b.kernel, b.owner); err != nil {
+		return nil, err
+	}
 	b.approvalMu.Lock()
 	defer b.approvalMu.Unlock()
 	var raw, state string
@@ -352,6 +367,9 @@ func (b *ProviderBridge) Approve(ctx context.Context, id string) (json.RawMessag
 	var p ProviderProposal
 	if err := json.Unmarshal([]byte(raw), &p); err != nil {
 		return nil, err
+	}
+	if result.Valid {
+		return json.RawMessage(result.String), nil
 	}
 	b.mu.Lock()
 	c := b.connections[p.ConnectionID]
@@ -453,3 +471,32 @@ func (b *ProviderBridge) Handoff(ctx context.Context, id, objective, result, pen
 	return map[string]any{"fromProvider": info.Provider, "objective": objective, "reviewedResult": result, "pendingWork": pending, "context": manifest, "requiresFreshApproval": true, "nativeSessionTransferred": false}, nil
 }
 func (b *ProviderBridge) String() string { return fmt.Sprintf("ProviderBridge(%s)", b.kernel.ID()) }
+
+func providerProposalNamespace(c *providerConnection) string {
+	if c.skillInvocation != "" {
+		return "skill:" + c.skillInvocation
+	}
+	return c.info.ID
+}
+
+// BindSkill is trusted-host only. A skill invocation never expands the existing grant.
+func (b *ProviderBridge) BindSkill(ctx context.Context, id string, ref SkillRunReference) error {
+	b.mu.Lock()
+	defer b.mu.Unlock()
+	c := b.connections[id]
+	if c == nil {
+		return Fail("NOT_FOUND", "Provider connection unavailable")
+	}
+	if !sameStringSet(c.info.PageIDs, ref.SourcePageIDs) || !sameStringSet(c.info.Tools, ref.Tools) {
+		return Fail("SCOPE_DENIED", "Skill selection differs from provider grant")
+	}
+	var actor string
+	if err := b.kernel.db.QueryRowContext(ctx, "SELECT actor_id FROM skill_invocations WHERE id=?", ref.InvocationID).Scan(&actor); err != nil {
+		return err
+	}
+	if actor != string(b.owner.Actor.ActorId) {
+		return Fail("SCOPE_DENIED", "Skill invocation belongs to another actor")
+	}
+	c.skillInvocation = ref.InvocationID
+	return nil
+}

@@ -128,6 +128,10 @@ defs['AutomationTrigger']=obj({'type':enum('event','schedule'),'collectionId':D(
 defs['AutomationCondition']=obj({'recordId':D('Id'),'propertyId':D('Id'),'op':enum('eq','ne','is_empty'),'value':json_value},['recordId','propertyId','op'])
 defs['AutomationRule']=obj({'id':D('Id'),'name':{'type':'string','minLength':1,'maxLength':200},'enabled':B,'paused':B,'allowedOrigins':arr(enum('user','ai'),2),'trigger':R('AutomationTrigger'),'condition':R('AutomationCondition'),'actions':{**arr(R('AutomationAction'),32),'minItems':1}},['id','name','enabled','paused','trigger','actions'])
 commands['SaveAutomation']['properties']['rule']=R('AutomationRule')
+# Manual skills retain immutable definitions; text never supplies authority.
+defs['SkillDefinition']=obj({'name':{'type':'string','minLength':1,'maxLength':200},'purpose':{'type':'string','maxLength':1000},'instructions':{'type':'string','minLength':1,'maxLength':4000},'inputDescription':{'type':'string','maxLength':500},'expectedOutput':{'type':'string','maxLength':1000},'mode':enum('answer','summarize','generate','workspace_agent'),'sourcePageIds':{**arr(D('Id'),32),'uniqueItems':True},'tools':{**arr(enum('readPage','search.query','queryRecords','resolveCitation','allocateIds','proposeChanges','proposeActions'),7),'uniqueItems':True}})
+defs['SkillRunReference']=obj({'skillId':D('Id'),'version':{'type':'integer','minimum':1},'invocationId':D('Id'),'input':{'type':'string','maxLength':1000},'sourcePageIds':{**arr(D('Id'),32),'uniqueItems':True},'tools':{**arr(enum('readPage','search.query','queryRecords','resolveCitation','allocateIds','proposeChanges','proposeActions'),7),'uniqueItems':True},'previewHash':{'type':'string','pattern':'^[0-9a-f]{64}$'}},['skillId','version','invocationId','input','sourcePageIds','tools'])
+commands['SaveSkill']=tagged('skill.save',{'skillId':D('Id'),'pageId':D('Id'),'expectedVersion':N,'definition':R('SkillDefinition'),'archived':B,'imported':B})
 defs.update(commands)
 defs['Command']={'oneOf':[R(n) for n in commands]}
 header={'contractVersion':{'const':1},'requestId':D('Id'),'workspaceId':D('Id')}
@@ -143,8 +147,14 @@ defs['MeetingExtractionCreateRequest']=obj({**header,'meetingId':D('Id'),'eviden
 defs['MeetingExtractionCreateRequest']['dependentRequired']={'proposalId':['itemId'],'itemId':['proposalId']}
 # Native-only backup output. Passphrases deliberately have no dispatcher/job
 # request definition and never enter a persisted request or model payload.
+defs['NativeAudioInput']=obj({'id':{'type':'string','minLength':1,'maxLength':1024},'name':{'type':'string','minLength':1,'maxLength':1024},'isDefault':B})
+defs['NativeCaptureControlAck']=obj({'controlId':D('Id'),'action':enum('pause','resume','stop'),'state':enum('paused','recording','stopped'),'bytes':N,'capturedSamples':N,'durationMs':N})
+defs['NativeRecordingGap']=obj({'id':D('Id'),'kind':enum('pause','interruption'),'sampleOffset':N,'startedAt':D('Timestamp'),'endedAt':D('Timestamp'),'durationMs':N,'reason':S},['id','kind','sampleOffset','startedAt'])
+defs['NativeRecordingDraft']=obj({'version':{'const':1},'id':D('Id'),'title':S,'actorId':D('Id'),'startedAt':D('Timestamp'),'state':enum('recording','paused','captured','interrupted','saved'),'bytes':N,'durationMs':N,'pageId':D('Id'),'meetingId':D('Id'),'fileId':D('Id'),'error':S,'inputDeviceId':S,'disclosureAcknowledgedAt':D('Timestamp'),'lastControlId':D('Id'),'gaps':arr(R('NativeRecordingGap'),10000),'segments':arr(obj({'startByte':N,'endByte':N,'sha256':{'type':'string','pattern':'^[0-9a-f]{64}$'}}),100000)},['id','title','actorId','startedAt','state','bytes','durationMs','pageId','meetingId','segments'])
 defs['NativeBackupProgress']=obj({'version':{'const':1},'phase':enum('idle','choosing','snapshot','encrypting','authenticating','verifying','review','restoring','complete'),'bytes':{'type':'string','pattern':'^(0|[1-9][0-9]*)$'},'totalBytes':{'type':'string','pattern':'^(0|[1-9][0-9]*)$'}})
 defs['NativeBackupSummary']=obj({'version':{'const':1},'format':{'const':'age-passphrase/native-tar-v1'},'included':arr(S,32),'excluded':arr(S,32),'restoration':arr(S,32)})
+defs['SkillsListRequest']=obj({**header,'skillId':D('Id')},list(header))
+defs['SkillPreviewRequest']=obj({**header,'skill':R('SkillRunReference'),'provider':enum('local','codex','claude_code')})
 defs['AutomationOptionsRequest']=obj({**header,'pageId':D('Id')})
 defs['TemplatePropertyDecision']={'oneOf':[obj({'sourcePropertyId':D('Id'),'action':{'const':'omit'}}),obj({'sourcePropertyId':D('Id'),'action':{'const':'map'},'targetPropertyId':D('Id'),'value':json_value})]}
 defs['TemplatePreviewRequest']=obj({**header,'templateId':D('Id'),'title':{'type':'string','minLength':1,'maxLength':2000},'collectionId':D('Id'),'propertyDecisions':arr(R('TemplatePropertyDecision'),256)},[*header,'templateId','title'])
@@ -247,6 +257,7 @@ defs['ImportItemOutcome']=obj({'sourceLocator':S,'mappingId':D('Id'),'outcome':e
 defs['ImportReport']=obj({'runId':D('Id'),'jobId':D('Id'),'state':enum('preview','running','partial','completed','failed','cancelled'),'sourceCompleteness':enum('complete','partial','unknown'),'discoveredCount':N,'accountedCount':N,'items':arr(R('ImportItemOutcome'),10000),'committedBatchIds':arr(D('Id'),10000),'unresolvedSourceIds':arr(S,10000),'sourceOmissions':arr(S,10000)})
 defs['PreviewImportRequest']=obj({**header,'sourceHandle':D('Id'),'sourceNamespace':S,'channel':enum('zip','html','api'),'destinationScope':D('Scope')})
 defs['PreviewImportResult']=obj({'planId':D('Id'),'planHash':D('Hash'),'report':R('ImportReport'),'reimportPlans':arr(D('ReimportPlan'),10000),'requiredRevisions':arr(R('ExpectedRevision'),10000)})
+defs['ConfigureImportRequest']=obj({**header,'planId':D('Id'),'planHash':D('Hash'),'columns':arr(obj({'sourceLocator':S,'index':N,'type':enum('text','number','checkbox','date','url','email')}),256),'choices':arr(obj({'sourceLocator':S,'choice':enum('keep_local','replace','duplicate','merge')}),10000),'resolutions':arr(obj({'sourceLocator':S,'fields':arr(D('ImportFieldResolution'),10000)}),10000)},[*header,'planId','planHash'])
 defs['GetImportReportRequest']=obj({**header,'runId':D('Id')})
 defs['GetImportReportResult']=R('ImportReport')
 defs['ListMemoryRequest']=obj({**header,'scope':D('Scope'),'includeInactive':B})
@@ -257,7 +268,7 @@ defs.update({
  'ProviderManagedStatusRequest':obj(header),
  'ProviderModelsRequest':obj({**header,'registrationId':D('Id')}),
  'ProviderDiscoverRequest':obj({**header,'provider':enum('codex','claude_code')}),
- 'ProviderManagedStartRequest':obj({**header,'provider':enum('codex','claude_code'),'registrationId':{'type':'string','minLength':1,'maxLength':256},'billingMode':enum('chatgpt_plan','claude_subscription','anthropic_api'),'model':{'type':'string','minLength':1,'maxLength':128},'prompt':{'type':'string','minLength':1,'maxLength':65536},'pageIds':{**arr(D('Id'),100),'minItems':1,'uniqueItems':True},'tools':{**arr(enum('readPage','search.query','queryRecords','resolveCitation','allocateIds','proposeChanges','proposeActions'),7),'minItems':1,'uniqueItems':True},'previewHash':{'type':'string','pattern':'^[a-f0-9]{64}$'},'resumeRunId':D('Id')},[*header,'provider','registrationId','billingMode','model','prompt','pageIds','tools','previewHash']),
+ 'ProviderManagedStartRequest':obj({**header,'provider':enum('codex','claude_code'),'registrationId':{'type':'string','minLength':1,'maxLength':256},'billingMode':enum('chatgpt_plan','claude_subscription','anthropic_api'),'model':{'type':'string','minLength':1,'maxLength':128},'prompt':{'type':'string','minLength':1,'maxLength':65536},'pageIds':{**arr(D('Id'),100),'minItems':1,'uniqueItems':True},'tools':{**arr(enum('readPage','search.query','queryRecords','resolveCitation','allocateIds','proposeChanges','proposeActions'),7),'minItems':1,'uniqueItems':True},'previewHash':{'type':'string','pattern':'^[a-f0-9]{64}$'},'resumeRunId':D('Id'),'skill':R('SkillRunReference')},[*header,'provider','registrationId','billingMode','model','prompt','pageIds','tools','previewHash']),
  'ProviderManagedCancelRequest':obj({**header,'runId':D('Id')})
 })
 # Native account operations expose metadata only, never OAuth URLs or tokens.

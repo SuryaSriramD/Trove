@@ -11,6 +11,18 @@ type Column = {
   warning?: string;
 };
 type Item = {
+  merge?: {
+    baselineStatus: "retained" | "unavailable";
+    localDeleted: boolean;
+    fields: Array<{
+      path: string;
+      outcome: string;
+      base: Presence;
+      local: Presence;
+      incoming: Presence;
+    }>;
+    resolutions: Array<{ path: string; choice: string }>;
+  };
   sourceLocator: string;
   kind: string;
   outcome: string;
@@ -23,8 +35,82 @@ type Item = {
   committed: boolean;
   columns?: Column[];
 };
+type Presence = { present: boolean; value?: unknown };
+const describeField = (value: Presence) =>
+  value.present ? JSON.stringify(value.value, null, 2) : "(absent)";
+function describeImportPath(path: string, item: Item, items: Item[]) {
+  const parts = path.split("/");
+  if (parts[1] === "collectionTitle") return "Collection title";
+  if (parts[1] !== "schema" && parts[1] !== "values") return path;
+  const property = parts[1] === "schema" ? parts[2] : parts[3];
+  const schema = item.merge?.fields.find((field) => field.path === `/schema/${property}`);
+  const definition = (schema?.local.present ? schema.local.value : schema?.incoming.value) as { name?: string } | undefined;
+  const name = definition?.name ?? property;
+  if (parts[1] === "schema") return `Property: ${name}`;
+  const record = item.merge?.fields.find((field) => field.path === `/records/${parts[2]}`);
+  const page = record?.local.present ? record.local.value : record?.incoming.value;
+  const title = items.find((candidate) => candidate.pageId === page)?.title ?? parts[2];
+  return `${title} · ${name}`;
+}
+function EditedImportField({
+  value,
+  disabled,
+  onResolve,
+}: {
+  value: Presence;
+  disabled: boolean;
+  onResolve: (value: Presence) => void;
+}) {
+  const [draft, setDraft] = useState(
+    JSON.stringify(value.value ?? null, null, 2),
+  );
+  const [present, setPresent] = useState(value.present);
+  const [error, setError] = useState("");
+  return (
+    <details>
+      <summary>Use an edited value</summary>
+      <label>
+        <input
+          type="checkbox"
+          checked={present}
+          disabled={disabled}
+          onChange={(event) => setPresent(event.target.checked)}
+        />
+        Field is present
+      </label>
+      {present && (
+        <textarea
+          aria-label="Merged import field JSON"
+          value={draft}
+          disabled={disabled}
+          onChange={(event) => setDraft(event.target.value)}
+        />
+      )}
+      <button
+        disabled={disabled}
+        onClick={() => {
+          try {
+            const next: Presence = present
+              ? { present: true, value: JSON.parse(draft) }
+              : { present: false };
+            setError("");
+            onResolve(next);
+          } catch {
+            setError(
+              "Enter valid JSON, including null for a present empty value.",
+            );
+          }
+        }}
+      >
+        Save edited decision
+      </button>
+      {error && <p role="alert">{error}</p>}
+    </details>
+  );
+}
 type Plan = {
   notionGraph?: boolean;
+  typedDatabaseMerge?: boolean;
   jobId?: string;
   planId: string;
   planHash: string;
@@ -473,6 +559,132 @@ export function ImportExportPanel({
                   <div className="import-conflict" key={item.sourceLocator}>
                     <strong>{item.sourceLocator}</strong>
                     <p>{item.conflict}</p>
+                    {item.merge && (
+                      <details open>
+                        <summary>
+                          Field review ·{" "}
+                          {item.merge.baselineStatus === "retained"
+                            ? "retained source baseline"
+                            : "baseline unavailable"}
+                        </summary>
+                        <p>
+                          Unchanged fields and one-sided edits merge
+                          automatically. Choose content, parent and order
+                          together when deleting a block. JSON null and absent
+                          values are different.
+                        </p>
+                        <table>
+                          <thead>
+                            <tr>
+                              <th>Field / outcome</th>
+                              <th>Base</th>
+                              <th>Local</th>
+                              <th>Incoming</th>
+                              <th>Decision</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            {item.merge.fields
+                              .filter((field) => field.outcome !== "unchanged")
+                              .map((field) => (
+                                <tr key={field.path}>
+                                  <td>
+                                    {describeImportPath(field.path, item, plan.items)}
+                                    {field.path.startsWith("/schema/") || field.path.startsWith("/values/") ? <small className="import-field-path">{field.path}</small> : null}
+                                    <br />
+                                    {field.outcome}
+                                  </td>
+                                  <td>
+                                    <pre>{describeField(field.base)}</pre>
+                                  </td>
+                                  <td>
+                                    <pre>{describeField(field.local)}</pre>
+                                  </td>
+                                  <td>
+                                    <pre>{describeField(field.incoming)}</pre>
+                                  </td>
+                                  <td>
+                                    <select
+                                      aria-label={`Resolution for ${item.sourceLocator} ${field.path}`}
+                                      disabled={
+                                        busy ||
+                                        running ||
+                                        plan.initialized ||
+                                        item.merge?.localDeleted
+                                      }
+                                      value={
+                                        item.merge?.resolutions.find(
+                                          (choice) =>
+                                            choice.path === field.path,
+                                        )?.choice ?? ""
+                                      }
+                                      onChange={(event) =>
+                                        configure({
+                                          resolutions: [
+                                            {
+                                              sourceLocator: item.sourceLocator,
+                                              fields: [
+                                                {
+                                                  path: field.path,
+                                                  choice: event.target.value,
+                                                },
+                                              ],
+                                            },
+                                          ],
+                                        })
+                                      }
+                                    >
+                                      <option value="" disabled>
+                                        {field.outcome === "conflict"
+                                          ? "Choose explicitly…"
+                                          : "Automatic merge"}
+                                      </option>
+                                      <option value="keep_local">
+                                        Keep local
+                                      </option>
+                                      <option value="take_incoming">
+                                        Take incoming
+                                      </option>
+                                      {item.merge?.resolutions.find(
+                                        (choice) => choice.path === field.path,
+                                      )?.choice === "merged" && (
+                                        <option value="merged">
+                                          Edited value
+                                        </option>
+                                      )}
+                                    </select>
+                                    <EditedImportField
+                                      value={field.local}
+                                      disabled={
+                                        busy ||
+                                        running ||
+                                        plan.initialized ||
+                                        !!item.merge?.localDeleted
+                                      }
+                                      onResolve={(value) =>
+                                        configure({
+                                          resolutions: [
+                                            {
+                                              sourceLocator: item.sourceLocator,
+                                              fields: [
+                                                {
+                                                  path: field.path,
+                                                  choice: "merged",
+                                                  value,
+                                                },
+                                              ],
+                                            },
+                                          ],
+                                        })
+                                      }
+                                    />
+                                  </td>
+                                </tr>
+                              ))}
+                          </tbody>
+                        </table>
+                      </details>
+                    )}
                     <select
                       aria-label={`Conflict choice for ${item.sourceLocator}`}
                       value={item.choice ?? ""}
@@ -480,7 +692,7 @@ export function ImportExportPanel({
                       onChange={(e) =>
                         configure({
                           choices:
-                            plan.notionGraph && notionGraphKinds.has(item.kind)
+                            (plan.notionGraph || plan.typedDatabaseMerge) && notionGraphKinds.has(item.kind) && e.target.value !== "merge"
                               ? plan.items
                                   .filter((i) => notionGraphKinds.has(i.kind))
                                   .map((i) => ({
@@ -502,6 +714,11 @@ export function ImportExportPanel({
                       <option value="keep_local">
                         Keep local; retain incoming source
                       </option>
+                      {item.merge && !item.merge.localDeleted && (
+                        <option value="merge">
+                          Apply reviewed field merge
+                        </option>
+                      )}
                       {(!plan.notionGraph ||
                         !notionGraphKinds.has(item.kind)) &&
                         item.kind !== "csv" &&

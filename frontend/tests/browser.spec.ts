@@ -1214,6 +1214,69 @@ test("Phase 2 import displays complete accounting and editable property preview"
   expect(await page.evaluate(() => (window as any).phase2Mutations)).toBe(0);
 });
 
+test("import field review persists an edited decision before enabling commit", async ({ page }) => {
+  await page.evaluate(() => {
+    const app = (window as any).go.main.App, previous = app.Dispatch;
+    app.PickFile = async () => "merge-selection";
+    const item: any = { sourceLocator: "Notes.html", kind: "html", outcome: "adapted", reason: "Source retained", committed: false, conflict: "Review local and incoming edits", choice: "", merge: {
+      baselineStatus: "retained", localDeleted: false, resolutions: [], fields: [{ path: "/title", outcome: "conflict", base: { present: true, value: "Base title" }, local: { present: true, value: "Local title" }, incoming: { present: true, value: "Incoming title" } }]
+    } };
+    const plan = { planId: "merge-plan", planHash: "review-hash-1", sourceNamespace: "fixture", sourceName: "Notes.html", rootPageId: "root", sourceFileId: "source", state: "preview", cursor: 0, initialized: false, sourceCompleteness: "unknown", sourceOmissions: [], unknownCompleteness: [], items: [item] };
+    (window as any).mergeReviewCalls = [];
+    app.Dispatch = async (method: string, raw: string) => {
+      if (method === "imports.preview") return JSON.stringify({ ok: true, result: plan });
+      if (method === "imports.configure") {
+        const request = JSON.parse(raw); (window as any).mergeReviewCalls.push(request);
+        item.merge.resolutions = request.resolutions[0].fields; item.choice = "merge"; plan.planHash = "review-hash-2";
+        return JSON.stringify({ ok: true, result: plan });
+      }
+      return previous(method, raw);
+    };
+  });
+  await navSurface(page, "Import");
+  await page.getByRole("button", { name: "Choose import file" }).click();
+  await expect(page.getByRole("button", { name: "Commit reviewed import", exact: true })).toBeDisabled();
+  await expect(page.getByText('"Base title"', { exact: true })).toBeVisible();
+  await expect(page.getByText('"Incoming title"', { exact: true })).toBeVisible();
+  await page.getByText("Use an edited value", { exact: true }).click();
+  await page.getByLabel("Merged import field JSON").fill('"Reviewed title"');
+  await page.getByRole("button", { name: "Save edited decision" }).click();
+  await expect(page.getByRole("button", { name: "Commit reviewed import", exact: true })).toBeEnabled();
+  expect(await page.evaluate(() => (window as any).mergeReviewCalls)).toEqual([expect.objectContaining({ planId: "merge-plan", planHash: "review-hash-1", resolutions: [{ sourceLocator: "Notes.html", fields: [{ path: "/title", choice: "merged", value: { present: true, value: "Reviewed title" } }] }] })]);
+});
+
+test("typed import review shows record and property names and saves the exact field choice", async ({ page }) => {
+  await page.evaluate(() => {
+    const app = (window as any).go.main.App, previous = app.Dispatch;
+    app.PickFile = async () => "typed-selection";
+    const same = (value: any) => ({ present: true, value });
+    const item: any = { sourceLocator: "Tasks.csv", kind: "portable_collection", title: "Tasks", outcome: "preserved", reason: "Typed source retained", committed: false, conflict: "Review typed changes", choice: "", merge: {
+      baselineStatus: "retained", localDeleted: false, resolutions: [], fields: [
+        { path: "/schema/prop-1", outcome: "unchanged", base: same({ name: "Notes" }), local: same({ name: "Notes" }), incoming: same({ name: "Notes" }) },
+        { path: "/records/record-1", outcome: "unchanged", base: same("page-1"), local: same("page-1"), incoming: same("page-1") },
+        { path: "/values/record-1/prop-1", outcome: "conflict", base: same("Base notes"), local: same("Local notes"), incoming: same("Incoming notes") }
+      ]
+    } };
+    const plan = { planId: "typed-plan", planHash: "typed-hash-1", typedDatabaseMerge: true, sourceNamespace: "fixture", sourceName: "Tasks.zip", rootPageId: "root", sourceFileId: "source", state: "preview", cursor: 0, initialized: false, sourceCompleteness: "unknown", sourceOmissions: [], unknownCompleteness: [], items: [item, { sourceLocator: "row.html", kind: "portable_record", pageId: "page-1", title: "Call customer", outcome: "preserved", reason: "Body retained", committed: false, choice: "keep_local" }] };
+    app.Dispatch = async (method: string, raw: string) => {
+      if (method === "imports.preview") return JSON.stringify({ ok: true, result: plan });
+      if (method === "imports.configure") {
+        const request = JSON.parse(raw); (window as any).typedReviewRequest = request;
+        item.merge.resolutions = request.resolutions[0].fields; item.choice = "merge"; plan.planHash = "typed-hash-2";
+        return JSON.stringify({ ok: true, result: plan });
+      }
+      return previous(method, raw);
+    };
+  });
+  await navSurface(page, "Import");
+  await page.getByRole("button", { name: "Choose import file" }).click();
+  await expect(page.getByText("Call customer · Notes", { exact: false })).toBeVisible();
+  await expect(page.getByRole("button", { name: "Commit reviewed import", exact: true })).toBeDisabled();
+  await page.getByLabel("Resolution for Tasks.csv /values/record-1/prop-1").selectOption("take_incoming");
+  await expect(page.getByRole("button", { name: "Commit reviewed import", exact: true })).toBeEnabled();
+  expect(await page.evaluate(() => (window as any).typedReviewRequest)).toMatchObject({ planId: "typed-plan", planHash: "typed-hash-1", resolutions: [{ sourceLocator: "Tasks.csv", fields: [{ path: "/values/record-1/prop-1", choice: "take_incoming" }] }] });
+});
+
 test("Phase 2 AI works without packs and shows reviewed memory controls", async ({ page }) => {
   await navSurface(page, "AI");
   await expect(page.getByRole("heading", { name: "Local AI", exact: true })).toBeVisible();
@@ -1801,4 +1864,63 @@ test("provider disconnect stays available while approval is pending", async ({ p
   await disconnect.click();
   await expect.poll(() => page.evaluate(() => (window as any).providerDisconnects)).toBe(1);
   await expect(page.getByText("mcp · disconnected", { exact: true })).toBeVisible();
+});
+
+test("G05 capture disclosure, selected input and acknowledged pause controls", async ({ page }) => {
+  await installMeetingAudioFixture(page);
+  await page.evaluate(() => {
+    const app = (window as any).go.main.App;
+    let draft: any = null;
+    (window as any).captureCalls = [];
+    app.MeetingAudioInputs = async () => [{ id: "usb-mic", name: "USB microphone", isDefault: false }];
+    app.MeetingRecordings = async () => draft ? [draft] : [];
+    app.StartMeetingRecordingWithOptions = async (title: string, input: string, disclosure: boolean) => {
+      (window as any).captureCalls.push({ title, input, disclosure });
+      draft = { version: 1, id: "capture", title: title || "Meeting recording", actorId: "owner", startedAt: "2026-10-15T00:00:00Z", state: "recording", durationMs: 1000, bytes: 64000, pageId: "page", meetingId: "meeting", segments: [] };
+      return draft;
+    };
+    app.ControlMeetingRecording = async (_id: string, action: string) => {
+      await new Promise<void>(resolve => { (window as any).acknowledgeCapture = resolve; });
+      draft.state = action === "pause" ? "paused" : "recording";
+      return draft;
+    };
+  });
+  await navSurface(page, "Meetings");
+  const record = page.getByRole("button", { name: "Record microphone" });
+  await expect(record).toBeDisabled();
+  await page.getByRole("button", { name: "Refresh audio inputs" }).click();
+  await page.getByLabel("Audio input", { exact: true }).selectOption("usb-mic");
+  await page.getByRole("checkbox", { name: /I have told participants/ }).check();
+  await record.click();
+  expect(await page.evaluate(() => (window as any).captureCalls)).toEqual([{ title: "", input: "usb-mic", disclosure: true }]);
+  await page.getByRole("button", { name: "Pause recording", exact: true }).click();
+  await expect(page.getByRole("button", { name: "Pause recording", exact: true })).toBeDisabled();
+  await expect(page.getByRole("button", { name: "Resume recording", exact: true })).toHaveCount(0);
+  await page.evaluate(() => (window as any).acknowledgeCapture());
+  await expect(page.getByRole("button", { name: "Resume recording", exact: true })).toBeEnabled();
+  await expect(page.locator(".recording-recovery")).toContainText("0:01");
+});
+
+test("G05 delayed meeting drafts never appear under a different selection", async ({ page }) => {
+  await installMeetingAudioFixture(page);
+  await page.evaluate(() => {
+    const app = (window as any).go.main.App, previous = app.Dispatch;
+    app.Dispatch = async (method: string, raw: string) => {
+      const request = JSON.parse(raw);
+      if (method === "meetings.drafts") {
+        if (request.meetingId.endsWith("510")) {
+          await new Promise<void>(resolve => { (window as any).releaseOldMeetingDraft = resolve; });
+          return JSON.stringify({ ok: true, result: [{ id: "old-draft", state: "draft", stale: false, evidenceHash: "old", body: { summary: [{ text: "OLD MEETING ONLY", segmentIds: [] }] } }] });
+        }
+        return JSON.stringify({ ok: true, result: [] });
+      }
+      return previous(method, raw);
+    };
+  });
+  await navSurface(page, "Meetings");
+  await expect.poll(() => page.evaluate(() => !!(window as any).releaseOldMeetingDraft)).toBe(true);
+  await page.getByRole("button", { name: /^Second audio recording/ }).click();
+  await page.evaluate(() => (window as any).releaseOldMeetingDraft());
+  await expect(page.locator(".meeting-detail h2")).toHaveText("Second audio recording");
+  await expect(page.getByText("OLD MEETING ONLY")).toHaveCount(0);
 });

@@ -84,7 +84,7 @@ func (k *Kernel) captureBackupRecordings(ctx context.Context) (sources []recordi
 			return sources, Fail("INVALID_REQUEST", "Recording journal identity mismatch")
 		}
 		switch draft.State {
-		case "recording", "captured", "interrupted", "saved":
+		case "recording", "paused", "captured", "interrupted", "saved":
 		default:
 			return sources, Fail("INVALID_REQUEST", "Unknown recording state")
 		}
@@ -111,7 +111,7 @@ func (k *Kernel) captureBackupRecordings(ctx context.Context) (sources []recordi
 				f.Close()
 				return sources, Fail("INVALID_REQUEST", "Recording length is invalid")
 			}
-			if draft.State == "recording" {
+			if draft.State == "recording" || draft.State == "paused" {
 				// The live journal is unchanged. Backup-only state makes the stable,
 				// acknowledged prefix recoverable without pretending capture stopped.
 				size = draft.Bytes

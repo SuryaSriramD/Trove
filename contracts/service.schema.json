@@ -1367,6 +1367,135 @@
       ],
       "additionalProperties": false
     },
+    "SkillDefinition": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 200
+        },
+        "purpose": {
+          "type": "string",
+          "maxLength": 1000
+        },
+        "instructions": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 4000
+        },
+        "inputDescription": {
+          "type": "string",
+          "maxLength": 500
+        },
+        "expectedOutput": {
+          "type": "string",
+          "maxLength": 1000
+        },
+        "mode": {
+          "type": "string",
+          "enum": [
+            "answer",
+            "summarize",
+            "generate",
+            "workspace_agent"
+          ]
+        },
+        "sourcePageIds": {
+          "type": "array",
+          "items": {
+            "$ref": "domain.schema.json#/$defs/Id"
+          },
+          "maxItems": 32,
+          "uniqueItems": true
+        },
+        "tools": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": [
+              "readPage",
+              "search.query",
+              "queryRecords",
+              "resolveCitation",
+              "allocateIds",
+              "proposeChanges",
+              "proposeActions"
+            ]
+          },
+          "maxItems": 7,
+          "uniqueItems": true
+        }
+      },
+      "required": [
+        "name",
+        "purpose",
+        "instructions",
+        "inputDescription",
+        "expectedOutput",
+        "mode",
+        "sourcePageIds",
+        "tools"
+      ],
+      "additionalProperties": false
+    },
+    "SkillRunReference": {
+      "type": "object",
+      "properties": {
+        "skillId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "version": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "invocationId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "input": {
+          "type": "string",
+          "maxLength": 1000
+        },
+        "sourcePageIds": {
+          "type": "array",
+          "items": {
+            "$ref": "domain.schema.json#/$defs/Id"
+          },
+          "maxItems": 32,
+          "uniqueItems": true
+        },
+        "tools": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": [
+              "readPage",
+              "search.query",
+              "queryRecords",
+              "resolveCitation",
+              "allocateIds",
+              "proposeChanges",
+              "proposeActions"
+            ]
+          },
+          "maxItems": 7,
+          "uniqueItems": true
+        },
+        "previewHash": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        }
+      },
+      "required": [
+        "skillId",
+        "version",
+        "invocationId",
+        "input",
+        "sourcePageIds",
+        "tools"
+      ],
+      "additionalProperties": false
+    },
     "CreatePage": {
       "type": "object",
       "properties": {
@@ -2978,6 +3107,44 @@
       ],
       "additionalProperties": false
     },
+    "SaveSkill": {
+      "type": "object",
+      "properties": {
+        "kind": {
+          "const": "skill.save"
+        },
+        "skillId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "pageId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "expectedVersion": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "definition": {
+          "$ref": "#/$defs/SkillDefinition"
+        },
+        "archived": {
+          "type": "boolean"
+        },
+        "imported": {
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "kind",
+        "skillId",
+        "pageId",
+        "expectedVersion",
+        "definition",
+        "archived",
+        "imported"
+      ],
+      "additionalProperties": false
+    },
     "Command": {
       "oneOf": [
         {
@@ -3141,6 +3308,9 @@
         },
         {
           "$ref": "#/$defs/ReviewPage"
+        },
+        {
+          "$ref": "#/$defs/SaveSkill"
         }
       ]
     },
@@ -3477,6 +3647,229 @@
         ]
       }
     },
+    "NativeAudioInput": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 1024
+        },
+        "name": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 1024
+        },
+        "isDefault": {
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "id",
+        "name",
+        "isDefault"
+      ],
+      "additionalProperties": false
+    },
+    "NativeCaptureControlAck": {
+      "type": "object",
+      "properties": {
+        "controlId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "action": {
+          "type": "string",
+          "enum": [
+            "pause",
+            "resume",
+            "stop"
+          ]
+        },
+        "state": {
+          "type": "string",
+          "enum": [
+            "paused",
+            "recording",
+            "stopped"
+          ]
+        },
+        "bytes": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "capturedSamples": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "durationMs": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        }
+      },
+      "required": [
+        "controlId",
+        "action",
+        "state",
+        "bytes",
+        "capturedSamples",
+        "durationMs"
+      ],
+      "additionalProperties": false
+    },
+    "NativeRecordingGap": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "kind": {
+          "type": "string",
+          "enum": [
+            "pause",
+            "interruption"
+          ]
+        },
+        "sampleOffset": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "startedAt": {
+          "$ref": "domain.schema.json#/$defs/Timestamp"
+        },
+        "endedAt": {
+          "$ref": "domain.schema.json#/$defs/Timestamp"
+        },
+        "durationMs": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "reason": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "kind",
+        "sampleOffset",
+        "startedAt"
+      ],
+      "additionalProperties": false
+    },
+    "NativeRecordingDraft": {
+      "type": "object",
+      "properties": {
+        "version": {
+          "const": 1
+        },
+        "id": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "title": {
+          "type": "string"
+        },
+        "actorId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "startedAt": {
+          "$ref": "domain.schema.json#/$defs/Timestamp"
+        },
+        "state": {
+          "type": "string",
+          "enum": [
+            "recording",
+            "paused",
+            "captured",
+            "interrupted",
+            "saved"
+          ]
+        },
+        "bytes": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "durationMs": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "pageId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "meetingId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "fileId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "error": {
+          "type": "string"
+        },
+        "inputDeviceId": {
+          "type": "string"
+        },
+        "disclosureAcknowledgedAt": {
+          "$ref": "domain.schema.json#/$defs/Timestamp"
+        },
+        "lastControlId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "gaps": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/NativeRecordingGap"
+          },
+          "maxItems": 10000
+        },
+        "segments": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "startByte": {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 9007199254740991
+              },
+              "endByte": {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 9007199254740991
+              },
+              "sha256": {
+                "type": "string",
+                "pattern": "^[0-9a-f]{64}$"
+              }
+            },
+            "required": [
+              "startByte",
+              "endByte",
+              "sha256"
+            ],
+            "additionalProperties": false
+          },
+          "maxItems": 100000
+        }
+      },
+      "required": [
+        "id",
+        "title",
+        "actorId",
+        "startedAt",
+        "state",
+        "bytes",
+        "durationMs",
+        "pageId",
+        "meetingId",
+        "segments"
+      ],
+      "additionalProperties": false
+    },
     "NativeBackupProgress": {
       "type": "object",
       "properties": {
@@ -3551,6 +3944,62 @@
         "included",
         "excluded",
         "restoration"
+      ],
+      "additionalProperties": false
+    },
+    "SkillsListRequest": {
+      "type": "object",
+      "properties": {
+        "contractVersion": {
+          "const": 1
+        },
+        "requestId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "workspaceId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "skillId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        }
+      },
+      "required": [
+        "contractVersion",
+        "requestId",
+        "workspaceId"
+      ],
+      "additionalProperties": false
+    },
+    "SkillPreviewRequest": {
+      "type": "object",
+      "properties": {
+        "contractVersion": {
+          "const": 1
+        },
+        "requestId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "workspaceId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "skill": {
+          "$ref": "#/$defs/SkillRunReference"
+        },
+        "provider": {
+          "type": "string",
+          "enum": [
+            "local",
+            "codex",
+            "claude_code"
+          ]
+        }
+      },
+      "required": [
+        "contractVersion",
+        "requestId",
+        "workspaceId",
+        "skill",
+        "provider"
       ],
       "additionalProperties": false
     },
@@ -6586,6 +7035,118 @@
       ],
       "additionalProperties": false
     },
+    "ConfigureImportRequest": {
+      "type": "object",
+      "properties": {
+        "contractVersion": {
+          "const": 1
+        },
+        "requestId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "workspaceId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "planId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "planHash": {
+          "$ref": "domain.schema.json#/$defs/Hash"
+        },
+        "columns": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "sourceLocator": {
+                "type": "string"
+              },
+              "index": {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 9007199254740991
+              },
+              "type": {
+                "type": "string",
+                "enum": [
+                  "text",
+                  "number",
+                  "checkbox",
+                  "date",
+                  "url",
+                  "email"
+                ]
+              }
+            },
+            "required": [
+              "sourceLocator",
+              "index",
+              "type"
+            ],
+            "additionalProperties": false
+          },
+          "maxItems": 256
+        },
+        "choices": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "sourceLocator": {
+                "type": "string"
+              },
+              "choice": {
+                "type": "string",
+                "enum": [
+                  "keep_local",
+                  "replace",
+                  "duplicate",
+                  "merge"
+                ]
+              }
+            },
+            "required": [
+              "sourceLocator",
+              "choice"
+            ],
+            "additionalProperties": false
+          },
+          "maxItems": 10000
+        },
+        "resolutions": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "sourceLocator": {
+                "type": "string"
+              },
+              "fields": {
+                "type": "array",
+                "items": {
+                  "$ref": "domain.schema.json#/$defs/ImportFieldResolution"
+                },
+                "maxItems": 10000
+              }
+            },
+            "required": [
+              "sourceLocator",
+              "fields"
+            ],
+            "additionalProperties": false
+          },
+          "maxItems": 10000
+        }
+      },
+      "required": [
+        "contractVersion",
+        "requestId",
+        "workspaceId",
+        "planId",
+        "planHash"
+      ],
+      "additionalProperties": false
+    },
     "GetImportReportRequest": {
       "type": "object",
       "properties": {
@@ -7211,6 +7772,9 @@
         },
         "resumeRunId": {
           "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "skill": {
+          "$ref": "#/$defs/SkillRunReference"
         }
       },
       "required": [

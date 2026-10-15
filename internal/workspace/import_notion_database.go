@@ -123,7 +123,9 @@ func (k *Kernel) reconstructNotionDatabases(ctx context.Context, q querier, s *N
 			propertyIDs[sourceID][external] = id
 			for _, option := range asList(asObject(def[str(def["type"])])["options"]) {
 				o := asObject(option)
-				optionIDs[sourceID+":"+external+":"+str(o["id"])] = NewID()
+				optionKey := sourceID + ":" + external + ":" + str(o["id"])
+				optionIDs[optionKey] = NewID()
+				trackImportIdentity(p, "option", optionKey, optionIDs[optionKey])
 			}
 		}
 	}
@@ -330,12 +332,14 @@ func (k *Kernel) reconstructNotionDatabases(ctx context.Context, q querier, s *N
 				continue
 			}
 			if converted == nil {
+				record.KnownProperties = append(record.KnownProperties, local)
 				continue
 			}
 			if err = contracts.Validate("domain", "property_"+prop.Type+"_v1", marshal(converted)); err != nil {
 				notionFieldOutcome(p, obj, "values/"+external, "unsupported_but_retained", "Supplied value cannot satisfy the local typed contract; exact source retained")
 				continue
 			}
+			record.KnownProperties = append(record.KnownProperties, local)
 			record.Values[local] = converted
 			notionFieldOutcome(p, obj, "values/"+external, "adapted", "Complete supplied value mapped; original API response remains evidence")
 		}
@@ -602,6 +606,9 @@ func notionGraphPage(item ImportItem) bool {
 	return item.Kind == "notion_template" || item.Kind == "notion_container" || item.Kind == "portable_collection" || item.Kind == "portable_record"
 }
 func setNotionGraphConflicts(p *ImportPlan) {
+	if p.TypedDatabaseMerge {
+		return
+	}
 	if !p.NotionGraph {
 		return
 	}
@@ -629,6 +636,39 @@ func setNotionGraphConflicts(p *ImportPlan) {
 	}
 }
 func prepareNotionGraphChoice(p *ImportPlan) error {
+	if p.TypedDatabaseMerge {
+		copy := false
+		for _, item := range p.Items {
+			if notionGraphPage(item) && item.Choice == "duplicate" {
+				copy = true
+			}
+		}
+		if copy {
+			for _, item := range p.Items {
+				if notionGraphPage(item) && item.MappingID != "" && item.Choice != "duplicate" {
+					return Fail("CONFLICT", "Copy the connected source graph consistently")
+				}
+			}
+			pages := map[string]bool{}
+			for _, collection := range p.PortableCollections {
+				pages[collection.PageID] = true
+				for _, record := range collection.Records {
+					pages[record.PageID] = true
+				}
+				for _, view := range collection.Views {
+					pages[view.OwningPageID] = true
+				}
+			}
+			for i := range p.Items {
+				if pages[p.Items[i].PageID] || notionGraphPage(p.Items[i]) {
+					p.Items[i].Choice = "duplicate"
+				}
+			}
+			p.NotionCopyGraph = true
+			copyImportDatabaseIdentities(p)
+		}
+		return nil
+	}
 	if !p.NotionGraph {
 		return nil
 	}
@@ -681,8 +721,14 @@ func commitNotionContainers(m *Mutation, p *ImportPlan) error {
 		if err := importGuardPage(m, container.PageID); err != nil {
 			return err
 		}
-		if err := databaseCommand(m, map[string]any{"kind": "container.create", "containerId": container.ID, "owningPageId": container.PageID, "label": container.Title, "containerKind": "database", "parentProjectId": nil}); err != nil {
-			return err
+		if m.GuardRevision("container", container.ID) == "0" {
+			if err := databaseCommand(m, map[string]any{"kind": "container.create", "containerId": container.ID, "owningPageId": container.PageID, "label": container.Title, "containerKind": "database", "parentProjectId": nil}); err != nil {
+				return err
+			}
+		} else {
+			// Existing presentation and placement remain local. The field merge
+			// does not yet review container membership changes.
+			continue
 		}
 		for _, id := range container.Collections {
 			if err := guardImport(m, "collection", id); err != nil {
@@ -698,6 +744,9 @@ func commitNotionContainers(m *Mutation, p *ImportPlan) error {
 			var existing string
 			err := m.Tx.QueryRowContext(m.Context, "SELECT local_id FROM import_mappings WHERE workspace_id=? AND source_system='notion_api' AND source_namespace=? AND external_kind=? AND identity_kind='external_id' AND identity_value=?", m.Kernel.id, p.Namespace, identity.Kind, identity.SourceID).Scan(&existing)
 			if err == nil {
+				if p.TypedDatabaseMerge && existing == identity.ID {
+					continue
+				}
 				return Fail("CONFLICT", "Notion source identity was imported after this preview; capture and review again")
 			}
 			if err != sql.ErrNoRows {
@@ -721,6 +770,15 @@ func validateNotionIdentityPreview(m *Mutation, p *ImportPlan) error {
 			return err
 		}
 		if found != 0 {
+			var existing string
+			if p.TypedDatabaseMerge {
+				if err := m.Tx.QueryRowContext(m.Context, "SELECT local_id FROM import_mappings WHERE workspace_id=? AND source_system='notion_api' AND source_namespace=? AND external_kind=? AND identity_kind='external_id' AND identity_value=?", m.Kernel.id, p.Namespace, identity.Kind, identity.SourceID).Scan(&existing); err != nil {
+					return err
+				}
+				if existing == identity.ID {
+					continue
+				}
+			}
 			return Fail("CONFLICT", "A Notion source was imported after this preview; capture and review again")
 		}
 	}

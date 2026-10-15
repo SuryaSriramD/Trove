@@ -1,3 +1,4 @@
+import type { SkillExecution } from "../ai/SkillsPanel";
 import { useEffect, useState } from "react";
 import { dispatch, envelope, type WorkspaceSnapshot } from "../api";
 import "./providers.css";
@@ -40,9 +41,13 @@ type Proposal = {
   result?: unknown;
 };
 export function ProviderPanel({
+  skill,
+  skillProvider,
   workspace,
   onCommitted,
 }: {
+  skill?: SkillExecution;
+  skillProvider?: "codex" | "claude_code";
   workspace: WorkspaceSnapshot;
   onCommitted: () => void | Promise<void>;
 }) {
@@ -58,7 +63,7 @@ export function ProviderPanel({
     } | null>(null),
     [error, setError] = useState(""),
     [busy, setBusy] = useState(false),
-    [provider, setProvider] = useState("mcp"),
+    [provider, setProvider] = useState<string>(skillProvider ?? "mcp"),
     [handoff, setHandoff] = useState(""),
     [objective, setObjective] = useState("");
   async function load() {
@@ -107,6 +112,7 @@ export function ProviderPanel({
         Provider{" "}
         <select
           aria-label="Provider"
+          disabled={!!skill}
           value={provider}
           onChange={(e) => {
             setProvider(e.target.value);
@@ -120,6 +126,7 @@ export function ProviderPanel({
       </label>
       {provider !== "mcp" ? (
         <ManagedProviderPanel
+          skill={skill}
           key={workspace.workspaceId + provider}
           workspace={workspace}
           provider={provider as "codex" | "claude_code"}

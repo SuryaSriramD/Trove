@@ -108,7 +108,34 @@ func semanticContentIdentity(ctx context.Context, q querier, page string) (contr
 		return out, err
 	}
 	var projection any
-	decoder := json.NewDecoder(bytes.NewReader(marshal(map[string]any{"version": 1, "title": p.Page.Title, "blocks": blocks, "values": values, "assets": assets, "reusableSources": dependencies, "referencedTasks": tasks, "taskFacet": facet})))
+	payload := map[string]any{"version": 1, "title": p.Page.Title, "blocks": blocks, "values": values, "assets": assets, "reusableSources": dependencies, "referencedTasks": tasks, "taskFacet": facet}
+	skillRows, err := q.QueryContext(ctx, "SELECT s.skill_id,s.definition_json FROM skill_versions s WHERE s.page_id=? AND s.version=(SELECT max(version) FROM skill_versions WHERE skill_id=s.skill_id) ORDER BY s.skill_id", page)
+	if err != nil {
+		return out, err
+	}
+	skillDefinitions := map[string]any{}
+	for skillRows.Next() {
+		var id, raw string
+		if err = skillRows.Scan(&id, &raw); err != nil {
+			skillRows.Close()
+			return out, err
+		}
+		var definition any
+		if err = json.Unmarshal([]byte(raw), &definition); err != nil {
+			skillRows.Close()
+			return out, err
+		}
+		skillDefinitions[id] = definition
+	}
+	err = skillRows.Err()
+	skillRows.Close()
+	if err != nil {
+		return out, err
+	}
+	if len(skillDefinitions) > 0 {
+		payload["skillDefinitions"] = skillDefinitions
+	}
+	decoder := json.NewDecoder(bytes.NewReader(marshal(payload)))
 	decoder.UseNumber()
 	if err = decoder.Decode(&projection); err != nil {
 		return out, err
@@ -526,7 +553,7 @@ func reviewRecordKnowledge(ctx context.Context, q querier, page string) (map[str
 		pages[p] = true
 		fields := []any{}
 		relations := []string{}
-		hasRollup := false
+		hasDerived := false
 		rows, err := q.QueryContext(ctx, `SELECT p.id,p.schema_version,p.name,p.type,p.config_json,v.value_json FROM records r JOIN properties p ON p.collection_id=r.collection_id LEFT JOIN property_values v ON v.record_id=r.id AND v.property_id=p.id WHERE r.id=? ORDER BY p.id`, id)
 		if err != nil {
 			return nil, nil, err
@@ -544,8 +571,8 @@ func reviewRecordKnowledge(ctx context.Context, q querier, page string) (map[str
 				field["value"] = reviewPropertyValue(kind, value.String)
 			}
 			fields = append(fields, field)
-			if kind == "rollup" {
-				hasRollup = true
+			if kind == "rollup" || kind == "formula" {
+				hasDerived = true
 			}
 			if kind == "relation" && value.Valid {
 				var ids []string
@@ -559,8 +586,18 @@ func reviewRecordKnowledge(ctx context.Context, q querier, page string) (map[str
 		if err != nil {
 			return nil, nil, err
 		}
-		graph[id] = map[string]any{"title": title, "deleted": deleted.Valid, "fields": fields}
-		if hasRollup {
+		facet := map[string]any{}
+		var status string
+		var due sql.NullString
+		err = q.QueryRowContext(ctx, "SELECT status_property_id,due_property_id FROM task_facets WHERE record_id=?", id).Scan(&status, &due)
+		if err == nil {
+			facet["statusPropertyId"] = status
+			facet["duePropertyId"] = due.String
+		} else if !errors.Is(err, sql.ErrNoRows) {
+			return nil, nil, err
+		}
+		graph[id] = map[string]any{"title": title, "deleted": deleted.Valid, "fields": fields, "taskFacet": facet}
+		if hasDerived {
 			pending = append(pending, relations...)
 		}
 	}

@@ -96,6 +96,7 @@ type portableHierarchy struct {
 }
 
 func (k *Kernel) parseImportPlan(ctx context.Context, p *ImportPlan) error {
+	p.NormalizerVersion = importNormalizerVersion
 	pages := map[string]string{}
 	assets := map[string]string{}
 	seenIDs := map[string]bool{}
@@ -383,8 +384,19 @@ func (k *Kernel) parseImportPlan(ctx context.Context, p *ImportPlan) error {
 	p.Items = append(p.Items, rows...)
 	k.restorePortableBlocks(p, manifest)
 	k.restorePortableDatabase(p, manifest)
+	if err := reconcileImportFolderIDs(ctx, k.db, p); err != nil {
+		return err
+	}
 	for i := range p.Items {
 		if err := reconcileImportBlockIDs(ctx, k.db, &p.Items[i]); err != nil {
+			return err
+		}
+	}
+	if err := reuseImportDatabaseIdentities(ctx, k.db, p); err != nil {
+		return err
+	}
+	for i := range p.Items {
+		if err := prepareImportMerge(ctx, k.db, p, &p.Items[i]); err != nil {
 			return err
 		}
 	}
