@@ -36,7 +36,8 @@ export default function BackupRestoreControls({ workspace: w, onError }: { works
   async function run(action: () => Promise<void>) { setBusy(true); setMessage(""); try { await action(); } catch (error) { onError(error); } finally { setBusy(false); } }
   return <div aria-label="Native backup restoration and retention">
     <h3>Encrypted portable backup</h3>
-    <p>Save a passphrase-protected .trove.age file containing pages, records, tasks, retained history, import evidence, managed files and recordings. External credentials, model downloads, search indexes and external files you have not acquired are excluded.</p>
+    <p>Save a passphrase-protected .trove.age file containing the complete workspace database, retained managed files and recordings. The database includes search tables and saved approval/job state. Native credential-store secrets, model downloads and original external files you have not acquired are excluded.</p>
+    <p>Restoration rebuilds search, revokes action approvals and requires fresh authorization for external folders. Indexed excerpts of external files can be present in the encrypted database snapshot.</p>
     <p>Keep the passphrase somewhere safe. Trove does not save it and cannot recover it. Private temporary files are removed on completion, cancellation or the next launch after interruption.</p>
     <label>New backup passphrase <input ref={password} type="password" autoComplete="new-password" disabled={busy} maxLength={4096} /></label>
     <label>Confirm backup passphrase <input ref={confirmation} type="password" autoComplete="new-password" disabled={busy} maxLength={4096} /></label>
@@ -63,7 +64,7 @@ export default function BackupRestoreControls({ workspace: w, onError }: { works
       <p>Created {new Date(review.manifest.createdAt).toLocaleString()} · {review.manifest.assets.length} managed files · {review.manifest.recordings?.length ?? 0} recording objects.</p>
       <p>Workspace {review.manifest.workspaceId} · saved through event {review.manifest.eventCursor}.</p>
       {review.warnings.map(text => <p key={text}>{text}</p>)}
-      {review.summary && <><p>Included: {review.summary.included.join("; ")}.</p><p>Excluded: {review.summary.excluded.join("; ")}.</p></>}
+      {review.summary && <><p>Included: {review.summary.included.join("; ")}.</p><p>Excluded: {review.summary.excluded.join("; ")}.</p><p>On restoration: {review.summary.restoration.join("; ")}.</p></>}
       <button disabled={busy} onClick={() => run(async () => { const raw = await bridge().RestoreNativeBackup(review.previewId); setReview(null); if (raw) { const result = JSON.parse(raw) as { destination: string }; setMessage(`Restored and verified at ${result.destination}. Use Open workspace to open this installation.`); } })}>Restore into a new folder…</button>
       <button disabled={busy} onClick={() => run(() => replaceReview(null))}>Cancel review</button>
     </article>}

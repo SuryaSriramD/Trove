@@ -522,5 +522,10 @@ func extractPortableArchive(ctx context.Context, input io.Reader, destination st
 
 // PortableBackupSummary is explicit about recovery coverage and exclusions.
 func PortableBackupSummary() contracts.ServiceNativeBackupSummary {
-	return contracts.ServiceNativeBackupSummary{Version: 1, Format: "age-passphrase/native-tar-v1", Included: []string{"Canonical pages, records and tasks", "Retained history and import evidence", "Managed files, transcripts and retained recordings", "Approved memory and workspace settings"}, Excluded: []string{"External account credentials and passphrases", "Model binaries and derived search indexes", "External files not acquired into the workspace", "Active external permissions and pending execution"}}
+	return contracts.ServiceNativeBackupSummary{
+		Version: 1, Format: "age-passphrase/native-tar-v1",
+		Included:    []string{"Complete workspace database, including canonical content, retained history, import evidence, derived search tables and saved approval/job state", "Managed files, transcripts and retained recordings", "Approved memory and workspace settings"},
+		Excluded:    []string{"Secrets held in the native credential store and this backup's passphrase", "Downloaded model binaries", "Original external files not copied into managed storage (indexed excerpts can remain in the database snapshot)"},
+		Restoration: []string{"Search indexes are rebuilt; copied external-folder index chunks are removed", "Pending and approved action approvals are revoked; prior restore and file-ingestion handles are invalidated", "External folder roots require fresh authorization; native credential-store secrets are not supplied by this archive"},
+	}
 }

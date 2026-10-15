@@ -1855,10 +1855,11 @@ type ServiceNativeBackupProgress struct {
 	TotalBytes string `json:"totalBytes"`
 }
 type ServiceNativeBackupSummary struct {
-	Version  int64    `json:"version"`
-	Format   string   `json:"format"`
-	Included []string `json:"included"`
-	Excluded []string `json:"excluded"`
+	Version     int64    `json:"version"`
+	Format      string   `json:"format"`
+	Included    []string `json:"included"`
+	Excluded    []string `json:"excluded"`
+	Restoration []string `json:"restoration"`
 }
 type ServiceAutomationOptionsRequest struct {
 	ContractVersion int64    `json:"contractVersion"`

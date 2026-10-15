@@ -2587,13 +2587,21 @@
             "type": "string"
           },
           "maxItems": 32
+        },
+        "restoration": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "maxItems": 32
         }
       },
       "required": [
         "version",
         "format",
         "included",
-        "excluded"
+        "excluded",
+        "restoration"
       ],
       "additionalProperties": false
     },
