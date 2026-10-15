@@ -316,6 +316,12 @@ func prepareImportMerge(ctx context.Context, q querier, p *ImportPlan, item *Imp
 			}
 			for path, value := range base.Fields {
 				if strings.HasPrefix(path, "/values/") && !observed[path] {
+					parts := strings.Split(path, "/")
+					// A proven schema removal also removes its values. Each local
+					// value is exposed below for explicit review, including edits.
+					if len(parts) == 4 && collection.SchemaComplete && base.Fields["/schema/"+parts[3]] != nil && incoming.Fields["/schema/"+parts[3]] == nil {
+						continue
+					}
 					if _, present := incoming.Fields[path]; !present {
 						incoming.Fields[path] = value
 					}
@@ -380,6 +386,12 @@ func prepareImportMerge(ctx context.Context, q querier, p *ImportPlan, item *Imp
 		if (strings.HasPrefix(field.Path, "/attachments/") || strings.HasPrefix(field.Path, "/blocks/") || strings.HasPrefix(field.Path, "/schema/")) && field.Base.Present && !field.Incoming.Present && field.Local.Present {
 			// Even a proven complete removal needs an explicit reviewed decision.
 			field.Outcome = "conflict"
+		}
+		if strings.HasPrefix(field.Path, "/values/") && collection != nil && collection.SchemaComplete && field.Local.Present {
+			parts := strings.Split(field.Path, "/")
+			if len(parts) == 4 && base.Fields["/schema/"+parts[3]] != nil && incoming.Fields["/schema/"+parts[3]] == nil {
+				field.Outcome = "conflict"
+			}
 		}
 		if strings.HasPrefix(field.Path, "/schema/") && field.Local.Present && field.Incoming.Present {
 			var local, incoming struct {

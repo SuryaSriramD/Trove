@@ -79,9 +79,9 @@ export function OperationHistory({
       const collection = workspace.collections.find((c) => c.id === action.collectionId)?.title ?? "Collection";
       if (!action.definition) {
         const name = workspace.properties.find((p) => p.id === action.propertyId)?.name ?? action.propertyId;
-        return `${collection}: remove unused property “${name}”.`;
+        return `${collection}: remove property “${name}”.`;
       }
-      return `${collection}: restore unused property “${action.definition.name}” as ${action.definition.type}, with its saved configuration ${JSON.stringify(action.definition.config)}.`;
+      return `${collection}: restore property “${action.definition.name}” as ${action.definition.type}, with its saved configuration ${JSON.stringify(action.definition.config)} and ${action.values?.length ?? 0} populated row values: ${JSON.stringify(action.values ?? [])}.`;
     }
     if (
       action.kind === "collection.layout.set" ||

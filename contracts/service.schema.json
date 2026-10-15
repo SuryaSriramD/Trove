@@ -790,6 +790,39 @@
                   "type": "null"
                 }
               ]
+            },
+            "valueInventoryVersion": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 1
+            },
+            "values": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "recordId": {
+                    "$ref": "domain.schema.json#/$defs/Id"
+                  },
+                  "value": {
+                    "type": [
+                      "object",
+                      "array",
+                      "string",
+                      "number",
+                      "integer",
+                      "boolean",
+                      "null"
+                    ]
+                  }
+                },
+                "required": [
+                  "recordId",
+                  "value"
+                ],
+                "additionalProperties": false
+              },
+              "maxItems": 128
             }
           },
           "required": [
@@ -3264,6 +3297,39 @@
               "type": "null"
             }
           ]
+        },
+        "valueInventoryVersion": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 1
+        },
+        "values": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "recordId": {
+                "$ref": "domain.schema.json#/$defs/Id"
+              },
+              "value": {
+                "type": [
+                  "object",
+                  "array",
+                  "string",
+                  "number",
+                  "integer",
+                  "boolean",
+                  "null"
+                ]
+              }
+            },
+            "required": [
+              "recordId",
+              "value"
+            ],
+            "additionalProperties": false
+          },
+          "maxItems": 128
         }
       },
       "required": [
