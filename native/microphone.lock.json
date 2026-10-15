@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "runtimeCommit": "miniaudio-0.11.25-trove-microphone-v1",
+  "runtimeCommit": "miniaudio-0.11.25-trove-microphone-v2",
   "version": "0.11.25",
   "source": "llama.cpp-d2e54583c7452353eb35d40431281f6ee984332f/vendor/miniaudio/miniaudio.h",
   "headerSha256": "ac7af4de748b7e26b777f37e01cee313a308a7296a3eb080e2906b320cc55c89",

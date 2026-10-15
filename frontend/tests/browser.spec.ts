@@ -1833,3 +1833,62 @@ test("provider disconnect stays available while approval is pending", async ({ p
   await expect.poll(() => page.evaluate(() => (window as any).providerDisconnects)).toBe(1);
   await expect(page.getByText("mcp · disconnected", { exact: true })).toBeVisible();
 });
+
+test("G05 capture disclosure, selected input and acknowledged pause controls", async ({ page }) => {
+  await installMeetingAudioFixture(page);
+  await page.evaluate(() => {
+    const app = (window as any).go.main.App;
+    let draft: any = null;
+    (window as any).captureCalls = [];
+    app.MeetingAudioInputs = async () => [{ id: "usb-mic", name: "USB microphone", isDefault: false }];
+    app.MeetingRecordings = async () => draft ? [draft] : [];
+    app.StartMeetingRecordingWithOptions = async (title: string, input: string, disclosure: boolean) => {
+      (window as any).captureCalls.push({ title, input, disclosure });
+      draft = { version: 1, id: "capture", title: title || "Meeting recording", actorId: "owner", startedAt: "2026-10-15T00:00:00Z", state: "recording", durationMs: 1000, bytes: 64000, pageId: "page", meetingId: "meeting", segments: [] };
+      return draft;
+    };
+    app.ControlMeetingRecording = async (_id: string, action: string) => {
+      await new Promise<void>(resolve => { (window as any).acknowledgeCapture = resolve; });
+      draft.state = action === "pause" ? "paused" : "recording";
+      return draft;
+    };
+  });
+  await navSurface(page, "Meetings");
+  const record = page.getByRole("button", { name: "Record microphone" });
+  await expect(record).toBeDisabled();
+  await page.getByRole("button", { name: "Refresh audio inputs" }).click();
+  await page.getByLabel("Audio input", { exact: true }).selectOption("usb-mic");
+  await page.getByRole("checkbox", { name: /I have told participants/ }).check();
+  await record.click();
+  expect(await page.evaluate(() => (window as any).captureCalls)).toEqual([{ title: "", input: "usb-mic", disclosure: true }]);
+  await page.getByRole("button", { name: "Pause recording", exact: true }).click();
+  await expect(page.getByRole("button", { name: "Pause recording", exact: true })).toBeDisabled();
+  await expect(page.getByRole("button", { name: "Resume recording", exact: true })).toHaveCount(0);
+  await page.evaluate(() => (window as any).acknowledgeCapture());
+  await expect(page.getByRole("button", { name: "Resume recording", exact: true })).toBeEnabled();
+  await expect(page.locator(".recording-recovery")).toContainText("0:01");
+});
+
+test("G05 delayed meeting drafts never appear under a different selection", async ({ page }) => {
+  await installMeetingAudioFixture(page);
+  await page.evaluate(() => {
+    const app = (window as any).go.main.App, previous = app.Dispatch;
+    app.Dispatch = async (method: string, raw: string) => {
+      const request = JSON.parse(raw);
+      if (method === "meetings.drafts") {
+        if (request.meetingId.endsWith("510")) {
+          await new Promise<void>(resolve => { (window as any).releaseOldMeetingDraft = resolve; });
+          return JSON.stringify({ ok: true, result: [{ id: "old-draft", state: "draft", stale: false, evidenceHash: "old", body: { summary: [{ text: "OLD MEETING ONLY", segmentIds: [] }] } }] });
+        }
+        return JSON.stringify({ ok: true, result: [] });
+      }
+      return previous(method, raw);
+    };
+  });
+  await navSurface(page, "Meetings");
+  await expect.poll(() => page.evaluate(() => !!(window as any).releaseOldMeetingDraft)).toBe(true);
+  await page.getByRole("button", { name: /^Second audio recording/ }).click();
+  await page.evaluate(() => (window as any).releaseOldMeetingDraft());
+  await expect(page.locator(".meeting-detail h2")).toHaveText("Second audio recording");
+  await expect(page.getByText("OLD MEETING ONLY")).toHaveCount(0);
+});
