@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { dispatch, envelope, type WorkspaceSnapshot } from "../api";
 import type * as S from "../../../contracts/generated/service";
 
@@ -15,7 +15,15 @@ type Preview = {
   pages: { pageId: string; title: string; revision: string }[];
   notice: string;
 };
-export function RemoteMCPPanel({
+export function RemoteMCPPanel(props: { workspace: WorkspaceSnapshot }) {
+  return (
+    <RemoteMCPPanelContent
+      key={`${props.workspace.workspaceId}:${props.workspace.scopeGrantId}`}
+      {...props}
+    />
+  );
+}
+function RemoteMCPPanelContent({
   workspace,
 }: {
   workspace: WorkspaceSnapshot;
@@ -33,32 +41,47 @@ export function RemoteMCPPanel({
   const [confirmed, setConfirmed] = useState<Record<string, boolean>>({});
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
+  const active = useRef(true);
+  const latestRead = useRef(0);
+  const changing = useRef(false);
   async function load() {
-    setStatus(
-      await dispatch<S.RemoteStatus>(
+    const read = ++latestRead.current;
+    try {
+      const result = await dispatch<S.RemoteStatus>(
         "providers.remote.status",
         envelope(workspace),
-      ),
-    );
+      );
+      if (active.current && read === latestRead.current) setStatus(result);
+    } catch (e) {
+      if (active.current && read === latestRead.current) setError(String(e));
+    }
   }
   useEffect(() => {
-    void load().catch((e) => setError(String(e)));
-    const timer = setInterval(
-      () => void load().catch((e) => setError(String(e))),
-      3000,
-    );
-    return () => clearInterval(timer);
-  }, [workspace.workspaceId]);
+    active.current = true;
+    void load();
+    const timer = setInterval(() => {
+      if (!changing.current) void load();
+    }, 3000);
+    return () => {
+      active.current = false;
+      latestRead.current++;
+      clearInterval(timer);
+    };
+  }, []);
   async function act(fn: () => Promise<void>) {
+    if (changing.current || !active.current) return;
+    changing.current = true;
+    latestRead.current++;
     setBusy(true);
     setError("");
     try {
       await fn();
-      await load();
+      if (active.current) await load();
     } catch (e) {
-      setError(String(e));
+      if (active.current) setError(String(e));
     } finally {
-      setBusy(false);
+      changing.current = false;
+      if (active.current) setBusy(false);
     }
   }
   const title = (id: string) =>

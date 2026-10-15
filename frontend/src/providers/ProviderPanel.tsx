@@ -1,5 +1,5 @@
 import type { SkillExecution } from "../ai/SkillsPanel";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { dispatch, envelope, type WorkspaceSnapshot } from "../api";
 import "./providers.css";
 import { RemoteMCPPanel } from "./RemoteMCPPanel";
@@ -43,7 +43,12 @@ type Proposal = {
 export function ProviderPanel(
   props: Parameters<typeof ProviderPanelContent>[0],
 ) {
-  return <ProviderPanelContent key={props.workspace.workspaceId} {...props} />;
+  return (
+    <ProviderPanelContent
+      key={`${props.workspace.workspaceId}:${props.workspace.scopeGrantId}`}
+      {...props}
+    />
+  );
 }
 
 function ProviderPanelContent({
@@ -72,35 +77,53 @@ function ProviderPanelContent({
     [provider, setProvider] = useState<string>(skillProvider ?? "mcp"),
     [handoff, setHandoff] = useState(""),
     [objective, setObjective] = useState("");
+  const active = useRef(true);
+  const latestRead = useRef(0);
+  const changing = useRef(false);
   async function load() {
-    const [s, p] = await Promise.all([
-      dispatch<{ connections: Connection[] }>(
-        "providers.status",
-        envelope(workspace),
-      ),
-      dispatch<Proposal[]>("providers.proposals", envelope(workspace)),
-    ]);
-    setConnections(s.connections);
-    setProposals(p);
+    const read = ++latestRead.current;
+    try {
+      const [s, p] = await Promise.all([
+        dispatch<{ connections: Connection[] }>(
+          "providers.status",
+          envelope(workspace),
+        ),
+        dispatch<Proposal[]>("providers.proposals", envelope(workspace)),
+      ]);
+      if (active.current && read === latestRead.current) {
+        setConnections(s.connections);
+        setProposals(p);
+      }
+    } catch (e) {
+      if (active.current && read === latestRead.current) setError(String(e));
+    }
   }
   useEffect(() => {
-    void load().catch((e) => setError(String(e)));
-    const timer = setInterval(
-      () => void load().catch((e) => setError(String(e))),
-      3000,
-    );
-    return () => clearInterval(timer);
-  }, [workspace.workspaceId]);
+    active.current = true;
+    void load();
+    const timer = setInterval(() => {
+      if (!changing.current) void load();
+    }, 3000);
+    return () => {
+      active.current = false;
+      latestRead.current++;
+      clearInterval(timer);
+    };
+  }, []);
   async function act(fn: () => Promise<void>) {
+    if (changing.current || !active.current) return;
+    changing.current = true;
+    latestRead.current++;
     setBusy(true);
     setError("");
     try {
       await fn();
-      await load();
+      if (active.current) await load();
     } catch (e) {
-      setError(String(e));
+      if (active.current) setError(String(e));
     } finally {
-      setBusy(false);
+      changing.current = false;
+      if (active.current) setBusy(false);
     }
   }
   return (
@@ -292,19 +315,16 @@ function ProviderPanelContent({
             {c.tools.map((t) => toolLabels[t] || t).join(", ")}
           </p>
           <button
-            disabled={c.state !== "connected"}
-            onClick={async () => {
-              try {
+            disabled={busy || c.state !== "connected"}
+            onClick={() =>
+              act(async () => {
                 await dispatch("providers.disconnect", {
                   ...envelope(workspace),
                   connectionId: c.id,
                 });
                 if (pair?.connection.id === c.id) setPair(null);
-                await load();
-              } catch (e) {
-                setError(String(e));
-              }
-            }}
+              })
+            }
           >
             Disconnect and revoke local access
           </button>
@@ -367,7 +387,7 @@ function ProviderPanelContent({
                       ...envelope(workspace),
                       proposalId: p.id,
                     });
-                    await onCommitted();
+                    if (active.current) await onCommitted();
                   })
                 }
               >
