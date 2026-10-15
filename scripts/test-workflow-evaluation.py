@@ -54,6 +54,8 @@ class WorkflowAccounting(unittest.TestCase):
             {'generationAttempts': True}, {'modelPackId': 'substitute'}, {'corpusSHA256': 'changed'},
             {'retainedFact': False}, {'sources': []}, {'promptTokens': 8192}, {'citations': []},
             {'releaseQualified': True}, {'rawDraft': '{}'},
+            {'promptTokens': -100, 'outputCap': -512, 'contextTokens': 0},
+            {'outputCap': 1}, {'contextTokens': 9999}, {'promptTokens': -1},
             {'rawDraft': r['rawDraft'].replace('2031', '2032')},
             {'rawDraft': r['rawDraft'].replace('2031.', '2031. The launch is guaranteed to succeed.', 1)},
         ]
@@ -68,7 +70,7 @@ class WorkflowAccounting(unittest.TestCase):
             assertions={key: True for key in m.CONTEXT_ASSERTIONS['framing-cost']},
             unframedTokens=200, framedTokens=220, contextTokens=728)
         self.assertEqual(m.validate_workflow_report(r, 'framing-cost', c), [])
-        for change in ({'generationAttempts': 1}, {'framedTokens': 200}, {'contextTokens': 750}):
+        for change in ({'generationAttempts': 1}, {'framedTokens': 200}, {'contextTokens': 750}, {'unframedTokens': -600, 'framedTokens': -599, 'contextTokens': -72}):
             self.assertTrue(m.validate_workflow_report(dict(r, **change), 'framing-cost', c))
 
     def test_related_positive(self):

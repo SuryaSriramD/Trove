@@ -202,13 +202,13 @@ def validate_workflow_report(report, case, contract):
             if type(report.get('generationAttempts')) is not int or report['generationAttempts'] != attempts:
                 errors.append('generation attempt count differs')
             if case not in ('oversized-code', 'during-tokenization', 'framing-cost'):
-                if not all(type(report.get(k)) is int for k in ('promptTokens', 'outputCap', 'contextTokens')) or report['promptTokens'] + report['outputCap'] + 16 > report['contextTokens']:
+                if not all(type(report.get(k)) is int for k in ('promptTokens', 'outputCap', 'contextTokens')) or report['promptTokens'] < 0 or report['outputCap'] != 512 or report['contextTokens'] != 8192 or report['promptTokens'] + report['outputCap'] + 16 > report['contextTokens']:
                     errors.append('reserved token budget not proved')
             if case == 'near-budget' and report.get('promptTokens', 0) < (8192 - 512 - 16) * 9 // 10:
                 errors.append('near-capacity workload was not measured near its declared limit')
             if case == 'framing-cost':
                 raw, framed = report.get('unframedTokens'), report.get('framedTokens')
-                if type(raw) is not int or type(framed) is not int or raw >= framed or raw + 512 + 16 != report.get('contextTokens'):
+                if type(raw) is not int or type(framed) is not int or type(report.get('contextTokens')) is not int or raw < 0 or raw >= framed or raw + 512 + 16 != report.get('contextTokens'):
                     errors.append('framing boundary not proved')
             if case in CONTEXT_GENERATION_CASES:
                 fact = 'Project Marigold launches on 14 April 2031.'
