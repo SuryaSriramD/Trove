@@ -1249,9 +1249,10 @@ type ServiceEnsureTasks struct {
 	DoneOptionId     DomainId `json:"doneOptionId"`
 }
 type ServicePromoteTask struct {
-	Kind             string   `json:"kind"`
-	RecordId         DomainId `json:"recordId"`
-	StatusPropertyId DomainId `json:"statusPropertyId"`
+	Kind             string    `json:"kind"`
+	RecordId         DomainId  `json:"recordId"`
+	StatusPropertyId DomainId  `json:"statusPropertyId"`
+	DuePropertyId    *DomainId `json:"duePropertyId,omitempty"`
 }
 type ServiceSetTaskStatus struct {
 	Kind           string   `json:"kind"`
@@ -1264,6 +1265,13 @@ type ServiceAttachFile struct {
 	IngestHandle DomainId  `json:"ingestHandle"`
 	PageId       DomainId  `json:"pageId"`
 	BlockId      *DomainId `json:"blockId,omitempty"`
+}
+type ServiceRecordMeetingExtraction struct {
+	Kind       string   `json:"kind"`
+	ProposalId DomainId `json:"proposalId"`
+	ItemId     string   `json:"itemId"`
+	Title      string   `json:"title"`
+	Body       string   `json:"body"`
 }
 type ServiceCreateMeeting struct {
 	Kind            string          `json:"kind"`
@@ -1416,54 +1424,55 @@ type ServiceDismissPersonalReview struct {
 type ServiceCommandValue interface{ isServiceCommand() }
 type ServiceCommand struct{ Value ServiceCommandValue }
 
-func (ServiceCreatePage) isServiceCommand()             {}
-func (ServiceUpdatePage) isServiceCommand()             {}
-func (ServiceMovePage) isServiceCommand()               {}
-func (ServiceTrashPage) isServiceCommand()              {}
-func (ServiceInsertBlock) isServiceCommand()            {}
-func (ServiceUpdateBlock) isServiceCommand()            {}
-func (ServiceDeleteBlock) isServiceCommand()            {}
-func (ServiceMoveBlock) isServiceCommand()              {}
-func (ServiceReorderBlocks) isServiceCommand()          {}
-func (ServiceCreateCollection) isServiceCommand()       {}
-func (ServiceAddProperty) isServiceCommand()            {}
-func (ServiceCreateRecord) isServiceCommand()           {}
-func (ServiceSetFormula) isServiceCommand()             {}
-func (ServiceSetValue) isServiceCommand()               {}
-func (ServiceClearValue) isServiceCommand()             {}
-func (ServiceSaveView) isServiceCommand()               {}
-func (ServiceSetProjectScope) isServiceCommand()        {}
-func (ServiceCreateContainer) isServiceCommand()        {}
-func (ServiceLinkCollection) isServiceCommand()         {}
-func (ServiceCreateTask) isServiceCommand()             {}
-func (ServiceEnsureTasks) isServiceCommand()            {}
-func (ServicePromoteTask) isServiceCommand()            {}
-func (ServiceSetTaskStatus) isServiceCommand()          {}
-func (ServiceAttachFile) isServiceCommand()             {}
-func (ServiceCreateMeeting) isServiceCommand()          {}
-func (ServiceAppendTranscript) isServiceCommand()       {}
-func (ServiceFinalizeMeeting) isServiceCommand()        {}
-func (ServiceProposeMemory) isServiceCommand()          {}
-func (ServiceApproveMemory) isServiceCommand()          {}
-func (ServiceForgetMemory) isServiceCommand()           {}
-func (ServiceUpdateMemory) isServiceCommand()           {}
-func (ServiceSetMemoryStatus) isServiceCommand()        {}
-func (ServiceApplyImportPlan) isServiceCommand()        {}
-func (ServiceRestoreRevision) isServiceCommand()        {}
-func (ServiceApplyTemplate) isServiceCommand()          {}
-func (ServiceConfigureCollection) isServiceCommand()    {}
-func (ServiceConfigureRecord) isServiceCommand()        {}
-func (ServiceSaveAutomation) isServiceCommand()         {}
-func (ServiceRunAutomation) isServiceCommand()          {}
-func (ServiceStateAutomation) isServiceCommand()        {}
-func (ServiceConfigureP2Database) isServiceCommand()    {}
-func (ServiceSubmitLocalForm) isServiceCommand()        {}
-func (ServiceRunRowButton) isServiceCommand()           {}
-func (ServiceSetPageDisplay) isServiceCommand()         {}
-func (ServiceActivatePersonalReview) isServiceCommand() {}
-func (ServiceAcceptPersonalReview) isServiceCommand()   {}
-func (ServiceDismissPersonalReview) isServiceCommand()  {}
-func (v ServiceCommand) MarshalJSON() ([]byte, error)   { return json.Marshal(v.Value) }
+func (ServiceCreatePage) isServiceCommand()              {}
+func (ServiceUpdatePage) isServiceCommand()              {}
+func (ServiceMovePage) isServiceCommand()                {}
+func (ServiceTrashPage) isServiceCommand()               {}
+func (ServiceInsertBlock) isServiceCommand()             {}
+func (ServiceUpdateBlock) isServiceCommand()             {}
+func (ServiceDeleteBlock) isServiceCommand()             {}
+func (ServiceMoveBlock) isServiceCommand()               {}
+func (ServiceReorderBlocks) isServiceCommand()           {}
+func (ServiceCreateCollection) isServiceCommand()        {}
+func (ServiceAddProperty) isServiceCommand()             {}
+func (ServiceCreateRecord) isServiceCommand()            {}
+func (ServiceSetFormula) isServiceCommand()              {}
+func (ServiceSetValue) isServiceCommand()                {}
+func (ServiceClearValue) isServiceCommand()              {}
+func (ServiceSaveView) isServiceCommand()                {}
+func (ServiceSetProjectScope) isServiceCommand()         {}
+func (ServiceCreateContainer) isServiceCommand()         {}
+func (ServiceLinkCollection) isServiceCommand()          {}
+func (ServiceCreateTask) isServiceCommand()              {}
+func (ServiceEnsureTasks) isServiceCommand()             {}
+func (ServicePromoteTask) isServiceCommand()             {}
+func (ServiceSetTaskStatus) isServiceCommand()           {}
+func (ServiceAttachFile) isServiceCommand()              {}
+func (ServiceRecordMeetingExtraction) isServiceCommand() {}
+func (ServiceCreateMeeting) isServiceCommand()           {}
+func (ServiceAppendTranscript) isServiceCommand()        {}
+func (ServiceFinalizeMeeting) isServiceCommand()         {}
+func (ServiceProposeMemory) isServiceCommand()           {}
+func (ServiceApproveMemory) isServiceCommand()           {}
+func (ServiceForgetMemory) isServiceCommand()            {}
+func (ServiceUpdateMemory) isServiceCommand()            {}
+func (ServiceSetMemoryStatus) isServiceCommand()         {}
+func (ServiceApplyImportPlan) isServiceCommand()         {}
+func (ServiceRestoreRevision) isServiceCommand()         {}
+func (ServiceApplyTemplate) isServiceCommand()           {}
+func (ServiceConfigureCollection) isServiceCommand()     {}
+func (ServiceConfigureRecord) isServiceCommand()         {}
+func (ServiceSaveAutomation) isServiceCommand()          {}
+func (ServiceRunAutomation) isServiceCommand()           {}
+func (ServiceStateAutomation) isServiceCommand()         {}
+func (ServiceConfigureP2Database) isServiceCommand()     {}
+func (ServiceSubmitLocalForm) isServiceCommand()         {}
+func (ServiceRunRowButton) isServiceCommand()            {}
+func (ServiceSetPageDisplay) isServiceCommand()          {}
+func (ServiceActivatePersonalReview) isServiceCommand()  {}
+func (ServiceAcceptPersonalReview) isServiceCommand()    {}
+func (ServiceDismissPersonalReview) isServiceCommand()   {}
+func (v ServiceCommand) MarshalJSON() ([]byte, error)    { return json.Marshal(v.Value) }
 func (v *ServiceCommand) UnmarshalJSON(data []byte) error {
 	var fields map[string]json.RawMessage
 	if err := json.Unmarshal(data, &fields); err != nil {
@@ -1637,7 +1646,7 @@ func (v *ServiceCommand) UnmarshalJSON(data []byte) error {
 		v.Value = result
 		return nil
 	}
-	if matchesVariant(fields, []string{"kind", "recordId", "statusPropertyId"}, map[string]string{"kind": "\"task.promote\""}, map[string][]string{}, []string{"kind", "recordId", "statusPropertyId"}) {
+	if matchesVariant(fields, []string{"kind", "recordId", "statusPropertyId"}, map[string]string{"kind": "\"task.promote\""}, map[string][]string{}, []string{"kind", "recordId", "statusPropertyId", "duePropertyId"}) {
 		var result ServicePromoteTask
 		if err := json.Unmarshal(data, &result); err != nil {
 			return err
@@ -1655,6 +1664,14 @@ func (v *ServiceCommand) UnmarshalJSON(data []byte) error {
 	}
 	if matchesVariant(fields, []string{"kind", "fileId", "ingestHandle", "pageId"}, map[string]string{"kind": "\"file.attach\""}, map[string][]string{}, []string{"kind", "fileId", "ingestHandle", "pageId", "blockId"}) {
 		var result ServiceAttachFile
+		if err := json.Unmarshal(data, &result); err != nil {
+			return err
+		}
+		v.Value = result
+		return nil
+	}
+	if matchesVariant(fields, []string{"kind", "proposalId", "itemId", "title", "body"}, map[string]string{"kind": "\"meeting.extraction.record\""}, map[string][]string{}, []string{"kind", "proposalId", "itemId", "title", "body"}) {
+		var result ServiceRecordMeetingExtraction
 		if err := json.Unmarshal(data, &result); err != nil {
 			return err
 		}
@@ -1848,6 +1865,55 @@ func (v *ServiceCommand) UnmarshalJSON(data []byte) error {
 	return fmt.Errorf("unknown or incomplete ServiceCommand variant")
 }
 
+type ServiceMeetingExtractionResult struct {
+	Version      int64            `json:"version"`
+	ProposalId   DomainId         `json:"proposalId"`
+	ItemId       string           `json:"itemId"`
+	MeetingId    DomainId         `json:"meetingId"`
+	EvidenceHash string           `json:"evidenceHash"`
+	Kind         string           `json:"kind"`
+	Title        string           `json:"title"`
+	Body         string           `json:"body"`
+	PageId       DomainId         `json:"pageId"`
+	RecordId     *DomainId        `json:"recordId,omitempty"`
+	AppliedAt    *DomainTimestamp `json:"appliedAt,omitempty"`
+	Stale        bool             `json:"stale"`
+}
+type ServiceMeetingExtractionApplyResult struct {
+	PageId     DomainId `json:"pageId"`
+	RecordId   string   `json:"recordId"`
+	Kind       string   `json:"kind"`
+	ProposalId DomainId `json:"proposalId"`
+	ItemId     string   `json:"itemId"`
+	Reused     bool     `json:"reused"`
+}
+type ServiceMeetingExtractionPrepareRequest struct {
+	ContractVersion int64     `json:"contractVersion"`
+	RequestId       DomainId  `json:"requestId"`
+	WorkspaceId     DomainId  `json:"workspaceId"`
+	MeetingId       DomainId  `json:"meetingId"`
+	Kind            string    `json:"kind"`
+	DraftId         *DomainId `json:"draftId,omitempty"`
+	ItemIndex       *int64    `json:"itemIndex,omitempty"`
+}
+type ServiceMeetingExtractionListRequest struct {
+	ContractVersion int64    `json:"contractVersion"`
+	RequestId       DomainId `json:"requestId"`
+	WorkspaceId     DomainId `json:"workspaceId"`
+	MeetingId       DomainId `json:"meetingId"`
+}
+type ServiceMeetingExtractionCreateRequest struct {
+	ContractVersion int64     `json:"contractVersion"`
+	RequestId       DomainId  `json:"requestId"`
+	WorkspaceId     DomainId  `json:"workspaceId"`
+	MeetingId       DomainId  `json:"meetingId"`
+	EvidenceHash    string    `json:"evidenceHash"`
+	Kind            string    `json:"kind"`
+	Title           string    `json:"title"`
+	Body            string    `json:"body"`
+	ProposalId      *DomainId `json:"proposalId,omitempty"`
+	ItemId          *string   `json:"itemId,omitempty"`
+}
 type ServiceAutomationOptionsRequest struct {
 	ContractVersion int64    `json:"contractVersion"`
 	RequestId       DomainId `json:"requestId"`

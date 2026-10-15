@@ -1632,6 +1632,9 @@
         },
         "statusPropertyId": {
           "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "duePropertyId": {
+          "$ref": "domain.schema.json#/$defs/Id"
         }
       },
       "required": [
@@ -1685,6 +1688,39 @@
         "fileId",
         "ingestHandle",
         "pageId"
+      ],
+      "additionalProperties": false
+    },
+    "RecordMeetingExtraction": {
+      "type": "object",
+      "properties": {
+        "kind": {
+          "const": "meeting.extraction.record"
+        },
+        "proposalId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "itemId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "title": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 512
+        },
+        "body": {
+          "type": "string",
+          "maxLength": 100000
+        }
+      },
+      "required": [
+        "kind",
+        "proposalId",
+        "itemId",
+        "title",
+        "body"
       ],
       "additionalProperties": false
     },
@@ -2458,6 +2494,9 @@
           "$ref": "#/$defs/AttachFile"
         },
         {
+          "$ref": "#/$defs/RecordMeetingExtraction"
+        },
+        {
           "$ref": "#/$defs/CreateMeeting"
         },
         {
@@ -2527,6 +2566,239 @@
           "$ref": "#/$defs/DismissPersonalReview"
         }
       ]
+    },
+    "MeetingExtractionResult": {
+      "type": "object",
+      "properties": {
+        "version": {
+          "const": 1
+        },
+        "proposalId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "itemId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "meetingId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "evidenceHash": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "kind": {
+          "type": "string",
+          "enum": [
+            "page",
+            "task"
+          ]
+        },
+        "title": {
+          "type": "string"
+        },
+        "body": {
+          "type": "string"
+        },
+        "pageId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "recordId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "appliedAt": {
+          "$ref": "domain.schema.json#/$defs/Timestamp"
+        },
+        "stale": {
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "version",
+        "proposalId",
+        "itemId",
+        "meetingId",
+        "evidenceHash",
+        "kind",
+        "title",
+        "body",
+        "pageId",
+        "stale"
+      ],
+      "additionalProperties": false
+    },
+    "MeetingExtractionApplyResult": {
+      "type": "object",
+      "properties": {
+        "pageId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "recordId": {
+          "type": "string"
+        },
+        "kind": {
+          "type": "string",
+          "enum": [
+            "page",
+            "task"
+          ]
+        },
+        "proposalId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "itemId": {
+          "type": "string"
+        },
+        "reused": {
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "pageId",
+        "recordId",
+        "kind",
+        "proposalId",
+        "itemId",
+        "reused"
+      ],
+      "additionalProperties": false
+    },
+    "MeetingExtractionPrepareRequest": {
+      "type": "object",
+      "properties": {
+        "contractVersion": {
+          "const": 1
+        },
+        "requestId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "workspaceId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "meetingId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "kind": {
+          "type": "string",
+          "enum": [
+            "page",
+            "task"
+          ]
+        },
+        "draftId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "itemIndex": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 249
+        }
+      },
+      "required": [
+        "contractVersion",
+        "requestId",
+        "workspaceId",
+        "meetingId",
+        "kind"
+      ],
+      "additionalProperties": false,
+      "dependentRequired": {
+        "draftId": [
+          "itemIndex"
+        ],
+        "itemIndex": [
+          "draftId"
+        ]
+      }
+    },
+    "MeetingExtractionListRequest": {
+      "type": "object",
+      "properties": {
+        "contractVersion": {
+          "const": 1
+        },
+        "requestId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "workspaceId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "meetingId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        }
+      },
+      "required": [
+        "contractVersion",
+        "requestId",
+        "workspaceId",
+        "meetingId"
+      ],
+      "additionalProperties": false
+    },
+    "MeetingExtractionCreateRequest": {
+      "type": "object",
+      "properties": {
+        "contractVersion": {
+          "const": 1
+        },
+        "requestId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "workspaceId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "meetingId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "evidenceHash": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "kind": {
+          "type": "string",
+          "enum": [
+            "page",
+            "task"
+          ]
+        },
+        "title": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 512
+        },
+        "body": {
+          "type": "string",
+          "maxLength": 100000
+        },
+        "proposalId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "itemId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        }
+      },
+      "required": [
+        "contractVersion",
+        "requestId",
+        "workspaceId",
+        "meetingId",
+        "evidenceHash",
+        "kind",
+        "title",
+        "body"
+      ],
+      "additionalProperties": false,
+      "dependentRequired": {
+        "proposalId": [
+          "itemId"
+        ],
+        "itemId": [
+          "proposalId"
+        ]
+      }
     },
     "AutomationOptionsRequest": {
       "type": "object",

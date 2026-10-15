@@ -59,9 +59,9 @@ func taskCommand(m *Mutation, c map[string]any) error {
 		if err := createRecord(m, map[string]any{"recordId": c["recordId"], "pageId": c["pageId"], "collectionId": collection, "title": c["title"]}); err != nil {
 			return err
 		}
-		return promoteTask(m, str(c["recordId"]), status)
+		return promoteTask(m, str(c["recordId"]), status, "")
 	case "task.promote":
-		return promoteTask(m, str(c["recordId"]), str(c["statusPropertyId"]))
+		return promoteTask(m, str(c["recordId"]), str(c["statusPropertyId"]), str(c["duePropertyId"]))
 	case "task.setStatus":
 		var property string
 		if err := m.Tx.QueryRowContext(m.Context, "SELECT status_property_id FROM task_facets WHERE record_id=?", c["recordId"]).Scan(&property); err != nil {
@@ -71,7 +71,7 @@ func taskCommand(m *Mutation, c map[string]any) error {
 	}
 	return Fail("UNSUPPORTED_SCHEMA", "Unsupported task command")
 }
-func promoteTask(m *Mutation, record, status string) error {
+func promoteTask(m *Mutation, record, status, dueProperty string) error {
 	var collection, page string
 	if err := m.Tx.QueryRowContext(m.Context, "SELECT collection_id,page_id FROM records WHERE id=?", record).Scan(&collection, &page); err != nil {
 		return err
@@ -99,11 +99,27 @@ func promoteTask(m *Mutation, record, status string) error {
 			return Fail("INVALID_REQUEST", "Task status requires explicit default, done, and reopen mappings")
 		}
 	}
+	if dueProperty != "" {
+		if err := m.Require("property", dueProperty); err != nil {
+			return err
+		}
+		due, err := propertyDefinition(m.Context, m.Tx, dueProperty)
+		if err != nil {
+			return err
+		}
+		if due.Type != "date" || string(due.CollectionId) != collection {
+			return Fail("INVALID_REQUEST", "Task due date must be a date property in this record's collection")
+		}
+	}
 	var bound string
 	err = m.Tx.QueryRowContext(m.Context, "SELECT status_property_id FROM task_facets WHERE record_id=?", record).Scan(&bound)
 	if err == nil {
 		if bound != status {
 			return Fail("INVALID_REQUEST", "Task status is already bound")
+		}
+		if dueProperty != "" {
+			_, err = m.Exec("UPDATE task_facets SET due_property_id=? WHERE record_id=?", dueProperty, record)
+			return err
 		}
 		return nil
 	}
@@ -120,8 +136,13 @@ func promoteTask(m *Mutation, record, status string) error {
 		return err
 	}
 	var due sql.NullString
-	if err = m.Tx.QueryRowContext(m.Context, "SELECT p.id FROM properties p JOIN collections c ON c.id=p.collection_id WHERE p.collection_id=? AND p.type='date' AND c.system_role='tasks' ORDER BY p.id LIMIT 1", collection).Scan(&due); err != nil && !errors.Is(err, sql.ErrNoRows) {
-		return err
+	if dueProperty != "" {
+		due = sql.NullString{String: dueProperty, Valid: true}
+	}
+	if dueProperty == "" {
+		if err = m.Tx.QueryRowContext(m.Context, "SELECT p.id FROM properties p JOIN collections c ON c.id=p.collection_id WHERE p.collection_id=? AND p.type='date' AND c.system_role='tasks' ORDER BY p.id LIMIT 1", collection).Scan(&due); err != nil && !errors.Is(err, sql.ErrNoRows) {
+			return err
+		}
 	}
 	_, err = m.Exec("INSERT INTO task_facets(record_id,collection_id,status_property_id,due_property_id) VALUES(?,?,?,?)", record, collection, status, due)
 	return err
