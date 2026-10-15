@@ -42,6 +42,7 @@ const describeField = (value: Presence) =>
 function describeImportPath(path: string, item: Item, items: Item[]) {
   const parts = path.split("/");
   if (parts[1] === "collectionTitle") return "Collection title";
+  if (parts[1] === "attachments") return "Attachment relationship (removal requires review)";
   if (parts[1] !== "schema" && parts[1] !== "values") return path;
   const property = parts[1] === "schema" ? parts[2] : parts[3];
   const schema = item.merge?.fields.find((field) => field.path === `/schema/${property}`);

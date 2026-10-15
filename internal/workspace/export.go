@@ -127,6 +127,10 @@ func (k *Kernel) ExportPortable(ctx context.Context, e contracts.ServiceExecutio
 		f := asset.metadata
 		filePaths[string(f.Id)] = "attachments/" + string(f.Id) + "/" + exportName(f.OriginalName, "")
 	}
+	relationships, err := portableAttachmentRelationships(ctx, tx, filePaths)
+	if err != nil {
+		return result, err
+	}
 	out, err := os.OpenFile(destination, os.O_WRONLY|os.O_CREATE|os.O_EXCL, 0600)
 	if err != nil {
 		return result, err
@@ -169,7 +173,7 @@ func (k *Kernel) ExportPortable(ctx context.Context, e contracts.ServiceExecutio
 		if displayErr != nil {
 			return result, displayErr
 		}
-		manifest["pages"] = append(manifest["pages"].([]any), map[string]any{"displayPreferences": display, "id": id, "path": name, "parentPath": parentPath, "provenance": p.Page.Provenance, "canonicalPage": p.Page, "canonicalBlocks": p.Blocks})
+		manifest["pages"] = append(manifest["pages"].([]any), map[string]any{"displayPreferences": display, "id": id, "path": name, "parentPath": parentPath, "provenance": p.Page.Provenance, "canonicalPage": p.Page, "canonicalBlocks": p.Blocks, "attachmentRelationshipsVersion": 1, "attachmentRelationships": relationships[id]})
 		result.Pages++
 	}
 	rows, err = tx.QueryContext(ctx, "SELECT id,owning_page_id,title,title_property_id FROM collections ORDER BY id")
