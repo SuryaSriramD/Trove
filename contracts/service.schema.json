@@ -723,8 +723,83 @@
       ],
       "additionalProperties": false
     },
+    "PropertyRestoreDefinition": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "type": {
+          "type": "string",
+          "enum": [
+            "text",
+            "number",
+            "select",
+            "multi_select",
+            "status",
+            "checkbox",
+            "date",
+            "url",
+            "email",
+            "phone"
+          ]
+        },
+        "schemaVersion": {
+          "const": 1
+        },
+        "config": {
+          "type": [
+            "object",
+            "array",
+            "string",
+            "number",
+            "integer",
+            "boolean",
+            "null"
+          ]
+        }
+      },
+      "required": [
+        "name",
+        "type",
+        "schemaVersion",
+        "config"
+      ],
+      "additionalProperties": false
+    },
     "JournalAction": {
       "oneOf": [
+        {
+          "type": "object",
+          "properties": {
+            "kind": {
+              "const": "collection.property.restore"
+            },
+            "collectionId": {
+              "$ref": "domain.schema.json#/$defs/Id"
+            },
+            "propertyId": {
+              "$ref": "domain.schema.json#/$defs/Id"
+            },
+            "definition": {
+              "oneOf": [
+                {
+                  "$ref": "#/$defs/PropertyRestoreDefinition"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            }
+          },
+          "required": [
+            "kind",
+            "collectionId",
+            "propertyId",
+            "definition"
+          ],
+          "additionalProperties": false
+        },
         {
           "type": "object",
           "properties": {
@@ -3168,6 +3243,37 @@
       ],
       "additionalProperties": false
     },
+    "RestoreProperty": {
+      "type": "object",
+      "properties": {
+        "kind": {
+          "const": "collection.property.restore"
+        },
+        "collectionId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "propertyId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "definition": {
+          "oneOf": [
+            {
+              "$ref": "#/$defs/PropertyRestoreDefinition"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "required": [
+        "kind",
+        "collectionId",
+        "propertyId",
+        "definition"
+      ],
+      "additionalProperties": false
+    },
     "ApplyOperation": {
       "type": "object",
       "properties": {
@@ -3471,6 +3577,9 @@
         },
         {
           "$ref": "#/$defs/ApplyScheduling"
+        },
+        {
+          "$ref": "#/$defs/RestoreProperty"
         },
         {
           "$ref": "#/$defs/ApplyOperation"
