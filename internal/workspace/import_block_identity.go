@@ -177,4 +177,24 @@ func remapImportBlockIDs(item *ImportItem, ids map[string]string) {
 		walk(item.Blocks[i].Data)
 	}
 	item.BlockParents, item.BlockSources = parents, sources
+	for path, relationship := range item.AttachmentRelationships {
+		relationship.BlockID = remap(relationship.BlockID)
+		item.AttachmentRelationships[path] = relationship
+	}
+	if item.Kind == "conversation" {
+		if provenance, ok := item.Provenance.(map[string]any); ok {
+			switch nodes := provenance["nodes"].(type) {
+			case []conversationNode:
+				for i := range nodes {
+					nodes[i].BlockID = remap(nodes[i].BlockID)
+				}
+			case []any:
+				for _, node := range nodes {
+					if n, ok := node.(map[string]any); ok {
+						n["blockId"] = remap(str(n["blockId"]))
+					}
+				}
+			}
+		}
+	}
 }

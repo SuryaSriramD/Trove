@@ -81,6 +81,8 @@ func (a *App) takeRestorePreview(id string) (nativeRestorePreview, error) {
 
 // Only native dialogs supply filesystem locations; the renderer receives a
 // short-lived, one-use review token and cannot request arbitrary restore paths.
+const restoredMemoryWarning = "Restoring an older backup can recover memory state from before a later Forget. Review restored memory before using AI."
+
 func (a *App) PreviewNativeRestore() (string, error) {
 	if err := a.requireRollbackCommitted(); err != nil {
 		return "", err
@@ -95,7 +97,10 @@ func (a *App) PreviewNativeRestore() (string, error) {
 		return "", err
 	}
 	id := a.saveRestorePreview(nativeRestorePreview{source: source, manifest: manifest})
-	warnings := []string{"Restores into a new folder. Your open workspace remains unchanged.", "All retained history, import evidence, managed assets and declared recording journals are included. Search is rebuilt.", "Pending approvals and old file/restore handles are revoked. Approved memory states are preserved."}
+	return nativeRestorePreviewResponse(id, source, manifest)
+}
+func nativeRestorePreviewResponse(id, source string, manifest workspace.BackupManifest) (string, error) {
+	warnings := []string{"Restores into a new folder. Your open workspace remains unchanged.", "All retained history, import evidence, managed assets and declared recording journals are included. Search is rebuilt.", "Pending approvals and old file/restore handles are revoked. Approved memory states are preserved.", restoredMemoryWarning}
 	if manifest.FormatVersion == 1 {
 		warnings = append(warnings, "This legacy backup did not inventory recording drafts. Only its declared data can be restored.")
 	}

@@ -147,6 +147,19 @@ info = {
 with (contents / 'Info.plist').open('wb') as f:
     plistlib.dump(info, f)
 (contents / 'PkgInfo').write_bytes(b'APPL????')
+reminder_destination = contents / 'Library/LoginItems/TroveReminders.app'
+if reminder_destination.exists() or reminder_destination.is_symlink():
+    # Ad-hoc development outputs may be rebuilt; candidate preflight above
+    # requires a new destination. Refuse an unrelated or linked nested payload.
+    if reminder_destination.is_symlink() or not reminder_destination.is_dir():
+        raise SystemExit('Invalid existing reminder build destination')
+    previous_info = plistlib.loads((reminder_destination / 'Contents/Info.plist').read_bytes())
+    if previous_info.get('CFBundleIdentifier') != 'local.trove.desktop.reminders':
+        raise SystemExit('Refusing to replace an unrelated nested helper')
+    shutil.rmtree(reminder_destination)
+run([sys.executable, ROOT / 'scripts/build-reminder-helper.py', '--cache', args.cache,
+     '--output', reminder_destination,
+     '--version', info['CFBundleShortVersionString'], '--build-number', info['CFBundleVersion']])
 # Source volume metadata must not become extra resources in the signed bundle.
 for sidecar in args.output.rglob('._*'):
     sidecar.unlink()

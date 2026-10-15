@@ -259,7 +259,7 @@ func (b *Broker) BeginMCP(ctx context.Context, workspaceID, workspacePath, accou
 // binding checks. A rejected refresh never starts an interactive OAuth flow.
 func (b *Broker) mcpSession(ctx context.Context, c *protectedCredential, a Account) (Session, error) {
 	state := c.MCP
-	if state == nil || state.GrantID == "" || state.GrantID != c.Identity.Subject || c.Identity.Provider != "mcp:"+a.Endpoint || ValidateEndpoint(state.Resource) != nil || ValidateEndpoint(state.Config.Endpoint.TokenURL) != nil {
+	if state == nil || state.GrantID == "" || (a.Kind == MCP && (state.GrantID != c.Identity.Subject || c.Identity.Provider != "mcp:"+a.Endpoint)) || (a.Kind == Notion && (c.Identity.Provider != "notion" || c.Identity.Subject == "")) || ValidateEndpoint(state.Resource) != nil || ValidateEndpoint(state.Config.Endpoint.TokenURL) != nil {
 		return Session{}, fail("AUTH_REQUIRED", "Stored MCP authorization is invalid; reconnect explicitly")
 	}
 	if !c.ExpiresAt.IsZero() && time.Until(c.ExpiresAt) < time.Minute {

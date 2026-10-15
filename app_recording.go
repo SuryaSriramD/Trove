@@ -199,6 +199,18 @@ func (a *App) MeetingRecordings() ([]workspace.RecordingDraft, error) {
 	return drafts, nil
 }
 
+func (a *App) MeetingRecordingDetails(meetingID string) (*workspace.RecordingDraft, error) {
+	if err := a.requireRollbackCommitted(); err != nil {
+		return nil, err
+	}
+	a.mu.RLock()
+	defer a.mu.RUnlock()
+	if a.kernel == nil {
+		return nil, fmt.Errorf("workspace is not open")
+	}
+	return a.kernel.MeetingRecordingDetails(a.ctx, a.execution, meetingID)
+}
+
 // Native device enumeration does not request microphone consent or open capture.
 func (a *App) MeetingAudioInputs() ([]native.AudioInput, error) {
 	if err := a.requireRollbackCommitted(); err != nil {

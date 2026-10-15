@@ -344,7 +344,9 @@ func attachFile(m *Mutation, c map[string]any) error {
 			return err
 		}
 	}
-	sourceKind, sourceID := "explicit", id
+	// User intent must survive deduplication with retained import source bytes.
+	// Legacy explicit references may also be automatic import evidence.
+	sourceKind, sourceID := "explicit_user", id
 	if block := str(c["blockId"]); block != "" {
 		sourceKind, sourceID = "explicit_block", block
 	}

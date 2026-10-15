@@ -68,6 +68,9 @@ func remapImportDatabaseEntities(p *ImportPlan, ids map[string]string) {
 	for i := range p.Items {
 		p.Items[i].CollectionID = ref(p.Items[i].CollectionID)
 		p.Items[i].RecordID = ref(p.Items[i].RecordID)
+		for j := range p.Items[i].Columns {
+			p.Items[i].Columns[j].PropertyID = ref(p.Items[i].Columns[j].PropertyID)
+		}
 	}
 	for i := range p.PortableCollections {
 		c := &p.PortableCollections[i]
@@ -738,6 +741,9 @@ func commitMergedImportDatabases(m *Mutation, p *ImportPlan) error {
 				return err
 			}
 		}
+	}
+	if err := persistCSVKeyBindings(m, p); err != nil {
+		return err
 	}
 	return persistImportDatabaseIdentities(m, p)
 }

@@ -300,6 +300,24 @@ func (k *Kernel) AcknowledgeRecordingControl(ctx context.Context, e contracts.Se
 	return d, k.writeRecording(d)
 }
 func (k *Kernel) ListRecordings(ctx context.Context, e contracts.ServiceExecutionContext) ([]RecordingDraft, error) {
+	return k.listRecordings(ctx, e, false)
+}
+func (k *Kernel) MeetingRecordingDetails(ctx context.Context, e contracts.ServiceExecutionContext, meeting string) (*RecordingDraft, error) {
+	if _, _, err := k.ReadMeetingForJob(ctx, e, meeting); err != nil {
+		return nil, err
+	}
+	all, err := k.listRecordings(ctx, e, true)
+	if err != nil {
+		return nil, err
+	}
+	for i := range all {
+		if all[i].MeetingID == meeting {
+			return &all[i], nil
+		}
+	}
+	return nil, nil
+}
+func (k *Kernel) listRecordings(ctx context.Context, e contracts.ServiceExecutionContext, includeSaved bool) ([]RecordingDraft, error) {
 	if err := requireOwnerScope(k, e); err != nil {
 		return nil, err
 	}
@@ -324,7 +342,7 @@ func (k *Kernel) ListRecordings(ctx context.Context, e contracts.ServiceExecutio
 		if err != nil {
 			return nil, err
 		}
-		if d.State != "saved" {
+		if includeSaved || d.State != "saved" {
 			out = append(out, d)
 		}
 	}

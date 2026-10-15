@@ -146,6 +146,37 @@ class SigningTests(unittest.TestCase):
                 self.assertNotEqual(error.exception.code, 0)
                 run.assert_not_called()
 
+    def test_reminder_login_item_identity_and_nested_seal(self):
+        native = self.prepare()
+        bundle = self.app / 'Contents/Library/LoginItems/TroveReminders.app'
+        (bundle / 'Contents/MacOS').mkdir(parents=True)
+        binary = bundle / 'Contents/MacOS/TroveReminders'
+        shutil.copyfile(native / 'microphone-worker', binary)
+        binary.chmod(0o755)
+        info = {'CFBundleIdentifier': signing.REMINDER_ID, 'CFBundleExecutable': 'TroveReminders', 'LSMinimumSystemVersion': '27.0', 'LSUIElement': True}
+        plist = bundle / 'Contents/Info.plist'
+        plist.write_bytes(plistlib.dumps(info))
+        self.assertIn(binary, signing.executable_items(self.app, signing.native_bindings(self.app)[2]))
+        commands = []
+        def signer(args, timeout=90):
+            args = [str(v) for v in args]; commands.append(args)
+            if '--display' in args:
+                return f'TeamIdentifier={TEAM}\nflags=0x10000(runtime)\nTimestamp=fixture\n'
+            return ''
+        signing.sign_reminder_bundle(self.app, IDENTITY, TEAM, signer)
+        self.assertEqual(commands[0][-1], str(bundle))
+        self.assertIn('--timestamp', commands[0])
+        self.assertNotIn('--deep', commands[0])
+        self.assertTrue(any('--verify' in command and '--deep' in command for command in commands))
+        info['CFBundleIdentifier'] = 'untrusted.helper'
+        plist.write_bytes(plistlib.dumps(info))
+        with self.assertRaisesRegex(signing.SigningBlocked, 'identity'):
+            signing.executable_items(self.app, signing.native_bindings(self.app)[2])
+        info['CFBundleIdentifier'] = signing.REMINDER_ID
+        plist.write_bytes(plistlib.dumps(info)); binary.chmod(0o644)
+        with self.assertRaisesRegex(signing.SigningBlocked, 'not executable'):
+            signing.reminder_bundle(self.app)
+
     def test_debug_entitlements_cannot_be_signed(self):
         self.prepare()
         original = plistlib.loads

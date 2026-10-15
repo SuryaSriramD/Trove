@@ -255,7 +255,7 @@ struct Device {
   config.periodSizeInMilliseconds=20;config.capture.shareMode=ma_share_mode_shared;
   config.dataCallback=[](ma_device*,void*,const void *input,ma_uint32 count){buffer.push(static_cast<const float*>(input),count);};
   config.notificationCallback=[](const ma_device_notification *notification){
-   if((notification->type==ma_device_notification_type_stopped||notification->type==ma_device_notification_type_interruption_began)&&buffer.accepting.load()){
+   if((notification->type==ma_device_notification_type_stopped&&buffer.accepting.load())||notification->type==ma_device_notification_type_rerouted||notification->type==ma_device_notification_type_interruption_began){
     buffer.failure.store(3);buffer.accepting.store(false);
    }
   };
