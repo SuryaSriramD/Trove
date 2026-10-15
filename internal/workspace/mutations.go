@@ -18,14 +18,15 @@ import (
 )
 
 type Mutation struct {
-	Tx        *sql.Tx
-	Kernel    *Kernel
-	Context   context.Context
-	Execution contracts.ServiceExecutionContext
-	Request   contracts.ServiceBatchRequest
-	guards    map[string]string
-	touched   map[string]contracts.ServiceRevisionChange
-	before    map[string]json.RawMessage
+	collectionVisibilityChanges map[string]bool
+	Tx                          *sql.Tx
+	Kernel                      *Kernel
+	Context                     context.Context
+	Execution                   contracts.ServiceExecutionContext
+	Request                     contracts.ServiceBatchRequest
+	guards                      map[string]string
+	touched                     map[string]contracts.ServiceRevisionChange
+	before                      map[string]json.RawMessage
 }
 
 var entityTables = map[string]string{"page": "pages", "block": "blocks", "collection": "collections", "property": "properties", "record": "records", "view": "views", "container": "containers", "file": "files", "meeting": "meetings", "memory": "memory_entries", "transcript_segment": "transcript_segments"}

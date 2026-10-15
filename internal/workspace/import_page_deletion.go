@@ -48,7 +48,7 @@ func preparePortablePageInventory(ctx context.Context, q querier, p *ImportPlan,
 		}
 	}
 	p.PageEnumerationScope = scope
-	return nil
+	return preparePortableCollectionInventory(p, manifest)
 }
 
 func appendMissingSourcePages(ctx context.Context, q querier, p *ImportPlan) error {
@@ -105,6 +105,11 @@ func appendMissingSourcePages(ctx context.Context, q querier, p *ImportPlan) err
 		delegated := false
 		for _, c := range p.PortableCollections {
 			if c.CollectionID == collection {
+				delegated = true
+			}
+		}
+		for _, c := range p.Items {
+			if c.Kind == "source_deleted_collection" && c.CollectionID == collection {
 				delegated = true
 			}
 		}
@@ -268,7 +273,11 @@ func reviewedPageDeletionActions(ctx context.Context, q querier, p *ImportPlan) 
 			selected[item.PageID] = true
 		}
 	}
-	if len(selected) > 128 {
+	collectionActions, err := reviewedCollectionDeletions(ctx, q, p, selected)
+	if err != nil {
+		return nil, err
+	}
+	if len(selected)+len(collectionActions) > 128 {
 		return nil, Fail("RESOURCE_EXHAUSTED", "At most 128 source page deletions may be reviewed together")
 	}
 	keys := []string{}
@@ -324,7 +333,7 @@ func reviewedPageDeletionActions(ctx context.Context, q querier, p *ImportPlan) 
 			return nil, err
 		}
 	}
-	return actions, nil
+	return append(actions, collectionActions...), nil
 }
 func commitSourcePageDeletions(m *Mutation, p *ImportPlan) error {
 	actions, err := reviewedPageDeletionActions(m.Context, m.Tx, p)
@@ -333,7 +342,7 @@ func commitSourcePageDeletions(m *Mutation, p *ImportPlan) error {
 	}
 	for i := range p.Items {
 		item := &p.Items[i]
-		if item.Kind != "source_deleted_page" {
+		if !isSourceDeletion(item.Kind) {
 			continue
 		}
 		if err := checkImportMergeGuards(m, item); err != nil {
@@ -342,6 +351,14 @@ func commitSourcePageDeletions(m *Mutation, p *ImportPlan) error {
 	}
 	for _, action := range actions {
 		page := str(action["pageId"])
+		if action["kind"] == "collection.trash.set" {
+			if err := m.Tx.QueryRowContext(m.Context, "SELECT owning_page_id FROM collections WHERE id=?", action["collectionId"]).Scan(&page); err != nil {
+				return err
+			}
+			if err := guardImport(m, "collection", str(action["collectionId"])); err != nil {
+				return err
+			}
+		}
 		if err := importGuardPage(m, page); err != nil {
 			return err
 		}
@@ -358,13 +375,13 @@ func commitSourcePageDeletions(m *Mutation, p *ImportPlan) error {
 		}
 	}
 	if len(actions) > 0 {
-		if err := applyJournal(m, p.PageDeletionOperationID, "Reviewed source page deletions", actions); err != nil {
+		if err := applyJournal(m, p.PageDeletionOperationID, "Reviewed source page and collection deletions", actions); err != nil {
 			return err
 		}
 	}
 	for i := range p.Items {
 		item := &p.Items[i]
-		if item.Kind != "source_deleted_page" {
+		if !isSourceDeletion(item.Kind) {
 			continue
 		}
 		if err := saveImportBaseline(m, p, item); err != nil {

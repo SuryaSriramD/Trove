@@ -105,6 +105,9 @@ func requireNew(m *Mutation, kind, id string) error {
 }
 func addProperty(m *Mutation, c map[string]any) error {
 	id, collection, kind := str(c["propertyId"]), str(c["collectionId"]), str(c["type"])
+	if err := requireActiveCollection(m.Context, m.Tx, collection); err != nil {
+		return err
+	}
 	if kind == "title" {
 		return Fail("INVALID_REQUEST", "A collection has one immutable title projection")
 	}
@@ -153,6 +156,9 @@ func addProperty(m *Mutation, c map[string]any) error {
 }
 func createRecord(m *Mutation, c map[string]any) error {
 	id, page, collection := str(c["recordId"]), str(c["pageId"]), str(c["collectionId"])
+	if err := requireActiveCollection(m.Context, m.Tx, collection); err != nil {
+		return err
+	}
 	if err := m.Touch("collection", collection); err != nil {
 		return err
 	}
@@ -325,6 +331,9 @@ func validateDate(v map[string]any) error {
 }
 func saveView(m *Mutation, c map[string]any) error {
 	id, collection, page, kind := str(c["viewId"]), str(c["collectionId"]), str(c["owningPageId"]), str(c["type"])
+	if err := requireActiveCollection(m.Context, m.Tx, collection); err != nil {
+		return err
+	}
 	if err := m.Touch("view", id); err != nil {
 		return err
 	}
@@ -573,6 +582,9 @@ func databaseSnapshot(ctx context.Context, k *Kernel, tx *sql.Tx, e contracts.Se
 		}
 		out := []contracts.DomainRecord{}
 		for _, r := range rs {
+			if requireActiveCollection(ctx, tx, string(r.CollectionId)) != nil {
+				continue
+			}
 			if k.authorizePage(ctx, tx, e, string(r.PageId)) == nil {
 				out = append(out, r)
 			}
@@ -643,6 +655,18 @@ func databaseSnapshot(ctx context.Context, k *Kernel, tx *sql.Tx, e contracts.Se
 		}
 		if err != nil {
 			return nil, err
+		}
+		collectionID := ""
+		switch value := v.(type) {
+		case contracts.DomainCollection:
+			collectionID = string(value.Id)
+		case contracts.DomainPropertyDefinition:
+			collectionID = string(value.CollectionId)
+		case contracts.DomainContainerCollection:
+			collectionID = string(value.CollectionId)
+		}
+		if collectionID != "" && requireActiveCollection(ctx, tx, collectionID) != nil {
+			continue
 		}
 		if k.authorizeEntity(ctx, tx, e, kind, id) == nil {
 			out = append(out, v)

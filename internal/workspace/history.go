@@ -14,13 +14,14 @@ import (
 	"trove.local/phase0/contracts"
 )
 
-const currentRecoveryMetadataVersion = 7
+const currentRecoveryMetadataVersion = 8
 
 type recoverySnapshot struct {
-	ExternalContextPolicy   *externalContextPolicy         `json:"externalContextPolicy,omitempty"`
-	AttachmentRelationships *[]recoveryAttachmentReference `json:"attachmentRelationships,omitempty"`
-	RecordLayouts           *recoveryLayouts               `json:"recordLayouts,omitempty"`
-	DisplayPreferences      *PageDisplayPreferences        `json:"displayPreferences,omitempty"`
+	CollectionVisibility    *[]recoveryCollectionVisibility `json:"collectionVisibility,omitempty"`
+	ExternalContextPolicy   *externalContextPolicy          `json:"externalContextPolicy,omitempty"`
+	AttachmentRelationships *[]recoveryAttachmentReference  `json:"attachmentRelationships,omitempty"`
+	RecordLayouts           *recoveryLayouts                `json:"recordLayouts,omitempty"`
+	DisplayPreferences      *PageDisplayPreferences         `json:"displayPreferences,omitempty"`
 	contracts.ServiceReadPageResult
 	Record          *contracts.DomainRecord              `json:"record,omitempty"`
 	Task            *contracts.DomainTaskFacet           `json:"task,omitempty"`
@@ -49,6 +50,11 @@ func captureRecoverySnapshot(ctx context.Context, q querier, page string, result
 	if layoutErr != nil {
 		return nil, layoutErr
 	}
+	visibility, visibilityErr := captureRecoveryCollectionVisibility(ctx, q, page)
+	if visibilityErr != nil {
+		return nil, visibilityErr
+	}
+	out.CollectionVisibility = &visibility
 	var collection string
 	err := q.QueryRowContext(ctx, "SELECT collection_id FROM records WHERE page_id=?", page).Scan(&collection)
 	if err == nil {
@@ -323,6 +329,20 @@ func restoreGuards(ctx context.Context, k *Kernel, q querier, e contracts.Servic
 	} else if snap.Record != nil {
 		return nil, nil, Fail("CONFLICT", "Historical record identity is no longer available")
 	}
+	if snap.CollectionVisibility != nil {
+		for _, entry := range *snap.CollectionVisibility {
+			var owner string
+			if err := q.QueryRowContext(ctx, "SELECT owning_page_id FROM collections WHERE id=?", entry.CollectionID).Scan(&owner); err != nil {
+				return nil, nil, err
+			}
+			if owner != page {
+				return nil, nil, Fail("CONFLICT", "Historical collection visibility belongs to another page")
+			}
+			if err = add("collection", entry.CollectionID); err != nil {
+				return nil, nil, err
+			}
+		}
+	}
 	if snap.RecordLayouts != nil {
 		for _, entry := range snap.RecordLayouts.Collections {
 			if err = add("collection", entry.CollectionID); err != nil {
@@ -570,6 +590,9 @@ func restoreHistory(m *Mutation, c map[string]any) error {
 		if err = retainPageExternalContextPolicy(m.Context, m.Tx, page, *snap.ExternalContextPolicy); err != nil {
 			return err
 		}
+	}
+	if err = restoreRecoveryCollectionVisibility(m, snap); err != nil {
+		return err
 	}
 	if err = restoreRecoveryLayouts(m, snap); err != nil {
 		return err

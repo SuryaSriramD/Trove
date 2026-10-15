@@ -74,12 +74,13 @@ func inferImportType(values []string) string {
 }
 
 type portableHierarchy struct {
-	WorkspaceID            string          `json:"workspaceId"`
-	PageEnumerationVersion int             `json:"pageEnumerationVersion,omitempty"`
-	Format                 string          `json:"format"`
-	HTMLRenditions         []string        `json:"htmlRenditions"`
-	Phase4Metadata         json.RawMessage `json:"phase4Metadata"`
-	Pages                  []struct {
+	WorkspaceID                  string          `json:"workspaceId"`
+	CollectionEnumerationVersion int             `json:"collectionEnumerationVersion,omitempty"`
+	PageEnumerationVersion       int             `json:"pageEnumerationVersion,omitempty"`
+	Format                       string          `json:"format"`
+	HTMLRenditions               []string        `json:"htmlRenditions"`
+	Phase4Metadata               json.RawMessage `json:"phase4Metadata"`
+	Pages                        []struct {
 		ExternalContextPolicy          *externalContextPolicy         `json:"externalContextPolicy,omitempty"`
 		AttachmentRelationshipsVersion int                            `json:"attachmentRelationshipsVersion,omitempty"`
 		AttachmentRelationships        []ImportAttachmentRelationship `json:"attachmentRelationships,omitempty"`
@@ -488,6 +489,9 @@ func (k *Kernel) parseImportPlan(ctx context.Context, p *ImportPlan) error {
 		if err := prepareImportMerge(ctx, k.db, p, &p.Items[i]); err != nil {
 			return err
 		}
+	}
+	if err := appendMissingSourceCollections(ctx, k.db, p); err != nil {
+		return err
 	}
 	if err := appendMissingSourcePages(ctx, k.db, p); err != nil {
 		return err
