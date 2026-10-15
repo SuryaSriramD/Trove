@@ -208,6 +208,13 @@ func replaceMemorySources(m *Mutation, id, page string, sources []any) error {
 		if err := validateMemoryLocation(m.Context, m.Tx, loc); err != nil {
 			return err
 		}
+		if restricted, err := pageExternalContextRestricted(m.Context, m.Tx, source); err != nil {
+			return err
+		} else if restricted {
+			if err := retainPageExternalContextPolicy(m.Context, m.Tx, page, gmailExternalContextPolicy); err != nil {
+				return err
+			}
+		}
 		transcript, _ := loc["transcript"].(map[string]any)
 		if _, err := m.Exec("INSERT INTO memory_sources(memory_id,page_id,source_revision,block_id,meeting_id,segment_id,start_ms,end_ms,source_index) VALUES(?,?,?,?,?,?,?,?,?)", id, source, loc["sourceRevision"], nullable(loc["blockId"]), nullable(transcript["meetingId"]), nullable(transcript["segmentId"]), transcript["startMs"], transcript["endMs"], i); err != nil {
 			return err

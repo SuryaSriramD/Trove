@@ -58,6 +58,17 @@ func meetingCommand(m *Mutation, c map[string]any) error {
 	}
 	switch str(c["kind"]) {
 	case "meeting.appendSegments":
+		// A retained transcript remains derived from its audio even after the
+		// owner later removes that audio through retention controls.
+		policy, err := capturePageExternalContextPolicy(m.Context, m.Tx, page)
+		if err != nil {
+			return err
+		}
+		if policy != nil {
+			if err = retainPageExternalContextPolicy(m.Context, m.Tx, page, *policy); err != nil {
+				return err
+			}
+		}
 		segments, _ := c["segments"].([]any)
 		for _, raw := range segments {
 			s := raw.(map[string]any)
@@ -90,7 +101,7 @@ func meetingCommand(m *Mutation, c map[string]any) error {
 				return err
 			}
 		}
-		_, err := m.Exec("UPDATE meetings SET state='transcribing' WHERE id=?", id)
+		_, err = m.Exec("UPDATE meetings SET state='transcribing' WHERE id=?", id)
 		return err
 	case "meeting.finalize":
 		duration = number(c["durationMs"])

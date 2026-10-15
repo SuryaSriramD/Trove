@@ -78,6 +78,7 @@ type portableHierarchy struct {
 	HTMLRenditions []string        `json:"htmlRenditions"`
 	Phase4Metadata json.RawMessage `json:"phase4Metadata"`
 	Pages          []struct {
+		ExternalContextPolicy          *externalContextPolicy         `json:"externalContextPolicy,omitempty"`
 		AttachmentRelationshipsVersion int                            `json:"attachmentRelationshipsVersion,omitempty"`
 		AttachmentRelationships        []ImportAttachmentRelationship `json:"attachmentRelationships,omitempty"`
 		DisplayPreferences             *PageDisplayPreferences        `json:"displayPreferences,omitempty"`
@@ -88,9 +89,11 @@ type portableHierarchy struct {
 		CanonicalBlocks                []contracts.DomainBlock        `json:"canonicalBlocks"`
 	} `json:"pages"`
 	Attachments []struct {
-		ID     string `json:"id"`
-		Path   string `json:"path"`
-		SHA256 string `json:"sha256"`
+		ExternalAcquisitionSources []externalAcquisitionSource `json:"externalAcquisitionSources,omitempty"`
+		ExternalContextPolicy      *externalContextPolicy      `json:"externalContextPolicy,omitempty"`
+		ID                         string                      `json:"id"`
+		Path                       string                      `json:"path"`
+		SHA256                     string                      `json:"sha256"`
 	} `json:"attachments"`
 	Collections        []portableDatabaseSource `json:"collections"`
 	SourceOmissions    []string                 `json:"sourceOmissions"`
@@ -99,6 +102,20 @@ type portableHierarchy struct {
 
 func (k *Kernel) parseImportPlan(ctx context.Context, p *ImportPlan) error {
 	p.NormalizerVersion = importNormalizerVersion
+	var sourcePolicy *externalContextPolicy
+	if p.SourceFileID != "" {
+		source, err := readFileMetadata(ctx, k.db, p.SourceFileID)
+		if err != nil {
+			return err
+		}
+		sourcePolicy, err = fileExternalContextPolicy(ctx, k.db, string(source.ContentHash))
+		if err != nil {
+			return err
+		}
+		if sourcePolicy != nil {
+			ctx = context.WithValue(ctx, importExternalPolicyKey{}, sourcePolicy)
+		}
+	}
 	pages := map[string]string{}
 	assets := map[string]string{}
 	seenIDs := map[string]bool{}
@@ -109,7 +126,9 @@ func (k *Kernel) parseImportPlan(ctx context.Context, p *ImportPlan) error {
 			if err != nil {
 				return err
 			}
-			_ = json.Unmarshal(b, &manifest)
+			if err = json.Unmarshal(b, &manifest); err != nil {
+				return Fail("INTEGRITY_ERROR", "Portable manifest is malformed; its provenance cannot be discarded")
+			}
 		}
 	}
 	initialPages := map[string]string{}
@@ -139,6 +158,37 @@ func (k *Kernel) parseImportPlan(ctx context.Context, p *ImportPlan) error {
 				item.Kind = "asset"
 				item.Outcome = "preserved"
 				item.Reason = "Portable attachment preserved and manifest hash verified"
+				if len(attachment.ExternalAcquisitionSources) > 100 {
+					return Fail("RESOURCE_EXHAUSTED", "Portable asset has too many acquisition sources")
+				}
+				if len(attachment.ExternalAcquisitionSources) > 0 {
+					if attachment.SHA256 != item.Hash {
+						return Fail("INTEGRITY_ERROR", "Acquisition provenance differs from its portable manifest hash")
+					}
+					if err := k.write(ctx, func(tx *sql.Tx) error {
+						for _, source := range attachment.ExternalAcquisitionSources {
+							if err := retainExternalAcquisitionSource(ctx, tx, item.Hash, source); err != nil {
+								return err
+							}
+						}
+						return nil
+					}); err != nil {
+						return err
+					}
+				}
+				if attachment.ExternalContextPolicy != nil {
+					if err := validateExternalContextPolicy(*attachment.ExternalContextPolicy); err != nil {
+						return err
+					}
+					if attachment.SHA256 != item.Hash {
+						return Fail("INTEGRITY_ERROR", "Restricted attachment differs from its portable manifest hash")
+					}
+					if err := k.write(ctx, func(tx *sql.Tx) error {
+						return retainFileExternalContextPolicy(ctx, tx, item.Hash, *attachment.ExternalContextPolicy)
+					}); err != nil {
+						return err
+					}
+				}
 				if attachment.SHA256 != item.Hash {
 					item.Kind = "rejected"
 					item.Outcome = "failed"
@@ -171,7 +221,9 @@ func (k *Kernel) parseImportPlan(ctx context.Context, p *ImportPlan) error {
 			if err != nil {
 				return err
 			}
-			_ = json.Unmarshal(b, &manifest)
+			if err = json.Unmarshal(b, &manifest); err != nil {
+				return Fail("INTEGRITY_ERROR", "Portable manifest is malformed; its provenance cannot be discarded")
+			}
 		}
 		if item.PageID != "" {
 			if item.IdentityKind == "" {
@@ -250,7 +302,12 @@ func (k *Kernel) parseImportPlan(ctx context.Context, p *ImportPlan) error {
 				if parent := pages[entry.ParentPath]; parent != "" {
 					item.ParentID = parent
 				}
-				item.Provenance = entry.Provenance
+				if entry.ExternalContextPolicy != nil {
+					if err := validateExternalContextPolicy(*entry.ExternalContextPolicy); err != nil {
+						return err
+					}
+				}
+				item.Provenance = externalPolicyProvenance(entry.ExternalContextPolicy, entry.Provenance)
 				item.DisplayPreferences = entry.DisplayPreferences
 			}
 		}
@@ -391,6 +448,9 @@ func (k *Kernel) parseImportPlan(ctx context.Context, p *ImportPlan) error {
 		return err
 	}
 	for i := range p.Items {
+		if sourcePolicy != nil {
+			p.Items[i].Provenance = externalPolicyProvenance(sourcePolicy, p.Items[i].Provenance)
+		}
 		if err := prepareImportMerge(ctx, k.db, p, &p.Items[i]); err != nil {
 			return err
 		}

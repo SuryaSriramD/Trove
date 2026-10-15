@@ -81,6 +81,10 @@ func (k *Kernel) PreviewConnectorImport(ctx context.Context, e contracts.Service
 		return empty, err
 	}
 	raw := marshal(snapshot)
+	if a.Kind == connectors.Gmail {
+		p := gmailExternalContextPolicy
+		ctx = context.WithValue(ctx, importExternalPolicyKey{}, &p)
+	}
 	fileID, err := k.storeImportBytes(ctx, "connector-source.json", raw)
 	if err != nil {
 		return empty, err
@@ -117,9 +121,11 @@ func (k *Kernel) PreviewConnectorImport(ctx context.Context, e contracts.Service
 // Native acquisition returns the existing one-use, actor-bound file ingress
 // proposal. The user still chooses a destination and reviews file.attach.
 func (k *Kernel) PrepareConnectorAcquired(ctx context.Context, e contracts.ServiceExecutionContext, a connectors.Account, selectionID string, file connectors.Acquired) (any, error) {
-	if _, err := activeConnector(ctx, k, k.db, e, a.ID, a.Revision); err != nil {
+	current, err := activeConnector(ctx, k, k.db, e, a.ID, a.Revision)
+	if err != nil {
 		return nil, err
 	}
+	a = current // Policy follows canonical account kind, never a caller copy.
 	if _, err := connectors.Selected(a, selectionID); err != nil {
 		return nil, err
 	}
@@ -139,5 +145,23 @@ func (k *Kernel) PrepareConnectorAcquired(ctx context.Context, e contracts.Servi
 	if err != nil {
 		return nil, err
 	}
-	return prepareFile(ctx, k, e, map[string]any{"selectionHandle": handle})
+	var policy *externalContextPolicy
+	if a.Kind == connectors.Gmail {
+		p := gmailExternalContextPolicy
+		policy = &p
+	}
+	return prepareFileWithPolicy(ctx, k, e, map[string]any{"selectionHandle": handle}, policy, func(tx *sql.Tx, digest string) error {
+		current, err := activeConnector(ctx, k, tx, e, a.ID, a.Revision)
+		if err != nil {
+			return err
+		}
+		_, err = connectors.Selected(current, selectionID)
+		if err != nil {
+			return err
+		}
+		if current.Kind == connectors.Gmail {
+			return retainExternalAcquisitionSource(ctx, tx, digest, externalAcquisitionSource{Version: 1, Provider: "gmail", AccountID: current.ID, SelectionID: selectionID, RemoteID: file.RemoteID, RemoteRevision: file.RemoteRevision})
+		}
+		return nil
+	})
 }

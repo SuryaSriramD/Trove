@@ -173,7 +173,11 @@ func (k *Kernel) ExportPortable(ctx context.Context, e contracts.ServiceExecutio
 		if displayErr != nil {
 			return result, displayErr
 		}
-		manifest["pages"] = append(manifest["pages"].([]any), map[string]any{"displayPreferences": display, "id": id, "path": name, "parentPath": parentPath, "provenance": p.Page.Provenance, "canonicalPage": p.Page, "canonicalBlocks": p.Blocks, "attachmentRelationshipsVersion": 1, "attachmentRelationships": relationships[id]})
+		policy, policyErr := capturePageExternalContextPolicy(ctx, tx, id)
+		if policyErr != nil {
+			return result, policyErr
+		}
+		manifest["pages"] = append(manifest["pages"].([]any), map[string]any{"externalContextPolicy": policy, "displayPreferences": display, "id": id, "path": name, "parentPath": parentPath, "provenance": p.Page.Provenance, "canonicalPage": p.Page, "canonicalBlocks": p.Blocks, "attachmentRelationshipsVersion": 1, "attachmentRelationships": relationships[id]})
 		result.Pages++
 	}
 	rows, err = tx.QueryContext(ctx, "SELECT id,owning_page_id,title,title_property_id FROM collections ORDER BY id")
@@ -291,6 +295,22 @@ func (k *Kernel) ExportPortable(ctx context.Context, e contracts.ServiceExecutio
 	}
 	for _, asset := range assets {
 		f := asset.metadata
+		policy := asset.externalPolicy
+		sources := asset.externalSources
+		if sources == nil {
+			var sourceErr error
+			sources, sourceErr = readExternalAcquisitionSources(ctx, tx, string(f.ContentHash))
+			if sourceErr != nil {
+				return result, sourceErr
+			}
+		}
+		if policy == nil {
+			var policyErr error
+			policy, policyErr = fileExternalContextPolicy(ctx, tx, string(f.ContentHash))
+			if policyErr != nil {
+				return result, policyErr
+			}
+		}
 		if err = ctx.Err(); err != nil {
 			return result, err
 		}
@@ -299,7 +319,7 @@ func (k *Kernel) ExportPortable(ctx context.Context, e contracts.ServiceExecutio
 			if err = write(name, asset.content); err != nil {
 				return result, err
 			}
-			manifest["attachments"] = append(manifest["attachments"].([]any), map[string]any{"id": f.Id, "path": name, "sha256": f.ContentHash, "sizeBytes": f.SizeBytes, "mediaType": f.MediaType, "originalName": f.OriginalName})
+			manifest["attachments"] = append(manifest["attachments"].([]any), map[string]any{"externalContextPolicy": policy, "externalAcquisitionSources": sources, "id": f.Id, "path": name, "sha256": f.ContentHash, "sizeBytes": f.SizeBytes, "mediaType": f.MediaType, "originalName": f.OriginalName})
 			result.Assets++
 			continue
 		}
@@ -323,7 +343,7 @@ func (k *Kernel) ExportPortable(ctx context.Context, e contracts.ServiceExecutio
 		if er != nil {
 			return result, er
 		}
-		manifest["attachments"] = append(manifest["attachments"].([]any), map[string]any{"id": f.Id, "path": name, "sha256": f.ContentHash, "sizeBytes": f.SizeBytes, "mediaType": f.MediaType, "originalName": f.OriginalName})
+		manifest["attachments"] = append(manifest["attachments"].([]any), map[string]any{"externalContextPolicy": policy, "externalAcquisitionSources": sources, "id": f.Id, "path": name, "sha256": f.ContentHash, "sizeBytes": f.SizeBytes, "mediaType": f.MediaType, "originalName": f.OriginalName})
 		result.Assets++
 	}
 	// Evidence is scoped to exported pages; a complete import inventory may

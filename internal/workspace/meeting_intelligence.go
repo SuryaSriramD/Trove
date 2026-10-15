@@ -311,6 +311,15 @@ func init() {
 		if _, ok := m.touched[guardKey("page", page)]; !ok {
 			return Fail("INVALID_REQUEST", "Meeting draft must append to its source page")
 		}
+		policy, err := capturePageExternalContextPolicy(m.Context, m.Tx, page)
+		if err != nil {
+			return err
+		}
+		if policy != nil {
+			if err = retainPageExternalContextPolicy(m.Context, m.Tx, page, *policy); err != nil {
+				return err
+			}
+		}
 		_, err = m.Exec("UPDATE meeting_intelligence SET state='applied' WHERE id=? AND state='draft'", id)
 		return err
 	})

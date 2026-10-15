@@ -9,8 +9,11 @@ import (
 	"log/slog"
 	"net/http"
 	"net/url"
+	"path"
 	"strings"
 	"sync/atomic"
+	"unicode"
+	"unicode/utf8"
 
 	mcpauth "github.com/modelcontextprotocol/go-sdk/auth"
 	"github.com/modelcontextprotocol/go-sdk/mcp"
@@ -583,8 +586,26 @@ func (a *mcpAdapter) Acquire(ctx context.Context, s Session, sel Selection, remo
 	if len(data) > MaxResponseBytes {
 		return Acquired{}, fail("RESOURCE_EXHAUSTED", "MCP resource exceeds the acquisition bound")
 	}
-	return Acquired{Name: bounded(sel.Label, 255), MediaType: mime, Bytes: append([]byte{}, data...), RemoteRevision: remoteHash(res)}, nil
+	return Acquired{RemoteID: remoteID, Name: mcpAcquiredName(sel.Label), MediaType: mime, Bytes: append([]byte{}, data...), RemoteRevision: remoteHash(res)}, nil
 }
 
 var _ Previewer = (*mcpAdapter)(nil)
 var _ Acquirer = (*mcpAdapter)(nil)
+
+func mcpAcquiredName(label string) string {
+	name := path.Base(strings.ReplaceAll(strings.TrimSpace(label), "\\", "/"))
+	name = strings.Map(func(r rune) rune {
+		if unicode.IsControl(r) {
+			return '_'
+		}
+		return r
+	}, name)
+	for len(name) > 200 {
+		_, n := utf8.DecodeLastRuneInString(name)
+		name = name[:len(name)-n]
+	}
+	if name == "" || name == "." || name == ".." || name == "/" {
+		return "resource"
+	}
+	return name
+}

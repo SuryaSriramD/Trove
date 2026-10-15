@@ -235,6 +235,9 @@ func revokeCompatibleRestorePermissions(ctx context.Context, root string) (err e
  UPDATE template_previews SET consumed=1;`); err != nil {
 		return err
 	}
+	if err := validateExternalContextRestore(ctx, tx); err != nil {
+		return err
+	}
 	if err = resetConnectorRestore(ctx, tx); err != nil {
 		return err
 	}
