@@ -18,6 +18,16 @@ import (
 
 const importNormalizerVersion = 1
 
+const importCSVArtifactIdentity = "normalizer-artifact:csv-evidence"
+
+func importCSVArtifact(raw json.RawMessage) bool {
+	var payload struct {
+		Type string         `json:"type"`
+		Data map[string]any `json:"data"`
+	}
+	return json.Unmarshal(raw, &payload) == nil && payload.Type == "unsupported_external" && str(payload.Data["sourceType"]) == "csv"
+}
+
 type ImportSnapshot struct {
 	Version        int                        `json:"version"`
 	SourceRevision string                     `json:"sourceRevision,omitempty"`
@@ -133,7 +143,13 @@ func snapshotImportItem(item *ImportItem) ImportSnapshot {
 	}
 	for index, block := range item.Blocks {
 		if item.BlockSources[block.ID] == "" {
-			item.BlockSources[block.ID] = fmt.Sprintf("normalizer-position:%d", index)
+			if item.Kind == "portable_collection" && len(item.Blocks) == 1 && importCSVArtifact(marshal(map[string]any{"type": block.Type, "data": block.Data})) {
+				// This is the normalizer's single retained CSV-evidence widget,
+				// not a position guessed to identify an upstream content block.
+				item.BlockSources[block.ID] = importCSVArtifactIdentity
+			} else {
+				item.BlockSources[block.ID] = fmt.Sprintf("normalizer-position:%d", index)
+			}
 		}
 	}
 	s := ImportSnapshot{Version: importNormalizerVersion, SourceRevision: item.Hash, Fields: map[string]json.RawMessage{"/title": marshal(item.Title), "/parent": marshal(nullable(item.ParentID))}, BlockSources: item.BlockSources}
@@ -275,9 +291,14 @@ func prepareImportMerge(ctx context.Context, q querier, p *ImportPlan, item *Imp
 	bySource := map[string]string{}
 	for id, source := range base.BlockSources {
 		bySource[source] = id
+		if item.Kind == "portable_collection" && len(base.BlockSources) == 1 && source == "normalizer-position:0" && importCSVArtifact(base.Fields["/blocks/"+id+"/content"]) {
+			// Upgrade the known v1 normalizer's exact single-widget evidence;
+			// arbitrary anonymous blocks never receive this identity.
+			bySource[importCSVArtifactIdentity] = id
+		}
 	}
 	for id, source := range item.BlockSources {
-		if old := bySource[source]; old != "" && (sourceRevision == item.Hash || strings.HasPrefix(source, "normalizer-position:"+item.Hash+":conversation-node:") || strings.HasPrefix(source, "notion-block:") || strings.HasPrefix(source, "html-id:") || strings.HasPrefix(source, "portable-block:") || strings.HasPrefix(source, "conversation-node:")) {
+		if old := bySource[source]; old != "" && (sourceRevision == item.Hash || source == importCSVArtifactIdentity || strings.HasPrefix(source, "normalizer-position:"+item.Hash+":conversation-node:") || strings.HasPrefix(source, "notion-block:") || strings.HasPrefix(source, "html-id:") || strings.HasPrefix(source, "portable-block:") || strings.HasPrefix(source, "conversation-node:")) {
 			ids[id] = old
 		}
 	}
@@ -356,9 +377,19 @@ func prepareImportMerge(ctx context.Context, q querier, p *ImportPlan, item *Imp
 	item.Merge = &ImportMergeReview{ID: NewID(), Version: 1, BaselineStatus: status, LocalDeleted: deleted, Fields: mergeImportFields(base.Fields, local.Fields, incoming.Fields, known), Resolutions: []ImportFieldChoice{}}
 	for i := range item.Merge.Fields {
 		field := &item.Merge.Fields[i]
-		if strings.HasPrefix(field.Path, "/attachments/") && field.Base.Present && !field.Incoming.Present && field.Local.Present {
+		if (strings.HasPrefix(field.Path, "/attachments/") || strings.HasPrefix(field.Path, "/blocks/")) && field.Base.Present && !field.Incoming.Present && field.Local.Present {
 			// Even a proven complete removal needs an explicit reviewed decision.
 			field.Outcome = "conflict"
+		}
+		if strings.HasPrefix(field.Path, "/schema/") && field.Local.Present && field.Incoming.Present {
+			var local, incoming struct {
+				Type string `json:"type"`
+			}
+			if json.Unmarshal(field.Local.Value, &local) == nil && json.Unmarshal(field.Incoming.Value, &incoming) == nil && local.Type != incoming.Type {
+				// Changing type is never an automatic scalar overwrite. The
+				// reviewed selection still needs a supported value migration.
+				field.Outcome = "conflict"
+			}
 		}
 	}
 	item.Choice = ""
