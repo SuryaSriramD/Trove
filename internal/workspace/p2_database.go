@@ -244,7 +244,11 @@ func p2DatabaseCommand(m *Mutation, c map[string]any) error {
 			if b.ConfirmationRequired && c["confirmed"] != true {
 				return Fail("APPROVAL_REQUIRED", "Confirm the displayed row action before running it")
 			}
-			return setRecordValue(m, str(c["recordId"]), b.PropertyID, b.Value)
+			id := str(c["operationId"])
+			if id == "" {
+				id = NewID()
+			}
+			return applyJournal(m, id, "Row action: "+b.Label, []map[string]any{{"kind": "record.setValue", "recordId": c["recordId"], "propertyId": b.PropertyID, "value": b.Value}})
 		}
 	}
 	return Fail("NOT_FOUND", "Row button is unavailable")

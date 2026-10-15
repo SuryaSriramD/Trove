@@ -1,3 +1,5 @@
+import { OperationHistory } from "./OperationHistory";
+import { PageFreshness, ReviewQueue } from "./PageFreshness";
 import SupportBundlePanel from "./SupportBundlePanel";
 import { useEffect, useState, useCallback, useMemo, useRef } from "react";
 import {
@@ -1064,6 +1066,8 @@ export default function App() {
                   <img src={fileURL(page.coverFileId)} alt="Page cover" />
                 </div>
               )}
+              <OperationHistory workspace={w} pageId={page.id} onChange={refresh} onError={errorHandler} />
+              <PageFreshness workspace={w} page={page} onChange={refresh} onError={errorHandler} />
               <div className="page-heading">
                 <button
                   className="page-icon"
@@ -1221,6 +1225,7 @@ export default function App() {
                       ✳
                     </span>
                   </div>
+                  <ReviewQueue workspace={w} onNavigate={navigate} />
                   <div className="section-title">
                     <h2>Pick up where you left off</h2>
                     <button onClick={() => navigate("Pages")}>

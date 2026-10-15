@@ -866,6 +866,23 @@ type DomainImportResolution struct {
 	Fields                 []DomainImportFieldResolution   `json:"fields"`
 }
 type DomainColorToken string
+type DomainSemanticContentIdentity struct {
+	Version int64  `json:"version"`
+	Digest  string `json:"digest"`
+}
+type DomainHumanReviewEvent struct {
+	Id              DomainId                      `json:"id"`
+	PageId          DomainId                      `json:"pageId"`
+	ActorId         DomainId                      `json:"actorId"`
+	ReviewedAt      DomainTimestamp               `json:"reviewedAt"`
+	ExpiresAt       *DomainTimestamp              `json:"expiresAt,omitempty"`
+	ContentIdentity DomainSemanticContentIdentity `json:"contentIdentity"`
+}
+type DomainPageFreshness struct {
+	State           string                        `json:"state"`
+	ContentIdentity DomainSemanticContentIdentity `json:"contentIdentity"`
+	Review          *DomainHumanReviewEvent       `json:"review,omitempty"`
+}
 type ServiceEntityRef struct {
 	EntityType string   `json:"entityType"`
 	EntityId   DomainId `json:"entityId"`
@@ -956,6 +973,54 @@ type ServiceP2DatabaseConfig struct {
 	Form    ServiceP2FormConfig  `json:"form"`
 	Buttons []ServiceP2RowButton `json:"buttons"`
 }
+type ServiceJournalActionValue interface{ isServiceJournalAction() }
+type ServiceJournalAction struct{ Value ServiceJournalActionValue }
+
+func (ServiceJournalActionVariant1) isServiceJournalAction() {}
+func (ServiceJournalActionVariant2) isServiceJournalAction() {}
+func (ServiceJournalActionVariant3) isServiceJournalAction() {}
+func (ServiceJournalActionVariant4) isServiceJournalAction() {}
+func (v ServiceJournalAction) MarshalJSON() ([]byte, error)  { return json.Marshal(v.Value) }
+func (v *ServiceJournalAction) UnmarshalJSON(data []byte) error {
+	var fields map[string]json.RawMessage
+	if err := json.Unmarshal(data, &fields); err != nil {
+		return err
+	}
+	if matchesVariant(fields, []string{"kind", "recordId", "propertyId", "value"}, map[string]string{"kind": "\"record.setValue\""}, map[string][]string{}, []string{"kind", "recordId", "propertyId", "value"}) {
+		var result ServiceJournalActionVariant1
+		if err := json.Unmarshal(data, &result); err != nil {
+			return err
+		}
+		v.Value = result
+		return nil
+	}
+	if matchesVariant(fields, []string{"kind", "recordId", "propertyId"}, map[string]string{"kind": "\"record.clearValue\""}, map[string][]string{}, []string{"kind", "recordId", "propertyId"}) {
+		var result ServiceJournalActionVariant2
+		if err := json.Unmarshal(data, &result); err != nil {
+			return err
+		}
+		v.Value = result
+		return nil
+	}
+	if matchesVariant(fields, []string{"kind", "pageId", "title"}, map[string]string{"kind": "\"page.update\""}, map[string][]string{}, []string{"kind", "pageId", "title"}) {
+		var result ServiceJournalActionVariant3
+		if err := json.Unmarshal(data, &result); err != nil {
+			return err
+		}
+		v.Value = result
+		return nil
+	}
+	if matchesVariant(fields, []string{"kind", "pageId", "fullWidth", "presentation"}, map[string]string{"kind": "\"page.display.set\""}, map[string][]string{}, []string{"kind", "pageId", "fullWidth", "presentation"}) {
+		var result ServiceJournalActionVariant4
+		if err := json.Unmarshal(data, &result); err != nil {
+			return err
+		}
+		v.Value = result
+		return nil
+	}
+	return fmt.Errorf("unknown or incomplete ServiceJournalAction variant")
+}
+
 type ServiceAutomationTemplateAction struct {
 	Kind         string    `json:"kind"`
 	TemplateId   DomainId  `json:"templateId"`
@@ -1383,11 +1448,12 @@ type ServiceSubmitLocalForm struct {
 	} `json:"values"`
 }
 type ServiceRunRowButton struct {
-	Kind         string   `json:"kind"`
-	CollectionId DomainId `json:"collectionId"`
-	RecordId     DomainId `json:"recordId"`
-	ButtonId     DomainId `json:"buttonId"`
-	Confirmed    bool     `json:"confirmed"`
+	Kind         string    `json:"kind"`
+	CollectionId DomainId  `json:"collectionId"`
+	RecordId     DomainId  `json:"recordId"`
+	ButtonId     DomainId  `json:"buttonId"`
+	Confirmed    bool      `json:"confirmed"`
+	OperationId  *DomainId `json:"operationId,omitempty"`
 }
 type ServiceSetPageDisplay struct {
 	Kind         string   `json:"kind"`
@@ -1412,6 +1478,22 @@ type ServiceDismissPersonalReview struct {
 	Kind   string   `json:"kind"`
 	PageId DomainId `json:"pageId"`
 	RunId  DomainId `json:"runId"`
+}
+type ServiceApplyOperation struct {
+	Kind        string                 `json:"kind"`
+	OperationId DomainId               `json:"operationId"`
+	Label       string                 `json:"label"`
+	Actions     []ServiceJournalAction `json:"actions"`
+}
+type ServiceUndoOperation struct {
+	Kind        string   `json:"kind"`
+	OperationId DomainId `json:"operationId"`
+}
+type ServiceReviewPage struct {
+	Kind            string                        `json:"kind"`
+	PageId          DomainId                      `json:"pageId"`
+	ContentIdentity DomainSemanticContentIdentity `json:"contentIdentity"`
+	ExpiresAt       *DomainTimestamp              `json:"expiresAt,omitempty"`
 }
 type ServiceCommandValue interface{ isServiceCommand() }
 type ServiceCommand struct{ Value ServiceCommandValue }
@@ -1463,6 +1545,9 @@ func (ServiceSetPageDisplay) isServiceCommand()         {}
 func (ServiceActivatePersonalReview) isServiceCommand() {}
 func (ServiceAcceptPersonalReview) isServiceCommand()   {}
 func (ServiceDismissPersonalReview) isServiceCommand()  {}
+func (ServiceApplyOperation) isServiceCommand()         {}
+func (ServiceUndoOperation) isServiceCommand()          {}
+func (ServiceReviewPage) isServiceCommand()             {}
 func (v ServiceCommand) MarshalJSON() ([]byte, error)   { return json.Marshal(v.Value) }
 func (v *ServiceCommand) UnmarshalJSON(data []byte) error {
 	var fields map[string]json.RawMessage
@@ -1805,7 +1890,7 @@ func (v *ServiceCommand) UnmarshalJSON(data []byte) error {
 		v.Value = result
 		return nil
 	}
-	if matchesVariant(fields, []string{"kind", "collectionId", "recordId", "buttonId", "confirmed"}, map[string]string{"kind": "\"database.rowButtonRun\""}, map[string][]string{}, []string{"kind", "collectionId", "recordId", "buttonId", "confirmed"}) {
+	if matchesVariant(fields, []string{"kind", "collectionId", "recordId", "buttonId", "confirmed"}, map[string]string{"kind": "\"database.rowButtonRun\""}, map[string][]string{}, []string{"kind", "collectionId", "recordId", "buttonId", "confirmed", "operationId"}) {
 		var result ServiceRunRowButton
 		if err := json.Unmarshal(data, &result); err != nil {
 			return err
@@ -1839,6 +1924,30 @@ func (v *ServiceCommand) UnmarshalJSON(data []byte) error {
 	}
 	if matchesVariant(fields, []string{"kind", "pageId", "runId"}, map[string]string{"kind": "\"review.dismiss\""}, map[string][]string{}, []string{"kind", "pageId", "runId"}) {
 		var result ServiceDismissPersonalReview
+		if err := json.Unmarshal(data, &result); err != nil {
+			return err
+		}
+		v.Value = result
+		return nil
+	}
+	if matchesVariant(fields, []string{"kind", "operationId", "label", "actions"}, map[string]string{"kind": "\"operation.apply\""}, map[string][]string{}, []string{"kind", "operationId", "label", "actions"}) {
+		var result ServiceApplyOperation
+		if err := json.Unmarshal(data, &result); err != nil {
+			return err
+		}
+		v.Value = result
+		return nil
+	}
+	if matchesVariant(fields, []string{"kind", "operationId"}, map[string]string{"kind": "\"operation.undo\""}, map[string][]string{}, []string{"kind", "operationId"}) {
+		var result ServiceUndoOperation
+		if err := json.Unmarshal(data, &result); err != nil {
+			return err
+		}
+		v.Value = result
+		return nil
+	}
+	if matchesVariant(fields, []string{"kind", "pageId", "contentIdentity"}, map[string]string{"kind": "\"page.review\""}, map[string][]string{}, []string{"kind", "pageId", "contentIdentity", "expiresAt"}) {
+		var result ServiceReviewPage
 		if err := json.Unmarshal(data, &result); err != nil {
 			return err
 		}
@@ -1934,6 +2043,59 @@ type ServiceDatabaseChartRequest struct {
 	RequestId       DomainId `json:"requestId"`
 	WorkspaceId     DomainId `json:"workspaceId"`
 	CollectionId    DomainId `json:"collectionId"`
+}
+type ServiceOperationsListResult struct {
+	Operations []struct {
+		Id        DomainId        `json:"id"`
+		Label     string          `json:"label"`
+		CreatedAt DomainTimestamp `json:"createdAt"`
+		State     string          `json:"state"`
+	} `json:"operations"`
+}
+type ServiceOperationsListRequest struct {
+	ContractVersion int64    `json:"contractVersion"`
+	RequestId       DomainId `json:"requestId"`
+	WorkspaceId     DomainId `json:"workspaceId"`
+	PageId          DomainId `json:"pageId"`
+}
+type ServiceOperationPreviewUndoRequest struct {
+	ContractVersion int64    `json:"contractVersion"`
+	RequestId       DomainId `json:"requestId"`
+	WorkspaceId     DomainId `json:"workspaceId"`
+	OperationId     DomainId `json:"operationId"`
+}
+type ServiceOperationPreviewUndoResult struct {
+	OperationId       DomainId                  `json:"operationId"`
+	Label             string                    `json:"label"`
+	Actions           []ServiceJournalAction    `json:"actions"`
+	ExpectedRevisions []ServiceExpectedRevision `json:"expectedRevisions"`
+	Command           ServiceUndoOperation      `json:"command"`
+}
+type ServicePageFreshnessRequest struct {
+	ContractVersion int64    `json:"contractVersion"`
+	RequestId       DomainId `json:"requestId"`
+	WorkspaceId     DomainId `json:"workspaceId"`
+	PageId          DomainId `json:"pageId"`
+}
+type ServicePageFreshnessResult struct {
+	PageId    DomainId                 `json:"pageId"`
+	Freshness DomainPageFreshness      `json:"freshness"`
+	History   []DomainHumanReviewEvent `json:"history"`
+}
+type ServiceReviewQueueRequest struct {
+	ContractVersion int64     `json:"contractVersion"`
+	RequestId       DomainId  `json:"requestId"`
+	WorkspaceId     DomainId  `json:"workspaceId"`
+	AfterPageId     *DomainId `json:"afterPageId,omitempty"`
+	Limit           int64     `json:"limit"`
+}
+type ServiceReviewQueueResult struct {
+	Items []struct {
+		PageId    DomainId            `json:"pageId"`
+		Title     string              `json:"title"`
+		Freshness DomainPageFreshness `json:"freshness"`
+	} `json:"items"`
+	NextPageId *DomainId `json:"nextPageId,omitempty"`
 }
 type ServicePageDisplayGetRequest struct {
 	ContractVersion int64    `json:"contractVersion"`
@@ -2403,11 +2565,12 @@ type ServiceSearchRequest struct {
 	Mode            string      `json:"mode"`
 }
 type ServiceSearchHit struct {
-	Location    DomainLocation `json:"location"`
-	Excerpt     string         `json:"excerpt"`
-	ContentHash string         `json:"contentHash"`
-	Score       float64        `json:"score"`
-	SourceState string         `json:"sourceState"`
+	Location    DomainLocation       `json:"location"`
+	Excerpt     string               `json:"excerpt"`
+	ContentHash string               `json:"contentHash"`
+	Score       float64              `json:"score"`
+	SourceState string               `json:"sourceState"`
+	Freshness   *DomainPageFreshness `json:"freshness,omitempty"`
 }
 type ServiceSearchResult struct {
 	Hits            []ServiceSearchHit `json:"hits"`
@@ -2422,11 +2585,12 @@ type ServiceResolveCitationRequest struct {
 	Location        DomainLocation `json:"location"`
 }
 type ServiceResolveCitationResult struct {
-	Location              DomainLocation  `json:"location"`
-	State                 string          `json:"state"`
-	CurrentRevision       *DomainRevision `json:"currentRevision,omitempty"`
-	Excerpt               *string         `json:"excerpt,omitempty"`
-	HistoricalSnapshotRef *DomainId       `json:"historicalSnapshotRef,omitempty"`
+	Location              DomainLocation       `json:"location"`
+	State                 string               `json:"state"`
+	CurrentRevision       *DomainRevision      `json:"currentRevision,omitempty"`
+	Excerpt               *string              `json:"excerpt,omitempty"`
+	HistoricalSnapshotRef *DomainId            `json:"historicalSnapshotRef,omitempty"`
+	Freshness             *DomainPageFreshness `json:"freshness,omitempty"`
 }
 type ServiceReadEventsRequest struct {
 	ContractVersion int64    `json:"contractVersion"`
@@ -3599,6 +3763,32 @@ type DomainImportIdentityResolutionVariant1 struct {
 }
 type DomainImportIdentityResolutionVariant2 struct {
 	Choice string `json:"choice"`
+}
+type ServiceJournalActionVariant1 struct {
+	Kind       string   `json:"kind"`
+	RecordId   DomainId `json:"recordId"`
+	PropertyId DomainId `json:"propertyId"`
+	Value      struct {
+		Type          string          `json:"type"`
+		SchemaVersion int64           `json:"schemaVersion"`
+		Value         json.RawMessage `json:"value"`
+	} `json:"value"`
+}
+type ServiceJournalActionVariant2 struct {
+	Kind       string   `json:"kind"`
+	RecordId   DomainId `json:"recordId"`
+	PropertyId DomainId `json:"propertyId"`
+}
+type ServiceJournalActionVariant3 struct {
+	Kind   string   `json:"kind"`
+	PageId DomainId `json:"pageId"`
+	Title  string   `json:"title"`
+}
+type ServiceJournalActionVariant4 struct {
+	Kind         string   `json:"kind"`
+	PageId       DomainId `json:"pageId"`
+	FullWidth    bool     `json:"fullWidth"`
+	Presentation bool     `json:"presentation"`
 }
 type ServiceAutomationActionVariant1 struct {
 	Kind         string  `json:"kind"`

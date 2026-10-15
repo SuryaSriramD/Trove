@@ -1,0 +1,671 @@
+{
+  "schemaVersion": 1,
+  "authority": [
+    "PROGRESS.md",
+    "docs/PRD_SCOPE_ADDENDUM.md",
+    "docs/phase-0/decisions.md"
+  ],
+  "developmentBaseline": "ee14f0c8955b933ee0918be3a3943da3b31e9fb2",
+  "completionBoundary": "Production service, usable interface, persistence, recovery and focused regressions integrated; live/native and final release acceptance recorded separately in PROGRESS.md",
+  "workstreams": {
+    "foundation": {
+      "sequence": 2,
+      "scope": [
+        "G01",
+        "G02"
+      ],
+      "owner": "A",
+      "dependencies": [
+        "baseline"
+      ]
+    },
+    "backup": {
+      "sequence": 3,
+      "scope": [
+        "G03"
+      ],
+      "owner": "B",
+      "dependencies": [
+        "baseline"
+      ]
+    },
+    "meetings": {
+      "sequence": 3,
+      "scope": [
+        "G05"
+      ],
+      "owner": "B",
+      "dependencies": [
+        "foundation",
+        "backup"
+      ]
+    },
+    "ai-quality": {
+      "sequence": 3,
+      "scope": [
+        "G04",
+        "EVAL-01",
+        "EVAL-02",
+        "EVAL-03",
+        "EVAL-04",
+        "EVAL-05",
+        "EVAL-06",
+        "EVAL-07"
+      ],
+      "owner": "C",
+      "dependencies": [
+        "baseline"
+      ]
+    },
+    "personal-desktop": {
+      "sequence": 4,
+      "scope": [
+        "G06",
+        "G07",
+        "G08",
+        "G09",
+        "G10-LAYOUT",
+        "G10-SCHEDULE"
+      ],
+      "owner": "coordinator/A/B/C",
+      "dependencies": [
+        "foundation"
+      ]
+    },
+    "connected-workflows": {
+      "sequence": 5,
+      "scope": [
+        "G12",
+        "CONN-00",
+        "CONN-01",
+        "CONN-02",
+        "CONN-03",
+        "CONN-04",
+        "CONN-05",
+        "CONN-06",
+        "EXT-001",
+        "EXT-002",
+        "EXT-003",
+        "EXT-004",
+        "EXT-005"
+      ],
+      "owner": "C",
+      "dependencies": [
+        "foundation"
+      ]
+    },
+    "desktop-p2": {
+      "sequence": 6,
+      "scope": [
+        "P2-01",
+        "P2-02",
+        "P2-03",
+        "P2-04",
+        "P2-05",
+        "P2-06",
+        "P2-07",
+        "P2-08",
+        "P2-09"
+      ],
+      "owner": "coordinator/A/B/C",
+      "dependencies": [
+        "foundation",
+        "personal-desktop"
+      ]
+    },
+    "qualification": {
+      "sequence": 7,
+      "scope": [
+        "REL-001",
+        "REL-002",
+        "REL-003",
+        "REL-004",
+        "REL-005",
+        "REL-006",
+        "REL-007",
+        "REL-008"
+      ],
+      "owner": "coordinator",
+      "dependencies": [
+        "backup",
+        "meetings",
+        "ai-quality",
+        "personal-desktop",
+        "connected-workflows",
+        "desktop-p2"
+      ]
+    },
+    "platforms": {
+      "sequence": 8,
+      "scope": [
+        "WIN-01",
+        "WIN-02",
+        "WIN-03",
+        "WIN-04",
+        "WIN-05",
+        "LIN-01",
+        "LIN-02",
+        "LIN-03",
+        "LIN-04",
+        "LIN-05"
+      ],
+      "owner": "coordinator",
+      "dependencies": [
+        "qualification"
+      ]
+    },
+    "mobile-decision": {
+      "sequence": 9,
+      "scope": [
+        "G11"
+      ],
+      "owner": "user/coordinator",
+      "dependencies": [
+        "platforms"
+      ],
+      "boundary": "Deferred; no mobile implementation authorized"
+    },
+    "baseline": {
+      "sequence": 1,
+      "scope": [
+        "GOV-001",
+        "GOV-002",
+        "GOV-003",
+        "GOV-004",
+        "GOV-005"
+      ],
+      "owner": "coordinator",
+      "dependencies": []
+    }
+  },
+  "legacyItems": [
+    {
+      "id": "FIX-001",
+      "title": "Exclude trashed-only attachments from portable exports",
+      "workstream": "backup",
+      "acceptanceSource": "PROGRESS.md#fix-001"
+    },
+    {
+      "id": "FIX-002",
+      "title": "Restore meeting history when transcript segments still exist",
+      "workstream": "meetings",
+      "acceptanceSource": "PROGRESS.md#fix-002"
+    },
+    {
+      "id": "FIX-003",
+      "title": "Preserve rich formatting and links during table and layout edits",
+      "workstream": "desktop-p2",
+      "acceptanceSource": "PROGRESS.md#fix-003"
+    },
+    {
+      "id": "FIX-004",
+      "title": "Open the correct linked database view on its owning page",
+      "workstream": "desktop-p2",
+      "acceptanceSource": "PROGRESS.md#fix-004"
+    },
+    {
+      "id": "FIX-005",
+      "title": "Make copied block links navigable",
+      "workstream": "desktop-p2",
+      "acceptanceSource": "PROGRESS.md#fix-005"
+    },
+    {
+      "id": "FIX-006",
+      "title": "Correct nested toggle visibility and collapse persistence",
+      "workstream": "desktop-p2",
+      "acceptanceSource": "PROGRESS.md#fix-006"
+    },
+    {
+      "id": "CORE-001",
+      "title": "Complete simple table structure controls",
+      "workstream": "desktop-p2",
+      "acceptanceSource": "PROGRESS.md#core-001"
+    },
+    {
+      "id": "CORE-002",
+      "title": "Add rich-text colors and highlights",
+      "workstream": "desktop-p2",
+      "acceptanceSource": "PROGRESS.md#core-002"
+    },
+    {
+      "id": "CORE-003",
+      "title": "Finish code and image block controls",
+      "workstream": "desktop-p2",
+      "acceptanceSource": "PROGRESS.md#core-003"
+    },
+    {
+      "id": "CORE-004",
+      "title": "Connect workspace Q&A to hybrid retrieval",
+      "workstream": "ai-quality",
+      "acceptanceSource": "PROGRESS.md#core-004"
+    },
+    {
+      "id": "CORE-005",
+      "title": "Decode and normalize common uploaded audio",
+      "workstream": "meetings",
+      "acceptanceSource": "PROGRESS.md#core-005"
+    },
+    {
+      "id": "CORE-006",
+      "title": "Provide schema-aware historical value restoration",
+      "workstream": "foundation",
+      "acceptanceSource": "PROGRESS.md#core-006"
+    },
+    {
+      "id": "CORE-007",
+      "title": "Complete database query scaling and virtualization",
+      "workstream": "desktop-p2",
+      "acceptanceSource": "PROGRESS.md#core-007"
+    },
+    {
+      "id": "CORE-008",
+      "title": "Honor core view configuration and calendar range editing",
+      "workstream": "desktop-p2",
+      "acceptanceSource": "PROGRESS.md#core-008"
+    },
+    {
+      "id": "CORE-009",
+      "title": "Resolve semantic index implementation and scale",
+      "workstream": "ai-quality",
+      "acceptanceSource": "PROGRESS.md#core-009"
+    },
+    {
+      "id": "CORE-010",
+      "title": "Resolve the backup snapshot contract",
+      "workstream": "backup",
+      "acceptanceSource": "PROGRESS.md#core-010"
+    },
+    {
+      "id": "PARITY-001",
+      "title": "Complete rich layout and reusable-block editing",
+      "workstream": "desktop-p2",
+      "acceptanceSource": "PROGRESS.md#parity-001"
+    },
+    {
+      "id": "PARITY-002",
+      "title": "Complete bookmarks and optional online embeds",
+      "workstream": "desktop-p2",
+      "acceptanceSource": "PROGRESS.md#parity-002"
+    },
+    {
+      "id": "PARITY-003",
+      "title": "Complete timeline behavior",
+      "workstream": "desktop-p2",
+      "acceptanceSource": "PROGRESS.md#parity-003"
+    },
+    {
+      "id": "PARITY-004",
+      "title": "Unify database templates with values and page bodies",
+      "workstream": "desktop-p2",
+      "acceptanceSource": "PROGRESS.md#parity-004"
+    },
+    {
+      "id": "PARITY-005",
+      "title": "Close the formula compatibility contract",
+      "workstream": "desktop-p2",
+      "acceptanceSource": "PROGRESS.md#parity-005"
+    },
+    {
+      "id": "PARITY-006",
+      "title": "Complete Notion API database and source reconstruction",
+      "workstream": "foundation",
+      "acceptanceSource": "PROGRESS.md#parity-006"
+    },
+    {
+      "id": "PARITY-007",
+      "title": "Preserve reconstructable nested import structure",
+      "workstream": "foundation",
+      "acceptanceSource": "PROGRESS.md#parity-007"
+    },
+    {
+      "id": "PARITY-008",
+      "title": "Render usable rich page PDFs",
+      "workstream": "desktop-p2",
+      "acceptanceSource": "PROGRESS.md#parity-008"
+    },
+    {
+      "id": "PARITY-009",
+      "title": "Deliver the browser clipper workflow",
+      "workstream": "desktop-p2",
+      "acceptanceSource": "PROGRESS.md#parity-009"
+    },
+    {
+      "id": "PARITY-010",
+      "title": "Expose usable automation configuration",
+      "workstream": "desktop-p2",
+      "acceptanceSource": "PROGRESS.md#parity-010"
+    },
+    {
+      "id": "AI-001",
+      "title": "Complete reviewed workspace-agent actions",
+      "workstream": "ai-quality",
+      "acceptanceSource": "PROGRESS.md#ai-001"
+    },
+    {
+      "id": "AI-002",
+      "title": "Qualify context budgeting and every exposed AI mode",
+      "workstream": "ai-quality",
+      "acceptanceSource": "PROGRESS.md#ai-002"
+    },
+    {
+      "id": "AI-003",
+      "title": "Qualify memory and semantic related-content workflows",
+      "workstream": "ai-quality",
+      "acceptanceSource": "PROGRESS.md#ai-003"
+    },
+    {
+      "id": "EXT-001",
+      "title": "Complete managed Claude Code execution",
+      "workstream": "connected-workflows",
+      "acceptanceSource": "PROGRESS.md#ext-001"
+    },
+    {
+      "id": "EXT-002",
+      "title": "Complete managed Codex execution",
+      "workstream": "connected-workflows",
+      "acceptanceSource": "PROGRESS.md#ext-002"
+    },
+    {
+      "id": "EXT-003",
+      "title": "Add reviewed MCP page and task creation",
+      "workstream": "connected-workflows",
+      "acceptanceSource": "PROGRESS.md#ext-003"
+    },
+    {
+      "id": "EXT-004",
+      "title": "Complete the supported remote MCP route",
+      "workstream": "connected-workflows",
+      "acceptanceSource": "PROGRESS.md#ext-004"
+    },
+    {
+      "id": "EXT-005",
+      "title": "Qualify provider handoffs and client interoperability",
+      "workstream": "connected-workflows",
+      "acceptanceSource": "PROGRESS.md#ext-005"
+    },
+    {
+      "id": "REL-001",
+      "title": "Freeze and identify the final release candidate",
+      "workstream": "qualification",
+      "acceptanceSource": "PROGRESS.md#rel-001"
+    },
+    {
+      "id": "REL-002",
+      "title": "Finish native end-to-end acceptance",
+      "workstream": "qualification",
+      "acceptanceSource": "PROGRESS.md#rel-002"
+    },
+    {
+      "id": "REL-003",
+      "title": "Qualify physical audio and screenshot capture",
+      "workstream": "qualification",
+      "acceptanceSource": "PROGRESS.md#rel-003"
+    },
+    {
+      "id": "REL-004",
+      "title": "Validate real migration and meeting datasets",
+      "workstream": "qualification",
+      "acceptanceSource": "PROGRESS.md#rel-004"
+    },
+    {
+      "id": "REL-005",
+      "title": "Qualify complete installation and model-pack paths",
+      "workstream": "qualification",
+      "acceptanceSource": "PROGRESS.md#rel-005"
+    },
+    {
+      "id": "REL-006",
+      "title": "Finish distribution, update, and recovery qualification",
+      "workstream": "qualification",
+      "acceptanceSource": "PROGRESS.md#rel-006"
+    },
+    {
+      "id": "REL-007",
+      "title": "Benchmark realistic end-to-end performance",
+      "workstream": "qualification",
+      "acceptanceSource": "PROGRESS.md#rel-007"
+    },
+    {
+      "id": "REL-008",
+      "title": "Add regression coverage for the audit gaps",
+      "workstream": "qualification",
+      "acceptanceSource": "PROGRESS.md#rel-008"
+    },
+    {
+      "id": "REL-009",
+      "title": "Qualify additional platforms separately",
+      "workstream": "platforms",
+      "acceptanceSource": "PROGRESS.md#rel-009"
+    },
+    {
+      "id": "GOV-001",
+      "title": "Establish source control and coordinated integration",
+      "workstream": "baseline",
+      "acceptanceSource": "PROGRESS.md#gov-001"
+    },
+    {
+      "id": "GOV-002",
+      "title": "Make development and qualification reproducible",
+      "workstream": "baseline",
+      "acceptanceSource": "PROGRESS.md#gov-002"
+    },
+    {
+      "id": "GOV-003",
+      "title": "Reconcile the requirements ledger and completion claims",
+      "workstream": "baseline",
+      "acceptanceSource": "PROGRESS.md#gov-003"
+    },
+    {
+      "id": "GOV-004",
+      "title": "Obtain and reconcile the referenced research evidence",
+      "workstream": "baseline",
+      "acceptanceSource": "PROGRESS.md#gov-004"
+    },
+    {
+      "id": "GOV-005",
+      "title": "Resolve selected-stack deviations explicitly",
+      "workstream": "baseline",
+      "acceptanceSource": "PROGRESS.md#gov-005"
+    },
+    {
+      "id": "OPT-001",
+      "title": "Qualify and optionally expand local image intelligence",
+      "workstream": "ai-quality",
+      "acceptanceSource": "PROGRESS.md#opt-001"
+    },
+    {
+      "id": "OPT-002",
+      "title": "Decide whether personal review needs generative analysis",
+      "workstream": "ai-quality",
+      "acceptanceSource": "PROGRESS.md#opt-002"
+    },
+    {
+      "id": "OPT-003",
+      "title": "Qualify declared P2 package boundaries",
+      "workstream": "desktop-p2",
+      "acceptanceSource": "PROGRESS.md#opt-003"
+    }
+  ],
+  "addendumScenarios": [
+    {
+      "id": "G01-A1",
+      "workstream": "foundation",
+      "acceptance": "Import, edit both the source and local copy, then re-import. The user can inspect the differences and choose a resolution without losing either retained version."
+    },
+    {
+      "id": "G01-A2",
+      "workstream": "foundation",
+      "acceptance": "Exercise source-only, local-only, converged, null-versus-missing, moved, deleted and denied-source cases through ZIP and the applicable HTML/API paths. Results conform to D002 and the source's actual completeness."
+    },
+    {
+      "id": "G01-A3",
+      "workstream": "foundation",
+      "acceptance": "Interrupt capture/application, retry and submit a stale resolution. No duplicate canonical object or attachment is created, and newer local edits survive."
+    },
+    {
+      "id": "G02-A1",
+      "workstream": "foundation",
+      "acceptance": "Edit title, status and due date from a page occurrence, Tasks/Home and a database. Every surface agrees after restart and native restore."
+    },
+    {
+      "id": "G02-A2",
+      "workstream": "foundation",
+      "acceptance": "Promote an existing record, create multiple occurrences, remove one and trash/restore the record. IDs remain stable and no task is silently duplicated or deleted."
+    },
+    {
+      "id": "G02-A3",
+      "workstream": "foundation",
+      "acceptance": "Retry extraction/import of an identified task. The existing task is reused or ambiguity is reviewed; equal titles alone do not establish identity."
+    },
+    {
+      "id": "G03-A1",
+      "workstream": "backup",
+      "acceptance": "Restore an encrypted archive on an independent clean installation and compare canonical content, schema, relationships, assets and retained history, not just counts."
+    },
+    {
+      "id": "G03-A2",
+      "workstream": "backup",
+      "acceptance": "Wrong passphrase, tampering, truncation, low disk, cancellation and crash cannot activate a partial destination. Temporary plaintext is handled under a documented cleanup/recovery policy without promising forensic secure erasure."
+    },
+    {
+      "id": "G03-A3",
+      "workstream": "backup",
+      "acceptance": "Existing native archives remain readable, encryption status is visible before export, and no credential or passphrase appears in inspected logs or archive metadata."
+    },
+    {
+      "id": "G04-A1",
+      "workstream": "ai-quality",
+      "acceptance": "Each release claim resolves to a named profile, exact candidate and independent pass condition with actual results and limitations."
+    },
+    {
+      "id": "G04-A2",
+      "workstream": "ai-quality",
+      "acceptance": "Answerable, ambiguous and unanswerable queries plus clean/noisy representative audio are evaluated with frozen expected outcomes and manual review where required."
+    },
+    {
+      "id": "G04-A3",
+      "workstream": "ai-quality",
+      "acceptance": "New rubrics and performance policies are versioned before execution; frozen candidate-7 evidence is neither rewritten nor used to qualify a changed product."
+    },
+    {
+      "id": "G05-A1",
+      "workstream": "meetings",
+      "acceptance": "Start/pause/resume/stop a real authorized recording, deny permission and disconnect an input. Indicators and saved audio accurately reflect what occurred."
+    },
+    {
+      "id": "G05-A2",
+      "workstream": "meetings",
+      "acceptance": "Interrupt a recording/transcription and simulate low disk. Retained audio is recoverable, gaps/errors are visible and retry does not duplicate transcripts or actions."
+    },
+    {
+      "id": "G05-A3",
+      "workstream": "meetings",
+      "acceptance": "Correct a transcript, navigate its evidence, review resulting actions and apply retention choices. Stale derived information is marked or excluded and unrelated source content remains intact."
+    },
+    {
+      "id": "G06-A1",
+      "workstream": "personal-desktop",
+      "acceptance": "A configured reminder is submitted through the real OS path with the main app closed; denial and disabled-background behavior are visible in settings/inbox."
+    },
+    {
+      "id": "G06-A2",
+      "workstream": "personal-desktop",
+      "acceptance": "Snooze, dismiss, complete, edit and cancel across sleep, restart, timezone/DST changes and concurrent schedule publication. No duplicate canonical effect or unreported stale registration occurs."
+    },
+    {
+      "id": "G06-A3",
+      "workstream": "personal-desktop",
+      "acceptance": "Restore a workspace and disable/re-enable the background component. Old epochs cannot reactivate unexpectedly, and uncertain OS outcomes remain explicitly uncertain."
+    },
+    {
+      "id": "G07-A1",
+      "workstream": "personal-desktop",
+      "acceptance": "Run a meeting-follow-up or project-review skill on selected sources, inspect evidence and approve selected changes. Unselected pages and disallowed tools remain unavailable."
+    },
+    {
+      "id": "G07-A2",
+      "workstream": "personal-desktop",
+      "acceptance": "Edit the skill version, cancel/retry a run and change provider explicitly. History identifies each version/provider and prior writes are not duplicated."
+    },
+    {
+      "id": "G07-A3",
+      "workstream": "personal-desktop",
+      "acceptance": "Import a skill containing instructions to grant access or execute arbitrary code. It remains inert and cannot bypass the ordinary permission layer."
+    },
+    {
+      "id": "G08-A1",
+      "workstream": "personal-desktop",
+      "acceptance": "Fill selected empty fields while leaving other records, existing manual values and computed fields unchanged. Invalid or unsupported values remain reviewable failures."
+    },
+    {
+      "id": "G08-A2",
+      "workstream": "personal-desktop",
+      "acceptance": "Edit a row or schema during generation and then apply. Newer values survive; stale suggestions cannot overwrite them."
+    },
+    {
+      "id": "G08-A3",
+      "workstream": "personal-desktop",
+      "acceptance": "Interrupt/resume and repeat an applied batch, then undo. Effects are not duplicated, provenance remains inspectable and unrelated edits are preserved."
+    },
+    {
+      "id": "G09-A1",
+      "workstream": "personal-desktop",
+      "acceptance": "Review a page, edit its covered content and pass its review deadline. Status and queue update accurately without altering the underlying knowledge."
+    },
+    {
+      "id": "G09-A2",
+      "workstream": "personal-desktop",
+      "acceptance": "Search/cite reviewed and stale pages. Freshness is visible and never presented as machine-verified truth or used to override current contradictory evidence."
+    },
+    {
+      "id": "G09-A3",
+      "workstream": "personal-desktop",
+      "acceptance": "Restore an earlier page/workspace revision. Review history remains attributable, elapsed deadlines are honored and stale approved memory remains excluded."
+    },
+    {
+      "id": "G10-LAYOUT-A1",
+      "workstream": "personal-desktop",
+      "acceptance": "Reuse a layout across records, rename a property, create an override and reset it. Values and stable references survive restart, undo and restore."
+    },
+    {
+      "id": "G10-LAYOUT-A2",
+      "workstream": "personal-desktop",
+      "acceptance": "Remove/change a schema property and open older records. The UI reports or safely omits invalid layout references without losing retained data."
+    },
+    {
+      "id": "G10-SCHEDULE-A1",
+      "workstream": "personal-desktop",
+      "acceptance": "Move a predecessor in a chain and a branched graph. Preview every affected date before writing; cancellation changes nothing and grouped undo restores the applied batch."
+    },
+    {
+      "id": "G10-SCHEDULE-A2",
+      "workstream": "personal-desktop",
+      "acceptance": "Exercise cycle, missing date, weekend/DST and concurrent-edit cases. The declared calendar/constraint policy determines the result; stale or invalid plans cannot partly apply."
+    },
+    {
+      "id": "G11-A1",
+      "workstream": "mobile-decision",
+      "acceptance": "Record the audience/workflow findings, accepted next scope and unresolved limitations in `PROGRESS.md`. Until a mobile scope decision changes, release messaging shall state the tested desktop/platform boundary. This is decision acceptance, not a mobile implementation pass."
+    },
+    {
+      "id": "G12-A1",
+      "workstream": "connected-workflows",
+      "acceptance": "Use a real authorized account/server to select a bounded source set, refresh/search/preview supported content and disconnect. Unselected resources are unavailable and cached results disclose freshness."
+    },
+    {
+      "id": "G12-A2",
+      "workstream": "connected-workflows",
+      "acceptance": "Switch accounts, revoke access, interrupt pagination, rotate credentials and hit rate limits. Resume cannot widen scope or mistake denied/partial data for deletion."
+    },
+    {
+      "id": "G12-A3",
+      "workstream": "connected-workflows",
+      "acceptance": "Preview and execute a permitted write, then exercise stale remote state and timeout-after-send. The receipt records the actual or unknown outcome; reconciliation prevents duplicate effects."
+    },
+    {
+      "id": "G12-A4",
+      "workstream": "connected-workflows",
+      "acceptance": "Restore/import connector state and attempt AI retrieval. No credential, activation, ambient context grant or pending external write is silently restored."
+    }
+  ]
+}

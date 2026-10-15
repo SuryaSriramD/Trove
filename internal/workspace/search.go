@@ -10,6 +10,7 @@ import (
 	"fmt"
 	"math"
 	"strings"
+	"time"
 	"unicode"
 
 	"trove.local/phase0/contracts"
@@ -623,6 +624,11 @@ func searchQuery(ctx context.Context, k *Kernel, e contracts.ServiceExecutionCon
 			return nil, err
 		}
 		if live == 1 && k.authorizePage(ctx, k.db, e, page) == nil && (requested == nil || k.authorizePage(ctx, k.db, *requested, page) == nil) {
+			freshness, err := pageFreshness(ctx, k.db, page, time.Now())
+			if err != nil {
+				return nil, err
+			}
+			hit.Freshness = &freshness
 			current = append(current, hit)
 		}
 	}
