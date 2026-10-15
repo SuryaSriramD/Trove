@@ -1,6 +1,6 @@
 import { test, expect } from "@playwright/test";
 
-test("OCR shows the actual local engine and source provenance, and drops superseded image results", async ({
+test("OCR shows the actual local engine and source provenance, and requires acknowledged cancellation before changing images", async ({
   page,
 }) => {
   await page.addInitScript(() => {
@@ -45,6 +45,8 @@ test("OCR shows the actual local engine and source provenance, and drops superse
       importMappings: [],
     };
     (window as any).ocrRequests = [];
+    (window as any).ocrCancellations = [];
+    const cancelled = new Set<string>();
     (window as any).runtime = { EventsOn: () => () => {} };
     (window as any).go = {
       main: {
@@ -72,12 +74,31 @@ test("OCR shows the actual local engine and source provenance, and drops superse
                 engine: "Deterministic local review",
                 scheduling: "While open",
               });
+            if (method === "ocr.cancel") {
+              const active = (window as any).ocrRequests.at(-1);
+              if (
+                req.runRequestId !== active?.requestId ||
+                req.workspaceId !== active.workspaceId
+              )
+                throw new Error(
+                  "Cancellation must target the active source request",
+                );
+              (window as any).ocrCancellations.push(req);
+              cancelled.add(req.runRequestId);
+              (window as any).releaseOCR();
+              return ok({ state: "cancellation_requested" });
+            }
             if (method === "ocr.run") {
               (window as any).ocrRequests.push(req);
               if ((window as any).holdOCR)
                 await new Promise(
                   (resolve) => ((window as any).releaseOCR = resolve),
                 );
+              if (cancelled.has(req.requestId))
+                return JSON.stringify({
+                  ok: false,
+                  error: { code: "CANCELLED", message: "OCR cancelled" },
+                });
               return ok({
                 fileId: req.fileId,
                 sourceRevision: "7",
@@ -126,10 +147,24 @@ test("OCR shows the actual local engine and source provenance, and drops superse
   await expect
     .poll(() => page.evaluate(() => (window as any).ocrRequests.length))
     .toBe(2);
+  await expect(panel.getByLabel("Attached image")).toBeDisabled();
+  await panel
+    .getByRole("button", { name: "Cancel image text extraction" })
+    .click();
+  await expect(panel.getByText(/Extraction cancelled/)).toBeVisible();
+  await expect(panel.getByLabel("Attached image")).toBeEnabled();
+  const cancellation = await page.evaluate(() => ({
+    sent: (window as any).ocrCancellations,
+    active: (window as any).ocrRequests[1],
+  }));
+  expect(cancellation.sent).toHaveLength(1);
+  expect(cancellation.sent[0].runRequestId).toBe(cancellation.active.requestId);
+  expect(cancellation.sent[0].workspaceId).toBe(
+    cancellation.active.workspaceId,
+  );
   await panel
     .getByLabel("Attached image")
     .selectOption({ label: "source-5.png" });
-  await page.evaluate(() => (window as any).releaseOCR());
   await expect(
     panel.getByRole("button", { name: "Extract image text locally" }),
   ).toBeEnabled();

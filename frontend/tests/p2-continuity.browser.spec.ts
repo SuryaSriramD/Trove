@@ -200,3 +200,38 @@ test("cancel after OCR publication reports saved text with pending indexing", as
     page.getByText(/Earlier extracted text is preserved/),
   ).toHaveCount(0);
 });
+
+for (const change of ["Advance source", "Switch workspace", "Change grant"])
+  test(`late OCR success is discarded on ${change}`, async ({ page }) => {
+    await page.evaluate(() => ((window as any).holdOCRCancellation = true));
+    await page.getByRole("button", { name: "Image text", exact: true }).click();
+    await page.getByLabel("Attached image").selectOption(id(70));
+    await page
+      .getByRole("button", { name: "Extract image text locally" })
+      .click();
+    await expect(page.getByLabel("Attached image")).toBeDisabled();
+    await page.getByRole("button", { name: change, exact: true }).click();
+    await page.getByRole("button", { name: "Image text", exact: true }).click();
+    if (change !== "Advance source") {
+      await expect
+        .poll(() =>
+          page.evaluate(() =>
+            (window as any).p2Calls.some(
+              (c: any) =>
+                c.method === "ocr.cancel" &&
+                c.request.runRequestId === (window as any).ocrStarted,
+            ),
+          ),
+        )
+        .toBe(true);
+    }
+    await page.evaluate(() => (window as any).finishOCR());
+    await paint(page);
+    await expect(
+      page.getByText("Prior OCR result", { exact: true }),
+    ).toHaveCount(0);
+    await expect(
+      page.getByText("Image text extracted and saved.", { exact: true }),
+    ).toHaveCount(0);
+    await expect(page.getByLabel("Attached image")).toBeEnabled();
+  });
