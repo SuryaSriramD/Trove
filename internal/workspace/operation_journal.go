@@ -11,6 +11,8 @@ import (
 )
 
 type journalEntry struct {
+	OwnerPageID      string         `json:"ownerPageId,omitempty"`
+	Tombstone        string         `json:"tombstone,omitempty"`
 	ChangedFields    []string       `json:"changedFields,omitempty"`
 	PageID           string         `json:"pageId"`
 	Target           string         `json:"target"`
@@ -44,6 +46,8 @@ func journalCurrent(ctx context.Context, q querier, action map[string]any) (jour
 	entry := journalEntry{}
 	kind := str(action["kind"])
 	switch kind {
+	case "record.trash.set":
+		return recordTrashCurrent(ctx, q, action)
 	case "collection.property.restore":
 		return schemaJournalCurrent(ctx, q, action)
 	case "record.setValue", "record.clearValue":
@@ -183,6 +187,7 @@ func applyJournal(m *Mutation, id, label string, actions []map[string]any) error
 			return err
 		}
 		entry.After = after.Before
+		entry.Tombstone = after.Tombstone
 		if str(action["kind"]) == "collection.property.restore" {
 			change := m.touched[guardKey("property", str(action["propertyId"]))]
 			entry.PropertyRevision = string(change.After)
@@ -242,7 +247,7 @@ func checkJournalCurrent(ctx context.Context, q querier, entry journalEntry) err
 			}
 		}
 	}
-	if !matches || current.PropertyRevision != entry.PropertyRevision {
+	if !matches || current.PropertyRevision != entry.PropertyRevision || current.Tombstone != entry.Tombstone {
 		return Fail("CONFLICT", "An affected field or its property changed after this operation")
 	}
 	return nil
@@ -303,6 +308,7 @@ func previewUndoJournal(ctx context.Context, k *Kernel, e contracts.ServiceExecu
 		return nil
 	}
 	actions := []map[string]any{}
+	restoredRecords := map[string]bool{}
 	for i := len(entries) - 1; i >= 0; i-- {
 		entry := entries[i]
 		if err = checkJournalCurrent(ctx, tx, entry); err != nil {
@@ -337,6 +343,23 @@ func previewUndoJournal(ctx context.Context, k *Kernel, e contracts.ServiceExecu
 		if err != nil {
 			return nil, err
 		}
+		if str(inverse["kind"]) == "record.trash.set" {
+			if err := validateRecordTrash(ctx, tx, inverse); err != nil {
+				return nil, err
+			}
+			if inverse["trashed"] == false {
+				restoredRecords[str(inverse["recordId"])] = true
+				var parent sql.NullString
+				if err := tx.QueryRowContext(ctx, "SELECT parent_page_id FROM pages WHERE id=?", entry.PageID).Scan(&parent); err != nil {
+					return nil, err
+				}
+				if parent.Valid {
+					if err := add("page", parent.String); err != nil {
+						return nil, err
+					}
+				}
+			}
+		}
 		if str(inverse["kind"]) == "collection.property.restore" {
 			if err := validateReviewedPropertyRestore(ctx, tx, inverse); err != nil {
 				return nil, err
@@ -347,7 +370,7 @@ func previewUndoJournal(ctx context.Context, k *Kernel, e contracts.ServiceExecu
 				if err := tx.QueryRowContext(ctx, "SELECT r.page_id,r.collection_id,p.deleted_at FROM records r JOIN pages p ON p.id=r.page_id WHERE r.id=?", record).Scan(&page, &collection, &deleted); err != nil {
 					return nil, err
 				}
-				if deleted.Valid || collection != str(inverse["collectionId"]) {
+				if deleted.Valid && !restoredRecords[record] || collection != str(inverse["collectionId"]) {
 					return nil, Fail("CONFLICT", "An affected record is trashed or moved outside the reviewed collection")
 				}
 				if err := add("record", record); err != nil {
@@ -376,7 +399,7 @@ func listJournal(ctx context.Context, k *Kernel, e contracts.ServiceExecutionCon
 	if err := k.authorizePage(ctx, k.db, e, page); err != nil {
 		return nil, err
 	}
-	rows, err := k.db.QueryContext(ctx, `SELECT id,label,created_at,state,entries_json FROM operation_journal WHERE EXISTS(SELECT 1 FROM json_each(entries_json) WHERE json_extract(value,'$.pageId')=?) ORDER BY created_at DESC,id DESC LIMIT 50`, page)
+	rows, err := k.db.QueryContext(ctx, `SELECT id,label,created_at,state,entries_json FROM operation_journal WHERE EXISTS(SELECT 1 FROM json_each(entries_json) WHERE json_extract(value,'$.pageId')=? OR json_extract(value,'$.ownerPageId')=?) ORDER BY created_at DESC,id DESC LIMIT 50`, page, page)
 	if err != nil {
 		return nil, err
 	}

@@ -75,6 +75,11 @@ export function OperationHistory({
   }
   if (!operations.length && !error) return null;
   function describe(action: S.OperationPreviewUndoResult["actions"][number]) {
+    if (action.kind === "record.trash.set") {
+      const record = workspace.records.find((r) => r.id === action.recordId);
+      const title = workspace.pages.find((p) => p.id === record?.pageId)?.title ?? action.recordId;
+      return `${action.trashed ? "Move to trash" : "Restore from trash"}: ${title}. Record values, content and attachments retain their identities.`;
+    }
     if (action.kind === "collection.property.restore") {
       const collection = workspace.collections.find((c) => c.id === action.collectionId)?.title ?? "Collection";
       if (!action.definition) {

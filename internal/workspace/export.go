@@ -235,9 +235,17 @@ func (k *Kernel) ExportPortable(ctx context.Context, e contracts.ServiceExecutio
 			}
 			rs = append(rs, r)
 		}
+		if er = records.Err(); er != nil {
+			records.Close()
+			return result, er
+		}
 		records.Close()
 		canonical := []any{}
+		recordEnumerationVersion := 1
 		for _, record := range rs {
+			if paths[record.page] == "" {
+				recordEnumerationVersion = 0
+			}
 			cells := []string{record.title}
 			values := map[string]any{}
 			for _, prop := range properties[1:] {
@@ -286,7 +294,7 @@ func (k *Kernel) ExportPortable(ctx context.Context, e contracts.ServiceExecutio
 			vs = append(vs, map[string]any{"id": id, "name": name, "type": kind, "schemaVersion": version, "query": json.RawMessage(query), "config": json.RawMessage(config), "owningPagePath": paths[viewPage]})
 		}
 		views.Close()
-		manifest["collections"] = append(manifest["collections"].([]any), map[string]any{"id": collection.id, "title": collection.title, "path": name, "owningPagePath": paths[collection.page], "properties": properties, "records": canonical, "views": vs})
+		manifest["collections"] = append(manifest["collections"].([]any), map[string]any{"sourceWorkspaceId": k.id, "recordEnumerationVersion": recordEnumerationVersion, "id": collection.id, "title": collection.title, "path": name, "owningPagePath": paths[collection.page], "properties": properties, "records": canonical, "views": vs})
 		result.Collections++
 	}
 	for _, asset := range assets {

@@ -773,6 +773,26 @@
           "type": "object",
           "properties": {
             "kind": {
+              "const": "record.trash.set"
+            },
+            "recordId": {
+              "$ref": "domain.schema.json#/$defs/Id"
+            },
+            "trashed": {
+              "type": "boolean"
+            }
+          },
+          "required": [
+            "kind",
+            "recordId",
+            "trashed"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "kind": {
               "const": "collection.property.restore"
             },
             "collectionId": {
@@ -3340,6 +3360,26 @@
       ],
       "additionalProperties": false
     },
+    "SetRecordTrash": {
+      "type": "object",
+      "properties": {
+        "kind": {
+          "const": "record.trash.set"
+        },
+        "recordId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "trashed": {
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "kind",
+        "recordId",
+        "trashed"
+      ],
+      "additionalProperties": false
+    },
     "ApplyOperation": {
       "type": "object",
       "properties": {
@@ -3646,6 +3686,9 @@
         },
         {
           "$ref": "#/$defs/RestoreProperty"
+        },
+        {
+          "$ref": "#/$defs/SetRecordTrash"
         },
         {
           "$ref": "#/$defs/ApplyOperation"
