@@ -110,3 +110,45 @@ test("native certificate handle and explicit scoped consent precede remote acces
     page.getByRole("button", { name: "Enable HTTPS listener", exact: true }),
   ).toBeDisabled();
 });
+
+test("delayed status cannot undo displayed HTTPS revocation", async ({
+  page,
+}) => {
+  await page
+    .getByLabel("Public HTTPS origin", { exact: true })
+    .fill("https://trove.example.test");
+  await page
+    .getByRole("button", {
+      name: "Choose certificate and private key…",
+      exact: true,
+    })
+    .click();
+  await page
+    .getByRole("button", { name: "Enable HTTPS listener", exact: true })
+    .click();
+  await expect(page.getByText(/HTTPS enabled at/)).toBeVisible();
+  await page.evaluate(() => {
+    (window as any).holdRemoteStatus = true;
+  });
+  await expect
+    .poll(() => page.evaluate(() => typeof (window as any).resolveRemoteStatus))
+    .toBe("function");
+  await page
+    .getByRole("button", {
+      name: "Disable remote access and disconnect all clients",
+      exact: true,
+    })
+    .click();
+  await expect(
+    page.getByText("Remote access is disabled.", { exact: true }),
+  ).toBeVisible();
+  await page.evaluate(async () => {
+    (window as any).resolveRemoteStatus();
+    await new Promise(requestAnimationFrame);
+    await new Promise(requestAnimationFrame);
+  });
+  expect(
+    await page.getByText("Remote access is disabled.", { exact: true }).count(),
+  ).toBe(1);
+  expect(await page.getByText(/HTTPS enabled at/).count()).toBe(0);
+});

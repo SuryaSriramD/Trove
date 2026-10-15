@@ -33,8 +33,8 @@ var providerHosts sync.Map
 func (a *App) stopProviders() {
 	if v, ok := providerHosts.LoadAndDelete(a); ok {
 		h := v.(*providerHost)
-		h.stopManaged()
 		h.bridge.Close()
+		h.stopManaged()
 		if h.listener != nil {
 			_ = h.listener.Close()
 		}
@@ -105,8 +105,8 @@ func (a *App) providerDispatch(method string, raw json.RawMessage) string {
 			result = map[string]any{"connection": connection, "url": url, "relayPath": filepath.Join(filepath.Dir(exe), desktopHelperFilename("trove-mcp"))}
 		}
 	case "providers.disconnect":
-		h.stopMatchingManaged(func(run workspace.ManagedRun) bool { return run.ConnectionID == r.ConnectionID })
 		err = h.bridge.Disconnect(ctx, r.ConnectionID)
+		h.stopMatchingManaged(func(run workspace.ManagedRun) bool { return run.ConnectionID == r.ConnectionID })
 		result = map[string]any{"state": "disconnected"}
 	case "providers.proposals":
 		result, err = h.bridge.Proposals(ctx)

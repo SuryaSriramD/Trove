@@ -32,7 +32,16 @@ window.go = {
         const request = JSON.parse(raw);
         calls.push({ method, request });
         const ok = (result: unknown) => JSON.stringify({ ok: true, result });
-        if (method === "providers.remote.status") return ok(status);
+        if (method === "providers.remote.status") {
+          if ((window as any).holdRemoteStatus) {
+            (window as any).holdRemoteStatus = false;
+            const captured = structuredClone(status);
+            return new Promise((resolve) => {
+              (window as any).resolveRemoteStatus = () => resolve(ok(captured));
+            });
+          }
+          return ok(status);
+        }
         if (method === "providers.remote.selectCertificate")
           return ok({
             handle: id(5),
