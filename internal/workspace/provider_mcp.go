@@ -171,6 +171,9 @@ func mcpInputSchema(name string) any {
 	required := []string{}
 	text := map[string]any{"type": "string"}
 	switch name {
+	case "readConnectedSource":
+		props["snapshotId"] = map[string]any{"type": "string", "minLength": 1, "maxLength": 2048}
+		required = []string{"snapshotId"}
 	case "readPage":
 		props["pageId"] = text
 		required = []string{"pageId"}

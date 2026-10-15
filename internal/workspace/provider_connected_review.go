@@ -11,9 +11,8 @@ import (
 	"trove.local/phase0/internal/connectors"
 )
 
-// This review store is deliberately not wired to a provider transport. Consuming
-// a preview proves the owner's exact source/recipient review; the trusted bridge
-// must separately bind it to a live, explicitly scoped provider connection.
+// Consuming a preview proves exact source/recipient review. Only the trusted
+// bridge may bind it to a live, explicitly scoped provider connection.
 type ConnectedSharingTarget struct {
 	Provider string `json:"provider"`
 	Account  string `json:"account"`
