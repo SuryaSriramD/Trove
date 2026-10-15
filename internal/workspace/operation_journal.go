@@ -44,6 +44,8 @@ func journalCurrent(ctx context.Context, q querier, action map[string]any) (jour
 	entry := journalEntry{}
 	kind := str(action["kind"])
 	switch kind {
+	case "collection.property.restore":
+		return schemaJournalCurrent(ctx, q, action)
 	case "record.setValue", "record.clearValue":
 		record, property := str(action["recordId"]), str(action["propertyId"])
 		definition, err := propertyDefinition(ctx, q, property)
@@ -147,6 +149,17 @@ func applyJournal(m *Mutation, id, label string, actions []map[string]any) error
 	}
 	entries := []journalEntry{}
 	seen := map[string]bool{}
+	schemas := map[string]bool{}
+	for _, action := range actions {
+		if str(action["kind"]) == "collection.property.restore" {
+			schemas[str(action["propertyId"])] = true
+		}
+	}
+	for _, action := range actions {
+		if (str(action["kind"]) == "record.setValue" || str(action["kind"]) == "record.clearValue") && schemas[str(action["propertyId"])] {
+			return Fail("CONFLICT", "A schema operation cannot also change that property's values without a populated-value migration")
+		}
+	}
 	for _, action := range actions {
 		if err := contracts.Validate("service", "JournalAction", marshal(action)); err != nil {
 			return Fail("INVALID_REQUEST", "Invalid grouped action")
@@ -170,6 +183,13 @@ func applyJournal(m *Mutation, id, label string, actions []map[string]any) error
 			return err
 		}
 		entry.After = after.Before
+		if str(action["kind"]) == "collection.property.restore" {
+			change := m.touched[guardKey("property", str(action["propertyId"]))]
+			entry.PropertyRevision = string(change.After)
+			if change.Deleted {
+				entry.PropertyRevision = "0"
+			}
+		}
 		if str(action["kind"]) == "page.display.set" {
 			for _, key := range []string{"fullWidth", "presentation"} {
 				if entry.Before[key] != entry.After[key] {
@@ -268,11 +288,16 @@ func previewUndoJournal(ctx context.Context, k *Kernel, e contracts.ServiceExecu
 	targets := map[string]contracts.ServiceExpectedRevision{}
 	add := func(kind, id string) error {
 		var revision string
-		if err := tx.QueryRowContext(ctx, "SELECT revision FROM "+entityTables[kind]+" WHERE id=?", id).Scan(&revision); err != nil {
+		err := tx.QueryRowContext(ctx, "SELECT revision FROM "+entityTables[kind]+" WHERE id=?", id).Scan(&revision)
+		if errors.Is(err, sql.ErrNoRows) && kind == "property" {
+			revision = "0"
+		} else if err != nil {
 			return err
 		}
-		if err := k.authorizeEntity(ctx, tx, e, kind, id); err != nil {
-			return err
+		if revision != "0" {
+			if err := k.authorizeEntity(ctx, tx, e, kind, id); err != nil {
+				return err
+			}
 		}
 		targets[kind+":"+id] = required(kind, id, revision)
 		return nil
@@ -311,6 +336,11 @@ func previewUndoJournal(ctx context.Context, k *Kernel, e contracts.ServiceExecu
 		inverse, err := journalInverse(ctx, tx, entry)
 		if err != nil {
 			return nil, err
+		}
+		if str(inverse["kind"]) == "collection.property.restore" {
+			if err := validateUnusedPropertyRestore(ctx, tx, inverse); err != nil {
+				return nil, err
+			}
 		}
 		actions = append(actions, inverse)
 	}

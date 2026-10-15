@@ -38,13 +38,14 @@ type portableViewSource struct {
 	Config         map[string]any `json:"config"`
 }
 type PortableCollectionImport struct {
-	CollectionID string                               `json:"collectionId"`
-	PageID       string                               `json:"pageId"`
-	Title        string                               `json:"title"`
-	Locator      string                               `json:"sourceLocator"`
-	Properties   []contracts.DomainPropertyDefinition `json:"properties"`
-	Records      []portableRecordSource               `json:"records"`
-	Views        []portableViewSource                 `json:"views"`
+	SchemaComplete bool                                 `json:"schemaComplete,omitempty"`
+	CollectionID   string                               `json:"collectionId"`
+	PageID         string                               `json:"pageId"`
+	Title          string                               `json:"title"`
+	Locator        string                               `json:"sourceLocator"`
+	Properties     []contracts.DomainPropertyDefinition `json:"properties"`
+	Records        []portableRecordSource               `json:"records"`
+	Views          []portableViewSource                 `json:"views"`
 }
 
 // restorePortableDatabase freezes only supplied, validated canonical definitions.
@@ -182,7 +183,7 @@ func (k *Kernel) restorePortableDatabase(p *ImportPlan, manifest portableHierarc
 			fail("readable CSV source is unavailable")
 			return
 		}
-		plan := PortableCollectionImport{CollectionID: ids[source.ID], PageID: pages[source.OwningPagePath], Title: csv.Title, Locator: source.Path, Properties: []contracts.DomainPropertyDefinition{}, Records: []portableRecordSource{}, Views: []portableViewSource{}}
+		plan := PortableCollectionImport{SchemaComplete: true, CollectionID: ids[source.ID], PageID: pages[source.OwningPagePath], Title: csv.Title, Locator: source.Path, Properties: []contracts.DomainPropertyDefinition{}, Records: []portableRecordSource{}, Views: []portableViewSource{}}
 		if source.Title != "" {
 			plan.Title = source.Title
 		}

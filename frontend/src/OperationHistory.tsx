@@ -75,6 +75,14 @@ export function OperationHistory({
   }
   if (!operations.length && !error) return null;
   function describe(action: S.OperationPreviewUndoResult["actions"][number]) {
+    if (action.kind === "collection.property.restore") {
+      const collection = workspace.collections.find((c) => c.id === action.collectionId)?.title ?? "Collection";
+      if (!action.definition) {
+        const name = workspace.properties.find((p) => p.id === action.propertyId)?.name ?? action.propertyId;
+        return `${collection}: remove unused property “${name}”.`;
+      }
+      return `${collection}: restore unused property “${action.definition.name}” as ${action.definition.type}, with its saved configuration ${JSON.stringify(action.definition.config)}.`;
+    }
     if (
       action.kind === "collection.layout.set" ||
       action.kind === "record.layout.set"

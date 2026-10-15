@@ -334,11 +334,28 @@ func validateReviewedImportDatabase(ctx context.Context, q querier, p *ImportPla
 			if err != nil {
 				return err
 			}
-			if string(current.CollectionId) != item.CollectionID || current.Type != incoming.Type {
-				return Fail("CONFLICT", "Changing a property's type or collection requires a separate value conversion; keep local schema or import a copy")
+			if string(current.CollectionId) != item.CollectionID {
+				return Fail("CONFLICT", "A property cannot move to another collection during import")
+			}
+			if current.Type != incoming.Type {
+				if err := validateImportSchemaChange(ctx, q, item, strings.TrimPrefix(path, "/schema/"), fields[path], fields); err != nil {
+					return err
+				}
 			}
 			if current.Type == "relation" && !equalImportPresence(ImportPresence{true, current.Config}, ImportPresence{true, incoming.Config}) {
 				return Fail("CONFLICT", "Changing relation configuration requires a separate migration; keep local schema or import a copy")
+			}
+		}
+		if item.Merge != nil {
+			for _, field := range item.Merge.Fields {
+				if strings.HasPrefix(field.Path, "/schema/") && field.Local.Present && fields[field.Path] == nil {
+					if c := importCollectionFor(p, item); c == nil || !c.SchemaComplete {
+						return Fail("CONFLICT", "Incomplete schema enumeration cannot establish a source property deletion")
+					}
+					if err := validateImportSchemaChange(ctx, q, item, strings.TrimPrefix(field.Path, "/schema/"), nil, fields); err != nil {
+						return err
+					}
+				}
 			}
 		}
 		for _, path := range sortedImportPaths(fields, "/records/") {
@@ -535,6 +552,49 @@ func commitMergedImportDatabases(m *Mutation, p *ImportPlan) error {
 			if err := checkImportMergeGuards(m, &p.Items[i]); err != nil {
 				return err
 			}
+		}
+	}
+	schemaActions := []map[string]any{}
+	for i := range p.Items {
+		item := &p.Items[i]
+		if item.Kind != "portable_collection" || item.Merge == nil {
+			continue
+		}
+		fields := selectedImportDatabaseFields(item)
+		for _, field := range item.Merge.Fields {
+			if !strings.HasPrefix(field.Path, "/schema/") || !field.Local.Present {
+				continue
+			}
+			id := strings.TrimPrefix(field.Path, "/schema/")
+			var before, after map[string]any
+			_ = json.Unmarshal(field.Local.Value, &before)
+			if raw := fields[field.Path]; raw != nil {
+				_ = json.Unmarshal(raw, &after)
+				if before["type"] == after["type"] {
+					continue
+				}
+			}
+			if fields[field.Path] == nil {
+				if c := importCollectionFor(p, item); c == nil || !c.SchemaComplete {
+					return Fail("CONFLICT", "Incomplete schema enumeration cannot establish a source property deletion")
+				}
+			}
+			if err := validateImportSchemaChange(m.Context, m.Tx, item, id, fields[field.Path], fields); err != nil {
+				return err
+			}
+			var owner string
+			if err := m.Tx.QueryRowContext(m.Context, "SELECT owning_page_id FROM collections WHERE id=?", item.CollectionID).Scan(&owner); err != nil {
+				return err
+			}
+			if err := importGuardPage(m, owner); err != nil {
+				return err
+			}
+			schemaActions = append(schemaActions, map[string]any{"kind": "collection.property.restore", "collectionId": item.CollectionID, "propertyId": id, "definition": after})
+		}
+	}
+	if len(schemaActions) > 0 {
+		if err := applyJournal(m, p.ID, "Reviewed import schema changes", schemaActions); err != nil {
+			return err
 		}
 	}
 	for i := range p.PortableCollections {
@@ -756,4 +816,19 @@ func sortedImportPaths(fields map[string]json.RawMessage, prefix string) []strin
 	}
 	sort.Strings(out)
 	return out
+}
+
+func validateImportSchemaChange(ctx context.Context, q querier, item *ImportItem, id string, raw json.RawMessage, fields map[string]json.RawMessage) error {
+	var definition any
+	if raw != nil {
+		if err := json.Unmarshal(raw, &definition); err != nil {
+			return err
+		}
+	}
+	for path := range fields {
+		if strings.HasPrefix(path, "/values/") && strings.HasSuffix(path, "/"+id) {
+			return Fail("CONFLICT", "A schema conversion or deletion requires an explicit populated-value migration; retain this schema or import a copy")
+		}
+	}
+	return validateUnusedPropertyRestore(ctx, q, map[string]any{"kind": "collection.property.restore", "collectionId": item.CollectionID, "propertyId": id, "definition": definition})
 }

@@ -210,7 +210,7 @@ func (k *Kernel) batch(ctx context.Context, e contracts.ServiceExecutionContext,
 			var replay contracts.ServiceBatchResult
 			json.Unmarshal([]byte(receipt), &replay)
 			for _, r := range replay.Revisions {
-				if r.Target.EntityType == "block" && r.Deleted {
+				if (r.Target.EntityType == "block" || r.Target.EntityType == "property") && r.Deleted {
 					continue
 				}
 				if err = k.authorizeEntity(ctx, tx, e, r.Target.EntityType, string(r.Target.EntityId)); err != nil {
@@ -351,7 +351,7 @@ func (k *Kernel) batch(ctx context.Context, e contracts.ServiceExecutionContext,
 		for _, key := range keys {
 			c := m.touched[key]
 			kind, id := c.Target.EntityType, string(c.Target.EntityId)
-			if c.Deleted && (kind == "block" || kind == "transcript_segment") {
+			if c.Deleted && (kind == "block" || kind == "transcript_segment" || kind == "property") {
 				_, err = tx.ExecContext(ctx, "INSERT INTO entity_tombstones VALUES(?,?,?,?) ON CONFLICT(entity_type,entity_id) DO UPDATE SET revision=excluded.revision,deleted_at=excluded.deleted_at", kind, id, c.After, now())
 			} else {
 				_, err = tx.ExecContext(ctx, "UPDATE "+entityTables[kind]+" SET revision=? WHERE id=?", c.After, id)
