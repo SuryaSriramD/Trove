@@ -1138,6 +1138,25 @@ type ServiceAutomationRule struct {
 	Condition      *ServiceAutomationCondition `json:"condition,omitempty"`
 	Actions        []ServiceAutomationAction   `json:"actions"`
 }
+type ServiceSkillDefinition struct {
+	Name             string     `json:"name"`
+	Purpose          string     `json:"purpose"`
+	Instructions     string     `json:"instructions"`
+	InputDescription string     `json:"inputDescription"`
+	ExpectedOutput   string     `json:"expectedOutput"`
+	Mode             string     `json:"mode"`
+	SourcePageIds    []DomainId `json:"sourcePageIds"`
+	Tools            []string   `json:"tools"`
+}
+type ServiceSkillRunReference struct {
+	SkillId       DomainId   `json:"skillId"`
+	Version       int64      `json:"version"`
+	InvocationId  DomainId   `json:"invocationId"`
+	Input         string     `json:"input"`
+	SourcePageIds []DomainId `json:"sourcePageIds"`
+	Tools         []string   `json:"tools"`
+	PreviewHash   *string    `json:"previewHash,omitempty"`
+}
 type ServiceCreatePage struct {
 	Kind         string    `json:"kind"`
 	PageId       DomainId  `json:"pageId"`
@@ -1510,6 +1529,15 @@ type ServiceReviewPage struct {
 	ContentIdentity DomainSemanticContentIdentity `json:"contentIdentity"`
 	ExpiresAt       *DomainTimestamp              `json:"expiresAt,omitempty"`
 }
+type ServiceSaveSkill struct {
+	Kind            string                 `json:"kind"`
+	SkillId         DomainId               `json:"skillId"`
+	PageId          DomainId               `json:"pageId"`
+	ExpectedVersion int64                  `json:"expectedVersion"`
+	Definition      ServiceSkillDefinition `json:"definition"`
+	Archived        bool                   `json:"archived"`
+	Imported        bool                   `json:"imported"`
+}
 type ServiceCommandValue interface{ isServiceCommand() }
 type ServiceCommand struct{ Value ServiceCommandValue }
 
@@ -1564,6 +1592,7 @@ func (ServiceDismissPersonalReview) isServiceCommand()   {}
 func (ServiceApplyOperation) isServiceCommand()          {}
 func (ServiceUndoOperation) isServiceCommand()           {}
 func (ServiceReviewPage) isServiceCommand()              {}
+func (ServiceSaveSkill) isServiceCommand()               {}
 func (v ServiceCommand) MarshalJSON() ([]byte, error)    { return json.Marshal(v.Value) }
 func (v *ServiceCommand) UnmarshalJSON(data []byte) error {
 	var fields map[string]json.RawMessage
@@ -1978,6 +2007,14 @@ func (v *ServiceCommand) UnmarshalJSON(data []byte) error {
 		v.Value = result
 		return nil
 	}
+	if matchesVariant(fields, []string{"kind", "skillId", "pageId", "expectedVersion", "definition", "archived", "imported"}, map[string]string{"kind": "\"skill.save\""}, map[string][]string{}, []string{"kind", "skillId", "pageId", "expectedVersion", "definition", "archived", "imported"}) {
+		var result ServiceSaveSkill
+		if err := json.Unmarshal(data, &result); err != nil {
+			return err
+		}
+		v.Value = result
+		return nil
+	}
 	return fmt.Errorf("unknown or incomplete ServiceCommand variant")
 }
 
@@ -2042,6 +2079,19 @@ type ServiceNativeBackupSummary struct {
 	Included    []string `json:"included"`
 	Excluded    []string `json:"excluded"`
 	Restoration []string `json:"restoration"`
+}
+type ServiceSkillsListRequest struct {
+	ContractVersion int64     `json:"contractVersion"`
+	RequestId       DomainId  `json:"requestId"`
+	WorkspaceId     DomainId  `json:"workspaceId"`
+	SkillId         *DomainId `json:"skillId,omitempty"`
+}
+type ServiceSkillPreviewRequest struct {
+	ContractVersion int64                    `json:"contractVersion"`
+	RequestId       DomainId                 `json:"requestId"`
+	WorkspaceId     DomainId                 `json:"workspaceId"`
+	Skill           ServiceSkillRunReference `json:"skill"`
+	Provider        string                   `json:"provider"`
 }
 type ServiceAutomationOptionsRequest struct {
 	ContractVersion int64    `json:"contractVersion"`
@@ -3216,18 +3266,19 @@ type ServiceProviderDiscoverRequest struct {
 	Provider        string   `json:"provider"`
 }
 type ServiceProviderManagedStartRequest struct {
-	ContractVersion int64      `json:"contractVersion"`
-	RequestId       DomainId   `json:"requestId"`
-	WorkspaceId     DomainId   `json:"workspaceId"`
-	Provider        string     `json:"provider"`
-	RegistrationId  string     `json:"registrationId"`
-	BillingMode     string     `json:"billingMode"`
-	Model           string     `json:"model"`
-	Prompt          string     `json:"prompt"`
-	PageIds         []DomainId `json:"pageIds"`
-	Tools           []string   `json:"tools"`
-	PreviewHash     string     `json:"previewHash"`
-	ResumeRunId     *DomainId  `json:"resumeRunId,omitempty"`
+	ContractVersion int64                     `json:"contractVersion"`
+	RequestId       DomainId                  `json:"requestId"`
+	WorkspaceId     DomainId                  `json:"workspaceId"`
+	Provider        string                    `json:"provider"`
+	RegistrationId  string                    `json:"registrationId"`
+	BillingMode     string                    `json:"billingMode"`
+	Model           string                    `json:"model"`
+	Prompt          string                    `json:"prompt"`
+	PageIds         []DomainId                `json:"pageIds"`
+	Tools           []string                  `json:"tools"`
+	PreviewHash     string                    `json:"previewHash"`
+	ResumeRunId     *DomainId                 `json:"resumeRunId,omitempty"`
+	Skill           *ServiceSkillRunReference `json:"skill,omitempty"`
 }
 type ServiceProviderManagedCancelRequest struct {
 	ContractVersion int64    `json:"contractVersion"`

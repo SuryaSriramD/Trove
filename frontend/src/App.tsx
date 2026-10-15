@@ -1,3 +1,4 @@
+import { SkillsPanel } from "./ai/SkillsPanel";
 import { OperationHistory } from "./OperationHistory";
 import { PageFreshness, ReviewQueue } from "./PageFreshness";
 import { TaskEditor } from "./tasks/TaskEditor";
@@ -49,6 +50,7 @@ type Surface =
   | "Search"
   | "Import"
   | "Jobs"
+  | "Skills"
   | "AI"
   | "Intelligence"
   | "Automations"
@@ -65,6 +67,7 @@ const nav: [Surface, string][] = [
   ["Import", "↓"],
   ["Jobs", "↻"],
   ["AI", "✧"],
+  ["Skills", "✎"],
   ["Providers", "⇄"],
   ["Capture", "⊕"],
   ["Automations", "◷"],
@@ -1363,6 +1366,8 @@ export default function App() {
                   onChanged={refresh}
                   onOpenPage={navigate}
                 />
+              ) : surface === "Skills" ? (
+                <SkillsPanel workspace={w} onCommitted={refresh} onNavigate={navigateSource}/>
               ) : surface === "AI" ? (
                 <AIPanel
                   workspace={w}

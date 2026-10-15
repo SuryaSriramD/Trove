@@ -71,17 +71,18 @@ func (a *App) managedProviderDispatch(method string, raw json.RawMessage) string
 		return errorEnvelope("INVALID_REQUEST", "Invalid managed provider request")
 	}
 	var req struct {
-		WorkspaceID    string   `json:"workspaceId"`
-		Provider       string   `json:"provider"`
-		RegistrationID string   `json:"registrationId"`
-		BillingMode    string   `json:"billingMode"`
-		Model          string   `json:"model"`
-		Prompt         string   `json:"prompt"`
-		PageIDs        []string `json:"pageIds"`
-		Tools          []string `json:"tools"`
-		PreviewHash    string   `json:"previewHash"`
-		ResumeRunID    string   `json:"resumeRunId"`
-		RunID          string   `json:"runId"`
+		Skill          *workspace.SkillRunReference `json:"skill,omitempty"`
+		WorkspaceID    string                       `json:"workspaceId"`
+		Provider       string                       `json:"provider"`
+		RegistrationID string                       `json:"registrationId"`
+		BillingMode    string                       `json:"billingMode"`
+		Model          string                       `json:"model"`
+		Prompt         string                       `json:"prompt"`
+		PageIDs        []string                     `json:"pageIds"`
+		Tools          []string                     `json:"tools"`
+		PreviewHash    string                       `json:"previewHash"`
+		ResumeRunID    string                       `json:"resumeRunId"`
+		RunID          string                       `json:"runId"`
 	}
 	_ = json.Unmarshal(raw, &req)
 	// Lifecycle is held by Dispatch. Validate the requesting workspace and owner
@@ -102,6 +103,16 @@ func (a *App) managedProviderDispatch(method string, raw json.RawMessage) string
 	h := v.(*providerHost)
 	var selectedRuntime providers.Runtime
 	if method == "providers.start" {
+		if req.Skill != nil {
+			if !sameProviderSelection(req.PageIDs, req.Skill.SourcePageIDs) || !sameProviderSelection(req.Tools, req.Skill.Tools) {
+				return errorEnvelope("SCOPE_DENIED", "Provider scope must match the reviewed skill")
+			}
+			preview, err := k.ResolveSkillRun(ctx, execution, *req.Skill, req.Provider)
+			if err != nil {
+				return errorEnvelope("CONFLICT", err.Error())
+			}
+			req.Prompt = preview.Prompt
+		}
 		if req.Provider == "codex" && req.BillingMode != "chatgpt_plan" {
 			return errorEnvelope("INVALID_REQUEST", "Choose ChatGPT plan billing for Codex")
 		}
@@ -253,6 +264,9 @@ func (a *App) managedProviderDispatch(method string, raw json.RawMessage) string
 			}
 			for _, old := range previous {
 				if old.ID == req.ResumeRunID && old.Account == req.RegistrationID && old.Provider == req.Provider {
+					if (old.Skill == nil) != (req.Skill == nil) || old.Skill != nil && old.Skill.InvocationID != req.Skill.InvocationID {
+						return errorEnvelope("CONFLICT", "Resume must retain the original skill invocation")
+					}
 					checkpoint = old.Checkpoint
 					sessionID = old.SessionID
 					break
@@ -280,6 +294,12 @@ func (a *App) managedProviderDispatch(method string, raw json.RawMessage) string
 		if err != nil {
 			break
 		}
+		if req.Skill != nil {
+			if err = h.bridge.BindSkill(ctx, connection.ID, *req.Skill); err != nil {
+				_ = h.bridge.Disconnect(ctx, connection.ID)
+				break
+			}
+		}
 		var specs []providers.ToolSpec
 		specs, err = h.bridge.ManagedTools(connection.ID, connection.Token)
 		if err != nil {
@@ -299,7 +319,7 @@ func (a *App) managedProviderDispatch(method string, raw json.RawMessage) string
 				break
 			}
 		}
-		run := workspace.ManagedRun{ID: workspace.NewID(), SessionID: sessionID, ConnectionID: connection.ID, Provider: req.Provider, Account: req.RegistrationID, AccountLabel: accountLabel, BillingMode: identity.BillingMode, Model: req.Model, State: "starting", Prompt: req.Prompt, PageIDs: req.PageIDs, Tools: req.Tools, Manifest: manifestJSON, CreatedAt: time.Now().UTC().Format(time.RFC3339Nano)}
+		run := workspace.ManagedRun{Skill: req.Skill, ID: workspace.NewID(), SessionID: sessionID, ConnectionID: connection.ID, Provider: req.Provider, Account: req.RegistrationID, AccountLabel: accountLabel, BillingMode: identity.BillingMode, Model: req.Model, State: "starting", Prompt: req.Prompt, PageIDs: req.PageIDs, Tools: req.Tools, Manifest: manifestJSON, CreatedAt: time.Now().UTC().Format(time.RFC3339Nano)}
 		if err = k.SaveManagedRun(ctx, execution, run); err != nil {
 			_ = h.bridge.Disconnect(ctx, connection.ID)
 			break
@@ -439,4 +459,12 @@ func canonicalFuturePath(path string) (string, error) {
 		suffix = append(suffix, filepath.Base(current))
 		current = parent
 	}
+}
+
+func sameProviderSelection(a, b []string) bool {
+	a = append([]string{}, a...)
+	b = append([]string{}, b...)
+	sort.Strings(a)
+	sort.Strings(b)
+	return strings.Join(a, "\x00") == strings.Join(b, "\x00")
 }

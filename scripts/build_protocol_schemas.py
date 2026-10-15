@@ -117,6 +117,10 @@ defs['AutomationTrigger']=obj({'type':enum('event','schedule'),'collectionId':D(
 defs['AutomationCondition']=obj({'recordId':D('Id'),'propertyId':D('Id'),'op':enum('eq','ne','is_empty'),'value':json_value},['recordId','propertyId','op'])
 defs['AutomationRule']=obj({'id':D('Id'),'name':{'type':'string','minLength':1,'maxLength':200},'enabled':B,'paused':B,'allowedOrigins':arr(enum('user','ai'),2),'trigger':R('AutomationTrigger'),'condition':R('AutomationCondition'),'actions':{**arr(R('AutomationAction'),32),'minItems':1}},['id','name','enabled','paused','trigger','actions'])
 commands['SaveAutomation']['properties']['rule']=R('AutomationRule')
+# Manual skills retain immutable definitions; text never supplies authority.
+defs['SkillDefinition']=obj({'name':{'type':'string','minLength':1,'maxLength':200},'purpose':{'type':'string','maxLength':1000},'instructions':{'type':'string','minLength':1,'maxLength':4000},'inputDescription':{'type':'string','maxLength':500},'expectedOutput':{'type':'string','maxLength':1000},'mode':enum('answer','summarize','generate','workspace_agent'),'sourcePageIds':{**arr(D('Id'),32),'uniqueItems':True},'tools':{**arr(enum('readPage','search.query','queryRecords','resolveCitation','allocateIds','proposeChanges','proposeActions'),7),'uniqueItems':True}})
+defs['SkillRunReference']=obj({'skillId':D('Id'),'version':{'type':'integer','minimum':1},'invocationId':D('Id'),'input':{'type':'string','maxLength':1000},'sourcePageIds':{**arr(D('Id'),32),'uniqueItems':True},'tools':{**arr(enum('readPage','search.query','queryRecords','resolveCitation','allocateIds','proposeChanges','proposeActions'),7),'uniqueItems':True},'previewHash':{'type':'string','pattern':'^[0-9a-f]{64}$'}},['skillId','version','invocationId','input','sourcePageIds','tools'])
+commands['SaveSkill']=tagged('skill.save',{'skillId':D('Id'),'pageId':D('Id'),'expectedVersion':N,'definition':R('SkillDefinition'),'archived':B,'imported':B})
 defs.update(commands)
 defs['Command']={'oneOf':[R(n) for n in commands]}
 header={'contractVersion':{'const':1},'requestId':D('Id'),'workspaceId':D('Id')}
@@ -131,6 +135,8 @@ defs['MeetingExtractionCreateRequest']['dependentRequired']={'proposalId':['item
 # request definition and never enter a persisted request or model payload.
 defs['NativeBackupProgress']=obj({'version':{'const':1},'phase':enum('idle','choosing','snapshot','encrypting','authenticating','verifying','review','restoring','complete'),'bytes':{'type':'string','pattern':'^(0|[1-9][0-9]*)$'},'totalBytes':{'type':'string','pattern':'^(0|[1-9][0-9]*)$'}})
 defs['NativeBackupSummary']=obj({'version':{'const':1},'format':{'const':'age-passphrase/native-tar-v1'},'included':arr(S,32),'excluded':arr(S,32),'restoration':arr(S,32)})
+defs['SkillsListRequest']=obj({**header,'skillId':D('Id')},list(header))
+defs['SkillPreviewRequest']=obj({**header,'skill':R('SkillRunReference'),'provider':enum('local','codex','claude_code')})
 defs['AutomationOptionsRequest']=obj({**header,'pageId':D('Id')})
 defs['TemplatePropertyDecision']={'oneOf':[obj({'sourcePropertyId':D('Id'),'action':{'const':'omit'}}),obj({'sourcePropertyId':D('Id'),'action':{'const':'map'},'targetPropertyId':D('Id'),'value':json_value})]}
 defs['TemplatePreviewRequest']=obj({**header,'templateId':D('Id'),'title':{'type':'string','minLength':1,'maxLength':2000},'collectionId':D('Id'),'propertyDecisions':arr(R('TemplatePropertyDecision'),256)},[*header,'templateId','title'])
@@ -244,7 +250,7 @@ defs.update({
  'ProviderManagedStatusRequest':obj(header),
  'ProviderModelsRequest':obj({**header,'registrationId':D('Id')}),
  'ProviderDiscoverRequest':obj({**header,'provider':enum('codex','claude_code')}),
- 'ProviderManagedStartRequest':obj({**header,'provider':enum('codex','claude_code'),'registrationId':{'type':'string','minLength':1,'maxLength':256},'billingMode':enum('chatgpt_plan','claude_subscription','anthropic_api'),'model':{'type':'string','minLength':1,'maxLength':128},'prompt':{'type':'string','minLength':1,'maxLength':65536},'pageIds':{**arr(D('Id'),100),'minItems':1,'uniqueItems':True},'tools':{**arr(enum('readPage','search.query','queryRecords','resolveCitation','allocateIds','proposeChanges','proposeActions'),7),'minItems':1,'uniqueItems':True},'previewHash':{'type':'string','pattern':'^[a-f0-9]{64}$'},'resumeRunId':D('Id')},[*header,'provider','registrationId','billingMode','model','prompt','pageIds','tools','previewHash']),
+ 'ProviderManagedStartRequest':obj({**header,'provider':enum('codex','claude_code'),'registrationId':{'type':'string','minLength':1,'maxLength':256},'billingMode':enum('chatgpt_plan','claude_subscription','anthropic_api'),'model':{'type':'string','minLength':1,'maxLength':128},'prompt':{'type':'string','minLength':1,'maxLength':65536},'pageIds':{**arr(D('Id'),100),'minItems':1,'uniqueItems':True},'tools':{**arr(enum('readPage','search.query','queryRecords','resolveCitation','allocateIds','proposeChanges','proposeActions'),7),'minItems':1,'uniqueItems':True},'previewHash':{'type':'string','pattern':'^[a-f0-9]{64}$'},'resumeRunId':D('Id'),'skill':R('SkillRunReference')},[*header,'provider','registrationId','billingMode','model','prompt','pageIds','tools','previewHash']),
  'ProviderManagedCancelRequest':obj({**header,'runId':D('Id')})
 })
 # Native account operations expose metadata only, never OAuth URLs or tokens.

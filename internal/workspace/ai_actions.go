@@ -43,6 +43,9 @@ func prepareAIAction(ctx context.Context, k *Kernel, e contracts.ServiceExecutio
 			return nil, err
 		}
 	}
+	if !skillAllowsProposal(run.Request.Skill, str(r["kind"])) {
+		return nil, Fail("SCOPE_DENIED", "The skill run did not permit this proposal category")
+	}
 	p := AIProposal{ID: NewID(), RunID: run.ID, State: "draft", Kind: str(r["kind"]), PageID: run.Request.PageID, Title: strings.TrimSpace(str(r["title"])), Body: str(r["body"]), Commands: []any{}, Guards: []contracts.ServiceExpectedRevision{}}
 	if p.Body == "" {
 		p.Body = run.Text
@@ -50,7 +53,11 @@ func prepareAIAction(ctx context.Context, k *Kernel, e contracts.ServiceExecutio
 	if strings.TrimSpace(p.Body) == "" || len(p.Body) > 64000 {
 		return nil, Fail("INVALID_REQUEST", "Review text between 1 and 64000 bytes")
 	}
-	hash := sha256.Sum256(marshal(map[string]any{"runId": p.RunID, "kind": p.Kind, "title": p.Title, "body": p.Body}))
+	effectRun := p.RunID
+	if run.Request.Skill != nil {
+		effectRun = run.Request.Skill.InvocationID
+	}
+	hash := sha256.Sum256(marshal(map[string]any{"runId": effectRun, "kind": p.Kind, "title": p.Title, "body": p.Body}))
 	p.RequestHash = hex.EncodeToString(hash[:])
 	p.After = p.Body
 	guards := map[string]bool{}
@@ -212,6 +219,13 @@ func prepareAIAction(ctx context.Context, k *Kernel, e contracts.ServiceExecutio
 	default:
 		return nil, Fail("INVALID_REQUEST", "Unknown reviewed action")
 	}
+	if run.Request.Skill != nil {
+		for _, guard := range p.Guards {
+			if guard.Target.EntityType == "page" && string(guard.Revision) != "0" && !skillSubset([]string{string(guard.Target.EntityId)}, run.Request.Skill.SourcePageIDs) {
+				return nil, Fail("SCOPE_DENIED", "A skill proposal cannot change or read an unselected page")
+			}
+		}
+	}
 	if len(p.Commands) > 200 {
 		return nil, Fail("RESOURCE_EXHAUSTED", "Draft contains too many block changes")
 	}
@@ -222,7 +236,13 @@ func prepareAIAction(ctx context.Context, k *Kernel, e contracts.ServiceExecutio
 	}
 	err = k.write(ctx, func(tx *sql.Tx) error {
 		var previous, state string
-		err := tx.QueryRowContext(ctx, "SELECT body_json,state FROM ai_proposals WHERE run_id=? AND json_extract(body_json,'$.requestHash')=? LIMIT 1", p.RunID, p.RequestHash).Scan(&previous, &state)
+		query := "SELECT body_json,state FROM ai_proposals WHERE run_id=? AND json_extract(body_json,'$.requestHash')=? LIMIT 1"
+		key := p.RunID
+		if run.Request.Skill != nil {
+			query = "SELECT p.body_json,p.state FROM ai_proposals p JOIN ai_runs r ON r.id=p.run_id WHERE json_extract(r.request_json,'$.skill.invocationId')=? AND json_extract(p.body_json,'$.requestHash')=? LIMIT 1"
+			key = run.Request.Skill.InvocationID
+		}
+		err := tx.QueryRowContext(ctx, query, key, p.RequestHash).Scan(&previous, &state)
 		if err == nil {
 			if err = json.Unmarshal([]byte(previous), &p); err != nil {
 				return err

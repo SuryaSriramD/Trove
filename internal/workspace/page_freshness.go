@@ -108,7 +108,34 @@ func semanticContentIdentity(ctx context.Context, q querier, page string) (contr
 		return out, err
 	}
 	var projection any
-	decoder := json.NewDecoder(bytes.NewReader(marshal(map[string]any{"version": 1, "title": p.Page.Title, "blocks": blocks, "values": values, "assets": assets, "reusableSources": dependencies, "referencedTasks": tasks, "taskFacet": facet})))
+	payload := map[string]any{"version": 1, "title": p.Page.Title, "blocks": blocks, "values": values, "assets": assets, "reusableSources": dependencies, "referencedTasks": tasks, "taskFacet": facet}
+	skillRows, err := q.QueryContext(ctx, "SELECT s.skill_id,s.definition_json FROM skill_versions s WHERE s.page_id=? AND s.version=(SELECT max(version) FROM skill_versions WHERE skill_id=s.skill_id) ORDER BY s.skill_id", page)
+	if err != nil {
+		return out, err
+	}
+	skillDefinitions := map[string]any{}
+	for skillRows.Next() {
+		var id, raw string
+		if err = skillRows.Scan(&id, &raw); err != nil {
+			skillRows.Close()
+			return out, err
+		}
+		var definition any
+		if err = json.Unmarshal([]byte(raw), &definition); err != nil {
+			skillRows.Close()
+			return out, err
+		}
+		skillDefinitions[id] = definition
+	}
+	err = skillRows.Err()
+	skillRows.Close()
+	if err != nil {
+		return out, err
+	}
+	if len(skillDefinitions) > 0 {
+		payload["skillDefinitions"] = skillDefinitions
+	}
+	decoder := json.NewDecoder(bytes.NewReader(marshal(payload)))
 	decoder.UseNumber()
 	if err = decoder.Decode(&projection); err != nil {
 		return out, err

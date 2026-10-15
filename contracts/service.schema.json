@@ -1081,6 +1081,135 @@
       ],
       "additionalProperties": false
     },
+    "SkillDefinition": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 200
+        },
+        "purpose": {
+          "type": "string",
+          "maxLength": 1000
+        },
+        "instructions": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 4000
+        },
+        "inputDescription": {
+          "type": "string",
+          "maxLength": 500
+        },
+        "expectedOutput": {
+          "type": "string",
+          "maxLength": 1000
+        },
+        "mode": {
+          "type": "string",
+          "enum": [
+            "answer",
+            "summarize",
+            "generate",
+            "workspace_agent"
+          ]
+        },
+        "sourcePageIds": {
+          "type": "array",
+          "items": {
+            "$ref": "domain.schema.json#/$defs/Id"
+          },
+          "maxItems": 32,
+          "uniqueItems": true
+        },
+        "tools": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": [
+              "readPage",
+              "search.query",
+              "queryRecords",
+              "resolveCitation",
+              "allocateIds",
+              "proposeChanges",
+              "proposeActions"
+            ]
+          },
+          "maxItems": 7,
+          "uniqueItems": true
+        }
+      },
+      "required": [
+        "name",
+        "purpose",
+        "instructions",
+        "inputDescription",
+        "expectedOutput",
+        "mode",
+        "sourcePageIds",
+        "tools"
+      ],
+      "additionalProperties": false
+    },
+    "SkillRunReference": {
+      "type": "object",
+      "properties": {
+        "skillId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "version": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "invocationId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "input": {
+          "type": "string",
+          "maxLength": 1000
+        },
+        "sourcePageIds": {
+          "type": "array",
+          "items": {
+            "$ref": "domain.schema.json#/$defs/Id"
+          },
+          "maxItems": 32,
+          "uniqueItems": true
+        },
+        "tools": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": [
+              "readPage",
+              "search.query",
+              "queryRecords",
+              "resolveCitation",
+              "allocateIds",
+              "proposeChanges",
+              "proposeActions"
+            ]
+          },
+          "maxItems": 7,
+          "uniqueItems": true
+        },
+        "previewHash": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        }
+      },
+      "required": [
+        "skillId",
+        "version",
+        "invocationId",
+        "input",
+        "sourcePageIds",
+        "tools"
+      ],
+      "additionalProperties": false
+    },
     "CreatePage": {
       "type": "object",
       "properties": {
@@ -2622,6 +2751,44 @@
       ],
       "additionalProperties": false
     },
+    "SaveSkill": {
+      "type": "object",
+      "properties": {
+        "kind": {
+          "const": "skill.save"
+        },
+        "skillId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "pageId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "expectedVersion": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "definition": {
+          "$ref": "#/$defs/SkillDefinition"
+        },
+        "archived": {
+          "type": "boolean"
+        },
+        "imported": {
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "kind",
+        "skillId",
+        "pageId",
+        "expectedVersion",
+        "definition",
+        "archived",
+        "imported"
+      ],
+      "additionalProperties": false
+    },
     "Command": {
       "oneOf": [
         {
@@ -2776,6 +2943,9 @@
         },
         {
           "$ref": "#/$defs/ReviewPage"
+        },
+        {
+          "$ref": "#/$defs/SaveSkill"
         }
       ]
     },
@@ -3086,6 +3256,62 @@
         "included",
         "excluded",
         "restoration"
+      ],
+      "additionalProperties": false
+    },
+    "SkillsListRequest": {
+      "type": "object",
+      "properties": {
+        "contractVersion": {
+          "const": 1
+        },
+        "requestId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "workspaceId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "skillId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        }
+      },
+      "required": [
+        "contractVersion",
+        "requestId",
+        "workspaceId"
+      ],
+      "additionalProperties": false
+    },
+    "SkillPreviewRequest": {
+      "type": "object",
+      "properties": {
+        "contractVersion": {
+          "const": 1
+        },
+        "requestId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "workspaceId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "skill": {
+          "$ref": "#/$defs/SkillRunReference"
+        },
+        "provider": {
+          "type": "string",
+          "enum": [
+            "local",
+            "codex",
+            "claude_code"
+          ]
+        }
+      },
+      "required": [
+        "contractVersion",
+        "requestId",
+        "workspaceId",
+        "skill",
+        "provider"
       ],
       "additionalProperties": false
     },
@@ -6858,6 +7084,9 @@
         },
         "resumeRunId": {
           "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "skill": {
+          "$ref": "#/$defs/SkillRunReference"
         }
       },
       "required": [

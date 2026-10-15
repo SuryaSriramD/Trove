@@ -28,6 +28,7 @@ func (b *ProviderBridge) ManagedTools(id, token string) ([]providers.ToolSpec, e
 }
 
 type ManagedRun struct {
+	Skill        *SkillRunReference           `json:"skill,omitempty"`
 	ID           string                       `json:"id"`
 	SessionID    string                       `json:"sessionId"`
 	ConnectionID string                       `json:"connectionId"`
@@ -101,6 +102,15 @@ func (k *Kernel) SaveManagedRun(ctx context.Context, e contracts.ServiceExecutio
 	return k.write(ctx, func(tx *sql.Tx) error {
 		if err := k.authorize(e); err != nil {
 			return err
+		}
+		if r.Skill != nil && r.State == "starting" {
+			preview, err := k.previewSkillTx(ctx, tx, e, *r.Skill, r.Provider)
+			if err != nil {
+				return err
+			}
+			if preview.Hash != r.Skill.PreviewHash {
+				return Fail("CONFLICT", "Reviewed skill changed before provider execution")
+			}
 		}
 		_, err := tx.ExecContext(ctx, "INSERT INTO managed_provider_runs(id,body_json,state,created_at) VALUES(?,?,?,?) ON CONFLICT(id) DO UPDATE SET body_json=excluded.body_json,state=excluded.state", r.ID, string(marshal(r)), r.State, r.CreatedAt)
 		return err
