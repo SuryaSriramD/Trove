@@ -4,6 +4,8 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
+	"path/filepath"
+	"slices"
 	"testing"
 	"time"
 
@@ -84,5 +86,44 @@ func TestNativeBackupShutdownRejectsNewOperations(t *testing.T) {
 	a.closeBackupPreviews()
 	if id := a.saveRestorePreview(nativeRestorePreview{source: "late result"}); id != "" {
 		t.Fatal("late preview retained after shutdown")
+	}
+}
+
+// Exercise the exact native bridge response builders used after verification.
+// This does not exercise OS dialogs; encrypted authentication is tested separately.
+func TestNativeRestorePreviewsDiscloseOlderBackupMemory(t *testing.T) {
+	const warning = "Restoring an older backup can recover memory state from before a later Forget. Review restored memory before using AI."
+	for _, tc := range []struct {
+		name    string
+		version int
+		build   func(string, string, workspace.BackupManifest) (string, error)
+	}{
+		{"legacy directory", 1, nativeRestorePreviewResponse},
+		{"native directory", 2, nativeRestorePreviewResponse},
+		{"encrypted archive", 2, encryptedRestorePreviewResponse},
+	} {
+		t.Run(tc.name, func(t *testing.T) {
+			manifest := workspace.BackupManifest{FormatVersion: tc.version, BackupID: "reviewed-backup"}
+			source := filepath.Join(t.TempDir(), "reviewed-backup")
+			raw, err := tc.build("review-token", source, manifest)
+			if err != nil {
+				t.Fatal(err)
+			}
+			var preview struct {
+				PreviewID  string                   `json:"previewId"`
+				SourceName string                   `json:"sourceName"`
+				Manifest   workspace.BackupManifest `json:"manifest"`
+				Warnings   []string                 `json:"warnings"`
+			}
+			if err := json.Unmarshal([]byte(raw), &preview); err != nil {
+				t.Fatal(err)
+			}
+			if !slices.Contains(preview.Warnings, warning) {
+				t.Fatalf("memory recovery warning missing from %s response: %+v", tc.name, preview.Warnings)
+			}
+			if preview.PreviewID != "review-token" || preview.SourceName != "reviewed-backup" || preview.Manifest.BackupID != manifest.BackupID || preview.Manifest.FormatVersion != tc.version {
+				t.Fatalf("preview identity changed: %+v", preview)
+			}
+		})
 	}
 }

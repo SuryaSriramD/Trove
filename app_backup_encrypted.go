@@ -164,7 +164,10 @@ func (a *App) PreviewEncryptedBackup(passphrase string) (string, error) {
 	if id == "" {
 		return "", errors.New("application is shutting down")
 	}
-	raw, err := json.Marshal(map[string]any{"version": 1, "previewId": id, "sourceName": filepath.Base(source), "manifest": verified.Manifest, "summary": workspace.PortableBackupSummary(), "warnings": []string{"The complete archive was authenticated before its contents were read.", "Restores the reviewed snapshot into a new folder; your open workspace remains unchanged.", "Pending approvals and local file access are revoked. Search is rebuilt.", restoredMemoryWarning, "This private preview expires after ten minutes; cancel it to remove staged plaintext immediately."}})
+	return encryptedRestorePreviewResponse(id, source, verified.Manifest)
+}
+func encryptedRestorePreviewResponse(id, source string, manifest workspace.BackupManifest) (string, error) {
+	raw, err := json.Marshal(map[string]any{"version": 1, "previewId": id, "sourceName": filepath.Base(source), "manifest": manifest, "summary": workspace.PortableBackupSummary(), "warnings": []string{"The complete archive was authenticated before its contents were read.", "Restores the reviewed snapshot into a new folder; your open workspace remains unchanged.", "Pending approvals and local file access are revoked. Search is rebuilt.", restoredMemoryWarning, "This private preview expires after ten minutes; cancel it to remove staged plaintext immediately."}})
 	return string(raw), err
 }
 func (a *App) CloseNativeRestorePreview(id string) {
