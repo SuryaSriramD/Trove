@@ -1,11 +1,10 @@
 package workspace
 
 import (
-	"bytes"
 	"context"
 	"encoding/json"
 	"fmt"
-	"go/format"
+	"go/ast"
 	"go/parser"
 	"go/token"
 	"os"
@@ -61,7 +60,22 @@ func expandedModeOracle(tc expandedModeCase, out string) error {
 		claims = append(claims, claim)
 	}
 	factsText := regexp.MustCompile(`\[\d+\]`).ReplaceAllString(strings.Join(claims, "\n"), "")
+	numbers := map[string]bool{}
+	if tc.Oracle == "writing" {
+		parsed, err := expandedWritingNumbers(factsText)
+		if err != nil {
+			return err
+		}
+		for _, n := range parsed {
+			numbers[n] = true
+		}
+	}
 	has := func(fact string) bool {
+		if tc.Oracle == "writing" {
+			if n, ok := expandedCanonicalNumber(fact); ok {
+				return numbers[n]
+			}
+		}
 		return regexp.MustCompile(`(?i)\b` + regexp.QuoteMeta(fact) + `\b`).MatchString(factsText)
 	}
 	switch tc.Oracle {
@@ -79,9 +93,13 @@ func expandedModeOracle(tc expandedModeCase, out string) error {
 		if tc.Oracle == "writing" {
 			allowed := map[string]bool{}
 			for _, n := range tc.AllowedNumbers {
-				allowed[n] = true
+				canonical, ok := expandedCanonicalNumber(n)
+				if !ok {
+					return fmt.Errorf("invalid numeric expectation: %q", n)
+				}
+				allowed[canonical] = true
 			}
-			for _, n := range regexp.MustCompile(`\b[0-9]+\b`).FindAllString(factsText, -1) {
+			for n := range numbers {
 				if !allowed[n] {
 					return fmt.Errorf("unprovided numeric claim: %s", n)
 				}
@@ -160,15 +178,31 @@ func expandedModeOracle(tc expandedModeCase, out string) error {
 			return fmt.Errorf("diagram edges changed")
 		}
 	case "code":
-		canonical := func(s string) (string, error) {
-			fset := token.NewFileSet()
-			tree, err := parser.ParseFile(fset, "fixture.go", "package fixture\n"+s, 0)
+		canonical := func(s string) (*ast.File, error) {
+			// Positions describe source layout, not syntax. Skip parser-only
+			// object links so identifier bindings cannot retain position-bearing
+			// pointers outside the syntax tree. Preserve whether a token exists:
+			// CallExpr.Ellipsis and TypeSpec.Assign carry syntax through Pos.IsValid.
+			// Keep every non-position AST field.
+			tree, err := parser.ParseFile(token.NewFileSet(), "fixture.go", "package fixture\n"+s, parser.SkipObjectResolution)
 			if err != nil {
-				return "", err
+				return nil, err
 			}
-			var b bytes.Buffer
-			err = format.Node(&b, fset, tree)
-			return b.String(), err
+			position := reflect.TypeOf(token.NoPos)
+			ast.Inspect(tree, func(node ast.Node) bool {
+				if node != nil {
+					fields := reflect.ValueOf(node).Elem()
+					for i := 0; i < fields.NumField(); i++ {
+						if field := fields.Field(i); field.Type() == position {
+							if field.Int() != 0 {
+								field.SetInt(1)
+							}
+						}
+					}
+				}
+				return true
+			})
+			return tree, nil
 		}
 		got, err := canonical(out)
 		if err != nil {
@@ -178,7 +212,7 @@ func expandedModeOracle(tc expandedModeCase, out string) error {
 		if err != nil {
 			return err
 		}
-		if got != want {
+		if !reflect.DeepEqual(got, want) {
 			return fmt.Errorf("function syntax/signature/logic changed")
 		}
 		if tc.RequireComment {

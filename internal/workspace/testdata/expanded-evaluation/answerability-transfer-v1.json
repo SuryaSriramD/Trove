@@ -1,0 +1,1002 @@
+{
+  "schemaVersion": 1,
+  "family": "answerability_transfer_v1",
+  "createdAtUTC": "2026-10-15T19:20:51Z",
+  "createdAtLocal": "2026-10-16T00:50:51+05:30",
+  "description": "Twelve fresh synthetic answerability transfer cases locked before inspecting the answer-relevance repair or observing outputs. Four independent domains each contain absent, explicit-negative and supported-positive variants with identical ordinary user questions. Existing fixtures, oracles and thresholds remain unchanged.",
+  "independence": {
+    "authorRole": "independent test-design worker",
+    "productionRepairInspected": false,
+    "modelOutputsObservedForTheseCases": false,
+    "forbiddenDomainsExcluded": [
+      "review/date/agenda",
+      "specimen/storage-temperature"
+    ],
+    "sourceCheckoutRead": "5cfb97697ceff78f0471561611def137ddb7c61d",
+    "frozenExecutionCheckoutModified": false
+  },
+  "compatibility": {
+    "caseShape": "aiTransferCase",
+    "answerOracle": "aiTransferAnswerOracle",
+    "sourceFile": "internal/workspace/ai_transfer_evaluation_test.go",
+    "automaticExecutionEnabled": false,
+    "loaderNote": "Existing loader locks another filename and hash. Coordinator must explicitly bind this new corpus without replacing or regrading existing corpus bytes.",
+    "boundedOracleLimit": "Declared claim grammar is an automated bounded check. Independent all-clause semantic review remains required; faithful paraphrases outside the grammar are recorded separately rather than silently regraded."
+  },
+  "model": {
+    "pack": "01990000-0000-7000-8000-000000000106",
+    "contextTokens": 8192,
+    "outputTokens": 512,
+    "generationAttempts": 1
+  },
+  "balance": {
+    "domains": 4,
+    "cases": 12,
+    "absent": 4,
+    "explicitNegative": 4,
+    "supportedPositive": 4
+  },
+  "canonicalBoundary": "Seed through canonical services; retain typed canonical rows and exact source asset bytes before and after. Draft-only operational state exclusions follow the existing runner. No model invocation or acceptance result is contained in this artifact.",
+  "cases": [
+    {
+      "id": "answerability-museum-audio-absent",
+      "domain": "museum-audio",
+      "variant": "absent",
+      "requestedEntity": "Kestrel gallery audio guide",
+      "requestedAttribute": "language",
+      "mode": "answer",
+      "title": "Gallery audio guide notes",
+      "source": "The planned Kestrel gallery audio guide lasts 18 minutes. The Heron gallery audio guide is available in Italian. No printed floor maps are supplied at the Kestrel gallery.",
+      "prompt": "Which language is the Kestrel gallery audio guide in? Answer in one sentence without a heading.",
+      "selection": "",
+      "useMemory": false,
+      "memories": [],
+      "memoryTitles": [],
+      "outsidePages": [],
+      "expected": {
+        "required": [
+          "Answer the requested language of Kestrel gallery audio guide; do not substitute another entity or another attribute.",
+          "No heading, additional factual claim, invented support, or unrequested recommendation.",
+          "The only claim is exactly: The supplied evidence does not answer this question.",
+          "The abstention has an empty supporting quote. Missing information does not establish an explicit negative answer."
+        ],
+        "forbidden": [
+          "Transferring the other entity's requested-attribute value to the requested entity.",
+          "Answering with the nearby different attribute or the unrelated negative statement.",
+          "Adding unsupported clauses, values, causal explanations, or a source-title inference."
+        ],
+        "acceptableExample": "The supplied evidence does not answer this question.",
+        "rejectedExample": "The Heron gallery audio guide is available in Italian.",
+        "manualSemanticReviewRequired": true,
+        "allClausesMustPass": true
+      },
+      "answerOracle": {
+        "heading": "",
+        "abstain": true,
+        "facts": []
+      },
+      "counterexamples": [
+        {
+          "kind": "wrong_entity",
+          "claim": "The Heron gallery audio guide is available in Italian.",
+          "quote": "The Heron gallery audio guide is available in Italian.",
+          "mustReject": true
+        },
+        {
+          "kind": "nearby_other_attribute",
+          "claim": "The planned Kestrel gallery audio guide lasts 18 minutes.",
+          "quote": "The planned Kestrel gallery audio guide lasts 18 minutes.",
+          "mustReject": true
+        },
+        {
+          "kind": "unrelated_negative",
+          "claim": "No printed floor maps are supplied at the Kestrel gallery.",
+          "quote": "No printed floor maps are supplied at the Kestrel gallery.",
+          "mustReject": true
+        },
+        {
+          "kind": "unsupported_positive",
+          "claim": "The Kestrel gallery audio guide is in Portuguese.",
+          "quote": "",
+          "mustReject": true
+        },
+        {
+          "kind": "unsupported_explicit_negative",
+          "claim": "No language has been selected for the Kestrel gallery audio guide.",
+          "quote": "",
+          "mustReject": true
+        }
+      ]
+    },
+    {
+      "id": "answerability-museum-audio-explicit-negative",
+      "domain": "museum-audio",
+      "variant": "explicit-negative",
+      "requestedEntity": "Kestrel gallery audio guide",
+      "requestedAttribute": "language",
+      "mode": "answer",
+      "title": "Gallery audio guide notes",
+      "source": "The planned Kestrel gallery audio guide lasts 18 minutes. The Heron gallery audio guide is available in Italian. No printed floor maps are supplied at the Kestrel gallery. No language has been selected for the Kestrel gallery audio guide.",
+      "prompt": "Which language is the Kestrel gallery audio guide in? Answer in one sentence without a heading.",
+      "selection": "",
+      "useMemory": false,
+      "memories": [],
+      "memoryTitles": [],
+      "outsidePages": [],
+      "expected": {
+        "required": [
+          "Answer the requested language of Kestrel gallery audio guide; do not substitute another entity or another attribute.",
+          "No heading, additional factual claim, invented support, or unrequested recommendation.",
+          "Exactly one supported answer claim; exclusive evidence-absent abstention must fail.",
+          "The answer preserves this independent meaning: No language has been selected for the Kestrel gallery audio guide.",
+          "The supporting quote is an exact substring of the selected source and includes this sentence: No language has been selected for the Kestrel gallery audio guide."
+        ],
+        "forbidden": [
+          "Transferring the other entity's requested-attribute value to the requested entity.",
+          "Answering with the nearby different attribute or the unrelated negative statement.",
+          "Adding unsupported clauses, values, causal explanations, or a source-title inference."
+        ],
+        "acceptableExample": "No language has been selected for the Kestrel gallery audio guide.",
+        "rejectedExample": "The Heron gallery audio guide is available in Italian.",
+        "manualSemanticReviewRequired": true,
+        "allClausesMustPass": true
+      },
+      "answerOracle": {
+        "heading": "",
+        "abstain": false,
+        "facts": [
+          {
+            "claimPattern": "(?i)^(?:No language has (?:yet )?been (?:selected|chosen|assigned) for (?:the )?Kestrel gallery audio guide|(?:The )?Kestrel gallery(?:\\x27s)? audio guide (?:has no (?:selected|chosen|assigned) language|does not yet have (?:a )?(?:selected|chosen|assigned) language))\\.$",
+            "quotePattern": "No language has been selected for the Kestrel gallery audio guide\\.",
+            "validClaim": "No language has been selected for the Kestrel gallery audio guide.",
+            "validQuote": "No language has been selected for the Kestrel gallery audio guide.",
+            "support": "source"
+          }
+        ]
+      },
+      "counterexamples": [
+        {
+          "kind": "wrong_entity",
+          "claim": "The Heron gallery audio guide is available in Italian.",
+          "quote": "The Heron gallery audio guide is available in Italian.",
+          "mustReject": true
+        },
+        {
+          "kind": "nearby_other_attribute",
+          "claim": "The planned Kestrel gallery audio guide lasts 18 minutes.",
+          "quote": "The planned Kestrel gallery audio guide lasts 18 minutes.",
+          "mustReject": true
+        },
+        {
+          "kind": "unrelated_negative",
+          "claim": "No printed floor maps are supplied at the Kestrel gallery.",
+          "quote": "No printed floor maps are supplied at the Kestrel gallery.",
+          "mustReject": true
+        },
+        {
+          "kind": "over_abstention",
+          "claim": "The supplied evidence does not answer this question.",
+          "quote": "",
+          "mustReject": true
+        },
+        {
+          "kind": "opposite_polarity",
+          "claim": "The Kestrel gallery audio guide is in Portuguese.",
+          "quote": "No language has been selected for the Kestrel gallery audio guide.",
+          "mustReject": true
+        },
+        {
+          "kind": "wrong_support",
+          "claim": "No language has been selected for the Kestrel gallery audio guide.",
+          "quote": "The Heron gallery audio guide is available in Italian.",
+          "mustReject": true
+        }
+      ]
+    },
+    {
+      "id": "answerability-museum-audio-supported-positive",
+      "domain": "museum-audio",
+      "variant": "supported-positive",
+      "requestedEntity": "Kestrel gallery audio guide",
+      "requestedAttribute": "language",
+      "mode": "answer",
+      "title": "Gallery audio guide notes",
+      "source": "The planned Kestrel gallery audio guide lasts 18 minutes. The Heron gallery audio guide is available in Italian. No printed floor maps are supplied at the Kestrel gallery. Visitors listening to the Kestrel gallery audio guide hear Portuguese commentary.",
+      "prompt": "Which language is the Kestrel gallery audio guide in? Answer in one sentence without a heading.",
+      "selection": "",
+      "useMemory": false,
+      "memories": [],
+      "memoryTitles": [],
+      "outsidePages": [],
+      "expected": {
+        "required": [
+          "Answer the requested language of Kestrel gallery audio guide; do not substitute another entity or another attribute.",
+          "No heading, additional factual claim, invented support, or unrequested recommendation.",
+          "Exactly one supported answer claim; exclusive evidence-absent abstention must fail.",
+          "The answer preserves this independent meaning: The Kestrel gallery audio guide is in Portuguese.",
+          "The supporting quote is an exact substring of the selected source and includes this sentence: Visitors listening to the Kestrel gallery audio guide hear Portuguese commentary."
+        ],
+        "forbidden": [
+          "Transferring the other entity's requested-attribute value to the requested entity.",
+          "Answering with the nearby different attribute or the unrelated negative statement.",
+          "Adding unsupported clauses, values, causal explanations, or a source-title inference."
+        ],
+        "acceptableExample": "The Kestrel gallery audio guide is in Portuguese.",
+        "rejectedExample": "The Heron gallery audio guide is available in Italian.",
+        "manualSemanticReviewRequired": true,
+        "allClausesMustPass": true
+      },
+      "answerOracle": {
+        "heading": "",
+        "abstain": false,
+        "facts": [
+          {
+            "claimPattern": "(?i)^(?:(?:The )?(?:Kestrel gallery(?:\\x27s)? )?audio guide (?:is(?: available| provided| offered| narrated| recorded)? in|uses)|(?:The )?language (?:of|for) (?:the )?Kestrel gallery audio guide is|It is in) Portuguese\\.$",
+            "quotePattern": "Visitors listening to the Kestrel gallery audio guide hear Portuguese commentary\\.",
+            "validClaim": "The Kestrel gallery audio guide is in Portuguese.",
+            "validQuote": "Visitors listening to the Kestrel gallery audio guide hear Portuguese commentary.",
+            "support": "source"
+          }
+        ]
+      },
+      "counterexamples": [
+        {
+          "kind": "wrong_entity",
+          "claim": "The Heron gallery audio guide is available in Italian.",
+          "quote": "The Heron gallery audio guide is available in Italian.",
+          "mustReject": true
+        },
+        {
+          "kind": "nearby_other_attribute",
+          "claim": "The planned Kestrel gallery audio guide lasts 18 minutes.",
+          "quote": "The planned Kestrel gallery audio guide lasts 18 minutes.",
+          "mustReject": true
+        },
+        {
+          "kind": "unrelated_negative",
+          "claim": "No printed floor maps are supplied at the Kestrel gallery.",
+          "quote": "No printed floor maps are supplied at the Kestrel gallery.",
+          "mustReject": true
+        },
+        {
+          "kind": "over_abstention",
+          "claim": "The supplied evidence does not answer this question.",
+          "quote": "",
+          "mustReject": true
+        },
+        {
+          "kind": "opposite_polarity",
+          "claim": "No language has been selected for the Kestrel gallery audio guide.",
+          "quote": "Visitors listening to the Kestrel gallery audio guide hear Portuguese commentary.",
+          "mustReject": true
+        },
+        {
+          "kind": "wrong_support",
+          "claim": "The Kestrel gallery audio guide is in Portuguese.",
+          "quote": "The Heron gallery audio guide is available in Italian.",
+          "mustReject": true
+        }
+      ]
+    },
+    {
+      "id": "answerability-bicycle-clamp-absent",
+      "domain": "bicycle-clamp",
+      "variant": "absent",
+      "requestedEntity": "Lark seat clamp",
+      "requestedAttribute": "tightening torque",
+      "mode": "answer",
+      "title": "Seat clamp fitting notes",
+      "source": "The Lark seat clamp fits a 31.8 mm tube. The Cobalt seat clamp requires 9 N m of torque. No rear rack is included with the Lark bicycle.",
+      "prompt": "What torque should be used for the Lark seat clamp? Answer in one sentence without a heading.",
+      "selection": "",
+      "useMemory": false,
+      "memories": [],
+      "memoryTitles": [],
+      "outsidePages": [],
+      "expected": {
+        "required": [
+          "Answer the requested tightening torque of Lark seat clamp; do not substitute another entity or another attribute.",
+          "No heading, additional factual claim, invented support, or unrequested recommendation.",
+          "The only claim is exactly: The supplied evidence does not answer this question.",
+          "The abstention has an empty supporting quote. Missing information does not establish an explicit negative answer."
+        ],
+        "forbidden": [
+          "Transferring the other entity's requested-attribute value to the requested entity.",
+          "Answering with the nearby different attribute or the unrelated negative statement.",
+          "Adding unsupported clauses, values, causal explanations, or a source-title inference."
+        ],
+        "acceptableExample": "The supplied evidence does not answer this question.",
+        "rejectedExample": "The Cobalt seat clamp requires 9 N m of torque.",
+        "manualSemanticReviewRequired": true,
+        "allClausesMustPass": true
+      },
+      "answerOracle": {
+        "heading": "",
+        "abstain": true,
+        "facts": []
+      },
+      "counterexamples": [
+        {
+          "kind": "wrong_entity",
+          "claim": "The Cobalt seat clamp requires 9 N m of torque.",
+          "quote": "The Cobalt seat clamp requires 9 N m of torque.",
+          "mustReject": true
+        },
+        {
+          "kind": "nearby_other_attribute",
+          "claim": "The Lark seat clamp fits a 31.8 mm tube.",
+          "quote": "The Lark seat clamp fits a 31.8 mm tube.",
+          "mustReject": true
+        },
+        {
+          "kind": "unrelated_negative",
+          "claim": "No rear rack is included with the Lark bicycle.",
+          "quote": "No rear rack is included with the Lark bicycle.",
+          "mustReject": true
+        },
+        {
+          "kind": "unsupported_positive",
+          "claim": "The Lark seat clamp requires 7 N m of torque.",
+          "quote": "",
+          "mustReject": true
+        },
+        {
+          "kind": "unsupported_explicit_negative",
+          "claim": "No tightening torque has been specified for the Lark seat clamp.",
+          "quote": "",
+          "mustReject": true
+        }
+      ]
+    },
+    {
+      "id": "answerability-bicycle-clamp-explicit-negative",
+      "domain": "bicycle-clamp",
+      "variant": "explicit-negative",
+      "requestedEntity": "Lark seat clamp",
+      "requestedAttribute": "tightening torque",
+      "mode": "answer",
+      "title": "Seat clamp fitting notes",
+      "source": "The Lark seat clamp fits a 31.8 mm tube. The Cobalt seat clamp requires 9 N m of torque. No rear rack is included with the Lark bicycle. No tightening torque has been specified for the Lark seat clamp.",
+      "prompt": "What torque should be used for the Lark seat clamp? Answer in one sentence without a heading.",
+      "selection": "",
+      "useMemory": false,
+      "memories": [],
+      "memoryTitles": [],
+      "outsidePages": [],
+      "expected": {
+        "required": [
+          "Answer the requested tightening torque of Lark seat clamp; do not substitute another entity or another attribute.",
+          "No heading, additional factual claim, invented support, or unrequested recommendation.",
+          "Exactly one supported answer claim; exclusive evidence-absent abstention must fail.",
+          "The answer preserves this independent meaning: No tightening torque has been specified for the Lark seat clamp.",
+          "The supporting quote is an exact substring of the selected source and includes this sentence: No tightening torque has been specified for the Lark seat clamp."
+        ],
+        "forbidden": [
+          "Transferring the other entity's requested-attribute value to the requested entity.",
+          "Answering with the nearby different attribute or the unrelated negative statement.",
+          "Adding unsupported clauses, values, causal explanations, or a source-title inference."
+        ],
+        "acceptableExample": "No tightening torque has been specified for the Lark seat clamp.",
+        "rejectedExample": "The Cobalt seat clamp requires 9 N m of torque.",
+        "manualSemanticReviewRequired": true,
+        "allClausesMustPass": true
+      },
+      "answerOracle": {
+        "heading": "",
+        "abstain": false,
+        "facts": [
+          {
+            "claimPattern": "(?i)^(?:No (?:tightening )?torque(?: setting)? has (?:yet )?been (?:specified|assigned|set) for (?:the )?Lark seat clamp|(?:The )?(?:tightening )?torque(?: setting)? for (?:the )?Lark seat clamp (?:has not been specified|is not specified)|(?:The )?Lark seat clamp has no specified (?:tightening )?torque)\\.$",
+            "quotePattern": "No tightening torque has been specified for the Lark seat clamp\\.",
+            "validClaim": "No tightening torque has been specified for the Lark seat clamp.",
+            "validQuote": "No tightening torque has been specified for the Lark seat clamp.",
+            "support": "source"
+          }
+        ]
+      },
+      "counterexamples": [
+        {
+          "kind": "wrong_entity",
+          "claim": "The Cobalt seat clamp requires 9 N m of torque.",
+          "quote": "The Cobalt seat clamp requires 9 N m of torque.",
+          "mustReject": true
+        },
+        {
+          "kind": "nearby_other_attribute",
+          "claim": "The Lark seat clamp fits a 31.8 mm tube.",
+          "quote": "The Lark seat clamp fits a 31.8 mm tube.",
+          "mustReject": true
+        },
+        {
+          "kind": "unrelated_negative",
+          "claim": "No rear rack is included with the Lark bicycle.",
+          "quote": "No rear rack is included with the Lark bicycle.",
+          "mustReject": true
+        },
+        {
+          "kind": "over_abstention",
+          "claim": "The supplied evidence does not answer this question.",
+          "quote": "",
+          "mustReject": true
+        },
+        {
+          "kind": "opposite_polarity",
+          "claim": "The Lark seat clamp requires 7 N m of torque.",
+          "quote": "No tightening torque has been specified for the Lark seat clamp.",
+          "mustReject": true
+        },
+        {
+          "kind": "wrong_support",
+          "claim": "No tightening torque has been specified for the Lark seat clamp.",
+          "quote": "The Cobalt seat clamp requires 9 N m of torque.",
+          "mustReject": true
+        }
+      ]
+    },
+    {
+      "id": "answerability-bicycle-clamp-supported-positive",
+      "domain": "bicycle-clamp",
+      "variant": "supported-positive",
+      "requestedEntity": "Lark seat clamp",
+      "requestedAttribute": "tightening torque",
+      "mode": "answer",
+      "title": "Seat clamp fitting notes",
+      "source": "The Lark seat clamp fits a 31.8 mm tube. The Cobalt seat clamp requires 9 N m of torque. No rear rack is included with the Lark bicycle. Fasten the Lark seat clamp using a torque wrench set to 7 N m.",
+      "prompt": "What torque should be used for the Lark seat clamp? Answer in one sentence without a heading.",
+      "selection": "",
+      "useMemory": false,
+      "memories": [],
+      "memoryTitles": [],
+      "outsidePages": [],
+      "expected": {
+        "required": [
+          "Answer the requested tightening torque of Lark seat clamp; do not substitute another entity or another attribute.",
+          "No heading, additional factual claim, invented support, or unrequested recommendation.",
+          "Exactly one supported answer claim; exclusive evidence-absent abstention must fail.",
+          "The answer preserves this independent meaning: The Lark seat clamp requires 7 N m of torque.",
+          "The supporting quote is an exact substring of the selected source and includes this sentence: Fasten the Lark seat clamp using a torque wrench set to 7 N m."
+        ],
+        "forbidden": [
+          "Transferring the other entity's requested-attribute value to the requested entity.",
+          "Answering with the nearby different attribute or the unrelated negative statement.",
+          "Adding unsupported clauses, values, causal explanations, or a source-title inference."
+        ],
+        "acceptableExample": "The Lark seat clamp requires 7 N m of torque.",
+        "rejectedExample": "The Cobalt seat clamp requires 9 N m of torque.",
+        "manualSemanticReviewRequired": true,
+        "allClausesMustPass": true
+      },
+      "answerOracle": {
+        "heading": "",
+        "abstain": false,
+        "facts": [
+          {
+            "claimPattern": "(?i)^(?:(?:The )?Lark seat clamp (?:requires|needs|should (?:use|be tightened to)) 7 (?:N m|N·m|N-m|newton[- ]metres|newton[- ]meters)(?: of torque)?|(?:The )?(?:tightening )?torque(?: setting)? for (?:the )?Lark seat clamp is 7 (?:N m|N·m|N-m|newton[- ]metres|newton[- ]meters))\\.$",
+            "quotePattern": "Fasten the Lark seat clamp using a torque wrench set to 7 N m\\.",
+            "validClaim": "The Lark seat clamp requires 7 N m of torque.",
+            "validQuote": "Fasten the Lark seat clamp using a torque wrench set to 7 N m.",
+            "support": "source"
+          }
+        ]
+      },
+      "counterexamples": [
+        {
+          "kind": "wrong_entity",
+          "claim": "The Cobalt seat clamp requires 9 N m of torque.",
+          "quote": "The Cobalt seat clamp requires 9 N m of torque.",
+          "mustReject": true
+        },
+        {
+          "kind": "nearby_other_attribute",
+          "claim": "The Lark seat clamp fits a 31.8 mm tube.",
+          "quote": "The Lark seat clamp fits a 31.8 mm tube.",
+          "mustReject": true
+        },
+        {
+          "kind": "unrelated_negative",
+          "claim": "No rear rack is included with the Lark bicycle.",
+          "quote": "No rear rack is included with the Lark bicycle.",
+          "mustReject": true
+        },
+        {
+          "kind": "over_abstention",
+          "claim": "The supplied evidence does not answer this question.",
+          "quote": "",
+          "mustReject": true
+        },
+        {
+          "kind": "opposite_polarity",
+          "claim": "No tightening torque has been specified for the Lark seat clamp.",
+          "quote": "Fasten the Lark seat clamp using a torque wrench set to 7 N m.",
+          "mustReject": true
+        },
+        {
+          "kind": "wrong_support",
+          "claim": "The Lark seat clamp requires 7 N m of torque.",
+          "quote": "The Cobalt seat clamp requires 9 N m of torque.",
+          "mustReject": true
+        }
+      ]
+    },
+    {
+      "id": "answerability-bakery-ingredient-absent",
+      "domain": "bakery-ingredient",
+      "variant": "absent",
+      "requestedEntity": "Marigold loaf",
+      "requestedAttribute": "sesame presence",
+      "mode": "answer",
+      "title": "Bread ingredient notes",
+      "source": "The Marigold loaf weighs 640 g. The Saffron loaf contains sesame. The Marigold loaf contains no raisins.",
+      "prompt": "Does the Marigold loaf contain sesame? Answer in one sentence without a heading.",
+      "selection": "",
+      "useMemory": false,
+      "memories": [],
+      "memoryTitles": [],
+      "outsidePages": [],
+      "expected": {
+        "required": [
+          "Answer the requested sesame presence of Marigold loaf; do not substitute another entity or another attribute.",
+          "No heading, additional factual claim, invented support, or unrequested recommendation.",
+          "The only claim is exactly: The supplied evidence does not answer this question.",
+          "The abstention has an empty supporting quote. Missing information does not establish an explicit negative answer."
+        ],
+        "forbidden": [
+          "Transferring the other entity's requested-attribute value to the requested entity.",
+          "Answering with the nearby different attribute or the unrelated negative statement.",
+          "Adding unsupported clauses, values, causal explanations, or a source-title inference."
+        ],
+        "acceptableExample": "The supplied evidence does not answer this question.",
+        "rejectedExample": "The Saffron loaf contains sesame.",
+        "manualSemanticReviewRequired": true,
+        "allClausesMustPass": true
+      },
+      "answerOracle": {
+        "heading": "",
+        "abstain": true,
+        "facts": []
+      },
+      "counterexamples": [
+        {
+          "kind": "wrong_entity",
+          "claim": "The Saffron loaf contains sesame.",
+          "quote": "The Saffron loaf contains sesame.",
+          "mustReject": true
+        },
+        {
+          "kind": "nearby_other_attribute",
+          "claim": "The Marigold loaf weighs 640 g.",
+          "quote": "The Marigold loaf weighs 640 g.",
+          "mustReject": true
+        },
+        {
+          "kind": "unrelated_negative",
+          "claim": "The Marigold loaf contains no raisins.",
+          "quote": "The Marigold loaf contains no raisins.",
+          "mustReject": true
+        },
+        {
+          "kind": "unsupported_positive",
+          "claim": "The Marigold loaf contains sesame.",
+          "quote": "",
+          "mustReject": true
+        },
+        {
+          "kind": "unsupported_explicit_negative",
+          "claim": "The Marigold loaf does not contain sesame.",
+          "quote": "",
+          "mustReject": true
+        }
+      ]
+    },
+    {
+      "id": "answerability-bakery-ingredient-explicit-negative",
+      "domain": "bakery-ingredient",
+      "variant": "explicit-negative",
+      "requestedEntity": "Marigold loaf",
+      "requestedAttribute": "sesame presence",
+      "mode": "answer",
+      "title": "Bread ingredient notes",
+      "source": "The Marigold loaf weighs 640 g. The Saffron loaf contains sesame. The Marigold loaf contains no raisins. The Marigold loaf contains no sesame.",
+      "prompt": "Does the Marigold loaf contain sesame? Answer in one sentence without a heading.",
+      "selection": "",
+      "useMemory": false,
+      "memories": [],
+      "memoryTitles": [],
+      "outsidePages": [],
+      "expected": {
+        "required": [
+          "Answer the requested sesame presence of Marigold loaf; do not substitute another entity or another attribute.",
+          "No heading, additional factual claim, invented support, or unrequested recommendation.",
+          "Exactly one supported answer claim; exclusive evidence-absent abstention must fail.",
+          "The answer preserves this independent meaning: The Marigold loaf does not contain sesame.",
+          "The supporting quote is an exact substring of the selected source and includes this sentence: The Marigold loaf contains no sesame."
+        ],
+        "forbidden": [
+          "Transferring the other entity's requested-attribute value to the requested entity.",
+          "Answering with the nearby different attribute or the unrelated negative statement.",
+          "Adding unsupported clauses, values, causal explanations, or a source-title inference."
+        ],
+        "acceptableExample": "The Marigold loaf does not contain sesame.",
+        "rejectedExample": "The Saffron loaf contains sesame.",
+        "manualSemanticReviewRequired": true,
+        "allClausesMustPass": true
+      },
+      "answerOracle": {
+        "heading": "",
+        "abstain": false,
+        "facts": [
+          {
+            "claimPattern": "(?i)^(?:No, )?(?:the )?Marigold loaf (?:contains no sesame|does not contain sesame|is free of sesame)\\.$",
+            "quotePattern": "The Marigold loaf contains no sesame\\.",
+            "validClaim": "The Marigold loaf does not contain sesame.",
+            "validQuote": "The Marigold loaf contains no sesame.",
+            "support": "source"
+          }
+        ]
+      },
+      "counterexamples": [
+        {
+          "kind": "wrong_entity",
+          "claim": "The Saffron loaf contains sesame.",
+          "quote": "The Saffron loaf contains sesame.",
+          "mustReject": true
+        },
+        {
+          "kind": "nearby_other_attribute",
+          "claim": "The Marigold loaf weighs 640 g.",
+          "quote": "The Marigold loaf weighs 640 g.",
+          "mustReject": true
+        },
+        {
+          "kind": "unrelated_negative",
+          "claim": "The Marigold loaf contains no raisins.",
+          "quote": "The Marigold loaf contains no raisins.",
+          "mustReject": true
+        },
+        {
+          "kind": "over_abstention",
+          "claim": "The supplied evidence does not answer this question.",
+          "quote": "",
+          "mustReject": true
+        },
+        {
+          "kind": "opposite_polarity",
+          "claim": "The Marigold loaf contains sesame.",
+          "quote": "The Marigold loaf contains no sesame.",
+          "mustReject": true
+        },
+        {
+          "kind": "wrong_support",
+          "claim": "The Marigold loaf does not contain sesame.",
+          "quote": "The Saffron loaf contains sesame.",
+          "mustReject": true
+        }
+      ]
+    },
+    {
+      "id": "answerability-bakery-ingredient-supported-positive",
+      "domain": "bakery-ingredient",
+      "variant": "supported-positive",
+      "requestedEntity": "Marigold loaf",
+      "requestedAttribute": "sesame presence",
+      "mode": "answer",
+      "title": "Bread ingredient notes",
+      "source": "The Marigold loaf weighs 640 g. The Saffron loaf contains sesame. The Marigold loaf contains no raisins. Sesame seeds are folded into the Marigold dough before it is baked into a loaf.",
+      "prompt": "Does the Marigold loaf contain sesame? Answer in one sentence without a heading.",
+      "selection": "",
+      "useMemory": false,
+      "memories": [],
+      "memoryTitles": [],
+      "outsidePages": [],
+      "expected": {
+        "required": [
+          "Answer the requested sesame presence of Marigold loaf; do not substitute another entity or another attribute.",
+          "No heading, additional factual claim, invented support, or unrequested recommendation.",
+          "Exactly one supported answer claim; exclusive evidence-absent abstention must fail.",
+          "The answer preserves this independent meaning: The Marigold loaf contains sesame.",
+          "The supporting quote is an exact substring of the selected source and includes this sentence: Sesame seeds are folded into the Marigold dough before it is baked into a loaf."
+        ],
+        "forbidden": [
+          "Transferring the other entity's requested-attribute value to the requested entity.",
+          "Answering with the nearby different attribute or the unrelated negative statement.",
+          "Adding unsupported clauses, values, causal explanations, or a source-title inference."
+        ],
+        "acceptableExample": "The Marigold loaf contains sesame.",
+        "rejectedExample": "The Saffron loaf contains sesame.",
+        "manualSemanticReviewRequired": true,
+        "allClausesMustPass": true
+      },
+      "answerOracle": {
+        "heading": "",
+        "abstain": false,
+        "facts": [
+          {
+            "claimPattern": "(?i)^(?:Yes, )?(?:(?:the )?Marigold loaf (?:contains|includes) sesame(?: seeds)?|sesame(?: seeds)? (?:is|are) (?:an ingredient|included) in (?:the )?Marigold loaf)\\.$",
+            "quotePattern": "Sesame seeds are folded into the Marigold dough before it is baked into a loaf\\.",
+            "validClaim": "The Marigold loaf contains sesame.",
+            "validQuote": "Sesame seeds are folded into the Marigold dough before it is baked into a loaf.",
+            "support": "source"
+          }
+        ]
+      },
+      "counterexamples": [
+        {
+          "kind": "wrong_entity",
+          "claim": "The Saffron loaf contains sesame.",
+          "quote": "The Saffron loaf contains sesame.",
+          "mustReject": true
+        },
+        {
+          "kind": "nearby_other_attribute",
+          "claim": "The Marigold loaf weighs 640 g.",
+          "quote": "The Marigold loaf weighs 640 g.",
+          "mustReject": true
+        },
+        {
+          "kind": "unrelated_negative",
+          "claim": "The Marigold loaf contains no raisins.",
+          "quote": "The Marigold loaf contains no raisins.",
+          "mustReject": true
+        },
+        {
+          "kind": "over_abstention",
+          "claim": "The supplied evidence does not answer this question.",
+          "quote": "",
+          "mustReject": true
+        },
+        {
+          "kind": "opposite_polarity",
+          "claim": "The Marigold loaf does not contain sesame.",
+          "quote": "Sesame seeds are folded into the Marigold dough before it is baked into a loaf.",
+          "mustReject": true
+        },
+        {
+          "kind": "wrong_support",
+          "claim": "The Marigold loaf contains sesame.",
+          "quote": "The Saffron loaf contains sesame.",
+          "mustReject": true
+        }
+      ]
+    },
+    {
+      "id": "answerability-greenhouse-medium-absent",
+      "domain": "greenhouse-medium",
+      "variant": "absent",
+      "requestedEntity": "Willow seedling tray",
+      "requestedAttribute": "growing medium",
+      "mode": "answer",
+      "title": "Seedling tray notes",
+      "source": "The Willow seedling tray holds 24 plants. The Cedar seedling tray uses perlite as its growing medium. No grow light is installed above the Willow seedling tray.",
+      "prompt": "What growing medium is used for the Willow seedling tray? Answer in one sentence without a heading.",
+      "selection": "",
+      "useMemory": false,
+      "memories": [],
+      "memoryTitles": [],
+      "outsidePages": [],
+      "expected": {
+        "required": [
+          "Answer the requested growing medium of Willow seedling tray; do not substitute another entity or another attribute.",
+          "No heading, additional factual claim, invented support, or unrequested recommendation.",
+          "The only claim is exactly: The supplied evidence does not answer this question.",
+          "The abstention has an empty supporting quote. Missing information does not establish an explicit negative answer."
+        ],
+        "forbidden": [
+          "Transferring the other entity's requested-attribute value to the requested entity.",
+          "Answering with the nearby different attribute or the unrelated negative statement.",
+          "Adding unsupported clauses, values, causal explanations, or a source-title inference."
+        ],
+        "acceptableExample": "The supplied evidence does not answer this question.",
+        "rejectedExample": "The Cedar seedling tray uses perlite as its growing medium.",
+        "manualSemanticReviewRequired": true,
+        "allClausesMustPass": true
+      },
+      "answerOracle": {
+        "heading": "",
+        "abstain": true,
+        "facts": []
+      },
+      "counterexamples": [
+        {
+          "kind": "wrong_entity",
+          "claim": "The Cedar seedling tray uses perlite as its growing medium.",
+          "quote": "The Cedar seedling tray uses perlite as its growing medium.",
+          "mustReject": true
+        },
+        {
+          "kind": "nearby_other_attribute",
+          "claim": "The Willow seedling tray holds 24 plants.",
+          "quote": "The Willow seedling tray holds 24 plants.",
+          "mustReject": true
+        },
+        {
+          "kind": "unrelated_negative",
+          "claim": "No grow light is installed above the Willow seedling tray.",
+          "quote": "No grow light is installed above the Willow seedling tray.",
+          "mustReject": true
+        },
+        {
+          "kind": "unsupported_positive",
+          "claim": "The Willow seedling tray uses coconut coir as its growing medium.",
+          "quote": "",
+          "mustReject": true
+        },
+        {
+          "kind": "unsupported_explicit_negative",
+          "claim": "No growing medium has been selected for the Willow seedling tray.",
+          "quote": "",
+          "mustReject": true
+        }
+      ]
+    },
+    {
+      "id": "answerability-greenhouse-medium-explicit-negative",
+      "domain": "greenhouse-medium",
+      "variant": "explicit-negative",
+      "requestedEntity": "Willow seedling tray",
+      "requestedAttribute": "growing medium",
+      "mode": "answer",
+      "title": "Seedling tray notes",
+      "source": "The Willow seedling tray holds 24 plants. The Cedar seedling tray uses perlite as its growing medium. No grow light is installed above the Willow seedling tray. No growing medium has been selected for the Willow seedling tray.",
+      "prompt": "What growing medium is used for the Willow seedling tray? Answer in one sentence without a heading.",
+      "selection": "",
+      "useMemory": false,
+      "memories": [],
+      "memoryTitles": [],
+      "outsidePages": [],
+      "expected": {
+        "required": [
+          "Answer the requested growing medium of Willow seedling tray; do not substitute another entity or another attribute.",
+          "No heading, additional factual claim, invented support, or unrequested recommendation.",
+          "Exactly one supported answer claim; exclusive evidence-absent abstention must fail.",
+          "The answer preserves this independent meaning: No growing medium has been selected for the Willow seedling tray.",
+          "The supporting quote is an exact substring of the selected source and includes this sentence: No growing medium has been selected for the Willow seedling tray."
+        ],
+        "forbidden": [
+          "Transferring the other entity's requested-attribute value to the requested entity.",
+          "Answering with the nearby different attribute or the unrelated negative statement.",
+          "Adding unsupported clauses, values, causal explanations, or a source-title inference."
+        ],
+        "acceptableExample": "No growing medium has been selected for the Willow seedling tray.",
+        "rejectedExample": "The Cedar seedling tray uses perlite as its growing medium.",
+        "manualSemanticReviewRequired": true,
+        "allClausesMustPass": true
+      },
+      "answerOracle": {
+        "heading": "",
+        "abstain": false,
+        "facts": [
+          {
+            "claimPattern": "(?i)^(?:No growing medium has (?:yet )?been (?:selected|chosen|assigned) for (?:the )?Willow seedling tray|(?:The )?Willow seedling tray (?:has no (?:selected|chosen|assigned) growing medium|does not yet have (?:a )?(?:selected|chosen|assigned) growing medium)|(?:The )?growing medium for (?:the )?Willow seedling tray has not been (?:selected|chosen))\\.$",
+            "quotePattern": "No growing medium has been selected for the Willow seedling tray\\.",
+            "validClaim": "No growing medium has been selected for the Willow seedling tray.",
+            "validQuote": "No growing medium has been selected for the Willow seedling tray.",
+            "support": "source"
+          }
+        ]
+      },
+      "counterexamples": [
+        {
+          "kind": "wrong_entity",
+          "claim": "The Cedar seedling tray uses perlite as its growing medium.",
+          "quote": "The Cedar seedling tray uses perlite as its growing medium.",
+          "mustReject": true
+        },
+        {
+          "kind": "nearby_other_attribute",
+          "claim": "The Willow seedling tray holds 24 plants.",
+          "quote": "The Willow seedling tray holds 24 plants.",
+          "mustReject": true
+        },
+        {
+          "kind": "unrelated_negative",
+          "claim": "No grow light is installed above the Willow seedling tray.",
+          "quote": "No grow light is installed above the Willow seedling tray.",
+          "mustReject": true
+        },
+        {
+          "kind": "over_abstention",
+          "claim": "The supplied evidence does not answer this question.",
+          "quote": "",
+          "mustReject": true
+        },
+        {
+          "kind": "opposite_polarity",
+          "claim": "The Willow seedling tray uses coconut coir as its growing medium.",
+          "quote": "No growing medium has been selected for the Willow seedling tray.",
+          "mustReject": true
+        },
+        {
+          "kind": "wrong_support",
+          "claim": "No growing medium has been selected for the Willow seedling tray.",
+          "quote": "The Cedar seedling tray uses perlite as its growing medium.",
+          "mustReject": true
+        }
+      ]
+    },
+    {
+      "id": "answerability-greenhouse-medium-supported-positive",
+      "domain": "greenhouse-medium",
+      "variant": "supported-positive",
+      "requestedEntity": "Willow seedling tray",
+      "requestedAttribute": "growing medium",
+      "mode": "answer",
+      "title": "Seedling tray notes",
+      "source": "The Willow seedling tray holds 24 plants. The Cedar seedling tray uses perlite as its growing medium. No grow light is installed above the Willow seedling tray. The roots in the Willow seedling tray sit in coconut coir.",
+      "prompt": "What growing medium is used for the Willow seedling tray? Answer in one sentence without a heading.",
+      "selection": "",
+      "useMemory": false,
+      "memories": [],
+      "memoryTitles": [],
+      "outsidePages": [],
+      "expected": {
+        "required": [
+          "Answer the requested growing medium of Willow seedling tray; do not substitute another entity or another attribute.",
+          "No heading, additional factual claim, invented support, or unrequested recommendation.",
+          "Exactly one supported answer claim; exclusive evidence-absent abstention must fail.",
+          "The answer preserves this independent meaning: The Willow seedling tray uses coconut coir as its growing medium.",
+          "The supporting quote is an exact substring of the selected source and includes this sentence: The roots in the Willow seedling tray sit in coconut coir."
+        ],
+        "forbidden": [
+          "Transferring the other entity's requested-attribute value to the requested entity.",
+          "Answering with the nearby different attribute or the unrelated negative statement.",
+          "Adding unsupported clauses, values, causal explanations, or a source-title inference."
+        ],
+        "acceptableExample": "The Willow seedling tray uses coconut coir as its growing medium.",
+        "rejectedExample": "The Cedar seedling tray uses perlite as its growing medium.",
+        "manualSemanticReviewRequired": true,
+        "allClausesMustPass": true
+      },
+      "answerOracle": {
+        "heading": "",
+        "abstain": false,
+        "facts": [
+          {
+            "claimPattern": "(?i)^(?:(?:The )?Willow seedling tray uses coconut coir(?: as its growing medium)?|(?:The )?growing medium (?:used )?for (?:the )?Willow seedling tray is coconut coir|(?:The )?Willow seedlings (?:grow|are rooted) in coconut coir|It uses coconut coir(?: as its growing medium)?)\\.$",
+            "quotePattern": "The roots in the Willow seedling tray sit in coconut coir\\.",
+            "validClaim": "The Willow seedling tray uses coconut coir as its growing medium.",
+            "validQuote": "The roots in the Willow seedling tray sit in coconut coir.",
+            "support": "source"
+          }
+        ]
+      },
+      "counterexamples": [
+        {
+          "kind": "wrong_entity",
+          "claim": "The Cedar seedling tray uses perlite as its growing medium.",
+          "quote": "The Cedar seedling tray uses perlite as its growing medium.",
+          "mustReject": true
+        },
+        {
+          "kind": "nearby_other_attribute",
+          "claim": "The Willow seedling tray holds 24 plants.",
+          "quote": "The Willow seedling tray holds 24 plants.",
+          "mustReject": true
+        },
+        {
+          "kind": "unrelated_negative",
+          "claim": "No grow light is installed above the Willow seedling tray.",
+          "quote": "No grow light is installed above the Willow seedling tray.",
+          "mustReject": true
+        },
+        {
+          "kind": "over_abstention",
+          "claim": "The supplied evidence does not answer this question.",
+          "quote": "",
+          "mustReject": true
+        },
+        {
+          "kind": "opposite_polarity",
+          "claim": "No growing medium has been selected for the Willow seedling tray.",
+          "quote": "The roots in the Willow seedling tray sit in coconut coir.",
+          "mustReject": true
+        },
+        {
+          "kind": "wrong_support",
+          "claim": "The Willow seedling tray uses coconut coir as its growing medium.",
+          "quote": "The Cedar seedling tray uses perlite as its growing medium.",
+          "mustReject": true
+        }
+      ]
+    }
+  ]
+}

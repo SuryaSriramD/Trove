@@ -272,6 +272,12 @@ func TestAITransferCanonicalSeedAndScope(t *testing.T) {
 	}
 }
 func TestRealLocalAITransferCases(t *testing.T) {
+	runRealLocalAITransferCases(t, aiTransferCorpus)
+}
+
+// Keep the original transfer execution path identical for separately locked corpora.
+func runRealLocalAITransferCases(t *testing.T, load func(*testing.T) ([]aiTransferCase, string)) {
+	t.Helper()
 	if os.Getenv("TROVE_NATIVE_INTEGRATION") != "1" {
 		t.Skip("requires explicit native integration")
 	}
@@ -279,7 +285,7 @@ func TestRealLocalAITransferCases(t *testing.T) {
 	if pack != "01990000-0000-7000-8000-000000000106" {
 		t.Fatal("fixed pack106 required")
 	}
-	cases, hash := aiTransferCorpus(t)
+	cases, hash := load(t)
 	manager, err := native.NewManager(os.Getenv("TROVE_MODEL_ROOT"))
 	if err != nil {
 		t.Fatal(err)
