@@ -202,6 +202,7 @@ func importPropertyField(prop contracts.DomainPropertyDefinition) json.RawMessag
 	return marshal(map[string]any{"name": prop.Name, "type": prop.Type, "schemaVersion": prop.SchemaVersion, "config": json.RawMessage(prop.Config)})
 }
 func addIncomingDatabaseFields(snapshot *ImportSnapshot, c *PortableCollectionImport) {
+	snapshot.SourceScope = c.SourceScope
 	snapshot.Fields["/collectionTitle"] = marshal(c.Title)
 	for _, prop := range c.Properties {
 		snapshot.Fields["/schema/"+string(prop.Id)] = importPropertyField(prop)
@@ -259,6 +260,13 @@ func addLocalDatabaseFields(ctx context.Context, q querier, snapshot *ImportSnap
 			return err
 		}
 		guard("page", string(r.PageId), pageRevision)
+		var deleted sql.NullString
+		if err := q.QueryRowContext(ctx, "SELECT deleted_at FROM pages WHERE id=?", r.PageId).Scan(&deleted); err != nil {
+			return err
+		}
+		if deleted.Valid {
+			continue
+		}
 		snapshot.Fields["/records/"+string(r.Id)] = marshal(r.PageId)
 		for _, value := range r.Values {
 			var titleValue map[string]any
@@ -311,12 +319,18 @@ func selectedImportDatabaseFields(item *ImportItem) map[string]json.RawMessage {
 
 // Reject unsupported schema migrations before any resumable page unit writes.
 func validateReviewedImportDatabase(ctx context.Context, q querier, p *ImportPlan) error {
+	journalChanges := 0
 	for i := range p.Items {
 		item := &p.Items[i]
 		if item.Kind != "portable_collection" || item.Choice == "duplicate" || p.NotionCopyGraph {
 			continue
 		}
 		fields := selectedImportDatabaseFields(item)
+		deletions, err := importRecordDeletions(ctx, q, p, item)
+		if err != nil {
+			return err
+		}
+		journalChanges += len(deletions)
 		for _, path := range sortedImportPaths(fields, "/schema/") {
 			var incoming struct {
 				Name          string          `json:"name"`
@@ -338,6 +352,7 @@ func validateReviewedImportDatabase(ctx context.Context, q querier, p *ImportPla
 				return Fail("CONFLICT", "A property cannot move to another collection during import")
 			}
 			if current.Type != incoming.Type {
+				journalChanges++
 				if err := validateImportSchemaChange(ctx, q, item, strings.TrimPrefix(path, "/schema/"), fields[path], fields); err != nil {
 					return err
 				}
@@ -349,6 +364,7 @@ func validateReviewedImportDatabase(ctx context.Context, q querier, p *ImportPla
 		if item.Merge != nil {
 			for _, field := range item.Merge.Fields {
 				if strings.HasPrefix(field.Path, "/schema/") && field.Local.Present && fields[field.Path] == nil {
+					journalChanges++
 					if c := importCollectionFor(p, item); c == nil || !c.SchemaComplete {
 						return Fail("CONFLICT", "Incomplete schema enumeration cannot establish a source property deletion")
 					}
@@ -372,6 +388,9 @@ func validateReviewedImportDatabase(ctx context.Context, q querier, p *ImportPla
 				return err
 			}
 		}
+	}
+	if journalChanges > 128 {
+		return Fail("RESOURCE_EXHAUSTED", "A reviewed import can migrate or delete at most 128 schema/record targets at once")
 	}
 	return validateReviewedImportDerivedGraph(ctx, q, p)
 }
@@ -406,6 +425,13 @@ func validateReviewedImportDerivedGraph(ctx context.Context, q querier, p *Impor
 			continue
 		}
 		fields := selectedImportDatabaseFields(item)
+		if item.Merge != nil {
+			for _, field := range item.Merge.Fields {
+				if strings.HasPrefix(field.Path, "/schema/") && field.Local.Present && fields[field.Path] == nil {
+					delete(props, strings.TrimPrefix(field.Path, "/schema/"))
+				}
+			}
+		}
 		for _, path := range sortedImportPaths(fields, "/schema/") {
 			var prop contracts.DomainPropertyDefinition
 			if err = json.Unmarshal(fields[path], &prop); err != nil {
@@ -555,12 +581,23 @@ func commitMergedImportDatabases(m *Mutation, p *ImportPlan) error {
 		}
 	}
 	schemaActions := []map[string]any{}
+	recordActions := []map[string]any{}
+	deletedRecords := map[string]bool{}
+	changedSchemas := map[string]bool{}
 	for i := range p.Items {
 		item := &p.Items[i]
 		if item.Kind != "portable_collection" || item.Merge == nil {
 			continue
 		}
 		fields := selectedImportDatabaseFields(item)
+		deletions, err := importRecordDeletions(m.Context, m.Tx, p, item)
+		if err != nil {
+			return err
+		}
+		for _, action := range deletions {
+			deletedRecords[str(action["recordId"])] = true
+		}
+		recordActions = append(recordActions, deletions...)
 		for _, field := range item.Merge.Fields {
 			if !strings.HasPrefix(field.Path, "/schema/") || !field.Local.Present {
 				continue
@@ -589,12 +626,12 @@ func commitMergedImportDatabases(m *Mutation, p *ImportPlan) error {
 			if err := importGuardPage(m, owner); err != nil {
 				return err
 			}
-			schemaActions = append(schemaActions, map[string]any{"kind": "collection.property.restore", "collectionId": item.CollectionID, "propertyId": id, "definition": after})
-		}
-	}
-	if len(schemaActions) > 0 {
-		if err := applyJournal(m, p.ID, "Reviewed import schema changes", schemaActions); err != nil {
-			return err
+			action, err := importSchemaAction(item, id, fields[field.Path], fields)
+			if err != nil {
+				return err
+			}
+			schemaActions = append(schemaActions, action)
+			changedSchemas[id] = true
 		}
 	}
 	for i := range p.PortableCollections {
@@ -636,6 +673,9 @@ func commitMergedImportDatabases(m *Mutation, p *ImportPlan) error {
 			}
 		}
 		for _, path := range sortedImportPaths(fields, "/schema/") {
+			if changedSchemas[strings.TrimPrefix(path, "/schema/")] {
+				continue
+			}
 			if err := updateImportedProperty(m, c.CollectionID, strings.TrimPrefix(path, "/schema/"), fields[path]); err != nil {
 				return err
 			}
@@ -686,6 +726,44 @@ func commitMergedImportDatabases(m *Mutation, p *ImportPlan) error {
 			m.touched[guardKey("record", rid)] = change
 		}
 	}
+	// New rows now exist. Add guards for the complete old/new value inventory
+	// and apply each schema with its typed values as one recoverable operation.
+	for _, action := range schemaActions {
+		before, err := schemaJournalCurrent(m.Context, m.Tx, action)
+		if err != nil {
+			return err
+		}
+		for _, record := range schemaValueRecords(before.Before, action) {
+			var page string
+			if err := m.Tx.QueryRowContext(m.Context, "SELECT page_id FROM records WHERE id=? AND collection_id=?", record, action["collectionId"]).Scan(&page); err != nil {
+				return err
+			}
+			if err := importGuardPage(m, page); err != nil {
+				return err
+			}
+		}
+		if err := guardImport(m, "property", str(action["propertyId"])); err != nil {
+			return err
+		}
+	}
+	for _, action := range recordActions {
+		var page, collection string
+		if err := m.Tx.QueryRowContext(m.Context, "SELECT page_id,collection_id FROM records WHERE id=?", action["recordId"]).Scan(&page, &collection); err != nil {
+			return err
+		}
+		if err := importGuardPage(m, page); err != nil {
+			return err
+		}
+		if err := guardImport(m, "collection", collection); err != nil {
+			return err
+		}
+	}
+	schemaActions = append(schemaActions, recordActions...)
+	if len(schemaActions) > 0 {
+		if err := applyJournal(m, p.ID, "Reviewed import schema, value and deletion changes", schemaActions); err != nil {
+			return err
+		}
+	}
 	// Every record exists before relation values are validated and applied.
 	for i := range p.Items {
 		item := &p.Items[i]
@@ -699,6 +777,9 @@ func commitMergedImportDatabases(m *Mutation, p *ImportPlan) error {
 				return Fail("INVALID_REQUEST", "Invalid reviewed record value path")
 			}
 			rid, pid := parts[2], parts[3]
+			if changedSchemas[pid] || deletedRecords[rid] {
+				continue
+			}
 			if err := guardImport(m, "record", rid); err != nil {
 				return err
 			}
@@ -752,6 +833,9 @@ func commitMergedImportDatabases(m *Mutation, p *ImportPlan) error {
 				}
 				parts := strings.Split(field.Path, "/")
 				rid, pid := parts[2], parts[3]
+				if changedSchemas[pid] || deletedRecords[rid] {
+					continue
+				}
 				if err := guardImport(m, "record", rid); err != nil {
 					return err
 				}
@@ -818,17 +902,31 @@ func sortedImportPaths(fields map[string]json.RawMessage, prefix string) []strin
 	return out
 }
 
-func validateImportSchemaChange(ctx context.Context, q querier, item *ImportItem, id string, raw json.RawMessage, fields map[string]json.RawMessage) error {
+func importSchemaAction(item *ImportItem, id string, raw json.RawMessage, fields map[string]json.RawMessage) (map[string]any, error) {
 	var definition any
 	if raw != nil {
 		if err := json.Unmarshal(raw, &definition); err != nil {
-			return err
+			return nil, err
 		}
 	}
-	for path := range fields {
-		if strings.HasPrefix(path, "/values/") && strings.HasSuffix(path, "/"+id) {
-			return Fail("CONFLICT", "A schema conversion or deletion requires an explicit populated-value migration; retain this schema or import a copy")
+	values := []any{}
+	for _, path := range sortedImportPaths(fields, "/values/") {
+		parts := strings.Split(path, "/")
+		if len(parts) != 4 || parts[3] != id {
+			continue
 		}
+		var value any
+		if err := json.Unmarshal(fields[path], &value); err != nil {
+			return nil, err
+		}
+		values = append(values, map[string]any{"recordId": parts[2], "value": value})
 	}
-	return validateUnusedPropertyRestore(ctx, q, map[string]any{"kind": "collection.property.restore", "collectionId": item.CollectionID, "propertyId": id, "definition": definition})
+	return map[string]any{"kind": "collection.property.restore", "collectionId": item.CollectionID, "propertyId": id, "definition": definition, "valueInventoryVersion": 1, "values": values}, nil
+}
+func validateImportSchemaChange(ctx context.Context, q querier, item *ImportItem, id string, raw json.RawMessage, fields map[string]json.RawMessage) error {
+	action, err := importSchemaAction(item, id, raw, fields)
+	if err != nil {
+		return err
+	}
+	return validateReviewedPropertyRestore(ctx, q, action)
 }

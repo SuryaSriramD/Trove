@@ -2,11 +2,13 @@ package connectors
 
 import (
 	"context"
+	"encoding/base64"
 	"encoding/json"
 	"io"
 	"net/http"
 	"strings"
 	"testing"
+	"unicode/utf8"
 )
 
 func githubFixtureSession(handle func(*http.Request) (string, error)) Session {
@@ -17,6 +19,97 @@ func githubFixtureSession(handle func(*http.Request) (string, error)) Session {
 		}
 		return &http.Response{StatusCode: 200, Header: http.Header{}, Body: io.NopCloser(strings.NewReader(body))}, nil
 	})}}
+}
+
+func TestGitHubSnapshotMarksTruncatedContentPartial(t *testing.T) {
+	s := githubSnapshot(map[string]any{"title": strings.Repeat("界", 1000), "body": strings.Repeat("界", 100000)}, "issue", "9")
+	if s.State != "partial" || !utf8.ValidString(s.Title) || !utf8.ValidString(s.Text) {
+		t.Fatal("incomplete or split Unicode content was presented as complete")
+	}
+}
+
+func TestGitHubDocumentationUsesCanonicalSelectionAndText(t *testing.T) {
+	for _, data := range [][]byte{[]byte("valid selected README"), {0xff, 0xfe}, []byte("binary\x00payload")} {
+		t.Run(base64.RawURLEncoding.EncodeToString(data), func(t *testing.T) {
+			requested := ""
+			s := githubFixtureSession(func(r *http.Request) (string, error) {
+				if r.URL.Path == "/user/installations/1/repositories" {
+					return `{"repositories":[{"full_name":"chosen/repo"}]}`, nil
+				}
+				requested = r.URL.Path
+				return stringify(map[string]any{"type": "file", "encoding": "base64", "content": base64.StdEncoding.EncodeToString(data), "sha": "revision", "path": "README.md"}), nil
+			})
+			g := &githubAdapter{}
+			selection := s.Account.Selections[0]
+			selection.Query = "unselected.txt"
+			if _, err := g.Preview(context.Background(), s, selection, "document:unselected.txt"); err == nil || requested != "" {
+				t.Fatal("caller expanded selected documentation")
+			}
+			selection = s.Account.Selections[0]
+			got, err := g.Preview(context.Background(), s, selection, "document:")
+			if utf8.Valid(data) && !strings.ContainsRune(string(data), 0) {
+				if err != nil || got.Text != string(data) {
+					t.Fatal(got, err)
+				}
+			} else if err == nil {
+				t.Fatal("non-text documentation accepted")
+			}
+		})
+	}
+}
+
+func TestGitHubRefreshCursorBoundToAccountAndSelection(t *testing.T) {
+	s := githubFixtureSession(func(r *http.Request) (string, error) {
+		if r.URL.Path == "/user/installations/1/repositories" {
+			return `{"repositories":[{"full_name":"chosen/repo"}]}`, nil
+		}
+		return `[]`, nil
+	})
+	s.Account.ID = "account-one"
+	s.Account.Revision = "revision-one"
+	g := &githubAdapter{}
+	page, err := g.Refresh(context.Background(), s, s.Account.Selections[0], "")
+	if err != nil || page.NextCursor == "" {
+		t.Fatal(page, err)
+	}
+	for _, change := range []string{"account", "identity", "revision", "selection"} {
+		t.Run(change, func(t *testing.T) {
+			other := s
+			other.Account.Selections = append([]Selection{}, s.Account.Selections...)
+			switch change {
+			case "account":
+				other.Account.ID = "other"
+			case "identity":
+				other.Account.Identity.Subject = "other"
+			case "revision":
+				other.Account.Revision = "other"
+			case "selection":
+				other.Account.Selections[0].Query = "different.md"
+			}
+			if _, err := g.Refresh(context.Background(), other, other.Account.Selections[0], page.NextCursor); err == nil {
+				t.Fatal("stale cursor accepted")
+			}
+		})
+	}
+}
+
+func TestGitHubDiscoveryCursorRejectsAccountSwitch(t *testing.T) {
+	s := githubFixtureSession(func(r *http.Request) (string, error) {
+		if r.URL.Path == "/user/installations" {
+			return `{"installations":[{"id":1},{"id":2}]}`, nil
+		}
+		return `{"repositories":[{"full_name":"chosen/repo"}]}`, nil
+	})
+	s.Account.ID = "one"
+	g := &githubAdapter{}
+	_, cursor, err := g.Discover(context.Background(), s, "")
+	if err != nil || cursor == "" {
+		t.Fatal(cursor, err)
+	}
+	s.Account.ID = "two"
+	if _, _, err = g.Discover(context.Background(), s, cursor); err == nil {
+		t.Fatal("cross-account discovery cursor accepted")
+	}
 }
 func TestGitHubReviewedArgumentsRevisionAndUnknownReconciliation(t *testing.T) {
 	ctx := context.Background()

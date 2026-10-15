@@ -371,6 +371,9 @@ func restoreBackupVerifiedExtra(ctx context.Context, source, destination string,
 		if _, err := tx.ExecContext(ctx, "INSERT OR REPLACE INTO kernel_meta(key,value) VALUES(?,?)", recoveryOperationKey, operationID); err != nil {
 			return err
 		}
+		if err := validateExternalContextRestore(ctx, tx); err != nil {
+			return err
+		}
 		if err := resetConnectorRestore(ctx, tx); err != nil {
 			return err
 		}

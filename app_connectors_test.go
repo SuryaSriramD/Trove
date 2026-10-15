@@ -2,9 +2,11 @@ package main
 
 import (
 	"context"
+	"encoding/json"
 	"sync"
 	"testing"
 	"time"
+	"trove.local/phase0/internal/connectors"
 )
 
 func TestConnectorSourceFlightCancellationAndAdmission(t *testing.T) {
@@ -48,6 +50,16 @@ func TestConnectorSourceFlightCancellationAndAdmission(t *testing.T) {
 	}
 	if got := h.run(context.Background(), "preview", "account", func(context.Context) string { return "completed" }); got != "completed" {
 		t.Fatal(got)
+	}
+}
+
+func TestConnectorAcquisitionRequiresAuthenticatedPreviewMembership(t *testing.T) {
+	source := connectors.Snapshot{RemoteID: "thread", Content: json.RawMessage(`{"attachmentKeys":["gmail-attachment:chosen"]}`)}
+	if !connectorAcquisitionAllowed(connectors.Gmail, source, "gmail-attachment:chosen") || connectorAcquisitionAllowed(connectors.Gmail, source, "gmail-attachment:other") || connectorAcquisitionAllowed(connectors.Gmail, source, "thread") {
+		t.Fatal("Gmail acquisition not bound to reviewed thread attachments")
+	}
+	if !connectorAcquisitionAllowed(connectors.MCP, source, "thread") || connectorAcquisitionAllowed(connectors.GoogleDrive, source, "another-file") || connectorAcquisitionAllowed(connectors.MCP, source, "") {
+		t.Fatal("resource acquisition not bound to preview")
 	}
 }
 func TestConnectorSourceFlightSharesBoundWithBackgroundRefresh(t *testing.T) {

@@ -75,13 +75,19 @@ export function OperationHistory({
   }
   if (!operations.length && !error) return null;
   function describe(action: S.OperationPreviewUndoResult["actions"][number]) {
+    if (action.kind === "page.trash.set") return `${action.trashed ? "Move page to Trash" : "Restore page"} (content, values and identities preserved)`;
+    if (action.kind === "record.trash.set") {
+      const record = workspace.records.find((r) => r.id === action.recordId);
+      const title = workspace.pages.find((p) => p.id === record?.pageId)?.title ?? action.recordId;
+      return `${action.trashed ? "Move to trash" : "Restore from trash"}: ${title}. Record values, content and attachments retain their identities.`;
+    }
     if (action.kind === "collection.property.restore") {
       const collection = workspace.collections.find((c) => c.id === action.collectionId)?.title ?? "Collection";
       if (!action.definition) {
         const name = workspace.properties.find((p) => p.id === action.propertyId)?.name ?? action.propertyId;
-        return `${collection}: remove unused property “${name}”.`;
+        return `${collection}: remove property “${name}”.`;
       }
-      return `${collection}: restore unused property “${action.definition.name}” as ${action.definition.type}, with its saved configuration ${JSON.stringify(action.definition.config)}.`;
+      return `${collection}: restore property “${action.definition.name}” as ${action.definition.type}, with its saved configuration ${JSON.stringify(action.definition.config)} and ${action.values?.length ?? 0} populated row values: ${JSON.stringify(action.values ?? [])}.`;
     }
     if (
       action.kind === "collection.layout.set" ||

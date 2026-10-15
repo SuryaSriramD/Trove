@@ -74,10 +74,13 @@ func inferImportType(values []string) string {
 }
 
 type portableHierarchy struct {
-	Format         string          `json:"format"`
-	HTMLRenditions []string        `json:"htmlRenditions"`
-	Phase4Metadata json.RawMessage `json:"phase4Metadata"`
-	Pages          []struct {
+	WorkspaceID            string          `json:"workspaceId"`
+	PageEnumerationVersion int             `json:"pageEnumerationVersion,omitempty"`
+	Format                 string          `json:"format"`
+	HTMLRenditions         []string        `json:"htmlRenditions"`
+	Phase4Metadata         json.RawMessage `json:"phase4Metadata"`
+	Pages                  []struct {
+		ExternalContextPolicy          *externalContextPolicy         `json:"externalContextPolicy,omitempty"`
 		AttachmentRelationshipsVersion int                            `json:"attachmentRelationshipsVersion,omitempty"`
 		AttachmentRelationships        []ImportAttachmentRelationship `json:"attachmentRelationships,omitempty"`
 		DisplayPreferences             *PageDisplayPreferences        `json:"displayPreferences,omitempty"`
@@ -88,9 +91,11 @@ type portableHierarchy struct {
 		CanonicalBlocks                []contracts.DomainBlock        `json:"canonicalBlocks"`
 	} `json:"pages"`
 	Attachments []struct {
-		ID     string `json:"id"`
-		Path   string `json:"path"`
-		SHA256 string `json:"sha256"`
+		ExternalAcquisitionSources []externalAcquisitionSource `json:"externalAcquisitionSources,omitempty"`
+		ExternalContextPolicy      *externalContextPolicy      `json:"externalContextPolicy,omitempty"`
+		ID                         string                      `json:"id"`
+		Path                       string                      `json:"path"`
+		SHA256                     string                      `json:"sha256"`
 	} `json:"attachments"`
 	Collections        []portableDatabaseSource `json:"collections"`
 	SourceOmissions    []string                 `json:"sourceOmissions"`
@@ -99,6 +104,20 @@ type portableHierarchy struct {
 
 func (k *Kernel) parseImportPlan(ctx context.Context, p *ImportPlan) error {
 	p.NormalizerVersion = importNormalizerVersion
+	var sourcePolicy *externalContextPolicy
+	if p.SourceFileID != "" {
+		source, err := readFileMetadata(ctx, k.db, p.SourceFileID)
+		if err != nil {
+			return err
+		}
+		sourcePolicy, err = fileExternalContextPolicy(ctx, k.db, string(source.ContentHash))
+		if err != nil {
+			return err
+		}
+		if sourcePolicy != nil {
+			ctx = context.WithValue(ctx, importExternalPolicyKey{}, sourcePolicy)
+		}
+	}
 	pages := map[string]string{}
 	assets := map[string]string{}
 	seenIDs := map[string]bool{}
@@ -109,7 +128,28 @@ func (k *Kernel) parseImportPlan(ctx context.Context, p *ImportPlan) error {
 			if err != nil {
 				return err
 			}
-			_ = json.Unmarshal(b, &manifest)
+			if err = json.Unmarshal(b, &manifest); err != nil {
+				return Fail("INTEGRITY_ERROR", "Portable manifest is malformed; its provenance cannot be discarded")
+			}
+		}
+	}
+	canonicalIdentities := map[string]string{}
+	retainedMappings := map[string]portableMapping{}
+	if manifest.Format == "trove-portable" {
+		var err error
+		retainedMappings, err = retainedPortableMappings(ctx, k.db, p)
+		if err != nil {
+			return err
+		}
+		for _, page := range manifest.Pages {
+			if page.CanonicalPage.Id != "" {
+				canonicalIdentities[page.Path] = portableSourceKey("page", string(page.CanonicalPage.Id))
+			}
+		}
+		for _, collection := range manifest.Collections {
+			if collection.ID != "" {
+				canonicalIdentities[collection.Path] = portableSourceKey("collection", collection.ID)
+			}
 		}
 	}
 	initialPages := map[string]string{}
@@ -139,6 +179,37 @@ func (k *Kernel) parseImportPlan(ctx context.Context, p *ImportPlan) error {
 				item.Kind = "asset"
 				item.Outcome = "preserved"
 				item.Reason = "Portable attachment preserved and manifest hash verified"
+				if len(attachment.ExternalAcquisitionSources) > 100 {
+					return Fail("RESOURCE_EXHAUSTED", "Portable asset has too many acquisition sources")
+				}
+				if len(attachment.ExternalAcquisitionSources) > 0 {
+					if attachment.SHA256 != item.Hash {
+						return Fail("INTEGRITY_ERROR", "Acquisition provenance differs from its portable manifest hash")
+					}
+					if err := k.write(ctx, func(tx *sql.Tx) error {
+						for _, source := range attachment.ExternalAcquisitionSources {
+							if err := retainExternalAcquisitionSource(ctx, tx, item.Hash, source); err != nil {
+								return err
+							}
+						}
+						return nil
+					}); err != nil {
+						return err
+					}
+				}
+				if attachment.ExternalContextPolicy != nil {
+					if err := validateExternalContextPolicy(*attachment.ExternalContextPolicy); err != nil {
+						return err
+					}
+					if attachment.SHA256 != item.Hash {
+						return Fail("INTEGRITY_ERROR", "Restricted attachment differs from its portable manifest hash")
+					}
+					if err := k.write(ctx, func(tx *sql.Tx) error {
+						return retainFileExternalContextPolicy(ctx, tx, item.Hash, *attachment.ExternalContextPolicy)
+					}); err != nil {
+						return err
+					}
+				}
 				if attachment.SHA256 != item.Hash {
 					item.Kind = "rejected"
 					item.Outcome = "failed"
@@ -171,9 +242,15 @@ func (k *Kernel) parseImportPlan(ctx context.Context, p *ImportPlan) error {
 			if err != nil {
 				return err
 			}
-			_ = json.Unmarshal(b, &manifest)
+			if err = json.Unmarshal(b, &manifest); err != nil {
+				return Fail("INTEGRITY_ERROR", "Portable manifest is malformed; its provenance cannot be discarded")
+			}
 		}
 		if item.PageID != "" {
+			if identity := canonicalIdentities[item.Locator]; identity != "" {
+				item.IdentityKind, item.ExternalID = "external_id", identity
+				item.PortableIdentity = identity
+			}
 			if item.IdentityKind == "" {
 				item.IdentityKind, item.ExternalID = importIdentity(item.Locator)
 			}
@@ -188,6 +265,12 @@ func (k *Kernel) parseImportPlan(ctx context.Context, p *ImportPlan) error {
 			seenIDs[key] = true
 			var id, local, hash, revision string
 			err := k.db.QueryRowContext(ctx, `SELECT m.id,m.local_id,m.base_content_hash,COALESCE(p.revision,'0') FROM import_mappings m LEFT JOIN pages p ON p.id=m.local_id WHERE m.workspace_id=? AND m.source_system=? AND m.source_namespace=? AND m.external_kind='page' AND m.identity_kind=? AND m.identity_value=?`, k.id, importItemSourceSystem(p, item), p.Namespace, item.IdentityKind, item.ExternalID).Scan(&id, &local, &hash, &revision)
+			if retained, ok := retainedMappings[canonicalIdentities[item.Locator]]; ok {
+				// Keep the exact historic mapping address; the explicit canonical
+				// key above has already prevented rendition identity collisions.
+				id, local, hash, revision, err = retained.ID, retained.Page, retained.Hash, retained.Revision, nil
+				item.IdentityKind, item.ExternalID = retained.IdentityKind, retained.IdentityValue
+			}
 			if err == nil {
 				item.MappingID = id
 				item.PageID = local
@@ -250,7 +333,12 @@ func (k *Kernel) parseImportPlan(ctx context.Context, p *ImportPlan) error {
 				if parent := pages[entry.ParentPath]; parent != "" {
 					item.ParentID = parent
 				}
-				item.Provenance = entry.Provenance
+				if entry.ExternalContextPolicy != nil {
+					if err := validateExternalContextPolicy(*entry.ExternalContextPolicy); err != nil {
+						return err
+					}
+				}
+				item.Provenance = externalPolicyProvenance(entry.ExternalContextPolicy, entry.Provenance)
 				item.DisplayPreferences = entry.DisplayPreferences
 			}
 		}
@@ -390,10 +478,19 @@ func (k *Kernel) parseImportPlan(ctx context.Context, p *ImportPlan) error {
 	if err := reuseImportDatabaseIdentities(ctx, k.db, p); err != nil {
 		return err
 	}
+	if err := preparePortablePageInventory(ctx, k.db, p, manifest); err != nil {
+		return err
+	}
 	for i := range p.Items {
+		if sourcePolicy != nil {
+			p.Items[i].Provenance = externalPolicyProvenance(sourcePolicy, p.Items[i].Provenance)
+		}
 		if err := prepareImportMerge(ctx, k.db, p, &p.Items[i]); err != nil {
 			return err
 		}
+	}
+	if err := appendMissingSourcePages(ctx, k.db, p); err != nil {
+		return err
 	}
 	sortImportItems(p.Items)
 	return nil

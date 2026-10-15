@@ -248,6 +248,12 @@ func googleError(err error, code string) bool {
 	return errors.As(err, &f) && f.Code == code
 }
 func googleSnapshot(s Session, sel Selection, id, kind, title, text, link, rev, state string, content any) Snapshot {
+	if len(title) > 2000 || len(text) > 256<<10 {
+		title, text = bounded(title, 2000), bounded(text, 256<<10)
+		if state != "removed" && state != "inaccessible" {
+			state = "partial"
+		}
+	}
 	return Snapshot{Version: 1, AccountID: s.Account.ID, SelectionID: sel.ID, RemoteID: id, Kind: kind, Title: title, Text: text, URL: link, RemoteRevision: rev, State: state, Content: json.RawMessage(stringify(content)), RetrievedAt: utcNow(), ExternalAIAllowed: s.Account.Kind != Gmail}
 }
 func googleReview(a Action, args any, effects ...string) Action {

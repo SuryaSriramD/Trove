@@ -131,4 +131,4 @@ export type ColorToken = "gray" | "brown" | "orange" | "yellow" | "green" | "blu
 export type SemanticContentIdentity = { "version": 1 | 2; "digest": string; };
 export type HumanReviewEvent = { "id": Id; "pageId": Id; "actorId": Id; "reviewedAt": Timestamp; "expiresAt"?: Timestamp; "contentIdentity": SemanticContentIdentity; };
 export type PageFreshness = { "state": "never_reviewed" | "reviewed" | "stale" | "expired"; "contentIdentity": SemanticContentIdentity; "review"?: HumanReviewEvent; };
-export type ImportNormalizedSnapshot = { "version": 1; "sourceRevision"?: string; "fields": { [key: string]: unknown }; "blockSources": { [key: string]: unknown }; };
+export type ImportNormalizedSnapshot = { "version": 1; "sourceRevision"?: string; "fields": { [key: string]: unknown }; "blockSources": { [key: string]: unknown }; "sourceScope"?: string; "pageSourceScope"?: string; "portableIdentity"?: string; };

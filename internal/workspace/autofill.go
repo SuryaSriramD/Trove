@@ -600,6 +600,13 @@ func applyAutofill(m *Mutation, c map[string]any) error {
 		if !cell.Overwrite && overwrite[cell.ID] {
 			return Fail("INVALID_REQUEST", "Overwrite approval names a blank field")
 		}
+		if restricted, err := pageExternalContextRestricted(m.Context, m.Tx, cell.PageID); err != nil {
+			return err
+		} else if restricted {
+			if err := retainPageExternalContextPolicy(m.Context, m.Tx, cell.PageID, gmailExternalContextPolicy); err != nil {
+				return err
+			}
+		}
 		actions = append(actions, map[string]any{"kind": "record.setValue", "recordId": cell.RecordID, "propertyId": string(cell.Property.Id), "value": map[string]any{"type": cell.Property.Type, "schemaVersion": cell.Property.SchemaVersion, "value": cell.Value}})
 		applied = append(applied, cell.ID)
 	}

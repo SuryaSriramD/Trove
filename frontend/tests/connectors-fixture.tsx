@@ -14,6 +14,8 @@ const w = {
 } as unknown as WorkspaceSnapshot;
 const calls: any[] = [];
 (window as any).connectorCalls = calls;
+const fixtureKind = new URLSearchParams(location.search).get("kind") as
+  S.ConnectorAccount["kind"] | null;
 let account: S.ConnectorAccount = {
   version: 1,
   id: id(3),
@@ -48,6 +50,43 @@ const source: S.ConnectorSnapshot = {
   retrievedAt: new Date().toISOString(),
   externalAiAllowed: false,
 };
+if (fixtureKind) {
+  account = {
+    ...account,
+    kind: fixtureKind,
+    identity: { ...account.identity, provider: fixtureKind },
+    selections: [
+      {
+        ...selection,
+        kind:
+          fixtureKind === "mcp"
+            ? "resource"
+            : fixtureKind === "gmail"
+              ? "thread"
+              : "file",
+      },
+    ],
+  };
+  source.kind =
+    fixtureKind === "mcp"
+      ? "mcp_resource"
+      : fixtureKind === "gmail"
+        ? "gmail_thread"
+        : "drive_file";
+  if (fixtureKind === "gmail")
+    source.content = {
+      attachmentKeys: [
+        "gmail-attachment:" +
+          btoa(JSON.stringify({ thread: "thread", name: "Meeting notes.pdf" }))
+            .replace(/=/g, "")
+            .replace(/\+/g, "-")
+            .replace(/\//g, "_"),
+      ],
+    };
+  if (fixtureKind === "google_drive")
+    source.content = { mimeType: "application/vnd.google-apps.document" };
+  if (fixtureKind === "mcp") source.state = "partial";
+}
 window.go = {
   main: {
     App: {
@@ -103,6 +142,23 @@ window.go = {
             },
           }));
           result = { state: "started" };
+        } else if (method === "connectors.native.resolve") {
+          proposals = proposals.map((p) => ({
+            ...p,
+            state: "resolved",
+            receipt: {
+              ...p.receipt!,
+              outcome: "unknown",
+              userResolution: {
+                version: 1,
+                observation: r.observation,
+                evidence: r.evidence,
+                actorId: id(2),
+                recordedAt: new Date().toISOString(),
+              },
+            },
+          }));
+          result = proposals[0];
         } else if (method === "connectors.native.reconcile") {
           const receipt: S.ConnectorReceipt = {
             version: 1,
@@ -126,6 +182,13 @@ window.go = {
                 resolve(JSON.stringify({ ok: true, result }));
             });
           }
+        } else if (method === "connectors.native.acquire") {
+          result = {
+            fileId: id(8),
+            ingestHandle: id(7),
+            mediaType: r.format || "application/octet-stream",
+            sizeBytes: 42,
+          };
         } else if (method === "connectors.native.import") {
           return JSON.stringify({
             ok: false,

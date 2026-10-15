@@ -69,6 +69,10 @@ func (k *Kernel) ExportPortable(ctx context.Context, e contracts.ServiceExecutio
 		}
 		pageIDs = append(pageIDs, id)
 	}
+	if err = rows.Err(); err != nil {
+		rows.Close()
+		return result, err
+	}
 	rows.Close()
 	pages := map[string]contracts.ServiceReadPageResult{}
 	livePageIDs := []string{}
@@ -154,7 +158,7 @@ func (k *Kernel) ExportPortable(ctx context.Context, e contracts.ServiceExecutio
 		_, er = w.Write(b)
 		return er
 	}
-	manifest := map[string]any{"format": "trove-portable", "formatVersion": 1, "workspaceId": k.id, "exportedAt": now(), "sourceCompleteness": "partial", "sourceOmissions": result.SourceOmissions, "pages": []any{}, "collections": []any{}, "attachments": []any{}}
+	manifest := map[string]any{"format": "trove-portable", "formatVersion": 1, "workspaceId": k.id, "pageEnumerationVersion": 1, "exportedAt": now(), "sourceCompleteness": "partial", "sourceOmissions": result.SourceOmissions, "pages": []any{}, "collections": []any{}, "attachments": []any{}}
 	for _, id := range pageIDs {
 		p := pages[id]
 		name := paths[id]
@@ -173,7 +177,11 @@ func (k *Kernel) ExportPortable(ctx context.Context, e contracts.ServiceExecutio
 		if displayErr != nil {
 			return result, displayErr
 		}
-		manifest["pages"] = append(manifest["pages"].([]any), map[string]any{"displayPreferences": display, "id": id, "path": name, "parentPath": parentPath, "provenance": p.Page.Provenance, "canonicalPage": p.Page, "canonicalBlocks": p.Blocks, "attachmentRelationshipsVersion": 1, "attachmentRelationships": relationships[id]})
+		policy, policyErr := capturePageExternalContextPolicy(ctx, tx, id)
+		if policyErr != nil {
+			return result, policyErr
+		}
+		manifest["pages"] = append(manifest["pages"].([]any), map[string]any{"externalContextPolicy": policy, "displayPreferences": display, "id": id, "path": name, "parentPath": parentPath, "provenance": p.Page.Provenance, "canonicalPage": p.Page, "canonicalBlocks": p.Blocks, "attachmentRelationshipsVersion": 1, "attachmentRelationships": relationships[id]})
 		result.Pages++
 	}
 	rows, err = tx.QueryContext(ctx, "SELECT id,owning_page_id,title,title_property_id FROM collections ORDER BY id")
@@ -235,9 +243,17 @@ func (k *Kernel) ExportPortable(ctx context.Context, e contracts.ServiceExecutio
 			}
 			rs = append(rs, r)
 		}
+		if er = records.Err(); er != nil {
+			records.Close()
+			return result, er
+		}
 		records.Close()
 		canonical := []any{}
+		recordEnumerationVersion := 1
 		for _, record := range rs {
+			if paths[record.page] == "" {
+				recordEnumerationVersion = 0
+			}
 			cells := []string{record.title}
 			values := map[string]any{}
 			for _, prop := range properties[1:] {
@@ -286,11 +302,27 @@ func (k *Kernel) ExportPortable(ctx context.Context, e contracts.ServiceExecutio
 			vs = append(vs, map[string]any{"id": id, "name": name, "type": kind, "schemaVersion": version, "query": json.RawMessage(query), "config": json.RawMessage(config), "owningPagePath": paths[viewPage]})
 		}
 		views.Close()
-		manifest["collections"] = append(manifest["collections"].([]any), map[string]any{"id": collection.id, "title": collection.title, "path": name, "owningPagePath": paths[collection.page], "properties": properties, "records": canonical, "views": vs})
+		manifest["collections"] = append(manifest["collections"].([]any), map[string]any{"sourceWorkspaceId": k.id, "recordEnumerationVersion": recordEnumerationVersion, "id": collection.id, "title": collection.title, "path": name, "owningPagePath": paths[collection.page], "properties": properties, "records": canonical, "views": vs})
 		result.Collections++
 	}
 	for _, asset := range assets {
 		f := asset.metadata
+		policy := asset.externalPolicy
+		sources := asset.externalSources
+		if sources == nil {
+			var sourceErr error
+			sources, sourceErr = readExternalAcquisitionSources(ctx, tx, string(f.ContentHash))
+			if sourceErr != nil {
+				return result, sourceErr
+			}
+		}
+		if policy == nil {
+			var policyErr error
+			policy, policyErr = fileExternalContextPolicy(ctx, tx, string(f.ContentHash))
+			if policyErr != nil {
+				return result, policyErr
+			}
+		}
 		if err = ctx.Err(); err != nil {
 			return result, err
 		}
@@ -299,7 +331,7 @@ func (k *Kernel) ExportPortable(ctx context.Context, e contracts.ServiceExecutio
 			if err = write(name, asset.content); err != nil {
 				return result, err
 			}
-			manifest["attachments"] = append(manifest["attachments"].([]any), map[string]any{"id": f.Id, "path": name, "sha256": f.ContentHash, "sizeBytes": f.SizeBytes, "mediaType": f.MediaType, "originalName": f.OriginalName})
+			manifest["attachments"] = append(manifest["attachments"].([]any), map[string]any{"externalContextPolicy": policy, "externalAcquisitionSources": sources, "id": f.Id, "path": name, "sha256": f.ContentHash, "sizeBytes": f.SizeBytes, "mediaType": f.MediaType, "originalName": f.OriginalName})
 			result.Assets++
 			continue
 		}
@@ -323,7 +355,7 @@ func (k *Kernel) ExportPortable(ctx context.Context, e contracts.ServiceExecutio
 		if er != nil {
 			return result, er
 		}
-		manifest["attachments"] = append(manifest["attachments"].([]any), map[string]any{"id": f.Id, "path": name, "sha256": f.ContentHash, "sizeBytes": f.SizeBytes, "mediaType": f.MediaType, "originalName": f.OriginalName})
+		manifest["attachments"] = append(manifest["attachments"].([]any), map[string]any{"externalContextPolicy": policy, "externalAcquisitionSources": sources, "id": f.Id, "path": name, "sha256": f.ContentHash, "sizeBytes": f.SizeBytes, "mediaType": f.MediaType, "originalName": f.OriginalName})
 		result.Assets++
 	}
 	// Evidence is scoped to exported pages; a complete import inventory may

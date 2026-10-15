@@ -329,6 +329,13 @@ func recordMeetingExtraction(m *Mutation, c map[string]any) error {
 			return Fail("INVALID_REQUEST", "Extraction task identity changed")
 		}
 	}
+	if restricted, err := pageExternalContextRestricted(m.Context, m.Tx, sourcePage); err != nil {
+		return err
+	} else if restricted {
+		if err := retainPageExternalContextPolicy(m.Context, m.Tx, x.PageID, gmailExternalContextPolicy); err != nil {
+			return err
+		}
+	}
 	_, err = m.Exec("UPDATE meeting_extraction_items SET title=?,body=?,applied_hash=?,applied_at=? WHERE proposal_id=? AND item_id=?", title, str(c["body"]), extractionHash(title, str(c["body"])), now(), x.ProposalID, x.ItemID)
 	return err
 }

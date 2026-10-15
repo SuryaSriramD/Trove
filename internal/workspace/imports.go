@@ -49,6 +49,8 @@ type ImportBlock struct {
 	Data map[string]any `json:"data"`
 }
 type ImportItem struct {
+	PortableIdentity        string                                  `json:"portableIdentity,omitempty"`
+	PageSourceScope         string                                  `json:"pageSourceScope,omitempty"`
 	AttachmentsComplete     bool                                    `json:"attachmentsComplete,omitempty"`
 	AttachmentRelationships map[string]ImportAttachmentRelationship `json:"attachmentRelationships,omitempty"`
 	CSVKeyColumn            string                                  `json:"csvKeyColumn,omitempty"`
@@ -86,6 +88,8 @@ type ImportItem struct {
 	Provenance              any                                     `json:"provenance,omitempty"`
 }
 type ImportPlan struct {
+	PageDeletionOperationID string                  `json:"pageDeletionOperationId,omitempty"`
+	PageEnumerationScope    string                  `json:"pageEnumerationScope,omitempty"`
 	CSVBindings             []ImportCSVBinding      `json:"csvBindings,omitempty"`
 	EntityIdentities        []ImportEntityIdentity  `json:"entityIdentities,omitempty"`
 	TypedDatabaseMerge      bool                    `json:"typedDatabaseMerge,omitempty"`
@@ -183,6 +187,11 @@ func (k *Kernel) storeImportBytes(ctx context.Context, name string, b []byte) (s
 	}
 	id := NewID()
 	err = k.write(ctx, func(tx *sql.Tx) error {
+		if policy, ok := ctx.Value(importExternalPolicyKey{}).(*externalContextPolicy); ok && policy != nil {
+			if err := retainFileExternalContextPolicy(ctx, tx, digest, *policy); err != nil {
+				return err
+			}
+		}
 		var existing string
 		e := tx.QueryRowContext(ctx, "SELECT id FROM files WHERE content_hash=?", digest).Scan(&existing)
 		if e == nil {
@@ -270,6 +279,13 @@ func previewPortableImport(ctx context.Context, k *Kernel, e contracts.ServiceEx
 	}
 	if int64(len(data)) > maxImportTotalBytes {
 		return nil, Fail("RESOURCE_EXHAUSTED", "Import exceeds 1 GiB")
+	}
+	sourcePolicy, err := fileExternalContextPolicy(ctx, k.db, importDigest(data))
+	if err != nil {
+		return nil, err
+	}
+	if sourcePolicy != nil {
+		ctx = context.WithValue(ctx, importExternalPolicyKey{}, sourcePolicy)
 	}
 	p := ImportPlan{ID: NewID(), Namespace: namespace, SourceSystem: "notion", SourceName: selection.name, RootID: NewID(), State: "preview", SourceCompleteness: "unknown", SourceOmissions: []string{}, UnknownCompleteness: []string{"The export alone cannot establish whether all original pages, comments, permissions, history, formulas, relations, or views were supplied."}, Items: []ImportItem{}, CommittedBatchIDs: []string{}, CreatedAt: now()}
 	if str(r["sourceSystem"]) != "" {
@@ -578,6 +594,9 @@ func configurePortableImport(ctx context.Context, k *Kernel, e contracts.Service
 					continue
 				}
 				choice := str(c["choice"])
+				if item.Kind == "source_deleted_page" && choice != "keep_local" && choice != "merge" {
+					return Fail("INVALID_REQUEST", "A missing source page can only be kept or explicitly reviewed for deletion")
+				}
 				if choice != "keep_local" && choice != "replace" && choice != "duplicate" && choice != "merge" {
 					return Fail("INVALID_REQUEST", "Choose merge, keep_local, replace, or duplicate")
 				}

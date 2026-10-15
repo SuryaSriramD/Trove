@@ -627,6 +627,13 @@ func (k *Kernel) ExecuteConnectorProposal(ctx context.Context, e contracts.Servi
 		if current.State != "review" || current.Hash != hash {
 			return Fail("CONFLICT", "Proposal was already executed or changed")
 		}
+		var unsettled int
+		if err := tx.QueryRowContext(ctx, "SELECT COUNT(*) FROM connector_proposals WHERE account_id=? AND id<>? AND json_extract(body_json,'$.state') IN('sending','unknown')", p.AccountID, p.ID).Scan(&unsettled); err != nil {
+			return err
+		}
+		if unsettled > 0 {
+			return Fail("CONFLICT", "Finish or reconcile this account's earlier write before sending another proposal")
+		}
 		p.State = "sending"
 		return saveConnectorProposal(ctx, tx, p)
 	})
@@ -653,6 +660,7 @@ func (k *Kernel) ExecuteConnectorProposal(ctx context.Context, e contracts.Servi
 	receipt.Version = 1
 	receipt.ProposalID = p.ID
 	receipt.RecordedAt = now()
+	receipt.UserResolution = nil // Only the direct-owner resolution path records attestations.
 	p.Receipt = &receipt
 	p.State = receipt.Outcome
 	clean := context.WithoutCancel(ctx)
@@ -707,6 +715,7 @@ func (k *Kernel) ReconcileConnectorProposal(ctx context.Context, e contracts.Ser
 	receipt.Version = 1
 	receipt.ProposalID = id
 	receipt.RecordedAt = now()
+	receipt.UserResolution = nil
 	err = k.write(ctx, func(tx *sql.Tx) error {
 		if _, err := activeConnector(ctx, k, tx, e, p.AccountID, a.Revision); err != nil {
 			return err

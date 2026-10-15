@@ -4728,6 +4728,15 @@
           "additionalProperties": {
             "type": "string"
           }
+        },
+        "sourceScope": {
+          "type": "string"
+        },
+        "pageSourceScope": {
+          "type": "string"
+        },
+        "portableIdentity": {
+          "type": "string"
         }
       },
       "required": [

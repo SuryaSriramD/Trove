@@ -100,17 +100,11 @@ func (k *Kernel) authorizePage(ctx context.Context, q querier, e contracts.Servi
 // Keep membership checks in the caller's transaction, never in a scope cache.
 func (k *Kernel) authorizePageScope(ctx context.Context, q querier, e contracts.ServiceExecutionContext, page string) error {
 	if e.Actor.Kind == "external_client" {
-		// Gmail context remains unqualified for external AI even after deliberate
-		// canonical import or a portable round trip. Imported instructions cannot
-		// override this policy, and a page-title edit does not clear provenance.
-		var restricted int
-		if err := q.QueryRowContext(ctx, `SELECT COUNT(*) FROM pages p WHERE p.id=? AND (
-EXISTS(SELECT 1 FROM json_tree(p.provenance_json) j WHERE
- (j.key='sourceSystem' AND j.value='connector:gmail') OR (j.key='provider' AND j.value='gmail')) OR
-EXISTS(SELECT 1 FROM import_mappings m WHERE m.local_id=p.id AND m.source_system='connector:gmail'))`, page).Scan(&restricted); err != nil {
+		restricted, err := pageExternalContextRestricted(ctx, q, page)
+		if err != nil {
 			return err
 		}
-		if restricted > 0 {
+		if restricted {
 			return Fail("SCOPE_DENIED", "Gmail-derived context is disabled for external AI pending separate qualification")
 		}
 	}
@@ -164,7 +158,16 @@ func (k *Kernel) authorizeEntity(ctx context.Context, q querier, e contracts.Ser
 	case "container":
 		query = "SELECT owning_page_id FROM containers WHERE id=?"
 	case "file":
-		if s, ok := e.Scope.Value.(contracts.DomainScopeVariant1); ok && string(s.WorkspaceId) == k.id {
+		if e.Actor.Kind == "external_client" {
+			var restricted int
+			if err := q.QueryRowContext(ctx, "SELECT count(*) FROM files f JOIN file_external_context_policy p ON p.content_hash=f.content_hash WHERE f.id=?", id).Scan(&restricted); err != nil {
+				return err
+			}
+			if restricted > 0 {
+				return Fail("SCOPE_DENIED", "Gmail-derived attachments are disabled for external AI pending separate qualification")
+			}
+		}
+		if s, ok := e.Scope.Value.(contracts.DomainScopeVariant1); ok && string(s.WorkspaceId) == k.id && e.Actor.Kind != "external_client" {
 			return k.authorize(e)
 		}
 		rows, err := q.QueryContext(ctx, "SELECT page_id FROM attachments WHERE file_id=?", id)

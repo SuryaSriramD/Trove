@@ -11,6 +11,7 @@ import (
 	"sync"
 	"sync/atomic"
 	"testing"
+	"unicode/utf8"
 
 	"github.com/modelcontextprotocol/go-sdk/mcp"
 )
@@ -28,6 +29,33 @@ type mcpFixture struct {
 	toolError     atomic.Bool
 	mu            sync.Mutex
 	args          json.RawMessage
+}
+
+func TestMCPBinaryPreviewAllowsExplicitRevisionBoundAcquisition(t *testing.T) {
+	f := newMCPFixture(t)
+	f.server.AddResource(&mcp.Resource{URI: "notes://selected", Name: "Selected notes"}, func(context.Context, *mcp.ReadResourceRequest) (*mcp.ReadResourceResult, error) {
+		return &mcp.ReadResourceResult{Contents: []*mcp.ResourceContents{{URI: "notes://selected", MIMEType: "application/octet-stream", Blob: []byte{0, 1, 2, 3}}}}, nil
+	})
+	a := &mcpAdapter{}
+	preview, err := a.Preview(context.Background(), f.session, f.session.Account.Selections[0], "resource:notes://selected")
+	if err != nil || preview.State != "partial" {
+		t.Fatal("binary preview blocks explicit acquisition", preview, err)
+	}
+	file, err := a.Acquire(context.Background(), f.session, f.session.Account.Selections[0], preview.RemoteID, "")
+	if err != nil || file.RemoteRevision != preview.RemoteRevision || len(file.Bytes) != 4 {
+		t.Fatal("acquisition not bound to preview", file, err)
+	}
+}
+
+func TestMCPLongResourcePreviewDisclosesIncompleteText(t *testing.T) {
+	f := newMCPFixture(t)
+	f.server.AddResource(&mcp.Resource{URI: "notes://selected", Name: "Selected notes"}, func(context.Context, *mcp.ReadResourceRequest) (*mcp.ReadResourceResult, error) {
+		return &mcp.ReadResourceResult{Contents: []*mcp.ResourceContents{{URI: "notes://selected", Text: strings.Repeat("界", 100000)}}}, nil
+	})
+	preview, err := (&mcpAdapter{}).Preview(context.Background(), f.session, f.session.Account.Selections[0], "resource:notes://selected")
+	if err != nil || preview.State != "partial" || !utf8.ValidString(preview.Text) || len(preview.Text) > 256<<10 {
+		t.Fatal("unbounded or incomplete source presented as complete", err)
+	}
 }
 
 func newMCPFixture(t *testing.T) *mcpFixture {
@@ -277,5 +305,25 @@ func TestMCPAcquisitionRequiresExactRepresentationAndSelection(t *testing.T) {
 	}
 	if f.calls.Load() != 0 {
 		t.Fatal("acquisition called tool")
+	}
+}
+
+func TestMCPAcquiredNamePreservesExactResourceIdentity(t *testing.T) {
+	for _, label := range []string{"Folder/notes.txt", `Folder\notes.txt`, "", "..", "/", strings.Repeat("語", 100)} {
+		t.Run(label, func(t *testing.T) {
+			f := newMCPFixture(t)
+			sel := f.session.Account.Selections[0]
+			sel.Label = label
+			item, err := NewMCPAdapter().(Acquirer).Acquire(context.Background(), f.session, sel, sel.ID, "")
+			if err != nil {
+				t.Fatal(err)
+			}
+			if item.RemoteID != sel.ID || item.Name == "" || item.Name == "." || item.Name == ".." || strings.ContainsAny(item.Name, "/\\\x00") || len(item.Name) > 200 {
+				t.Fatal("unsafe acquisition filename or lost source identity", item.Name, item.RemoteID)
+			}
+			if string(item.Bytes) != "Selected source evidence" {
+				t.Fatal("resource changed")
+			}
+		})
 	}
 }

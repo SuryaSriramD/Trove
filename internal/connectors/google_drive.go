@@ -189,7 +189,7 @@ func (g *googleAdapter) driveAcquire(ctx context.Context, s Session, sel Selecti
 	if driveRevision(after) != driveRevision(f) || after.Version != f.Version || after.Trashed {
 		return Acquired{}, fail("REMOTE_CHANGED", "File changed while downloading; review the current revision")
 	}
-	return Acquired{Name: name, MediaType: mediaType, Bytes: data, RemoteRevision: driveRevision(f)}, nil
+	return Acquired{RemoteID: id, Name: name, MediaType: mediaType, Bytes: data, RemoteRevision: driveRevision(f)}, nil
 }
 
 type driveArguments struct {

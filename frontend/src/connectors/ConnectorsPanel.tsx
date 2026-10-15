@@ -30,6 +30,56 @@ function message(error: unknown) {
   return error instanceof Error ? error.message : String(error);
 }
 
+const driveFormats: Record<string, [string, string][]> = {
+  "application/vnd.google-apps.document": [
+    ["text/plain", "Plain text"],
+    ["application/pdf", "PDF"],
+    [
+      "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+      "Word document",
+    ],
+  ],
+  "application/vnd.google-apps.spreadsheet": [
+    ["text/csv", "CSV"],
+    ["application/pdf", "PDF"],
+    [
+      "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+      "Excel workbook",
+    ],
+  ],
+  "application/vnd.google-apps.presentation": [
+    ["text/plain", "Plain text"],
+    ["application/pdf", "PDF"],
+    [
+      "application/vnd.openxmlformats-officedocument.presentationml.presentation",
+      "PowerPoint presentation",
+    ],
+  ],
+  "application/vnd.google-apps.drawing": [
+    ["image/png", "PNG image"],
+    ["application/pdf", "PDF"],
+    ["image/svg+xml", "SVG image"],
+  ],
+};
+function attachmentLabel(key: string, index: number) {
+  try {
+    const raw = key
+      .slice("gmail-attachment:".length)
+      .replace(/-/g, "+")
+      .replace(/_/g, "/");
+    const data = JSON.parse(
+      new TextDecoder().decode(
+        Uint8Array.from(atob(raw), (c) => c.charCodeAt(0)),
+      ),
+    );
+    if (typeof data.name === "string" && data.name.trim())
+      return data.name.slice(0, 255);
+  } catch {
+    /* Opaque keys are validated by the native adapter. */
+  }
+  return `Attachment ${index + 1}`;
+}
+
 export function ConnectorsPanel(props: {
   workspace: WorkspaceSnapshot;
   onChanged: () => Promise<void> | void;
@@ -70,9 +120,24 @@ function Connections({
   const [manual, setManual] = useState("");
   const [destination, setDestination] = useState("");
   const [acquired, setAcquired] = useState<S.PrepareFileResult>();
+  const [acquisitionFormat, setAcquisitionFormat] = useState("");
   const alive = useRef(true);
   const epoch = useRef(0);
   const account = accounts.find((a) => a.id === selected);
+  const previewKind = accounts.find((a) => a.id === preview?.accountId)?.kind;
+  const previewContent = (preview?.content ?? {}) as Record<string, unknown>;
+  const formats =
+    typeof previewContent.mimeType === "string"
+      ? (driveFormats[previewContent.mimeType] ?? [])
+      : [];
+  const attachmentKeys = Array.isArray(previewContent.attachmentKeys)
+    ? previewContent.attachmentKeys.filter(
+        (v): v is string =>
+          typeof v === "string" &&
+          v.startsWith("gmail-attachment:") &&
+          v.length < 32768,
+      )
+    : [];
   const request = <T,>(method: string, data: object = {}) =>
     dispatch<T>(method, { ...envelope(workspace), ...data });
   async function sourceRequest<T>(method: string, data: object) {
@@ -136,6 +201,7 @@ function Connections({
     setPreview(undefined);
     setProposal(undefined);
     setAcquired(undefined);
+    setAcquisitionFormat("");
     setPlanId("");
     setError("");
     setNotice("");
@@ -272,8 +338,23 @@ function Connections({
       if (current(stamp)) {
         setPreview(result);
         setAcquired(undefined);
+        setAcquisitionFormat("");
         setPlanId("");
       }
+    });
+  const acquire = (remoteId: string) =>
+    act(async (stamp) => {
+      if (!preview) return;
+      const file = await sourceRequest<S.PrepareFileResult>(
+        "connectors.native.acquire",
+        {
+          snapshotId: preview.id,
+          expectedRevision: preview.remoteRevision,
+          remoteId,
+          format: previewKind === "google_drive" ? acquisitionFormat : "",
+        },
+      );
+      if (current(stamp)) setAcquired(file);
     });
   const activeAttempt =
     attempt && ["waiting", "authorized", "verifying"].includes(attempt.state);
@@ -771,7 +852,56 @@ function Connections({
               >
                 Reconcile outcome
               </button>
+              <ManualResolution
+                key={proposal.id}
+                disabled={
+                  busy ||
+                  accounts.find((a) => a.id === proposal.accountId)?.state !==
+                    "active"
+                }
+                onResolve={(observation, evidence) =>
+                  act(async (stamp) => {
+                    const currentAccount = accounts.find(
+                      (a) => a.id === proposal.accountId,
+                    );
+                    if (!currentAccount)
+                      throw new Error(
+                        "Reload the connection before resolving its outcome",
+                      );
+                    const result = await request<Proposal>(
+                      "connectors.native.resolve",
+                      {
+                        proposalId: proposal.id,
+                        hash: proposal.hash,
+                        expectedRevision: currentAccount.revision,
+                        observation,
+                        evidence,
+                      },
+                    );
+                    if (current(stamp)) setProposal(result);
+                  })
+                }
+              />
             </>
+          )}
+          {proposal.receipt?.userResolution && (
+            <section aria-label="Manual resolution record">
+              <p>
+                Resolved by the user:{" "}
+                {proposal.receipt.userResolution.observation === "applied"
+                  ? "change was applied"
+                  : "change was not applied"}
+                . The provider outcome remains unverified; this proposal cannot
+                be sent again.
+              </p>
+              <p>{proposal.receipt.userResolution.evidence}</p>
+              <small>
+                Recorded{" "}
+                {new Date(
+                  proposal.receipt.userResolution.recordedAt,
+                ).toLocaleString()}
+              </small>
+            </section>
           )}
           {proposal.state === "sending" && (
             <button
@@ -826,8 +956,14 @@ function Connections({
           <h2>{preview.title}</h2>
           <p>
             Retrieved {new Date(preview.retrievedAt).toLocaleString()} ·
-            External AI disabled
+            {preview.state} · External AI disabled
           </p>
+          {preview.state === "partial" && (
+            <p>
+              This preview is incomplete. Acquire a file where available;
+              incomplete text cannot replace canonical content.
+            </p>
+          )}
           <pre className="connection-text">{preview.text}</pre>
           {/^https:\/\//.test(preview.url) && (
             <a href={preview.url} target="_blank" rel="noreferrer">
@@ -835,7 +971,7 @@ function Connections({
             </a>
           )}
           <button
-            disabled={busy}
+            disabled={busy || preview.state !== "present"}
             onClick={() =>
               void act(async (stamp) => {
                 const plan = await sourceRequest<{ planId: string }>(
@@ -851,27 +987,48 @@ function Connections({
           >
             Review import into Trove
           </button>
-          {accounts.find((a) => a.id === preview.accountId)?.kind ===
-            "google_drive" && (
+          {previewKind === "google_drive" && formats.length > 0 && (
+            <label>
+              Acquisition format
+              <select
+                value={acquisitionFormat}
+                onChange={(e) => setAcquisitionFormat(e.target.value)}
+              >
+                <option value="">Default ({formats[0][1]})</option>
+                {formats.map(([value, label]) => (
+                  <option key={value} value={value}>
+                    {label}
+                  </option>
+                ))}
+              </select>
+            </label>
+          )}
+          {((previewKind === "google_drive" &&
+            previewContent.mimeType !== "application/vnd.google-apps.folder") ||
+            (previewKind === "mcp" && preview.kind === "mcp_resource")) && (
             <button
               disabled={busy}
-              onClick={() =>
-                void act(async (stamp) => {
-                  const file = await sourceRequest<S.PrepareFileResult>(
-                    "connectors.native.acquire",
-                    {
-                      snapshotId: preview.id,
-                      expectedRevision: preview.remoteRevision,
-                      remoteId: preview.remoteId,
-                      format: "",
-                    },
-                  );
-                  if (current(stamp)) setAcquired(file);
-                })
-              }
+              onClick={() => void acquire(preview.remoteId)}
             >
               Acquire this file
             </button>
+          )}
+          {previewKind === "gmail" && attachmentKeys.length > 0 && (
+            <div aria-label="Gmail attachments">
+              <p>
+                Acquired Gmail attachments remain unavailable to external AI,
+                including after import, export and restoration.
+              </p>
+              {attachmentKeys.map((key, index) => (
+                <button
+                  key={key}
+                  disabled={busy}
+                  onClick={() => void acquire(key)}
+                >
+                  Acquire {attachmentLabel(key, index)}
+                </button>
+              ))}
+            </div>
           )}
           {acquired && (
             <div>
@@ -983,6 +1140,71 @@ function Connections({
   );
 }
 
+function ManualResolution({
+  disabled,
+  onResolve,
+}: {
+  disabled: boolean;
+  onResolve: (
+    observation: "applied" | "not_applied",
+    evidence: string,
+  ) => Promise<void>;
+}) {
+  const [observation, setObservation] = useState<"applied" | "not_applied">(
+    "applied",
+  );
+  const [evidence, setEvidence] = useState("");
+  const [confirmed, setConfirmed] = useState(false);
+  return (
+    <details>
+      <summary>Record a manually verified outcome</summary>
+      <p>
+        Use this after inspecting the remote result when automatic
+        reconciliation cannot confirm it. This records your inspection, retains
+        the uncertain provider receipt, and permits new work requiring a
+        separate review.
+      </p>
+      <label>
+        Inspected outcome
+        <select
+          value={observation}
+          onChange={(e) => setObservation(e.target.value as typeof observation)}
+        >
+          <option value="applied">I confirmed the change was applied</option>
+          <option value="not_applied">
+            I confirmed the change was not applied
+          </option>
+        </select>
+      </label>
+      <label>
+        Evidence from your inspection
+        <textarea
+          value={evidence}
+          maxLength={4000}
+          onChange={(e) => {
+            setEvidence(e.target.value);
+            setConfirmed(false);
+          }}
+        />
+      </label>
+      <label>
+        <input
+          type="checkbox"
+          checked={confirmed}
+          onChange={(e) => setConfirmed(e.target.checked)}
+        />
+        I inspected this exact change in the connected account.
+      </label>
+      <button
+        disabled={disabled || !confirmed || evidence.trim().length < 10}
+        onClick={() => void onResolve(observation, evidence)}
+      >
+        Record manual resolution
+      </button>
+    </details>
+  );
+}
+
 function WriteComposer({
   workspace,
   account,
@@ -1031,6 +1253,8 @@ function WriteComposer({
   const [head, setHead] = useState("");
   const [base, setBase] = useState("");
   const [recipients, setRecipients] = useState("");
+  const [cc, setCC] = useState("");
+  const [bcc, setBCC] = useState("");
   const [start, setStart] = useState("");
   const [end, setEnd] = useState("");
   const [timezone, setTimezone] = useState(
@@ -1073,6 +1297,8 @@ function WriteComposer({
       setHead(text("head"));
       setBase(text("base"));
       setRecipients(text("recipients"));
+      setCC(text("cc"));
+      setBCC(text("bcc"));
       setStart(text("start"));
       setEnd(text("end"));
       setTimezone(
@@ -1117,6 +1343,8 @@ function WriteComposer({
           head,
           base,
           recipients,
+          cc,
+          bcc,
           start,
           end,
           timezone,
@@ -1158,6 +1386,14 @@ function WriteComposer({
             .filter(Boolean),
           subject: title,
           text: body,
+          cc: cc
+            .split(",")
+            .map((s) => s.trim())
+            .filter(Boolean),
+          bcc: bcc
+            .split(",")
+            .map((s) => s.trim())
+            .filter(Boolean),
           ...(file ? { attachments: [file] } : {}),
         };
       } else if (account.kind === "google_calendar") {
@@ -1216,7 +1452,12 @@ function WriteComposer({
         ...(account.kind === "notion" && operation !== "notion.page.create"
           ? { remoteId: selection }
           : remote
-            ? { remoteId: remote }
+            ? {
+                remoteId:
+                  account.kind === "github"
+                    ? remote.replace(/^(issue|pull_request|comment):/, "")
+                    : remote,
+              }
             : {}),
         arguments: args as S.ConnectorAction["arguments"],
         effects: [],
@@ -1340,6 +1581,18 @@ function WriteComposer({
               onChange={(e) => setRecipients(e.target.value)}
             />
           </label>
+        )}
+        {account.kind === "gmail" && (
+          <>
+            <label>
+              Cc (comma separated)
+              <input value={cc} onChange={(e) => setCC(e.target.value)} />
+            </label>
+            <label>
+              Bcc (comma separated)
+              <input value={bcc} onChange={(e) => setBCC(e.target.value)} />
+            </label>
+          </>
         )}
         {account.kind === "google_calendar" && (
           <>

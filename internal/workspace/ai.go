@@ -15,18 +15,20 @@ import (
 )
 
 type AIRequest struct {
-	Skill          *SkillRunReference `json:"skill,omitempty"`
-	ConversationID string             `json:"conversationId,omitempty"`
-	PageID         string             `json:"pageId,omitempty"`
-	BlockID        string             `json:"blockId,omitempty"`
-	ProjectID      string             `json:"projectId,omitempty"`
-	Mode           string             `json:"mode"`
-	Prompt         string             `json:"prompt"`
-	Selection      string             `json:"selection,omitempty"`
-	UseMemory      bool               `json:"useMemory"`
-	ModelPackID    string             `json:"modelPackId"`
+	ConnectedSources []ConnectedSourceReference `json:"connectedSources,omitempty"`
+	Skill            *SkillRunReference         `json:"skill,omitempty"`
+	ConversationID   string                     `json:"conversationId,omitempty"`
+	PageID           string                     `json:"pageId,omitempty"`
+	BlockID          string                     `json:"blockId,omitempty"`
+	ProjectID        string                     `json:"projectId,omitempty"`
+	Mode             string                     `json:"mode"`
+	Prompt           string                     `json:"prompt"`
+	Selection        string                     `json:"selection,omitempty"`
+	UseMemory        bool                       `json:"useMemory"`
+	ModelPackID      string                     `json:"modelPackId"`
 }
 type AIEvidence struct {
+	Connected      *ConnectedEvidence             `json:"connected,omitempty"`
 	Freshness      *contracts.DomainPageFreshness `json:"freshness,omitempty"`
 	Number         int                            `json:"number"`
 	Title          string                         `json:"title"`
@@ -38,10 +40,11 @@ type AIEvidence struct {
 	State          string                         `json:"state,omitempty"`
 }
 type AICitation struct {
-	Number   int                      `json:"number"`
-	Title    string                   `json:"title"`
-	Location contracts.DomainLocation `json:"location"`
-	State    string                   `json:"state"`
+	Connected *ConnectedEvidence       `json:"connected,omitempty"`
+	Number    int                      `json:"number"`
+	Title     string                   `json:"title"`
+	Location  contracts.DomainLocation `json:"location"`
+	State     string                   `json:"state"`
 }
 type AIRun struct {
 	ID             string       `json:"id"`

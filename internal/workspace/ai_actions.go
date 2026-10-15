@@ -363,6 +363,17 @@ func init() {
 		if m.Execution.Actor.Kind != "local_ai" || m.Execution.Origin != "ai" || m.Request.Mutation.ApprovalId == nil {
 			return Fail("APPROVAL_REQUIRED", "Only an explicitly approved local AI proposal may commit")
 		}
+		var sourcesJSON string
+		if err := m.Tx.QueryRowContext(m.Context, "SELECT sources_json FROM ai_runs WHERE id=?", p.RunID).Scan(&sourcesJSON); err != nil {
+			return err
+		}
+		var sources []AIEvidence
+		if err := json.Unmarshal([]byte(sourcesJSON), &sources); err != nil {
+			return err
+		}
+		if err := retainAIExternalContextPolicy(m, sources); err != nil {
+			return err
+		}
 		_, err := m.Exec("UPDATE ai_proposals SET state='applied' WHERE id=?", id)
 		return err
 	})

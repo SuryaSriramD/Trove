@@ -146,6 +146,12 @@ func (k *Kernel) RegisterSelection(path string) (string, error) {
 	return handle, nil
 }
 func prepareFile(ctx context.Context, k *Kernel, e contracts.ServiceExecutionContext, r map[string]any) (any, error) {
+	return prepareFileWithPolicy(ctx, k, e, r, nil, nil)
+}
+
+// Policy is supplied only by a trusted native acquisition adapter. Renderer
+// requests cannot change provenance or clear an existing content restriction.
+func prepareFileWithPolicy(ctx context.Context, k *Kernel, e contracts.ServiceExecutionContext, r map[string]any, policy *externalContextPolicy, guard func(*sql.Tx, string) error) (any, error) {
 	if e.Actor.Kind != "user" || e.Origin != "user" {
 		return nil, Fail("SCOPE_DENIED", "Native file ingestion requires a direct user selection")
 	}
@@ -198,6 +204,16 @@ func prepareFile(ctx context.Context, k *Kernel, e contracts.ServiceExecutionCon
 	err = k.write(ctx, func(tx *sql.Tx) error {
 		if err := k.authorize(e); err != nil {
 			return err
+		}
+		if guard != nil {
+			if err := guard(tx, digest); err != nil {
+				return err
+			}
+		}
+		if policy != nil {
+			if err := retainFileExternalContextPolicy(ctx, tx, digest, *policy); err != nil {
+				return err
+			}
 		}
 		var id string
 		err := tx.QueryRowContext(ctx, "SELECT id FROM files WHERE content_hash=? UNION ALL SELECT file_id FROM file_ingests WHERE content_hash=? LIMIT 1", digest, digest).Scan(&id)
@@ -392,6 +408,10 @@ func (k *Kernel) ReadFile(ctx context.Context, e contracts.ServiceExecutionConte
 	if err != nil || strconv.FormatInt(size, 10) != meta.SizeBytes || hex.EncodeToString(h.Sum(nil)) != string(meta.ContentHash) {
 		f.Close()
 		return nil, meta, Fail("INVALID_REQUEST", "Attachment failed integrity verification")
+	}
+	if err = k.authorizeEntity(ctx, k.db, e, "file", id); err != nil {
+		f.Close()
+		return nil, meta, err
 	}
 	_, err = f.Seek(0, io.SeekStart)
 	if err != nil {
