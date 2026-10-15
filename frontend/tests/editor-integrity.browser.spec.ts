@@ -95,11 +95,23 @@ async function save(page:Page) {
 }
 async function insertCharacter(page:Page,field:Locator) {
   await field.click();
-  await field.evaluate(element=>{
+  const caret=await field.evaluate(element=>{
     const walker=document.createTreeWalker(element,NodeFilter.SHOW_TEXT);const text=walker.nextNode()!;
-    const range=document.createRange();range.setStart(text,4);range.collapse(true);
-    const selection=window.getSelection()!;selection.removeAllRanges();selection.addRange(range);
+    const editor=(element as HTMLElement & {editor?:any}).editor;
+    if(!editor)throw Error("The nested rich editor is not ready");
+    // A DOM Range alone races ProseMirror's deferred focus reconciliation.
+    // Update its selection transaction first, then synchronize the DOM before
+    // real keyboard input. Focus reconciliation must preserve this exact caret.
+    const position=editor.view.posAtDOM(text,4);
+    editor.commands.setTextSelection(position);
+    editor.view.focus();
+    const selection=window.getSelection()!;
+    return {focused:document.activeElement===element,modelFrom:editor.state.selection.from,
+      modelTo:editor.state.selection.to,position,domOffset:selection.anchorOffset,
+      domText:selection.anchorNode?.textContent,collapsed:selection.isCollapsed};
   });
+  expect(caret).toEqual({focused:true,modelFrom:caret.position,modelTo:caret.position,
+    position:caret.position,domOffset:4,domText:"Keep ",collapsed:true});
   await page.keyboard.insertText("!");
 }
 async function persistedRich(page:Page,kind:"table"|"layout") {
