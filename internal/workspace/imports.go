@@ -29,17 +29,19 @@ CREATE TABLE IF NOT EXISTS import_runs(id TEXT PRIMARY KEY,plan_hash TEXT NOT NU
 CREATE TABLE IF NOT EXISTS import_mapping_state(mapping_id TEXT PRIMARY KEY REFERENCES import_mappings(id),local_revision TEXT NOT NULL);
 CREATE TABLE IF NOT EXISTS import_baselines(mapping_id TEXT PRIMARY KEY REFERENCES import_mappings(id),normalizer_version INTEGER NOT NULL,snapshot_json TEXT NOT NULL CHECK(json_valid(snapshot_json)),source_revision TEXT NOT NULL,raw_file_id TEXT NOT NULL REFERENCES files(id),import_run_id TEXT NOT NULL REFERENCES import_runs(id));
 CREATE TABLE IF NOT EXISTS import_entity_ids(source_system TEXT NOT NULL,source_namespace TEXT NOT NULL,entity_kind TEXT NOT NULL,source_identity TEXT NOT NULL,local_id TEXT NOT NULL,PRIMARY KEY(source_system,source_namespace,entity_kind,source_identity));
+CREATE TABLE IF NOT EXISTS import_csv_bindings(source_system TEXT NOT NULL,source_namespace TEXT NOT NULL,source_identity TEXT NOT NULL,binding_json TEXT NOT NULL CHECK(json_valid(binding_json)),PRIMARY KEY(source_system,source_namespace,source_identity));
 `
 const maxImportEntries = 10000
 const maxImportEntryBytes int64 = 64 * 1024 * 1024
 const maxImportTotalBytes int64 = 1024 * 1024 * 1024
 
 type ImportColumn struct {
-	Name       string   `json:"name"`
-	Type       string   `json:"type"`
-	PropertyID string   `json:"propertyId"`
-	Samples    []string `json:"samples"`
-	Warning    string   `json:"warning,omitempty"`
+	SourceHeader *string  `json:"sourceHeader,omitempty"`
+	Name         string   `json:"name"`
+	Type         string   `json:"type"`
+	PropertyID   string   `json:"propertyId"`
+	Samples      []string `json:"samples"`
+	Warning      string   `json:"warning,omitempty"`
 }
 type ImportBlock struct {
 	ID   string         `json:"id"`
@@ -47,6 +49,7 @@ type ImportBlock struct {
 	Data map[string]any `json:"data"`
 }
 type ImportItem struct {
+	CSVKeyColumn       string                     `json:"csvKeyColumn,omitempty"`
 	MergeGuards        map[string]string          `json:"mergeGuards,omitempty"`
 	ResolvedFields     map[string]json.RawMessage `json:"resolvedFields,omitempty"`
 	Merge              *ImportMergeReview         `json:"merge,omitempty"`
@@ -81,6 +84,7 @@ type ImportItem struct {
 	Provenance         any                        `json:"provenance,omitempty"`
 }
 type ImportPlan struct {
+	CSVBindings             []ImportCSVBinding      `json:"csvBindings,omitempty"`
 	EntityIdentities        []ImportEntityIdentity  `json:"entityIdentities,omitempty"`
 	TypedDatabaseMerge      bool                    `json:"typedDatabaseMerge,omitempty"`
 	NormalizerVersion       int                     `json:"normalizerVersion,omitempty"`
@@ -522,6 +526,22 @@ func configurePortableImport(ctx context.Context, k *Kernel, e contracts.Service
 			}
 			if !found {
 				return Fail("NOT_FOUND", "CSV source not found")
+			}
+		}
+		for _, raw := range asList(r["csvKeys"]) {
+			binding := asObject(raw)
+			found := false
+			for i := range p.Items {
+				if p.Items[i].Locator == str(binding["sourceLocator"]) && p.Items[i].Kind == "csv" {
+					if err := configureCSVKey(ctx, tx, &p, i, int(number(binding["index"])), true); err != nil {
+						return err
+					}
+					found = true
+					break
+				}
+			}
+			if !found {
+				return Fail("INVALID_REQUEST", "Select a key before this CSV is converted into a typed import")
 			}
 		}
 		resolutions, _ := r["resolutions"].([]any)

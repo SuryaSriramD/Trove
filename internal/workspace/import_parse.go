@@ -330,7 +330,7 @@ func (k *Kernel) parseImportPlan(ctx context.Context, p *ImportPlan) error {
 				if samples == nil {
 					samples = []string{}
 				}
-				column := ImportColumn{Name: name, Type: kind, PropertyID: NewID(), Samples: samples}
+				column := ImportColumn{SourceHeader: &name, Name: name, Type: kind, PropertyID: NewID(), Samples: samples}
 				if name == "" {
 					column.Name = fmt.Sprintf("Column %d", col+1)
 				}
@@ -355,21 +355,8 @@ func (k *Kernel) parseImportPlan(ctx context.Context, p *ImportPlan) error {
 					title = cells[0]
 				}
 				row := ImportItem{Locator: fmt.Sprintf("%s#row=%d", item.Locator, index+1), Kind: "row", Outcome: "adapted", Reason: "CSV row values preserved; blank values remain unset", RawFileID: rawID, Hash: importDigest(raw), Size: int64(len(raw)), PageID: NewID(), ParentID: item.PageID, Title: title, RecordID: NewID(), CollectionID: item.CollectionID, CSVSource: item.Locator, Cells: cells, IdentityKind: "derived_locator", ExternalID: fmt.Sprintf("%s#row=%d", item.Locator, index+1)}
-				// Notion exports each database record body beside the CSV. Match only an
-				// unambiguous title within that CSV directory; never collapse duplicates.
-				matches := []int{}
-				stem := strings.TrimSuffix(item.Locator, path.Ext(item.Locator)) + "/"
-				for n := range p.Items {
-					candidate := &p.Items[n]
-					if (candidate.Kind == "markdown" || candidate.Kind == "html") && strings.HasPrefix(candidate.Locator, stem) && candidate.Title == sourceTitle(title) {
-						matches = append(matches, n)
-					}
-				}
-				if len(matches) == 1 {
-					row.PageID = p.Items[matches[0]].PageID
-					p.Items[matches[0]].ParentID = item.PageID
-					row.Reason += "; matched supplied record page body"
-				}
+				// A matching title is not a row/page identity. Portable manifests
+				// may bind an explicit record body later; otherwise keep both.
 				if len(cells) != len(header) {
 					row.Outcome = "partial"
 					row.Reason = "Row width differs from header; every source cell retained in readable fallback and raw evidence"
@@ -384,6 +371,9 @@ func (k *Kernel) parseImportPlan(ctx context.Context, p *ImportPlan) error {
 	p.Items = append(p.Items, rows...)
 	k.restorePortableBlocks(p, manifest)
 	k.restorePortableDatabase(p, manifest)
+	if err := restoreCSVKeyBindings(ctx, k.db, p); err != nil {
+		return err
+	}
 	if err := reconcileImportFolderIDs(ctx, k.db, p); err != nil {
 		return err
 	}
