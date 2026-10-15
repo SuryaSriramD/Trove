@@ -15,7 +15,7 @@ class MicrophoneBundleTests(unittest.TestCase):
         (root/'microphone-worker').write_bytes(b'helper fixture; never executed')
         pin=json.loads((ROOT/'native/microphone.lock.json').read_text())
         helper={'name':'microphone-worker','runtime':'microphone','runtimeCommit':pin['runtimeCommit'],'architecture':'arm64','sha256':file_digest(root/'microphone-worker')}
-        sidecar={'schemaVersion':1,'platform':'darwin','helper':helper,'testOnly':False,'deviceBackendCompiled':True,'capabilities':['record']}
+        sidecar={'schemaVersion':1,'platform':'darwin','helper':helper,'testOnly':False,'deviceBackendCompiled':True,'capabilities':['record','capture_controls_v1','input_devices_v1']}
         (root/'microphone-worker.json').write_text(json.dumps(sidecar))
         return root,helper,sidecar
 
@@ -40,6 +40,19 @@ class MicrophoneBundleTests(unittest.TestCase):
             (root/'microphone-worker.json').write_text(json.dumps(sidecar))
             (root/'microphone-worker').write_bytes(b'tampered')
             with self.assertRaises(RuntimeError):microphone_record(root,'darwin-arm64')
+
+    def test_refuses_obsolete_runtime_and_incomplete_capabilities(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root,helper,sidecar=self.setup_bundle(directory)
+            variants=[{k:v for k,v in sidecar.items() if k!='capabilities'}]
+            variants += [{**sidecar,'capabilities':caps} for caps in [[],['record'],['record','capture_controls_v1'],['record','input_devices_v1']]]
+            variants.append({**sidecar,'helper':{**helper,'runtimeCommit':'miniaudio-0.11.25-trove-microphone-v1'}})
+            for index,variant in enumerate(variants):
+                with self.subTest(variant=index):
+                    (root/'microphone-worker.json').write_text(json.dumps(variant))
+                    with self.assertRaises(RuntimeError):microphone_record(root,'darwin-arm64')
+            (root/'microphone-worker.json').write_text(json.dumps(sidecar))
+            self.assertEqual(microphone_record(root,'darwin-arm64'),helper)
 
     def test_startup_stall_cannot_build_production(self):
         import subprocess
