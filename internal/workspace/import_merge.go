@@ -29,6 +29,7 @@ func importCSVArtifact(raw json.RawMessage) bool {
 }
 
 type ImportSnapshot struct {
+	SourceScope    string                     `json:"sourceScope,omitempty"`
 	Version        int                        `json:"version"`
 	SourceRevision string                     `json:"sourceRevision,omitempty"`
 	Fields         map[string]json.RawMessage `json:"fields"`
@@ -308,6 +309,20 @@ func prepareImportMerge(ctx context.Context, q querier, p *ImportPlan, item *Imp
 	if collection != nil {
 		addIncomingDatabaseFields(&incoming, collection)
 		if known {
+			if base.SourceScope != "" && incoming.SourceScope != "" && base.SourceScope != incoming.SourceScope {
+				return Fail("CONFLICT", "Portable source workspace or collection changed; use a separate source namespace")
+			}
+			if base.SourceScope == "" || incoming.SourceScope == "" {
+				// An older capture can establish identity for future runs, but
+				// cannot retroactively prove omissions in this capture.
+				collection.RecordEnumerationVersion = 0
+				collection.SchemaComplete = false
+			}
+			if incoming.SourceScope == "" {
+				incoming.SourceScope = base.SourceScope
+			}
+		}
+		if known {
 			observed := map[string]bool{}
 			for _, record := range collection.Records {
 				for _, property := range record.KnownProperties {
@@ -326,7 +341,7 @@ func prepareImportMerge(ctx context.Context, q querier, p *ImportPlan, item *Imp
 						incoming.Fields[path] = value
 					}
 				}
-				if strings.HasPrefix(path, "/records/") || strings.HasPrefix(path, "/schema/") && !collection.SchemaComplete {
+				if strings.HasPrefix(path, "/records/") && collection.RecordEnumerationVersion != 1 || strings.HasPrefix(path, "/schema/") && !collection.SchemaComplete {
 					if _, present := incoming.Fields[path]; !present {
 						incoming.Fields[path] = value
 					}
@@ -383,7 +398,7 @@ func prepareImportMerge(ctx context.Context, q querier, p *ImportPlan, item *Imp
 	item.Merge = &ImportMergeReview{ID: NewID(), Version: 1, BaselineStatus: status, LocalDeleted: deleted, Fields: mergeImportContentFields(base.Fields, local.Fields, incoming.Fields, known), Resolutions: []ImportFieldChoice{}}
 	for i := range item.Merge.Fields {
 		field := &item.Merge.Fields[i]
-		if (strings.HasPrefix(field.Path, "/attachments/") || strings.HasPrefix(field.Path, "/blocks/") || strings.HasPrefix(field.Path, "/schema/")) && field.Base.Present && !field.Incoming.Present && field.Local.Present {
+		if (strings.HasPrefix(field.Path, "/attachments/") || strings.HasPrefix(field.Path, "/blocks/") || strings.HasPrefix(field.Path, "/schema/") || strings.HasPrefix(field.Path, "/records/")) && field.Base.Present && !field.Incoming.Present && field.Local.Present {
 			// Even a proven complete removal needs an explicit reviewed decision.
 			field.Outcome = "conflict"
 		}
@@ -610,13 +625,6 @@ func materializeImportMerge(item *ImportItem) error {
 		item.BlockSources = map[string]string{}
 	}
 	item.ResolvedFields = fields
-	for _, field := range item.Merge.Fields {
-		if field.Local.Present && strings.HasPrefix(field.Path, "/records/") {
-			if _, present := fields[field.Path]; !present {
-				return Fail("CONFLICT", "Deleting a property or record requires a separately reviewed deletion; retain it in this import")
-			}
-		}
-	}
 	item.Choice = "replace"
 	return nil
 }

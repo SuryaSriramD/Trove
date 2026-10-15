@@ -11,13 +11,15 @@ import (
 )
 
 type portableDatabaseSource struct {
-	Title          string                               `json:"title,omitempty"`
-	ID             string                               `json:"id"`
-	Path           string                               `json:"path"`
-	OwningPagePath string                               `json:"owningPagePath"`
-	Properties     []contracts.DomainPropertyDefinition `json:"properties"`
-	Records        []portableRecordSource               `json:"records"`
-	Views          []portableViewSource                 `json:"views"`
+	SourceWorkspaceID        string                               `json:"sourceWorkspaceId,omitempty"`
+	RecordEnumerationVersion int                                  `json:"recordEnumerationVersion,omitempty"`
+	Title                    string                               `json:"title,omitempty"`
+	ID                       string                               `json:"id"`
+	Path                     string                               `json:"path"`
+	OwningPagePath           string                               `json:"owningPagePath"`
+	Properties               []contracts.DomainPropertyDefinition `json:"properties"`
+	Records                  []portableRecordSource               `json:"records"`
+	Views                    []portableViewSource                 `json:"views"`
 }
 type portableRecordSource struct {
 	KnownProperties []string       `json:"knownProperties,omitempty"`
@@ -38,14 +40,16 @@ type portableViewSource struct {
 	Config         map[string]any `json:"config"`
 }
 type PortableCollectionImport struct {
-	SchemaComplete bool                                 `json:"schemaComplete,omitempty"`
-	CollectionID   string                               `json:"collectionId"`
-	PageID         string                               `json:"pageId"`
-	Title          string                               `json:"title"`
-	Locator        string                               `json:"sourceLocator"`
-	Properties     []contracts.DomainPropertyDefinition `json:"properties"`
-	Records        []portableRecordSource               `json:"records"`
-	Views          []portableViewSource                 `json:"views"`
+	SourceScope              string                               `json:"sourceScope,omitempty"`
+	RecordEnumerationVersion int                                  `json:"recordEnumerationVersion,omitempty"`
+	SchemaComplete           bool                                 `json:"schemaComplete,omitempty"`
+	CollectionID             string                               `json:"collectionId"`
+	PageID                   string                               `json:"pageId"`
+	Title                    string                               `json:"title"`
+	Locator                  string                               `json:"sourceLocator"`
+	Properties               []contracts.DomainPropertyDefinition `json:"properties"`
+	Records                  []portableRecordSource               `json:"records"`
+	Views                    []portableViewSource                 `json:"views"`
 }
 
 // restorePortableDatabase freezes only supplied, validated canonical definitions.
@@ -183,7 +187,19 @@ func (k *Kernel) restorePortableDatabase(p *ImportPlan, manifest portableHierarc
 			fail("readable CSV source is unavailable")
 			return
 		}
-		plan := PortableCollectionImport{SchemaComplete: true, CollectionID: ids[source.ID], PageID: pages[source.OwningPagePath], Title: csv.Title, Locator: source.Path, Properties: []contracts.DomainPropertyDefinition{}, Records: []portableRecordSource{}, Views: []portableViewSource{}}
+		if source.RecordEnumerationVersion < 0 || source.RecordEnumerationVersion > 1 {
+			fail("unsupported record enumeration version")
+			return
+		}
+		scope := ""
+		if source.SourceWorkspaceID != "" {
+			if contracts.Validate("domain", "Id", marshal(source.SourceWorkspaceID)) != nil {
+				fail("invalid source workspace identity")
+				return
+			}
+			scope = "trove-owner-collection-v1:" + source.SourceWorkspaceID + ":" + source.ID
+		}
+		plan := PortableCollectionImport{SourceScope: scope, RecordEnumerationVersion: source.RecordEnumerationVersion, SchemaComplete: true, CollectionID: ids[source.ID], PageID: pages[source.OwningPagePath], Title: csv.Title, Locator: source.Path, Properties: []contracts.DomainPropertyDefinition{}, Records: []portableRecordSource{}, Views: []portableViewSource{}}
 		if source.Title != "" {
 			plan.Title = source.Title
 		}
