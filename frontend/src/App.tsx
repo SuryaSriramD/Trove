@@ -1,4 +1,3 @@
-import { RecordLayout } from "./database/RecordLayout";
 import { SkillsPanel } from "./ai/SkillsPanel";
 import { RecordLayout } from "./database/RecordLayout";
 import { OperationHistory } from "./OperationHistory";
