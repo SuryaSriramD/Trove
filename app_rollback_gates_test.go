@@ -131,6 +131,9 @@ func TestRollbackPendingActionsDoNotConsumeReviewsCancelOrBeginIO(t *testing.T) 
 	defer appRecordings.Delete(a)
 	actions := map[string]func() error{
 		"backup":            func() error { _, e := a.CreateBackup(); return e },
+		"encrypted backup":  func() error { _, e := a.CreateEncryptedBackup("unused"); return e },
+		"encrypted preview": func() error { _, e := a.PreviewEncryptedBackup("unused"); return e },
+		"backup progress":   func() error { _, e := a.NativeBackupProgress(); return e },
 		"import picker":     func() error { _, e := a.PickImportFolder(); return e },
 		"index picker":      func() error { _, e := a.PickIndexRoot(true); return e },
 		"screenshot":        func() error { _, e := a.CaptureScreenshot(); return e },
@@ -165,6 +168,8 @@ func TestRollbackPendingActionsDoNotConsumeReviewsCancelOrBeginIO(t *testing.T) 
 		t.Run(name, func(t *testing.T) { check(t, action()) })
 	}
 	a.CancelUpdateOperation()
+	a.CancelBackupOperation()
+	a.CloseNativeRestorePreview(review)
 	if cancelled {
 		t.Fatal("pending operation cancelled an existing native operation")
 	}

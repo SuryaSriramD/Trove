@@ -80,8 +80,8 @@ export default function RecoveryPanel({ workspace: w, onCommitted, onError }: {
       const bridge = window.go?.main.App as { CreateBackup?: () => Promise<string> } | undefined;
       if (!bridge?.CreateBackup) throw new Error("Backup creation is available in the desktop application.");
       const result = await bridge.CreateBackup();
-      if (result) setMessage("Backup created and verified in the selected folder.");
-    })}>Create backup…</button>
+      if (result) setMessage("Unencrypted legacy backup created and verified in the selected folder.");
+    })}>Create unencrypted legacy backup…</button>
     <BackupRestoreControls workspace={w} onError={onError} />
     <p role="status" aria-live="polite">{busy ? "Working…" : message}</p>
   </section>;

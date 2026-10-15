@@ -1848,6 +1848,18 @@ func (v *ServiceCommand) UnmarshalJSON(data []byte) error {
 	return fmt.Errorf("unknown or incomplete ServiceCommand variant")
 }
 
+type ServiceNativeBackupProgress struct {
+	Version    int64  `json:"version"`
+	Phase      string `json:"phase"`
+	Bytes      string `json:"bytes"`
+	TotalBytes string `json:"totalBytes"`
+}
+type ServiceNativeBackupSummary struct {
+	Version  int64    `json:"version"`
+	Format   string   `json:"format"`
+	Included []string `json:"included"`
+	Excluded []string `json:"excluded"`
+}
 type ServiceAutomationOptionsRequest struct {
 	ContractVersion int64    `json:"contractVersion"`
 	RequestId       DomainId `json:"requestId"`

@@ -1254,7 +1254,7 @@ test("Phase 2 native restore is reviewed before mutation and retention keeps all
   });
   await navSurface(page, "Settings");
   await expect(page.getByRole("combobox", { name: "Backup retention count" })).toHaveValue("0");
-  await page.getByRole("button", { name: "Choose backup to review…" }).click();
+  await page.getByRole("button", { name: "Choose legacy backup folder…" }).click();
   await expect(page.getByRole("article", { name: "Native restore preview" })).toBeVisible();
   expect(await page.evaluate(() => (window as any).restores)).toBe(0);
   await page.getByRole("button", { name: "Restore into a new folder…" }).click();

@@ -11,14 +11,16 @@ import (
 )
 
 type nativeRestorePreview struct {
-	source   string
-	manifest workspace.BackupManifest
-	cleanup  *workspace.BackupCleanupPlan
-	expires  time.Time
+	source    string
+	manifest  workspace.BackupManifest
+	cleanup   *workspace.BackupCleanupPlan
+	encrypted *workspace.VerifiedEncryptedBackup
+	expires   time.Time
 }
 type nativeRestoreState struct {
 	mu       sync.Mutex
 	previews map[string]nativeRestorePreview
+	closed   bool
 }
 
 var nativeRestoreStates sync.Map
@@ -31,14 +33,34 @@ func (a *App) saveRestorePreview(p nativeRestorePreview) string {
 	s := a.restoreState()
 	s.mu.Lock()
 	defer s.mu.Unlock()
+	if s.closed {
+		p.encrypted.Close()
+		return ""
+	}
 	for id, old := range s.previews {
 		if time.Now().After(old.expires) {
+			old.encrypted.Close()
+			delete(s.previews, id)
+		}
+	}
+	if len(s.previews) >= 16 {
+		for id, old := range s.previews {
+			old.encrypted.Close()
 			delete(s.previews, id)
 		}
 	}
 	id := workspace.NewID()
 	p.expires = time.Now().Add(10 * time.Minute)
 	s.previews[id] = p
+	time.AfterFunc(time.Until(p.expires), func() {
+		s.mu.Lock()
+		old, ok := s.previews[id]
+		if ok && !old.expires.After(time.Now()) {
+			delete(s.previews, id)
+			old.encrypted.Close()
+		}
+		s.mu.Unlock()
+	})
 	return id
 }
 func (a *App) takeRestorePreview(id string) (nativeRestorePreview, error) {
@@ -47,6 +69,10 @@ func (a *App) takeRestorePreview(id string) (nativeRestorePreview, error) {
 	defer s.mu.Unlock()
 	p, ok := s.previews[id]
 	if !ok || !p.expires.After(time.Now()) {
+		if ok {
+			delete(s.previews, id)
+			p.encrypted.Close()
+		}
 		return p, fmt.Errorf("review expired; choose the backup again")
 	}
 	delete(s.previews, id)
@@ -80,6 +106,11 @@ func (a *App) RestoreNativeBackup(previewID string) (string, error) {
 	if err := a.requireRollbackCommitted(); err != nil {
 		return "", err
 	}
+	ctx, done, err := a.beginBackupOperation()
+	if err != nil {
+		return "", err
+	}
+	defer done()
 
 	p, err := a.takeRestorePreview(previewID)
 	if err != nil {
@@ -88,12 +119,18 @@ func (a *App) RestoreNativeBackup(previewID string) (string, error) {
 	if p.cleanup != nil {
 		return "", fmt.Errorf("invalid restore review")
 	}
+	defer p.encrypted.Close()
 	parent, err := runtime.OpenDirectoryDialog(a.ctx, runtime.OpenDialogOptions{Title: "Choose a destination for the restored workspace", CanCreateDirectories: true})
 	if err != nil || parent == "" {
 		return "", err
 	}
 	destination := filepath.Join(parent, "Trove-restored-"+workspace.NewID())
-	result, err := workspace.RestoreBackupReviewed(a.ctx, p.source, destination, p.manifest)
+	var result workspace.RestoreResult
+	if p.encrypted != nil {
+		result, err = p.encrypted.Restore(ctx, destination, a.backupProgress)
+	} else {
+		result, err = workspace.RestoreBackupReviewed(ctx, p.source, destination, p.manifest)
+	}
 	if err != nil {
 		return "", err
 	}
