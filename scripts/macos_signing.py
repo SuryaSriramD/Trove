@@ -18,6 +18,7 @@ import zipfile
 import uuid
 
 BUNDLE_ID = 'local.trove.desktop'
+REMINDER_ID = BUNDLE_ID + '.reminders'
 ROOT = Path(__file__).resolve().parents[1]
 
 
@@ -170,9 +171,35 @@ def native_bindings(app):
     return native, documents, bindings
 
 
+def reminder_bundle(app):
+    bundle = app / 'Contents/Library/LoginItems/TroveReminders.app'
+    if not bundle.exists() and not bundle.is_symlink():
+        return None  # Historical candidates predate the reminder feature.
+    if bundle.is_symlink() or not bundle.is_dir():
+        raise SigningBlocked('Reminder login item must be a regular nested bundle.')
+    info = plistlib.loads(plain_file(bundle / 'Contents/Info.plist').read_bytes())
+    if (info.get('CFBundleIdentifier') != REMINDER_ID or info.get('CFBundleExecutable') != 'TroveReminders'
+            or info.get('LSMinimumSystemVersion') != '27.0' or info.get('LSUIElement') is not True):
+        raise SigningBlocked('Reminder login item identity or lifecycle policy is invalid.')
+    executable = plain_file(bundle / 'Contents/MacOS/TroveReminders')
+    if not executable.stat().st_mode & 0o111:
+        raise SigningBlocked('Reminder login item is not executable.')
+    return bundle
+
+
+def sign_reminder_bundle(app, identity, team, run):
+    bundle = reminder_bundle(app)
+    if bundle is not None:
+        run(['/usr/bin/codesign', '--force', '--sign', identity, '--timestamp', '--options', 'runtime', '--identifier', REMINDER_ID, bundle])
+        verify_code(bundle, team, REMINDER_ID, run, deep=True)
+
+
 def executable_items(app, bindings):
     allowed = {app / 'Contents/Resources/native' / name for name in bindings}
     allowed.add(plain_file(app / 'Contents/MacOS/Trove'))
+    reminder = reminder_bundle(app)
+    if reminder is not None:
+        allowed.add(reminder / 'Contents/MacOS/TroveReminders')
     for name in ['trove-mcp', 'trove-host']:
         path = app / 'Contents/MacOS' / name
         if path.exists() or path.is_symlink():
@@ -236,12 +263,13 @@ class SigningSession:
         for path in nested + [app / 'Contents/MacOS/Trove']:
             self.run(['/usr/bin/lipo', '-verify_arch', 'arm64', path])
         for path in nested:
-            identifier = BUNDLE_ID + '.' + path.name
+            identifier = REMINDER_ID if path.name == 'TroveReminders' else BUNDLE_ID + '.' + path.name
             args = ['/usr/bin/codesign', '--force', '--sign', self.identity, '--timestamp', '--options', 'runtime', '--identifier', identifier]
             if path.name == 'microphone-worker':
                 args += ['--entitlements', ROOT / 'packaging/microphone.entitlements.plist']
             self.run(args + [path])
             verify_code(path, self.team, identifier, self.run)
+        sign_reminder_bundle(app, self.identity, self.team, self.run)
         # Commit helper digests only after every nested code signature verified.
         for name, refs in bindings.items():
             for ref in refs:
