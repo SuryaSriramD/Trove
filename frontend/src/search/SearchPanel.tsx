@@ -1,4 +1,4 @@
-import { freshnessLabel } from "../PageFreshness";
+import { freshnessLabel, useReviewClock } from "../PageFreshness";
 import { useEffect, useRef, useState } from "react";
 import { dispatch, envelope, fileURL, type WorkspaceSnapshot } from "../api";
 import type { Location, PageFreshness } from "../../../contracts/generated/domain";
@@ -11,6 +11,7 @@ type FileStatus={fileId:string;name:string;state:string;warning:string};
 export type SearchPanelProps={workspace:WorkspaceSnapshot;onNavigate:(location:Location)=>void};
 
 export function SearchPanel({workspace,onNavigate}:SearchPanelProps){
+ useReviewClock();
  const [query,setQuery]=useState("");const [kind,setKind]=useState("");const [mode,setMode]=useState("keyword");
  const [automatic,setAutomatic]=useState(false);
  const [models,setModels]=useState<EmbeddingPack[]>([]);const [model,setModel]=useState("");
