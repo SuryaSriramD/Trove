@@ -43,6 +43,10 @@ type App struct {
 	reminders         *reminderDesktop
 	reminderBootstrap sync.Once
 
+	ocrAdmissionMu sync.Mutex
+	ocrSuspensions int
+	ocrReads       map[*nativeOCRRead]struct{}
+
 	providerPreparationMu          sync.Mutex
 	providerPreparationSuspensions int
 }
@@ -215,15 +219,6 @@ func (a *App) shutdown(context.Context) {
 		k.Close()
 	}
 }
-func (a *App) cancelOCRForLifecycle() func() {
-	a.mu.RLock()
-	k := a.kernel
-	a.mu.RUnlock()
-	if k != nil {
-		return k.SuspendOCR()
-	}
-	return func() {}
-}
 func (a *App) open(path string, create bool) error {
 	if err := a.requireRollbackCommitted(); err != nil {
 		return err
@@ -358,6 +353,14 @@ func (a *App) Dispatch(method, raw string) string {
 	a.mu.RUnlock()
 	if k == nil {
 		return errorEnvelope("WORKSPACE_LOCKED", "Workspace is not open")
+	}
+	if method == "ocr.run" {
+		bounded, done, err := a.beginOCRRead(serviceContext)
+		if err != nil {
+			return errorEnvelope("CANCELLED", "Workspace transition cancelled OCR admission")
+		}
+		defer done()
+		serviceContext = bounded
 	}
 	// Bootstrap is a trusted adapter operation: the renderer does not know the
 	// workspace ID until the first snapshot. All later requests carry headers.

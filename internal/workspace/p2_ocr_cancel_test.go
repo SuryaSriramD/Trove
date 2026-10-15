@@ -4,9 +4,11 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
+	"github.com/mattn/go-sqlite3"
 	"image"
 	"image/png"
 	"os"
+	"sync"
 	"testing"
 	"time"
 
@@ -194,4 +196,72 @@ func TestP2OCRLifecycleSuspensionPreventsRacingAdmission(t *testing.T) {
 		t.Fatal("failed transition could not resume OCR", err)
 	}
 	finish()
+}
+
+func TestP2OCRCancellationAfterCommitReportsSavedPendingIndex(t *testing.T) {
+	k, e, file := ocrCancelFixture(t)
+	k.SetOCRProvider(func(context.Context, *os.File) (OCRResult, error) {
+		return OCRResult{Lines: []OCRLine{{Text: "Earlier extraction", Confidence: 1}}}, nil
+	})
+	testOK(t, testDispatch(t, k, e, "ocr.run", recoveryRequest(k, map[string]any{"fileId": file})))
+	entered, release := make(chan struct{}), make(chan struct{})
+	var once sync.Once
+	conn, err := k.writeDB.Conn(context.Background())
+	if err != nil {
+		t.Fatal(err)
+	}
+	err = conn.Raw(func(driver any) error {
+		return driver.(*sqlite3.SQLiteConn).RegisterFunc("ocr_index_pause", func() int { once.Do(func() { close(entered); <-release }); return 0 }, false)
+	})
+	conn.Close()
+	if err != nil {
+		t.Fatal(err)
+	}
+	if _, err = k.writeDB.Exec("CREATE TRIGGER ocr_index_pause BEFORE DELETE ON search_chunks BEGIN SELECT ocr_index_pause(); END"); err != nil {
+		t.Fatal(err)
+	}
+	k.SetOCRProvider(func(context.Context, *os.File) (OCRResult, error) {
+		return OCRResult{Lines: []OCRLine{{Text: "Saved replacement", Confidence: 1}}}, nil
+	})
+	req := recoveryRequest(k, map[string]any{"fileId": file})
+	done := make(chan map[string]any, 1)
+	go func() { done <- testDispatch(t, k, e, "ocr.run", req) }()
+	select {
+	case <-entered:
+	case <-time.After(3 * time.Second):
+		close(release)
+		t.Fatal("indexing never paused after extraction commit")
+	}
+	var saved string
+	if err = k.db.QueryRow("SELECT body FROM document_sections WHERE file_id=?", file).Scan(&saved); err != nil || saved != "Saved replacement" {
+		close(release)
+		t.Fatal("fixture did not reach durable publication", saved, err)
+	}
+	testOK(t, testDispatch(t, k, e, "ocr.cancel", recoveryRequest(k, map[string]any{"runRequestId": req["requestId"]})))
+	close(release)
+	var response map[string]any
+	select {
+	case response = <-done:
+	case <-time.After(time.Second):
+		t.Fatal("cancel did not stop pending indexing")
+	}
+	testOK(t, response)
+	result := response["result"].(map[string]any)
+	if result["persisted"] != true || result["indexingState"] != "pending" || result["text"] != "Saved replacement" {
+		t.Fatal("saved extraction misreported", result)
+	}
+	var dirty int
+	if err = k.db.QueryRow("SELECT count(*) FROM search_dirty").Scan(&dirty); err != nil || dirty == 0 {
+		t.Fatal("index retry lost", dirty, err)
+	}
+	if _, err = k.writeDB.Exec("DROP TRIGGER ocr_index_pause"); err != nil {
+		t.Fatal(err)
+	}
+	if err = k.FlushSearch(context.Background()); err != nil {
+		t.Fatal(err)
+	}
+	var indexed int
+	if err = k.db.QueryRow("SELECT count(*) FROM search_chunks WHERE body LIKE '%Saved replacement%'").Scan(&indexed); err != nil || indexed == 0 {
+		t.Fatal("saved extraction did not index on retry", indexed, err)
+	}
 }

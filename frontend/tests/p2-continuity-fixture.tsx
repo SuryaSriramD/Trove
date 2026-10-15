@@ -84,6 +84,20 @@ w.go = {
         else if (method === "ocr.run")
           return new Promise((resolve) => {
             w.ocrStarted = request.requestId;
+            w.finishSavedOCR = () =>
+              resolve(
+                ok({
+                  fileId: request.fileId,
+                  text: "Saved OCR replacement",
+                  engine: "Fixture",
+                  acceptedLines: 1,
+                  rejectedLines: 0,
+                  persisted: true,
+                  indexingState: "pending",
+                  warning:
+                    "Extracted text was saved. Search indexing is pending.",
+                }),
+              );
             w.finishOCR = () =>
               resolve(
                 ok({
@@ -105,7 +119,8 @@ w.go = {
         else if (method === "ocr.cancel") {
           if (request.runRequestId !== w.ocrStarted)
             throw Error("Wrong cancellation identity");
-          w.cancelOCR();
+          if (w.ocrSaved) w.finishSavedOCR();
+          else w.cancelOCR();
           return ok({ state: "cancellation_requested" });
         } else throw Error(`Unexpected ${method}`);
         const response = ok(result);

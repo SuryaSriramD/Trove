@@ -173,3 +173,30 @@ test("leaving OCR requests cancellation for its exact original workspace request
     await page.getByText("Prior OCR result", { exact: true }).count(),
   ).toBe(0);
 });
+
+test("cancel after OCR publication reports saved text with pending indexing", async ({
+  page,
+}) => {
+  await page.getByRole("button", { name: "Image text", exact: true }).click();
+  await page.getByLabel("Attached image").selectOption(id(70));
+  await page
+    .getByRole("button", { name: "Extract image text locally" })
+    .click();
+  await page.evaluate(() => {
+    (window as any).ocrSaved = true;
+  });
+  await page
+    .getByRole("button", { name: "Cancel image text extraction" })
+    .click();
+  await expect(
+    page.getByText("Image text saved. Search indexing is pending.", {
+      exact: true,
+    }),
+  ).toBeVisible();
+  await expect(
+    page.getByText("Saved OCR replacement", { exact: true }),
+  ).toBeVisible();
+  await expect(
+    page.getByText(/Earlier extracted text is preserved/),
+  ).toHaveCount(0);
+});
