@@ -20,6 +20,7 @@ import (
 	"strings"
 	"sync"
 	"time"
+	"trove.local/phase0/internal/platformfs"
 )
 
 const LlamaCommit = "d2e54583c7452353eb35d40431281f6ee984332f"
@@ -60,6 +61,7 @@ type Manager struct {
 	mu     sync.Mutex
 	busy   map[string]bool
 	leases map[string]int
+	owners map[string]*os.File
 	client *http.Client
 	// Injectable only inside this package so disk exhaustion is reproducible
 	// without filling the user's actual model volume during qualification.
@@ -70,7 +72,7 @@ func NewManager(root string) (*Manager, error) {
 	if err := os.MkdirAll(root, 0700); err != nil {
 		return nil, err
 	}
-	return &Manager{root: root, busy: map[string]bool{}, leases: map[string]int{}, availableBytes: availableModelBytes, client: &http.Client{Timeout: 2 * time.Hour, CheckRedirect: func(req *http.Request, via []*http.Request) error {
+	return &Manager{root: root, busy: map[string]bool{}, leases: map[string]int{}, owners: map[string]*os.File{}, availableBytes: availableModelBytes, client: &http.Client{Timeout: 2 * time.Hour, CheckRedirect: func(req *http.Request, via []*http.Request) error {
 		if req.URL.Scheme != "https" || len(via) > 5 {
 			return errors.New("invalid model redirect")
 		}
@@ -190,10 +192,29 @@ func (m *Manager) begin(p Pack) error {
 	if m.busy[p.ID] || m.leases[p.ID] > 0 {
 		return errors.New("RESOURCE_EXHAUSTED: model in use")
 	}
+	owner, err := m.acquireOwner(p.ID)
+	if err != nil {
+		return err
+	}
+	m.owners[p.ID] = owner
 	m.busy[p.ID] = true
 	return nil
 }
-func (m *Manager) end(id string) { m.mu.Lock(); delete(m.busy, id); m.mu.Unlock() }
+func (m *Manager) acquireOwner(id string) (*os.File, error) {
+	owner, err := platformfs.AcquireLock(filepath.Join(m.root, id+".owner.lock"))
+	if err != nil {
+		return nil, fmt.Errorf("RESOURCE_EXHAUSTED: model is owned by another operation or application: %w", err)
+	}
+	return owner, nil
+}
+func (m *Manager) end(id string) {
+	m.mu.Lock()
+	defer m.mu.Unlock()
+	delete(m.busy, id)
+	_ = platformfs.ReleaseLock(m.owners[id])
+	delete(m.owners, id)
+}
+
 func regular(path string) error {
 	s, e := os.Lstat(path)
 	if e != nil {
@@ -488,7 +509,32 @@ func (m *Manager) lease(id string) (Pack, *os.File, func(), error) {
 	if !uuidPattern.MatchString(id) {
 		return p, nil, nil, errors.New("invalid pack ID")
 	}
-	b, e := os.ReadFile(filepath.Join(m.root, id+".json"))
+	if m.busy[id] {
+		return p, nil, nil, errors.New("model acquisition in progress")
+	}
+	// A missing model must remain a read-only failure. Re-read the manifest
+	// after acquiring ownership, since another application may remove it here.
+	manifestPath := filepath.Join(m.root, id+".json")
+	if _, err := os.Stat(manifestPath); err != nil {
+		return p, nil, nil, err
+	}
+	acquired := false
+	if m.leases[id] == 0 {
+		owner, err := m.acquireOwner(id)
+		if err != nil {
+			return p, nil, nil, err
+		}
+		m.owners[id] = owner
+		acquired = true
+	}
+	admitted := false
+	defer func() {
+		if acquired && !admitted {
+			_ = platformfs.ReleaseLock(m.owners[id])
+			delete(m.owners, id)
+		}
+	}()
+	b, e := os.ReadFile(manifestPath)
 	if e != nil {
 		return p, nil, nil, e
 	}
@@ -501,9 +547,6 @@ func (m *Manager) lease(id string) (Pack, *os.File, func(), error) {
 	if p.ID != id {
 		return p, nil, nil, errors.New("model manifest identity mismatch")
 	}
-	if m.busy[id] {
-		return p, nil, nil, errors.New("model acquisition in progress")
-	}
 	final, _, _ := m.paths(p)
 	if e = verifyFile(final, p); e != nil {
 		return p, nil, nil, e
@@ -513,7 +556,20 @@ func (m *Manager) lease(id string) (Pack, *os.File, func(), error) {
 		return p, nil, nil, e
 	}
 	m.leases[id]++
-	release := func() { f.Close(); m.mu.Lock(); m.leases[id]--; m.mu.Unlock() }
+	admitted = true
+	var once sync.Once
+	release := func() {
+		once.Do(func() {
+			f.Close()
+			m.mu.Lock()
+			defer m.mu.Unlock()
+			m.leases[id]--
+			if m.leases[id] == 0 {
+				_ = platformfs.ReleaseLock(m.owners[id])
+				delete(m.owners, id)
+			}
+		})
+	}
 	return p, f, release, nil
 }
 func (m *Manager) Remove(id string) error {
@@ -525,6 +581,11 @@ func (m *Manager) Remove(id string) error {
 	if m.busy[id] || m.leases[id] > 0 {
 		return errors.New("RESOURCE_EXHAUSTED: pack in use")
 	}
+	owner, err := m.acquireOwner(id)
+	if err != nil {
+		return err
+	}
+	defer platformfs.ReleaseLock(owner)
 	if err := m.removeUnusedProjector(id); err != nil {
 		return err
 	}

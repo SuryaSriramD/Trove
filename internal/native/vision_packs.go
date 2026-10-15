@@ -8,6 +8,7 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
+	"trove.local/phase0/internal/platformfs"
 )
 
 // Version 2 vision packs bind the language model to one exact projector. The
@@ -159,6 +160,11 @@ func (m *Manager) removeUnusedProjector(id string) error {
 	if m.busy[child] || m.leases[child] > 0 {
 		return errors.New("RESOURCE_EXHAUSTED: vision companion in use")
 	}
+	owner, err := m.acquireOwner(child)
+	if err != nil {
+		return err
+	}
+	defer platformfs.ReleaseLock(owner)
 	for _, suffix := range []string{".json", ".model", ".part", ".part.json"} {
 		if err = os.Remove(filepath.Join(m.root, child+suffix)); err != nil && !os.IsNotExist(err) {
 			return err
