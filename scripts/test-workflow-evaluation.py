@@ -30,13 +30,67 @@ class WorkflowAccounting(unittest.TestCase):
             keywordFallback={'mode': 'keyword', 'warning': 'Semantic disabled'})
         return report, contract
 
+    def memory(self, case='preference-on'):
+        contract = {'family': 'memory-lifecycle', 'modelPackId': 'chosen', 'corpusSHA256': 'frozen'}
+        included = case not in m.MEMORY_EXCLUDED_CASES
+        content = 'Use the heading Launch note for answers about Project Marigold.'
+        fact = 'Project Marigold launches on 14 April 2031.'
+        sources = [{'text': fact, 'location': {'pageId': 'primary'}}]
+        if included: sources.append({'text': content, 'memoryId': 'memory', 'location': {'pageId': 'support'}})
+        report = dict(contract, engineMode='native', releaseQualified=False,
+            generationAttempts=int(case in m.MEMORY_GENERATION_CASES),
+            assertions={key: True for key in m.MEMORY_ASSERTIONS[case]},
+            promptTokens=1000, outputCap=512, contextTokens=8192,
+            request={'pageId': 'primary', 'useMemory': case != 'preference-off', 'modelPackId': 'chosen'},
+            sources=sources, memoryId='memory', memoryPageId='backing', supportingPageId='support',
+            memoryContent=content, memoryIncluded=included, memoryStatus='active', preparedPrompt=content if included else fact,
+            rawDraft=json.dumps({'title': 'Launch note' if case == 'preference-on' else '', 'claims': [{'text': fact, 'quote': fact}]}),
+            citations=[{'location': {'pageId': 'primary'}, 'state': 'current'}])
+        return report, contract
+
+    def test_memory_generation_and_request_counterexamples(self):
+        for case in ('preference-on', 'preference-off'):
+            r, c = self.memory(case)
+            self.assertEqual(m.validate_workflow_report(r, case, c), [])
+            changes = [{'engineMode': 'deterministic'}, {'memoryIncluded': not r['memoryIncluded']},
+                {'memoryStatus': 'forgotten'}, {'sources': []}, {'generationAttempts': 0},
+                {'rawDraft': '{}'}, {'rawDraft': r['rawDraft'].replace('2031', '2032')},
+                {'citations': []}, {'promptTokens': -1}, {'outputCap': 0}, {'assertions': {}}]
+            for change in changes:
+                self.assertTrue(m.validate_workflow_report(dict(r, **change), case, c), change)
+            bad = copy.deepcopy(r)
+            bad['request']['useMemory'] = not bad['request']['useMemory']
+            self.assertTrue(m.validate_workflow_report(bad, case, c))
+        r, c = self.memory('preference-off')
+        r['preparedPrompt'] += r['memoryContent']
+        self.assertTrue(m.validate_workflow_report(r, 'preference-off', c))
+
+    def test_memory_forget_and_restore_boundary_counterexamples(self):
+        r, c = self.memory('forget-stream')
+        r.update(finishState='failed', finishText='', finishRejected=False, proposalRejected=True)
+        self.assertEqual(m.validate_workflow_report(r, 'forget-stream', c), [])
+        for change in ({'finishText': 'old memory'}, {'finishState': 'completed'}, {'proposalRejected': False}, {'generationAttempts': 1}):
+            self.assertTrue(m.validate_workflow_report(dict(r, **change), 'forget-stream', c))
+        r, c = self.memory('restore-forgotten')
+        r.update(memoryStatus='forgotten', relatedRejected=True, backupWorkspaceId='workspace', restoredWorkspaceId='workspace', restoredIndexRebuilt=True)
+        self.assertEqual(m.validate_workflow_report(r, 'restore-forgotten', c), [])
+        for change in ({'memoryStatus': 'active'}, {'relatedRejected': False}, {'restoredWorkspaceId': 'other'}, {'restoredIndexRebuilt': False}):
+            self.assertTrue(m.validate_workflow_report(dict(r, **change), 'restore-forgotten', c))
+        r, c = self.memory('older-backup')
+        r.update(backupWorkspaceId='workspace', restoredWorkspaceId='workspace', restoredIndexRebuilt=True,
+            sourceAfterBackupStatus='forgotten', restoreBoundary='A backup predating Forget retains the earlier approved memory state.',
+            nativeRestoreWarningAcceptancePending=True, manualSemanticReviewRequired=True)
+        self.assertEqual(m.validate_workflow_report(r, 'older-backup', c), [])
+        self.assertTrue(m.validate_workflow_report(dict(r, nativeRestoreWarningAcceptancePending=False), 'older-backup', c))
+
     def test_case_inventory_is_complete_and_frozen(self):
         root = m.ROOT / 'internal/workspace/testdata/expanded-evaluation'
-        for family in ('context', 'related'):
+        for family in ('context', 'related', 'memory-lifecycle'):
             filename, _, count = m.FAMILIES[family]
             cases = json.loads((root/filename).read_text())['cases']
             self.assertEqual(count, 12)
             self.assertEqual(len({c['id'] for c in cases}), count)
+        self.assertEqual(set(m.MEMORY_ASSERTIONS), {c['id'] for c in json.loads((root/'memory-lifecycle.json').read_text())['cases']})
         self.assertEqual(set(m.CONTEXT_ASSERTIONS), {c['id'] for c in json.loads((root/'context.json').read_text())['cases']})
 
     def test_context_positive_and_absent_fact(self):
