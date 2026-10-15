@@ -7,3 +7,7 @@
 .canonical-task-due .db-date-editor > div { min-width: 260px; }
 .task-promotion { padding: 12px; border: 1px solid var(--line); border-radius: 8px; display: flex; gap: 12px; align-items: end; flex-wrap: wrap; }
 .task-promotion label { display: grid; gap: 4px; }
+
+.task-detach section { display: flex; flex-direction: column; gap: .5rem; padding: .75rem; border: 1px solid var(--border); max-width: 44rem; }
+.task-detach ul { padding-left: 1.25rem; }
+.task-detach p { white-space: normal; }
