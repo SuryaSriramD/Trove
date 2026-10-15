@@ -1214,6 +1214,37 @@ test("Phase 2 import displays complete accounting and editable property preview"
   expect(await page.evaluate(() => (window as any).phase2Mutations)).toBe(0);
 });
 
+test("import field review persists an edited decision before enabling commit", async ({ page }) => {
+  await page.evaluate(() => {
+    const app = (window as any).go.main.App, previous = app.Dispatch;
+    app.PickFile = async () => "merge-selection";
+    const item: any = { sourceLocator: "Notes.html", kind: "html", outcome: "adapted", reason: "Source retained", committed: false, conflict: "Review local and incoming edits", choice: "", merge: {
+      baselineStatus: "retained", localDeleted: false, resolutions: [], fields: [{ path: "/title", outcome: "conflict", base: { present: true, value: "Base title" }, local: { present: true, value: "Local title" }, incoming: { present: true, value: "Incoming title" } }]
+    } };
+    const plan = { planId: "merge-plan", planHash: "review-hash-1", sourceNamespace: "fixture", sourceName: "Notes.html", rootPageId: "root", sourceFileId: "source", state: "preview", cursor: 0, initialized: false, sourceCompleteness: "unknown", sourceOmissions: [], unknownCompleteness: [], items: [item] };
+    (window as any).mergeReviewCalls = [];
+    app.Dispatch = async (method: string, raw: string) => {
+      if (method === "imports.preview") return JSON.stringify({ ok: true, result: plan });
+      if (method === "imports.configure") {
+        const request = JSON.parse(raw); (window as any).mergeReviewCalls.push(request);
+        item.merge.resolutions = request.resolutions[0].fields; item.choice = "merge"; plan.planHash = "review-hash-2";
+        return JSON.stringify({ ok: true, result: plan });
+      }
+      return previous(method, raw);
+    };
+  });
+  await navSurface(page, "Import");
+  await page.getByRole("button", { name: "Choose import file" }).click();
+  await expect(page.getByRole("button", { name: "Commit reviewed import", exact: true })).toBeDisabled();
+  await expect(page.getByText('"Base title"', { exact: true })).toBeVisible();
+  await expect(page.getByText('"Incoming title"', { exact: true })).toBeVisible();
+  await page.getByText("Use an edited value", { exact: true }).click();
+  await page.getByLabel("Merged import field JSON").fill('"Reviewed title"');
+  await page.getByRole("button", { name: "Save edited decision" }).click();
+  await expect(page.getByRole("button", { name: "Commit reviewed import", exact: true })).toBeEnabled();
+  expect(await page.evaluate(() => (window as any).mergeReviewCalls)).toEqual([expect.objectContaining({ planId: "merge-plan", planHash: "review-hash-1", resolutions: [{ sourceLocator: "Notes.html", fields: [{ path: "/title", choice: "merged", value: { present: true, value: "Reviewed title" } }] }] })]);
+});
+
 test("Phase 2 AI works without packs and shows reviewed memory controls", async ({ page }) => {
   await navSurface(page, "AI");
   await expect(page.getByRole("heading", { name: "Local AI", exact: true })).toBeVisible();

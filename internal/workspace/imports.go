@@ -27,6 +27,7 @@ import (
 const importSchema = `
 CREATE TABLE IF NOT EXISTS import_runs(id TEXT PRIMARY KEY,plan_hash TEXT NOT NULL,plan_json TEXT NOT NULL CHECK(json_valid(plan_json)),created_at TEXT NOT NULL,updated_at TEXT NOT NULL);
 CREATE TABLE IF NOT EXISTS import_mapping_state(mapping_id TEXT PRIMARY KEY REFERENCES import_mappings(id),local_revision TEXT NOT NULL);
+CREATE TABLE IF NOT EXISTS import_baselines(mapping_id TEXT PRIMARY KEY REFERENCES import_mappings(id),normalizer_version INTEGER NOT NULL,snapshot_json TEXT NOT NULL CHECK(json_valid(snapshot_json)),source_revision TEXT NOT NULL,raw_file_id TEXT NOT NULL REFERENCES files(id),import_run_id TEXT NOT NULL REFERENCES import_runs(id));
 `
 const maxImportEntries = 10000
 const maxImportEntryBytes int64 = 64 * 1024 * 1024
@@ -45,6 +46,8 @@ type ImportBlock struct {
 	Data map[string]any `json:"data"`
 }
 type ImportItem struct {
+	Merge              *ImportMergeReview      `json:"merge,omitempty"`
+	Incoming           *ImportSnapshot         `json:"incomingSnapshot,omitempty"`
 	SourceSystem       string                  `json:"sourceSystem,omitempty"`
 	DisplayPreferences *PageDisplayPreferences `json:"displayPreferences,omitempty"`
 	Locator            string                  `json:"sourceLocator"`
@@ -75,6 +78,7 @@ type ImportItem struct {
 	Provenance         any                     `json:"provenance,omitempty"`
 }
 type ImportPlan struct {
+	NormalizerVersion       int                     `json:"normalizerVersion,omitempty"`
 	NotionGraph             bool                    `json:"notionGraph,omitempty"`
 	NotionKeepGraph         bool                    `json:"notionKeepGraph,omitempty"`
 	NotionCopyGraph         bool                    `json:"notionCopyGraph,omitempty"`
@@ -515,6 +519,25 @@ func configurePortableImport(ctx context.Context, k *Kernel, e contracts.Service
 				return Fail("NOT_FOUND", "CSV source not found")
 			}
 		}
+		resolutions, _ := r["resolutions"].([]any)
+		for _, raw := range resolutions {
+			resolution, _ := raw.(map[string]any)
+			found := false
+			for i := range p.Items {
+				item := &p.Items[i]
+				if item.Locator != str(resolution["sourceLocator"]) {
+					continue
+				}
+				fields, _ := resolution["fields"].([]any)
+				if err := configureImportMerge(item, fields); err != nil {
+					return err
+				}
+				found = true
+			}
+			if !found {
+				return Fail("NOT_FOUND", "Merge source not found")
+			}
+		}
 		choices, _ := r["choices"].([]any)
 		for _, raw := range choices {
 			c, ok := raw.(map[string]any)
@@ -528,13 +551,22 @@ func configurePortableImport(ctx context.Context, k *Kernel, e contracts.Service
 					continue
 				}
 				choice := str(c["choice"])
-				if choice != "keep_local" && choice != "replace" && choice != "duplicate" {
-					return Fail("INVALID_REQUEST", "Choose keep_local, replace, or duplicate")
+				if choice != "keep_local" && choice != "replace" && choice != "duplicate" && choice != "merge" {
+					return Fail("INVALID_REQUEST", "Choose merge, keep_local, replace, or duplicate")
 				}
 				if (item.Kind == "csv" || item.Kind == "portable_collection" || p.NotionGraph && notionGraphPage(*item)) && choice == "replace" {
 					return Fail("INVALID_REQUEST", "Database schema replacement requires a separate reviewed schema migration; keep local or import a copy")
 				}
-				item.Choice = choice
+				if choice == "merge" {
+					if err := configureImportMerge(item, nil); err != nil {
+						return err
+					}
+					if item.Choice != "merge" {
+						return Fail("CONFLICT", "Resolve every conflicting field first")
+					}
+				} else {
+					item.Choice = choice
+				}
 				found = true
 			}
 			if !found {

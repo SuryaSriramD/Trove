@@ -2683,6 +2683,16 @@
             "no_change",
             "tombstone"
           ]
+        },
+        "normalizerVersion": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "baselineStatus": {
+          "enum": [
+            "retained",
+            "unavailable"
+          ]
         }
       },
       "required": [
@@ -4619,6 +4629,33 @@
         "pink",
         "red"
       ]
+    },
+    "ImportNormalizedSnapshot": {
+      "type": "object",
+      "properties": {
+        "version": {
+          "const": 1
+        },
+        "fields": {
+          "type": "object",
+          "propertyNames": {
+            "pattern": "^/"
+          },
+          "additionalProperties": {}
+        },
+        "blockSources": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          }
+        }
+      },
+      "required": [
+        "version",
+        "fields",
+        "blockSources"
+      ],
+      "additionalProperties": false
     }
   }
 }

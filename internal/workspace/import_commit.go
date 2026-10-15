@@ -142,41 +142,8 @@ func applyPortableImport(m *Mutation, c map[string]any) error {
 			return err
 		}
 		if resolutions, ok := c["resolutions"].([]any); ok {
-			for _, raw := range resolutions {
-				resolution, _ := raw.(map[string]any)
-				found := false
-				for i := range p.Items {
-					item := &p.Items[i]
-					if item.MappingID == "" || item.MappingID != str(resolution["mappingId"]) {
-						continue
-					}
-					if str(resolution["planId"]) != item.MappingID || str(resolution["expectedLocalRevision"]) != item.ExpectedRevision || str(resolution["incomingSourceRevision"]) != item.Hash {
-						return Fail("CONFLICT", "Re-import resolution no longer matches its preview")
-					}
-					fields, _ := resolution["fields"].([]any)
-					if len(fields) != 1 {
-						return Fail("INVALID_REQUEST", "Resolve the complete /body import field")
-					}
-					field, _ := fields[0].(map[string]any)
-					if str(field["path"]) != "/body" {
-						return Fail("INVALID_REQUEST", "Unknown import field")
-					}
-					switch str(field["choice"]) {
-					case "keep_local":
-						item.Choice = "keep_local"
-					case "take_incoming":
-						if item.Kind == "csv" || item.Kind == "portable_collection" {
-							return Fail("CONFLICT", "Keep the local database or import a separate copy")
-						}
-						item.Choice = "replace"
-					default:
-						return Fail("INVALID_REQUEST", "Merged bodies require a separate reviewed block edit")
-					}
-					found = true
-				}
-				if !found {
-					return Fail("NOT_FOUND", "Import resolution mapping is not part of this plan")
-				}
+			if err := applyImportFieldResolutions(&p, resolutions); err != nil {
+				return err
 			}
 		}
 		remap := map[string]string{}
@@ -199,6 +166,19 @@ func applyPortableImport(m *Mutation, c map[string]any) error {
 					return Fail("CONFLICT", "Restore the trashed page first, or import a copy")
 				}
 			}
+			if item.Choice == "replace" && item.Incoming != nil {
+				var parent *string
+				if err := json.Unmarshal(item.Incoming.Fields["/parent"], &parent); err != nil {
+					return err
+				}
+				item.ParentID = ""
+				if parent != nil {
+					item.ParentID = *parent
+				}
+			}
+			if err := materializeImportMerge(item); err != nil {
+				return err
+			}
 			if item.Choice == "duplicate" {
 				blockIDs := map[string]string{}
 				for _, block := range item.Blocks {
@@ -212,6 +192,9 @@ func applyPortableImport(m *Mutation, c map[string]any) error {
 				item.ExpectedRevision = ""
 				item.IdentityKind = "derived_locator"
 				item.ExternalID = item.Locator + "#copy=" + p.ID
+				item.Merge = nil
+				snapshot := snapshotImportItem(item)
+				item.Incoming = &snapshot
 			}
 		}
 		for i := range p.Items {
@@ -353,6 +336,21 @@ func commitImportItem(m *Mutation, p *ImportPlan, item *ImportItem) error {
 		return nil
 	}
 	if item.Choice == "keep_local" {
+		if item.MappingID != "" && item.PageID != "" {
+			var revision string
+			if err := m.Tx.QueryRowContext(m.Context, "SELECT revision FROM pages WHERE id=?", item.PageID).Scan(&revision); err != nil {
+				return err
+			}
+			if revision != item.ExpectedRevision {
+				return Fail("CONFLICT", "Page changed after import review")
+			}
+			if err := saveImportBaseline(m, p, item); err != nil {
+				return err
+			}
+			if _, err := m.Exec("INSERT OR REPLACE INTO import_observations VALUES(?,?,?,?,?)", item.MappingID, p.ID, item.Hash, item.RawFileID, item.Outcome); err != nil {
+				return err
+			}
+		}
 		item.Reason += "; incoming bytes retained without changing local content"
 		if item.Conflict != "" {
 			item.Outcome = "partial"
@@ -427,6 +425,23 @@ func commitImportItem(m *Mutation, p *ImportPlan, item *ImportItem) error {
 		for _, id := range ids {
 			if !wanted[id] {
 				if _, err = m.Exec("DELETE FROM blocks WHERE id=?", id); err != nil {
+					return err
+				}
+			}
+		}
+		if item.Merge != nil {
+			var previous sql.NullString
+			if err := m.Tx.QueryRowContext(m.Context, "SELECT parent_page_id FROM pages WHERE id=?", item.PageID).Scan(&previous); err != nil {
+				return err
+			}
+			if previous.String != item.ParentID {
+				if err := guardImport(m, "page", previous.String); err != nil {
+					return err
+				}
+				if err := guardImport(m, "page", item.ParentID); err != nil {
+					return err
+				}
+				if err := pageCommand(m, map[string]any{"kind": "page.move", "pageId": item.PageID, "parentPageId": nullable(item.ParentID)}); err != nil {
 					return err
 				}
 			}
@@ -574,6 +589,9 @@ func commitImportItem(m *Mutation, p *ImportPlan, item *ImportItem) error {
 			return err
 		}
 		item.MappingID = mapping
+		if err = saveImportBaseline(m, p, item); err != nil {
+			return err
+		}
 		if _, err = m.Exec("INSERT OR REPLACE INTO import_observations VALUES(?,?,?,?,?)", mapping, p.ID, item.Hash, item.RawFileID, item.Outcome); err != nil {
 			return err
 		}

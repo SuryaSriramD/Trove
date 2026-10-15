@@ -649,6 +649,12 @@ func finishNotionCapture(ctx context.Context, k *Kernel, e contracts.ServiceExec
 				p.NotionContainers[i].PageID = id
 			}
 		}
+		p.NormalizerVersion = importNormalizerVersion
+		for i := range p.Items {
+			if err := prepareImportMerge(ctx, tx, &p, &p.Items[i]); err != nil {
+				return err
+			}
+		}
 		setNotionGraphConflicts(&p)
 		for _, task := range s.Pending {
 			item := ImportItem{Locator: "notion/pending/" + task.ID, Kind: "rejected", Outcome: "failed", Reason: "Capture finished before this authorized source could be read: " + s.Error, RawFileID: p.SourceFileID}

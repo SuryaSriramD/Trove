@@ -381,6 +381,8 @@ type DomainReimportPlan struct {
 	SourceDeleted          bool                          `json:"sourceDeleted"`
 	LocalDeleted           bool                          `json:"localDeleted"`
 	Resolution             string                        `json:"resolution"`
+	NormalizerVersion      *int64                        `json:"normalizerVersion,omitempty"`
+	BaselineStatus         json.RawMessage               `json:"baselineStatus,omitempty"`
 }
 type DomainBlockParagraphV1 struct {
 	RichText DomainRichText `json:"richText"`
@@ -866,6 +868,11 @@ type DomainImportResolution struct {
 	Fields                 []DomainImportFieldResolution   `json:"fields"`
 }
 type DomainColorToken string
+type DomainImportNormalizedSnapshot struct {
+	Version      int64                      `json:"version"`
+	Fields       map[string]json.RawMessage `json:"fields"`
+	BlockSources map[string]json.RawMessage `json:"blockSources"`
+}
 type ServiceEntityRef struct {
 	EntityType string   `json:"entityType"`
 	EntityId   DomainId `json:"entityId"`
@@ -2563,6 +2570,26 @@ type ServicePreviewImportResult struct {
 	Report            ServiceImportReport       `json:"report"`
 	ReimportPlans     []DomainReimportPlan      `json:"reimportPlans"`
 	RequiredRevisions []ServiceExpectedRevision `json:"requiredRevisions"`
+}
+type ServiceConfigureImportRequest struct {
+	ContractVersion int64      `json:"contractVersion"`
+	RequestId       DomainId   `json:"requestId"`
+	WorkspaceId     DomainId   `json:"workspaceId"`
+	PlanId          DomainId   `json:"planId"`
+	PlanHash        DomainHash `json:"planHash"`
+	Columns         []struct {
+		SourceLocator string `json:"sourceLocator"`
+		Index         int64  `json:"index"`
+		Type          string `json:"type"`
+	} `json:"columns,omitempty"`
+	Choices []struct {
+		SourceLocator string `json:"sourceLocator"`
+		Choice        string `json:"choice"`
+	} `json:"choices,omitempty"`
+	Resolutions []struct {
+		SourceLocator string                        `json:"sourceLocator"`
+		Fields        []DomainImportFieldResolution `json:"fields"`
+	} `json:"resolutions,omitempty"`
 }
 type ServiceGetImportReportRequest struct {
 	ContractVersion int64    `json:"contractVersion"`
