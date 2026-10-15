@@ -49,6 +49,8 @@ type ImportBlock struct {
 	Data map[string]any `json:"data"`
 }
 type ImportItem struct {
+	PortableIdentity        string                                  `json:"portableIdentity,omitempty"`
+	PageSourceScope         string                                  `json:"pageSourceScope,omitempty"`
 	AttachmentsComplete     bool                                    `json:"attachmentsComplete,omitempty"`
 	AttachmentRelationships map[string]ImportAttachmentRelationship `json:"attachmentRelationships,omitempty"`
 	CSVKeyColumn            string                                  `json:"csvKeyColumn,omitempty"`
@@ -86,6 +88,8 @@ type ImportItem struct {
 	Provenance              any                                     `json:"provenance,omitempty"`
 }
 type ImportPlan struct {
+	PageDeletionOperationID string                  `json:"pageDeletionOperationId,omitempty"`
+	PageEnumerationScope    string                  `json:"pageEnumerationScope,omitempty"`
 	CSVBindings             []ImportCSVBinding      `json:"csvBindings,omitempty"`
 	EntityIdentities        []ImportEntityIdentity  `json:"entityIdentities,omitempty"`
 	TypedDatabaseMerge      bool                    `json:"typedDatabaseMerge,omitempty"`
@@ -590,6 +594,9 @@ func configurePortableImport(ctx context.Context, k *Kernel, e contracts.Service
 					continue
 				}
 				choice := str(c["choice"])
+				if item.Kind == "source_deleted_page" && choice != "keep_local" && choice != "merge" {
+					return Fail("INVALID_REQUEST", "A missing source page can only be kept or explicitly reviewed for deletion")
+				}
 				if choice != "keep_local" && choice != "replace" && choice != "duplicate" && choice != "merge" {
 					return Fail("INVALID_REQUEST", "Choose merge, keep_local, replace, or duplicate")
 				}

@@ -886,10 +886,13 @@ type DomainPageFreshness struct {
 	Review          *DomainHumanReviewEvent       `json:"review,omitempty"`
 }
 type DomainImportNormalizedSnapshot struct {
-	Version        int64                      `json:"version"`
-	SourceRevision *string                    `json:"sourceRevision,omitempty"`
-	Fields         map[string]json.RawMessage `json:"fields"`
-	BlockSources   map[string]json.RawMessage `json:"blockSources"`
+	Version          int64                      `json:"version"`
+	SourceRevision   *string                    `json:"sourceRevision,omitempty"`
+	Fields           map[string]json.RawMessage `json:"fields"`
+	BlockSources     map[string]json.RawMessage `json:"blockSources"`
+	SourceScope      *string                    `json:"sourceScope,omitempty"`
+	PageSourceScope  *string                    `json:"pageSourceScope,omitempty"`
+	PortableIdentity *string                    `json:"portableIdentity,omitempty"`
 }
 type ServiceEntityRef struct {
 	EntityType string   `json:"entityType"`
@@ -1042,13 +1045,14 @@ func (ServiceJournalActionVariant5) isServiceJournalAction() {}
 func (ServiceJournalActionVariant6) isServiceJournalAction() {}
 func (ServiceJournalActionVariant7) isServiceJournalAction() {}
 func (ServiceJournalActionVariant8) isServiceJournalAction() {}
+func (ServiceJournalActionVariant9) isServiceJournalAction() {}
 func (v ServiceJournalAction) MarshalJSON() ([]byte, error)  { return json.Marshal(v.Value) }
 func (v *ServiceJournalAction) UnmarshalJSON(data []byte) error {
 	var fields map[string]json.RawMessage
 	if err := json.Unmarshal(data, &fields); err != nil {
 		return err
 	}
-	if matchesVariant(fields, []string{"kind", "recordId", "trashed"}, map[string]string{"kind": "\"record.trash.set\""}, map[string][]string{}, []string{"kind", "recordId", "trashed"}) {
+	if matchesVariant(fields, []string{"kind", "pageId", "trashed"}, map[string]string{"kind": "\"page.trash.set\""}, map[string][]string{}, []string{"kind", "pageId", "trashed"}) {
 		var result ServiceJournalActionVariant1
 		if err := json.Unmarshal(data, &result); err != nil {
 			return err
@@ -1056,7 +1060,7 @@ func (v *ServiceJournalAction) UnmarshalJSON(data []byte) error {
 		v.Value = result
 		return nil
 	}
-	if matchesVariant(fields, []string{"kind", "collectionId", "propertyId", "definition"}, map[string]string{"kind": "\"collection.property.restore\""}, map[string][]string{}, []string{"kind", "collectionId", "propertyId", "definition", "valueInventoryVersion", "values"}) {
+	if matchesVariant(fields, []string{"kind", "recordId", "trashed"}, map[string]string{"kind": "\"record.trash.set\""}, map[string][]string{}, []string{"kind", "recordId", "trashed"}) {
 		var result ServiceJournalActionVariant2
 		if err := json.Unmarshal(data, &result); err != nil {
 			return err
@@ -1064,7 +1068,7 @@ func (v *ServiceJournalAction) UnmarshalJSON(data []byte) error {
 		v.Value = result
 		return nil
 	}
-	if matchesVariant(fields, []string{"kind", "recordId", "propertyId", "value"}, map[string]string{"kind": "\"record.setValue\""}, map[string][]string{}, []string{"kind", "recordId", "propertyId", "value"}) {
+	if matchesVariant(fields, []string{"kind", "collectionId", "propertyId", "definition"}, map[string]string{"kind": "\"collection.property.restore\""}, map[string][]string{}, []string{"kind", "collectionId", "propertyId", "definition", "valueInventoryVersion", "values"}) {
 		var result ServiceJournalActionVariant3
 		if err := json.Unmarshal(data, &result); err != nil {
 			return err
@@ -1072,7 +1076,7 @@ func (v *ServiceJournalAction) UnmarshalJSON(data []byte) error {
 		v.Value = result
 		return nil
 	}
-	if matchesVariant(fields, []string{"kind", "recordId", "propertyId"}, map[string]string{"kind": "\"record.clearValue\""}, map[string][]string{}, []string{"kind", "recordId", "propertyId"}) {
+	if matchesVariant(fields, []string{"kind", "recordId", "propertyId", "value"}, map[string]string{"kind": "\"record.setValue\""}, map[string][]string{}, []string{"kind", "recordId", "propertyId", "value"}) {
 		var result ServiceJournalActionVariant4
 		if err := json.Unmarshal(data, &result); err != nil {
 			return err
@@ -1080,7 +1084,7 @@ func (v *ServiceJournalAction) UnmarshalJSON(data []byte) error {
 		v.Value = result
 		return nil
 	}
-	if matchesVariant(fields, []string{"kind", "pageId", "title"}, map[string]string{"kind": "\"page.update\""}, map[string][]string{}, []string{"kind", "pageId", "title"}) {
+	if matchesVariant(fields, []string{"kind", "recordId", "propertyId"}, map[string]string{"kind": "\"record.clearValue\""}, map[string][]string{}, []string{"kind", "recordId", "propertyId"}) {
 		var result ServiceJournalActionVariant5
 		if err := json.Unmarshal(data, &result); err != nil {
 			return err
@@ -1088,7 +1092,7 @@ func (v *ServiceJournalAction) UnmarshalJSON(data []byte) error {
 		v.Value = result
 		return nil
 	}
-	if matchesVariant(fields, []string{"kind", "pageId", "fullWidth", "presentation"}, map[string]string{"kind": "\"page.display.set\""}, map[string][]string{}, []string{"kind", "pageId", "fullWidth", "presentation"}) {
+	if matchesVariant(fields, []string{"kind", "pageId", "title"}, map[string]string{"kind": "\"page.update\""}, map[string][]string{}, []string{"kind", "pageId", "title"}) {
 		var result ServiceJournalActionVariant6
 		if err := json.Unmarshal(data, &result); err != nil {
 			return err
@@ -1096,7 +1100,7 @@ func (v *ServiceJournalAction) UnmarshalJSON(data []byte) error {
 		v.Value = result
 		return nil
 	}
-	if matchesVariant(fields, []string{"kind", "collectionId", "layout"}, map[string]string{"kind": "\"collection.layout.set\""}, map[string][]string{}, []string{"kind", "collectionId", "layout"}) {
+	if matchesVariant(fields, []string{"kind", "pageId", "fullWidth", "presentation"}, map[string]string{"kind": "\"page.display.set\""}, map[string][]string{}, []string{"kind", "pageId", "fullWidth", "presentation"}) {
 		var result ServiceJournalActionVariant7
 		if err := json.Unmarshal(data, &result); err != nil {
 			return err
@@ -1104,8 +1108,16 @@ func (v *ServiceJournalAction) UnmarshalJSON(data []byte) error {
 		v.Value = result
 		return nil
 	}
-	if matchesVariant(fields, []string{"kind", "recordId", "layout"}, map[string]string{"kind": "\"record.layout.set\""}, map[string][]string{}, []string{"kind", "recordId", "layout"}) {
+	if matchesVariant(fields, []string{"kind", "collectionId", "layout"}, map[string]string{"kind": "\"collection.layout.set\""}, map[string][]string{}, []string{"kind", "collectionId", "layout"}) {
 		var result ServiceJournalActionVariant8
+		if err := json.Unmarshal(data, &result); err != nil {
+			return err
+		}
+		v.Value = result
+		return nil
+	}
+	if matchesVariant(fields, []string{"kind", "recordId", "layout"}, map[string]string{"kind": "\"record.layout.set\""}, map[string][]string{}, []string{"kind", "recordId", "layout"}) {
+		var result ServiceJournalActionVariant9
 		if err := json.Unmarshal(data, &result); err != nil {
 			return err
 		}
@@ -1668,6 +1680,11 @@ type ServiceRestoreProperty struct {
 		Value    json.RawMessage `json:"value"`
 	} `json:"values,omitempty"`
 }
+type ServiceSetPageTrash struct {
+	Kind    string   `json:"kind"`
+	PageId  DomainId `json:"pageId"`
+	Trashed bool     `json:"trashed"`
+}
 type ServiceSetRecordTrash struct {
 	Kind     string   `json:"kind"`
 	RecordId DomainId `json:"recordId"`
@@ -1763,6 +1780,7 @@ func (ServiceSetCollectionLayout) isServiceCommand()     {}
 func (ServiceSetRecordLayout) isServiceCommand()         {}
 func (ServiceApplyScheduling) isServiceCommand()         {}
 func (ServiceRestoreProperty) isServiceCommand()         {}
+func (ServiceSetPageTrash) isServiceCommand()            {}
 func (ServiceSetRecordTrash) isServiceCommand()          {}
 func (ServiceApplyOperation) isServiceCommand()          {}
 func (ServiceUndoOperation) isServiceCommand()           {}
@@ -2217,6 +2235,14 @@ func (v *ServiceCommand) UnmarshalJSON(data []byte) error {
 	}
 	if matchesVariant(fields, []string{"kind", "collectionId", "propertyId", "definition"}, map[string]string{"kind": "\"collection.property.restore\""}, map[string][]string{}, []string{"kind", "collectionId", "propertyId", "definition", "valueInventoryVersion", "values"}) {
 		var result ServiceRestoreProperty
+		if err := json.Unmarshal(data, &result); err != nil {
+			return err
+		}
+		v.Value = result
+		return nil
+	}
+	if matchesVariant(fields, []string{"kind", "pageId", "trashed"}, map[string]string{"kind": "\"page.trash.set\""}, map[string][]string{}, []string{"kind", "pageId", "trashed"}) {
+		var result ServiceSetPageTrash
 		if err := json.Unmarshal(data, &result); err != nil {
 			return err
 		}
@@ -4644,11 +4670,16 @@ type DomainImportIdentityResolutionVariant2 struct {
 	Choice string `json:"choice"`
 }
 type ServiceJournalActionVariant1 struct {
+	Kind    string   `json:"kind"`
+	PageId  DomainId `json:"pageId"`
+	Trashed bool     `json:"trashed"`
+}
+type ServiceJournalActionVariant2 struct {
 	Kind     string   `json:"kind"`
 	RecordId DomainId `json:"recordId"`
 	Trashed  bool     `json:"trashed"`
 }
-type ServiceJournalActionVariant2 struct {
+type ServiceJournalActionVariant3 struct {
 	Kind                  string                            `json:"kind"`
 	CollectionId          DomainId                          `json:"collectionId"`
 	PropertyId            DomainId                          `json:"propertyId"`
@@ -4659,7 +4690,7 @@ type ServiceJournalActionVariant2 struct {
 		Value    json.RawMessage `json:"value"`
 	} `json:"values,omitempty"`
 }
-type ServiceJournalActionVariant3 struct {
+type ServiceJournalActionVariant4 struct {
 	Kind       string   `json:"kind"`
 	RecordId   DomainId `json:"recordId"`
 	PropertyId DomainId `json:"propertyId"`
@@ -4669,28 +4700,28 @@ type ServiceJournalActionVariant3 struct {
 		Value         json.RawMessage `json:"value"`
 	} `json:"value"`
 }
-type ServiceJournalActionVariant4 struct {
+type ServiceJournalActionVariant5 struct {
 	Kind       string   `json:"kind"`
 	RecordId   DomainId `json:"recordId"`
 	PropertyId DomainId `json:"propertyId"`
 }
-type ServiceJournalActionVariant5 struct {
+type ServiceJournalActionVariant6 struct {
 	Kind   string   `json:"kind"`
 	PageId DomainId `json:"pageId"`
 	Title  string   `json:"title"`
 }
-type ServiceJournalActionVariant6 struct {
+type ServiceJournalActionVariant7 struct {
 	Kind         string   `json:"kind"`
 	PageId       DomainId `json:"pageId"`
 	FullWidth    bool     `json:"fullWidth"`
 	Presentation bool     `json:"presentation"`
 }
-type ServiceJournalActionVariant7 struct {
+type ServiceJournalActionVariant8 struct {
 	Kind         string               `json:"kind"`
 	CollectionId DomainId             `json:"collectionId"`
 	Layout       *ServiceRecordLayout `json:"layout"`
 }
-type ServiceJournalActionVariant8 struct {
+type ServiceJournalActionVariant9 struct {
 	Kind     string               `json:"kind"`
 	RecordId DomainId             `json:"recordId"`
 	Layout   *ServiceRecordLayout `json:"layout"`

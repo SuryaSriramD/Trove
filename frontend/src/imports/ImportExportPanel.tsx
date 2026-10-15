@@ -46,6 +46,8 @@ function describeImportPath(
   workspace: WorkspaceSnapshot,
 ) {
   const parts = path.split("/");
+  if (parts[1] === "exists")
+    return "Source page existence (explicit deletion moves only this page to Trash; content and attachments remain recoverable)";
   if (parts[1] === "collectionTitle") return "Collection title";
   if (parts[1] === "records") {
     const record = workspace.records.find((r) => r.id === parts[2]);
@@ -751,7 +753,8 @@ export function ImportExportPanel({
                                         Keep local
                                       </option>
                                       <option value="take_incoming">
-                                        {field.path.startsWith("/records/") &&
+                                        {(field.path.startsWith("/records/") ||
+                                          field.path === "/exists") &&
                                         !field.incoming.present
                                           ? "Accept source deletion"
                                           : "Take incoming"}
@@ -835,12 +838,17 @@ export function ImportExportPanel({
                       {(!plan.notionGraph ||
                         !notionGraphKinds.has(item.kind)) &&
                         item.kind !== "csv" &&
-                        item.kind !== "portable_collection" && (
+                        item.kind !== "portable_collection" &&
+                        item.kind !== "source_deleted_page" && (
                           <option value="replace">
                             Replace the page body with incoming content
                           </option>
                         )}
-                      <option value="duplicate">Import a separate copy</option>
+                      {item.kind !== "source_deleted_page" && (
+                        <option value="duplicate">
+                          Import a separate copy
+                        </option>
+                      )}
                     </select>
                   </div>
                 ))}

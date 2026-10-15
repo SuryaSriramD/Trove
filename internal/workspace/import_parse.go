@@ -74,10 +74,12 @@ func inferImportType(values []string) string {
 }
 
 type portableHierarchy struct {
-	Format         string          `json:"format"`
-	HTMLRenditions []string        `json:"htmlRenditions"`
-	Phase4Metadata json.RawMessage `json:"phase4Metadata"`
-	Pages          []struct {
+	WorkspaceID            string          `json:"workspaceId"`
+	PageEnumerationVersion int             `json:"pageEnumerationVersion,omitempty"`
+	Format                 string          `json:"format"`
+	HTMLRenditions         []string        `json:"htmlRenditions"`
+	Phase4Metadata         json.RawMessage `json:"phase4Metadata"`
+	Pages                  []struct {
 		ExternalContextPolicy          *externalContextPolicy         `json:"externalContextPolicy,omitempty"`
 		AttachmentRelationshipsVersion int                            `json:"attachmentRelationshipsVersion,omitempty"`
 		AttachmentRelationships        []ImportAttachmentRelationship `json:"attachmentRelationships,omitempty"`
@@ -247,6 +249,7 @@ func (k *Kernel) parseImportPlan(ctx context.Context, p *ImportPlan) error {
 		if item.PageID != "" {
 			if identity := canonicalIdentities[item.Locator]; identity != "" {
 				item.IdentityKind, item.ExternalID = "external_id", identity
+				item.PortableIdentity = identity
 			}
 			if item.IdentityKind == "" {
 				item.IdentityKind, item.ExternalID = importIdentity(item.Locator)
@@ -475,6 +478,9 @@ func (k *Kernel) parseImportPlan(ctx context.Context, p *ImportPlan) error {
 	if err := reuseImportDatabaseIdentities(ctx, k.db, p); err != nil {
 		return err
 	}
+	if err := preparePortablePageInventory(ctx, k.db, p, manifest); err != nil {
+		return err
+	}
 	for i := range p.Items {
 		if sourcePolicy != nil {
 			p.Items[i].Provenance = externalPolicyProvenance(sourcePolicy, p.Items[i].Provenance)
@@ -482,6 +488,9 @@ func (k *Kernel) parseImportPlan(ctx context.Context, p *ImportPlan) error {
 		if err := prepareImportMerge(ctx, k.db, p, &p.Items[i]); err != nil {
 			return err
 		}
+	}
+	if err := appendMissingSourcePages(ctx, k.db, p); err != nil {
+		return err
 	}
 	sortImportItems(p.Items)
 	return nil

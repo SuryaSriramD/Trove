@@ -250,6 +250,9 @@ func applyPortableImport(m *Mutation, c map[string]any) error {
 				}
 			}
 		}
+		if _, err := reviewedPageDeletionActions(m.Context, m.Tx, &p); err != nil {
+			return err
+		}
 		if err := validateReviewedImportDatabase(m.Context, m.Tx, &p); err != nil {
 			return err
 		}
@@ -324,6 +327,9 @@ func applyPortableImport(m *Mutation, c map[string]any) error {
 		if err = commitPortableDatabase(m, &p); err != nil {
 			return err
 		}
+		if err = commitSourcePageDeletions(m, &p); err != nil {
+			return err
+		}
 		p.State = "complete"
 	}
 	// Record projections touch their collection during commit validation. Do
@@ -382,6 +388,9 @@ func rewriteImportBlock(v any, ids map[string]string) {
 }
 
 func commitImportItem(m *Mutation, p *ImportPlan, item *ImportItem) error {
+	if item.Kind == "source_deleted_page" {
+		return nil
+	}
 	if item.Kind == "directory" || item.Kind == "asset" || item.Kind == "rejected" {
 		return nil
 	}

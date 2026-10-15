@@ -69,6 +69,10 @@ func (k *Kernel) ExportPortable(ctx context.Context, e contracts.ServiceExecutio
 		}
 		pageIDs = append(pageIDs, id)
 	}
+	if err = rows.Err(); err != nil {
+		rows.Close()
+		return result, err
+	}
 	rows.Close()
 	pages := map[string]contracts.ServiceReadPageResult{}
 	livePageIDs := []string{}
@@ -154,7 +158,7 @@ func (k *Kernel) ExportPortable(ctx context.Context, e contracts.ServiceExecutio
 		_, er = w.Write(b)
 		return er
 	}
-	manifest := map[string]any{"format": "trove-portable", "formatVersion": 1, "workspaceId": k.id, "exportedAt": now(), "sourceCompleteness": "partial", "sourceOmissions": result.SourceOmissions, "pages": []any{}, "collections": []any{}, "attachments": []any{}}
+	manifest := map[string]any{"format": "trove-portable", "formatVersion": 1, "workspaceId": k.id, "pageEnumerationVersion": 1, "exportedAt": now(), "sourceCompleteness": "partial", "sourceOmissions": result.SourceOmissions, "pages": []any{}, "collections": []any{}, "attachments": []any{}}
 	for _, id := range pageIDs {
 		p := pages[id]
 		name := paths[id]
