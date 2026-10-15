@@ -277,7 +277,7 @@ func prepareImportMerge(ctx context.Context, q querier, p *ImportPlan, item *Imp
 		bySource[source] = id
 	}
 	for id, source := range item.BlockSources {
-		if old := bySource[source]; old != "" && (sourceRevision == item.Hash || strings.HasPrefix(source, "notion-block:") || strings.HasPrefix(source, "html-id:") || strings.HasPrefix(source, "portable-block:") || strings.HasPrefix(source, "conversation-node:")) {
+		if old := bySource[source]; old != "" && (sourceRevision == item.Hash || strings.HasPrefix(source, "normalizer-position:"+item.Hash+":conversation-node:") || strings.HasPrefix(source, "notion-block:") || strings.HasPrefix(source, "html-id:") || strings.HasPrefix(source, "portable-block:") || strings.HasPrefix(source, "conversation-node:")) {
 			ids[id] = old
 		}
 	}
@@ -307,8 +307,9 @@ func prepareImportMerge(ctx context.Context, q querier, p *ImportPlan, item *Imp
 			}
 		}
 	}
-	if known && p.SourceSystem == "notion_api" && p.SourceCompleteness != "complete" {
-		// An incomplete API enumeration is not evidence that a prior block was deleted.
+	if known && ((p.SourceSystem == "notion_api" && p.SourceCompleteness != "complete") || item.Kind == "conversation") {
+		// An incomplete API enumeration or supplied conversation graph is not
+		// proof that an omitted prior block was deleted at its source.
 		for path, value := range base.Fields {
 			if strings.HasPrefix(path, "/blocks/") {
 				if _, present := incoming.Fields[path]; !present {

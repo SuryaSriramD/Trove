@@ -13,14 +13,15 @@ import (
 const maxConversationNodes = 2000
 
 type conversationNode struct {
-	ID        string   `json:"id"`
-	Parent    string   `json:"parentId,omitempty"`
-	Children  []string `json:"childrenIds"`
-	MessageID string   `json:"messageId,omitempty"`
-	Role      string   `json:"role"`
-	CreatedAt any      `json:"createdAt,omitempty"`
-	BlockID   string   `json:"blockId"`
-	Text      string   `json:"-"`
+	DerivedIdentity bool     `json:"derivedIdentity,omitempty"`
+	ID              string   `json:"id"`
+	Parent          string   `json:"parentId,omitempty"`
+	Children        []string `json:"childrenIds"`
+	MessageID       string   `json:"messageId,omitempty"`
+	Role            string   `json:"role"`
+	CreatedAt       any      `json:"createdAt,omitempty"`
+	BlockID         string   `json:"blockId"`
+	Text            string   `json:"-"`
 }
 
 // ParseConversationExport is a pure parser: it produces canonical import objects
@@ -97,6 +98,7 @@ func ParseConversationExport(raw []byte, source ImportItem) ([]ImportItem, bool,
 					return nil, true, fmt.Errorf("invalid Claude message %d", i+1)
 				}
 				mid := str(m["uuid"])
+				derivedIdentity := mid == ""
 				if mid == "" {
 					mid = fmt.Sprintf("message-%d", i+1)
 				}
@@ -108,7 +110,7 @@ func ParseConversationExport(raw []byte, source ImportItem) ([]ImportItem, bool,
 				if text == "" {
 					text = conversationContent(m["content"])
 				}
-				nodes = append(nodes, conversationNode{ID: mid, Parent: parent, MessageID: mid, Role: str(m["sender"]), CreatedAt: m["created_at"], Children: []string{}, Text: text})
+				nodes = append(nodes, conversationNode{ID: mid, Parent: parent, MessageID: mid, Role: str(m["sender"]), CreatedAt: m["created_at"], Children: []string{}, Text: text, DerivedIdentity: derivedIdentity})
 				previous = mid
 			}
 		} else {
@@ -209,6 +211,12 @@ func ParseConversationExport(raw []byte, source ImportItem) ([]ImportItem, bool,
 		item.BlockSources[item.Blocks[len(item.Blocks)-1].ID] = "conversation-node:summary"
 		for _, i := range order {
 			n := nodes[i]
+			identity := "conversation-node:" + n.ID
+			if n.DerivedIdentity {
+				// An anonymous array position only matches identical retained raw
+				// evidence. Edited exports must not assign it an external identity.
+				identity = "normalizer-position:" + item.Hash + ":" + identity
+			}
 			label := n.Role + " · " + n.ID
 			if n.CreatedAt != nil {
 				label += " · " + fmt.Sprint(n.CreatedAt)
@@ -217,7 +225,7 @@ func ParseConversationExport(raw []byte, source ImportItem) ([]ImportItem, bool,
 				label += " · selected source branch"
 			}
 			item.Blocks = append(item.Blocks, ImportBlock{ID: n.BlockID, Type: "heading_3", Data: map[string]any{"richText": richImport(label)}})
-			item.BlockSources[n.BlockID] = "conversation-node:" + n.ID + ":heading"
+			item.BlockSources[n.BlockID] = identity + ":heading"
 			links := []any{}
 			if p, exists := byID[n.Parent]; exists {
 				links = append(links, map[string]any{"text": "Parent: " + n.Parent, "link": canonicalPageLink(item.PageID, nodes[p].BlockID)})
@@ -230,14 +238,14 @@ func ParseConversationExport(raw []byte, source ImportItem) ([]ImportItem, bool,
 			}
 			if len(links) > 0 {
 				item.Blocks = append(item.Blocks, ImportBlock{ID: NewID(), Type: "paragraph", Data: map[string]any{"richText": links}})
-				item.BlockSources[item.Blocks[len(item.Blocks)-1].ID] = "conversation-node:" + n.ID + ":links"
+				item.BlockSources[item.Blocks[len(item.Blocks)-1].ID] = identity + ":links"
 			}
 			text := n.Text
 			if text == "" {
 				text = "[No readable text in this node; exact source payload retained.]"
 			}
 			item.Blocks = append(item.Blocks, ImportBlock{ID: NewID(), Type: "paragraph", Data: map[string]any{"richText": richImport(text)}})
-			item.BlockSources[item.Blocks[len(item.Blocks)-1].ID] = "conversation-node:" + n.ID + ":text"
+			item.BlockSources[item.Blocks[len(item.Blocks)-1].ID] = identity + ":text"
 		}
 		item.Provenance = map[string]any{"format": "conversation-export-v1", "provider": provider, "conversationId": id, "createdAt": c["create_time"], "updatedAt": c["update_time"], "currentNode": c["current_node"], "nodes": nodes, "sourceLocator": source.Locator, "rawFileId": source.RawFileID, "nonTextPolicy": "Exact original JSON retained; only explicit text is projected"}
 		if provider == "claude" {
