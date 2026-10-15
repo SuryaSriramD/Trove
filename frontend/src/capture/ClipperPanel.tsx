@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { dispatch, envelope, type WorkspaceSnapshot } from "../api";
 type Pairing = {
   endpoint: string;
@@ -37,15 +37,34 @@ type Bridge = {
   ClipperStatus: () => Promise<string>;
   ClipperReviewPlans: () => Promise<string>;
 };
-export function ClipperPanel({
-  workspace,
-  onChanged,
-  onOpenPage,
-}: {
+type ClipperProps = {
   workspace: WorkspaceSnapshot;
   onChanged: () => Promise<void> | void;
   onOpenPage?: (id: string) => void;
-}) {
+};
+export function ClipperPanel(props: ClipperProps) {
+  return (
+    <ClipperWorkspacePanel
+      key={`${props.workspace.workspaceId}:${props.workspace.scopeGrantId}`}
+      {...props}
+    />
+  );
+}
+function ClipperWorkspacePanel({
+  workspace,
+  onChanged,
+  onOpenPage,
+}: ClipperProps) {
+  const active = useRef(true);
+  const cancelSave = useRef(false);
+  const [saving, setSaving] = useState(false);
+  const [cancelling, setCancelling] = useState(false);
+  const scoped = async <T,>(operation: () => Promise<T>): Promise<T> => {
+    if (!active.current) throw Error("Browser capture workspace changed");
+    const result = await operation();
+    if (!active.current) throw Error("Browser capture workspace changed");
+    return result;
+  };
   const [extension, setExtension] = useState(""),
     [inbox, setInbox] = useState(true),
     [destination, setDestination] = useState(""),
@@ -61,10 +80,9 @@ export function ClipperPanel({
   const supported = !!native?.BeginClipperPairing;
   const refresh = async () => {
     if (!supported) return;
-    const [status, items] = await Promise.all([
-      native!.ClipperStatus!(),
-      native!.ClipperReviewPlans!(),
-    ]);
+    const [status, items] = await scoped(() =>
+      Promise.all([native!.ClipperStatus!(), native!.ClipperReviewPlans!()]),
+    );
     const current = JSON.parse(status);
     setPaired(current.paired);
     setListening(current.listening);
@@ -72,25 +90,37 @@ export function ClipperPanel({
     setPlans(JSON.parse(items));
   };
   useEffect(() => {
+    active.current = true;
     setPairing(null);
     setSelected(null);
     setPlans([]);
-    if (supported) void refresh().catch((e) => setError(String(e)));
+    if (supported)
+      void refresh().catch((e) => {
+        if (active.current) setError(String(e));
+      });
     const timer = setInterval(() => {
-      if (supported) void refresh().catch((e) => setError(String(e)));
+      if (supported)
+        void refresh().catch((e) => {
+          if (active.current) setError(String(e));
+        });
     }, 5000);
-    return () => clearInterval(timer);
+    return () => {
+      active.current = false;
+      cancelSave.current = true;
+      clearInterval(timer);
+    };
   }, [workspace.workspaceId, supported]);
   const act = async (fn: () => Promise<void>) => {
+    if (!active.current) return;
     setBusy(true);
     setError("");
     setNotice("");
     try {
       await fn();
     } catch (e) {
-      setError(String(e));
+      if (active.current) setError(String(e));
     } finally {
-      setBusy(false);
+      if (active.current) setBusy(false);
     }
   };
   const begin = () =>
@@ -100,35 +130,56 @@ export function ClipperPanel({
         ...(destination ? [destination] : []),
       ];
       setPairing(
-        JSON.parse(await native!.BeginClipperPairing!(extension.trim(), ids)),
+        JSON.parse(
+          await scoped(() =>
+            native!.BeginClipperPairing!(extension.trim(), ids),
+          ),
+        ),
       );
       await refresh();
     });
   const save = () =>
     act(async () => {
       if (!selected) return;
-      let plan = selected;
-      let attempts = 0;
-      while (plan.state !== "complete") {
-        if (++attempts > 64)
-          throw Error(
-            "Capture save did not complete; refresh the draft before retrying.",
+      cancelSave.current = false;
+      setSaving(true);
+      setCancelling(false);
+      let plan = selected,
+        attempts = 0;
+      try {
+        while (plan.state !== "complete") {
+          if (cancelSave.current || ++attempts > 64) {
+            await scoped(() => Promise.resolve(onChanged()));
+            setNotice(
+              "Browser capture save paused. Completed batches remain saved; review and resume the remaining items.",
+            );
+            return;
+          }
+          const previousHash = plan.planHash;
+          plan = await scoped(() =>
+            dispatch<Plan>("imports.commit", {
+              ...envelope(workspace),
+              planId: plan.planId,
+              planHash: plan.planHash,
+            }),
           );
-        const previousHash = plan.planHash;
-        plan = await dispatch<Plan>("imports.commit", {
-          ...envelope(workspace),
-          planId: plan.planId,
-          planHash: plan.planHash,
-        });
-        setSelected(plan);
-        if (plan.state !== "complete" && plan.planHash === previousHash)
-          throw Error(
-            "Capture save made no progress; refresh the draft before retrying.",
-          );
+          setSelected(plan);
+          if (plan.state !== "complete" && plan.planHash === previousHash)
+            throw Error(
+              "Capture save made no progress; refresh the draft before retrying.",
+            );
+        }
+        await scoped(() => Promise.resolve(onChanged()));
+        await refresh();
+        setNotice(
+          "Reviewed browser capture saved as offline workspace content.",
+        );
+      } finally {
+        if (active.current) {
+          setSaving(false);
+          setCancelling(false);
+        }
       }
-      await onChanged();
-      await refresh();
-      setNotice("Reviewed browser capture saved as offline workspace content.");
     });
   return (
     <section aria-label="Browser clipper" className="browser-clipper-panel">
@@ -138,7 +189,7 @@ export function ClipperPanel({
           disabled={busy}
           onClick={() =>
             act(async () => {
-              await native!.ShowClipperExtension!();
+              await scoped(() => native!.ShowClipperExtension!());
             })
           }
         >
@@ -240,7 +291,7 @@ export function ClipperPanel({
             disabled={busy || !listening}
             onClick={() =>
               act(async () => {
-                await native!.RevokeClipperPairing!();
+                await scoped(() => native!.RevokeClipperPairing!());
                 setPairing(null);
                 await refresh();
                 setNotice(
@@ -320,9 +371,11 @@ export function ClipperPanel({
                   act(async () => {
                     setSelected(
                       JSON.parse(
-                        await native!.RefreshClipperDestination!(
-                          selected.planId,
-                          selected.planHash,
+                        await scoped(() =>
+                          native!.RefreshClipperDestination!(
+                            selected.planId,
+                            selected.planHash,
+                          ),
                         ),
                       ),
                     );
@@ -335,8 +388,23 @@ export function ClipperPanel({
                 Refresh destination for review
               </button>
               <button disabled={busy} onClick={save}>
-                Save reviewed browser capture
+                {selected.state === "preview"
+                  ? "Save reviewed browser capture"
+                  : "Resume reviewed browser capture"}
               </button>
+              {saving && (
+                <button
+                  disabled={cancelling}
+                  onClick={() => {
+                    cancelSave.current = true;
+                    setCancelling(true);
+                  }}
+                >
+                  {cancelling
+                    ? "Cancelling after current batch…"
+                    : "Cancel browser capture save"}
+                </button>
+              )}
             </>
           ) : (
             <button

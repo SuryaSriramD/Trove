@@ -39,9 +39,20 @@ type Item = {
 type Presence = { present: boolean; value?: unknown };
 const describeField = (value: Presence) =>
   value.present ? JSON.stringify(value.value, null, 2) : "(absent)";
-function describeImportPath(path: string, item: Item, items: Item[]) {
+function describeImportPath(
+  path: string,
+  item: Item,
+  items: Item[],
+  workspace: WorkspaceSnapshot,
+) {
   const parts = path.split("/");
   if (parts[1] === "collectionTitle") return "Collection title";
+  if (parts[1] === "records") {
+    const record = workspace.records.find((r) => r.id === parts[2]);
+    const name =
+      workspace.pages.find((p) => p.id === record?.pageId)?.title ?? parts[2];
+    return `Record: ${name} (accepting source deletion moves it to Trash; content and attachments remain recoverable)`;
+  }
   if (parts[1] === "attachments")
     return "Attachment relationship (removal requires review)";
   if (parts[1] === "siblingOrder")
@@ -665,6 +676,7 @@ export function ImportExportPanel({
                                       field.path,
                                       item,
                                       plan.items,
+                                      workspace,
                                     )}
                                     {field.path.startsWith("/schema/") ||
                                     field.path.startsWith("/values/") ? (
@@ -674,6 +686,21 @@ export function ImportExportPanel({
                                     ) : null}
                                     <br />
                                     {field.outcome}
+                                    {field.path.startsWith("/records/") &&
+                                      field.local.present &&
+                                      typeof field.local.value === "string" &&
+                                      onOpenPage && (
+                                        <button
+                                          type="button"
+                                          onClick={() =>
+                                            onOpenPage(
+                                              field.local.value as string,
+                                            )
+                                          }
+                                        >
+                                          Inspect local record
+                                        </button>
+                                      )}
                                   </td>
                                   <td>
                                     <pre>{describeField(field.base)}</pre>
@@ -724,7 +751,10 @@ export function ImportExportPanel({
                                         Keep local
                                       </option>
                                       <option value="take_incoming">
-                                        Take incoming
+                                        {field.path.startsWith("/records/") &&
+                                        !field.incoming.present
+                                          ? "Accept source deletion"
+                                          : "Take incoming"}
                                       </option>
                                       {item.merge?.resolutions.find(
                                         (choice) => choice.path === field.path,

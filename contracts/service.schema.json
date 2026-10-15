@@ -723,8 +723,136 @@
       ],
       "additionalProperties": false
     },
+    "PropertyRestoreDefinition": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "type": {
+          "type": "string",
+          "enum": [
+            "text",
+            "number",
+            "select",
+            "multi_select",
+            "status",
+            "checkbox",
+            "date",
+            "url",
+            "email",
+            "phone"
+          ]
+        },
+        "schemaVersion": {
+          "const": 1
+        },
+        "config": {
+          "type": [
+            "object",
+            "array",
+            "string",
+            "number",
+            "integer",
+            "boolean",
+            "null"
+          ]
+        }
+      },
+      "required": [
+        "name",
+        "type",
+        "schemaVersion",
+        "config"
+      ],
+      "additionalProperties": false
+    },
     "JournalAction": {
       "oneOf": [
+        {
+          "type": "object",
+          "properties": {
+            "kind": {
+              "const": "record.trash.set"
+            },
+            "recordId": {
+              "$ref": "domain.schema.json#/$defs/Id"
+            },
+            "trashed": {
+              "type": "boolean"
+            }
+          },
+          "required": [
+            "kind",
+            "recordId",
+            "trashed"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "kind": {
+              "const": "collection.property.restore"
+            },
+            "collectionId": {
+              "$ref": "domain.schema.json#/$defs/Id"
+            },
+            "propertyId": {
+              "$ref": "domain.schema.json#/$defs/Id"
+            },
+            "definition": {
+              "oneOf": [
+                {
+                  "$ref": "#/$defs/PropertyRestoreDefinition"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "valueInventoryVersion": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 1
+            },
+            "values": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "recordId": {
+                    "$ref": "domain.schema.json#/$defs/Id"
+                  },
+                  "value": {
+                    "type": [
+                      "object",
+                      "array",
+                      "string",
+                      "number",
+                      "integer",
+                      "boolean",
+                      "null"
+                    ]
+                  }
+                },
+                "required": [
+                  "recordId",
+                  "value"
+                ],
+                "additionalProperties": false
+              },
+              "maxItems": 128
+            }
+          },
+          "required": [
+            "kind",
+            "collectionId",
+            "propertyId",
+            "definition"
+          ],
+          "additionalProperties": false
+        },
         {
           "type": "object",
           "properties": {
@@ -3270,6 +3398,90 @@
       ],
       "additionalProperties": false
     },
+    "RestoreProperty": {
+      "type": "object",
+      "properties": {
+        "kind": {
+          "const": "collection.property.restore"
+        },
+        "collectionId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "propertyId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "definition": {
+          "oneOf": [
+            {
+              "$ref": "#/$defs/PropertyRestoreDefinition"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "valueInventoryVersion": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 1
+        },
+        "values": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "recordId": {
+                "$ref": "domain.schema.json#/$defs/Id"
+              },
+              "value": {
+                "type": [
+                  "object",
+                  "array",
+                  "string",
+                  "number",
+                  "integer",
+                  "boolean",
+                  "null"
+                ]
+              }
+            },
+            "required": [
+              "recordId",
+              "value"
+            ],
+            "additionalProperties": false
+          },
+          "maxItems": 128
+        }
+      },
+      "required": [
+        "kind",
+        "collectionId",
+        "propertyId",
+        "definition"
+      ],
+      "additionalProperties": false
+    },
+    "SetRecordTrash": {
+      "type": "object",
+      "properties": {
+        "kind": {
+          "const": "record.trash.set"
+        },
+        "recordId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "trashed": {
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "kind",
+        "recordId",
+        "trashed"
+      ],
+      "additionalProperties": false
+    },
     "ApplyOperation": {
       "type": "object",
       "properties": {
@@ -3579,6 +3791,12 @@
         },
         {
           "$ref": "#/$defs/ApplyScheduling"
+        },
+        {
+          "$ref": "#/$defs/RestoreProperty"
+        },
+        {
+          "$ref": "#/$defs/SetRecordTrash"
         },
         {
           "$ref": "#/$defs/ApplyOperation"
@@ -4941,6 +5159,40 @@
       ],
       "additionalProperties": false
     },
+    "ConnectorUserResolution": {
+      "type": "object",
+      "properties": {
+        "version": {
+          "const": 1
+        },
+        "observation": {
+          "type": "string",
+          "enum": [
+            "applied",
+            "not_applied"
+          ]
+        },
+        "evidence": {
+          "type": "string",
+          "minLength": 10,
+          "maxLength": 4000
+        },
+        "actorId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "recordedAt": {
+          "$ref": "domain.schema.json#/$defs/Timestamp"
+        }
+      },
+      "required": [
+        "version",
+        "observation",
+        "evidence",
+        "actorId",
+        "recordedAt"
+      ],
+      "additionalProperties": false
+    },
     "ConnectorReceipt": {
       "type": "object",
       "properties": {
@@ -4972,6 +5224,9 @@
         },
         "recordedAt": {
           "$ref": "domain.schema.json#/$defs/Timestamp"
+        },
+        "userResolution": {
+          "$ref": "#/$defs/ConnectorUserResolution"
         }
       },
       "required": [
@@ -5016,6 +5271,7 @@
             "succeeded",
             "failed",
             "unknown",
+            "resolved",
             "discarded",
             "restored_inactive"
           ]
@@ -5632,6 +5888,53 @@
         "workspaceId",
         "proposalId",
         "hash"
+      ],
+      "additionalProperties": false
+    },
+    "ConnectorResolveRequest": {
+      "type": "object",
+      "properties": {
+        "contractVersion": {
+          "const": 1
+        },
+        "requestId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "workspaceId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "proposalId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "hash": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "expectedRevision": {
+          "type": "string"
+        },
+        "observation": {
+          "type": "string",
+          "enum": [
+            "applied",
+            "not_applied"
+          ]
+        },
+        "evidence": {
+          "type": "string",
+          "minLength": 10,
+          "maxLength": 4000
+        }
+      },
+      "required": [
+        "contractVersion",
+        "requestId",
+        "workspaceId",
+        "proposalId",
+        "hash",
+        "expectedRevision",
+        "observation",
+        "evidence"
       ],
       "additionalProperties": false
     },

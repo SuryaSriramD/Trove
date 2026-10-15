@@ -116,12 +116,14 @@ func (a *App) connectorDispatch(method string, raw json.RawMessage) string {
 		"connectors.native.cleanup": "ConnectorAccountRequest", "connectors.native.disconnect": "ConnectorDisconnectRequest", "connectors.native.discover": "ConnectorDiscoverRequest", "connectors.native.refresh": "ConnectorRefreshRequest",
 		"connectors.native.preview": "ConnectorSourceRequest", "connectors.native.import": "ConnectorSourceRequest", "connectors.native.acquire": "ConnectorSourceRequest",
 		"connectors.native.prepare": "ConnectorPrepareRequest", "connectors.native.execute": "ConnectorExecuteRequest", "connectors.native.reconcile": "ConnectorProposalRequest", "connectors.native.cancel": "ConnectorCancelRequest",
+		"connectors.native.resolve": "ConnectorResolveRequest",
 	}
 	definition := definitions[method]
 	if definition == "" || contracts.Validate("service", definition, raw) != nil {
 		return errorEnvelope("INVALID_REQUEST", "Invalid connector operation")
 	}
 	var r struct {
+		RequestID        string                  `json:"requestId"`
 		SnapshotID       string                  `json:"snapshotId"`
 		RemoteID         string                  `json:"remoteId"`
 		Format           string                  `json:"format"`
@@ -131,6 +133,8 @@ func (a *App) connectorDispatch(method string, raw json.RawMessage) string {
 		AttemptID        string                  `json:"attemptId"`
 		ProposalID       string                  `json:"proposalId"`
 		Hash             string                  `json:"hash"`
+		Observation      string                  `json:"observation"`
+		Evidence         string                  `json:"evidence"`
 		Cursor           string                  `json:"cursor"`
 		ResumeID         string                  `json:"resumeId"`
 		OperationID      string                  `json:"operationId"`
@@ -287,60 +291,60 @@ func (a *App) connectorDispatch(method string, raw json.RawMessage) string {
 		}
 		return connectorSuccess(map[string]any{"selections": options, "nextCursor": cursor})
 	case "connectors.native.preview", "connectors.native.import", "connectors.native.acquire":
-		selection, err := connectors.Selected(account, source.SelectionID)
-		if err != nil {
-			return connectorError(err)
-		}
-		identity, err := adapter.Identity(ctx, session)
-		if err != nil {
-			return connectorError(err)
-		}
-		if err = connectors.RequireIdentity(account.Identity, identity); err != nil {
-			return connectorError(err)
-		}
-		previewer, ok := adapter.(connectors.Previewer)
-		if !ok {
-			return connectorError(connectors.Unsupported("authenticated preview"))
-		}
-		fresh, err := previewer.Preview(ctx, session, selection, source.RemoteID)
-		if err != nil {
-			return connectorError(err)
-		}
-		if fresh.RemoteID != source.RemoteID {
-			return errorEnvelope("CONFLICT", "External preview identity changed")
-		}
-		fresh, err = k.StoreConnectorPreview(ctx, e, account, selection.ID, fresh)
-		if err != nil {
-			return connectorError(err)
-		}
-		if method == "connectors.native.preview" {
-			return connectorSuccess(fresh)
-		}
-		if r.ExpectedRevision == "" || fresh.RemoteRevision != r.ExpectedRevision || (fresh.State != "present" && !(method == "connectors.native.acquire" && fresh.State == "partial")) {
-			return errorEnvelope("CONFLICT", "External content changed or is incomplete; inspect its latest preview")
-		}
-		if method == "connectors.native.import" {
-			plan, err := k.PreviewConnectorImport(ctx, e, fresh.ID, fresh.RemoteRevision)
-			return connectorSuccessOrError(plan, err)
-		}
-		acquirer, ok := adapter.(connectors.Acquirer)
-		if !ok {
-			return connectorError(connectors.Unsupported("file acquisition"))
-		}
-		// Gmail attachment provenance must retain its external-AI restriction
-		// across attachment moves before this native ingress is exposed.
-		if account.Kind == connectors.Gmail {
-			return errorEnvelope("SCOPE_DENIED", "Gmail attachment acquisition is awaiting provenance integration")
-		}
-		file, err := acquirer.Acquire(ctx, session, selection, r.RemoteID, r.Format)
-		if err != nil {
-			return connectorError(err)
-		}
-		if account.Kind == connectors.GoogleDrive && file.RemoteRevision != fresh.RemoteRevision {
-			return errorEnvelope("CONFLICT", "File changed during acquisition; inspect its latest preview")
-		}
-		result, err := k.PrepareConnectorAcquired(ctx, e, account, selection.ID, file)
-		return connectorSuccessOrError(result, err)
+		return host.run(ctx, r.RequestID, account.ID, func(ctx context.Context) string {
+			selection, err := connectors.Selected(account, source.SelectionID)
+			if err != nil {
+				return connectorError(err)
+			}
+			identity, err := adapter.Identity(ctx, session)
+			if err != nil {
+				return connectorError(err)
+			}
+			if err = connectors.RequireIdentity(account.Identity, identity); err != nil {
+				return connectorError(err)
+			}
+			previewer, ok := adapter.(connectors.Previewer)
+			if !ok {
+				return connectorError(connectors.Unsupported("authenticated preview"))
+			}
+			fresh, err := previewer.Preview(ctx, session, selection, source.RemoteID)
+			if err != nil {
+				return connectorError(err)
+			}
+			if fresh.RemoteID != source.RemoteID {
+				return errorEnvelope("CONFLICT", "External preview identity changed")
+			}
+			fresh, err = k.StoreConnectorPreview(ctx, e, account, selection.ID, fresh)
+			if err != nil {
+				return connectorError(err)
+			}
+			if method == "connectors.native.preview" {
+				return connectorSuccess(fresh)
+			}
+			if r.ExpectedRevision == "" || fresh.RemoteRevision != r.ExpectedRevision || (fresh.State != "present" && !(method == "connectors.native.acquire" && fresh.State == "partial")) {
+				return errorEnvelope("CONFLICT", "External content changed or is incomplete; inspect its latest preview")
+			}
+			if method == "connectors.native.import" {
+				plan, err := k.PreviewConnectorImport(ctx, e, fresh.ID, fresh.RemoteRevision)
+				return connectorSuccessOrError(plan, err)
+			}
+			acquirer, ok := adapter.(connectors.Acquirer)
+			if !ok {
+				return connectorError(connectors.Unsupported("file acquisition"))
+			}
+			if !connectorAcquisitionAllowed(account.Kind, fresh, r.RemoteID) {
+				return errorEnvelope("SCOPE_DENIED", "Choose a file from the authenticated source preview")
+			}
+			file, err := acquirer.Acquire(ctx, session, selection, r.RemoteID, r.Format)
+			if err != nil {
+				return connectorError(err)
+			}
+			if file.RemoteRevision == "" || file.RemoteRevision != fresh.RemoteRevision {
+				return errorEnvelope("CONFLICT", "File changed during acquisition; inspect its latest preview")
+			}
+			result, err := k.PrepareConnectorAcquired(ctx, e, account, selection.ID, file)
+			return connectorSuccessOrError(result, err)
+		})
 	case "connectors.native.refresh":
 		j, err := k.PrepareConnectorRefresh(ctx, e, account.ID, r.ResumeID)
 		if err != nil {
@@ -368,8 +372,34 @@ func (a *App) connectorDispatch(method string, raw json.RawMessage) string {
 	case "connectors.native.reconcile":
 		receipt, err := k.ReconcileConnectorProposal(ctx, e, r.ProposalID, adapter, session)
 		return connectorSuccessOrError(receipt, err)
+	case "connectors.native.resolve":
+		return host.run(ctx, r.RequestID, account.ID, func(ctx context.Context) string {
+			proposal, err := k.ResolveConnectorProposal(ctx, e, r.ProposalID, r.Hash, r.ExpectedRevision, r.Observation, r.Evidence, adapter, session)
+			return connectorSuccessOrError(proposal, err)
+		})
 	}
 	return errorEnvelope("INVALID_REQUEST", "Unknown connector operation")
+}
+
+func connectorAcquisitionAllowed(kind connectors.Kind, source connectors.Snapshot, remote string) bool {
+	if remote == "" {
+		return false
+	}
+	if kind != connectors.Gmail {
+		return remote == source.RemoteID
+	}
+	var content struct {
+		AttachmentKeys []string `json:"attachmentKeys"`
+	}
+	if json.Unmarshal(source.Content, &content) != nil {
+		return false
+	}
+	for _, key := range content.AttachmentKeys {
+		if key == remote {
+			return true
+		}
+	}
+	return false
 }
 func connectorSuccessOrError(result any, err error) string {
 	if err != nil {
@@ -392,4 +422,20 @@ func cleanupConnectorCredentials(ctx context.Context, k *workspace.Kernel, e con
 		}
 	}
 	return nil
+}
+
+// Synchronous previews/acquisition still have a cancellable, bounded flight.
+// Cancellation can race completion and never claims to undo an already returned result.
+func (h *connectorHost) run(ctx context.Context, id, account string, fn func(context.Context) string) string {
+	h.mu.Lock()
+	if h.closing || h.flights[id] != nil || len(h.flights) >= 4 {
+		h.mu.Unlock()
+		return errorEnvelope("RESOURCE_EXHAUSTED", "Wait for an active connection operation or cancel it")
+	}
+	flow, cancel := context.WithTimeout(ctx, 10*time.Minute)
+	f := &connectorFlight{accountID: account, cancel: cancel, done: make(chan struct{})}
+	h.flights[id] = f
+	h.mu.Unlock()
+	defer func() { cancel(); h.mu.Lock(); delete(h.flights, id); h.mu.Unlock(); close(f.done) }()
+	return fn(flow)
 }

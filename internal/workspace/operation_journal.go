@@ -11,6 +11,8 @@ import (
 )
 
 type journalEntry struct {
+	OwnerPageID      string         `json:"ownerPageId,omitempty"`
+	Tombstone        string         `json:"tombstone,omitempty"`
 	ChangedFields    []string       `json:"changedFields,omitempty"`
 	PageID           string         `json:"pageId"`
 	Target           string         `json:"target"`
@@ -44,6 +46,10 @@ func journalCurrent(ctx context.Context, q querier, action map[string]any) (jour
 	entry := journalEntry{}
 	kind := str(action["kind"])
 	switch kind {
+	case "record.trash.set":
+		return recordTrashCurrent(ctx, q, action)
+	case "collection.property.restore":
+		return schemaJournalCurrent(ctx, q, action)
 	case "record.setValue", "record.clearValue":
 		record, property := str(action["recordId"]), str(action["propertyId"])
 		definition, err := propertyDefinition(ctx, q, property)
@@ -147,6 +153,17 @@ func applyJournal(m *Mutation, id, label string, actions []map[string]any) error
 	}
 	entries := []journalEntry{}
 	seen := map[string]bool{}
+	schemas := map[string]bool{}
+	for _, action := range actions {
+		if str(action["kind"]) == "collection.property.restore" {
+			schemas[str(action["propertyId"])] = true
+		}
+	}
+	for _, action := range actions {
+		if (str(action["kind"]) == "record.setValue" || str(action["kind"]) == "record.clearValue") && schemas[str(action["propertyId"])] {
+			return Fail("CONFLICT", "A schema operation cannot also change that property's values without a populated-value migration")
+		}
+	}
 	for _, action := range actions {
 		if err := contracts.Validate("service", "JournalAction", marshal(action)); err != nil {
 			return Fail("INVALID_REQUEST", "Invalid grouped action")
@@ -170,6 +187,14 @@ func applyJournal(m *Mutation, id, label string, actions []map[string]any) error
 			return err
 		}
 		entry.After = after.Before
+		entry.Tombstone = after.Tombstone
+		if str(action["kind"]) == "collection.property.restore" {
+			change := m.touched[guardKey("property", str(action["propertyId"]))]
+			entry.PropertyRevision = string(change.After)
+			if change.Deleted {
+				entry.PropertyRevision = "0"
+			}
+		}
 		if str(action["kind"]) == "page.display.set" {
 			for _, key := range []string{"fullWidth", "presentation"} {
 				if entry.Before[key] != entry.After[key] {
@@ -222,7 +247,7 @@ func checkJournalCurrent(ctx context.Context, q querier, entry journalEntry) err
 			}
 		}
 	}
-	if !matches || current.PropertyRevision != entry.PropertyRevision {
+	if !matches || current.PropertyRevision != entry.PropertyRevision || current.Tombstone != entry.Tombstone {
 		return Fail("CONFLICT", "An affected field or its property changed after this operation")
 	}
 	return nil
@@ -268,16 +293,22 @@ func previewUndoJournal(ctx context.Context, k *Kernel, e contracts.ServiceExecu
 	targets := map[string]contracts.ServiceExpectedRevision{}
 	add := func(kind, id string) error {
 		var revision string
-		if err := tx.QueryRowContext(ctx, "SELECT revision FROM "+entityTables[kind]+" WHERE id=?", id).Scan(&revision); err != nil {
+		err := tx.QueryRowContext(ctx, "SELECT revision FROM "+entityTables[kind]+" WHERE id=?", id).Scan(&revision)
+		if errors.Is(err, sql.ErrNoRows) && kind == "property" {
+			revision = "0"
+		} else if err != nil {
 			return err
 		}
-		if err := k.authorizeEntity(ctx, tx, e, kind, id); err != nil {
-			return err
+		if revision != "0" {
+			if err := k.authorizeEntity(ctx, tx, e, kind, id); err != nil {
+				return err
+			}
 		}
 		targets[kind+":"+id] = required(kind, id, revision)
 		return nil
 	}
 	actions := []map[string]any{}
+	restoredRecords := map[string]bool{}
 	for i := len(entries) - 1; i >= 0; i-- {
 		entry := entries[i]
 		if err = checkJournalCurrent(ctx, tx, entry); err != nil {
@@ -312,6 +343,44 @@ func previewUndoJournal(ctx context.Context, k *Kernel, e contracts.ServiceExecu
 		if err != nil {
 			return nil, err
 		}
+		if str(inverse["kind"]) == "record.trash.set" {
+			if err := validateRecordTrash(ctx, tx, inverse); err != nil {
+				return nil, err
+			}
+			if inverse["trashed"] == false {
+				restoredRecords[str(inverse["recordId"])] = true
+				var parent sql.NullString
+				if err := tx.QueryRowContext(ctx, "SELECT parent_page_id FROM pages WHERE id=?", entry.PageID).Scan(&parent); err != nil {
+					return nil, err
+				}
+				if parent.Valid {
+					if err := add("page", parent.String); err != nil {
+						return nil, err
+					}
+				}
+			}
+		}
+		if str(inverse["kind"]) == "collection.property.restore" {
+			if err := validateReviewedPropertyRestore(ctx, tx, inverse); err != nil {
+				return nil, err
+			}
+			for _, record := range schemaValueRecords(entry.After, inverse) {
+				var page, collection string
+				var deleted sql.NullString
+				if err := tx.QueryRowContext(ctx, "SELECT r.page_id,r.collection_id,p.deleted_at FROM records r JOIN pages p ON p.id=r.page_id WHERE r.id=?", record).Scan(&page, &collection, &deleted); err != nil {
+					return nil, err
+				}
+				if deleted.Valid && !restoredRecords[record] || collection != str(inverse["collectionId"]) {
+					return nil, Fail("CONFLICT", "An affected record is trashed or moved outside the reviewed collection")
+				}
+				if err := add("record", record); err != nil {
+					return nil, err
+				}
+				if err := add("page", page); err != nil {
+					return nil, err
+				}
+			}
+		}
 		actions = append(actions, inverse)
 	}
 	keys := []string{}
@@ -330,7 +399,7 @@ func listJournal(ctx context.Context, k *Kernel, e contracts.ServiceExecutionCon
 	if err := k.authorizePage(ctx, k.db, e, page); err != nil {
 		return nil, err
 	}
-	rows, err := k.db.QueryContext(ctx, `SELECT id,label,created_at,state,entries_json FROM operation_journal WHERE EXISTS(SELECT 1 FROM json_each(entries_json) WHERE json_extract(value,'$.pageId')=?) ORDER BY created_at DESC,id DESC LIMIT 50`, page)
+	rows, err := k.db.QueryContext(ctx, `SELECT id,label,created_at,state,entries_json FROM operation_journal WHERE EXISTS(SELECT 1 FROM json_each(entries_json) WHERE json_extract(value,'$.pageId')=? OR json_extract(value,'$.ownerPageId')=?) ORDER BY created_at DESC,id DESC LIMIT 50`, page, page)
 	if err != nil {
 		return nil, err
 	}
@@ -361,7 +430,17 @@ func listJournal(ctx context.Context, k *Kernel, e contracts.ServiceExecutionCon
 
 func journalInverse(ctx context.Context, q querier, entry journalEntry) (map[string]any, error) {
 	if len(entry.ChangedFields) == 0 {
-		return entry.Before, nil
+		inverse := map[string]any{}
+		for key, value := range entry.Before {
+			inverse[key] = value
+		}
+		if str(inverse["kind"]) == "collection.property.restore" {
+			if _, present := inverse["values"]; !present && len(asList(entry.After["values"])) > 0 {
+				inverse["values"] = []any{}
+				inverse["valueInventoryVersion"] = 1
+			}
+		}
+		return inverse, nil
 	}
 	current, err := journalCurrent(ctx, q, entry.After)
 	if err != nil {

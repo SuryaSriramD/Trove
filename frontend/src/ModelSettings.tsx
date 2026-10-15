@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { dispatch } from "./api";
 type Pack = {
   id: string;
@@ -12,7 +12,15 @@ type Pack = {
   estimatedMemoryBytes: number;
   qualificationOnly?: boolean;
 };
+type Operation = {
+  packId: string;
+  revision?: number;
+  bytes?: number;
+  state: string;
+  error?: string;
+};
 type State = {
+  operations?: Operation[];
   packs: { pack: Pack; state: string; downloadedBytes: number }[];
   catalog: Pack[];
   runtime: { available: boolean; visionAvailable?: boolean; error: string };
@@ -26,41 +34,68 @@ export default function ModelSettings({
 }) {
   const [value, setValue] = useState<State | null>(null);
   const [loading, setLoading] = useState(true);
-  const [progress, setProgress] = useState<
-    Record<string, { bytes?: number; state: string; error?: string }>
-  >({});
+  const [progress, setProgress] = useState<Record<string, Operation>>({});
+  const [pending, setPending] = useState<Record<string, boolean>>({});
+  const mounted = useRef(true);
+  const refreshID = useRef(0);
+  function acceptProgress(p: Operation) {
+    if (!mounted.current || !p?.packId) return;
+    setProgress((s) =>
+      (s[p.packId]?.revision ?? -1) > (p.revision ?? 0)
+        ? s
+        : { ...s, [p.packId]: p },
+    );
+  }
   async function refresh() {
+    const request = ++refreshID.current;
     setLoading(true);
     try {
-      setValue(await dispatch<State>("models.list"));
+      const next = await dispatch<State>("models.list");
+      if (!mounted.current) return;
+      next.operations?.forEach(acceptProgress);
+      if (request === refreshID.current) setValue(next);
     } catch (e) {
-      onError(e);
+      if (mounted.current && request === refreshID.current) onError(e);
     } finally {
-      setLoading(false);
+      if (mounted.current && request === refreshID.current) setLoading(false);
     }
   }
   useEffect(() => {
+    mounted.current = true;
+    const unsubscribe = window.runtime?.EventsOn(
+      "models:progress",
+      (...args: unknown[]) => {
+        const p = args[0] as Operation;
+        if (p?.packId) {
+          acceptProgress(p);
+          if (["ready", "failed", "interrupted"].includes(p.state))
+            void refresh();
+        }
+      },
+    );
     void refresh();
-    return window.runtime?.EventsOn("models:progress", (...args: unknown[]) => {
-      const p = args[0] as any;
-      if (p?.packId) {
-        setProgress((s) => ({ ...s, [p.packId]: p }));
-        if (["ready", "failed", "interrupted"].includes(p.state))
-          void refresh();
-      }
-    });
+    return () => {
+      mounted.current = false;
+      refreshID.current++;
+      unsubscribe?.();
+    };
   }, []);
   async function action(method: string, packId: string) {
+    setPending((s) => ({ ...s, [packId]: true }));
     try {
       if (method === "import") {
-        await window.go?.main.App.PickModelPack?.(packId);
+        const pick = window.go?.main.App.PickModelPack;
+        if (!pick) throw new Error("Native model import is unavailable.");
+        await pick(packId);
       } else {
         const result = await dispatch<any>(`models.${method}`, { packId });
-        setProgress((s) => ({ ...s, [packId]: result }));
+        acceptProgress(result);
       }
-      await refresh();
+      if (mounted.current) await refresh();
     } catch (e) {
-      onError(e);
+      if (mounted.current) onError(e);
+    } finally {
+      if (mounted.current) setPending((s) => ({ ...s, [packId]: false }));
     }
   }
   return (
@@ -87,7 +122,12 @@ export default function ModelSettings({
           const installed = value.packs.find((x) => x.pack.id === pack.id);
           const p = progress[pack.id];
           const state = p?.state ?? installed?.state ?? "not installed";
-          const running = ["acquiring", "importing"].includes(state);
+          const cancelling = state === "cancellation_requested";
+          const running = [
+            "acquiring",
+            "importing",
+            "cancellation_requested",
+          ].includes(state);
           return (
             <div className="model-pack" key={pack.id}>
               <div>
@@ -131,19 +171,31 @@ export default function ModelSettings({
               </div>
               <div className="model-actions">
                 {running ? (
-                  <button onClick={() => void action("cancel", pack.id)}>
-                    Cancel
+                  <button
+                    disabled={cancelling}
+                    onClick={() => void action("cancel", pack.id)}
+                  >
+                    {cancelling ? "Cancelling…" : "Cancel"}
                   </button>
                 ) : state === "ready" ? (
-                  <button onClick={() => void action("remove", pack.id)}>
+                  <button
+                    disabled={pending[pack.id]}
+                    onClick={() => void action("remove", pack.id)}
+                  >
                     Remove pack
                   </button>
                 ) : (
                   <>
-                    <button onClick={() => void action("acquire", pack.id)}>
+                    <button
+                      disabled={pending[pack.id]}
+                      onClick={() => void action("acquire", pack.id)}
+                    >
                       {state === "interrupted" ? "Resume download" : "Download"}
                     </button>
-                    <button onClick={() => void action("import", pack.id)}>
+                    <button
+                      disabled={pending[pack.id]}
+                      onClick={() => void action("import", pack.id)}
+                    >
                       {pack.projector
                         ? "Import model and projector"
                         : "Import file"}

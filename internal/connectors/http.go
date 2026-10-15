@@ -11,6 +11,7 @@ import (
 	"strconv"
 	"strings"
 	"time"
+	"unicode/utf8"
 )
 
 const MaxResponseBytes = 8 << 20
@@ -212,6 +213,9 @@ func queryURL(base string, values url.Values) string {
 func pathPart(s string) string { return url.PathEscape(s) }
 func bounded(s string, n int) string {
 	if len(s) > n {
+		for n > 0 && !utf8.RuneStart(s[n]) {
+			n--
+		}
 		return s[:n]
 	}
 	return s
