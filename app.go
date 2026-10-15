@@ -22,25 +22,26 @@ import (
 // App is the trusted desktop adapter. It never accepts execution actors or raw
 // workspace paths from a renderer command. Native dialogs mint input handles.
 type App struct {
-	mu              sync.RWMutex
-	lifecycle       sync.RWMutex
-	ctx             context.Context
-	kernel          *workspace.Kernel
-	execution       contracts.ServiceExecutionContext
-	startupError    string
-	pendingDeepLink string
-	stopEvents      func()
-	native          *nativeState
-	jobCancel       context.CancelFunc
-	jobDone         <-chan struct{}
-	uploadGate      chan struct{}
-	startupDone     chan struct{}
-	startupOnce     sync.Once
-	shutdownDone    chan struct{}
-	shutdownOnce    sync.Once
-	rollback        *rollbackChildState
-	performance     *qualificationPerformance
-	reminders       *reminderDesktop
+	mu                sync.RWMutex
+	lifecycle         sync.RWMutex
+	ctx               context.Context
+	kernel            *workspace.Kernel
+	execution         contracts.ServiceExecutionContext
+	startupError      string
+	pendingDeepLink   string
+	stopEvents        func()
+	native            *nativeState
+	jobCancel         context.CancelFunc
+	jobDone           <-chan struct{}
+	uploadGate        chan struct{}
+	startupDone       chan struct{}
+	startupOnce       sync.Once
+	shutdownDone      chan struct{}
+	shutdownOnce      sync.Once
+	rollback          *rollbackChildState
+	performance       *qualificationPerformance
+	reminders         *reminderDesktop
+	reminderBootstrap sync.Once
 }
 
 func NewApp() *App {

@@ -33,6 +33,7 @@ type reminderDesktop struct {
 	stop        chan struct{}
 	done        chan struct{}
 	loopStarted bool
+	handoff     bool
 }
 type ReminderDesktopStatus struct {
 	Available    bool   `json:"available"`
@@ -60,6 +61,11 @@ func reminderBundleAvailable() bool {
 func (a *App) reminderDesktopState() (*reminderDesktop, error) {
 	a.mu.Lock()
 	defer a.mu.Unlock()
+	select {
+	case <-a.shutdownDone:
+		return nil, fmt.Errorf("application is shutting down")
+	default:
+	}
 	if a.reminders != nil {
 		return a.reminders, nil
 	}
@@ -91,41 +97,77 @@ func (a *App) startReminderLoop() {
 	if !reminderBundleAvailable() {
 		return
 	}
-	s, err := a.reminderDesktopState()
-	if err != nil {
-		return
-	}
-	s.mu.Lock()
-	if s.loopStarted {
-		s.mu.Unlock()
-		return
-	}
-	s.loopStarted = true
-	s.status.Available = true
-	if _, err = a.syncReminderPublication(s, ""); err != nil {
-		s.status.Error = err.Error()
-	}
-	s.mu.Unlock()
-	go func() {
-		defer close(s.done)
-		timer := time.NewTicker(3 * time.Second)
-		defer timer.Stop()
-		for {
-			select {
-			case <-s.stop:
-				return
-			case <-a.shutdownDone:
-				return
-			case <-timer.C:
-				s.mu.Lock()
-				_, err := a.syncReminderPublication(s, "")
-				if err != nil {
-					s.status.Error = err.Error()
+	a.startReminderPublisher(a.reminderDesktopState, 3*time.Second)
+}
+func (a *App) startReminderPublisher(open func() (*reminderDesktop, error), interval time.Duration) {
+	a.reminderBootstrap.Do(func() {
+		go func() {
+			retry := time.NewTicker(interval)
+			defer retry.Stop()
+			for {
+				select {
+				case <-a.shutdownDone:
+					return
+				default:
 				}
-				s.mu.Unlock()
+				a.lifecycle.Lock()
+				s, err := open()
+				if err == nil {
+					s.mu.Lock()
+					select {
+					case <-a.shutdownDone:
+						s.mu.Unlock()
+						a.lifecycle.Unlock()
+						return
+					default:
+					}
+					if s.loopStarted {
+						s.mu.Unlock()
+						a.lifecycle.Unlock()
+						return
+					}
+					s.loopStarted = true
+					s.status.Available = true
+					if _, err = a.syncReminderPublication(s, ""); err != nil {
+						s.status.Error = err.Error()
+					}
+					s.mu.Unlock()
+					a.lifecycle.Unlock()
+					a.runReminderLoop(s, interval)
+					return
+				}
+				a.lifecycle.Unlock()
+				// A predecessor may still own publication until its authenticated
+				// handoff commits. Retry without opening the workspace database.
+				select {
+				case <-a.shutdownDone:
+					return
+				case <-retry.C:
+				}
 			}
+		}()
+	})
+}
+func (a *App) runReminderLoop(s *reminderDesktop, interval time.Duration) {
+	defer close(s.done)
+	timer := time.NewTicker(interval)
+	defer timer.Stop()
+	for {
+		select {
+		case <-s.stop:
+			return
+		case <-a.shutdownDone:
+			return
+		case <-timer.C:
+			a.lifecycle.RLock()
+			s.mu.Lock()
+			if _, err := a.syncReminderPublication(s, ""); err != nil {
+				s.status.Error = err.Error()
+			}
+			s.mu.Unlock()
+			a.lifecycle.RUnlock()
 		}
-	}()
+	}
 }
 func (a *App) stopReminderLoop() {
 	a.mu.RLock()
@@ -152,6 +194,9 @@ func (a *App) stopReminderLoop() {
 	_ = s.store.Close()
 }
 func (a *App) syncReminderPublication(s *reminderDesktop, authorization string) (ReminderDesktopStatus, error) {
+	if s.handoff {
+		return s.status, fmt.Errorf("Reminder publication is suspended during workspace handoff")
+	}
 	a.mu.RLock()
 	defer a.mu.RUnlock()
 	k, e := a.kernel, a.execution
@@ -235,6 +280,8 @@ func (a *App) ReminderStatus() (ReminderDesktopStatus, error) {
 	if err := a.requireRollbackCommitted(); err != nil {
 		return ReminderDesktopStatus{}, err
 	}
+	a.lifecycle.RLock()
+	defer a.lifecycle.RUnlock()
 	s, err := a.reminderDesktopState()
 	if err != nil {
 		return ReminderDesktopStatus{Available: reminderBundleAvailable(), Registration: "unavailable", Publication: "inactive", Permission: "unknown", Error: err.Error()}, nil
@@ -247,6 +294,8 @@ func (a *App) RefreshReminders() (ReminderDesktopStatus, error) {
 	if err := a.requireRollbackCommitted(); err != nil {
 		return ReminderDesktopStatus{}, err
 	}
+	a.lifecycle.RLock()
+	defer a.lifecycle.RUnlock()
 	s, err := a.reminderDesktopState()
 	if err != nil {
 		return ReminderDesktopStatus{}, err
@@ -308,6 +357,8 @@ func (a *App) SetReminderBackgroundEnabled(enabled bool) (ReminderDesktopStatus,
 	if err := a.requireRollbackCommitted(); err != nil {
 		return ReminderDesktopStatus{}, err
 	}
+	a.lifecycle.RLock()
+	defer a.lifecycle.RUnlock()
 	s, err := a.reminderDesktopState()
 	if err != nil {
 		if !enabled && reminderBundleAvailable() {
@@ -414,4 +465,16 @@ func (a *App) suspendReminderWorkspace() error {
 	}
 	s.data.CurrentBinding = ""
 	return s.store.Write("desktop.json", s.data)
+}
+
+func (a *App) reminderHandoff(active bool) {
+	a.mu.RLock()
+	s := a.reminders
+	a.mu.RUnlock()
+	if s == nil {
+		return
+	}
+	s.mu.Lock()
+	s.handoff = active
+	s.mu.Unlock()
 }

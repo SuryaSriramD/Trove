@@ -3,10 +3,14 @@ package main
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"path/filepath"
+	"strconv"
+	"sync/atomic"
 	"testing"
 	"time"
 	"trove.local/phase0/internal/reminders"
+	"trove.local/phase0/internal/updates"
 	"trove.local/phase0/internal/workspace"
 )
 
@@ -190,5 +194,135 @@ func TestReminderReceiptCacheReconcilesLaterRecoveryBatches(t *testing.T) {
 		if item.Outcome != "unknown" {
 			t.Fatal("cached receipt lost delivery evidence for a later recovered occurrence", item)
 		}
+	}
+}
+
+func TestReminderPublisherRetriesPredecessorOwnershipAndStops(t *testing.T) {
+	a := supportTestApp(t)
+	root := filepath.Join(t.TempDir(), "handoff")
+	parent, err := reminders.OpenStore(root)
+	if err != nil {
+		t.Fatal(err)
+	}
+	attempted, ready := make(chan struct{}, 1), make(chan struct{}, 1)
+	a.startReminderPublisher(func() (*reminderDesktop, error) {
+		a.mu.Lock()
+		defer a.mu.Unlock()
+		select {
+		case <-a.shutdownDone:
+			return nil, errors.New("closed")
+		default:
+		}
+		select {
+		case attempted <- struct{}{}:
+		default:
+		}
+		store, err := reminders.OpenStore(root)
+		if err != nil {
+			return nil, err
+		}
+		s := &reminderDesktop{store: store, data: reminderDesktopFile{Version: 1, Bindings: map[string]reminderActivation{}}, stop: make(chan struct{}), done: make(chan struct{}), native: func(int) (string, error) {
+			select {
+			case ready <- struct{}{}:
+			default:
+			}
+			return "notRegistered", nil
+		}}
+		a.reminders = s
+		return s, nil
+	}, 10*time.Millisecond)
+	select {
+	case <-attempted:
+	case <-time.After(time.Second):
+		t.Fatal("publisher did not try ownership")
+	}
+	if err = parent.Close(); err != nil {
+		t.Fatal(err)
+	}
+	select {
+	case <-ready:
+	case <-time.After(2 * time.Second):
+		t.Fatal("publisher never retried predecessor lock")
+	}
+	a.shutdownOnce.Do(func() { close(a.shutdownDone) })
+	a.stopReminderLoop()
+	next, err := reminders.OpenStore(root)
+	if err != nil {
+		t.Fatal("shutdown retained publisher lock", err)
+	}
+	next.Close()
+}
+func TestReminderShutdownCancelsPublisherBootstrap(t *testing.T) {
+	a := supportTestApp(t)
+	attempted := make(chan struct{}, 1)
+	var count atomic.Int32
+	a.startReminderPublisher(func() (*reminderDesktop, error) {
+		count.Add(1)
+		select {
+		case attempted <- struct{}{}:
+		default:
+		}
+		return nil, errors.New("predecessor owns publisher")
+	}, 10*time.Millisecond)
+	select {
+	case <-attempted:
+	case <-time.After(time.Second):
+		t.Fatal("no bootstrap attempt")
+	}
+	a.shutdownOnce.Do(func() { close(a.shutdownDone) })
+	a.stopReminderLoop()
+	time.Sleep(20 * time.Millisecond)
+	before := count.Load()
+	time.Sleep(30 * time.Millisecond)
+	if count.Load() != before {
+		t.Fatal("publisher kept retrying after shutdown")
+	}
+}
+func TestReminderRollbackHandoffKeepsPublicationQuiescent(t *testing.T) {
+	for _, failure := range []bool{false, true} {
+		t.Run(strconv.FormatBool(failure), func(t *testing.T) {
+			f := newRollbackFixture(t)
+			k, err := workspace.Create(t.TempDir())
+			if err != nil {
+				t.Fatal(err)
+			}
+			defer k.Close()
+			f.a.kernel = k
+			f.a.execution = k.OwnerContext()
+			store, err := reminders.OpenStore(filepath.Join(t.TempDir(), "derived"))
+			if err != nil {
+				t.Fatal(err)
+			}
+			defer store.Close()
+			s := &reminderDesktop{store: store, data: reminderDesktopFile{Version: 1, Bindings: map[string]reminderActivation{}}, native: func(int) (string, error) { return "notRegistered", nil }}
+			f.a.reminders = s
+			if _, err = f.a.syncReminderPublication(s, ""); err != nil {
+				t.Fatal(err)
+			}
+			deps := f.dependencies(t)
+			deps.quit = func() {}
+			deps.start = func(context.Context, string, []string, updates.RollbackTarget) error {
+				if !s.handoff || s.data.Published.Active {
+					t.Fatal("rollback launched before reminder suspension")
+				}
+				if _, err := f.a.syncReminderPublication(s, ""); err == nil {
+					t.Fatal("handoff allowed re-publication")
+				}
+				if failure {
+					return errors.New("verified child cleanup fixture")
+				}
+				return nil
+			}
+			err = f.a.launchApplicationRollback(context.Background(), f.id, deps)
+			if failure {
+				if err == nil || s.handoff {
+					t.Fatal("failed verified handoff did not resume source", err)
+				}
+			} else {
+				if err != nil || !s.handoff {
+					t.Fatal("successful handoff reactivated source", err)
+				}
+			}
+		})
 	}
 }
