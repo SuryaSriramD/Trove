@@ -1,0 +1,3079 @@
+{
+  "schemaVersion": 1,
+  "sourceCommit": "eb2ded0f70523a55e8ac7bd851c73746aae1a050",
+  "workingTreeStatus": " M native/vision-worker.cpp\n?? native/vision-prompt.hpp\n?? scripts/test-vision-prompt.py\n",
+  "family": "images",
+  "inputs": {
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/contracts/contracts_test.go": {
+      "sha256": "1ced92bc7aa677c7c5057cd4599c26a9b641f3e189110a3c8c34faacde62babe",
+      "bytes": 3799
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/contracts/domain.schema.json": {
+      "sha256": "9682da169dca175a16ea1b196cb0e4312b9f3f772321ef0c5502705aed3b30cf",
+      "bytes": 102613
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/contracts/examples/domain-import-resolution.json": {
+      "sha256": "24e570629c388271955a0df7957a14326fd09e8140b51c10092b4c1766534268",
+      "bytes": 411
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/contracts/examples/domain-memory-context.json": {
+      "sha256": "304d952fd5a0198584996c113d4e3605b50859fc23aa98c87fc811e191167813",
+      "bytes": 882
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/contracts/examples/domain-registry-values.json": {
+      "sha256": "4374c5ac9ca890f2274f0e4edc6c84a769200566579b797bcc3472555330d821",
+      "bytes": 13590
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/contracts/examples/domain-reimport-plan.json": {
+      "sha256": "12275a7607ae7b03875010c6c29d0ab410259dc3537d64237d3144cdd7402e22",
+      "bytes": 647
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/contracts/examples/domain-reimport.json": {
+      "sha256": "123ed6c03161f75b960388f59bd7ed245c144476f305dc9af5662b957893bb8b",
+      "bytes": 2037
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/contracts/examples/domain-workspace.json": {
+      "sha256": "fd304c695adce18a1165c2b8dadca74988b3a324da05cee3604c4a19c092631f",
+      "bytes": 15641
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/contracts/examples/job-progress.json": {
+      "sha256": "4d972599862dcf5ccb2f749e30e9a9c121e336520d1531b18b8fe0856d6052da",
+      "bytes": 238
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/contracts/examples/job-transcribe.json": {
+      "sha256": "e4bdb4ef3f9708cb6f74ac6b84a2a1c5c357963f1d32bb58e642e8365eaff01f",
+      "bytes": 580
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/contracts/examples/protocol-manifest.json": {
+      "sha256": "0924a6271eb866d7307ec35956fb3f8ae0ce7634833b140038723eb3588da426",
+      "bytes": 2588
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/contracts/examples/service-batch-result.json": {
+      "sha256": "a46422b3945744e2e09171434cfa29f200baebc4f4527114ae00bc472c3e483d",
+      "bytes": 436
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/contracts/examples/service-batch.json": {
+      "sha256": "9113e047d27e115778179665ba9a9eccfa7d567469f5867c82ff9a77a9b7ab34",
+      "bytes": 672
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/contracts/examples/service-conflict.json": {
+      "sha256": "32f7d3724c52e4e808a85ff96d250eb0edc2e9be84a6adc331b05ec6363cb5cd",
+      "bytes": 424
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/contracts/examples/service-event.json": {
+      "sha256": "a0f076f05f83bb70310dae434b5047b1144bd8fdc61bf8bcb4cfcb88432759fa",
+      "bytes": 912
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/contracts/examples/service-import-apply.json": {
+      "sha256": "d04eadd5cd5d60ec2f00797729892e501204127700290a9a15847e8595afe737",
+      "bytes": 670
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/contracts/examples/service-import-preview.json": {
+      "sha256": "49ad2226b3d35d6ea62b0696cdf3f3acfdb2621bf9fa820d212250918eeb0b7d",
+      "bytes": 1924
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/contracts/examples/service-import-report.json": {
+      "sha256": "ba110be26bfa04dd20f2de43076bd35bb7389f2c39b49137c5be85b7c5846c65",
+      "bytes": 835
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/contracts/examples/service-memory-proposal.json": {
+      "sha256": "b6de5ec4cc877c0c7779f27ed576c02b39d6811b56050a9aee507f21857d48ae",
+      "bytes": 754
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/contracts/examples/service-p2-database.json": {
+      "sha256": "cb0152a28d53def0b62bb08761d72ec5a90e8619e1517d117500310b63a386c1",
+      "bytes": 351
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/contracts/examples/service-p2-display.json": {
+      "sha256": "368b07f761e75a66c275891adec6157c622b99dd06340dbd8092a656da3e8b91",
+      "bytes": 131
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/contracts/examples/service-p2-form.json": {
+      "sha256": "0211853a25800d061c00062bf8b6e2530707239ada04a84e5cced925f9009e51",
+      "bytes": 247
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/contracts/examples/service-p2-graph.json": {
+      "sha256": "5667f2c7b2b5719203510c0201849041a4feee7693ec08f2853d1405c7b6236f",
+      "bytes": 233
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/contracts/examples/service-p2-ocr.json": {
+      "sha256": "73dcbd136d05c5cb06a2202b9aec0beab0d4990b8fff5875aa478a4694d95a53",
+      "bytes": 191
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/contracts/examples/service-p2-review-activate.json": {
+      "sha256": "14993e887f14f0bcce44651be2f288847ed6a8d410efec69971f17373e0facd2",
+      "bytes": 160
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/contracts/examples/service-p2-review.json": {
+      "sha256": "a78cc980a68621a9c89a6b9dd242a850df3f9b787d961c2f8e2aefb8855a8ad0",
+      "bytes": 206
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/contracts/examples/service-search.json": {
+      "sha256": "2cfa668163fcf6c476ea2f3007fb1c74293a8188a14e619eede0ba8ed8c2f35a",
+      "bytes": 789
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/contracts/examples/service-stale-citation.json": {
+      "sha256": "8b9a9e1cdfc3ee36242258ac210c027f7c82638c86ec57c207b59394645c346e",
+      "bytes": 520
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/contracts/examples/service-task-toggle.json": {
+      "sha256": "9922dfab0c5154140ab82c6c1bd4327464b236f73d322f03687e5425b117f759",
+      "bytes": 809
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/contracts/examples/worker-cancel.json": {
+      "sha256": "47027af03e9dce88b8a828cbd6978b0f3b9a8f739996a7d50c7f7599b80323e0",
+      "bytes": 162
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/contracts/examples/worker-result.json": {
+      "sha256": "7b54d00795827582f4557645dabdd5b1d2dcaccc3a713acdc4a099d5b23efedf",
+      "bytes": 357
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/contracts/examples/worker-transcribe.json": {
+      "sha256": "d7a1b9ef39acb5e9f7619e185b3a882fb2634c35c92491786d330c5f4a7700c8",
+      "bytes": 706
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/contracts/examples/worker-transcript.json": {
+      "sha256": "e5d7b87a323c1ca03848e46a12f7a8569181d451c612178f3883ad54b3409e0d",
+      "bytes": 318
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/contracts/jobs.schema.json": {
+      "sha256": "2eaaea765ee7e68b72b6905bf0ea48a8e94bfb854e2bc31003c71e6ce33bec1d",
+      "bytes": 25645
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/contracts/p2_test.go": {
+      "sha256": "db3640f61d40009838eeb41a2fb3ab6e3bb9534783fe0db6b697330f592ea519",
+      "bytes": 1480
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/contracts/registries.json": {
+      "sha256": "193b61ff678e38ed00a95cb489bc40cddadcdd213575c0b3d5aee19504b6cd6d",
+      "bytes": 98527
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/contracts/release.json": {
+      "sha256": "b9ea2eb7e84c34822fbb92b2f5f70aca684dd9698df3a9017e449bc2ac82d801",
+      "bytes": 2184
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/contracts/service.go": {
+      "sha256": "2ac6b38599d3919d38618ee35a9a9b2f7a4f2f335def106a52ddd57e9a3ec09f",
+      "bytes": 5155
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/contracts/service.schema.json": {
+      "sha256": "d2e502c59c37ac21a36b9f25b2b25e9a06e8b500d535413a8a517f0266da6779",
+      "bytes": 254543
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/contracts/tsconfig.json": {
+      "sha256": "e52212240fc1476540c750c17631a201c5a261612444d4e479209603e041ff07",
+      "bytes": 165
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/contracts/types_generated.go": {
+      "sha256": "7503bc6ff4d5bd32df75bd15c6061dbdfe2908787a8671671d7d8eacf4c33702",
+      "bytes": 216524
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/go.mod": {
+      "sha256": "3b539bb8877906e7460c7b65868110a9b0123c28c93e254b3fc965d773693538",
+      "bytes": 2095
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/go.sum": {
+      "sha256": "52688f32151217d12cd109545de25a77e5d0c8214661501fe9f800b4edaf1eb2",
+      "bytes": 10181
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/clipper/bridge.go": {
+      "sha256": "00d53985d4ec4ef7e923c56081ed542d6a84438ffd35c3fc2fbc0287358f818e",
+      "bytes": 8951
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/clipper/bridge_test.go": {
+      "sha256": "2b6bca919e61f5e93024224aba6700d70efbc4dd4e6acbbbe68a4820a1bceca0",
+      "bytes": 5288
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/connectors/broker.go": {
+      "sha256": "d65b636d204cdc82869b7fb11d8531b8beedea25808ea05f6824a1739b60b6e7",
+      "bytes": 20803
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/connectors/connectors_test.go": {
+      "sha256": "c5a5ce5ea600a230f2c2137f65345934bea9a8db1de3341335419b99eba4c3c7",
+      "bytes": 6694
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/connectors/github.go": {
+      "sha256": "78ce80b8d4f6fe9761174d2baaa24224d2723d49338ab6ab4612f4fb93f38887",
+      "bytes": 23151
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/connectors/github_test.go": {
+      "sha256": "548baf81d22641c6cbae7453f5c1ed3d1a0e284e9fedd01914dfe35eb9a79289",
+      "bytes": 8894
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/connectors/google.go": {
+      "sha256": "eb35774ab625fdc33062487372507e2f5aa9ba1ef42ef13b042a2b2ffea21182",
+      "bytes": 12713
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/connectors/google_calendar.go": {
+      "sha256": "be19997c872680744b80e9870d1a5059bc31a3121a78c45e2fa154ca94a28cff",
+      "bytes": 14187
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/connectors/google_drive.go": {
+      "sha256": "9244fe0b3bc6006f715185c7e00c3bdbdbc628e39fbc01487e576a710f035d39",
+      "bytes": 14106
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/connectors/google_gmail.go": {
+      "sha256": "6ff735c210597b290b8b3d1eda813f3afec522fd1e32f6dae49447c8c224fd65",
+      "bytes": 24383
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/connectors/google_preview.go": {
+      "sha256": "15c1bcc26bf85202c3ab32822ef3068c3dde66f45a57e47ea258f8e5538935fc",
+      "bytes": 3337
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/connectors/google_snapshot_test.go": {
+      "sha256": "10ee69d35fdbd91838e8db876c4155fb1253879377ae5516d6e57a1b3a436184",
+      "bytes": 1089
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/connectors/google_test.go": {
+      "sha256": "2d7f490b24126364170f2a4ed2e4719c07c49f6a0dac6db036ed9ebcc20715e2",
+      "bytes": 30872
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/connectors/http.go": {
+      "sha256": "f5af70693f28639d4c942ab005ce7547d190453ff18ae4991080299f00689c9a",
+      "bytes": 8257
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/connectors/mcp.go": {
+      "sha256": "c4001c7b9b59510cf067a0a89620154654617f6d67949429e7351dee614767ca",
+      "bytes": 21498
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/connectors/mcp_auth.go": {
+      "sha256": "e692f3386416be96dfb1e7090d93683f02c02eb5422ce4c306c5c05016f31df6",
+      "bytes": 12416
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/connectors/mcp_auth_test.go": {
+      "sha256": "497ae67fb4ec1cbd718adfe5cddc69eaa79fb33fc70a3c769c2f9c218b85e7f6",
+      "bytes": 9959
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/connectors/mcp_test.go": {
+      "sha256": "551fbfb649982d94e9b59736b12364f93ff0d3a87ad1f15836a127fe4651eda3",
+      "bytes": 13885
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/connectors/notion.go": {
+      "sha256": "df2bd16ab71e6d60d73bc3a90631cec39d456d688a45398b24923bbe19249991",
+      "bytes": 12161
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/connectors/notion_test.go": {
+      "sha256": "1cb11beb24385b4f9d7f695370dbf6f03b395591214c9a56f46c73c821a6d292",
+      "bytes": 21051
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/connectors/notion_write.go": {
+      "sha256": "508441751be5ab36b5aa18f7420ec9294dcb9eec92a6b2b1b973cfbf3054ff34",
+      "bytes": 15229
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/connectors/registry.go": {
+      "sha256": "dacbd7eaaaf9092a5844b86f4c92dcb450dd361012b739cff5009058920c6ca2",
+      "bytes": 350
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/connectors/types.go": {
+      "sha256": "0e5900878ac0508c0fd50d9b9e91104cb1fbf451f952bfa195a9906e76217a49",
+      "bytes": 7352
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/diagnostics/store.go": {
+      "sha256": "c6198c194b06cc761fb4ad9e5573a370578fb391a8f79493cf99144b6e897b44",
+      "bytes": 8278
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/diagnostics/store_test.go": {
+      "sha256": "5524e928aef5b5f2e30bd88abc7f78fd9d9c61f893a11d4028f5b2621392b60a",
+      "bytes": 6627
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/hosting/desktop_routes_test.go": {
+      "sha256": "0895f000743ea2789ad30030ea455a04ebcdeb70178a14de451ef126c6609112",
+      "bytes": 2761
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/hosting/server.go": {
+      "sha256": "81abb2b1024910dccb503870f331932ccc313ca673a987fadc50cd9183c07939",
+      "bytes": 13188
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/hosting/server_test.go": {
+      "sha256": "87e88bf8a2adb121fdd67c08ac97bded70669262e1ab79cd5d80af5fb849470c",
+      "bytes": 9438
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/integration/p0.go": {
+      "sha256": "4b632a8fd81587faff662f7b70c05a50403c26e62513a72aff5c3483137d90e0",
+      "bytes": 11949
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/integration/p0_test.go": {
+      "sha256": "605eb07fae79d1030699f04d709d994457bb55ef7a5066e3284013a9749db1b6",
+      "bytes": 803
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/integration/p1.go": {
+      "sha256": "7b60356d479e92a0d215c5bd387dc51a4a98ae8d994090873e753e789b1db31b",
+      "bytes": 11551
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/integration/p1_test.go": {
+      "sha256": "16f42e136b57217cef264f31272fd520a5606fba906554e29e4ba7a094f31c3d",
+      "bytes": 749
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/integration/p2.go": {
+      "sha256": "5bd82bf6e609ee2c9fe4e86173a5df9f99963d1c4a90e7f781637f6925bf2bee",
+      "bytes": 17277
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/integration/p2_test.go": {
+      "sha256": "91591bd1db9cc8336c6dfe3c9c04c821c9679c0d9272bf9674f60c56b8668c68",
+      "bytes": 744
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/integration/scenario.go": {
+      "sha256": "1da06d47feed4a1c61ba128ea93b7871bd37c286e71cc5a2a338f4adb3e6ba98",
+      "bytes": 9849
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/native/acquisition_test.go": {
+      "sha256": "3801202e903c8261286702ca59def60299518211ae6f464621963b35ed9edce6",
+      "bytes": 9142
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/native/audio_decoder.go": {
+      "sha256": "eaac6d77bf6654b9cd420cb1bdcd1e45544cdaef81a0f76e564d63e21efec6cf",
+      "bytes": 8875
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/native/audio_decoder_test.go": {
+      "sha256": "21694a1708a5f7ab02604c7eb90ae543b5ee0c12861b751babbf30289486d4d5",
+      "bytes": 10672
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/native/audio_protocol_test.go": {
+      "sha256": "8828c764ce6d010836671e19aab28e984c892f513e05ea429a970b9b366fc9fb",
+      "bytes": 3376
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/native/capture_control.go": {
+      "sha256": "0757e37e4687076b2c6883332d054dad444ffd0074a05423687252a34018c8d8",
+      "bytes": 3497
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/native/capture_control_test.go": {
+      "sha256": "ea54d1f1f15b1cbd049ef305ad41cbc85f83e8ef82c00a328fa3184caaea93a7",
+      "bytes": 3223
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/native/capture_inputs.go": {
+      "sha256": "5dbb0bd34b3b3b98877c0f0f0da0c2c4eeb080819e4494642121f4e905fa2fdd",
+      "bytes": 3852
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/native/catalog.go": {
+      "sha256": "7d1ebd22282135e2d01aaaf1083a1a79f73f88ae4cd80bd4044dc95cf30cd59e",
+      "bytes": 415
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/native/context_budget.go": {
+      "sha256": "661e5ea0f6e053a8a96b0194fc9710c16e90d61e8367fb2adb38d5772937daed",
+      "bytes": 423
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/native/document_availability.go": {
+      "sha256": "d82f67d081a910794b0ac74cadc4e4b60aec99121d5f462ef6052d9678814dc3",
+      "bytes": 538
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/native/document_availability_test.go": {
+      "sha256": "4e9142e54837263a9802009fbcc377043f1cd1dd5954dedaefac5a26c35b1f7f",
+      "bytes": 2115
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/native/document_helper.go": {
+      "sha256": "8de25b8007fd863eadec03c3fa4089097972ceceea5a57cfb33cc1192715d2fa",
+      "bytes": 14005
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/native/document_helper_test.go": {
+      "sha256": "4e6ee33111364c568e8e2fea210ad747fdeb5310aa1c5d9a484d8d4758cdbe6a",
+      "bytes": 8913
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/native/document_process.go": {
+      "sha256": "0a0b7cb91787f2eb89c50e0286df8e8052fa2a24f97795756fa8e3d5d2627877",
+      "bytes": 2540
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/native/document_process_unix.go": {
+      "sha256": "30aa178be2c181b666f91d72e347c311bcae267aaae60ed61129c003e361c667",
+      "bytes": 4143
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/native/document_process_unix_test.go": {
+      "sha256": "cb0db2c214a946ceabf6b39a754ff81153d605b63dc4092c0808297f12909794",
+      "bytes": 2828
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/native/document_process_windows.go": {
+      "sha256": "49d0e9f1338508260ccf54290f6ee34aa112f0831473644736a0629e5060aea4",
+      "bytes": 2506
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/native/embedding_identity.go": {
+      "sha256": "dba07744fd9b15aa10e202a30761b293d730ec5397ae6604e9eea64c47764d5a",
+      "bytes": 1271
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/native/embedding_identity_test.go": {
+      "sha256": "65426a829f9ae6f05791d507db98be4e6441a934a61fbc370dc6d10cd5724c0e",
+      "bytes": 1361
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/native/generation.go": {
+      "sha256": "379a6d04db80d2d5ae62e0431976d2cf164b2189e6cac2b6bf6277036879144e",
+      "bytes": 6756
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/native/generation_test.go": {
+      "sha256": "456503f36e3211aecf3451d80cceac68fb6c016a44ecc2c068d2e18ef2226a10",
+      "bytes": 1387
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/native/grammar_test.go": {
+      "sha256": "8576ad29020cb5afb0eac56a25c23efa369913047fd541324ffb720e8e5fadf2",
+      "bytes": 1416
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/native/inputs.go": {
+      "sha256": "16fb61aaba9da8ecccfb76937ddcd15aecdd9ad683627d80ff59f47cfaed584c",
+      "bytes": 4200
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/native/microphone.go": {
+      "sha256": "435f4f7657e3f76f4709c51a0a795c0676ba8c38a54f8f0c5af31161d31b4e35",
+      "bytes": 11386
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/native/microphone_portable_test.go": {
+      "sha256": "54239344cca5ef4b81647a235f4a6da2bc4eece3fbd3681e5e8be91443b01f31",
+      "bytes": 11892
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/native/microphone_production_test.go": {
+      "sha256": "5faf695b3ba28a7162939cbf1af7b6843ff4463c34692e597d35236d893c1b34",
+      "bytes": 3076
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/native/microphone_test.go": {
+      "sha256": "8dc3979fec3a4277d1eec2349d83e1f68836d3396babfed34007d96a73b13648",
+      "bytes": 4285
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/native/model_ownership_test.go": {
+      "sha256": "7decfd5fbc692627be9265b38b82d4f7a148210a17382ab8bceb1e1b36b97b3a",
+      "bytes": 4487
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/native/native_test.go": {
+      "sha256": "aaf6c9b3d9ad0f3f27541968a8cbe9cdf08fe399a58023c2ff6c1ef3ebfe2ad1",
+      "bytes": 9296
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/native/p2_ocr.go": {
+      "sha256": "c78e0bf2456012d1e302ee3be8206fa1bcc7f30405029c767b25891c2dc51a36",
+      "bytes": 2707
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/native/p2_ocr_portable.go": {
+      "sha256": "f1451290a955e8b14fa0211f6f07a4d7da3c53eb707581ce16ab04437a60add9",
+      "bytes": 10682
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/native/p2_ocr_portable_test.go": {
+      "sha256": "f72dbe255503201d5c6845b6d58ec826243625a4e06289e9b93ecffc695ffcdf",
+      "bytes": 7610
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/native/p2_ocr_test.go": {
+      "sha256": "f142192d21c96cccfe99427cd5b55e401800a8bf925f94a52c21453001b2209d",
+      "bytes": 1739
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/native/packs.go": {
+      "sha256": "830a4a71afe83473b5a01ffb3e00d0ec7e14e31cdaffced3326a39c652a014d8",
+      "bytes": 16834
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/native/platform_darwin.go": {
+      "sha256": "1cde82e45c186663ed793420d4f3f70fb0a34431210ac5f34cce27fd2602b6a8",
+      "bytes": 283
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/native/platform_linux.go": {
+      "sha256": "0c31485ea76fc4c92bb073fb61f2d833ed676ba19f4f88df755349a62876ee09",
+      "bytes": 236
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/native/platform_test.go": {
+      "sha256": "2244287ca1af07d662e038726918c181798cda9272be8dcc0eea01078cdd08a0",
+      "bytes": 6608
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/native/platform_unix.go": {
+      "sha256": "cc958938353246cdb57684f5d2cf99406113425b3dfcb601daaeb53efbc5d1e8",
+      "bytes": 1529
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/native/platform_windows.go": {
+      "sha256": "59f47448d29743fd0668e071f9c18c38f2783d3695eae28d11f3594e6f2830f1",
+      "bytes": 6969
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/native/platform_windows_test.go": {
+      "sha256": "fc2662e53ca3549511460a3f3432c4acb5bdef58f38e1f0d74c017ed5dc1cdf7",
+      "bytes": 4045
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/native/protocol.go": {
+      "sha256": "a09f9a222fb4c3ed5f31b4c8beb996792754c5392cb1ea73177415ad9f897ae0",
+      "bytes": 1335
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/native/qualification.go": {
+      "sha256": "98ed8eb8f2a0dec0eda4643ec228e627c9b0614cca2704ffa3e406cbd3d43258",
+      "bytes": 6103
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/native/rss_darwin.go": {
+      "sha256": "a8126cea0096db897cb612f8b6093acaae06574ed10b52e1fcfd12f989ea8162",
+      "bytes": 953
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/native/rss_darwin_nocgo.go": {
+      "sha256": "453dc5aec833386b215234d46eeb1771ae93f7c88837cecd91e34e7ec0426878",
+      "bytes": 195
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/native/rss_linux.go": {
+      "sha256": "329de8611629b75eff3c0a00c1c547e6f90901f449bc14f8b1cafaaebbd4fb3a",
+      "bytes": 759
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/native/rss_unix_test.go": {
+      "sha256": "9232bcf330a4141d337b163812710ba88a0060f5bff0916f611fe244b41c07d8",
+      "bytes": 941
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/native/scheduler.go": {
+      "sha256": "2b36bd35471aed053199c0cf6883862e265ab8b517162c9c11a4a5256c70a89d",
+      "bytes": 2146
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/native/staging.go": {
+      "sha256": "d1b3dbb1320e3fe8169b567290e0da787f98bcd1e0104c3e2ba7eea9a7dbf0db",
+      "bytes": 763
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/native/staging_test.go": {
+      "sha256": "1a19c4043c1899536a349e9d6ec80195fe3b49aea9a891de7895716a01ceeba5",
+      "bytes": 1117
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/native/supervisor.go": {
+      "sha256": "2def196de6756973c29901ed7a07536cfc0d86f43e2d466e5afe49664060c40c",
+      "bytes": 17957
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/native/support_inventory.go": {
+      "sha256": "5980995e59de1204dda8bfc091221a073c548aee5361552d2d787740a79fc5f5",
+      "bytes": 1643
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/native/support_inventory_test.go": {
+      "sha256": "674ae2899b265b10d2bf88862ba306fdd2c67ef3a8d77d4ec285a4e7f5dddfc8",
+      "bytes": 1673
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/native/token_budget_test.go": {
+      "sha256": "c9c4e60598fb2ea2b52633d54a6641108997bdbabbcf4a91201ece04e1f4aa1d",
+      "bytes": 2253
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/native/vision.go": {
+      "sha256": "325a17e7bd5b340407a9993a6dc2729c03c32ff15cc84647283810cf83399bc2",
+      "bytes": 9712
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/native/vision_packs.go": {
+      "sha256": "293f174f9fedffeff440769a1071ec35aab9af84253f48f670b931121ad075ce",
+      "bytes": 5784
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/native/vision_pixels.go": {
+      "sha256": "f635a975df4d2b0298c82ae0b3387d68f28ccae4da8a480846510afd8e8c40fb",
+      "bytes": 2717
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/native/vision_pixels_test.go": {
+      "sha256": "10575b94b4d8619c38c589e3724ea03e1ed171960e67590d3fbe3f3f9f9ed900",
+      "bytes": 7969
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/native/vision_product_rubric_test.go": {
+      "sha256": "65065b0f1e32fce50690d5caebd5cd1c0f9857019dc943b1a8d7f153560ddfd4",
+      "bytes": 4565
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/native/vision_test.go": {
+      "sha256": "c2b0e1099a238e0f1cf440c61a404c28384a7c95165cb69c29dd812956892d3f",
+      "bytes": 15102
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/platformfs/files.go": {
+      "sha256": "b2b09f8d182cbaef8f02d4115d3ae66bc43b1cec171957c5a5357818a0888cd1",
+      "bytes": 2596
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/platformfs/files_other.go": {
+      "sha256": "da2af9b87bf566731e3f5e399fd2f5f9aefe8ae7a7bb6fe8195789e2211c983f",
+      "bytes": 769
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/platformfs/files_test.go": {
+      "sha256": "dce8c9afc01c925c996b35583bbb1e8ed7875c81b6e3d712b91dd046c34208cf",
+      "bytes": 5542
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/platformfs/files_unix.go": {
+      "sha256": "7340a4ad5a51c12a46ee703136d05719a245b27063d153adacbc5fdb616ce2af",
+      "bytes": 1934
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/platformfs/files_unix_test.go": {
+      "sha256": "63f92b789a3060eb918f3452349d7ed3e91f178cc7ea8f9563d43c1a52e32601",
+      "bytes": 1206
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/platformfs/files_windows.go": {
+      "sha256": "6650e2a46d1f299c6b9c2612bbc67f2a6d11339f8508f172c0a1f65ace3fe0bb",
+      "bytes": 4373
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/platformfs/files_windows_test.go": {
+      "sha256": "03e420176c6b3f7acd71bb3876efc5e4f4f702b5690178cfa1cf7e327a837356",
+      "bytes": 1527
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/platformfs/publication.go": {
+      "sha256": "cce10ce937e21eae19f62ed2e5fbb0d545970721a1f66d1e9fc6ad5777ad7286",
+      "bytes": 1450
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/platformfs/publication_darwin.go": {
+      "sha256": "6a19326ac5a79e49c682e6a8bc8ecd9cb42206aa665f06b53167ef096f5a0b41",
+      "bytes": 238
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/platformfs/publication_linux.go": {
+      "sha256": "cae4c0ad7a9fb08d744f1aa531aa1a19832d188e306606441765dab7ffd86db6",
+      "bytes": 270
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/platformfs/publication_other.go": {
+      "sha256": "93fe0eeb353eb6d28f2d5c070d75c7807a96dd7d17e5eda8418f72d74684b27b",
+      "bytes": 430
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/platformfs/publication_test.go": {
+      "sha256": "2c2aa6d39692d0dd6387f3eeb42d8518362161c80e9d09bebd275bdc443f3e70",
+      "bytes": 4108
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/platformfs/publication_unix.go": {
+      "sha256": "1e5b1850e7f8c0da342b8fafff29845f04c1ceff277cdaa04fb092f624b1b2ae",
+      "bytes": 1641
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/platformfs/publication_windows.go": {
+      "sha256": "38eb7dfe1dbae8ddb95bb24080530a7e40fdee7575157bfe76eb062330e1be65",
+      "bytes": 10546
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/platformfs/publication_windows_test.go": {
+      "sha256": "2840e4fdcde79a170128a09ba1b1b19fbcc42b21fdfbe4db4ded99368e415926",
+      "bytes": 3560
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/platformfs/recovery_publication.go": {
+      "sha256": "6f72bbec74a35516839cc33c1ae741d92e74f47fbcba544be472c8380c06141f",
+      "bytes": 22277
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/platformfs/recovery_publication_darwin.go": {
+      "sha256": "629500f50c844ebd8c018b055cc8e82fdfcc60017bd2932e2386ef943413d106",
+      "bytes": 261
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/platformfs/recovery_publication_linux.go": {
+      "sha256": "85d1de97f7d802a2300961e26f9abeb7a2766f114888966e387d8bbb2a2d1668",
+      "bytes": 263
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/platformfs/recovery_publication_test.go": {
+      "sha256": "1a8d370e6acdaaf42b4e5eb9c0d19728190c1d7ea2b349445dc5fbae8bfa3083",
+      "bytes": 17202
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/platformfs/recovery_publication_unix.go": {
+      "sha256": "43baad367aee88e25fef184be1dd2fea6497abb25a2196832050427db6362e59",
+      "bytes": 2672
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/platformfs/recovery_publication_windows.go": {
+      "sha256": "140c9156e3be5230cbf856eebd26d7b3da34938264a3bf5186952d40bee00575",
+      "bytes": 1360
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/platformfs/recovery_publication_windows_test.go": {
+      "sha256": "0e67bc0e3d38c8588b3dbf86048e6e0ed9c20e0ee61acef012fd092a805f068f",
+      "bytes": 3043
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/platformfs/root_lock_test.go": {
+      "sha256": "fd872d4db9e7ba3e5682a3013a6845a75da5171eab40b8bbb69ba22fb6d9d320",
+      "bytes": 1224
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/platformfs/space_other.go": {
+      "sha256": "1e41cb676e40d0e00f284201c567fe3ed63cf0af8f1d5bf1159e67d6e8d8bb57",
+      "bytes": 210
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/platformfs/space_unix.go": {
+      "sha256": "6f21114f99ceea1e9f3c1722abcf5fb894b7a292130e6dbf6eaa32d302a916dc",
+      "bytes": 260
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/platformfs/space_windows.go": {
+      "sha256": "c00c7fe55937ab0ee3fc9ff41c183efba75f59e73af01af2a2d40cccc3aa13a8",
+      "bytes": 303
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/processdomain/counters.go": {
+      "sha256": "2b97e364945a5b10f1ba4031f95142c0fde574b8f22f9692dfc868288ca26c6f",
+      "bytes": 957
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/processdomain/domain.go": {
+      "sha256": "69e4e6eed3af75261fb34e4dc113d8a4e372c45ae60b0fb54f95bb3a3b6b4497",
+      "bytes": 9169
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/processdomain/domain_linux.go": {
+      "sha256": "57d5f4e8ee65b0f19735785b0ff17d3fbaaa961aeebc28632528685ff2caef1a",
+      "bytes": 8675
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/processdomain/domain_linux_test.go": {
+      "sha256": "cbb94993781a0572363b4039f3d3ef556b02d235ddaa3f883333db2aa1c5bc20",
+      "bytes": 10967
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/processdomain/domain_other.go": {
+      "sha256": "ced89bf5b1634e36b78d53f1eb371b820f824321814dec97d2b97c4e44879f53",
+      "bytes": 256
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/processdomain/domain_test.go": {
+      "sha256": "e9ef1f674f7182de946f9c8f1953c3be2637e051063e0cc29df7ed170d26ea39",
+      "bytes": 8818
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/providers/adapter.go": {
+      "sha256": "6df393ae1ead67e243c5440061f7da1d6326d3dbe9eb842f1c1870ec0c8719a3",
+      "bytes": 11470
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/providers/adapter_test.go": {
+      "sha256": "99a5adec10d31720e4d7dfc81588a067d35b51155c1fb6b90fcf1922d757efec",
+      "bytes": 4227
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/providers/auth/files_other.go": {
+      "sha256": "392591d97b703f21730cb9707f6b61f83b3168c986da5a73c9f968571a082ec9",
+      "bytes": 217
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/providers/auth/files_unix.go": {
+      "sha256": "1d055c0d1a64d664b3af1a3cb060b031a39dfb1d02f5e0f34fc7eba92e16c112",
+      "bytes": 1251
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/providers/auth/files_windows.go": {
+      "sha256": "90e8bf5f6675495e9bc747662a6390b826e5db83afe4603145cd48aed2b3f3d6",
+      "bytes": 7011
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/providers/auth/http.go": {
+      "sha256": "40f1d8b68e97b6988058c268b7a0d9039da126b164d6dfa03381f83b2bcf600a",
+      "bytes": 7066
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/providers/auth/keychain_darwin.go": {
+      "sha256": "251930ec638278c4ac86e1a146d71f124c13bcfc03f085c61735328ded5ebea9",
+      "bytes": 4544
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/providers/auth/keychain_linux.go": {
+      "sha256": "8beb3df7051e418c86e33efd6a183a8101a77b8a50535912e272c73b442264d9",
+      "bytes": 2965
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/providers/auth/keychain_other.go": {
+      "sha256": "a4ee01e8263b195988ebbb15d8b8aa0df518df8eeb23c94095598373989ca82f",
+      "bytes": 161
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/providers/auth/keychain_windows.go": {
+      "sha256": "e4a8acdd1eb80f516b9fd28ca1951559e5a798121228d3c8ac07da3fb57286e3",
+      "bytes": 4014
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/providers/auth/lock_other.go": {
+      "sha256": "0786ffbe87d1d44c939689de85907b4ed1fcb78e146bf13bbfb1a4affd893aa6",
+      "bytes": 201
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/providers/auth/lock_unix.go": {
+      "sha256": "80794c9dcaaa0124eb1fc00cbf745aa1bf35f251f8e457d20cb56265bc2d1ba1",
+      "bytes": 1612
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/providers/auth/manager.go": {
+      "sha256": "360a9fa8ff707bafc9b7f37dfd800d79ffd731d84544e97254fd920e72d7f67f",
+      "bytes": 16690
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/providers/auth/manager_prompt_test.go": {
+      "sha256": "5e8602accbf692fb1daeffcca358c9783e490216f0abbda530c5239a9bd9721e",
+      "bytes": 10363
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/providers/auth/manager_test.go": {
+      "sha256": "4b9043633619af3d32b40c95de81445b2cbfc591ab4c089f779fb5fb94e16c98",
+      "bytes": 18880
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/providers/auth/native_store.go": {
+      "sha256": "f65d02c06007fde2b5cba6f763d833cdcf6563dc03e57707b9df7cde41d3846a",
+      "bytes": 525
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/providers/auth/secret_crypto.go": {
+      "sha256": "35391238d4cd3abe6bdaa2b7814ba301e74ee05eb8ef0b9b4986af7e8cf13ec0",
+      "bytes": 3544
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/providers/auth/secret_crypto_test.go": {
+      "sha256": "6423cbec173f5ac4ecd89bef71d43573e48d06f5fa0d66bfc0cae8f91e75d284",
+      "bytes": 2283
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/providers/auth/secret_service.go": {
+      "sha256": "8ee10227b05f8a55bd906ec18a7708e33511af915b052429edf36fb8443a89ec",
+      "bytes": 10766
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/providers/auth/secret_service_test.go": {
+      "sha256": "0556edcb1bdd9e6ce6228ff2841927f1c9d0e9f9ef40f5a5dc3178f743c7ea46",
+      "bytes": 12260
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/providers/auth/session.go": {
+      "sha256": "23981ad57fca0dc7b68d88a148df4d54c9057f2c9d1a9ada801d29faed0ddb99",
+      "bytes": 6484
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/providers/auth/storage.go": {
+      "sha256": "be96bb0c1205e2e1c8e8aed088dfcea6b43b8b6917ade463f72b7934768391e5",
+      "bytes": 2083
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/providers/auth/storage_windows_test.go": {
+      "sha256": "5d2980d60c77ef56aa78b955f23d608a9a1db33707dc98d464208858415f5609",
+      "bytes": 3457
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/providers/auth/types.go": {
+      "sha256": "feab837c62fc3f3e26494077588cf54b2f54eb3b3738540ddb140a3e45b5e2ac",
+      "bytes": 2986
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/providers/claude.go": {
+      "sha256": "3ba6ce57ab6fcee07be23da893dcaa00c1864ddc356cf40a715b3a5977fdc6e6",
+      "bytes": 14025
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/providers/claude_auth.go": {
+      "sha256": "8f6c3317f3eea5da96612b3865c98160567761a044b1e72885442978ed6b7fd3",
+      "bytes": 8255
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/providers/claude_darwin_test.go": {
+      "sha256": "df102cf65f4412251b66fb914253a50d3e04d46e273c4e95eaeb53d5e08a3d22",
+      "bytes": 2997
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/providers/claude_login_helper.go": {
+      "sha256": "e92ebcdfb9301d53c639ce4772910a7a6bd9a621bb14acd01d0c6943df22bffd",
+      "bytes": 5750
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/providers/claude_profiles.go": {
+      "sha256": "55eedb2e77c9579822e63bac7b54fea3ec16950e57b37f8309b42481f213cd87",
+      "bytes": 16292
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/providers/claude_profiles_darwin.go": {
+      "sha256": "a2852ce6d4ff6c26be8dd136d8b0279ab31466cc5b11c4b033a7be2f614af02f",
+      "bytes": 2515
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/providers/claude_profiles_darwin_test.go": {
+      "sha256": "cb93d24e7aeea5967f5233d503c46c6e4eabaf105f59f17a132018731fbab269",
+      "bytes": 11799
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/providers/claude_profiles_other.go": {
+      "sha256": "6be2e55a67aa3f83ec3651d80cc4e125b4e36f8ebe7d2b5c13aebbf7ee6b7aeb",
+      "bytes": 778
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/providers/claude_test.go": {
+      "sha256": "5941cd44d1bdbc697cec21a69511861a802429fac4effd2915ab0075b6e4c45a",
+      "bytes": 8520
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/providers/codex.go": {
+      "sha256": "ccd4cdf39d599327379fe17b1dac4dd59107822371c633773e16e24970b416d4",
+      "bytes": 17975
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/providers/codex_test.go": {
+      "sha256": "0c64adda1522396c050cfb598873e16ebc7b56ad50c8ab208329aab27a0d3068",
+      "bytes": 6782
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/providers/containment_darwin.go": {
+      "sha256": "6b44a3b5f04b13847e522e0511d0a36dfa6472a84662e3877c9365440b7661f2",
+      "bytes": 2838
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/providers/containment_darwin_test.go": {
+      "sha256": "5c74fa527d21900c49c9ee0a3816d9d064cf3fba1dd76e9a45581e6d2aa03a20",
+      "bytes": 6603
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/providers/containment_other.go": {
+      "sha256": "ad1d84833439790801e596ea1f8f6b4419229939704691dca28c0fafe6f7e1c8",
+      "bytes": 370
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/providers/discovery.go": {
+      "sha256": "e23cb4334425a93f3e06d71fc23f2568fd0f30c4333b3b70ddf799ffd78ca193",
+      "bytes": 4074
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/providers/icu_darwin.go": {
+      "sha256": "35355d83223f6896604c817070c93e0d93dfe5e3b7ede5664d6bf60462e23755",
+      "bytes": 2126
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/providers/icu_darwin_test.go": {
+      "sha256": "2f55b1bbf77b6cc0635f2286d16f1340b354dfa4e90dd7acc981cf342236cd11",
+      "bytes": 4235
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/providers/models.go": {
+      "sha256": "2b04e30e82193f58cebb5e48ad4d5e231463f30b6af60872ffcdef22f4f65fd9",
+      "bytes": 2759
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/providers/models_test.go": {
+      "sha256": "c11edab577b3aab3317264a30a948f1d735d395c8735bbbfffe89b6b524307e3",
+      "bytes": 2358
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/providers/remote/metadata.go": {
+      "sha256": "fe10b048bf46927600f787c8e628d70d8e84c9eadd94289c4bdc8b389e0ad71c",
+      "bytes": 5367
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/providers/remote/oauth.go": {
+      "sha256": "e4d9b1ec8e6b574e904be92e5d43a0d1c4530b62c81772689a9a1d4de573ac63",
+      "bytes": 12063
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/providers/remote/server.go": {
+      "sha256": "32f7264c4e8972ef7657fdff1ac4af13baec61ac01affba35fe3141cdbf8da19",
+      "bytes": 15443
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/providers/remote/server_test.go": {
+      "sha256": "bdbf955dc8bb4d3a2a00260a97e6a210f21b8f311229094a444d771eecd5e95a",
+      "bytes": 22149
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/providers/remote/types.go": {
+      "sha256": "cb2f040aaaed673d9434b2f98ea63d73adf22c4da98addee53b601d8e12107ec",
+      "bytes": 3259
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/reminders/schedule.go": {
+      "sha256": "588113f8c1e2f2b28665db5061d03c097470056a77f3e2860eef996e8ed0bd25",
+      "bytes": 5569
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/reminders/schedule_test.go": {
+      "sha256": "72b3f783f01fa165e48901bafa62bce118ab4263cbbd15a2ba8e4bad9077bd51",
+      "bytes": 2007
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/reminders/store.go": {
+      "sha256": "7ffe5539e220c2aa513cd448032692c09dfa41f44b89b6e27f69c337c47b797b",
+      "bytes": 3940
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/reminders/store_test.go": {
+      "sha256": "53a0892cb1dd92f52670060254d53e3906d2b87e53169b70a85b7c09961d371b",
+      "bytes": 3830
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/sqlitevec/register.go": {
+      "sha256": "79453eb05a3700e53ef93dbb1d488e533dfe732866eb544e45ac9c7daf4d2fb1",
+      "bytes": 794
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/sqlitevec/runtime_test.go": {
+      "sha256": "cdab0461658e3433d01cf321549d7e081bda9c953aaef968e8674cfb1a104a64",
+      "bytes": 5325
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/updates/identity.go": {
+      "sha256": "60ec853740a01f937e888942aca8410ba77ec0e57b8dd336e4c28ce73cc93c77",
+      "bytes": 3413
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/updates/kit.go": {
+      "sha256": "73d4732fd43924de5478dd8aebc69c3c53d4706cecc90690ebb8f29d27861bed",
+      "bytes": 8581
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/updates/launch_darwin.go": {
+      "sha256": "fea5cd850b8606ae3324abf469a33bb251cba2f407a0f31c90e00fcff9f3572d",
+      "bytes": 870
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/updates/launch_other.go": {
+      "sha256": "b13154e7484e9fead24a40882d9bf7e8ab0e7a6aa02a3f69037c0823e1ffc2dd",
+      "bytes": 235
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/updates/portable.go": {
+      "sha256": "5715acd48914b2e907e0695af8c304e322b4283c036935c7f1a807def5969c1f",
+      "bytes": 13284
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/updates/publisher.go": {
+      "sha256": "24b5cbb0881dd4d846dfbeec57c3a71aa22bcab8e0e98446a68461df13db0ed6",
+      "bytes": 2045
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/updates/publisher_test.go": {
+      "sha256": "6c0079c22e81439c23b18b0cd0464234ba553b160162cbd64a4e048d8b282616",
+      "bytes": 10828
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/updates/publisher_windows_test.go": {
+      "sha256": "2b037c7033fb161d4a6508bf1511ff371c2f36097e7fe00fd1b255f10fcc6945",
+      "bytes": 3090
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/updates/reveal_darwin.go": {
+      "sha256": "69d333f33ed5d7b596182d6301dc5544966abc92797093b57c6f6aee14fba948",
+      "bytes": 254
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/updates/reveal_other.go": {
+      "sha256": "c3be3c44f9e399ba049c846d356f23dd65505af12c8986c236d88b5840d11343",
+      "bytes": 201
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/updates/rollback_child_darwin.go": {
+      "sha256": "a15c26fd9566faa297ff91ead0c6c319e2ceb719d67b181be72e74a2bf98263b",
+      "bytes": 4638
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/updates/rollback_child_other.go": {
+      "sha256": "ff0eee2ef0f5fb0a41f52ca151f2b3fdef6461b1e1e657ac79c0720076416e56",
+      "bytes": 782
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/updates/rollback_native_darwin_test.go": {
+      "sha256": "a24dda716996b6be28761dc55ab15129c01ddf3937dc64a3c2c4b30fd5e3103f",
+      "bytes": 3518
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/updates/rollback_process_darwin.go": {
+      "sha256": "efc9b43a2241db06149e35b73f8a44403df3ceb7a0db70ef5d6f74188bb4a275",
+      "bytes": 4645
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/updates/rollback_process_darwin_test.go": {
+      "sha256": "ddc6cb77b1b5bccbc90496529654104f31d89413bed290a38e9d92e60eebfd38",
+      "bytes": 3179
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/updates/rollback_wire.go": {
+      "sha256": "212bf8d15f037e38ad63b45b81af4399ee0e07037b3aa6b9bf5b1095f8146633",
+      "bytes": 4261
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/updates/rollback_wire_test.go": {
+      "sha256": "8891b10de1240225b01e2a9ee825886fe84b1de8c6710d489baf77c2cb311647",
+      "bytes": 3226
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/updates/tree.go": {
+      "sha256": "ce8f179322b31dd2ba06cf111fdca62520e75c930f4ef88a84e6a2b6a064b0ff",
+      "bytes": 7087
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/updates/tree_policy_other.go": {
+      "sha256": "cb20d06645d8d2be46f72e867d36d8043fcb45141426bfa796e2fa6b89a8de73",
+      "bytes": 512
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/updates/tree_policy_windows.go": {
+      "sha256": "7b62de2e90cd42bab0ca9b100ac5176eb5b94d05ff6e34aadb55440053a6caf3",
+      "bytes": 2456
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/updates/updates_test.go": {
+      "sha256": "f1c9c42c11434a25eb16e8e6747334f479741ff072c2005e9ab09dace077fd52",
+      "bytes": 10502
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/updates/verify_darwin.go": {
+      "sha256": "e9aeae7a4b8bcf7bb7e3dfc88aee4a784e8c94a5f13476ac28d4f56606f4a2ad",
+      "bytes": 5337
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/updates/verify_darwin_test.go": {
+      "sha256": "3631261bec6441cf66e5b20795e5ae5339ed7b507673b3bcb5cd1c8606804e49",
+      "bytes": 457
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/updates/verify_other.go": {
+      "sha256": "563723d25db6fe317649f91965c2d58b2993197057a58a40317998b42c4d2e09",
+      "bytes": 278
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/updates/verify_windows.go": {
+      "sha256": "49b0e2bb343073ab7972ba60fc811f4f1bb510a7654fe687ee2f80f592b20593",
+      "bytes": 8819
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/updates/verify_windows_other.go": {
+      "sha256": "3600ca765c83edc6d1a3d518a112bee5e5d122a0688fa9d4ab49d5902da19f65",
+      "bytes": 283
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/workers/audio.go": {
+      "sha256": "810ddacee1323d9e4721daf65a73b72356656bfcccb23db61bb815613401ac95",
+      "bytes": 6262
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/workers/audio_normalization_test.go": {
+      "sha256": "f086cc63a6bb840663e7201f3ecfab25470429b2b75502293e62a69536598bc0",
+      "bytes": 8455
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/workers/meeting_summary.go": {
+      "sha256": "788a0902a02be5dfd27e4b3bdfe743e60ac2582f687902442cd4a55967148860",
+      "bytes": 10581
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/workers/ocr.go": {
+      "sha256": "2a05f4447e1ed273e79b5f3dabe467018d98bc3a81eed4d3f63dc3453f518ab5",
+      "bytes": 1218
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/workers/personal_review.go": {
+      "sha256": "e333aabe731a4f542c1a557457cd10188602e8d97ca181c9d3ca0a9b875ab2ea",
+      "bytes": 3402
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/workers/personal_review_test.go": {
+      "sha256": "447a9654c519498139e5c3f34046bb419c93ff0ecc6afa13d5bea5077324b244",
+      "bytes": 9976
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/workers/runner.go": {
+      "sha256": "cba5e30a4ca058e48838e545a76eb9508794b9596b2bfbb76b9b14c9afdfe484",
+      "bytes": 9035
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/workers/runner_test.go": {
+      "sha256": "157a9511eb939b57c9f0ab62871eafb519b05caca67fb677dcb13c5c63f684ec",
+      "bytes": 5269
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/workers/search.go": {
+      "sha256": "7ea48d5b097d184c71781181c004d6be1332ff5ca247ce8dbcd892f4c61ad981",
+      "bytes": 3561
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/workers/transcription_test.go": {
+      "sha256": "63922762db0b2fefe3388540b15818454d991db6c034509c33d31cbaa4bba7e8",
+      "bytes": 20666
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/workspace/action_plan.go": {
+      "sha256": "ad5a767126a62ce8ee800d9a6e585800157f54bc63d54ecfe7ec4d4de84fc59d",
+      "bytes": 20923
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/workspace/action_plan_grammar.go": {
+      "sha256": "41364f030bfc779458ba28a9076a6dcdc05519ef286705b0740e02f51b527883",
+      "bytes": 2015
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/workspace/action_plan_test.go": {
+      "sha256": "e21360b0bfb26d80095b4a74edb6966bddc4586a8d4b6761c7d76d4bbf414e99",
+      "bytes": 6177
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/workspace/advanced_database.go": {
+      "sha256": "4edadbc12015bfd50fe12cfe488a753efe3afe35871ee254619cc7d6f32458f7",
+      "bytes": 27222
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/workspace/advanced_database_recovery.go": {
+      "sha256": "e94c5687805bbd95cd7c96dc2d680e5b8383e09c6a9c9088a562eac6de60474c",
+      "bytes": 5320
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/workspace/advanced_database_test.go": {
+      "sha256": "2c416a9afeeb760b6bf61b04426140a0acc43261758a2b91ac33643aa91f0c69",
+      "bytes": 10750
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/workspace/advanced_editor.go": {
+      "sha256": "342959203a0d2fa85c07e52d17e24deeaca23b3eeb6f6e4d8419eedec6978dd3",
+      "bytes": 16990
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/workspace/advanced_editor_test.go": {
+      "sha256": "e07231d98ca9f63a16d77cb56a0dfa5e924e7bdd78ace2375a1fd431001651cc",
+      "bytes": 7673
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/workspace/ai.go": {
+      "sha256": "3b6474eb0e5d9539bdbf59a215912e348de7c47742fd2ae4cd37340a9c0ff93b",
+      "bytes": 24092
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/workspace/ai_actions.go": {
+      "sha256": "e94cbccfaa82a5f2d2bbebc0bc05a91399a82e2aca8f9733123d0329862a5a8f",
+      "bytes": 15076
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/workspace/ai_advanced.go": {
+      "sha256": "857163894adab25d47eff7d0835e675250eeb34c1151683761f8a4d42e8d7a4d",
+      "bytes": 19538
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/workspace/ai_advanced_test.go": {
+      "sha256": "287aecec7f9b7b3d5657fec42e87b3c45444a6b7e317b5ebbcc8d56f65c241e6",
+      "bytes": 11218
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/workspace/ai_canonical_inventory_regression_test.go": {
+      "sha256": "b6f65c6ff974e3628696a38435da4e3e595a48efaded79a534d25fa74dc647b2",
+      "bytes": 9279
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/workspace/ai_canonical_inventory_test.go": {
+      "sha256": "0e523925858baaea02adf55d1854cb1ef82834a81309efb81f580fcf83f3b9e6",
+      "bytes": 15591
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/workspace/ai_code_generation.go": {
+      "sha256": "74fab6b81525a482d714e344bc6f4e07c56f0c34783aa6a5bd822f232aceea73",
+      "bytes": 3424
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/workspace/ai_code_generation_test.go": {
+      "sha256": "0a504dee515724eaeda2ec3fb9057838e8216d8fd029625736f8052188dd28f1",
+      "bytes": 3823
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/workspace/ai_context.go": {
+      "sha256": "38956133932be62bebc52af5eb64251a63c06ccdd949efa24ba35d700a5f6641",
+      "bytes": 12522
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/workspace/ai_context_test.go": {
+      "sha256": "1601d3d7d510cc08f95c02fc4b6706d3ec44db2e271cf8d24375745b5c954775",
+      "bytes": 25570
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/workspace/ai_database_generation.go": {
+      "sha256": "71a3383677dee8bc8dc23064fa510539435fc1a4be4d49b8a7398dde1ac5cd46",
+      "bytes": 3807
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/workspace/ai_database_generation_test.go": {
+      "sha256": "e2ddee90429132edc9dc5a6e06ab19c513ea16ce7866114b2365c3e581322e16",
+      "bytes": 3929
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/workspace/ai_display_context_holdouts_test.go": {
+      "sha256": "35f2ef2ff0345055e529cfd95403144bd73a2173645b027c4e993a4ac5525188",
+      "bytes": 31045
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/workspace/ai_evaluation_report_test.go": {
+      "sha256": "0aff36ed333a580f6d0dcdacfeb1300587300d641ba9a307490caf7cd718137a",
+      "bytes": 4370
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/workspace/ai_expanded_evaluation_test.go": {
+      "sha256": "f4415374e0772f8d0108aaf0251d78531c3c978fa25580b00c194119273f618c",
+      "bytes": 11825
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/workspace/ai_expanded_modes_test.go": {
+      "sha256": "6fffd1a3a4c4b04fdca16e08370fd3e29476f221fb88af8dd58cd28e24f2edb5",
+      "bytes": 11644
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/workspace/ai_generation.go": {
+      "sha256": "8f03929943bd44074ca66a2693682080f899f2abefea346724c58e6fa8c2435c",
+      "bytes": 18089
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/workspace/ai_generation_test.go": {
+      "sha256": "770e182e0885464ee2bb6baf0e47c266f1ae17e3cd4091fea73c3ce06abb061e",
+      "bytes": 21069
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/workspace/ai_image_workflow_evaluation_test.go": {
+      "sha256": "4f0c9327eb46f3d7acb598bada6c539e396c1077d641d87413455c3a5ecd375e",
+      "bytes": 10714
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/workspace/ai_local_evaluation_test.go": {
+      "sha256": "dd71bd3d1af95a7ebc91b4d894fb7ae4d0335d7ab10589e824f9fe4cf86c1aa2",
+      "bytes": 12739
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/workspace/ai_local_heldout_test.go": {
+      "sha256": "58fc1fc2735a2d942b366cf3e535c1312a636921598dcb92520bfa20f1ae8f53",
+      "bytes": 6731
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/workspace/ai_local_modes_test.go": {
+      "sha256": "8c4ae525d74c8abb32cfb5e95e33df2c42b55ab5dcae023994306828f59d1469",
+      "bytes": 11362
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/workspace/ai_memory_lifecycle_evaluation_test.go": {
+      "sha256": "23000847a4107a71451b655e0df906d95a0833870a3f78e1c6dd3dd97f3ac995",
+      "bytes": 12202
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/workspace/ai_memory_test.go": {
+      "sha256": "a559f63493fb7076d4e8c482ba51400d2700960faab3ee175679c8c68a510417",
+      "bytes": 15205
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/workspace/ai_p0_closure_holdouts_test.go": {
+      "sha256": "f80ce124c3617c95b1c9f818359d23b84e102d5ebae8c8ce1a2dd39bbe87cfb1",
+      "bytes": 10206
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/workspace/ai_prior_generation_telemetry_test.go": {
+      "sha256": "8911a7779f19c45dde7ff12129cdd98d50c3fb9a603674969b95be1ed74959b8",
+      "bytes": 6118
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/workspace/ai_related_evaluation_test.go": {
+      "sha256": "feaa732ce6f13d50edb487c83a12a493fed9cdf3803ef00fdd9252fe9a9be624",
+      "bytes": 7806
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/workspace/ai_repair_holdouts_test.go": {
+      "sha256": "95d9ebc5ac3e87db3de47cd10d711192ad901907e3d704bf78cfac1d4e7fa047",
+      "bytes": 9573
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/workspace/ai_retrieval_test.go": {
+      "sha256": "fddcdcd0bfadfdc242c22ed113d11ef43529d4c2b5bc9e22f8c65787d5d02e44",
+      "bytes": 4767
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/workspace/ai_review_workflow_evaluation_test.go": {
+      "sha256": "5227a6b16aedc7b47536ad5c1b89bd687be553cd3f96a842b09948f182b4ba8e",
+      "bytes": 20367
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/workspace/ai_suggestions_test.go": {
+      "sha256": "43f0a0a9c20a660d0c3123dcf8edf1b1ef7e77465d478d5298ba1e26aaa397c4",
+      "bytes": 10830
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/workspace/ai_transfer_evaluation_test.go": {
+      "sha256": "3e46665c28d084899cb4b485cd4f3c50d90b76b6d154dbfa50572af62e1c058b",
+      "bytes": 13635
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/workspace/ai_workflow_evaluation_test.go": {
+      "sha256": "048cf34b91f385aa799fc9f1f2231bb4c601fc0419a21ffa1667aa7b8b98e2dd",
+      "bytes": 17094
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/workspace/autofill.go": {
+      "sha256": "5c425cd62f266a8233dd00105b308bb9bd95764811f45c9f8ef38b0c4944302e",
+      "bytes": 23206
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/workspace/autofill_test.go": {
+      "sha256": "50ddff974300c1fcc633dab07c9ff9ec3a58a526809affaa04aa79ee7ea28b1c",
+      "bytes": 13081
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/workspace/automation.go": {
+      "sha256": "7dbe6e401ffaa154d16efc418f040041a15bd3598affea5122c1c61f5c774af1",
+      "bytes": 24093
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/workspace/automation_plan.go": {
+      "sha256": "96a78bbf9d22d4e4d283de2f7df79318fe1e22b1fea71d71e78570ac7f864350",
+      "bytes": 6567
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/workspace/automation_runner.go": {
+      "sha256": "e07a578a695392d0044397b2894d80e0b687cafc75cc2ed0c83dcb853f13254b",
+      "bytes": 10613
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/workspace/automation_templates_test.go": {
+      "sha256": "d1313e3ea691e880fcb87810bd5ca0e80495ba0f28ca301a8f202919f866f6c1",
+      "bytes": 10645
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/workspace/automation_test.go": {
+      "sha256": "df8c44356dc6a51a06515f49e56a12c4ad2fb4e80553fd32f519a0ba0ac11c38",
+      "bytes": 10763
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/workspace/backup.go": {
+      "sha256": "54d21acc4ce6fc0382a91583eb7db74197d2d155fa947ba1d77b97deb6c977ab",
+      "bytes": 8617
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/workspace/backup_online_test.go": {
+      "sha256": "2f47f7807231c1926e145b5e1f8baecf3fb59c0c84313de6c6374395f1404b4d",
+      "bytes": 6692
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/workspace/backup_portable.go": {
+      "sha256": "29a066bcac4a8b20a5d4d6494a99c5f8fb5b86400deb7c99c337b232ae679b46",
+      "bytes": 16501
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/workspace/backup_portable_test.go": {
+      "sha256": "ab340d914302d28123ac1b10a7c6f48aba359214ae96269ee72b245105f3a584",
+      "bytes": 12854
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/workspace/backup_recordings.go": {
+      "sha256": "c3c1ebb87a7dc9c64331a06357855fc4cf11ae1b06c4f1a076b76c041342c670",
+      "bytes": 5213
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/workspace/backup_retention.go": {
+      "sha256": "0cfa95067d9696b5947a08382d5ea57a8c606a1af5516bac13263cc1a9fff4e5",
+      "bytes": 4799
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/workspace/backup_sqlite.go": {
+      "sha256": "d6fc36c698611c5faacf4a894421dbd9a3cc8317dc79291ed28ffd0a5cc4b920",
+      "bytes": 2422
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/workspace/bookmark_preview.go": {
+      "sha256": "45f2ffcde28b578a18766d7c498151fe3dfba5bfa72395649ba9be46868926c3",
+      "bytes": 6841
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/workspace/bookmark_preview_test.go": {
+      "sha256": "974f8bf634f6847922eec79057a4edbc15263009f56c04a90d8af77e8c2ee884",
+      "bytes": 8522
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/workspace/canonical.go": {
+      "sha256": "727ba27437dd1c20917bcae5dad5c509e5d46b1ec1ac76a58aa8b34057353459",
+      "bytes": 2423
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/workspace/canonical_links.go": {
+      "sha256": "2052df3fdc0f247a87333bc08da81a866e7601f33c7322663c511da2d7bae120",
+      "bytes": 1862
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/workspace/canonical_links_test.go": {
+      "sha256": "0280278abb5eef3b29b062a5011352b1af72856f7988b3fa9cc2ba471b608031",
+      "bytes": 8960
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/workspace/capture.go": {
+      "sha256": "8b5f1037ed96a631898dc50e09ad63b9d2c85364ff77487b332d6b32b3dfe207",
+      "bytes": 5143
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/workspace/capture_clipper.go": {
+      "sha256": "e239c7db7d1cf04b9ee2c4862e7ee1f75924af68be5dd665001ca28a5515aa29",
+      "bytes": 10952
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/workspace/capture_clipper_browser_test.go": {
+      "sha256": "834359824ca19e36275aa305d9df03d5e0e2a6116cea1369e75613ee1b7371e7",
+      "bytes": 3115
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/workspace/capture_clipper_test.go": {
+      "sha256": "9d32a3295ad9ed26056ca1d96c12d9687a3bc0012000fbd86b8d6151f772a3a8",
+      "bytes": 4785
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/workspace/compatibility.go": {
+      "sha256": "7493ebd7bc3a12e15f552b537babbc22e9b9c6e5b49ea66e181b56248dcb812d",
+      "bytes": 5240
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/workspace/connector_ai.go": {
+      "sha256": "00ed681f544c2200dae6bc879b2d6b5fa7115ca1080b3a67ffbe0150a68664d6",
+      "bytes": 8122
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/workspace/connector_ai_test.go": {
+      "sha256": "1d05acfd5093646fb680ddb39deb04123de3a9a4af62a7ec4bba6fbbe5ee3ca6",
+      "bytes": 4939
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/workspace/connector_drafts.go": {
+      "sha256": "560455cdbf997c6c349b239fd34b6cb441358482ef2d2307f1c8f938584fb09a",
+      "bytes": 2991
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/workspace/connector_import.go": {
+      "sha256": "3d20947197fd43f0e0d6ce9fb609efa5714104d8769eeaba44d2f5df2119a136",
+      "bytes": 7936
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/workspace/connector_import_test.go": {
+      "sha256": "b340092c78a61985b9ab6f696d92403b91a0ea7f74c724d7e57d0fe8b71c461f",
+      "bytes": 6424
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/workspace/connector_resolution.go": {
+      "sha256": "efb25e6df3d0b841b649ac00f03907bc072742e6c5d0fcbef20cc0ec099c8bb2",
+      "bytes": 3111
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/workspace/connector_resolution_test.go": {
+      "sha256": "f82c781bad71a4bb32cef568c107622fb634bead5a836e761a15ff4832acc5b5",
+      "bytes": 4801
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/workspace/connectors.go": {
+      "sha256": "cb8f0b993ecdc181dd7a630f59a01822e4c08ec596c5b382c4b7115c60eaafe4",
+      "bytes": 35179
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/workspace/connectors_test.go": {
+      "sha256": "2012d09ce171597e377127be5b11495768a388e714e1a0e3b825de3ec3fa9d61",
+      "bytes": 11170
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/workspace/database.go": {
+      "sha256": "5c7d328161e4e2734d00d79881dd9b806461eb729360dfc40b3aab0203a11f27",
+      "bytes": 28607
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/workspace/database_benchmark_fixture_test.go": {
+      "sha256": "4f7bb7ba19f863a0bc5a90e7493020579714c451ba08f49f34398c9496c1ac5d",
+      "bytes": 4927
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/workspace/database_benchmark_test.go": {
+      "sha256": "f0dbef617d054593381c98456a80b6077db26e4648f9852bbfb661c0051ec183",
+      "bytes": 24652
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/workspace/database_query.go": {
+      "sha256": "7789cbc635c170eb36547b55747cd68fc3f18749259094eac4a1aa21942ba9fb",
+      "bytes": 17979
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/workspace/database_query_cache.go": {
+      "sha256": "8be8681f90163c3c144193d6c56b2d7845de4503084dbc0eab8df0fd53233674",
+      "bytes": 5143
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/workspace/database_query_optimization_test.go": {
+      "sha256": "f702cae2b5d0bd9a77d8c10553bc01f5e586498a42456c1035abf65c3f0d45a9",
+      "bytes": 6136
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/workspace/database_query_test.go": {
+      "sha256": "fd8898286aa480928b7378ef792ee3dc9e5e76f4861aa22896be6a5cfade49c4",
+      "bytes": 6488
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/workspace/database_structure.go": {
+      "sha256": "ea3359c7b6fa10a9c6220dc77c2eb3863f7b0087548f8d08ec874e7debe3f1d7",
+      "bytes": 2920
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/workspace/database_structure_test.go": {
+      "sha256": "2fc273369ac6edd49d72117f24a3c09a4abba8bae9e3d9f8aeb85d0cb95f5228",
+      "bytes": 2482
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/workspace/database_test.go": {
+      "sha256": "72b37ecc204f98b7a26bb3c05f2ac0f477f10699f516ace512e9bc2b1d77fa1a",
+      "bytes": 18127
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/workspace/diagnostics.go": {
+      "sha256": "6c1e9604c5379df2776b0bff70addabab92546da21e0dd4078aa99cfeec47ea6",
+      "bytes": 1814
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/workspace/diagnostics_test.go": {
+      "sha256": "e9418a8c8e934981b7623bc1085526bde998bcc7bbf02dbb17ad4461004331e7",
+      "bytes": 3287
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/workspace/editor_integrity_test.go": {
+      "sha256": "62446b1621e34b29c050ba2499c036f803db76d6dcdc3ce6a67a15bde24adb2b",
+      "bytes": 6745
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/workspace/events.go": {
+      "sha256": "3af568733d586d3742514b3d595298090a0325c9662ef928887dfbc370d292f7",
+      "bytes": 14028
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/workspace/evidence_lifecycle.go": {
+      "sha256": "a07c8d3c7ebc7e30ffd9e0d46bd3de43f7112b8081c196a304f008ef0e4ec2b9",
+      "bytes": 1498
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/workspace/export.go": {
+      "sha256": "fcb96ea1b731a5bb65ee481c21dadb77ffe088193694527a94a1db8b59910dcb",
+      "bytes": 20829
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/workspace/export_assets.go": {
+      "sha256": "330f8caa466a3ea9cb500baf84721bf99dc5031f594940a8e3cb6b76f0cb606e",
+      "bytes": 10318
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/workspace/export_html.go": {
+      "sha256": "159f95652edc4f91688f515645cebc9a3d01260bf21d8554b0274ab4d8dbb63a",
+      "bytes": 8651
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/workspace/export_pdf.go": {
+      "sha256": "73dae4bd802958232370696758036e50f417b0ea02b619e5f27af3ea97d729f6",
+      "bytes": 11531
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/workspace/export_pdf_portable.go": {
+      "sha256": "a6c89e27bc13fbf2b9fe71c0a8eab929e6803cb565325211d2f712eb53803011",
+      "bytes": 3962
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/workspace/export_pdf_test.go": {
+      "sha256": "2ecf4c4727b6c36be27e2e732437125beba308edb4afbc74d792336fe466adc9",
+      "bytes": 5382
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/workspace/export_privacy_test.go": {
+      "sha256": "714d17facf8aac009e5d2ae12065e96b3cde14375be908cc61a669675871254b",
+      "bytes": 9685
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/workspace/external_context_policy.go": {
+      "sha256": "c0fe8e58b18b9a4e8cd1ab598546ba4d1ec854af1f20a1fbe375525d87c25642",
+      "bytes": 13244
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/workspace/external_context_policy_test.go": {
+      "sha256": "5f709b686cad13349a27cdad40059103b7fbfbadc60f7155015cb9db17f20dfe",
+      "bytes": 24311
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/workspace/extraction.go": {
+      "sha256": "d504e9a722c08eb9104dbc876946fca52bed64dda5ea79e45d8a12a11a1e524c",
+      "bytes": 14504
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/workspace/files.go": {
+      "sha256": "388961b16930ebdf0b69c112409a139df2508d54f87ea777a3e6629549d14bd4",
+      "bytes": 21999
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/workspace/formula.go": {
+      "sha256": "320d0dc8857d9724921d90c308388d70eac6efbf3f40158ca5a8d1daecc708d1",
+      "bytes": 12782
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/workspace/formula_contract.go": {
+      "sha256": "c4a2603f81d4e2c037349eb9a2ac30261e7e989b2a7e834a8e9ac8c8bb06bb38",
+      "bytes": 5933
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/workspace/formula_service.go": {
+      "sha256": "5617e115d1c22204316a1dca3feb18a6deb2583273821587f1c6b82aac555098",
+      "bytes": 7892
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/workspace/formula_test.go": {
+      "sha256": "b2249e1e8ccd9a590976b31fdfc945b44bb94af5410c7e67e034a7fdc74c9f03",
+      "bytes": 1962
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/workspace/formula_translation.go": {
+      "sha256": "70f4cdbc4ec70884f8602c8ce669a8973054377dafd00a9ba14d752777b154a9",
+      "bytes": 2660
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/workspace/formula_v2.go": {
+      "sha256": "058cb43682e5140d838e1900cfa8a97eaa1132608a778a24665c99718fd1e736",
+      "bytes": 17233
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/workspace/formula_v2_test.go": {
+      "sha256": "8db9e027e889c33885a1b0d7f76aeedeb9537a7f90cf551cda953438edf91184",
+      "bytes": 10278
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/workspace/history.go": {
+      "sha256": "f11a05682273118c947ad6987c95ed0ec8b23a69d195a989cb2165693cccf9cb",
+      "bytes": 27034
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/workspace/history_attachments.go": {
+      "sha256": "d494ad0916ccc0d902d47f7eb28f63a2da2bc89f95b84b3599ad76a128eef17b",
+      "bytes": 1544
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/workspace/history_attachments_test.go": {
+      "sha256": "97f5e4ef0d922fcb5bf55b3248701af73b5e03f04a4dabbe103d605c07f7b6ae",
+      "bytes": 2556
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/workspace/hosting_transfer.go": {
+      "sha256": "bb3bcabaee14be011dd7b006d48fefd3f827ca9ce7f9b996a30b61e4e3ce8163",
+      "bytes": 3814
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/workspace/hosting_transfer_test.go": {
+      "sha256": "a0328e09a12cdb63ee55ff0347559c78f2f6ce2dff438d01a3ec653106f6fcfa",
+      "bytes": 3359
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/workspace/image_description.go": {
+      "sha256": "c271e5051d63acd693fa47b88ace0e11a465a129653d839ea1df7890f06cb35d",
+      "bytes": 13390
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/workspace/image_description_test.go": {
+      "sha256": "57235845f8a7ea53bc4922400e6800fde6000a4f105dddf7528d21f7a1054f69",
+      "bytes": 7937
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/workspace/image_measurement_test.go": {
+      "sha256": "0a9c267efa25f29b1c9a5781090b4abbd0a15c882ad562350080595a786ed713",
+      "bytes": 4352
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/workspace/import_attachments.go": {
+      "sha256": "1d3361ba4a3acc661c6207a1b3c77b6d74ab2639074c2f1bd727d4072d57a031",
+      "bytes": 8669
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/workspace/import_attachments_test.go": {
+      "sha256": "44563c88918c1da8f68f55933b820cc7cc1fce8d0f2f20291e9e56e98487dc90",
+      "bytes": 11417
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/workspace/import_block_identity.go": {
+      "sha256": "0a9be1f487aecc89dbff25c0e4b7a483ea3af99d8449650fd8cdb0d5cd0362ad",
+      "bytes": 5627
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/workspace/import_canonical_blocks.go": {
+      "sha256": "8da94e9a4d1ba5b757e3b1f7dfcde23728d3a4dec62b2f316ddcb5b1b7a2a608",
+      "bytes": 7633
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/workspace/import_commit.go": {
+      "sha256": "58775d872de2d51aedd00d8a191f5177801fec02e1cdb01bf516370156e4653e",
+      "bytes": 24613
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/workspace/import_conversation_merge_test.go": {
+      "sha256": "20e0c4c263d42c65219f9e7319761fb47dc305eb243b6ed4887129dfacab18ab",
+      "bytes": 6225
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/workspace/import_conversations.go": {
+      "sha256": "ecd5ada1f19c195215433901f4db07d2e2f2731f6fd7af8ea6cb13c658ef1525",
+      "bytes": 11770
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/workspace/import_csv_merge.go": {
+      "sha256": "1490954cb4b330b7106bc369ed8de8224862f0e84a177ceadc2d3aa4134cb1a9",
+      "bytes": 8361
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/workspace/import_csv_merge_test.go": {
+      "sha256": "4d352ea98c9a9bc21de02190cee7f03ee880eab818d21f3d00554487a796231d",
+      "bytes": 7049
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/workspace/import_database_canonical.go": {
+      "sha256": "9c65be053f1d016699d408480730415f61d028bd4e4d7a9ea481df25f3e8aef7",
+      "bytes": 27446
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/workspace/import_database_canonical_test.go": {
+      "sha256": "59ca357467b58cc4bd38ba5527fdf99caace53bc86f40d67f8b092002adf14b9",
+      "bytes": 5073
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/workspace/import_database_merge.go": {
+      "sha256": "cf9d280477fac5cb8d609d499eed29aaac3dc9fcbde1a875de9960be98bbeb9d",
+      "bytes": 32647
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/workspace/import_database_merge_test.go": {
+      "sha256": "2bbd22ed2a9ba992ed316173b0f7e416937a16adfc6ff0bf854514e1b4f501de",
+      "bytes": 19237
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/workspace/import_deletion_review_test.go": {
+      "sha256": "a80ce71902ce9de23469d32ed924c56dfdbc12ea14605a141ee8e4002e7d1fd8",
+      "bytes": 4540
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/workspace/import_expanded_test.go": {
+      "sha256": "511a829f91af42fad3ab019cdd0fc9195f1f28d2f8f81915107026a42b4ab866",
+      "bytes": 6795
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/workspace/import_export_test.go": {
+      "sha256": "9cf5c75cbb852cd1d56318ce8b5f1bc39509f0c8abfd16a40cef89e3bb2c33c9",
+      "bytes": 11415
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/workspace/import_html.go": {
+      "sha256": "24ef4f1e966216462386f4a371067b67af4fee32b1a6fa6e1d6698661ef45cf4",
+      "bytes": 9896
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/workspace/import_jobs.go": {
+      "sha256": "e1436951b1c7dfb650b1a00cab1e7904177a343275a42f72850a8d249a5119f7",
+      "bytes": 3943
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/workspace/import_merge.go": {
+      "sha256": "aff9cd47557c15e389a89cf7e2d4d95caa7c173bbb6f6a729f47f3457bbd723c",
+      "bytes": 26733
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/workspace/import_merge_test.go": {
+      "sha256": "9d4dff0e27755cb4192d96669e71b34de7452f825ec4f6441114b7aabca958ea",
+      "bytes": 16175
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/workspace/import_notion.go": {
+      "sha256": "56cec49b5bdeda2c8ed77f2d26651bbd2adea11da237e3cb80c5fa6bf5602421",
+      "bytes": 28755
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/workspace/import_notion_capture.go": {
+      "sha256": "ad05121d25722405fad6a1b38afc4ac1f1b2dde2ff700fdaa166b825de417557",
+      "bytes": 21574
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/workspace/import_notion_database.go": {
+      "sha256": "5fba7a04a6392b076df9c2c46bf50a2fe127407b15a5e303977c8a5f710e615f",
+      "bytes": 28620
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/workspace/import_notion_database_test.go": {
+      "sha256": "06a37fafc7bbf50d414749f6d012fab9e156e3c90f033f8480fe681a79d955b9",
+      "bytes": 29054
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/workspace/import_notion_structure.go": {
+      "sha256": "e9f59c2691c725a76d9d508b402a3a88a5757852c0d2410d8d88b38376fe99d3",
+      "bytes": 6139
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/workspace/import_notion_test.go": {
+      "sha256": "5786ab80ee9dc18be05b93319ca9d0d645bb7bf85e03b61a09e026c031660cbc",
+      "bytes": 5787
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/workspace/import_notion_views.go": {
+      "sha256": "008f86e28eabf62cd1b01ea4f8c2b88cc7a80c5492540b9815518084c3ff2cec",
+      "bytes": 9180
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/workspace/import_order_merge.go": {
+      "sha256": "e252b7bc18e360ff87b8ea086b561e6681ec6f6ad1e0f0fc74b27f8e805c3213",
+      "bytes": 4327
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/workspace/import_order_merge_test.go": {
+      "sha256": "a3a9eba8fd18da9d7a355ea6680ae1db41d5da70093902ef86d7c3a6bde6e909",
+      "bytes": 4573
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/workspace/import_page_deletion.go": {
+      "sha256": "37aac143b2a4faf94c68c1c53108d25a8801b31dd290886e1409f2e7e6ed3570",
+      "bytes": 12790
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/workspace/import_page_deletion_test.go": {
+      "sha256": "418d71898d21378b57025a75c664edee2ba56dcf55667ad802ee6419b31cf792",
+      "bytes": 11846
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/workspace/import_parse.go": {
+      "sha256": "a688cda66eca26f29012d1a7069b7c1e31e5c1df59f1d6967d3dafa6033f5ead",
+      "bytes": 22771
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/workspace/import_portable_identity.go": {
+      "sha256": "392c0dea959ad99bc92751888be4bc03e0cacccb6b087903a4faaf8c539530cd",
+      "bytes": 2657
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/workspace/import_portable_identity_test.go": {
+      "sha256": "f279695acdf625a4d02c4c9da402c220d6c990496ccf58979e80cec014cb9da2",
+      "bytes": 3900
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/workspace/import_progress.go": {
+      "sha256": "07f0576e25384e82650e6ed39b6f38683e507b96a3cee3580da59db7aaeaedc7",
+      "bytes": 490
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/workspace/import_record_deletion.go": {
+      "sha256": "7d15ab3a55598873a0ee681547b618c5bd807aa388331ce32bcf1b1dbddec4e9",
+      "bytes": 5812
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/workspace/import_record_deletion_test.go": {
+      "sha256": "39f2039abb740a35bd50821d87d6eaa4655be10dfd619fc3a9951122b6066d7c",
+      "bytes": 15395
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/workspace/import_structure.go": {
+      "sha256": "f00d7860b52d7240a7f105c9dd622cad69156347e9310c569482e27c61f5eff7",
+      "bytes": 10953
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/workspace/import_structure_test.go": {
+      "sha256": "cf034b53db3ddbd014bda36b6b7240464ad7a296cc13ef5749ef0b3cccc1ab4f",
+      "bytes": 18876
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/workspace/imports.go": {
+      "sha256": "cd474bdfe75732a06bf56ce0759a939dffe6f90304ed05a62874c1e91d3f1f42",
+      "bytes": 26924
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/workspace/index_external.go": {
+      "sha256": "abcb76990453e29f39234f492dc0637787047bbd3c67375ec5d978fec850a3ba",
+      "bytes": 23357
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/workspace/index_external_recovery_test.go": {
+      "sha256": "b89f8e3185519c554be3e650efa3f28921d13d944ada2743b159d43e6f01c0f0",
+      "bytes": 9099
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/workspace/index_external_test.go": {
+      "sha256": "d080dc52c47c5e7e3bb90f980c0e0859d8c31c1a90639615480e7e1d70e060cf",
+      "bytes": 4750
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/workspace/job_backup.go": {
+      "sha256": "38c711be69f95b8163464cd97c36b037de5f57e4af782989258bd15a8c131e70",
+      "bytes": 3841
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/workspace/job_commits.go": {
+      "sha256": "a5506e0e42a787774e233c1f21f250c92cecd3d523f8c7d6e4b8c247199f5c75",
+      "bytes": 13134
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/workspace/job_retry.go": {
+      "sha256": "1d0f425d5750fed98dcbeff029a2807f39613978fde057d4cf67c8c552d73e80",
+      "bytes": 1836
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/workspace/job_retry_test.go": {
+      "sha256": "bb1a4b3fb00941c4f29d952b9756c40b3dee0717f1e28b3e35a4e298ff390756",
+      "bytes": 3307
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/workspace/jobs.go": {
+      "sha256": "517985a843cbcf219ac690ace0913a7248f3266ea32811f7da7e1f869e707a54",
+      "bytes": 19066
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/workspace/jobs_test.go": {
+      "sha256": "455005fc866f4edeba6e69553fbb05b4a369117915b835cbfd017e834c645a58",
+      "bytes": 17693
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/workspace/kernel.go": {
+      "sha256": "c1670443f9a4dc100c77c1eda6120d3c42571467d694c7b68e4f9b94bfd9f719",
+      "bytes": 20025
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/workspace/kernel_test.go": {
+      "sha256": "3e26d59af88821a48dc590eeb065646a4d2f12853f27a4f7500ce8e36c75403b",
+      "bytes": 14671
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/workspace/layout_integrity_test.go": {
+      "sha256": "71bcb7b9e92c1f4b1e516071e0edff2b8a64a0e64474c801b304404b41b83332",
+      "bytes": 4802
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/workspace/meeting_controls.go": {
+      "sha256": "359652e2a3b88fbcf2298b9e980e4d167b41ee6089768b955a827a45611cc366",
+      "bytes": 15874
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/workspace/meeting_controls_test.go": {
+      "sha256": "c4b3728a7dc6b1f3c2d051b738729d64983605fc563748ceccf050b9195f4582",
+      "bytes": 15368
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/workspace/meeting_extraction.go": {
+      "sha256": "3687a1dae7b4ff9b2edd883d397ba9c97048a2490082f57e5ea26a357d1d635c",
+      "bytes": 16037
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/workspace/meeting_extraction_test.go": {
+      "sha256": "829a2a285786fa68e2c633d170da1b59025bc4cc1f4947532df105010fa71652",
+      "bytes": 9202
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/workspace/meeting_intelligence.go": {
+      "sha256": "99656a8c737fc979bdf0111d093beaaf0dd720770741df74c05e427bed6cab9d",
+      "bytes": 12415
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/workspace/meetings.go": {
+      "sha256": "04d19ed113156c75bf1db25e353645a1891438b59399608b2f841834511dab4a",
+      "bytes": 11596
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/workspace/memory.go": {
+      "sha256": "73f98ab8d192f86f607f92a3209eaf7b34a7041b1a236eac0fdad143d14e0dfb",
+      "bytes": 16019
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/workspace/migration_snapshot.go": {
+      "sha256": "55b6d18d1cbe76f1242e0dbeaf9df29c4fdab06bb6c110a03e12dfbd8987caeb",
+      "bytes": 25484
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/workspace/migration_snapshot_test.go": {
+      "sha256": "04d6e9dd54eaec979e7762275fb5594b0c70c7c683652070cad0d8c9b272c62c",
+      "bytes": 19236
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/workspace/mutations.go": {
+      "sha256": "70b95ab3a62626f34c5e6aee3f52ebaa9bc0fe7189bd71e127acfa81a61c6e99",
+      "bytes": 18897
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/workspace/native_diagnostics_fixture_test.go": {
+      "sha256": "cacfd269e7571f823a2d4aed16e71f7d9d3f3adcd211b7e4cfa443253eedbecf",
+      "bytes": 6504
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/workspace/open_compatible.go": {
+      "sha256": "1ec6c0cd0118f9d2ebf24bcd58a1db3443ae6231c5b352dc9fe6496c6f55d844",
+      "bytes": 3775
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/workspace/open_compatible_test.go": {
+      "sha256": "2d3a82c4c25ae4efd4392fa3d63a9e0aac78e21bd517be18977479c9bd6b4369",
+      "bytes": 5452
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/workspace/operation_journal.go": {
+      "sha256": "3329cc6aff8c6df99a6eb610b2a12dafcdc28435682079ba1a29f04270c1f6b1",
+      "bytes": 16894
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/workspace/operation_journal_test.go": {
+      "sha256": "4a32939c0f2a1c5d36d7edc2a413a59b89561a0a85efdb6736df38e98faf6116",
+      "bytes": 6298
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/workspace/p0_acceptance_test.go": {
+      "sha256": "effcfae82770b5ae8c72a89986709762451a70715d79e89382f6c437d8097f5e",
+      "bytes": 12767
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/workspace/p2_database.go": {
+      "sha256": "810176bd73ffe7cd0d8b1a323a02dffaf0b4efa49d8f38ecb185f895cab7fef1",
+      "bytes": 16504
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/workspace/p2_database_test.go": {
+      "sha256": "80978eca754f97392182131ba53d9ca83156482106972aaf63350582afd4cc85",
+      "bytes": 11425
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/workspace/p2_display.go": {
+      "sha256": "bdca91e4a55be519e32409d20c07ff23d3f3cc7b95a21d3ee4fd78084e5fa784",
+      "bytes": 2581
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/workspace/p2_intelligence_graph.go": {
+      "sha256": "a4aa08843a6b3c644f03aad8e4e88bcf9a70e092f53e4230b242ee92c1c7c51f",
+      "bytes": 6415
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/workspace/p2_intelligence_ocr.go": {
+      "sha256": "297ed5a2d3651c9befb0fbbe8306b2048544cc76b186f931b6351f67b9705ccf",
+      "bytes": 6812
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/workspace/p2_intelligence_review.go": {
+      "sha256": "8979cc6ecab3445390ff4a294694e1c7162f737e0bfbd4d32fa18f75edda7808",
+      "bytes": 23438
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/workspace/p2_intelligence_test.go": {
+      "sha256": "8fe79cb75a3f12f442fb350196bf6a5e0113f00a3624333b18d46338e6071526",
+      "bytes": 14701
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/workspace/p2_migration_editor_test.go": {
+      "sha256": "286fcaf9871f8eff1f31b74087b9ecc80d1f9d5a32c2f47ebbf74c5e02c4376e",
+      "bytes": 10098
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/workspace/p2_ocr_provenance_test.go": {
+      "sha256": "1518466868c483735a0a2558083e42e6da4b94d419971904a66b80a88008ca2b",
+      "bytes": 3986
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/workspace/page_freshness.go": {
+      "sha256": "5df19d39f8b22cb23d47b61803cc72b0c97e25e6e998f9bad94276b91746a0fb",
+      "bytes": 20583
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/workspace/page_freshness_acceptance_test.go": {
+      "sha256": "29de8ac627d101c8cb2057af8e6050a1a055185d5c6aae97e28680198646628a",
+      "bytes": 7251
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/workspace/page_freshness_test.go": {
+      "sha256": "a81466a09d5d1e381e326b2ddf3113d20c15da0e4b5460d2eefc807637e5478e",
+      "bytes": 11885
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/workspace/pages.go": {
+      "sha256": "fab3369e4a51d7d4f9364957e8f24826f179496cab17983d761d57e77cd44bb7",
+      "bytes": 15036
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/workspace/permissions.go": {
+      "sha256": "eae92daf6200eccd128145f633706406a0ced589fe15ed7c694e81fc175c6465",
+      "bytes": 8477
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/workspace/personal_review_generation.go": {
+      "sha256": "d7881d9d85e8abb419862956ca79549cffbdc2461a4f4e8400ffd5bb4a484815",
+      "bytes": 31141
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/workspace/personal_review_generation_test.go": {
+      "sha256": "4230e136adaf35027c1e7dbb7db0617134a851ef7224434af0e80a0e4df84796",
+      "bytes": 15513
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/workspace/personal_review_local_evaluation_test.go": {
+      "sha256": "39ccd591d3ccd5bdb8a9a40d1a89c5aa1adddbf78bd2b4f3292d060ffe39c317",
+      "bytes": 3378
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/workspace/personal_review_worker.go": {
+      "sha256": "4610af916e5b0ba3b559e8dc33b244f0cee2b894c36879c4c2e54ef711475799",
+      "bytes": 826
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/workspace/phase4_export.go": {
+      "sha256": "dec70296f29bd2cd795afc98869349d95208fab8b493bbe54019afc48891677b",
+      "bytes": 3679
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/workspace/phase4_export_test.go": {
+      "sha256": "59a769a3a4d36dc82eb729509aac95e8886e1c9d4798959b655b7ac77d711ba6",
+      "bytes": 2213
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/workspace/phase5_behavior_test.go": {
+      "sha256": "0d9f151bd28b3073a1cc713f3eebbbfcebcd0c604c37adbabed32a47c6372f27",
+      "bytes": 10807
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/workspace/phase5_boundaries_test.go": {
+      "sha256": "afd4b836e591a8f2c5a37e028c59b126d0996336b6386d5746feaf14aaca35aa",
+      "bytes": 12430
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/workspace/phase5_editor_performance_test.go": {
+      "sha256": "5e19bb8516333677d03f28ccb74c500f773b020f3fd1a10e2e510f2131c24e3a",
+      "bytes": 7144
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/workspace/phase5_recovery_test.go": {
+      "sha256": "e6f1b139e26e215d98d3693f8ae1948b75449ed2bdb04520aa6fd889f8844aa6",
+      "bytes": 26285
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/workspace/projects.go": {
+      "sha256": "8f174e5ee8b0948cdbd0421566d3d64303314e82a19474fc1d04de90068dd424",
+      "bytes": 3344
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/workspace/provider_actions.go": {
+      "sha256": "63f3e474dadadf589676c3b8241e3cf8f9def8a6d25909934a37b40a2a0a2e66",
+      "bytes": 2402
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/workspace/provider_actions_test.go": {
+      "sha256": "c27cc15277ad790d1be5d02eba295091650f9be4375980de283d44c3a4a3f496",
+      "bytes": 8558
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/workspace/provider_auth_boundary.go": {
+      "sha256": "1251eef09b80fe92ca1379e1ea8062d0aa7125f4f9cb80f04a4554fe0faed03b",
+      "bytes": 339
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/workspace/provider_managed.go": {
+      "sha256": "39e02b42dade947a489e713dcd6da99e14443c6ff246874f5c7c9f2dcae475cd",
+      "bytes": 4750
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/workspace/provider_managed_test.go": {
+      "sha256": "a054d02fecfe5e4ededc394a54cbbc009cd73889c7797c13f2ab679d4ea791ae",
+      "bytes": 3511
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/workspace/provider_mcp.go": {
+      "sha256": "bd920230b32c694719ef6a37299fea1508e2fbcb065d29f059114e2a1d4e2f15",
+      "bytes": 8583
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/workspace/provider_mcp_boundary.go": {
+      "sha256": "370a18a3ac2205e522d2420bb93b7fa8f99f9f5d3811513fa94845f6523b655e",
+      "bytes": 1598
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/workspace/provider_remote_audit.go": {
+      "sha256": "10a111251785d7aa0240d03d2328e1180e30546112107cdd91c4acef0e638325",
+      "bytes": 1340
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/workspace/provider_remote_test.go": {
+      "sha256": "a7aea19d6649a5fd263c103bc494200764c02c2cc954e781b07769e637a5700b",
+      "bytes": 8275
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/workspace/provider_sdk_test.go": {
+      "sha256": "bf2532740bf142ee18c33d95f0089484111842f679d44e49d1439b8ef1590643",
+      "bytes": 7373
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/workspace/providers.go": {
+      "sha256": "8dc1fe3d235b380456ab32a1739812362529b50c7dbe8944b736d8eef945a039",
+      "bytes": 20385
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/workspace/providers_test.go": {
+      "sha256": "d501f7870a0009fbf65084748912b40f11abf22207b581bc48d726d822780dd6",
+      "bytes": 12641
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/workspace/record_layout.go": {
+      "sha256": "808f9ff7cc349ddc058843bb3fd2ad046198067b77416659f99ce30d59130d81",
+      "bytes": 9482
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/workspace/record_layout_test.go": {
+      "sha256": "09f10965d7a0390eef90fde8d461cdd9537a5a875ac585beaceb200209abfc77",
+      "bytes": 6435
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/workspace/recording_controls_test.go": {
+      "sha256": "c12944bef8229b4c4e0af1595c921b22fbc36fa17049b0697be442c4ac429ff0",
+      "bytes": 3606
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/workspace/recording_duration.go": {
+      "sha256": "bf2fb2abfdef9ca06e4f231e25b72deeae6280e92ea5af25da684a6ace304ce7",
+      "bytes": 3196
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/workspace/recordings.go": {
+      "sha256": "12e1f9c7428a87fd8eab1dc400aa0a454e5d9fdb4e061350a0abfe5c991ae9a3",
+      "bytes": 24406
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/workspace/recordings_test.go": {
+      "sha256": "0c74dd883b6b85220c5208078e85d8fa11d08b77301845199d27869e4c409e00",
+      "bytes": 8888
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/workspace/recovery_admission.go": {
+      "sha256": "2586d1e208d7a0b1508180f89c18365589880cda80453acdce3ad6e5c229139a",
+      "bytes": 4735
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/workspace/recovery_admission_test.go": {
+      "sha256": "c1889f1e12beb00b7d5e69097853fb66e9575cf8d7223f9c2bc492fa7845a491",
+      "bytes": 11746
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/workspace/recovery_metadata.go": {
+      "sha256": "ac512041faeeb7de94f884443d276bf78a59668f5bad547fd95da8b900987fc9",
+      "bytes": 12045
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/workspace/recovery_subtree.go": {
+      "sha256": "8128ada4a596bd80c8107c721ddd14045a8e4f16e61a13207be77425d8cf5b67",
+      "bytes": 7549
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/workspace/recovery_test.go": {
+      "sha256": "9d66cc56d6b22e0d9c31d10414636f84f64758fb77819e550bda245c060d10b5",
+      "bytes": 16529
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/workspace/recovery_values.go": {
+      "sha256": "775a2aea6f4ca627a42675ea624194404b76cb43407a65553148daee413a055b",
+      "bytes": 9216
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/workspace/recovery_values_test.go": {
+      "sha256": "3738da07b154eb1a4949e4f35b83b52ea3e96ab9eaa140fd768d3ae7c50f35ba",
+      "bytes": 12638
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/workspace/related_graph_test.go": {
+      "sha256": "c64713ac395cd976c370efb0b3e1e7918c01a184b0eb11dec60d21df2c27d6d3",
+      "bytes": 5221
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/workspace/related_search.go": {
+      "sha256": "4605de8badf1eea0978f4ec1d420ad253dda9d5612971072df32ae2b0c01e814",
+      "bytes": 2478
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/workspace/reminders.go": {
+      "sha256": "89f5c441aaf8de31b8198cb5d6c7d3cc748674720f29b7db3296ddad56aeb8eb",
+      "bytes": 14771
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/workspace/reminders_test.go": {
+      "sha256": "60c9745dc7b0fdc39363aec1dde17eb625eac49f612144e6530e1355de00d959",
+      "bytes": 8297
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/workspace/restore.go": {
+      "sha256": "45874ec34d3322939976e14b384d3d72b904efac130b7dcef70b66b9d3cc7b87",
+      "bytes": 16075
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/workspace/restore_compatible.go": {
+      "sha256": "a90eaf575c841f2230d51a9268700677a3dfc04d40bb0cd33b8ea9e0c4016f3e",
+      "bytes": 11031
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/workspace/restore_compatible_test.go": {
+      "sha256": "45a26288c57aad01ed165ab0118646453ad9d7a583d9ae222382cbe904543a95",
+      "bytes": 9006
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/workspace/restore_meeting_test.go": {
+      "sha256": "f169ccf4a63669ca162fb8f2e93d42ef9337c005c7eda4f69b2d428c243318d3",
+      "bytes": 5650
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/workspace/restore_test.go": {
+      "sha256": "253ed118cc6cdd5c54b0c51bbd3998cbc72ad695da905e001b91e0b8e4d16205",
+      "bytes": 17573
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/workspace/rich_colors.go": {
+      "sha256": "ad97e093efc62681df59a0cb782a45e71ecb0351c69fe3344de288654d85ec5c",
+      "bytes": 1775
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/workspace/rich_colors_test.go": {
+      "sha256": "eee7e87269bf91159ef5c6453c412f0c8436a3f1204374dd478a16ad9d0ffe6c",
+      "bytes": 4284
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/workspace/scheduling.go": {
+      "sha256": "4e13d2c044dceaa01784618cf81cf96dcc4045350a2a92b6db345946413a5422",
+      "bytes": 11774
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/workspace/scheduling_calendar.go": {
+      "sha256": "9d2824b6a5946b88553f72e3414fe2b5f54e1658ce08e9224075bdb5db671dee",
+      "bytes": 7769
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/workspace/scheduling_test.go": {
+      "sha256": "47878c396ae7051ccb9e15612e4ca9f8b2cf33cb99f73d48f29049a8e2c99d27",
+      "bytes": 13787
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/workspace/schema_journal.go": {
+      "sha256": "ef360ef3823f56513d9fe82e25413659d88fa031a5590771e4e39ad2724a0e5e",
+      "bytes": 14438
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/workspace/schema_journal_test.go": {
+      "sha256": "605f73be0bb02fb36de6f442a0d5c371de0c1ef8f402da5a4f2f762a149013fa",
+      "bytes": 11839
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/workspace/schema_value_migration_test.go": {
+      "sha256": "48c49e84deb3eb40912b166f3f8c21d12c37409b9d960af500cc1c4fbe950d4a",
+      "bytes": 15649
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/workspace/search.go": {
+      "sha256": "5c5a871a4045b48614c32bdbbe816b3a9630734add7797c754774f6f61d5f83b",
+      "bytes": 25182
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/workspace/search_auto.go": {
+      "sha256": "e348b5a04c8c4c6968c0b19be7fe67090d351f49ed7be7f3e2a31d375d18ce02",
+      "bytes": 5836
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/workspace/search_auto_test.go": {
+      "sha256": "a374028c87aa13f9857223b2d0822b95ceea26daf3ea300e8c2e623abd4083a1",
+      "bytes": 5489
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/workspace/search_richtext_test.go": {
+      "sha256": "9119d6ece0875c4713bde847db3959dbb829dd46f252bda501e44631bb19640f",
+      "bytes": 7572
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/workspace/search_semantic.go": {
+      "sha256": "cc3af34a43fb2567a691c8cd349c7b0c0e3493c97ca46b0bb5073c5183dedc45",
+      "bytes": 10887
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/workspace/search_test.go": {
+      "sha256": "e1b91dbf02a31cf1546bdc06ac850d4eea8e7e5ad8e74f51f098cc6218cba55e",
+      "bytes": 15895
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/workspace/search_vectors.go": {
+      "sha256": "18dfe65f0126826fad0f8217afff8c6d5d9649074d02cf7514bf729ce8c13875",
+      "bytes": 4732
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/workspace/search_vectors_benchmark_test.go": {
+      "sha256": "62bd7589136d96a1e337c67657421499de8dfe25a81ef3509ececf4d612725c1",
+      "bytes": 2285
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/workspace/search_vectors_test.go": {
+      "sha256": "58514a375902dfdb3a222631622fb3768ceb5643befeb144e4ad24c4c58b19e9",
+      "bytes": 3854
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/workspace/services.go": {
+      "sha256": "684bbb35ec06646f85aee2997c2e07c5b85e3c7e40af433434753183f512c297",
+      "bytes": 4140
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/workspace/shell_snapshot.go": {
+      "sha256": "40ae94dcdaa209c2ae8e18a84e6ab3d0ac7ad444af2ee53ae1bd444b75d0136a",
+      "bytes": 6852
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/workspace/shell_snapshot_test.go": {
+      "sha256": "442d22f108263c8f073fc3ec9bf0a5f99c659b5a049ee802232e109b1abe380f",
+      "bytes": 5115
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/workspace/skills.go": {
+      "sha256": "eff3ac19a7bd53608145a09a768a60de93c83649065297f34b8d71491da1fadc",
+      "bytes": 11431
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/workspace/skills_test.go": {
+      "sha256": "77a2de8965a0c4e40b828edb41cd7bb5a2d6b7d0c46d99a7d150d493555c107a",
+      "bytes": 11716
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/workspace/support_bundle.go": {
+      "sha256": "02ab9a17d4a7732c1efcbdbe81e7540889bfd985371113fe6e5b52a157eaaf68",
+      "bytes": 16412
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/workspace/support_bundle_test.go": {
+      "sha256": "10fe4deb732ad820cd4529f7c747c71d88118d11220bdc132cd419e76e432bb4",
+      "bytes": 14336
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/workspace/tasks.go": {
+      "sha256": "fa5c9729be1ee57d1d60fb7b0f22c6a68b916ae0d730d2f3b2e2d54f47da52ff",
+      "bytes": 7196
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/workspace/tasks_test.go": {
+      "sha256": "b35561f30a6ee23d9eccce9a403c2923eb7f0c26e2099664213a9defdd0ee295",
+      "bytes": 9062
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/workspace/templates.go": {
+      "sha256": "20aab32b6a3963ac486e2c43c795c0fe1817c3f9c3d30bac4aa4a77ce1fbc3bd",
+      "bytes": 26629
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/workspace/templates_test.go": {
+      "sha256": "df4395214c9b094394d145f2487d6ff62a7a86b0eec839d3728fc27d7c477ba3",
+      "bytes": 16591
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/workspace/testdata/expanded-evaluation/image-boundary-1.png": {
+      "sha256": "fd69ade16fed487a06129b5f071527f55e87e249d6d87f775449b4fb315fa7b6",
+      "bytes": 311
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/workspace/testdata/expanded-evaluation/image-boundary-2.png": {
+      "sha256": "6a204a6dd39541c3b46779333153e0a883453fb4a38c03081c32928c0b553421",
+      "bytes": 300
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/workspace/testdata/expanded-evaluation/image-boundary-3.png": {
+      "sha256": "2c5fb7c6f188f7f264da07eb97511eba3de4b9228ecbd75c5f78a542a6c2f9ee",
+      "bytes": 300
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/workspace/testdata/expanded-evaluation/image-boundary-4.png": {
+      "sha256": "e4ceac3ac2fa99a4eb01985a81223d358975ed7795f2987857ebf8dff059549e",
+      "bytes": 316
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/workspace/testdata/expanded-evaluation/image-boundary-5.png": {
+      "sha256": "7c95a6a9df0450db45c8e91a3cfb820c6bb8a7b483259c87e2b5f0a2d7f72755",
+      "bytes": 317
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/workspace/testdata/expanded-evaluation/image-boundary-6.png": {
+      "sha256": "ccee59d034a77dd6a0a622ea8643db2861145a9c6c4e274053ff6e6b390bef7f",
+      "bytes": 332
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/workspace/testdata/expanded-evaluation/image-diagram-1.png": {
+      "sha256": "5a66d839da185a654cbd089f1944770516688334ddd5149417b68ae5f36c1194",
+      "bytes": 318
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/workspace/testdata/expanded-evaluation/image-diagram-2.png": {
+      "sha256": "2d5690be137f5f9ed9dcec909b84ba376b023dc6888174d59081203dc08b44a8",
+      "bytes": 318
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/workspace/testdata/expanded-evaluation/image-diagram-3.png": {
+      "sha256": "57d027ea47444206b8cdf5c415643f75e150d71236b7627e28505292b773f96e",
+      "bytes": 321
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/workspace/testdata/expanded-evaluation/image-diagram-4.png": {
+      "sha256": "a885e5dc35f0129700d54c11980d4667bfdb672ed4ec167e337271a7485668a1",
+      "bytes": 359
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/workspace/testdata/expanded-evaluation/image-diagram-5.png": {
+      "sha256": "a885e5dc35f0129700d54c11980d4667bfdb672ed4ec167e337271a7485668a1",
+      "bytes": 359
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/workspace/testdata/expanded-evaluation/image-diagram-6.png": {
+      "sha256": "a885e5dc35f0129700d54c11980d4667bfdb672ed4ec167e337271a7485668a1",
+      "bytes": 359
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/workspace/testdata/expanded-evaluation/images-execution-v2.json": {
+      "sha256": "b3c93a6a6b0f93548d9f44b75694c38673586ebcce2cf24f38689418986fca4b",
+      "bytes": 11942
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/workspace/testdata/expanded-evaluation/images.json": {
+      "sha256": "f726da41e496636780c3402a78f2541bdee2fe3f07ff403fe803017c466b63c6",
+      "bytes": 8012
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/internal/workspace/transcript_commit_test.go": {
+      "sha256": "debaedf63b53004f77a3e5efd5fc562bb5f4f619657ceedd57c172507cbb4c85",
+      "bytes": 7209
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/schemas/embed.go": {
+      "sha256": "62ea3729e621cc75c2b5885ddfb4696deb0a70543c69ed8c9c4ab3e791d3af7e",
+      "bytes": 156
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/schemas/services.sql": {
+      "sha256": "a9ed90022d9fadf28468a8625b0716ba47e6dba5b45bcf3b5ce3d9fc3d8523c5",
+      "bytes": 3496
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/schemas/workspace.sql": {
+      "sha256": "227c533aef7dea1d5fb358f41245861fd589995783172972c7edef1f9c2d82ed",
+      "bytes": 16328
+    },
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/scripts/run-expanded-evaluation.py": {
+      "sha256": "d2bb91e926a767d85a295a61d5dc0ca98c8f5be47857712f3c90fa3103c834e6",
+      "bytes": 52459
+    },
+    "/Users/suryasriramduvvuri/Library/Caches/Trove/completion/models/01990000-0000-7000-8000-000000000107.json": {
+      "sha256": "27d498689d154154d1caecc2152b78be4bb106343497153787a1dc5e4269e7fa",
+      "bytes": 1288
+    },
+    "/Users/suryasriramduvvuri/Library/Caches/Trove/completion/models/01990000-0000-7000-8000-000000000107.model": {
+      "sha256": "9d4612de6a42214499e301494a3ecc2be0abdd9de44e663bda63f1152fad1bf4",
+      "bytes": 436806912
+    },
+    "/Users/suryasriramduvvuri/Library/Caches/Trove/completion/models/01990000-0000-7000-8000-000000000108.model": {
+      "sha256": "4b2fca922e549e9b9608f4ba56f93565dd5220e935ba5570a2a864a0fcc988a6",
+      "bytes": 199468800
+    },
+    "/private/tmp/trove-workflow-native-image-framing-20261015-v1/audio-decoder": {
+      "sha256": "8e582101947184849b89596568f89394ba5c88a654511d8f5b2974f290e70719",
+      "bytes": 1755984
+    },
+    "/private/tmp/trove-workflow-native-image-framing-20261015-v1/audio-decoder.json": {
+      "sha256": "82b73182fd7f973903cb08219e8b64b6c1a53dabedac6ab45b5817af4a87a5cb",
+      "bytes": 951
+    },
+    "/private/tmp/trove-workflow-native-image-framing-20261015-v1/document-extractor": {
+      "sha256": "ef7f2543226846f39283ba325f4699c10b92b22fcf19828b11c1fbcf2b80f75d",
+      "bytes": 59728
+    },
+    "/private/tmp/trove-workflow-native-image-framing-20261015-v1/document-extractor.json": {
+      "sha256": "fae8680d007214f5e6769aa6205a2f88941f4287474d34b00adcd205695e2425",
+      "bytes": 299
+    },
+    "/private/tmp/trove-workflow-native-image-framing-20261015-v1/evaluation-assembly.json": {
+      "sha256": "c08cee5f4e187ac6088a2bb9f9f23d657fded87b02b1d278fff0a239d668c726",
+      "bytes": 2304
+    },
+    "/private/tmp/trove-workflow-native-image-framing-20261015-v1/llama-worker": {
+      "sha256": "6bdae1f55891d9df40f40eb7ac9e4a5fccfb93fd22f30fda181554a1c2b2c9af",
+      "bytes": 7111232
+    },
+    "/private/tmp/trove-workflow-native-image-framing-20261015-v1/manifest.json": {
+      "sha256": "f5412a887adac1ad2f00b5dbeda61a22f7f74349ab5c682f2e11c1d6b040098a",
+      "bytes": 1366
+    },
+    "/private/tmp/trove-workflow-native-image-framing-20261015-v1/microphone-worker": {
+      "sha256": "1227b1506c50426fe3579f1232697b07f6f31ecad7f51f5220bb510893ba1624",
+      "bytes": 664544
+    },
+    "/private/tmp/trove-workflow-native-image-framing-20261015-v1/microphone-worker.json": {
+      "sha256": "f467028caddcb324b59c4a692d89c418d09a657e397249e27362d8e22acf08df",
+      "bytes": 4608
+    },
+    "/private/tmp/trove-workflow-native-image-framing-20261015-v1/ocr-worker": {
+      "sha256": "dcb2bccae9ee1de6d3502d60b8017ee345edafd882edcff98b4a9ac7057650bd",
+      "bytes": 110624
+    },
+    "/private/tmp/trove-workflow-native-image-framing-20261015-v1/ocr-worker.sha256": {
+      "sha256": "5a7ae8c15473176bf44a622eb3236cfd439971b74b1b21a2ea7df600ea249602",
+      "bytes": 65
+    },
+    "/private/tmp/trove-workflow-native-image-framing-20261015-v1/pdf-renderer": {
+      "sha256": "6329e8e63df8cb3cb2c4043e490a8f1a0007d5c704c7bbf4034d8722745b9964",
+      "bytes": 137888
+    },
+    "/private/tmp/trove-workflow-native-image-framing-20261015-v1/pdf-renderer.json": {
+      "sha256": "2d7c6a0ea0de7b38d4d05e33f056fd7e206308f39a98727c2722e07ac5a0708b",
+      "bytes": 307
+    },
+    "/private/tmp/trove-workflow-native-image-framing-20261015-v1/vision-worker": {
+      "sha256": "f35abc550886062e6b302a21eca34bfc0e6a1d0d923a7c50e0acf0559a791122",
+      "bytes": 6217888
+    },
+    "/private/tmp/trove-workflow-native-image-framing-20261015-v1/whisper-worker": {
+      "sha256": "5b6996956ca7412bf3cd79aedb225eda7d98ab08eb7415f754362e257302f488",
+      "bytes": 4105392
+    }
+  },
+  "hardware": "macOS-27.0.1-arm64-arm-64bit",
+  "networkPolicy": "(version 1)(allow default)(deny network*)",
+  "performanceQualified": false,
+  "releaseQualified": false,
+  "state": "finished",
+  "initialFreeBytes": {
+    "/private/tmp": 16199675904,
+    "/var/folders/xc/s78np0812b12p6338l0ndvsm0000gn/T": 16199675904
+  },
+  "canonicalEvidenceDirectory": "/private/tmp/trove-workflow-images-framing-20261015-v1/canonical",
+  "canonicalEvidenceScope": "Retained typed canonical rows and exact asset bytes; runtime temporary workspace itself is not retained.",
+  "buildCommand": [
+    "/Users/suryasriramduvvuri/Library/Caches/Trove/completion/go/bin/go",
+    "test",
+    "-mod=readonly",
+    "-tags",
+    "fts5 sqlite_omit_load_extension",
+    "-c",
+    "-o",
+    "/private/tmp/trove-workflow-images-framing-20261015-v1/evaluation.test",
+    "./internal/workspace"
+  ],
+  "testBinarySHA256": "eccc687c28ae14f6474ed81c2b892eb68ce7e4ba1add529ad9d645669caa2ddd",
+  "runCommand": [
+    "/Users/suryasriramduvvuri/Library/Caches/Trove/completion/go/bin/go",
+    "tool",
+    "test2json",
+    "-t",
+    "-p",
+    "trove.local/phase0/internal/workspace",
+    "/private/tmp/trove-workflow-images-framing-20261015-v1/evaluation.test",
+    "-test.run",
+    "^TestRealLocalWorkflowImages$/^(diagram\\-1|boundary\\-4|boundary\\-5)$",
+    "-test.v",
+    "-test.timeout=150m"
+  ],
+  "exitCode": 1,
+  "elapsedSeconds": 23.957337856292725,
+  "summary": {
+    "reportedTaskPasses": [
+      "diagram-1"
+    ],
+    "reportedTaskFailures": [
+      "boundary-4",
+      "boundary-5"
+    ],
+    "expectedCases": 3,
+    "passedCases": 1,
+    "missingCases": [],
+    "unexpectedCases": [],
+    "errors": [
+      "workflow boundary-4: required assertion missing or failed",
+      "workflow boundary-4: faint-mark answer differs or adds unsupported content",
+      "required case did not pass: boundary-4",
+      "workflow boundary-5: required assertion missing or failed",
+      "workflow boundary-5: faint-mark answer differs or adds unsupported content",
+      "required case did not pass: boundary-5"
+    ],
+    "automatedCorpusPassed": false,
+    "manualSemanticReviewPending": [],
+    "canonicalEvidence": {
+      "diagram-1": {
+        "schemaVersion": 1,
+        "unchanged": true,
+        "rowsUnchanged": true,
+        "assetsUnchanged": true,
+        "mutationHistoryCountUnchanged": true,
+        "before": {
+          "sha256": "69dbcefbae385e564762950b71fae9049a4290bf1865a2219d15920076037c5f",
+          "size": 59904,
+          "path": "/private/tmp/trove-workflow-images-framing-20261015-v1/canonical/07649c97ec266eb6-2565168385/before.json",
+          "retained": true,
+          "tableRows": {
+            "advanced_button_actions": 0,
+            "advanced_page_locks": 0,
+            "advanced_templates": 0,
+            "approvals": 0,
+            "attachments": 1,
+            "autofill_batches": 0,
+            "automation_rules": 0,
+            "automation_runs": 0,
+            "backup_destinations": 0,
+            "backup_pins": 0,
+            "backups": 0,
+            "blocks": 0,
+            "cancellation_receipts": 2,
+            "collections": 0,
+            "committed_events": 2,
+            "connector_account_history": 0,
+            "connector_accounts": 0,
+            "connector_credential_cleanup": 0,
+            "connector_cursors": 0,
+            "connector_draft_history": 0,
+            "connector_drafts": 0,
+            "connector_proposals": 0,
+            "connector_receipts": 0,
+            "connector_refreshes": 0,
+            "connector_snapshots": 0,
+            "container_collections": 0,
+            "containers": 0,
+            "database_settings": 0,
+            "entity_tombstones": 0,
+            "external_chunks": 0,
+            "external_page_references": 0,
+            "external_root_approvals": 0,
+            "external_roots": 0,
+            "external_sources": 0,
+            "file_external_context_policy": 0,
+            "file_external_context_sources": 0,
+            "file_ingests": 0,
+            "file_references": 1,
+            "files": 1,
+            "idempotency_receipts": 2,
+            "import_baselines": 0,
+            "import_csv_bindings": 0,
+            "import_entity_ids": 0,
+            "import_mapping_state": 0,
+            "import_mappings": 0,
+            "import_observations": 0,
+            "import_runs": 0,
+            "job_authorizations": 0,
+            "job_context": 0,
+            "job_events": 0,
+            "job_results": 0,
+            "job_sources": 0,
+            "job_units": 0,
+            "jobs": 0,
+            "kernel_meta": 6,
+            "managed_provider_runs": 0,
+            "meeting_archived_proposals_v1": 0,
+            "meeting_extraction_items": 0,
+            "meeting_intelligence": 0,
+            "meeting_retention_v1": 0,
+            "meetings": 0,
+            "memory_entries": 0,
+            "memory_sources": 0,
+            "mutation_history": 2,
+            "notion_captures": 0,
+            "operation_journal": 0,
+            "p2_database_config": 0,
+            "p2_form_submissions": 0,
+            "p2_page_display": 0,
+            "page_external_context_policy": 0,
+            "page_links": 0,
+            "page_metadata": 0,
+            "page_review_events": 0,
+            "page_snapshots": 2,
+            "pages": 1,
+            "personal_review_activation": 0,
+            "personal_review_model_runs": 0,
+            "personal_review_runs": 0,
+            "personal_review_schedule": 0,
+            "project_pages": 0,
+            "project_scopes": 0,
+            "properties": 0,
+            "property_options": 0,
+            "property_values": 0,
+            "provider_audit": 0,
+            "provider_connections": 0,
+            "provider_proposals": 0,
+            "record_dependencies": 0,
+            "record_layouts": 0,
+            "record_structure": 0,
+            "records": 0,
+            "recovery_point_pages": 0,
+            "recovery_points": 0,
+            "relation_edges": 0,
+            "reminder_config_v1": 0,
+            "reminder_history_v1": 0,
+            "reminder_inbox_v1": 0,
+            "restore_preview_decisions": 0,
+            "restore_previews": 0,
+            "scheduling_plans": 0,
+            "service_runtime_migrations": 3,
+            "skill_invocations": 0,
+            "skill_versions": 0,
+            "task_facets": 0,
+            "template_previews": 0,
+            "todo_references": 0,
+            "transcript_segments": 0,
+            "views": 0,
+            "workspaces": 1
+          },
+          "assetFiles": 1,
+          "assetBytes": 318
+        },
+        "after": {
+          "sha256": "69dbcefbae385e564762950b71fae9049a4290bf1865a2219d15920076037c5f",
+          "size": 59904,
+          "path": "/private/tmp/trove-workflow-images-framing-20261015-v1/canonical/07649c97ec266eb6-2565168385/after.json",
+          "retained": true,
+          "tableRows": {
+            "advanced_button_actions": 0,
+            "advanced_page_locks": 0,
+            "advanced_templates": 0,
+            "approvals": 0,
+            "attachments": 1,
+            "autofill_batches": 0,
+            "automation_rules": 0,
+            "automation_runs": 0,
+            "backup_destinations": 0,
+            "backup_pins": 0,
+            "backups": 0,
+            "blocks": 0,
+            "cancellation_receipts": 2,
+            "collections": 0,
+            "committed_events": 2,
+            "connector_account_history": 0,
+            "connector_accounts": 0,
+            "connector_credential_cleanup": 0,
+            "connector_cursors": 0,
+            "connector_draft_history": 0,
+            "connector_drafts": 0,
+            "connector_proposals": 0,
+            "connector_receipts": 0,
+            "connector_refreshes": 0,
+            "connector_snapshots": 0,
+            "container_collections": 0,
+            "containers": 0,
+            "database_settings": 0,
+            "entity_tombstones": 0,
+            "external_chunks": 0,
+            "external_page_references": 0,
+            "external_root_approvals": 0,
+            "external_roots": 0,
+            "external_sources": 0,
+            "file_external_context_policy": 0,
+            "file_external_context_sources": 0,
+            "file_ingests": 0,
+            "file_references": 1,
+            "files": 1,
+            "idempotency_receipts": 2,
+            "import_baselines": 0,
+            "import_csv_bindings": 0,
+            "import_entity_ids": 0,
+            "import_mapping_state": 0,
+            "import_mappings": 0,
+            "import_observations": 0,
+            "import_runs": 0,
+            "job_authorizations": 0,
+            "job_context": 0,
+            "job_events": 0,
+            "job_results": 0,
+            "job_sources": 0,
+            "job_units": 0,
+            "jobs": 0,
+            "kernel_meta": 6,
+            "managed_provider_runs": 0,
+            "meeting_archived_proposals_v1": 0,
+            "meeting_extraction_items": 0,
+            "meeting_intelligence": 0,
+            "meeting_retention_v1": 0,
+            "meetings": 0,
+            "memory_entries": 0,
+            "memory_sources": 0,
+            "mutation_history": 2,
+            "notion_captures": 0,
+            "operation_journal": 0,
+            "p2_database_config": 0,
+            "p2_form_submissions": 0,
+            "p2_page_display": 0,
+            "page_external_context_policy": 0,
+            "page_links": 0,
+            "page_metadata": 0,
+            "page_review_events": 0,
+            "page_snapshots": 2,
+            "pages": 1,
+            "personal_review_activation": 0,
+            "personal_review_model_runs": 0,
+            "personal_review_runs": 0,
+            "personal_review_schedule": 0,
+            "project_pages": 0,
+            "project_scopes": 0,
+            "properties": 0,
+            "property_options": 0,
+            "property_values": 0,
+            "provider_audit": 0,
+            "provider_connections": 0,
+            "provider_proposals": 0,
+            "record_dependencies": 0,
+            "record_layouts": 0,
+            "record_structure": 0,
+            "records": 0,
+            "recovery_point_pages": 0,
+            "recovery_points": 0,
+            "relation_edges": 0,
+            "reminder_config_v1": 0,
+            "reminder_history_v1": 0,
+            "reminder_inbox_v1": 0,
+            "restore_preview_decisions": 0,
+            "restore_previews": 0,
+            "scheduling_plans": 0,
+            "service_runtime_migrations": 3,
+            "skill_invocations": 0,
+            "skill_versions": 0,
+            "task_facets": 0,
+            "template_previews": 0,
+            "todo_references": 0,
+            "transcript_segments": 0,
+            "views": 0,
+            "workspaces": 1
+          },
+          "assetFiles": 1,
+          "assetBytes": 318
+        }
+      },
+      "boundary-4": {
+        "schemaVersion": 1,
+        "unchanged": true,
+        "rowsUnchanged": true,
+        "assetsUnchanged": true,
+        "mutationHistoryCountUnchanged": true,
+        "before": {
+          "sha256": "bfa8dd1fa2dbc3f9118c814f1c9418a9d7773051c0a212f0d1340f3ef1e1336a",
+          "size": 59913,
+          "path": "/private/tmp/trove-workflow-images-framing-20261015-v1/canonical/a03beb45bfc12a25-3290194734/before.json",
+          "retained": true,
+          "tableRows": {
+            "advanced_button_actions": 0,
+            "advanced_page_locks": 0,
+            "advanced_templates": 0,
+            "approvals": 0,
+            "attachments": 1,
+            "autofill_batches": 0,
+            "automation_rules": 0,
+            "automation_runs": 0,
+            "backup_destinations": 0,
+            "backup_pins": 0,
+            "backups": 0,
+            "blocks": 0,
+            "cancellation_receipts": 2,
+            "collections": 0,
+            "committed_events": 2,
+            "connector_account_history": 0,
+            "connector_accounts": 0,
+            "connector_credential_cleanup": 0,
+            "connector_cursors": 0,
+            "connector_draft_history": 0,
+            "connector_drafts": 0,
+            "connector_proposals": 0,
+            "connector_receipts": 0,
+            "connector_refreshes": 0,
+            "connector_snapshots": 0,
+            "container_collections": 0,
+            "containers": 0,
+            "database_settings": 0,
+            "entity_tombstones": 0,
+            "external_chunks": 0,
+            "external_page_references": 0,
+            "external_root_approvals": 0,
+            "external_roots": 0,
+            "external_sources": 0,
+            "file_external_context_policy": 0,
+            "file_external_context_sources": 0,
+            "file_ingests": 0,
+            "file_references": 1,
+            "files": 1,
+            "idempotency_receipts": 2,
+            "import_baselines": 0,
+            "import_csv_bindings": 0,
+            "import_entity_ids": 0,
+            "import_mapping_state": 0,
+            "import_mappings": 0,
+            "import_observations": 0,
+            "import_runs": 0,
+            "job_authorizations": 0,
+            "job_context": 0,
+            "job_events": 0,
+            "job_results": 0,
+            "job_sources": 0,
+            "job_units": 0,
+            "jobs": 0,
+            "kernel_meta": 6,
+            "managed_provider_runs": 0,
+            "meeting_archived_proposals_v1": 0,
+            "meeting_extraction_items": 0,
+            "meeting_intelligence": 0,
+            "meeting_retention_v1": 0,
+            "meetings": 0,
+            "memory_entries": 0,
+            "memory_sources": 0,
+            "mutation_history": 2,
+            "notion_captures": 0,
+            "operation_journal": 0,
+            "p2_database_config": 0,
+            "p2_form_submissions": 0,
+            "p2_page_display": 0,
+            "page_external_context_policy": 0,
+            "page_links": 0,
+            "page_metadata": 0,
+            "page_review_events": 0,
+            "page_snapshots": 2,
+            "pages": 1,
+            "personal_review_activation": 0,
+            "personal_review_model_runs": 0,
+            "personal_review_runs": 0,
+            "personal_review_schedule": 0,
+            "project_pages": 0,
+            "project_scopes": 0,
+            "properties": 0,
+            "property_options": 0,
+            "property_values": 0,
+            "provider_audit": 0,
+            "provider_connections": 0,
+            "provider_proposals": 0,
+            "record_dependencies": 0,
+            "record_layouts": 0,
+            "record_structure": 0,
+            "records": 0,
+            "recovery_point_pages": 0,
+            "recovery_points": 0,
+            "relation_edges": 0,
+            "reminder_config_v1": 0,
+            "reminder_history_v1": 0,
+            "reminder_inbox_v1": 0,
+            "restore_preview_decisions": 0,
+            "restore_previews": 0,
+            "scheduling_plans": 0,
+            "service_runtime_migrations": 3,
+            "skill_invocations": 0,
+            "skill_versions": 0,
+            "task_facets": 0,
+            "template_previews": 0,
+            "todo_references": 0,
+            "transcript_segments": 0,
+            "views": 0,
+            "workspaces": 1
+          },
+          "assetFiles": 1,
+          "assetBytes": 316
+        },
+        "after": {
+          "sha256": "bfa8dd1fa2dbc3f9118c814f1c9418a9d7773051c0a212f0d1340f3ef1e1336a",
+          "size": 59913,
+          "path": "/private/tmp/trove-workflow-images-framing-20261015-v1/canonical/a03beb45bfc12a25-3290194734/after.json",
+          "retained": true,
+          "tableRows": {
+            "advanced_button_actions": 0,
+            "advanced_page_locks": 0,
+            "advanced_templates": 0,
+            "approvals": 0,
+            "attachments": 1,
+            "autofill_batches": 0,
+            "automation_rules": 0,
+            "automation_runs": 0,
+            "backup_destinations": 0,
+            "backup_pins": 0,
+            "backups": 0,
+            "blocks": 0,
+            "cancellation_receipts": 2,
+            "collections": 0,
+            "committed_events": 2,
+            "connector_account_history": 0,
+            "connector_accounts": 0,
+            "connector_credential_cleanup": 0,
+            "connector_cursors": 0,
+            "connector_draft_history": 0,
+            "connector_drafts": 0,
+            "connector_proposals": 0,
+            "connector_receipts": 0,
+            "connector_refreshes": 0,
+            "connector_snapshots": 0,
+            "container_collections": 0,
+            "containers": 0,
+            "database_settings": 0,
+            "entity_tombstones": 0,
+            "external_chunks": 0,
+            "external_page_references": 0,
+            "external_root_approvals": 0,
+            "external_roots": 0,
+            "external_sources": 0,
+            "file_external_context_policy": 0,
+            "file_external_context_sources": 0,
+            "file_ingests": 0,
+            "file_references": 1,
+            "files": 1,
+            "idempotency_receipts": 2,
+            "import_baselines": 0,
+            "import_csv_bindings": 0,
+            "import_entity_ids": 0,
+            "import_mapping_state": 0,
+            "import_mappings": 0,
+            "import_observations": 0,
+            "import_runs": 0,
+            "job_authorizations": 0,
+            "job_context": 0,
+            "job_events": 0,
+            "job_results": 0,
+            "job_sources": 0,
+            "job_units": 0,
+            "jobs": 0,
+            "kernel_meta": 6,
+            "managed_provider_runs": 0,
+            "meeting_archived_proposals_v1": 0,
+            "meeting_extraction_items": 0,
+            "meeting_intelligence": 0,
+            "meeting_retention_v1": 0,
+            "meetings": 0,
+            "memory_entries": 0,
+            "memory_sources": 0,
+            "mutation_history": 2,
+            "notion_captures": 0,
+            "operation_journal": 0,
+            "p2_database_config": 0,
+            "p2_form_submissions": 0,
+            "p2_page_display": 0,
+            "page_external_context_policy": 0,
+            "page_links": 0,
+            "page_metadata": 0,
+            "page_review_events": 0,
+            "page_snapshots": 2,
+            "pages": 1,
+            "personal_review_activation": 0,
+            "personal_review_model_runs": 0,
+            "personal_review_runs": 0,
+            "personal_review_schedule": 0,
+            "project_pages": 0,
+            "project_scopes": 0,
+            "properties": 0,
+            "property_options": 0,
+            "property_values": 0,
+            "provider_audit": 0,
+            "provider_connections": 0,
+            "provider_proposals": 0,
+            "record_dependencies": 0,
+            "record_layouts": 0,
+            "record_structure": 0,
+            "records": 0,
+            "recovery_point_pages": 0,
+            "recovery_points": 0,
+            "relation_edges": 0,
+            "reminder_config_v1": 0,
+            "reminder_history_v1": 0,
+            "reminder_inbox_v1": 0,
+            "restore_preview_decisions": 0,
+            "restore_previews": 0,
+            "scheduling_plans": 0,
+            "service_runtime_migrations": 3,
+            "skill_invocations": 0,
+            "skill_versions": 0,
+            "task_facets": 0,
+            "template_previews": 0,
+            "todo_references": 0,
+            "transcript_segments": 0,
+            "views": 0,
+            "workspaces": 1
+          },
+          "assetFiles": 1,
+          "assetBytes": 316
+        }
+      },
+      "boundary-5": {
+        "schemaVersion": 1,
+        "unchanged": true,
+        "rowsUnchanged": true,
+        "assetsUnchanged": true,
+        "mutationHistoryCountUnchanged": true,
+        "before": {
+          "sha256": "9bb567855cc2027fbe01963fcd977bf786a23c9d2eb00d1335fcfecdb61811fa",
+          "size": 59905,
+          "path": "/private/tmp/trove-workflow-images-framing-20261015-v1/canonical/79c60d895a177649-914880956/before.json",
+          "retained": true,
+          "tableRows": {
+            "advanced_button_actions": 0,
+            "advanced_page_locks": 0,
+            "advanced_templates": 0,
+            "approvals": 0,
+            "attachments": 1,
+            "autofill_batches": 0,
+            "automation_rules": 0,
+            "automation_runs": 0,
+            "backup_destinations": 0,
+            "backup_pins": 0,
+            "backups": 0,
+            "blocks": 0,
+            "cancellation_receipts": 2,
+            "collections": 0,
+            "committed_events": 2,
+            "connector_account_history": 0,
+            "connector_accounts": 0,
+            "connector_credential_cleanup": 0,
+            "connector_cursors": 0,
+            "connector_draft_history": 0,
+            "connector_drafts": 0,
+            "connector_proposals": 0,
+            "connector_receipts": 0,
+            "connector_refreshes": 0,
+            "connector_snapshots": 0,
+            "container_collections": 0,
+            "containers": 0,
+            "database_settings": 0,
+            "entity_tombstones": 0,
+            "external_chunks": 0,
+            "external_page_references": 0,
+            "external_root_approvals": 0,
+            "external_roots": 0,
+            "external_sources": 0,
+            "file_external_context_policy": 0,
+            "file_external_context_sources": 0,
+            "file_ingests": 0,
+            "file_references": 1,
+            "files": 1,
+            "idempotency_receipts": 2,
+            "import_baselines": 0,
+            "import_csv_bindings": 0,
+            "import_entity_ids": 0,
+            "import_mapping_state": 0,
+            "import_mappings": 0,
+            "import_observations": 0,
+            "import_runs": 0,
+            "job_authorizations": 0,
+            "job_context": 0,
+            "job_events": 0,
+            "job_results": 0,
+            "job_sources": 0,
+            "job_units": 0,
+            "jobs": 0,
+            "kernel_meta": 6,
+            "managed_provider_runs": 0,
+            "meeting_archived_proposals_v1": 0,
+            "meeting_extraction_items": 0,
+            "meeting_intelligence": 0,
+            "meeting_retention_v1": 0,
+            "meetings": 0,
+            "memory_entries": 0,
+            "memory_sources": 0,
+            "mutation_history": 2,
+            "notion_captures": 0,
+            "operation_journal": 0,
+            "p2_database_config": 0,
+            "p2_form_submissions": 0,
+            "p2_page_display": 0,
+            "page_external_context_policy": 0,
+            "page_links": 0,
+            "page_metadata": 0,
+            "page_review_events": 0,
+            "page_snapshots": 2,
+            "pages": 1,
+            "personal_review_activation": 0,
+            "personal_review_model_runs": 0,
+            "personal_review_runs": 0,
+            "personal_review_schedule": 0,
+            "project_pages": 0,
+            "project_scopes": 0,
+            "properties": 0,
+            "property_options": 0,
+            "property_values": 0,
+            "provider_audit": 0,
+            "provider_connections": 0,
+            "provider_proposals": 0,
+            "record_dependencies": 0,
+            "record_layouts": 0,
+            "record_structure": 0,
+            "records": 0,
+            "recovery_point_pages": 0,
+            "recovery_points": 0,
+            "relation_edges": 0,
+            "reminder_config_v1": 0,
+            "reminder_history_v1": 0,
+            "reminder_inbox_v1": 0,
+            "restore_preview_decisions": 0,
+            "restore_previews": 0,
+            "scheduling_plans": 0,
+            "service_runtime_migrations": 3,
+            "skill_invocations": 0,
+            "skill_versions": 0,
+            "task_facets": 0,
+            "template_previews": 0,
+            "todo_references": 0,
+            "transcript_segments": 0,
+            "views": 0,
+            "workspaces": 1
+          },
+          "assetFiles": 1,
+          "assetBytes": 317
+        },
+        "after": {
+          "sha256": "9bb567855cc2027fbe01963fcd977bf786a23c9d2eb00d1335fcfecdb61811fa",
+          "size": 59905,
+          "path": "/private/tmp/trove-workflow-images-framing-20261015-v1/canonical/79c60d895a177649-914880956/after.json",
+          "retained": true,
+          "tableRows": {
+            "advanced_button_actions": 0,
+            "advanced_page_locks": 0,
+            "advanced_templates": 0,
+            "approvals": 0,
+            "attachments": 1,
+            "autofill_batches": 0,
+            "automation_rules": 0,
+            "automation_runs": 0,
+            "backup_destinations": 0,
+            "backup_pins": 0,
+            "backups": 0,
+            "blocks": 0,
+            "cancellation_receipts": 2,
+            "collections": 0,
+            "committed_events": 2,
+            "connector_account_history": 0,
+            "connector_accounts": 0,
+            "connector_credential_cleanup": 0,
+            "connector_cursors": 0,
+            "connector_draft_history": 0,
+            "connector_drafts": 0,
+            "connector_proposals": 0,
+            "connector_receipts": 0,
+            "connector_refreshes": 0,
+            "connector_snapshots": 0,
+            "container_collections": 0,
+            "containers": 0,
+            "database_settings": 0,
+            "entity_tombstones": 0,
+            "external_chunks": 0,
+            "external_page_references": 0,
+            "external_root_approvals": 0,
+            "external_roots": 0,
+            "external_sources": 0,
+            "file_external_context_policy": 0,
+            "file_external_context_sources": 0,
+            "file_ingests": 0,
+            "file_references": 1,
+            "files": 1,
+            "idempotency_receipts": 2,
+            "import_baselines": 0,
+            "import_csv_bindings": 0,
+            "import_entity_ids": 0,
+            "import_mapping_state": 0,
+            "import_mappings": 0,
+            "import_observations": 0,
+            "import_runs": 0,
+            "job_authorizations": 0,
+            "job_context": 0,
+            "job_events": 0,
+            "job_results": 0,
+            "job_sources": 0,
+            "job_units": 0,
+            "jobs": 0,
+            "kernel_meta": 6,
+            "managed_provider_runs": 0,
+            "meeting_archived_proposals_v1": 0,
+            "meeting_extraction_items": 0,
+            "meeting_intelligence": 0,
+            "meeting_retention_v1": 0,
+            "meetings": 0,
+            "memory_entries": 0,
+            "memory_sources": 0,
+            "mutation_history": 2,
+            "notion_captures": 0,
+            "operation_journal": 0,
+            "p2_database_config": 0,
+            "p2_form_submissions": 0,
+            "p2_page_display": 0,
+            "page_external_context_policy": 0,
+            "page_links": 0,
+            "page_metadata": 0,
+            "page_review_events": 0,
+            "page_snapshots": 2,
+            "pages": 1,
+            "personal_review_activation": 0,
+            "personal_review_model_runs": 0,
+            "personal_review_runs": 0,
+            "personal_review_schedule": 0,
+            "project_pages": 0,
+            "project_scopes": 0,
+            "properties": 0,
+            "property_options": 0,
+            "property_values": 0,
+            "provider_audit": 0,
+            "provider_connections": 0,
+            "provider_proposals": 0,
+            "record_dependencies": 0,
+            "record_layouts": 0,
+            "record_structure": 0,
+            "records": 0,
+            "recovery_point_pages": 0,
+            "recovery_points": 0,
+            "relation_edges": 0,
+            "reminder_config_v1": 0,
+            "reminder_history_v1": 0,
+            "reminder_inbox_v1": 0,
+            "restore_preview_decisions": 0,
+            "restore_previews": 0,
+            "scheduling_plans": 0,
+            "service_runtime_migrations": 3,
+            "skill_invocations": 0,
+            "skill_versions": 0,
+            "task_facets": 0,
+            "template_previews": 0,
+            "todo_references": 0,
+            "transcript_segments": 0,
+            "views": 0,
+            "workspaces": 1
+          },
+          "assetFiles": 1,
+          "assetBytes": 317
+        }
+      }
+    },
+    "releaseQualified": false,
+    "inputsUnchanged": true,
+    "malformedLogLines": [],
+    "automatedSelectionPassed": false,
+    "fullFamilyRun": false
+  },
+  "outputs": {
+    "build.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "results.jsonl": "65f03342d650feb3cf6eca694c0c91862a0964e030cee8bf9f2f0deca33f4a44"
+  }
+}

@@ -1,0 +1,27 @@
+{
+  "schemaVersion": 1,
+  "sourceCommit": "eb2ded0f70523a55e8ac7bd851c73746aae1a050",
+  "sourceState": "framing correction before commit; exact source digests below",
+  "ggufVersion": 3,
+  "modelMetadata": {
+    "general.name": "SmolVLM 500M Instruct",
+    "tokenizer.chat_template": "<|im_start|>{% for message in messages %}{{message['role'] | capitalize}}{% if message['content'][0]['type'] == 'image' %}{{':'}}{% else %}{{': '}}{% endif %}{% for line in message['content'] %}{% if line['type'] == 'text' %}{{line['text']}}{% elif line['type'] == 'image' %}{{ '<image>' }}{% endif %}{% endfor %}<end_of_utterance>\n{% endfor %}{% if add_generation_prompt %}{{ 'Assistant:' }}{% endif %}"
+  },
+  "inputs": {
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/native/vision-worker.cpp": "23170659a33c003465972959339eac3044263ac11e87ec383a27a3bb54606e4a",
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/native/vision-prompt.hpp": "4db2bb717baeb7559004eda9e92e256270ce254de6a34d7f4cffd1c8c50683a5",
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/scripts/test-vision-prompt.py": "d8bb2fd1125362f873f2b3b2660ab2e7a508ea82499307076e5b3b1ee07210df",
+    "/Users/suryasriramduvvuri/.codex/worktrees/feature-encrypted-backup/Trove/scripts/build-vision.py": "7811e2b413eacde68acf6ceb24d32f8dd831845593fc6221518e3c8427156f7a",
+    "/private/tmp/trove-workflow-native-image-framing-20261015-v1/manifest.json": "f5412a887adac1ad2f00b5dbeda61a22f7f74349ab5c682f2e11c1d6b040098a",
+    "/private/tmp/trove-workflow-native-image-framing-20261015-v1/vision-worker": "f35abc550886062e6b302a21eca34bfc0e6a1d0d923a7c50e0acf0559a791122",
+    "/Users/suryasriramduvvuri/Library/Caches/Trove/completion/models/01990000-0000-7000-8000-000000000107.model": "9d4612de6a42214499e301494a3ecc2be0abdd9de44e663bda63f1152fad1bf4"
+  },
+  "compiledPromptRegression": {
+    "command": "python3 scripts/test-vision-prompt.py",
+    "tests": 3,
+    "passed": 3,
+    "failed": 0,
+    "skipped": 0
+  },
+  "qualityResult": "1 selected case passed, 2 failed the unchanged image semantic oracle; full-family and release acceptance remain false"
+}
