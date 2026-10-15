@@ -83,7 +83,7 @@ class WorkflowAccounting(unittest.TestCase):
         return report, contract
 
     def image(self):
-        corpus=json.loads((m.ROOT/'internal/workspace/testdata/expanded-evaluation/images-execution-v1.json').read_text())
+        corpus=json.loads((m.ROOT/'internal/workspace/testdata/expanded-evaluation/images-execution-v2.json').read_text())
         cases={case['id']:case for case in corpus['cases']}
         contract=dict(family='images',modelPackId='chosen',corpusSHA256='locked',imageCases=cases,modelSHA256='a'*64,projectorSHA256='b'*64,helperSHA256='c'*64)
         case=cases['diagram-1']

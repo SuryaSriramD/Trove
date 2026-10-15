@@ -31,7 +31,7 @@ type imageEvaluationCase struct {
 
 func imageEvaluationCorpus(t *testing.T) ([]imageEvaluationCase, string) {
 	t.Helper()
-	raw, err := os.ReadFile("testdata/expanded-evaluation/images-execution-v1.json")
+	raw, err := os.ReadFile("testdata/expanded-evaluation/images-execution-v2.json")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -78,6 +78,9 @@ func imageAnswerOracle(tc imageEvaluationCase, r ImageDescription) bool {
 	}
 	if strings.HasPrefix(tc.ID, "diagram-") {
 		return text == tc.Expected || text == tc.Expected+"."
+	}
+	if tc.ID == "boundary-4" || tc.ID == "boundary-5" {
+		return regexp.MustCompile(`^(?:a |there is a )?(?:small |tiny )?(?:faint|light) (?:gray|grey) (?:square|mark|dot|patch)(?: (?:on|against) a (?:plain )?white background)?\.?$`).MatchString(text)
 	}
 	return regexp.MustCompile(`^(?:a |there is a )?(?:small|tiny) (?:black|dark) (?:square|mark|dot)(?: (?:on|against) a (?:plain |white )?white background)?\.?$`).MatchString(text)
 }

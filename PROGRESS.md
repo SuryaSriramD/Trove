@@ -2,7 +2,7 @@
 
 **The single current development and progress tracker for this project.** Read and update this file for every meaningful implementation change, investigation, test result, decision, blocker and handoff. This is not an automatically running monitor.
 
-Last updated: **2026-10-15 21:28 IST**. User-facing dates use **Asia/Kolkata (IST, UTC+05:30)**; source artifacts may retain UTC timestamps.
+Last updated: **2026-10-15 21:35 IST**. User-facing dates use **Asia/Kolkata (IST, UTC+05:30)**; source artifacts may retain UTC timestamps.
 
 This file consolidates the original 51-item backlog, the newly selected desktop scope, current qualification, next actions and development history. Earlier status pages are historical snapshots. Machine-readable contracts, the legacy registry and immutable qualification records remain supporting inputs/evidence; they are not additional human progress dashboards. Their frozen bytes must not be rewritten to make a status look current.
 
@@ -33,7 +33,7 @@ Candidate 7's focused 22-case prompt experiment was rejected and production prom
 
 | Location | Branch / source | Current interpretation |
 | --- | --- | --- |
-| Primary project: `/Volumes/HD-B1/HD-Projects/Trove` | `codex/macos-feature-completion`, current integrated source `daf4877` | Baseline `ee14f0c`; shared foundations `0ed5350`, G02 `2b421a4`, G03 `950cea5`/`6e713bc` and G01 page merge `2279bf0`/`a3f9e54` integrated. See the development log for subsequent commits and current verification. |
+| Primary project: `/Volumes/HD-B1/HD-Projects/Trove` | `codex/macos-feature-completion`, current integrated source `ebb3589` | Baseline `ee14f0c`; shared foundations `0ed5350`, G02 `2b421a4`, G03 `950cea5`/`6e713bc` and G01 page merge `2279bf0`/`a3f9e54` integrated. See the development log for subsequent commits and current verification. |
 | Latest development worktree: `/Users/suryasriramduvvuri/.codex/worktrees/macos-p0-title-context/Trove` | `codex/macos-p0-title-context`, `299e43df9b716f771125d939ad320c3cb595f2c7` | Candidate 7 source. One descendant commit containing tests, fixtures, telemetry and execution documentation. |
 
 Keep candidate 7's execution in its declared worktree. Review and integrate the descendant commit separately; do not rebuild a package just to align a checkout. A product/binary/policy change requires a new candidate and affected fresh evidence.
@@ -1009,6 +1009,16 @@ Final autofill workspace and protocol suite passed **37 tests/subtests, zero ski
 **Image runner in progress:** Coordinator added a separate versioned execution contract without modifying the original 24-slot corpus, preserving 12 unavailable photograph/screenshot slots. It binds original-pixel hashes, prompts and independent color/measurement/detail-loss/OCR predicates, native model/projector/helper identities and complete canonical snapshots; only derived image drafts are excluded from this family-specific audit. Initial focused image service/oracle campaign passed 32 tests/subtests, zero failures/skips; updated bound-dimension regressions are running. Independent Python consumers now pass 49 tests. A Python bytecode check initially hit the default cache sandbox restriction; the corrected private-cache invocation passed. A private evaluation helper copy includes a newly compiled production Apple Vision OCR helper; no frozen candidate helper changed. Focused native image execution is next.
 
 **Other active scope:** Deeper Notion capture, whole-page/collection deletion, direct connected-source AI context and EXT are still implementation work. Hosting scope explicitly reserves interactive native model controls for desktop, but the audit found a required background-worker gap: configured headless hosts queue generative reviews without draining them. That repair is active. No representative photo/screenshot, live-account/device, final candidate or release acceptance is claimed.
+
+### DEV-032 — 15 October 2026, 21:35 IST: native image evidence and headless review execution
+
+**Source:** `cbcf356` adds the image runner/independent consumer; `ebb3589` integrates the required headless generative-review worker. Worker evidence records 39 focused race passes, zero skips/failures, a successful CLI build, and an actual compiled CLI/loopback queued→durable-missing-model-failure→clean-restart workflow. Generated HTTP scenarios used a controlled generator and do not establish model quality. Initial test fixtures used a nil required array and UUIDv4 IDs; both were corrected with failures retained. Explicit desktop-only model management remains unchanged by this background-worker implementation.
+
+**Image execution:** Six selected cases ran with the verified local vision pair and newly compiled production OCR helper in a private copy of the native bundle. Evidence at `evidence/completion/workflow-images-20261015-v1` records **four passes/two failures**, unchanged source inputs and six unchanged canonical row/asset snapshot pairs. The red-square model answer and exact white/black/transparent source measurements passed. Both faint-mark cases failed safely with OUTPUT_LIMIT; all six original-image and no-invented-OCR predicates passed. No retry or post-run rewrite changes this result.
+
+**Oracle correction:** The new version-1 execution contract incorrectly assumed that the original 128×96, 8-bit faint variations disappear during normalization. Source-pixel inspection establishes that they remain nonuniform. A separate version-2 contract now requires complete supported model interpretations for those cases; guarded model errors still cannot pass their answer oracle. The original corpus, version-1 contract and failed native evidence remain intact. No quality threshold is weakened, and no version-2 native pass is claimed yet. The completed image service/oracle campaigns each passed 32 tests/subtests; independent Python consumers passed 49 checks. The current combined image/host integration campaign is still running.
+
+**Notion reconciliation:** Source audit found that the existing REST import workflow already recursively captures explicitly selected page/database/data-source roots, typed properties, supplied descendants, paginated values, acquired files, views and original bytes through the G01 normalizer. The hosted MCP adapter supplies connected context and reviewed writes separately. Coordinator is verifying those actual capture/re-import paths before declaring a new recursive MCP implementation necessary. Direct connected-source AI context and whole-object import recovery remain active; real account/device and full quality/release campaigns remain pending.
 
 <a id="commit-history"></a>
 ## Recorded source-development history

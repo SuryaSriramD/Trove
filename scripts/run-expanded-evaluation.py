@@ -10,7 +10,7 @@ FAMILIES = {
     'context': ('context.json', 'TestRealLocalWorkflowContext', 12),
     'related': ('related.json', 'TestRealLocalWorkflowRelated', 12),
     'memory-lifecycle': ('memory-lifecycle.json', 'TestRealLocalWorkflowMemoryLifecycle', 12),
-    'images': ('images-execution-v1.json', 'TestRealLocalWorkflowImages', 24),
+    'images': ('images-execution-v2.json', 'TestRealLocalWorkflowImages', 24),
     'reviews': ('reviews.json', 'TestRealLocalWorkflowReviews', 12),
 }
 
@@ -367,6 +367,8 @@ def validate_image_report(report, case, contract):
         answer = result.get('text', '').strip().lower()
         if case.startswith('diagram-'):
             if answer not in (expected['expected'], expected['expected']+'.'): errors.append('color answer differs or adds unsupported content')
+        elif case in ('boundary-4', 'boundary-5'):
+            if not re.fullmatch(r'(?:a |there is a )?(?:small |tiny )?(?:faint|light) (?:gray|grey) (?:square|mark|dot|patch)(?: (?:on|against) a (?:plain )?white background)?\.?', answer): errors.append('faint-mark answer differs or adds unsupported content')
         elif not re.fullmatch(r'(?:a |there is a )?(?:small|tiny) (?:black|dark) (?:square|mark|dot)(?: (?:on|against) a (?:plain |white )?white background)?\.?', answer):
             errors.append('small-mark answer includes unsupported content')
         for key, identity in (('modelHash','modelSHA256'), ('projectorHash','projectorSHA256'), ('helperHash','helperSHA256')):
