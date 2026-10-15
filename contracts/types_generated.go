@@ -2652,6 +2652,54 @@ type ServiceConnectorSnapshot struct {
 	RetrievedAt       DomainTimestamp `json:"retrievedAt"`
 	ExternalAiAllowed bool            `json:"externalAiAllowed"`
 }
+type ServiceConnectedSourceReference struct {
+	SnapshotId     string     `json:"snapshotId"`
+	RemoteRevision string     `json:"remoteRevision"`
+	ContentHash    DomainHash `json:"contentHash"`
+}
+type ServiceConnectedEvidence struct {
+	Version         int64           `json:"version"`
+	ReceiptId       DomainId        `json:"receiptId"`
+	SnapshotId      string          `json:"snapshotId"`
+	AccountId       DomainId        `json:"accountId"`
+	AccountRevision string          `json:"accountRevision"`
+	SelectionId     string          `json:"selectionId"`
+	Provider        string          `json:"provider"`
+	RemoteId        string          `json:"remoteId"`
+	RemoteRevision  string          `json:"remoteRevision"`
+	ContentHash     DomainHash      `json:"contentHash"`
+	Url             string          `json:"url"`
+	CheckedAt       DomainTimestamp `json:"checkedAt"`
+	Partial         bool            `json:"partial"`
+}
+type ServiceConnectedSource struct {
+	Connected ServiceConnectedEvidence `json:"connected"`
+	Title     string                   `json:"title"`
+	Text      string                   `json:"text"`
+}
+type ServiceConnectedSharingTarget struct {
+	Provider string `json:"provider"`
+	Account  string `json:"account"`
+}
+type ServiceConnectedSharingPreview struct {
+	Id        DomainId                      `json:"id"`
+	Hash      DomainHash                    `json:"hash"`
+	Target    ServiceConnectedSharingTarget `json:"target"`
+	Sources   []ServiceConnectedSource      `json:"sources"`
+	ExpiresAt DomainTimestamp               `json:"expiresAt"`
+	Notice    string                        `json:"notice"`
+}
+type ServiceConnectedSharingPreviewRequest struct {
+	ContractVersion int64                             `json:"contractVersion"`
+	RequestId       DomainId                          `json:"requestId"`
+	WorkspaceId     DomainId                          `json:"workspaceId"`
+	Target          ServiceConnectedSharingTarget     `json:"target"`
+	Sources         []ServiceConnectedSourceReference `json:"sources"`
+}
+type ServiceConnectedSharingApproval struct {
+	Id   DomainId   `json:"id"`
+	Hash DomainHash `json:"hash"`
+}
 type ServiceConnectorRegistration struct {
 	Kind                      string  `json:"kind"`
 	ClientId                  string  `json:"clientId"`
@@ -4038,19 +4086,29 @@ type ServiceProviderDiscoverRequest struct {
 	Provider        string   `json:"provider"`
 }
 type ServiceProviderManagedStartRequest struct {
-	ContractVersion int64                     `json:"contractVersion"`
-	RequestId       DomainId                  `json:"requestId"`
-	WorkspaceId     DomainId                  `json:"workspaceId"`
-	Provider        string                    `json:"provider"`
-	RegistrationId  string                    `json:"registrationId"`
-	BillingMode     string                    `json:"billingMode"`
-	Model           string                    `json:"model"`
-	Prompt          string                    `json:"prompt"`
-	PageIds         []DomainId                `json:"pageIds"`
-	Tools           []string                  `json:"tools"`
-	PreviewHash     string                    `json:"previewHash"`
-	ResumeRunId     *DomainId                 `json:"resumeRunId,omitempty"`
-	Skill           *ServiceSkillRunReference `json:"skill,omitempty"`
+	ContractVersion  int64                            `json:"contractVersion"`
+	RequestId        DomainId                         `json:"requestId"`
+	WorkspaceId      DomainId                         `json:"workspaceId"`
+	Provider         string                           `json:"provider"`
+	RegistrationId   string                           `json:"registrationId"`
+	BillingMode      string                           `json:"billingMode"`
+	Model            string                           `json:"model"`
+	Prompt           string                           `json:"prompt"`
+	PageIds          []DomainId                       `json:"pageIds"`
+	Tools            []string                         `json:"tools"`
+	PreviewHash      string                           `json:"previewHash"`
+	ResumeRunId      *DomainId                        `json:"resumeRunId,omitempty"`
+	Skill            *ServiceSkillRunReference        `json:"skill,omitempty"`
+	ConnectedSharing *ServiceConnectedSharingApproval `json:"connectedSharing,omitempty"`
+}
+type ServiceProviderConnectedPreviewRequest struct {
+	ContractVersion int64                             `json:"contractVersion"`
+	RequestId       DomainId                          `json:"requestId"`
+	WorkspaceId     DomainId                          `json:"workspaceId"`
+	Provider        string                            `json:"provider"`
+	RegistrationId  string                            `json:"registrationId"`
+	BillingMode     string                            `json:"billingMode"`
+	Sources         []ServiceConnectedSourceReference `json:"sources"`
 }
 type ServiceProviderManagedCancelRequest struct {
 	ContractVersion int64    `json:"contractVersion"`

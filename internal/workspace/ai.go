@@ -96,6 +96,9 @@ func (k *Kernel) PrepareAIWithBudget(ctx context.Context, e contracts.ServiceExe
 	if err := k.authorize(e); err != nil {
 		return out, err
 	}
+	if r.Skill != nil && len(r.ConnectedSources) > 0 {
+		return out, Fail("INVALID_REQUEST", "Skills require their own explicit canonical source selection")
+	}
 	if r.Skill != nil {
 		skill, err := k.ResolveSkillRun(ctx, e, *r.Skill, "local")
 		if err != nil {
@@ -137,7 +140,7 @@ func (k *Kernel) PrepareAIWithBudget(ctx context.Context, e contracts.ServiceExe
 			return out, Fail("NOT_FOUND", "Conversation is unavailable")
 		}
 		candidate := runs[0]
-		if candidate.State == "completed" && candidate.Request.PageID == r.PageID && candidate.Request.ProjectID == r.ProjectID && (r.UseMemory || !candidate.Request.UseMemory) {
+		if candidate.State == "completed" && candidate.Request.PageID == r.PageID && candidate.Request.ProjectID == r.ProjectID && len(candidate.Request.ConnectedSources) == 0 && len(r.ConnectedSources) == 0 && (r.UseMemory || !candidate.Request.UseMemory) {
 			live := true
 			for _, s := range candidate.Sources {
 				if k.aiEvidenceValid(ctx, e, s) != nil {
@@ -181,6 +184,9 @@ func (k *Kernel) PrepareAIWithBudget(ctx context.Context, e contracts.ServiceExe
 		return AIPrepared{}, err
 	}
 	run, kept := out.Run, out.Run.Sources
+	if err := k.revalidateConnectedEvidence(ctx, e, kept); err != nil {
+		return AIPrepared{}, err
+	}
 	// Tokenization is asynchronous native work; revalidate current evidence and
 	// permissions after it, before persisting a runnable prompt.
 	if err := k.authorize(e); err != nil {
@@ -194,7 +200,14 @@ func (k *Kernel) PrepareAIWithBudget(ctx context.Context, e contracts.ServiceExe
 			return AIPrepared{}, err
 		}
 	}
-	err = k.write(ctx, func(tx *sql.Tx) error {
+	err = k.write(connectedCommitContext(ctx, e, kept), func(tx *sql.Tx) error {
+		for _, source := range kept {
+			if source.Connected != nil {
+				if err := k.connectedEvidenceLocal(ctx, tx, e, source); err != nil {
+					return err
+				}
+			}
+		}
 		if r.Skill != nil {
 			preview, err := k.previewSkillTx(ctx, tx, e, *r.Skill, "local")
 			if err != nil {
@@ -220,6 +233,25 @@ func truncateAI(s string, n int) string {
 	return s[:n] + "…"
 }
 func (k *Kernel) aiSources(ctx context.Context, e contracts.ServiceExecutionContext, r AIRequest) ([]AIEvidence, string, error) {
+	if len(r.ConnectedSources) > 0 {
+		if r.ProjectID != "" || (r.PageID == "" && (r.BlockID != "" || r.UseMemory)) {
+			return nil, "", Fail("INVALID_REQUEST", "Choose an explicit page for additional canonical evidence; connected selection does not expand project or workspace scope")
+		}
+		sources, warning, err := k.connectedSources(ctx, e, r.ConnectedSources)
+		if err != nil {
+			return nil, "", err
+		}
+		if r.PageID != "" {
+			r.ConnectedSources = nil
+			canonical, w, err := k.aiSources(ctx, e, r)
+			if err != nil {
+				return nil, "", err
+			}
+			sources = append(sources, canonical...)
+			warning += " " + w
+		}
+		return sources, warning, nil
+	}
 	if r.Skill != nil {
 		sources := []AIEvidence{}
 		warnings := []string{}
@@ -473,6 +505,18 @@ func (k *Kernel) FinishAI(ctx context.Context, e contracts.ServiceExecutionConte
 	if len(text) > 64000 {
 		text = truncateAI(text, 64000)
 	}
+	if state == "completed" {
+		if err := k.revalidateConnectedEvidence(ctx, e, run.Sources); err != nil {
+			state, failure, text = "failed", "Connected access changed during generation; refresh and ask again.", ""
+		}
+	} else {
+		for _, source := range run.Sources {
+			if source.Connected != nil {
+				text = ""
+				break
+			}
+		}
+	}
 	citations := []AICitation{}
 	valid := map[int]AIEvidence{}
 	seen := map[int]bool{}
@@ -492,7 +536,7 @@ func (k *Kernel) FinishAI(ctx context.Context, e contracts.ServiceExecutionConte
 			}
 			if !seen[n] {
 				seen[n] = true
-				citations = append(citations, AICitation{Number: n, Title: s.Title, Location: s.Location, State: "current"})
+				citations = append(citations, AICitation{Number: n, Title: s.Title, Location: s.Location, Connected: s.Connected, State: "current"})
 			}
 			return marker
 		})
@@ -503,7 +547,7 @@ func (k *Kernel) FinishAI(ctx context.Context, e contracts.ServiceExecutionConte
 			for _, s := range run.Sources {
 				if _, ok := valid[s.Number]; ok && strings.Contains(strings.ToLower(s.Text), strings.ToLower(quote)) {
 					text = strings.TrimSpace(text) + fmt.Sprintf(" [%d]", s.Number)
-					citations = append(citations, AICitation{Number: s.Number, Title: s.Title, Location: s.Location, State: "current"})
+					citations = append(citations, AICitation{Number: s.Number, Title: s.Title, Location: s.Location, Connected: s.Connected, State: "current"})
 					break
 				}
 			}
@@ -527,7 +571,15 @@ func (k *Kernel) FinishAI(ctx context.Context, e contracts.ServiceExecutionConte
 		failure = "The local model returned no text."
 	}
 	sort.Slice(citations, func(i, j int) bool { return citations[i].Number < citations[j].Number })
-	err = k.write(ctx, func(tx *sql.Tx) error {
+	err = k.write(connectedCommitContext(ctx, e, run.Sources), func(tx *sql.Tx) error {
+		for _, source := range run.Sources {
+			if source.Connected != nil {
+				if err := k.connectedEvidenceLocal(ctx, tx, e, source); err != nil {
+					state, failure, text = "failed", "Connected authorization changed before publication.", ""
+					citations = []AICitation{}
+				}
+			}
+		}
 		_, err := tx.ExecContext(ctx, "UPDATE ai_runs SET text=?,state=?,citations_json=?,warning=?,error=? WHERE id=? AND actor_id=? AND state='running'", text, state, string(marshal(citations)), warning, failure, id, e.Actor.ActorId)
 		return err
 	})
@@ -537,6 +589,9 @@ func (k *Kernel) FinishAI(ctx context.Context, e contracts.ServiceExecutionConte
 	return k.AIRun(ctx, e, id)
 }
 func (k *Kernel) aiEvidenceValid(ctx context.Context, e contracts.ServiceExecutionContext, s AIEvidence) error {
+	if s.Connected != nil {
+		return k.connectedEvidenceLocal(ctx, k.db, e, s)
+	}
 	if err := k.authorizePage(ctx, k.db, e, string(s.Location.PageId)); err != nil {
 		return err
 	}
@@ -577,6 +632,12 @@ func (k *Kernel) AIRun(ctx context.Context, e contracts.ServiceExecutionContext,
 	json.Unmarshal([]byte(sources), &run.Sources)
 	json.Unmarshal([]byte(citations), &run.Citations)
 	for _, s := range run.Sources {
+		if s.Connected != nil {
+			if err := connectorOwner(k, e); err != nil {
+				return AIRun{}, err
+			}
+			continue
+		}
 		if k.authorizePage(ctx, k.db, e, string(s.Location.PageId)) != nil {
 			return AIRun{}, Fail("SCOPE_DENIED", "Conversation evidence is outside the current scope")
 		}
@@ -584,7 +645,7 @@ func (k *Kernel) AIRun(ctx context.Context, e contracts.ServiceExecutionContext,
 	states := map[int]string{}
 	for i := range run.Sources {
 		run.Sources[i].State = "current"
-		if run.Sources[i].MemoryID == "" {
+		if run.Sources[i].MemoryID == "" && run.Sources[i].Connected == nil {
 			freshness, err := pageFreshness(ctx, k.db, string(run.Sources[i].Location.PageId), time.Now())
 			if err != nil {
 				return AIRun{}, err

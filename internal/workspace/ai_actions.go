@@ -38,6 +38,9 @@ func prepareAIAction(ctx context.Context, k *Kernel, e contracts.ServiceExecutio
 	if run.State != "completed" {
 		return nil, Fail("CONFLICT", "Only completed generations can be reviewed")
 	}
+	if err = k.revalidateConnectedEvidence(ctx, e, run.Sources); err != nil {
+		return nil, err
+	}
 	for _, s := range run.Sources {
 		if err = k.aiEvidenceValid(ctx, e, s); err != nil {
 			return nil, err
@@ -81,6 +84,9 @@ func prepareAIAction(ctx context.Context, k *Kernel, e contracts.ServiceExecutio
 		return nil
 	}
 	for _, s := range run.Sources {
+		if s.Connected != nil {
+			continue
+		}
 		guard("page", string(s.Location.PageId), string(s.Location.SourceRevision))
 		if s.MemoryID != "" {
 			guard("memory", s.MemoryID, s.MemoryRevision)
@@ -234,7 +240,14 @@ func prepareAIAction(ctx context.Context, k *Kernel, e contracts.ServiceExecutio
 	if _, err = contracts.DecodeBatch(marshal(req)); err != nil {
 		return nil, Fail("INVALID_REQUEST", err.Error())
 	}
-	err = k.write(ctx, func(tx *sql.Tx) error {
+	err = k.write(connectedCommitContext(ctx, e, run.Sources), func(tx *sql.Tx) error {
+		for _, source := range run.Sources {
+			if source.Connected != nil {
+				if err := k.connectedEvidenceLocal(ctx, tx, e, source); err != nil {
+					return err
+				}
+			}
+		}
 		var previous, state string
 		query := "SELECT body_json,state FROM ai_proposals WHERE run_id=? AND json_extract(body_json,'$.requestHash')=? LIMIT 1"
 		key := p.RunID
@@ -305,6 +318,9 @@ func applyAIAction(ctx context.Context, k *Kernel, e contracts.ServiceExecutionC
 	if state == "applied" {
 		return map[string]any{"pageId": p.PageID, "state": state}, nil
 	}
+	if err = k.revalidateConnectedEvidence(ctx, e, run.Sources); err != nil {
+		return nil, err
+	}
 	for _, s := range run.Sources {
 		if err = k.aiEvidenceValid(ctx, e, s); err != nil {
 			return nil, err
@@ -370,6 +386,17 @@ func init() {
 		var sources []AIEvidence
 		if err := json.Unmarshal([]byte(sourcesJSON), &sources); err != nil {
 			return err
+		}
+		sourceExecution, ok := m.Context.Value(approvalSourceGrantKey{}).(contracts.ServiceExecutionContext)
+		for _, source := range sources {
+			if source.Connected != nil {
+				if !ok {
+					return Fail("APPROVAL_REQUIRED", "Connected source approval context is missing")
+				}
+				if err := m.Kernel.connectedEvidenceLocal(m.Context, m.Tx, sourceExecution, source); err != nil {
+					return err
+				}
+			}
 		}
 		if err := retainAIExternalContextPolicy(m, sources); err != nil {
 			return err

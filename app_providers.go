@@ -53,7 +53,7 @@ func (a *App) providerDispatch(method string, raw json.RawMessage) string {
 	if strings.HasPrefix(method, "providers.auth.") {
 		return a.providerAuthDispatch(method, raw)
 	}
-	if method == "providers.models" || method == "providers.discover" || method == "providers.runs" || method == "providers.start" || method == "providers.cancel" {
+	if method == "providers.connectedPreview" || method == "providers.models" || method == "providers.discover" || method == "providers.runs" || method == "providers.start" || method == "providers.cancel" {
 		return a.managedProviderDispatch(method, raw)
 	}
 	a.mu.RLock()

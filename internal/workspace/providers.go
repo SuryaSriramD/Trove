@@ -22,8 +22,10 @@ type ProviderBridge struct {
 	kernel      *Kernel
 	owner       contracts.ServiceExecutionContext
 	connections map[string]*providerConnection
+	sharing     *ConnectedSharingReviews
 }
 type providerConnection struct {
+	connected       []ConnectedEvidence
 	skillInvocation string
 	mcp             *providerMCP
 	execution       contracts.ServiceExecutionContext
@@ -34,28 +36,30 @@ type providerConnection struct {
 	ctx             context.Context
 }
 type ProviderConnection struct {
-	ID             string   `json:"id"`
-	Provider       string   `json:"provider"`
-	State          string   `json:"state"`
-	AuthMode       string   `json:"authMode"`
-	BillingMode    string   `json:"billingMode"`
-	Account        string   `json:"account"`
-	AdapterVersion string   `json:"adapterVersion"`
-	PageIDs        []string `json:"pageIds"`
-	Tools          []string `json:"tools"`
-	Token          string   `json:"token,omitempty"`
+	ConnectedSources []ConnectedEvidence `json:"connectedSources,omitempty"`
+	ID               string              `json:"id"`
+	Provider         string              `json:"provider"`
+	State            string              `json:"state"`
+	AuthMode         string              `json:"authMode"`
+	BillingMode      string              `json:"billingMode"`
+	Account          string              `json:"account"`
+	AdapterVersion   string              `json:"adapterVersion"`
+	PageIDs          []string            `json:"pageIds"`
+	Tools            []string            `json:"tools"`
+	Token            string              `json:"token,omitempty"`
 }
 type ProviderProposal struct {
-	PlanHash     string                        `json:"planHash,omitempty"`
-	Changes      []ActionReview                `json:"changes,omitempty"`
-	ID           string                        `json:"id"`
-	ConnectionID string                        `json:"connectionId"`
-	State        string                        `json:"state"`
-	Request      contracts.ServiceBatchRequest `json:"request"`
-	Result       json.RawMessage               `json:"result,omitempty"`
+	ConnectedSources []ConnectedEvidence           `json:"connectedSources,omitempty"`
+	PlanHash         string                        `json:"planHash,omitempty"`
+	Changes          []ActionReview                `json:"changes,omitempty"`
+	ID               string                        `json:"id"`
+	ConnectionID     string                        `json:"connectionId"`
+	State            string                        `json:"state"`
+	Request          contracts.ServiceBatchRequest `json:"request"`
+	Result           json.RawMessage               `json:"result,omitempty"`
 }
 
-var providerTools = map[string]bool{"readPage": true, "queryRecords": true, "search.query": true, "resolveCitation": true, "allocateIds": true, "proposeChanges": true, "proposeActions": true}
+var providerTools = map[string]bool{"readConnectedSource": true, "readPage": true, "queryRecords": true, "search.query": true, "resolveCitation": true, "allocateIds": true, "proposeChanges": true, "proposeActions": true}
 
 func init() {
 	RegisterInitializer(func(ctx context.Context, k *Kernel) error {
@@ -66,7 +70,7 @@ func init() {
 	})
 }
 func NewProviderBridge(k *Kernel, owner contracts.ServiceExecutionContext) *ProviderBridge {
-	return &ProviderBridge{kernel: k, owner: owner, connections: map[string]*providerConnection{}}
+	return &ProviderBridge{kernel: k, owner: owner, connections: map[string]*providerConnection{}, sharing: NewConnectedSharingReviews(k)}
 }
 func (b *ProviderBridge) audit(ctx context.Context, id, action, state, detail string) {
 	_ = b.kernel.write(ctx, func(tx *sql.Tx) error {
@@ -78,7 +82,7 @@ func (b *ProviderBridge) Connect(ctx context.Context, provider string, pages, to
 	if provider != "mcp" {
 		return ProviderConnection{}, Fail("UNSUPPORTED_VERSION", "Managed vendors must use the authenticated native runtime adapter")
 	}
-	return b.connect(ctx, ProviderConnection{Provider: provider, AuthMode: "paired_local", BillingMode: "client_owned", Account: "paired client", AdapterVersion: "1"}, pages, tools)
+	return b.connect(ctx, ProviderConnection{Provider: provider, AuthMode: "paired_local", BillingMode: "client_owned", Account: "paired client", AdapterVersion: "1"}, pages, tools, nil)
 }
 
 // ConnectManaged is a trusted-host entry point, never a workspace RPC tool.
@@ -89,16 +93,16 @@ func (b *ProviderBridge) ConnectManaged(ctx context.Context, provider, account, 
 	if !valid || strings.TrimSpace(account) == "" || len(account) > 512 {
 		return ProviderConnection{}, Fail("INVALID_REQUEST", "Invalid managed provider identity")
 	}
-	return b.connect(ctx, ProviderConnection{Provider: provider, AuthMode: authMode, BillingMode: billingMode, Account: account, AdapterVersion: "2"}, pages, tools)
+	return b.connect(ctx, ProviderConnection{Provider: provider, AuthMode: authMode, BillingMode: billingMode, Account: account, AdapterVersion: "2"}, pages, tools, nil)
 }
 
-func (b *ProviderBridge) connect(ctx context.Context, identity ProviderConnection, pages, tools []string) (ProviderConnection, error) {
+func (b *ProviderBridge) connect(ctx context.Context, identity ProviderConnection, pages, tools []string, connected []ConnectedEvidence) (ProviderConnection, error) {
 	b.mu.Lock()
 	defer b.mu.Unlock()
 	if err := requireOwnerScope(b.kernel, b.owner); err != nil {
 		return ProviderConnection{}, err
 	}
-	if len(pages) == 0 || len(pages) > 100 || len(tools) == 0 {
+	if len(pages) == 0 && len(connected) == 0 || len(pages) > 100 || len(tools) == 0 {
 		return ProviderConnection{}, Fail("INVALID_REQUEST", "Select 1–100 pages and explicit capabilities")
 	}
 	seen := map[string]bool{}
@@ -107,7 +111,7 @@ func (b *ProviderBridge) connect(ctx context.Context, identity ProviderConnectio
 			return ProviderConnection{}, Fail("INVALID_REQUEST", "Duplicate context page")
 		}
 		seen[p] = true
-		if err := b.kernel.authorizePage(ctx, b.kernel.db, b.owner, p); err != nil {
+		if err := b.authorizeSharedPageMetadata(ctx, p); err != nil {
 			return ProviderConnection{}, err
 		}
 		var n int
@@ -122,6 +126,9 @@ func (b *ProviderBridge) connect(ctx context.Context, identity ProviderConnectio
 		}
 		allow[t] = true
 	}
+	if allow["readConnectedSource"] != (len(connected) > 0) {
+		return ProviderConnection{}, Fail("APPROVAL_REQUIRED", "Connected sources require exact recipient review and the explicit readConnectedSource capability")
+	}
 	id := NewID()
 	scopeIDs := []contracts.DomainId{}
 	for _, p := range pages {
@@ -129,8 +136,13 @@ func (b *ProviderBridge) connect(ctx context.Context, identity ProviderConnectio
 	}
 	e := b.kernel.Grant(contracts.ServiceActor{Kind: "external_client", ActorId: contracts.DomainId(id)}, "external", contracts.DomainScope{Value: contracts.DomainScopeVariant3{Kind: "pages", WorkspaceId: contracts.DomainId(b.kernel.id), PageIds: scopeIDs}})
 	info := identity
-	info.ID, info.State, info.PageIDs, info.Tools = id, "connected", append([]string(nil), pages...), append([]string(nil), tools...)
+	info.ConnectedSources = append([]ConnectedEvidence(nil), connected...)
+	info.ID, info.State, info.PageIDs, info.Tools = id, "connected", append([]string{}, pages...), append([]string(nil), tools...)
+	ctx = context.WithValue(ctx, commitGrantKey{}, b.owner)
 	err := b.kernel.write(ctx, func(tx *sql.Tx) error {
+		if err := b.connectedLocal(ctx, tx, connected); err != nil {
+			return err
+		}
 		_, err := tx.ExecContext(ctx, "INSERT INTO provider_connections VALUES(?,?,'connected')", id, string(marshal(info)))
 		return err
 	})
@@ -140,7 +152,10 @@ func (b *ProviderBridge) connect(ctx context.Context, identity ProviderConnectio
 	}
 	live, cancel := context.WithCancel(context.Background())
 	token := strings.ReplaceAll(NewID()+NewID(), "-", "")
-	b.connections[id] = &providerConnection{execution: e, token: token, tools: allow, info: info, ctx: live, cancel: cancel}
+	b.connections[id] = &providerConnection{connected: append([]ConnectedEvidence(nil), connected...), execution: e, token: token, tools: allow, info: info, ctx: live, cancel: cancel}
+	info.ConnectedSources = append([]ConnectedEvidence(nil), info.ConnectedSources...)
+	info.PageIDs = append([]string{}, info.PageIDs...)
+	info.Tools = append([]string(nil), info.Tools...)
 	info.Token = token
 	b.audit(ctx, id, "connect", "connected", "Explicit pages and capabilities approved")
 	return info, nil
@@ -150,7 +165,11 @@ func (b *ProviderBridge) Status() []ProviderConnection {
 	defer b.mu.Unlock()
 	out := []ProviderConnection{}
 	for _, c := range b.connections {
-		out = append(out, c.info)
+		info := c.info
+		info.PageIDs = append([]string{}, info.PageIDs...)
+		info.Tools = append([]string(nil), info.Tools...)
+		info.ConnectedSources = append([]ConnectedEvidence(nil), info.ConnectedSources...)
+		out = append(out, info)
 	}
 	return out
 }
@@ -216,6 +235,12 @@ func (b *ProviderBridge) Call(ctx context.Context, id, token, tool string, args 
 	defer cancel()
 	stop := context.AfterFunc(c.ctx, cancel)
 	defer stop()
+	if tool == "readConnectedSource" {
+		return b.readConnectedSource(live, c, args)
+	}
+	if err := b.validateConnected(live, c); err != nil {
+		return nil, err
+	}
 	if tool == "proposeActions" {
 		return b.proposeActions(live, c, args)
 	}
@@ -244,6 +269,9 @@ func (b *ProviderBridge) Call(ctx context.Context, id, token, tool string, args 
 	clean["requestId"] = NewID()
 	clean["workspaceId"] = b.kernel.id
 	response := b.kernel.Dispatch(live, c.execution, tool, marshal(clean))
+	if err := b.validateConnected(live, c); err != nil {
+		return nil, err
+	}
 	b.audit(ctx, id, tool, "completed", "Scoped service read")
 	return response, nil
 }
@@ -288,8 +316,12 @@ func (b *ProviderBridge) persistProposal(ctx context.Context, c *providerConnect
 	}
 	sum := sha256.Sum256([]byte(providerProposalNamespace(c) + ":" + key))
 	id := hex.EncodeToString(sum[:])
-	p := ProviderProposal{ID: id, ConnectionID: c.info.ID, State: "pending", Request: req, PlanHash: planHash, Changes: changes}
+	p := ProviderProposal{ConnectedSources: append([]ConnectedEvidence(nil), c.connected...), ID: id, ConnectionID: c.info.ID, State: "pending", Request: req, PlanHash: planHash, Changes: changes}
+	ctx = b.connectedWriteContext(ctx, c)
 	err = b.kernel.write(ctx, func(tx *sql.Tx) error {
+		if err := b.connectedLocal(ctx, tx, c.connected); err != nil {
+			return err
+		}
 		var previous, previousState string
 		var previousResult sql.NullString
 		err := tx.QueryRowContext(ctx, "SELECT body_json,state,result_json FROM provider_proposals WHERE id=?", id).Scan(&previous, &previousState, &previousResult)
@@ -297,6 +329,9 @@ func (b *ProviderBridge) persistProposal(ctx context.Context, c *providerConnect
 			var old ProviderProposal
 			if err = json.Unmarshal([]byte(previous), &old); err != nil {
 				return err
+			}
+			if connectorHash(old.ConnectedSources) != connectorHash(c.connected) {
+				return Fail("IDEMPOTENCY_CONFLICT", "Proposal source review changed")
 			}
 			compare := old.Request
 			compare.Mutation.ScopeGrantId = req.Mutation.ScopeGrantId
@@ -372,7 +407,12 @@ func (b *ProviderBridge) Approve(ctx context.Context, id string) (json.RawMessag
 		return json.RawMessage(result.String), nil
 	}
 	b.mu.Lock()
-	c := b.connections[p.ConnectionID]
+	stored := b.connections[p.ConnectionID]
+	var c *providerConnection
+	if stored != nil {
+		copy := *stored
+		c = &copy
+	}
 	connected := c != nil && c.info.State == "connected"
 	b.mu.Unlock()
 	if !connected {
@@ -391,6 +431,16 @@ func (b *ProviderBridge) Approve(ctx context.Context, id string) (json.RawMessag
 	defer cancel()
 	stop := context.AfterFunc(c.ctx, cancel)
 	defer stop()
+	if connectorHash(p.ConnectedSources) != connectorHash(c.connected) {
+		return nil, Fail("CONFLICT", "Proposal connected-source review differs from this connection")
+	}
+	if err := b.validateConnected(live, c); err != nil {
+		return nil, err
+	}
+	live = b.connectedWriteContext(live, c)
+	if len(c.connected) > 0 {
+		live = context.WithValue(live, providerConnectedCommitKey{}, append([]ConnectedEvidence(nil), c.connected...))
+	}
 	// Persist the approval-bearing request before dispatch. A crash after commit
 	// retries the exact same idempotent request and returns its receipt.
 	if p.Request.Mutation.ApprovalId == nil {
@@ -440,7 +490,7 @@ func (b *ProviderBridge) PreviewContext(ctx context.Context, pages []string) (an
 		return nil, Fail("RESOURCE_EXHAUSTED", "Context is limited to 100 pages")
 	}
 	for _, id := range pages {
-		if err := b.kernel.authorizePage(ctx, b.kernel.db, b.owner, id); err != nil {
+		if err := b.authorizeSharedPageMetadata(ctx, id); err != nil {
 			return nil, err
 		}
 		p, err := readPageTx(ctx, b.kernel.db, id)
@@ -487,6 +537,9 @@ func (b *ProviderBridge) BindSkill(ctx context.Context, id string, ref SkillRunR
 	if c == nil {
 		return Fail("NOT_FOUND", "Provider connection unavailable")
 	}
+	if len(c.connected) > 0 {
+		return Fail("SCOPE_DENIED", "Skills and connected sharing require separate reviewed runs")
+	}
 	if !sameStringSet(c.info.PageIDs, ref.SourcePageIDs) || !sameStringSet(c.info.Tools, ref.Tools) {
 		return Fail("SCOPE_DENIED", "Skill selection differs from provider grant")
 	}
@@ -498,5 +551,21 @@ func (b *ProviderBridge) BindSkill(ctx context.Context, id string, ref SkillRunR
 		return Fail("SCOPE_DENIED", "Skill invocation belongs to another actor")
 	}
 	c.skillInvocation = ref.InvocationID
+	return nil
+}
+
+// Context manifests disclose titles as well as page identities. Apply the same
+// existing Gmail-derived policy before metadata reaches an external runtime.
+func (b *ProviderBridge) authorizeSharedPageMetadata(ctx context.Context, page string) error {
+	if err := b.kernel.authorizePage(ctx, b.kernel.db, b.owner, page); err != nil {
+		return err
+	}
+	restricted, err := pageExternalContextRestricted(ctx, b.kernel.db, page)
+	if err != nil {
+		return err
+	}
+	if restricted {
+		return Fail("SCOPE_DENIED", "Gmail-derived context is not qualified for external AI")
+	}
 	return nil
 }

@@ -28,25 +28,27 @@ func (b *ProviderBridge) ManagedTools(id, token string) ([]providers.ToolSpec, e
 }
 
 type ManagedRun struct {
-	Skill        *SkillRunReference           `json:"skill,omitempty"`
-	ID           string                       `json:"id"`
-	SessionID    string                       `json:"sessionId"`
-	ConnectionID string                       `json:"connectionId"`
-	Provider     string                       `json:"provider"`
-	Account      string                       `json:"account"`
-	AccountLabel string                       `json:"accountLabel"`
-	BillingMode  string                       `json:"billingMode"`
-	Model        string                       `json:"model"`
-	State        string                       `json:"state"`
-	Prompt       string                       `json:"prompt"`
-	Text         string                       `json:"text"`
-	Message      string                       `json:"message,omitempty"`
-	PageIDs      []string                     `json:"pageIds"`
-	Tools        []string                     `json:"tools"`
-	Manifest     json.RawMessage              `json:"manifest"`
-	Checkpoint   *providers.ManagedCheckpoint `json:"checkpoint,omitempty"`
-	CreatedAt    string                       `json:"createdAt"`
-	UpdatedAt    string                       `json:"updatedAt"`
+	ConnectedSources   []ConnectedEvidence          `json:"connectedSources,omitempty"`
+	ConnectedRecipient *ConnectedSharingTarget      `json:"connectedRecipient,omitempty"`
+	Skill              *SkillRunReference           `json:"skill,omitempty"`
+	ID                 string                       `json:"id"`
+	SessionID          string                       `json:"sessionId"`
+	ConnectionID       string                       `json:"connectionId"`
+	Provider           string                       `json:"provider"`
+	Account            string                       `json:"account"`
+	AccountLabel       string                       `json:"accountLabel"`
+	BillingMode        string                       `json:"billingMode"`
+	Model              string                       `json:"model"`
+	State              string                       `json:"state"`
+	Prompt             string                       `json:"prompt"`
+	Text               string                       `json:"text"`
+	Message            string                       `json:"message,omitempty"`
+	PageIDs            []string                     `json:"pageIds"`
+	Tools              []string                     `json:"tools"`
+	Manifest           json.RawMessage              `json:"manifest"`
+	Checkpoint         *providers.ManagedCheckpoint `json:"checkpoint,omitempty"`
+	CreatedAt          string                       `json:"createdAt"`
+	UpdatedAt          string                       `json:"updatedAt"`
 }
 
 var managedIDPattern = regexp.MustCompile(`^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$`)
@@ -99,9 +101,28 @@ func (k *Kernel) SaveManagedRun(ctx context.Context, e contracts.ServiceExecutio
 		r.CreatedAt = now()
 	}
 	r.UpdatedAt = now()
+	if len(r.ConnectedSources) > 12 {
+		return Fail("INVALID_REQUEST", "Too many connected sources")
+	}
+	if len(r.ConnectedSources) > 0 && ctx.Value(commitGrantKey{}) == nil {
+		ctx = context.WithValue(ctx, commitGrantKey{}, e)
+	}
 	return k.write(ctx, func(tx *sql.Tx) error {
 		if err := k.authorize(e); err != nil {
 			return err
+		}
+		if len(r.ConnectedSources) > 0 {
+			if r.State == "starting" || r.State == "running" || r.State == "completed" {
+				proof, _ := ctx.Value(providerConnectedRunKey{}).(string)
+				if proof == "" || proof != connectorHash([]any{r.ConnectionID, r.ConnectedRecipient, r.ConnectedSources}) {
+					return Fail("APPROVAL_REQUIRED", "A connected run requires the trusted bridge sharing receipt")
+				}
+				if err := k.validateExternalConnectedLocal(ctx, tx, e, r.ConnectedSources); err != nil {
+					return err
+				}
+			} else if r.Text != "" || r.Checkpoint != nil {
+				return Fail("SCOPE_DENIED", "Unavailable connected results cannot retain text or a resumable checkpoint")
+			}
 		}
 		if r.Skill != nil && r.State == "starting" {
 			preview, err := k.previewSkillTx(ctx, tx, e, *r.Skill, r.Provider)

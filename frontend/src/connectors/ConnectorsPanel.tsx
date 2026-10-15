@@ -10,6 +10,8 @@ import {
   type WorkspaceSnapshot,
 } from "../api";
 import { ImportExportPanel } from "../imports/ImportExportPanel";
+import { NotionCapturePanel } from "../imports/NotionCapturePanel";
+import { AIPanel } from "../ai/AIPanel";
 import "./connectors.css";
 
 type Account = S.ConnectorAccount;
@@ -85,7 +87,12 @@ export function ConnectorsPanel(props: {
   onChanged: () => Promise<void> | void;
   onOpenPage: (id: string) => void;
 }) {
-  return <Connections key={props.workspace.workspaceId} {...props} />;
+  return (
+    <Connections
+      key={`${props.workspace.workspaceId}:${props.workspace.scopeGrantId}`}
+      {...props}
+    />
+  );
 }
 function Connections({
   workspace,
@@ -111,6 +118,10 @@ function Connections({
   const [query, setQuery] = useState("");
   const [sources, setSources] = useState<Source[]>([]);
   const [preview, setPreview] = useState<Source>();
+  const [aiSources, setAISources] = useState<
+    { reference: S.ConnectedSourceReference; title: string }[]
+  >([]);
+  const [aiOpen, setAIOpen] = useState(false);
   const [planId, setPlanId] = useState("");
   const [proposal, setProposal] = useState<Proposal>();
   const [error, setError] = useState("");
@@ -125,6 +136,7 @@ function Connections({
   const epoch = useRef(0);
   const account = accounts.find((a) => a.id === selected);
   const previewKind = accounts.find((a) => a.id === preview?.accountId)?.kind;
+  const notionRootKind = preview?.kind.replace(/^notion_/, "");
   const previewContent = (preview?.content ?? {}) as Record<string, unknown>;
   const formats =
     typeof previewContent.mimeType === "string"
@@ -199,6 +211,8 @@ function Connections({
     setCursor("");
     setHistory(emptyHistory);
     setPreview(undefined);
+    setAISources([]);
+    setAIOpen(false);
     setProposal(undefined);
     setAcquired(undefined);
     setAcquisitionFormat("");
@@ -987,6 +1001,59 @@ function Connections({
           >
             Review import into Trove
           </button>
+          <button
+            disabled={
+              busy ||
+              !["present", "partial"].includes(preview.state) ||
+              aiSources.length >= 12
+            }
+            onClick={() =>
+              void act(async (stamp) => {
+                const reference = await request<S.ConnectedSourceReference>(
+                  "connectors.contextReference",
+                  {
+                    snapshotId: preview.id,
+                    expectedRevision: preview.remoteRevision,
+                  },
+                );
+                if (current(stamp)) {
+                  setAISources((old) => [
+                    ...old.filter(
+                      (s) => s.reference.snapshotId !== reference.snapshotId,
+                    ),
+                    { reference, title: preview.title },
+                  ]);
+                  setAIOpen(false);
+                }
+              })
+            }
+          >
+            Select for local AI
+          </button>
+          {previewKind === "notion" &&
+            (notionRootKind === "page" ||
+              notionRootKind === "database" ||
+              notionRootKind === "data_source") && (
+              <section aria-label="Capture Notion descendants">
+                <p>
+                  To include this root's descendants, typed records and files,
+                  capture through a Notion integration with access to that root.
+                  Its integration token is separate from this connection's OAuth
+                  authorization. Review the captured inventory before importing.
+                </p>
+                <NotionCapturePanel
+                  workspace={workspace}
+                  namespace={`notion-api:${preview.selectionId}`}
+                  initialRoots={[
+                    { kind: notionRootKind, id: preview.remoteId },
+                  ]}
+                  onPlan={(plan) => {
+                    const id = (plan as { planId?: unknown })?.planId;
+                    if (typeof id === "string") setPlanId(id);
+                  }}
+                />
+              </section>
+            )}
           {previewKind === "google_drive" && formats.length > 0 && (
             <label>
               Acquisition format
@@ -1086,6 +1153,43 @@ function Connections({
                 Attach acquired file
               </button>
             </div>
+          )}
+        </section>
+      )}
+      {aiSources.length > 0 && (
+        <section aria-label="Selected local AI sources">
+          <h2>Local AI source selection</h2>
+          <ul>
+            {aiSources.map((source) => (
+              <li key={source.reference.snapshotId}>
+                {source.title}
+                <button
+                  onClick={() => {
+                    setAISources((old) =>
+                      old.filter(
+                        (s) =>
+                          s.reference.snapshotId !==
+                          source.reference.snapshotId,
+                      ),
+                    );
+                    setAIOpen(false);
+                  }}
+                >
+                  Remove {source.title}
+                </button>
+              </li>
+            ))}
+          </ul>
+          <button onClick={() => setAIOpen((open) => !open)}>
+            {aiOpen ? "Close local AI" : "Ask local AI about selected sources"}
+          </button>
+          {aiOpen && (
+            <AIPanel
+              workspace={workspace}
+              connectedSources={aiSources}
+              onNavigate={(location) => onOpenPage(location.pageId)}
+              onCommitted={onChanged}
+            />
           )}
         </section>
       )}

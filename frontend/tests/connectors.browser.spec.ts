@@ -283,3 +283,33 @@ test("source cancellation targets the active request and creates no import", asy
   );
   await page.evaluate(() => (window as any).resolveConnectorPreview());
 });
+
+test("Notion preview offers explicit descendant capture with the selected root", async ({
+  page,
+}) => {
+  await page.goto(url + "?kind=notion");
+  await page.getByRole("button", { name: "Search", exact: true }).click();
+  await page.getByRole("button", { name: /Remote issue/ }).click();
+  const capture = page.getByRole("region", {
+    name: "Capture Notion descendants",
+  });
+  await capture
+    .getByText("Optional authenticated Notion capture", { exact: true })
+    .click();
+  await expect(capture.getByLabel("Root type")).toHaveValue("page");
+  await expect(capture.getByLabel("Authorized root IDs")).toHaveValue(
+    "019a1234-5678-7000-8000-000000000010",
+  );
+  await expect(capture.getByLabel("Integration token")).toHaveValue("");
+  await expect(
+    capture.getByRole("button", { name: "Capture selected roots" }),
+  ).toBeDisabled();
+  expect(
+    await page.evaluate(
+      () =>
+        (window as any).connectorCalls.filter(
+          (c: any) => c.method === "imports.notion.start",
+        ).length,
+    ),
+  ).toBe(0);
+});

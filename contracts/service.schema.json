@@ -5526,6 +5526,232 @@
       ],
       "additionalProperties": false
     },
+    "ConnectedSourceReference": {
+      "type": "object",
+      "properties": {
+        "snapshotId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 2048
+        },
+        "remoteRevision": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 2048
+        },
+        "contentHash": {
+          "$ref": "domain.schema.json#/$defs/Hash"
+        }
+      },
+      "required": [
+        "snapshotId",
+        "remoteRevision",
+        "contentHash"
+      ],
+      "additionalProperties": false
+    },
+    "ConnectedEvidence": {
+      "type": "object",
+      "properties": {
+        "version": {
+          "const": 1
+        },
+        "receiptId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "snapshotId": {
+          "type": "string",
+          "maxLength": 2048
+        },
+        "accountId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "accountRevision": {
+          "type": "string"
+        },
+        "selectionId": {
+          "type": "string",
+          "maxLength": 2048
+        },
+        "provider": {
+          "type": "string",
+          "enum": [
+            "google_calendar",
+            "google_drive",
+            "gmail",
+            "github",
+            "notion",
+            "mcp"
+          ]
+        },
+        "remoteId": {
+          "type": "string",
+          "maxLength": 2048
+        },
+        "remoteRevision": {
+          "type": "string",
+          "maxLength": 2048
+        },
+        "contentHash": {
+          "$ref": "domain.schema.json#/$defs/Hash"
+        },
+        "url": {
+          "type": "string"
+        },
+        "checkedAt": {
+          "$ref": "domain.schema.json#/$defs/Timestamp"
+        },
+        "partial": {
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "version",
+        "receiptId",
+        "snapshotId",
+        "accountId",
+        "accountRevision",
+        "selectionId",
+        "provider",
+        "remoteId",
+        "remoteRevision",
+        "contentHash",
+        "url",
+        "checkedAt",
+        "partial"
+      ],
+      "additionalProperties": false
+    },
+    "ConnectedSource": {
+      "type": "object",
+      "properties": {
+        "connected": {
+          "$ref": "#/$defs/ConnectedEvidence"
+        },
+        "title": {
+          "type": "string"
+        },
+        "text": {
+          "type": "string",
+          "maxLength": 262144
+        }
+      },
+      "required": [
+        "connected",
+        "title",
+        "text"
+      ],
+      "additionalProperties": false
+    },
+    "ConnectedSharingTarget": {
+      "type": "object",
+      "properties": {
+        "provider": {
+          "type": "string",
+          "enum": [
+            "codex",
+            "claude_code",
+            "mcp"
+          ]
+        },
+        "account": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 512
+        }
+      },
+      "required": [
+        "provider",
+        "account"
+      ],
+      "additionalProperties": false
+    },
+    "ConnectedSharingPreview": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "hash": {
+          "$ref": "domain.schema.json#/$defs/Hash"
+        },
+        "target": {
+          "$ref": "#/$defs/ConnectedSharingTarget"
+        },
+        "sources": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/ConnectedSource"
+          },
+          "maxItems": 12,
+          "minItems": 1
+        },
+        "expiresAt": {
+          "$ref": "domain.schema.json#/$defs/Timestamp"
+        },
+        "notice": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "hash",
+        "target",
+        "sources",
+        "expiresAt",
+        "notice"
+      ],
+      "additionalProperties": false
+    },
+    "ConnectedSharingPreviewRequest": {
+      "type": "object",
+      "properties": {
+        "contractVersion": {
+          "const": 1
+        },
+        "requestId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "workspaceId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "target": {
+          "$ref": "#/$defs/ConnectedSharingTarget"
+        },
+        "sources": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/ConnectedSourceReference"
+          },
+          "maxItems": 12,
+          "minItems": 1
+        }
+      },
+      "required": [
+        "contractVersion",
+        "requestId",
+        "workspaceId",
+        "target",
+        "sources"
+      ],
+      "additionalProperties": false
+    },
+    "ConnectedSharingApproval": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "hash": {
+          "$ref": "domain.schema.json#/$defs/Hash"
+        }
+      },
+      "required": [
+        "id",
+        "hash"
+      ],
+      "additionalProperties": false
+    },
     "ConnectorRegistration": {
       "type": "object",
       "properties": {
@@ -10240,7 +10466,7 @@
             "$ref": "domain.schema.json#/$defs/Id"
           },
           "maxItems": 100,
-          "minItems": 1,
+          "minItems": 0,
           "uniqueItems": true
         },
         "tools": {
@@ -10254,10 +10480,11 @@
               "resolveCitation",
               "allocateIds",
               "proposeChanges",
-              "proposeActions"
+              "proposeActions",
+              "readConnectedSource"
             ]
           },
-          "maxItems": 7,
+          "maxItems": 8,
           "minItems": 1,
           "uniqueItems": true
         },
@@ -10270,6 +10497,9 @@
         },
         "skill": {
           "$ref": "#/$defs/SkillRunReference"
+        },
+        "connectedSharing": {
+          "$ref": "#/$defs/ConnectedSharingApproval"
         }
       },
       "required": [
@@ -10284,6 +10514,58 @@
         "pageIds",
         "tools",
         "previewHash"
+      ],
+      "additionalProperties": false
+    },
+    "ProviderConnectedPreviewRequest": {
+      "type": "object",
+      "properties": {
+        "contractVersion": {
+          "const": 1
+        },
+        "requestId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "workspaceId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "provider": {
+          "type": "string",
+          "enum": [
+            "codex",
+            "claude_code"
+          ]
+        },
+        "registrationId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 256
+        },
+        "billingMode": {
+          "type": "string",
+          "enum": [
+            "chatgpt_plan",
+            "claude_subscription",
+            "anthropic_api"
+          ]
+        },
+        "sources": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/ConnectedSourceReference"
+          },
+          "maxItems": 12,
+          "minItems": 1
+        }
+      },
+      "required": [
+        "contractVersion",
+        "requestId",
+        "workspaceId",
+        "provider",
+        "registrationId",
+        "billingMode",
+        "sources"
       ],
       "additionalProperties": false
     },
