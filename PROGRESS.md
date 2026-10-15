@@ -2,7 +2,7 @@
 
 **The single current development and progress tracker for this project.** Read and update this file for every meaningful implementation change, investigation, test result, decision, blocker and handoff. This is not an automatically running monitor.
 
-Last updated: **2026-10-15 23:24 IST**. User-facing dates use **Asia/Kolkata (IST, UTC+05:30)**; source artifacts may retain UTC timestamps.
+Last updated: **2026-10-15 23:36 IST**. User-facing dates use **Asia/Kolkata (IST, UTC+05:30)**; source artifacts may retain UTC timestamps.
 
 This file consolidates the original 51-item backlog, the newly selected desktop scope, current qualification, next actions and development history. Earlier status pages are historical snapshots. Machine-readable contracts, the legacy registry and immutable qualification records remain supporting inputs/evidence; they are not additional human progress dashboards. Their frozen bytes must not be rewritten to make a status look current.
 
@@ -1115,6 +1115,12 @@ Final autofill workspace and protocol suite passed **37 tests/subtests, zero ski
 **Source and evidence:** `dc54ec9` integrates worker `9244d63`: the portable OCR scenario now verifies the deliberate one-flight UI, exact request/workspace cancellation acknowledgement and subsequent image selection, retaining engine/source provenance assertions. Three additional cases reject late successful OCR results after source cursor, workspace or grant changes. Integrated root execution passed **15 browser scenarios, zero failures/skips** (`/private/tmp/trove-ocr-fixtures-integrated-20261015-v1.json`). `f8c3975` integrates worker `8b739d5`: support/update test URLs now honor their explicit overrides, then the common test URL, then their legacy defaults; ten unchanged scenarios passed using only the common URL. This corrects the DEV-041 harness setup failures without changing product behavior.
 
 **Build preparation:** Created a new ignored development output directory, `build/macos-feature-integration-20261015`, containing a separate 30-file native input copy and its SHA-256 origin inventory. The packaging script will rebuild current helpers before producing the app. No candidate-7 or other original helper bytes changed; no app build or qualification is claimed from preparation. G01 identity review is under independent review; review found and is correcting a legacy content-duplicate path that could contradict a frozen identity choice. Final integration/build follows that repair and its tests.
+
+### DEV-043 — 2026-10-15 23:36 IST: current helper build and packaging review
+
+**Native build:** On primary source `7e77764`, rebuilt the pinned llama, whisper, microphone v2, vision, document extraction, audio decoding and PDF helpers successfully. The new APFS output is `/Users/suryasriramduvvuri/.codex/visualizations/2026/10/13/01a1363a-7a42-7700-930e-3083f64ff417/macos-feature-integration-20261015/native-staging`; `native-build.log` and `native-build-inventory.json` retain command outcome and all 54 file hashes. This replaces the earlier exFAT staging destination for the new app; the earlier copy, original helpers and candidate 7 remain unchanged. Cached pinned sources supplied the speech fixture and license files. No inference, device measurement, application build or release qualification is inferred from helper compilation.
+
+**Review:** Final packaging review found the Developer ID validator still expected the old microphone capability list, which would reject the implemented capture-controls/input-devices helper. A narrow validator repair and regression are in progress; ad-hoc development packaging is unaffected. G01 review additionally exposed legacy content duplication and partial/rendition identity alias edge cases. Those are being resolved before the worker checkpoint; its intermediate passing results do not yet count as integrated root evidence. Next: integrate reviewed final identity/signing changes, run combined checks and assemble the new app.
 
 <a id="commit-history"></a>
 ## Recorded source-development history
