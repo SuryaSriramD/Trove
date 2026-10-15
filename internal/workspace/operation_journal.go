@@ -46,6 +46,10 @@ func journalCurrent(ctx context.Context, q querier, action map[string]any) (jour
 	entry := journalEntry{}
 	kind := str(action["kind"])
 	switch kind {
+	case "collection.trash.set":
+		return collectionTrashCurrent(ctx, q, action)
+	case "page.trash.set":
+		return pageTrashCurrent(ctx, q, action)
 	case "record.trash.set":
 		return recordTrashCurrent(ctx, q, action)
 	case "collection.property.restore":
@@ -309,6 +313,8 @@ func previewUndoJournal(ctx context.Context, k *Kernel, e contracts.ServiceExecu
 	}
 	actions := []map[string]any{}
 	restoredRecords := map[string]bool{}
+	restoredPages := map[string]bool{}
+	restoredCollections := map[string]bool{}
 	for i := len(entries) - 1; i >= 0; i-- {
 		entry := entries[i]
 		if err = checkJournalCurrent(ctx, tx, entry); err != nil {
@@ -342,6 +348,40 @@ func previewUndoJournal(ctx context.Context, k *Kernel, e contracts.ServiceExecu
 		inverse, err := journalInverse(ctx, tx, entry)
 		if err != nil {
 			return nil, err
+		}
+		if inverse["trashed"] == false && collection != "" && (inverse["kind"] == "page.trash.set" || inverse["kind"] == "record.trash.set") && !restoredCollections[collection] {
+			var hidden int
+			if err := tx.QueryRowContext(ctx, "SELECT count(*) FROM collection_visibility WHERE collection_id=?", collection).Scan(&hidden); err != nil {
+				return nil, err
+			}
+			if hidden != 0 {
+				return nil, Fail("CONFLICT", "Restore the collection before restoring this record")
+			}
+		}
+		if str(inverse["kind"]) == "collection.trash.set" {
+			if inverse["trashed"] == false {
+				restoredCollections[str(inverse["collectionId"])] = true
+			}
+			if err := validateCollectionTrash(ctx, tx, inverse); err != nil {
+				return nil, err
+			}
+		}
+		if str(inverse["kind"]) == "page.trash.set" {
+			if err := validatePageTrash(ctx, tx, inverse, restoredPages); err != nil {
+				return nil, err
+			}
+			if inverse["trashed"] == false {
+				restoredPages[entry.PageID] = true
+				var parent sql.NullString
+				if err := tx.QueryRowContext(ctx, "SELECT parent_page_id FROM pages WHERE id=?", entry.PageID).Scan(&parent); err != nil {
+					return nil, err
+				}
+				if parent.Valid {
+					if err := add("page", parent.String); err != nil {
+						return nil, err
+					}
+				}
+			}
 		}
 		if str(inverse["kind"]) == "record.trash.set" {
 			if err := validateRecordTrash(ctx, tx, inverse); err != nil {

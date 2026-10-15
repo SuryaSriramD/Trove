@@ -6,6 +6,7 @@ import (
 	"crypto/rand"
 	"encoding/hex"
 	"encoding/json"
+	"errors"
 	"flag"
 	"fmt"
 	"net/http"
@@ -127,6 +128,13 @@ func run() error {
 			fmt.Fprintln(os.Stderr, "jobs:", e)
 		}
 	}()
+	reviewDone := make(chan struct{})
+	go func() {
+		defer close(reviewDone)
+		if err := workers.RunPersonalReviews(ctx, k, supervisor); err != nil && !errors.Is(err, context.Canceled) {
+			fmt.Fprintln(os.Stderr, "review worker:", err)
+		}
+	}()
 	maintenanceDone := make(chan struct{})
 	go func() {
 		defer close(maintenanceDone)
@@ -151,7 +159,7 @@ func run() error {
 			}
 		}
 	}()
-	defer func() { cancel(); <-done; <-maintenanceDone }()
+	defer func() { cancel(); <-done; <-maintenanceDone; <-reviewDone }()
 	server := &http.Server{Addr: *listen, Handler: host, ReadHeaderTimeout: 5 * time.Second, ReadTimeout: 2 * time.Minute, WriteTimeout: 2 * time.Minute, IdleTimeout: 60 * time.Second, MaxHeaderBytes: 16 << 10}
 	failures := make(chan error, 1)
 	go func() {

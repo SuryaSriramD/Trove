@@ -773,6 +773,46 @@
           "type": "object",
           "properties": {
             "kind": {
+              "const": "collection.trash.set"
+            },
+            "collectionId": {
+              "$ref": "domain.schema.json#/$defs/Id"
+            },
+            "trashed": {
+              "type": "boolean"
+            }
+          },
+          "required": [
+            "kind",
+            "collectionId",
+            "trashed"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "kind": {
+              "const": "page.trash.set"
+            },
+            "pageId": {
+              "$ref": "domain.schema.json#/$defs/Id"
+            },
+            "trashed": {
+              "type": "boolean"
+            }
+          },
+          "required": [
+            "kind",
+            "pageId",
+            "trashed"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "kind": {
               "const": "record.trash.set"
             },
             "recordId": {
@@ -3462,6 +3502,46 @@
       ],
       "additionalProperties": false
     },
+    "SetCollectionTrash": {
+      "type": "object",
+      "properties": {
+        "kind": {
+          "const": "collection.trash.set"
+        },
+        "collectionId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "trashed": {
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "kind",
+        "collectionId",
+        "trashed"
+      ],
+      "additionalProperties": false
+    },
+    "SetPageTrash": {
+      "type": "object",
+      "properties": {
+        "kind": {
+          "const": "page.trash.set"
+        },
+        "pageId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "trashed": {
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "kind",
+        "pageId",
+        "trashed"
+      ],
+      "additionalProperties": false
+    },
     "SetRecordTrash": {
       "type": "object",
       "properties": {
@@ -3794,6 +3874,12 @@
         },
         {
           "$ref": "#/$defs/RestoreProperty"
+        },
+        {
+          "$ref": "#/$defs/SetCollectionTrash"
+        },
+        {
+          "$ref": "#/$defs/SetPageTrash"
         },
         {
           "$ref": "#/$defs/SetRecordTrash"

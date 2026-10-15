@@ -319,6 +319,9 @@ func selectedImportDatabaseFields(item *ImportItem) map[string]json.RawMessage {
 
 // Reject unsupported schema migrations before any resumable page unit writes.
 func validateReviewedImportDatabase(ctx context.Context, q querier, p *ImportPlan) error {
+	if _, err := hiddenImportCollections(ctx, q, p); err != nil {
+		return err
+	}
 	journalChanges := 0
 	for i := range p.Items {
 		item := &p.Items[i]
@@ -573,6 +576,10 @@ func updateImportedProperty(m *Mutation, collection, id string, raw json.RawMess
 // A typed graph is a single final import unit. Guards captured by preview are
 // advanced only by this import's own committed units; unrelated edits reject it.
 func commitMergedImportDatabases(m *Mutation, p *ImportPlan) error {
+	hidden, err := hiddenImportCollections(m.Context, m.Tx, p)
+	if err != nil {
+		return err
+	}
 	for i := range p.Items {
 		if p.Items[i].Kind == "portable_collection" {
 			if err := checkImportMergeGuards(m, &p.Items[i]); err != nil {
@@ -586,7 +593,7 @@ func commitMergedImportDatabases(m *Mutation, p *ImportPlan) error {
 	changedSchemas := map[string]bool{}
 	for i := range p.Items {
 		item := &p.Items[i]
-		if item.Kind != "portable_collection" || item.Merge == nil {
+		if item.Kind != "portable_collection" || item.Merge == nil || hidden[item.CollectionID] {
 			continue
 		}
 		fields := selectedImportDatabaseFields(item)
@@ -645,6 +652,9 @@ func commitMergedImportDatabases(m *Mutation, p *ImportPlan) error {
 		}
 		if item == nil {
 			return Fail("INTEGRITY_ERROR", "Typed database has no reviewed item")
+		}
+		if hidden[c.CollectionID] {
+			continue
 		}
 		fields := selectedImportDatabaseFields(item)
 		for _, ref := range [][2]string{{"collection", c.CollectionID}, {"page", c.PageID}} {
@@ -768,6 +778,12 @@ func commitMergedImportDatabases(m *Mutation, p *ImportPlan) error {
 	for i := range p.Items {
 		item := &p.Items[i]
 		if item.Kind != "portable_collection" {
+			continue
+		}
+		if hidden[item.CollectionID] {
+			if err := saveImportBaseline(m, p, item); err != nil {
+				return err
+			}
 			continue
 		}
 		fields := selectedImportDatabaseFields(item)

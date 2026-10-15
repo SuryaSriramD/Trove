@@ -87,16 +87,18 @@ func TestPageFreshnessOldCoverageRemainsAttributable(t *testing.T) {
 	identity := testFreshness(t, k, page).ContentIdentity
 	testOK(t, dbBatch(t, k, e, []any{map[string]any{"kind": "page.review", "pageId": page, "contentIdentity": identity}}, "page", page))
 	review := testFreshness(t, k, page).Review
-	if _, err := k.db.Exec("UPDATE page_review_events SET identity_version=1 WHERE id=?", review.Id); err != nil {
-		t.Fatal(err)
-	}
-	result := testOK(t, testDispatch(t, k, e, "page.freshness", advancedRequest(k, map[string]any{"pageId": page})))
-	if err := contracts.Validate("service", "PageFreshnessResult", marshal(result)); err != nil {
-		t.Fatal(err)
-	}
-	got := testFreshness(t, k, page)
-	if got.State != "stale" || got.ContentIdentity.Version != 2 || got.Review.ContentIdentity.Version != 1 || got.Review.Id != review.Id || got.Review.ReviewedAt != review.ReviewedAt {
-		t.Fatal("Older coverage silently renewed or lost attribution", got)
+	for _, version := range []int{1, 2} {
+		if _, err := k.db.Exec("UPDATE page_review_events SET identity_version=? WHERE id=?", version, review.Id); err != nil {
+			t.Fatal(err)
+		}
+		result := testOK(t, testDispatch(t, k, e, "page.freshness", advancedRequest(k, map[string]any{"pageId": page})))
+		if err := contracts.Validate("service", "PageFreshnessResult", marshal(result)); err != nil {
+			t.Fatal(err)
+		}
+		got := testFreshness(t, k, page)
+		if got.State != "stale" || got.ContentIdentity.Version != 3 || got.Review.ContentIdentity.Version != int64(version) || got.Review.Id != review.Id || got.Review.ReviewedAt != review.ReviewedAt {
+			t.Fatal("Older coverage silently renewed or lost attribution", got)
+		}
 	}
 }
 

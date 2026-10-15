@@ -41,3 +41,45 @@ test("late old-workspace provider status cannot replace current connections", as
     page.getByText("Original client · connected", { exact: true }),
   ).toHaveCount(0);
 });
+
+test("delayed status cannot restore a revoked local client", async ({
+  page,
+}) => {
+  await page.goto(url);
+  await page.getByLabel("Shared launch", { exact: true }).check();
+  await page.getByRole("button", { name: "Preview shared context" }).click();
+  await page
+    .getByRole("button", { name: "Approve context and pair client" })
+    .click();
+  await expect(
+    page.getByText("Original client · connected", { exact: true }),
+  ).toBeVisible();
+  await page.evaluate(() => {
+    (window as any).holdRevocationStatus = true;
+  });
+  await expect
+    .poll(() =>
+      page.evaluate(() => typeof (window as any).resolveRevocationStatus),
+    )
+    .toBe("function");
+  await page
+    .getByRole("button", {
+      name: "Disconnect and revoke local access",
+      exact: true,
+    })
+    .click();
+  await expect(
+    page.getByText("No clients connected.", { exact: true }),
+  ).toBeVisible();
+  await page.evaluate(async () => {
+    (window as any).resolveRevocationStatus();
+    await new Promise(requestAnimationFrame);
+    await new Promise(requestAnimationFrame);
+  });
+  expect(
+    await page
+      .getByText("Original client · connected", { exact: true })
+      .count(),
+  ).toBe(0);
+  await expect(page.getByText(/synthetic-pair-token/)).toHaveCount(0);
+});

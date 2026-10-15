@@ -104,16 +104,66 @@ func reviewExpectedDraft(id string) string {
 	}
 	return string(marshal(map[string]any{"claims": claims, "actions": actions}))
 }
+
+// Version 2 permits only omission of an initial definite article in claim
+// prose. Quotes, categories, actions and every other byte remain exact.
+func reviewClaimTextV2(actual, expected string) bool {
+	if actual == expected {
+		return true
+	}
+	if !strings.HasPrefix(expected, "The ") || len(expected) < 5 || expected[4] < 'a' || expected[4] > 'z' {
+		return false
+	}
+	return actual == strings.ToUpper(expected[4:5])+expected[5:]
+}
 func reviewAnswerOracle(id, raw string) error {
-	var actual, expected any
+	var actual, expected map[string]any
 	if err := json.Unmarshal([]byte(raw), &actual); err != nil {
 		return err
 	}
-	json.Unmarshal([]byte(reviewExpectedDraft(id)), &expected)
+	if err := json.Unmarshal([]byte(reviewExpectedDraft(id)), &expected); err != nil {
+		return err
+	}
+	claims, ok := actual["claims"].([]any)
+	want := expected["claims"].([]any)
+	if ok && len(claims) == len(want) {
+		for index, claim := range claims {
+			if fields, valid := claim.(map[string]any); valid {
+				text, valid := fields["text"].(string)
+				expectedText := want[index].(map[string]any)["text"].(string)
+				if valid && reviewClaimTextV2(text, expectedText) {
+					fields["text"] = expectedText
+				}
+			}
+		}
+	}
 	if string(marshal(actual)) != string(marshal(expected)) {
-		return fmt.Errorf("review facts, category, exact source quotes or suggestion-only action differ from the independent fixture oracle")
+		return fmt.Errorf("review facts, category, exact source quotes or suggestion-only action differ from independent v2 oracle")
 	}
 	return nil
+}
+func TestWorkflowReviewArticleEquivalenceV2(t *testing.T) {
+	good := reviewExpectedDraft("risk-suggestion")
+	withoutArticle := strings.Replace(good, `"text":"The security`, `"text":"Security`, 1)
+	if err := reviewAnswerOracle("risk-suggestion", withoutArticle); err != nil {
+		t.Fatal("article-only claim variant rejected", err)
+	}
+	for name, bad := range map[string]string{
+		"actor":       strings.Replace(withoutArticle, `"text":"Security`, `"text":"Alex's security`, 1),
+		"date":        strings.Replace(withoutArticle, `"text":"Security review is incomplete.`, `"text":"Security review is incomplete until 14 April 2031.`, 1),
+		"negation":    strings.Replace(withoutArticle, "Launch cannot proceed", "Launch can proceed", 1),
+		"unsupported": strings.Replace(withoutArticle, `"text":"Security`, `"text":"Approval is scheduled. Security`, 1),
+		"quote":       strings.Replace(withoutArticle, `"quote":"The security`, `"quote":"Security`, 1),
+		"action":      strings.Replace(withoutArticle, `"kind":"update_page"`, `"kind":"create_task"`, 1),
+		"target":      strings.Replace(withoutArticle, "Current security decision", "Other decision", 1),
+		"body":        strings.Replace(withoutArticle, "Suggestion: request security review approval.", "Launch now.", 1),
+	} {
+		t.Run(name, func(t *testing.T) {
+			if bad == withoutArticle || reviewAnswerOracle("risk-suggestion", bad) == nil {
+				t.Fatal("v2 oracle admitted unsupported variation", bad)
+			}
+		})
+	}
 }
 func TestWorkflowReviewOracleRejectsCounterexamples(t *testing.T) {
 	for _, id := range reviewCaseIDs {
@@ -128,13 +178,13 @@ func TestWorkflowReviewOracleRejectsCounterexamples(t *testing.T) {
 		}
 	}
 }
-func TestWorkflowReviewBoundaries(t *testing.T) { runWorkflowReviews(t, nil, NewID()) }
-func TestRealLocalWorkflowReviews(t *testing.T) {
+func TestWorkflowReviewBoundariesV2(t *testing.T) { runWorkflowReviews(t, nil, NewID()) }
+func TestRealLocalWorkflowReviewsV2(t *testing.T) {
 	s, p := workflowNative(t, "chat")
 	runWorkflowReviews(t, s, p.ID)
 }
 func runWorkflowReviews(t *testing.T, supervisor *native.Supervisor, pack string) {
-	cases, hash := workflowCorpus(t, "reviews", 12)
+	cases, hash := workflowCorpus(t, "reviews-execution-v2", 12)
 	for index, tc := range cases {
 		if tc.ID != reviewCaseIDs[index] || tc.Source != reviewFact {
 			t.Fatal("review scenario inventory changed")
@@ -203,7 +253,7 @@ func runWorkflowReviews(t *testing.T, supervisor *native.Supervisor, pack string
 				t.Fatal(err)
 			}
 			check := map[string]bool{}
-			report := map[string]any{"fixture": tc.ID, "family": "reviews", "corpusSHA256": hash, "modelPackId": pack, "engineMode": "deterministic", "releaseQualified": false, "assertions": check, "generationAttempts": 0, "generatorInvocations": 0, "sourceBindings": bindings, "plan": plan, "capturedSources": r.Evidence, "capturedWarning": r.Warning, "runId": r.ID, "occurrence": r.Occurrence, "serviceBoundaryOnly": !reviewModelCases[tc.ID], "outputCap": 1024, "contextTokens": 8192}
+			report := map[string]any{"fixture": tc.ID, "family": "reviews", "oracleVersion": 2, "corpusSHA256": hash, "modelPackId": pack, "engineMode": "deterministic", "releaseQualified": false, "assertions": check, "generationAttempts": 0, "generatorInvocations": 0, "sourceBindings": bindings, "plan": plan, "capturedSources": r.Evidence, "capturedWarning": r.Warning, "runId": r.ID, "occurrence": r.Occurrence, "serviceBoundaryOnly": !reviewModelCases[tc.ID], "outputCap": 1024, "contextTokens": 8192}
 			if supervisor != nil {
 				report["engineMode"] = "native"
 			}

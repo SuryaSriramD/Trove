@@ -29,11 +29,14 @@ func importCSVArtifact(raw json.RawMessage) bool {
 }
 
 type ImportSnapshot struct {
-	SourceScope    string                     `json:"sourceScope,omitempty"`
-	Version        int                        `json:"version"`
-	SourceRevision string                     `json:"sourceRevision,omitempty"`
-	Fields         map[string]json.RawMessage `json:"fields"`
-	BlockSources   map[string]string          `json:"blockSources"`
+	CollectionSourceScope string                     `json:"collectionSourceScope,omitempty"`
+	PortableIdentity      string                     `json:"portableIdentity,omitempty"`
+	PageSourceScope       string                     `json:"pageSourceScope,omitempty"`
+	SourceScope           string                     `json:"sourceScope,omitempty"`
+	Version               int                        `json:"version"`
+	SourceRevision        string                     `json:"sourceRevision,omitempty"`
+	Fields                map[string]json.RawMessage `json:"fields"`
+	BlockSources          map[string]string          `json:"blockSources"`
 }
 type ImportPresence struct {
 	Present bool            `json:"present"`
@@ -153,7 +156,13 @@ func snapshotImportItem(item *ImportItem) ImportSnapshot {
 			}
 		}
 	}
-	s := ImportSnapshot{Version: importNormalizerVersion, SourceRevision: item.Hash, Fields: map[string]json.RawMessage{"/title": marshal(item.Title), "/parent": marshal(nullable(item.ParentID))}, BlockSources: item.BlockSources}
+	s := ImportSnapshot{CollectionSourceScope: item.CollectionSourceScope, PortableIdentity: item.PortableIdentity, PageSourceScope: item.PageSourceScope, Version: importNormalizerVersion, SourceRevision: item.Hash, Fields: map[string]json.RawMessage{"/title": marshal(item.Title), "/parent": marshal(nullable(item.ParentID))}, BlockSources: item.BlockSources}
+	if item.PageSourceScope != "" {
+		s.Fields["/exists"] = marshal(true)
+	}
+	if item.CollectionSourceScope != "" {
+		s.Fields["/collectionExists"] = marshal(true)
+	}
 	positions := map[string]int{}
 	for _, b := range item.Blocks {
 		parent := item.BlockParents[b.ID]
@@ -305,6 +314,20 @@ func prepareImportMerge(ctx context.Context, q querier, p *ImportPlan, item *Imp
 	}
 	remapImportBlockIDs(item, ids)
 	incoming := snapshotImportItem(item)
+	if known && base.PageSourceScope != "" {
+		if incoming.PageSourceScope != "" && incoming.PageSourceScope != base.PageSourceScope {
+			return Fail("CONFLICT", "Source workspace enumeration changed; use a separate source namespace")
+		}
+		incoming.PageSourceScope = base.PageSourceScope
+		incoming.Fields["/exists"] = marshal(true)
+	}
+	if known && base.CollectionSourceScope != "" {
+		if incoming.CollectionSourceScope != "" && incoming.CollectionSourceScope != base.CollectionSourceScope {
+			return Fail("CONFLICT", "Source collection enumeration changed; use a separate source namespace")
+		}
+		incoming.CollectionSourceScope = base.CollectionSourceScope
+		incoming.Fields["/collectionExists"] = marshal(true)
+	}
 	collection := importCollectionFor(p, item)
 	if collection != nil {
 		addIncomingDatabaseFields(&incoming, collection)
@@ -370,8 +393,20 @@ func prepareImportMerge(ctx context.Context, q querier, p *ImportPlan, item *Imp
 	if err != nil {
 		return err
 	}
+	if incoming.PageSourceScope != "" && !deleted {
+		local.Fields["/exists"] = marshal(true)
+	}
 	if err := prepareImportAttachmentFields(ctx, q, item, base, &local, &incoming); err != nil {
 		return err
+	}
+	if collection != nil && incoming.CollectionSourceScope != "" {
+		var hidden int
+		if err := q.QueryRowContext(ctx, "SELECT count(*) FROM collection_visibility WHERE collection_id=?", collection.CollectionID).Scan(&hidden); err != nil {
+			return err
+		}
+		if hidden == 0 {
+			local.Fields["/collectionExists"] = marshal(true)
+		}
 	}
 	if collection != nil {
 		if err := addLocalDatabaseFields(ctx, q, &local, item, collection); err != nil {
@@ -492,6 +527,9 @@ func configureImportMerge(item *ImportItem, raw []any) error {
 }
 
 func materializeImportMerge(item *ImportItem) error {
+	if isSourceDeletion(item.Kind) {
+		return nil
+	}
 	if item.Merge == nil || item.Choice != "merge" {
 		return nil
 	}
@@ -656,7 +694,7 @@ func importMergeContract(item ImportItem, p ImportPlan) map[string]any {
 	} else if item.Choice == "merge" || item.Choice == "replace" {
 		resolution = "apply"
 	}
-	return map[string]any{"id": id, "mappingId": item.MappingID, "expectedLocalRevision": item.ExpectedRevision, "incomingSourceRevision": item.Hash, "identityStatus": "matched", "sourceCompleteness": p.SourceCompleteness, "fields": fields, "sourceDeleted": false, "localDeleted": deleted, "resolution": resolution, "normalizerVersion": importNormalizerVersion, "baselineStatus": func() string {
+	return map[string]any{"id": id, "mappingId": item.MappingID, "expectedLocalRevision": item.ExpectedRevision, "incomingSourceRevision": item.Hash, "identityStatus": "matched", "sourceCompleteness": p.SourceCompleteness, "fields": fields, "sourceDeleted": isSourceDeletion(item.Kind), "localDeleted": deleted, "resolution": resolution, "normalizerVersion": importNormalizerVersion, "baselineStatus": func() string {
 		if item.Merge != nil {
 			return item.Merge.BaselineStatus
 		}

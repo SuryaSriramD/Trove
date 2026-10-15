@@ -69,6 +69,10 @@ func (k *Kernel) ExportPortable(ctx context.Context, e contracts.ServiceExecutio
 		}
 		pageIDs = append(pageIDs, id)
 	}
+	if err = rows.Err(); err != nil {
+		rows.Close()
+		return result, err
+	}
 	rows.Close()
 	pages := map[string]contracts.ServiceReadPageResult{}
 	livePageIDs := []string{}
@@ -154,7 +158,7 @@ func (k *Kernel) ExportPortable(ctx context.Context, e contracts.ServiceExecutio
 		_, er = w.Write(b)
 		return er
 	}
-	manifest := map[string]any{"format": "trove-portable", "formatVersion": 1, "workspaceId": k.id, "exportedAt": now(), "sourceCompleteness": "partial", "sourceOmissions": result.SourceOmissions, "pages": []any{}, "collections": []any{}, "attachments": []any{}}
+	manifest := map[string]any{"format": "trove-portable", "formatVersion": 1, "workspaceId": k.id, "pageEnumerationVersion": 1, "collectionEnumerationVersion": 1, "exportedAt": now(), "sourceCompleteness": "partial", "sourceOmissions": result.SourceOmissions, "pages": []any{}, "collections": []any{}, "attachments": []any{}}
 	for _, id := range pageIDs {
 		p := pages[id]
 		name := paths[id]
@@ -180,7 +184,7 @@ func (k *Kernel) ExportPortable(ctx context.Context, e contracts.ServiceExecutio
 		manifest["pages"] = append(manifest["pages"].([]any), map[string]any{"externalContextPolicy": policy, "displayPreferences": display, "id": id, "path": name, "parentPath": parentPath, "provenance": p.Page.Provenance, "canonicalPage": p.Page, "canonicalBlocks": p.Blocks, "attachmentRelationshipsVersion": 1, "attachmentRelationships": relationships[id]})
 		result.Pages++
 	}
-	rows, err = tx.QueryContext(ctx, "SELECT id,owning_page_id,title,title_property_id FROM collections ORDER BY id")
+	rows, err = tx.QueryContext(ctx, "SELECT id,owning_page_id,title,title_property_id FROM collections WHERE NOT EXISTS(SELECT 1 FROM collection_visibility v WHERE v.collection_id=collections.id) ORDER BY id")
 	if err != nil {
 		return result, err
 	}
@@ -196,6 +200,10 @@ func (k *Kernel) ExportPortable(ctx context.Context, e contracts.ServiceExecutio
 			collections = append(collections, c)
 		}
 	}
+	if err = rows.Err(); err != nil {
+		rows.Close()
+		return result, err
+	}
 	rows.Close()
 	for _, collection := range collections {
 		cols, er := tx.QueryContext(ctx, "SELECT id FROM properties WHERE collection_id=? ORDER BY CASE WHEN id=? THEN 0 ELSE 1 END,id", collection.id, collection.titleProperty)
@@ -210,6 +218,10 @@ func (k *Kernel) ExportPortable(ctx context.Context, e contracts.ServiceExecutio
 				return result, er
 			}
 			propIDs = append(propIDs, id)
+		}
+		if er = cols.Err(); er != nil {
+			cols.Close()
+			return result, er
 		}
 		cols.Close()
 		properties := []contracts.DomainPropertyDefinition{}

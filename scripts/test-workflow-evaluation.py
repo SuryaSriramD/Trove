@@ -64,7 +64,7 @@ class WorkflowAccounting(unittest.TestCase):
             loc = {'pageId': page, 'sourceRevision': '2'}
             sources.append({'number': index+1, 'text': claim['quote'], 'location': loc})
             citations.append({'number': index+1, 'state': 'current', 'location': loc})
-        report = dict(contract, engineMode='native', releaseQualified=False,
+        report = dict(contract, engineMode='native', releaseQualified=False, oracleVersion=2,
             assertions={key: True for key in m.REVIEW_ASSERTIONS[case]},
             generationAttempts=int(case in m.REVIEW_GENERATION_CASES), serviceBoundaryOnly=case in m.REVIEW_BOUNDARY_CASES,
             generatorInvocations=0 if case == 'restart' else 2 if case == 'cancel-retry' else 1,
@@ -81,6 +81,41 @@ class WorkflowAccounting(unittest.TestCase):
         if case == 'cancel-retry': report.update(cancelStatus='cancelled')
         if case == 'dedup-import': report.update(portableExecutionCounts=dict.fromkeys(m.REVIEW_PORTABLE_TABLES, 0), portableNextRunId='')
         return report, contract
+
+    def image(self):
+        corpus=json.loads((m.ROOT/'internal/workspace/testdata/expanded-evaluation/images-execution-v2.json').read_text())
+        cases={case['id']:case for case in corpus['cases']}
+        contract=dict(family='images',modelPackId='chosen',corpusSHA256='locked',imageCases=cases,modelSHA256='a'*64,projectorSHA256='b'*64,helperSHA256='c'*64)
+        case=cases['diagram-1']
+        report=dict(family='images',modelPackId='chosen',corpusSHA256='locked',engineMode='native',releaseQualified=False,
+            assertions=dict.fromkeys(m.IMAGE_ASSERTIONS,True),sourceSHA256=case['sourceSHA256'],sourceKind=case['sourceKind'],
+            question=case['prompt'],expectedMethod=case['method'],productInvocations=1,ocrInvocations=1,
+            result=dict(state='ready',analysisMethod='local_vision_model',text='red',modelHash='a'*64,projectorHash='b'*64,helperHash='c'*64,finishReason='eos',inputTokens=200,outputTokens=2,sampledPeakRSSBytes=500000),
+            ocr={'lines':[]},ocrCapability={'engine':'Apple Vision (local)','extractorVersion':'trove-local-vision-v1'})
+        return report,contract
+
+    def test_image_native_identity_content_and_calls(self):
+        report,contract=self.image()
+        self.assertEqual(m.validate_workflow_report(report,'diagram-1',contract),[])
+        for change in ({'productInvocations':2},{'productInvocations':True},{'ocrInvocations':0},{'engineMode':'deterministic'},{'sourceSHA256':'changed'},{'question':'different'},{'ocrError':'failed'},{'ocr':{'lines':[{'text':'invented','confidence':.2}]}},{'assertions':{}}):
+            self.assertTrue(m.validate_workflow_report(dict(report,**change),'diagram-1',contract),change)
+        for change in ({'text':'red and a cat'},{'text':'blue'},{'modelHash':'f'*64},{'helperHash':'d'*64},{'finishReason':'length'},{'sampledPeakRSSBytes':0},{'state':'partial'}):
+            bad=copy.deepcopy(report);bad['result'].update(change)
+            self.assertTrue(m.validate_workflow_report(bad,'diagram-1',contract),change)
+
+    def test_image_missing_representative_source_cannot_pass(self):
+        report,contract=self.image()
+        self.assertTrue(m.validate_workflow_report(report,'photograph-1',contract))
+        self.assertTrue(m.validate_workflow_report(report,'screenshot-1',contract))
+
+    def test_image_measurement_does_not_claim_model_generation(self):
+        report,contract=self.image();case=contract['imageCases']['boundary-1']
+        report.update(sourceSHA256=case['sourceSHA256'],sourceKind=case['sourceKind'],question=case['prompt'],expectedMethod=case['method'])
+        report['result']=dict(state='ready',analysisMethod='pixel_measurement',finishReason='measurement',text=f"Source pixel measurement ({case['width']} × {case['height']} decoded pixels, before resizing and alpha composition; encoded orientation): the image is exactly uniform white (blank at decoded-pixel level). No objects or text can be identified from spatial pixel variation. No model interpretation or OCR was attempted.")
+        self.assertEqual(m.validate_workflow_report(report,'boundary-1',contract),[])
+        for change in ({'modelHash':'a'*64},{'outputTokens':1},{'sampledPeakRSSBytes':1},{'text':report['result']['text']+' There is a cat.'}):
+            bad=copy.deepcopy(report);bad['result'].update(change)
+            self.assertTrue(m.validate_workflow_report(bad,'boundary-1',contract),change)
 
     def test_review_native_and_service_boundaries_are_distinct(self):
         for case in m.REVIEW_ASSERTIONS:
@@ -102,6 +137,37 @@ class WorkflowAccounting(unittest.TestCase):
                 self.assertTrue(m.validate_workflow_report(bad, case, c))
         r,c=self.review('unresolved-tasks');r['citations'][0]['location']['pageId']='done'
         self.assertTrue(m.validate_workflow_report(r, 'unresolved-tasks', c))
+
+    def test_review_v2_article_equivalence_keeps_facts_quotes_actions_and_effect_exact(self):
+        report, contract = self.review('risk-suggestion')
+        draft = json.loads(report['rawDraft'])
+        draft['claims'][0]['text'] = 'Security review is incomplete. Launch cannot proceed until that review is approved.'
+        report['rawDraft'] = json.dumps(draft)
+        report['reviewedEffect']['destinationText'] = draft['claims'][0]['text']
+        self.assertEqual(m.validate_workflow_report(report, 'risk-suggestion', contract), [])
+        for name, text in {
+            'actor': "Alex's security review is incomplete. Launch cannot proceed until that review is approved.",
+            'date': 'Security review is incomplete until 14 April 2031. Launch cannot proceed until that review is approved.',
+            'negation': 'Security review is complete. Launch can proceed until that review is approved.',
+            'unsupported': draft['claims'][0]['text'] + ' Approval is scheduled.',
+        }.items():
+            bad=copy.deepcopy(report); changed=copy.deepcopy(draft); changed['claims'][0]['text']=text
+            bad['rawDraft']=json.dumps(changed); bad['reviewedEffect']['destinationText']=text
+            self.assertTrue(m.validate_workflow_report(bad, 'risk-suggestion', contract), name)
+        for key, value in (('quote', draft['claims'][0]['quote'][4:]), ('category', 'summary')):
+            bad=copy.deepcopy(report); changed=copy.deepcopy(draft); changed['claims'][0][key]=value
+            bad['rawDraft']=json.dumps(changed)
+            self.assertTrue(m.validate_workflow_report(bad, 'risk-suggestion', contract), key)
+        for key, value in (('kind', 'create_task'), ('target', 'Other decision'), ('body', 'Launch now.')):
+            bad=copy.deepcopy(report); changed=copy.deepcopy(draft); changed['actions'][0][key]=value
+            bad['rawDraft']=json.dumps(changed); bad['actions']=changed['actions']
+            self.assertTrue(m.validate_workflow_report(bad, 'risk-suggestion', contract), key)
+        for mutation in ('old-version', 'missing-effect', 'unsupported-citation'):
+            bad=copy.deepcopy(report)
+            if mutation == 'old-version': bad.pop('oracleVersion')
+            elif mutation == 'missing-effect': bad['reviewedEffect']['destinationText'] = ''
+            else: bad['citations'][0]['location']['pageId']='private'
+            self.assertTrue(m.validate_workflow_report(bad, 'risk-suggestion', contract), mutation)
 
     def test_review_forget_restart_stale_and_portable_counterexamples(self):
         changes = {'forgotten-memory': {'proposalRejected': False}, 'restart': {'nextRunId': 'run'}, 'stale-destination': {'staleApplyRejected': False}, 'cancel-retry': {'cancelStatus': 'ready'}, 'dedup-import': {'portableExecutionCounts': dict.fromkeys(m.REVIEW_PORTABLE_TABLES, 1)}}
@@ -151,7 +217,7 @@ class WorkflowAccounting(unittest.TestCase):
             cases = json.loads((root/filename).read_text())['cases']
             self.assertEqual(count, 12)
             self.assertEqual(len({c['id'] for c in cases}), count)
-        self.assertEqual(set(m.REVIEW_ASSERTIONS), {c['id'] for c in json.loads((root/'reviews.json').read_text())['cases']})
+        self.assertEqual(set(m.REVIEW_ASSERTIONS), {c['id'] for c in json.loads((root/'reviews-execution-v2.json').read_text())['cases']})
         self.assertEqual(set(m.MEMORY_ASSERTIONS), {c['id'] for c in json.loads((root/'memory-lifecycle.json').read_text())['cases']})
         self.assertEqual(set(m.CONTEXT_ASSERTIONS), {c['id'] for c in json.loads((root/'context.json').read_text())['cases']})
 

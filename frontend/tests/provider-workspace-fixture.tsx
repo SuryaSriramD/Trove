@@ -35,6 +35,16 @@ window.go = {
         if (method === "providers.remote.status")
           return ok({ enabled: false, connections: [], authorizations: [] });
         if (method === "providers.status") {
+          if ((window as any).holdRevocationStatus) {
+            (window as any).holdRevocationStatus = false;
+            const captured = structuredClone({
+              connections: paired ? [connection] : [],
+            });
+            return new Promise((resolve) => {
+              (window as any).resolveRevocationStatus = () =>
+                resolve(ok(captured));
+            });
+          }
           if (r.workspaceId === id(1) && (window as any).holdProviderStatus) {
             (window as any).holdProviderStatus = false;
             return new Promise((resolve) => {
@@ -47,6 +57,10 @@ window.go = {
           });
         }
         if (method === "providers.proposals") return ok([]);
+        if (method === "providers.disconnect") {
+          paired = false;
+          return ok({});
+        }
         if (method === "providers.preview")
           return ok({ pages: workspace.pages, notice: "Explicit preview" });
         if (method === "providers.connect") {

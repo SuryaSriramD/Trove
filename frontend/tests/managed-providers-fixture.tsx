@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { createRoot } from "react-dom/client";
 import { ManagedProviderPanel } from "../src/providers/ManagedProviderPanel";
 import type { WorkspaceSnapshot } from "../src/api";
@@ -19,6 +19,12 @@ const provider =
   new URLSearchParams(location.search).get("provider") === "claude_code"
     ? "claude_code"
     : "codex";
+const connected = new URLSearchParams(location.search).has("connected");
+const sourceReference = {
+  snapshotId: "external-source",
+  remoteRevision: "r1",
+  contentHash: "c".repeat(64),
+};
 const status: any = { runs: [], activeRunId: "", runtimes: [] };
 window.go = {
   main: {
@@ -102,6 +108,38 @@ window.go = {
               })),
             notice: "Only selected page context is shared.",
           });
+        if (method === "providers.connectedPreview") {
+          if ((window as any).holdSharing)
+            await new Promise<void>((resolve, reject) => {
+              (window as any).resolveSharing = resolve;
+              (window as any).rejectSharing = reject;
+            });
+          return ok({
+            id: "review-id",
+            hash: "d".repeat(64),
+            target: {
+              provider: request.provider,
+              account: `recipient-${request.registrationId.slice(-1)}@example.test`,
+            },
+            sources: [
+              {
+                connected: {
+                  ...sourceReference,
+                  provider: "github",
+                  checkedAt: new Date().toISOString(),
+                  partial: false,
+                  url: "https://github.com/org/repo/issues/1",
+                },
+                title: "Selected external issue",
+                text: "Exact private excerpt: launch AMBER-27",
+              },
+            ],
+            expiresAt: new Date(
+              Date.now() + ((window as any).expiredSharing ? -1000 : 600000),
+            ).toISOString(),
+            notice: "Review the exact recipient and excerpts.",
+          });
+        }
         if (method === "providers.start") {
           if ((window as any).stalePreview)
             return JSON.stringify({
@@ -113,6 +151,7 @@ window.go = {
               },
             });
           const run = {
+            ...(connected ? { connectedSources: [sourceReference] } : {}),
             id: id(7),
             provider: request.provider,
             account: request.registrationId,
@@ -132,6 +171,11 @@ window.go = {
           return ok(run);
         }
         if (method === "providers.cancel") {
+          if ((window as any).rejectSharing) {
+            (window as any).rejectSharing(new Error("Source review cancelled"));
+            (window as any).rejectSharing = null;
+            return ok({ state: "cancellation_requested" });
+          }
           status.activeRunId = "";
           status.runs[0].state = "cancelled";
           status.runs[0].message =
@@ -144,6 +188,30 @@ window.go = {
     },
   },
 };
-createRoot(document.getElementById("root")!).render(
-  <ManagedProviderPanel workspace={workspace} provider={provider} />,
-);
+function Fixture() {
+  const [grant, setGrant] = useState(workspace.scopeGrantId);
+  const [revision, setRevision] = useState("r1");
+  return (
+    <>
+      <button onClick={() => setGrant(id(99))}>Switch fixture grant</button>
+      <button onClick={() => setRevision("r2")}>
+        Switch fixture source revision
+      </button>
+      <ManagedProviderPanel
+        workspace={{ ...workspace, scopeGrantId: grant }}
+        provider={provider}
+        {...(connected
+          ? {
+              connectedSources: [
+                {
+                  reference: { ...sourceReference, remoteRevision: revision },
+                  title: "Selected external issue",
+                },
+              ],
+            }
+          : {})}
+      />
+    </>
+  );
+}
+createRoot(document.getElementById("root")!).render(<Fixture />);

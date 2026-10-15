@@ -46,8 +46,12 @@ function describeImportPath(
   workspace: WorkspaceSnapshot,
 ) {
   const parts = path.split("/");
+  if (parts[1] === "exists")
+    return "Source page existence (explicit deletion moves only this page to Trash; content and attachments remain recoverable)";
+  if (parts[1] === "collectionExists")
+    return "Source collection existence (hides the collection after every affected record is reviewed; schema and values remain recoverable)";
   if (parts[1] === "collectionTitle") return "Collection title";
-  if (parts[1] === "records") {
+  if (parts[1] === "records" || parts[1] === "collectionRecords") {
     const record = workspace.records.find((r) => r.id === parts[2]);
     const name =
       workspace.pages.find((p) => p.id === record?.pageId)?.title ?? parts[2];
@@ -56,7 +60,7 @@ function describeImportPath(
   if (parts[1] === "attachments")
     return "Attachment relationship (removal requires review)";
   if (parts[1] === "siblingOrder")
-    return "Sibling block order (choose the complete list)";
+    return "Sibling block order (include every final retained block exactly once; review additions, deletions and moves together)";
   if (parts[1] !== "schema" && parts[1] !== "values") return path;
   const property = parts[1] === "schema" ? parts[2] : parts[3];
   const schema = item.merge?.fields.find(
@@ -751,7 +755,8 @@ export function ImportExportPanel({
                                         Keep local
                                       </option>
                                       <option value="take_incoming">
-                                        {field.path.startsWith("/records/") &&
+                                        {(field.path.startsWith("/records/") ||
+                                          field.path === "/exists" || field.path === "/collectionExists" || field.path.startsWith("/collectionRecords/")) &&
                                         !field.incoming.present
                                           ? "Accept source deletion"
                                           : "Take incoming"}
@@ -835,12 +840,17 @@ export function ImportExportPanel({
                       {(!plan.notionGraph ||
                         !notionGraphKinds.has(item.kind)) &&
                         item.kind !== "csv" &&
-                        item.kind !== "portable_collection" && (
+                        item.kind !== "portable_collection" &&
+                        !item.kind.startsWith("source_deleted_") && (
                           <option value="replace">
                             Replace the page body with incoming content
                           </option>
                         )}
-                      <option value="duplicate">Import a separate copy</option>
+                      {!item.kind.startsWith("source_deleted_") && (
+                        <option value="duplicate">
+                          Import a separate copy
+                        </option>
+                      )}
                     </select>
                   </div>
                 ))}

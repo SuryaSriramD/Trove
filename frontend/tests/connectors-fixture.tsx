@@ -11,6 +11,8 @@ const w = {
   records: [],
   collections: [],
   files: [],
+  blocks: [],
+  containers: [],
 } as unknown as WorkspaceSnapshot;
 const calls: any[] = [];
 (window as any).connectorCalls = calls;
@@ -34,6 +36,7 @@ const selection = {
   parentId: "1",
 };
 let proposals: S.ConnectorProposal[] = [];
+let aiRuns: any[] = [];
 const source: S.ConnectorSnapshot = {
   version: 1,
   id: "source1",
@@ -86,7 +89,26 @@ if (fixtureKind) {
   if (fixtureKind === "google_drive")
     source.content = { mimeType: "application/vnd.google-apps.document" };
   if (fixtureKind === "mcp") source.state = "partial";
+  if (fixtureKind === "notion") {
+    source.kind = "notion_page";
+    source.remoteId = id(10);
+    source.selectionId = id(10);
+  }
 }
+const eventHandlers = new Map<string, Set<(...args: any[]) => void>>();
+(window as any).runtime = {
+  EventsOn(name: string, handler: (...args: any[]) => void) {
+    const handlers = eventHandlers.get(name) ?? new Set();
+    handlers.add(handler);
+    eventHandlers.set(name, handlers);
+    return () => handlers.delete(handler);
+  },
+};
+(window as any).emitAIProgress = (run: any) => {
+  for (const handler of eventHandlers.get("ai:progress") ?? [])
+    handler({ workspaceId: w.workspaceId, runId: run.id, run });
+};
+(window as any).fixtureSource = source;
 window.go = {
   main: {
     App: {
@@ -95,8 +117,90 @@ window.go = {
         const r = JSON.parse(raw);
         calls.push({ method, request: r });
         let result: any;
-        if (method === "connectors.list")
+        if (method === "providers.status") result = { connections: [] };
+        else if (method === "providers.proposals") result = [];
+        else if (method === "providers.runs")
+          result = { runs: [], activeRunId: "", runtimes: [] };
+        else if (method === "providers.auth.list")
+          result = { available: true, reason: "", registrations: [] };
+        else if (method === "connectors.list")
           result = r.workspaceId === id(9) ? [] : [account];
+        else if (method === "connectors.contextReference")
+          result = {
+            snapshotId: source.id,
+            remoteRevision: source.remoteRevision,
+            contentHash: "a".repeat(64),
+          };
+        else if (method === "models.list")
+          result = {
+            packs: [
+              {
+                pack: { id: id(106), name: "Local model", kind: "chat" },
+                state: "ready",
+              },
+            ],
+          };
+        else if (method === "ai.runs") result = aiRuns;
+        else if (method === "ai.cancel") {
+          result = { state: "cancellation_requested" };
+          (window as any).resolveAICancellation?.();
+        } else if (method === "ai.run")
+          result = aiRuns.find((run) => run.id === r.runId);
+        else if (method === "ai.start") {
+          const connected = {
+            version: 1,
+            receiptId: id(12),
+            snapshotId: source.id,
+            accountId: account.id,
+            accountRevision: account.revision,
+            selectionId: source.selectionId,
+            provider: account.kind,
+            remoteId: source.remoteId,
+            remoteRevision: source.remoteRevision,
+            contentHash: "a".repeat(64),
+            url: source.url,
+            checkedAt: new Date().toISOString(),
+            partial: source.state === "partial",
+          };
+          const run = {
+            id: id(13),
+            conversationId: id(14),
+            state: "completed",
+            request: r,
+            text: "The launch is Friday [1].",
+            citations: [
+              { number: 1, title: source.title, state: "current", connected },
+            ],
+            sources: [
+              {
+                number: 1,
+                title: source.title,
+                state: "current",
+                text: source.text,
+                connected,
+              },
+            ],
+            createdAt: new Date().toISOString(),
+          };
+          aiRuns = [run];
+          (window as any).lastAIRun = run;
+          result = run;
+          if ((window as any).holdAIStart)
+            return new Promise((resolve) => {
+              (window as any).resolveAICancellation = () =>
+                resolve(
+                  JSON.stringify({
+                    ok: false,
+                    error: {
+                      code: "CANCELLED",
+                      message: "Source preparation cancelled",
+                    },
+                  }),
+                );
+              (window as any).resolveAIStart = () =>
+                resolve(JSON.stringify({ ok: true, result: run }));
+            });
+        } else if (method === "imports.notion.list") result = [];
         else if (method === "connectors.draft")
           result = { revision: "", fields: {} };
         else if (method === "connectors.saveDraft")

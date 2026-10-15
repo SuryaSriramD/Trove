@@ -10,7 +10,8 @@ FAMILIES = {
     'context': ('context.json', 'TestRealLocalWorkflowContext', 12),
     'related': ('related.json', 'TestRealLocalWorkflowRelated', 12),
     'memory-lifecycle': ('memory-lifecycle.json', 'TestRealLocalWorkflowMemoryLifecycle', 12),
-    'reviews': ('reviews.json', 'TestRealLocalWorkflowReviews', 12),
+    'images': ('images-execution-v2.json', 'TestRealLocalWorkflowImages', 24),
+    'reviews': ('reviews-execution-v2.json', 'TestRealLocalWorkflowReviewsV2', 12),
 }
 
 def digest(path):
@@ -289,8 +290,24 @@ def review_expected_draft(case):
     return {'claims': claims, 'actions': actions}
 
 
+def review_draft_matches_v2(actual, expected):
+    # Only claim prose may omit the initial article; all remaining structure,
+    # source quotations and proposed actions must match the independent oracle.
+    if not isinstance(actual, dict): return False
+    claims = actual.get('claims')
+    if not isinstance(claims, list) or len(claims) != len(expected['claims']): return False
+    normalized = []
+    for claim, wanted in zip(claims, expected['claims']):
+        if not isinstance(claim, dict): return False
+        text, expected_text = claim.get('text'), wanted['text']
+        alternate = expected_text[4].upper() + expected_text[5:] if len(expected_text) > 4 and expected_text.startswith('The ') and 'a' <= expected_text[4] <= 'z' else expected_text
+        normalized.append(dict(claim, text=expected_text) if text in (expected_text, alternate) else claim)
+    return dict(actual, claims=normalized) == expected
+
+
 def validate_review_report(report, case):
     errors = []
+    if report.get('oracleVersion') != 2: errors.append('review report lacks the explicit v2 oracle version')
     model_case = case in REVIEW_GENERATION_CASES
     if type(report.get('generationAttempts')) is not int or report['generationAttempts'] != int(model_case): errors.append('review native generation count differs')
     if report.get('serviceBoundaryOnly') is not (not model_case): errors.append('service-only boundary is not explicitly distinguished')
@@ -319,7 +336,8 @@ def validate_review_report(report, case):
         if report.get('finishRejected') is not True or report.get('proposalRejected') is not True or report.get('finalStatus') not in ('failed', 'cancelled'): errors.append('Forget did not invalidate generated review')
         return errors
     expected = review_expected_draft(case)
-    if json.loads(report.get('rawDraft', '')) != expected or report.get('actions') != expected['actions']: errors.append('review output differs from independent fact/category/action oracle')
+    actual_draft = json.loads(report.get('rawDraft', ''))
+    if not review_draft_matches_v2(actual_draft, expected) or report.get('actions') != expected['actions']: errors.append('review output differs from independent fact/category/action oracle')
     sources, citations = report['sources'], report['citations']
     if report.get('finalStatus') != 'ready' or not citations or report.get('unapprovedApplyRejected') is not True: errors.append('review escaped its unapplied approval boundary')
     if any(c.get('state') != 'current' or c.get('location', {}).get('pageId') not in selected for c in citations): errors.append('review citations are stale or outside selection')
@@ -333,13 +351,64 @@ def validate_review_report(report, case):
         return errors
     effect = report['reviewedEffect']
     if effect.get('destinationPageId') != bindings['destination'] or effect.get('status') != 'accepted' or not all(type(effect.get(k)) is int for k in ('beforeBlocks', 'afterBlocks', 'retryBlocks')) or effect['beforeBlocks'] < 1 or effect['afterBlocks'] <= effect['beforeBlocks'] or effect['retryBlocks'] != effect['afterBlocks']: errors.append('reviewed effect or duplicate-apply bound differs')
-    if any(claim['text'] not in effect.get('destinationText', '') for claim in expected['claims']): errors.append('approved review content missing from canonical destination')
+    actual_claims = actual_draft.get('claims', []) if isinstance(actual_draft, dict) else []
+    if not actual_claims or any(not isinstance(claim, dict) or not isinstance(claim.get('text'), str) or claim['text'] not in effect.get('destinationText', '') for claim in actual_claims): errors.append('approved review content missing from canonical destination')
     if case == 'risk-suggestion' and REVIEW_SUGGESTION not in effect.get('sourceText', ''): errors.append('reviewed suggestion not applied to exact destination')
     if report.get('repeatedOccurrenceRunId') != report.get('runId') or not report.get('runId'): errors.append('repeated occurrence changed identity')
     if case == 'cancel-retry' and report.get('cancelStatus') != 'cancelled': errors.append('cancelled occurrence did not remain inert before retry')
     if case == 'dedup-import' and (report.get('portableExecutionCounts') != dict.fromkeys(REVIEW_PORTABLE_TABLES, 0) or report.get('portableNextRunId') != ''): errors.append('portable review import activated or replayed execution')
     return errors
 
+
+IMAGE_EXCLUDED_TABLES = CANONICAL_EXCLUDED_TABLES | {'image_descriptions'}
+IMAGE_ASSERTIONS = frozenset(('serviceCompleted', 'independentAnswerOracle', 'provenance', 'ocrOracle', 'originalPreserved', 'canonicalPreserved'))
+
+def validate_image_report(report, case, contract):
+    errors = []
+    expected = contract['imageCases'][case]
+    if not expected.get('source') or not expected.get('sourceSHA256'):
+        return ['authorized source and locked oracle unavailable']
+    for key in ('sourceSHA256', 'sourceKind'):
+        if report.get(key) != expected[key]: errors.append('image ' + key + ' differs')
+    if report.get('question') != expected['prompt'] or report.get('expectedMethod') != expected['method']:
+        errors.append('image prompt or method differs')
+    if type(report.get('productInvocations')) is not int or type(report.get('ocrInvocations')) is not int or report.get('productInvocations') != 1 or report.get('ocrInvocations') != 1:
+        errors.append('one product and one OCR invocation required')
+    result = report.get('result', {})
+    method = expected['method']
+    if method == 'normalization_rejected':
+        if result.get('state') != 'failed' or result.get('text') or not result.get('error', '').startswith('NORMALIZATION_DETAIL_LOST:'):
+            errors.append('lost source detail was not rejected')
+    elif result.get('state') != 'ready' or result.get('analysisMethod') != method:
+        errors.append('ready image analysis method differs')
+    elif method == 'local_vision_model':
+        answer = result.get('text', '').strip().lower()
+        if case.startswith('diagram-'):
+            if answer not in (expected['expected'], expected['expected']+'.'): errors.append('color answer differs or adds unsupported content')
+        elif case in ('boundary-4', 'boundary-5'):
+            if not re.fullmatch(r'(?:a |there is a )?(?:small |tiny )?(?:faint|light) (?:gray|grey) (?:square|mark|dot|patch)(?: (?:on|against) a (?:plain )?white background)?\.?', answer): errors.append('faint-mark answer differs or adds unsupported content')
+        elif not re.fullmatch(r'(?:a |there is a )?(?:small|tiny) (?:black|dark) (?:square|mark|dot)(?: (?:on|against) a (?:plain |white )?white background)?\.?', answer):
+            errors.append('small-mark answer includes unsupported content')
+        for key, identity in (('modelHash','modelSHA256'), ('projectorHash','projectorSHA256'), ('helperHash','helperSHA256')):
+            if result.get(key) != contract[identity] or not re.fullmatch('[0-9a-f]{64}', result.get(key,'')): errors.append('image artifact identity differs: '+key)
+        if result.get('finishReason') != 'eos' or not 0 < result.get('inputTokens',0) <= 8192 or not 0 < result.get('outputTokens',0) <= 512 or result.get('sampledPeakRSSBytes',0) <= 0:
+            errors.append('complete bounded native image metrics absent')
+    elif method == 'pixel_measurement':
+        suffix = {
+            'boundary-1': 'the image is exactly uniform white (blank at decoded-pixel level). No objects or text can be identified from spatial pixel variation. No model interpretation or OCR was attempted.',
+            'boundary-2': 'every source pixel has the same 16-bit RGB value #000000000000 and alpha 65535/65535. This uniform color has no spatial pixel variation to identify objects or text. No model interpretation or OCR was attempted.',
+            'boundary-3': 'every source pixel is fully transparent. Hidden RGB values are not visible content. No visible objects or text can be identified. No model interpretation or OCR was attempted.',
+        }[case]
+        if not re.fullmatch(re.escape(f"Source pixel measurement ({expected['width']} × {expected['height']} decoded pixels, before resizing and alpha composition; encoded orientation): "+suffix),result.get('text','')):
+            errors.append('exact pixel measurement differs')
+        if result.get('finishReason') != 'measurement': errors.append('pixel measurement was not disclosed')
+    if method != 'local_vision_model' and any(result.get(key) for key in ('modelHash','projectorHash','helperHash','inputTokens','outputTokens','sampledPeakRSSBytes')):
+        errors.append('non-model measurement claims model output')
+    ocr = report.get('ocr', {})
+    lines = '\n'.join(line['text'].strip() for line in (ocr.get('lines') or []) if line['text'].strip())
+    if report.get('ocrError') or lines != expected['ocrExpected'] or not report.get('ocrCapability',{}).get('engine') or not report.get('ocrCapability',{}).get('extractorVersion'):
+        errors.append('OCR output or provenance differs')
+    return errors
 
 def validate_workflow_report(report, case, contract):
     """Independently bind native mode, declared controls, semantic observations
@@ -354,7 +423,7 @@ def validate_workflow_report(report, case, contract):
         if report.get('engineMode') != 'native' or report.get('releaseQualified') is not False:
             errors.append('native execution mode or release boundary absent')
         family = contract['family']
-        required = CONTEXT_ASSERTIONS[case] if family == 'context' else MEMORY_ASSERTIONS[case] if family == 'memory-lifecycle' else REVIEW_ASSERTIONS[case] if family == 'reviews' else RELATED_ASSERTIONS
+        required = IMAGE_ASSERTIONS if family == 'images' else CONTEXT_ASSERTIONS[case] if family == 'context' else MEMORY_ASSERTIONS[case] if family == 'memory-lifecycle' else REVIEW_ASSERTIONS[case] if family == 'reviews' else RELATED_ASSERTIONS
         assertions = report.get('assertions', {})
         if not isinstance(assertions, dict) or not required.issubset(assertions) or any(value is not True for value in assertions.values()):
             errors.append('required assertion missing or failed')
@@ -392,6 +461,8 @@ def validate_workflow_report(report, case, contract):
                         errors.append('current source citation absent')
                 elif claims[0] != {'text': 'The supplied evidence does not answer this question.', 'quote': ''}:
                     errors.append('omitted fact requires exclusive abstention')
+        elif family == 'images':
+            errors.extend(validate_image_report(report, case, contract))
         elif family == 'reviews':
             errors.extend(validate_review_report(report, case))
         elif family == 'memory-lifecycle':
@@ -473,7 +544,7 @@ def summarize(events, expected, parent, canonical_root=None, expected_requests=N
         if workflow_contract is not None:
             errors.extend('workflow ' + case + ': ' + message for message in validate_workflow_report(r, case, workflow_contract))
         passed = r.get('passed', r.get('automatedTaskPassed')) is True
-        excluded = REVIEW_EXCLUDED_TABLES if workflow_contract and workflow_contract.get('family') == 'reviews' else None
+        excluded = IMAGE_EXCLUDED_TABLES if workflow_contract and workflow_contract.get('family') == 'images' else REVIEW_EXCLUDED_TABLES if workflow_contract and workflow_contract.get('family') == 'reviews' else None
         canonical_error = validate_canonical_inventory(r, canonical_root, parent + '/' + case, excluded)
         if excluded is not None:
             for name in (['beforeExplicitMutationInventory'] if case == 'forgotten-memory' else ['staleApplyInventory'] if case == 'stale-destination' else []):
@@ -560,6 +631,11 @@ def main():
     paths += list((ROOT / 'contracts').rglob('*.json')) + list((ROOT / 'internal').rglob('*.sql'))
     paths += list((ROOT / 'schemas').glob('*.go')) + list((ROOT / 'schemas').glob('*.sql'))
     paths += [ROOT / 'go.mod', ROOT / 'go.sum']
+    if args.family == 'images':
+        pack_manifest = json.loads((models / (args.pack + '.json')).read_text())
+        paths += [corpus_dir / 'images.json', models / (pack_manifest['projector']['id'] + '.model')]
+        paths += [corpus_dir / case['source'] for case in corpus['cases'] if case.get('source')]
+        paths += [path for path in bundle.iterdir() if path.is_file()]
     paths = sorted(set(paths))
     started = time.time()
     before = {str(x): {'sha256': digest(x), 'bytes': x.stat().st_size} for x in paths}
@@ -588,7 +664,7 @@ def main():
     if build_result.returncode:
         manifest.update(state='build_failed', exitCode=build_result.returncode); write(); return 1
     manifest['testBinarySHA256'] = digest(binary)
-    env.update(TROVE_NATIVE_INTEGRATION='1', TROVE_CHAT_EVAL_PACK=args.pack, TROVE_EMBED_EVAL_PACK=args.pack,
+    env.update(TROVE_NATIVE_INTEGRATION='1', TROVE_CHAT_EVAL_PACK=args.pack, TROVE_EMBED_EVAL_PACK=args.pack, TROVE_VISION_EVAL_PACK=args.pack,
                TROVE_MODEL_ROOT=str(models), TROVE_NATIVE_BUNDLE=str(bundle),
                TROVE_AI_CANONICAL_EVIDENCE_DIR=manifest['canonicalEvidenceDirectory'])
     selector = '^' + test + '$'
@@ -612,9 +688,14 @@ def main():
                              'corpusSHA256': before[str(corpus_dir / corpus_file)]['sha256']}
                              for case in corpus['cases'] if case['id'] in expected}
     workflow_contract = None
-    if args.family in ('context', 'related', 'memory-lifecycle', 'reviews'):
+    if args.family in ('context', 'related', 'memory-lifecycle', 'reviews', 'images'):
         workflow_contract = {'family': args.family, 'modelPackId': args.pack,
                              'corpusSHA256': before[str(corpus_dir / corpus_file)]['sha256']}
+    if args.family == 'images':
+        workflow_contract.update(imageCases={case['id']: case for case in corpus['cases']},
+            modelSHA256=before[str(models / (args.pack + '.model'))]['sha256'],
+            projectorSHA256=before[str(models / (pack_manifest['projector']['id'] + '.model'))]['sha256'],
+            helperSHA256=before[str(bundle / 'vision-worker')]['sha256'])
     summary = summarize(events, expected, test, out / 'canonical', expected_requests, workflow_contract)
     after = {str(x): {'sha256': digest(x), 'bytes': x.stat().st_size} for x in paths}
     summary['inputsUnchanged'] = before == after

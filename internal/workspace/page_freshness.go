@@ -11,12 +11,12 @@ import (
 	"trove.local/phase0/contracts"
 )
 
-// Version 2 adds meeting speaker/timing/audio-binding knowledge. Version 1
-// review events remain readable; an older coverage version requires review.
+// Version 3 adds collection visibility, schema and live record knowledge.
+// Earlier review events remain readable; an older coverage version requires review.
 // The projection excludes revisions, decoration, and review state.
 // A change to this projection requires a new version, never silent reinterpretation.
 func semanticContentIdentity(ctx context.Context, q querier, page string) (contracts.DomainSemanticContentIdentity, error) {
-	out := contracts.DomainSemanticContentIdentity{Version: 2}
+	out := contracts.DomainSemanticContentIdentity{Version: 3}
 	p, err := readPageTx(ctx, q, page)
 	if err != nil {
 		return out, err
@@ -109,8 +109,12 @@ func semanticContentIdentity(ctx context.Context, q querier, page string) (contr
 	if err != nil {
 		return out, err
 	}
+	collections, _, err := reviewPageCollectionKnowledge(ctx, q, page)
+	if err != nil {
+		return out, err
+	}
 	var projection any
-	payload := map[string]any{"version": out.Version, "title": p.Page.Title, "blocks": blocks, "values": values, "assets": assets, "reusableSources": dependencies, "referencedTasks": tasks, "taskFacet": facet}
+	payload := map[string]any{"collections": collections, "version": out.Version, "title": p.Page.Title, "blocks": blocks, "values": values, "assets": assets, "reusableSources": dependencies, "referencedTasks": tasks, "taskFacet": facet}
 	meeting := recoverySnapshot{}
 	if err = captureRecoveryMeeting(ctx, q, page, &meeting); err != nil {
 		return out, err
@@ -237,6 +241,13 @@ func reviewPage(m *Mutation, c map[string]any) error {
 	_, recordPages, err := reviewRecordKnowledge(m.Context, m.Tx, page)
 	if err != nil {
 		return err
+	}
+	_, collectionPages, err := reviewPageCollectionKnowledge(m.Context, m.Tx, page)
+	if err != nil {
+		return err
+	}
+	for source := range collectionPages {
+		sourcePages[source] = true
 	}
 	for source := range recordPages {
 		sourcePages[source] = true
@@ -563,7 +574,12 @@ func reviewRecordKnowledge(ctx context.Context, q querier, page string) (map[str
 	if err != nil {
 		return nil, nil, err
 	}
-	pending := []string{root}
+	return reviewRecordsKnowledge(ctx, q, []string{root})
+}
+func reviewRecordsKnowledge(ctx context.Context, q querier, pending []string) (map[string]any, map[string]bool, error) {
+	graph := map[string]any{}
+	pages := map[string]bool{}
+	var err error
 	for len(pending) > 0 {
 		id := pending[0]
 		pending = pending[1:]

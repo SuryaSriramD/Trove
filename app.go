@@ -261,6 +261,7 @@ func (a *App) installKernelLocked(k *workspace.Kernel) error {
 	}
 	a.kernel = k
 	a.execution = k.OwnerContext()
+	k.SetConnectorContextReader(a.connectorContextReader(k))
 	a.startupError = ""
 	a.mu.Unlock()
 	if cancel != nil {
@@ -331,13 +332,18 @@ func (a *App) Dispatch(method, raw string) string {
 		return a.autofillDispatch(method, json.RawMessage(raw))
 	}
 	if method == "ai.start" || method == "ai.cancel" {
-		a.lifecycle.Lock()
-		defer a.lifecycle.Unlock()
+		a.lifecycle.RLock()
+		defer a.lifecycle.RUnlock()
 		return a.aiDispatch(method, json.RawMessage(raw))
 	}
+	// Keep the workspace alive across service dispatch, but do not hold app.mu:
+	// connected evidence may reenter the native host for an authenticated read.
+	a.lifecycle.RLock()
+	defer a.lifecycle.RUnlock()
 	a.mu.RLock()
-	defer a.mu.RUnlock()
-	if a.kernel == nil {
+	k, execution, serviceContext := a.kernel, a.execution, a.ctx
+	a.mu.RUnlock()
+	if k == nil {
 		return errorEnvelope("WORKSPACE_LOCKED", "Workspace is not open")
 	}
 	// Bootstrap is a trusted adapter operation: the renderer does not know the
@@ -349,12 +355,12 @@ func (a *App) Dispatch(method, raw string) string {
 		}
 		if json.Unmarshal([]byte(raw), &bootstrap) == nil && bootstrap != nil && bootstrap["workspaceId"] == nil {
 			// Preserve caller options and unknown fields for contract validation.
-			bootstrap["contractVersion"], bootstrap["requestId"], bootstrap["workspaceId"] = 1, workspace.NewID(), a.kernel.ID()
+			bootstrap["contractVersion"], bootstrap["requestId"], bootstrap["workspaceId"] = 1, workspace.NewID(), k.ID()
 			payload, _ := json.Marshal(bootstrap)
 			raw = string(payload)
 		}
 	}
-	result := a.kernel.Dispatch(a.ctx, a.execution, method, json.RawMessage(raw))
+	result := k.Dispatch(serviceContext, execution, method, json.RawMessage(raw))
 	if method == "workspace.snapshot" && startupTracePending("snapshot_ready") {
 		var envelope struct {
 			OK bool `json:"ok"`
