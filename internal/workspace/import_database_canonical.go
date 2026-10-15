@@ -1,6 +1,8 @@
 package workspace
 
 import (
+	"crypto/sha256"
+	"encoding/hex"
 	"encoding/json"
 	"fmt"
 	"sort"
@@ -414,6 +416,15 @@ func rewritePortableDatabaseValue(v any, ids map[string]string, key string) any 
 		out := map[string]any{}
 		for k, v := range x {
 			out[k] = rewritePortableDatabaseValue(v, ids, k)
+		}
+		// Version-two AST/hash metadata is derived from the translated
+		// expression. Remapping property IDs must regenerate those references.
+		// Original source text and captured results remain retained evidence.
+		if expression := str(out["translatedExpression"]); expression != "" && number(out["evaluatorVersion"]) == 2 {
+			if ast, _, err := formulaCompileV2(expression); err == nil {
+				hash := sha256.Sum256([]byte(expression))
+				out["translatedAST"], out["expressionHash"] = ast, hex.EncodeToString(hash[:])
+			}
 		}
 		return out
 	}

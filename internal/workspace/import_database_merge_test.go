@@ -3,6 +3,7 @@ package workspace
 import (
 	"context"
 	"encoding/json"
+	"fmt"
 	"path/filepath"
 	"strings"
 	"testing"
@@ -344,5 +345,42 @@ func TestImportDatabaseBackupRetainsSourceBaselineAndPendingReview(t *testing.T)
 	var value string
 	if err = restored.db.QueryRow("SELECT value_json FROM property_values WHERE record_id=? AND property_id=?", lr, lp).Scan(&value); err != nil || !strings.Contains(value, "incoming") {
 		t.Fatal("restored reviewed import did not preserve its canonical target", value, err)
+	}
+}
+
+func TestImportDatabaseMergedFormulaCycleRejectsBeforeInitialization(t *testing.T) {
+	source, se := testKernel(t)
+	f := newDatabase(t, source, se)
+	a, b := NewID(), NewID()
+	for _, id := range []string{a, b} {
+		testOK(t, dbBatch(t, source, se, []any{map[string]any{"kind": "collection.addProperty", "collectionId": f.collection, "propertyId": id, "name": id, "type": "formula", "schemaVersion": 1, "config": derivedConfig("formula", map[string]any{"translatedExpression": "1"})}}, "collection", f.collection, "property", id))
+	}
+	target, te := testKernel(t)
+	first := completeImportFixture(t, target, te, portableDatabasePreview(t, source, target))
+	la, lb := importedEntity(t, target, "property", a), importedEntity(t, target, "property", b)
+	lc, owningPage := first.PortableCollections[0].CollectionID, first.PortableCollections[0].PageID
+	testOK(t, dbBatch(t, target, te, []any{map[string]any{"kind": "property.setFormula", "propertyId": lb, "expression": fmt.Sprintf("prop(%q)", la), "evaluatorVersion": 2}}, "property", la, "property", lb, "collection", lc, "page", owningPage))
+	testOK(t, dbBatch(t, source, se, []any{map[string]any{"kind": "property.setFormula", "propertyId": a, "expression": fmt.Sprintf("prop(%q)", b), "evaluatorVersion": 2}}, "property", a, "property", b, "collection", f.collection, "page", f.page))
+	preview := reviewDatabasePreview(t, target, portableDatabasePreview(t, source, target), nil)
+	if _, err := commitPortableImport(context.Background(), target, te, map[string]any{"planId": preview.ID, "planHash": preview.Hash}); err == nil || !strings.Contains(err.Error(), "cycle") {
+		t.Fatal("independent formula edits formed an unchecked cycle", err)
+	}
+	stored, err := loadImportPlan(context.Background(), target.db, preview.ID)
+	if err != nil || stored.Initialized || stored.Cursor != 0 {
+		t.Fatal("invalid merged graph started resumable writes", err)
+	}
+}
+
+func TestImportFormulaRemapRegeneratesOnlyDerivedVersionTwoMetadata(t *testing.T) {
+	old, local := NewID(), NewID()
+	input := map[string]any{"evaluatorVersion": float64(2), "translatedExpression": fmt.Sprintf("prop(%q) + 1", old), "originalExpression": "original source formula", "importedCachedValue": "captured result", "translatedAST": map[string]any{"stale": old}, "expressionHash": "stale"}
+	result := rewritePortableDatabaseValue(input, map[string]string{old: local}, "").(map[string]any)
+	if strings.Contains(string(marshal(result["translatedAST"])), old) || !strings.Contains(str(result["translatedExpression"]), local) || result["expressionHash"] == "stale" || result["originalExpression"] != input["originalExpression"] || result["importedCachedValue"] != input["importedCachedValue"] || number(result["evaluatorVersion"]) != 2 {
+		t.Fatal("formula remap changed source evidence or left stale evaluator metadata", result)
+	}
+	delete(input, "evaluatorVersion")
+	result = rewritePortableDatabaseValue(input, map[string]string{old: local}, "").(map[string]any)
+	if _, upgraded := result["evaluatorVersion"]; upgraded {
+		t.Fatal("legacy formula was silently upgraded")
 	}
 }

@@ -12,6 +12,8 @@ import (
 	"fmt"
 	"sort"
 	"strings"
+
+	"trove.local/phase0/contracts"
 )
 
 const importNormalizerVersion = 1
@@ -183,7 +185,7 @@ func loadImportBaseline(ctx context.Context, q querier, mapping string) (ImportS
 	var version int
 	err := q.QueryRowContext(ctx, "SELECT normalizer_version,snapshot_json,source_revision FROM import_baselines WHERE mapping_id=?", mapping).Scan(&version, &raw, &revision)
 	if errors.Is(err, sql.ErrNoRows) {
-		return s, "", false, nil
+		return reconstructRetainedImportBaseline(ctx, q, mapping)
 	}
 	if err != nil {
 		return s, "", false, err
@@ -195,6 +197,52 @@ func loadImportBaseline(ctx context.Context, q querier, mapping string) (ImportS
 		return s, revision, false, err
 	}
 	return s, revision, s.Version == importNormalizerVersion, nil
+}
+
+// An accepted, versioned incoming snapshot retained in a completed import unit
+// is source evidence. Materialized blocks may contain local edits and are never
+// used to reconstruct a baseline. Older plans without a known normalizer remain
+// explicitly unavailable, even when their raw attachment still exists.
+func reconstructRetainedImportBaseline(ctx context.Context, q querier, mapping string) (ImportSnapshot, string, bool, error) {
+	var empty ImportSnapshot
+	var run, file, revision string
+	err := q.QueryRowContext(ctx, "SELECT COALESCE(last_import_run_id,''),COALESCE(base_raw_file_id,''),COALESCE(base_source_revision,'') FROM import_mappings WHERE id=?", mapping).Scan(&run, &file, &revision)
+	if errors.Is(err, sql.ErrNoRows) {
+		return empty, "", false, nil
+	}
+	if err != nil {
+		return empty, "", false, err
+	}
+	if run == "" || file == "" || revision == "" {
+		return empty, revision, false, nil
+	}
+	plan, err := loadImportPlan(ctx, q, run)
+	if errors.Is(err, sql.ErrNoRows) {
+		return empty, revision, false, nil
+	}
+	if err != nil {
+		return empty, revision, false, err
+	}
+	if plan.NormalizerVersion != importNormalizerVersion {
+		return empty, revision, false, nil
+	}
+	for _, item := range plan.Items {
+		if item.MappingID != mapping || !item.Committed || item.RawFileID != file || item.Hash != revision || item.Incoming == nil || item.Incoming.Version != importNormalizerVersion {
+			continue
+		}
+		if item.Kind == "portable_collection" && plan.State != "complete" {
+			continue
+		}
+		var retained int
+		if err := q.QueryRowContext(ctx, "SELECT count(*) FROM files WHERE id=?", file).Scan(&retained); err != nil {
+			return empty, revision, false, err
+		}
+		if retained != 1 || contracts.Validate("domain", "ImportNormalizedSnapshot", marshal(item.Incoming)) != nil {
+			continue
+		}
+		return *item.Incoming, revision, true, nil
+	}
+	return empty, revision, false, nil
 }
 
 func prepareImportMerge(ctx context.Context, q querier, p *ImportPlan, item *ImportItem) error {

@@ -236,7 +236,14 @@ func TestImportThreeWayConflictPersistsResolvesAndRejectsStaleReview(t *testing.
 func TestImportBaselineUnavailableRequiresExplicitReviewAndDoesNotGuessFromLocal(t *testing.T) {
 	k, e := testKernel(t)
 	first := completeImportFixture(t, k, e, importFixture(t, k, e, map[string]string{"A.html": `<p id="one">base</p>`}))
-	if err := k.write(context.Background(), func(tx *sql.Tx) error { _, err := tx.Exec("DELETE FROM import_baselines"); return err }); err != nil {
+	if err := k.write(context.Background(), func(tx *sql.Tx) error {
+		if _, err := tx.Exec("DELETE FROM import_baselines"); err != nil {
+			return err
+		}
+		// A genuine historical plan does not declare our known normalizer.
+		first.NormalizerVersion = 0
+		return saveImportPlan(context.Background(), tx, first)
+	}); err != nil {
 		t.Fatal(err)
 	}
 	preview := importFixture(t, k, e, map[string]string{"A.html": `<p id="one">base</p>`})
@@ -256,6 +263,38 @@ func TestImportBaselineUnavailableRequiresExplicitReviewAndDoesNotGuessFromLocal
 	var count int
 	if err = k.db.QueryRow("SELECT count(*) FROM import_baselines WHERE mapping_id=?", first.Items[0].MappingID).Scan(&count); err != nil || count != 1 {
 		t.Fatal("explicit review did not establish retained baseline", err)
+	}
+}
+
+func TestImportBaselineReconstructedOnlyFromVersionedAcceptedSourceEvidence(t *testing.T) {
+	k, e := testKernel(t)
+	first := completeImportFixture(t, k, e, importFixture(t, k, e, map[string]string{"A.html": `<p id="one">source base</p>`}))
+	item := first.Items[0]
+	updateImportFixtureBlock(t, k, item.Blocks[0].ID, "local edit")
+	if err := k.write(context.Background(), func(tx *sql.Tx) error { _, err := tx.Exec("DELETE FROM import_baselines"); return err }); err != nil {
+		t.Fatal(err)
+	}
+	preview := importFixture(t, k, e, map[string]string{"A.html": `<p id="one">incoming edit</p>`})
+	merge := preview.Items[0].Merge
+	if merge == nil || merge.BaselineStatus != "retained" {
+		t.Fatal("known retained source snapshot was not reconstructed")
+	}
+	path := "/blocks/" + item.Blocks[0].ID + "/content"
+	found := false
+	for _, field := range merge.Fields {
+		if field.Path == path {
+			found = field.Outcome == "conflict" && strings.Contains(string(field.Base.Value), "source base") && strings.Contains(string(field.Local.Value), "local edit") && strings.Contains(string(field.Incoming.Value), "incoming edit")
+		}
+	}
+	if !found {
+		t.Fatal("reconstructed baseline incorporated local edits", string(marshal(merge)))
+	}
+	preview = configureMergeFixture(t, k, preview, []any{map[string]any{"path": path, "choice": "keep_local"}})
+	completeImportFixture(t, k, e, preview)
+	var count int
+	k.db.QueryRow("SELECT count(*) FROM import_baselines WHERE mapping_id=?", item.MappingID).Scan(&count)
+	if count != 1 {
+		t.Fatal("reviewed reconstruction was not durably promoted")
 	}
 }
 
