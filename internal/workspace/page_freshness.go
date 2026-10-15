@@ -526,7 +526,7 @@ func reviewRecordKnowledge(ctx context.Context, q querier, page string) (map[str
 		pages[p] = true
 		fields := []any{}
 		relations := []string{}
-		hasRollup := false
+		hasDerived := false
 		rows, err := q.QueryContext(ctx, `SELECT p.id,p.schema_version,p.name,p.type,p.config_json,v.value_json FROM records r JOIN properties p ON p.collection_id=r.collection_id LEFT JOIN property_values v ON v.record_id=r.id AND v.property_id=p.id WHERE r.id=? ORDER BY p.id`, id)
 		if err != nil {
 			return nil, nil, err
@@ -544,8 +544,8 @@ func reviewRecordKnowledge(ctx context.Context, q querier, page string) (map[str
 				field["value"] = reviewPropertyValue(kind, value.String)
 			}
 			fields = append(fields, field)
-			if kind == "rollup" {
-				hasRollup = true
+			if kind == "rollup" || kind == "formula" {
+				hasDerived = true
 			}
 			if kind == "relation" && value.Valid {
 				var ids []string
@@ -559,8 +559,18 @@ func reviewRecordKnowledge(ctx context.Context, q querier, page string) (map[str
 		if err != nil {
 			return nil, nil, err
 		}
-		graph[id] = map[string]any{"title": title, "deleted": deleted.Valid, "fields": fields}
-		if hasRollup {
+		facet := map[string]any{}
+		var status string
+		var due sql.NullString
+		err = q.QueryRowContext(ctx, "SELECT status_property_id,due_property_id FROM task_facets WHERE record_id=?", id).Scan(&status, &due)
+		if err == nil {
+			facet["statusPropertyId"] = status
+			facet["duePropertyId"] = due.String
+		} else if !errors.Is(err, sql.ErrNoRows) {
+			return nil, nil, err
+		}
+		graph[id] = map[string]any{"title": title, "deleted": deleted.Valid, "fields": fields, "taskFacet": facet}
+		if hasDerived {
 			pending = append(pending, relations...)
 		}
 	}
