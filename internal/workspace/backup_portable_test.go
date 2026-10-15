@@ -4,8 +4,10 @@ import (
 	"archive/tar"
 	"bytes"
 	"context"
+	"database/sql"
 	"errors"
 	"math"
+	"net/url"
 	"os"
 	"path/filepath"
 	"strings"
@@ -31,6 +33,13 @@ func TestEncryptedBackupRoundTripPreservesRetainedState(t *testing.T) {
 	k, e := testKernel(t)
 	page := createPage(t, k, e, "Private portable snapshot title")
 	attachTestFile(t, k, e, page, stageTestFile(t, k, e, "private portable asset bytes"), false)
+	if err := k.RebuildSearch(ctx); err != nil {
+		t.Fatal(err)
+	}
+	approval := NewID()
+	if _, err := k.db.Exec("INSERT INTO approvals VALUES(?,?,?,?,?,?,?,?,'approved')", approval, e.Actor.ActorId, e.ScopeGrantId, 1, strings.Repeat("a", 64), "[]", timeAfterMinutes(60), e.Actor.ActorId); err != nil {
+		t.Fatal(err)
+	}
 	draft, audio, err := k.BeginRecording(ctx, e, "Retained interrupted recording")
 	if err != nil {
 		t.Fatal(err)
@@ -78,6 +87,21 @@ func TestEncryptedBackupRoundTripPreservesRetainedState(t *testing.T) {
 	if string(marshal(verified.Manifest)) != string(marshal(manifest)) {
 		t.Fatal("manifest changed")
 	}
+	// The encrypted payload is a full SQLite snapshot. Search and approval
+	// bytes are included even though restore rebuilds/revokes their live state.
+	snapshotDB, err := sql.Open("sqlite3", (&url.URL{Scheme: "file", Path: filepath.Join(verified.stage.path, "snapshot", "workspace.db")}).String()+"?mode=ro&immutable=1")
+	if err != nil {
+		t.Fatal(err)
+	}
+	var indexed int
+	var approvalState string
+	if err = snapshotDB.QueryRow("SELECT count(*) FROM search_chunks").Scan(&indexed); err != nil || indexed == 0 {
+		t.Fatal("snapshot lost included search tables", indexed, err)
+	}
+	if err = snapshotDB.QueryRow("SELECT state FROM approvals WHERE approval_id=?", approval).Scan(&approvalState); err != nil || approvalState != "approved" {
+		t.Fatal("snapshot did not preserve approval evidence", approvalState, err)
+	}
+	snapshotDB.Close()
 	if info, err := os.Stat(verified.stage.path); err != nil || info.Mode().Perm() != 0700 {
 		t.Fatal("non-private staging", info, err)
 	}
@@ -97,6 +121,9 @@ func TestEncryptedBackupRoundTripPreservesRetainedState(t *testing.T) {
 		t.Fatal(err)
 	}
 	defer restored.Close()
+	if err = restored.db.QueryRow("SELECT state FROM approvals WHERE approval_id=?", approval).Scan(&approvalState); err != nil || approvalState != "revoked" {
+		t.Fatal("restored approval remains active", approvalState, err)
+	}
 	for _, table := range tables {
 		if got := retainedTable(t, restored, table); got != expected[table] {
 			t.Fatalf("%s changed", table)
@@ -122,6 +149,22 @@ func TestEncryptedBackupRoundTripPreservesRetainedState(t *testing.T) {
 	assertPortableStagesEmpty(t, staging)
 	if _, err = verified.Restore(ctx, filepath.Join(t.TempDir(), "closed"), nil); err == nil {
 		t.Fatal("closed preview reused")
+	}
+}
+
+func TestPortableBackupSummarySeparatesPayloadFromRestoration(t *testing.T) {
+	summary := PortableBackupSummary()
+	excluded := strings.ToLower(strings.Join(summary.Excluded, " "))
+	for _, includedTerm := range []string{"search", "approval", "pending execution"} {
+		if strings.Contains(excluded, includedTerm) {
+			t.Fatalf("summary falsely excludes database state: %s", includedTerm)
+		}
+	}
+	if !strings.Contains(strings.Join(summary.Included, " "), "derived search tables") || !strings.Contains(strings.Join(summary.Included, " "), "approval/job state") {
+		t.Fatal("summary omits included SQLite state")
+	}
+	if !strings.Contains(strings.Join(summary.Restoration, " "), "rebuilt") || !strings.Contains(strings.Join(summary.Restoration, " "), "revoked") {
+		t.Fatal("restore transformations are not disclosed separately")
 	}
 }
 
