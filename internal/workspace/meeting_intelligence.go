@@ -75,16 +75,31 @@ func (k *Kernel) MeetingSource(ctx context.Context, e contracts.ServiceExecution
 		return out, err
 	}
 	out = MeetingSource{MeetingID: meeting, PageID: string(m.PageId), PageRevision: string(rev), Segments: []MeetingEvidence{}}
-	rows, err := k.db.QueryContext(ctx, "SELECT s.id,s.block_id,s.start_ms,s.end_ms,b.data_json,b.revision FROM transcript_segments s JOIN blocks b ON b.id=s.block_id WHERE s.meeting_id=? ORDER BY s.start_ms,s.id", meeting)
+	out.Segments, err = readMeetingEvidence(ctx, k.db, meeting)
 	if err != nil {
 		return out, err
+	}
+	hash := sha256.Sum256(marshal(out.Segments))
+	out.EvidenceHash = hex.EncodeToString(hash[:])
+	return out, nil
+}
+
+type meetingEvidenceReader interface {
+	QueryContext(context.Context, string, ...any) (*sql.Rows, error)
+}
+
+func readMeetingEvidence(ctx context.Context, reader meetingEvidenceReader, meeting string) ([]MeetingEvidence, error) {
+	segments := []MeetingEvidence{}
+	rows, err := reader.QueryContext(ctx, "SELECT s.id,s.block_id,s.start_ms,s.end_ms,b.data_json,b.revision FROM transcript_segments s JOIN blocks b ON b.id=s.block_id WHERE s.meeting_id=? ORDER BY s.start_ms,s.id", meeting)
+	if err != nil {
+		return nil, err
 	}
 	defer rows.Close()
 	for rows.Next() {
 		var s MeetingEvidence
 		var raw string
 		if err = rows.Scan(&s.SegmentID, &s.BlockID, &s.StartMS, &s.EndMS, &raw, &s.Revision); err != nil {
-			return out, err
+			return nil, err
 		}
 		var data struct {
 			RichText []struct {
@@ -92,19 +107,17 @@ func (k *Kernel) MeetingSource(ctx context.Context, e contracts.ServiceExecution
 			} `json:"richText"`
 		}
 		if err = json.Unmarshal([]byte(raw), &data); err != nil {
-			return out, err
+			return nil, err
 		}
 		for _, span := range data.RichText {
 			s.Text += span.Text
 		}
-		out.Segments = append(out.Segments, s)
+		segments = append(segments, s)
 	}
 	if err = rows.Err(); err != nil {
-		return out, err
+		return nil, err
 	}
-	hash := sha256.Sum256(marshal(out.Segments))
-	out.EvidenceHash = hex.EncodeToString(hash[:])
-	return out, nil
+	return segments, nil
 }
 func ValidateMeetingIntelligence(body MeetingIntelligence, source MeetingSource) error {
 	valid := map[string]bool{}
@@ -293,62 +306,5 @@ func init() {
 		}
 		_, err = m.Exec("UPDATE meeting_intelligence SET state='applied' WHERE id=? AND state='draft'", id)
 		return err
-	})
-}
-
-func init() {
-	RegisterQuery("meetings.source", func(ctx context.Context, k *Kernel, e contracts.ServiceExecutionContext, r map[string]any) (any, error) {
-		return k.MeetingSource(ctx, e, str(r["meetingId"]))
-	})
-	RegisterQuery("meetings.createFromTranscript", func(ctx context.Context, k *Kernel, e contracts.ServiceExecutionContext, r map[string]any) (any, error) {
-		if e.Actor.Kind != "user" || e.Origin != "user" {
-			return nil, Fail("APPROVAL_REQUIRED", "Voice-note conversion requires user approval")
-		}
-		source, err := k.MeetingSource(ctx, e, str(r["meetingId"]))
-		if err != nil {
-			return nil, err
-		}
-		if source.EvidenceHash != str(r["evidenceHash"]) {
-			return nil, Fail("STALE_CITATION", "Transcript changed; review the conversion again")
-		}
-		title, body, kind := strings.TrimSpace(str(r["title"])), str(r["body"]), str(r["kind"])
-		if title == "" || len(title) > 512 || len(body) > 100000 || (kind != "page" && kind != "task") {
-			return nil, Fail("INVALID_REQUEST", "Review a title and text before creating a page or task")
-		}
-		page, block := NewID(), NewID()
-		commands := []any{}
-		guards := []contracts.ServiceExpectedRevision{required("page", source.PageID, source.PageRevision), required("page", page, "0"), required("block", block, "0")}
-		if kind == "page" {
-			commands = append(commands, map[string]any{"kind": "page.create", "pageId": page, "parentPageId": source.PageID, "title": title})
-		} else {
-			var collection, status string
-			err = k.db.QueryRowContext(ctx, "SELECT c.id,p.id FROM collections c JOIN properties p ON p.collection_id=c.id AND p.type='status' WHERE c.system_role='tasks' ORDER BY p.id LIMIT 1").Scan(&collection, &status)
-			if errors.Is(err, sql.ErrNoRows) {
-				taskPage, titleProperty, due := NewID(), NewID(), NewID()
-				collection, status = NewID(), NewID()
-				commands = append(commands, map[string]any{"kind": "tasks.ensure", "pageId": taskPage, "collectionId": collection, "titlePropertyId": titleProperty, "statusPropertyId": status, "duePropertyId": due, "defaultOptionId": NewID(), "doneOptionId": NewID()})
-				guards = append(guards, required("page", taskPage, "0"), required("collection", collection, "0"), required("property", titleProperty, "0"), required("property", status, "0"), required("property", due, "0"))
-			} else if err != nil {
-				return nil, err
-			} else {
-				cg, err := k.currentGuard(ctx, "collection", collection)
-				if err != nil {
-					return nil, err
-				}
-				sg, err := k.currentGuard(ctx, "property", status)
-				if err != nil {
-					return nil, err
-				}
-				guards = append(guards, cg, sg)
-			}
-			record := NewID()
-			guards = append(guards, required("record", record, "0"))
-			commands = append(commands, map[string]any{"kind": "task.create", "recordId": record, "pageId": page, "collectionId": collection, "statusPropertyId": status, "title": title})
-		}
-		commands = append(commands, map[string]any{"kind": "block.insert", "block": map[string]any{"blockId": block, "pageId": page, "type": "paragraph", "schemaVersion": 1, "data": map[string]any{"richText": []any{map[string]any{"text": body}, map[string]any{"text": "\nSource meeting", "link": "trove://page/" + source.PageID}}}}})
-		if err = k.recordingBatch(ctx, e, "voice-note-"+NewID(), commands, guards); err != nil {
-			return nil, err
-		}
-		return map[string]any{"pageId": page, "kind": kind}, nil
 	})
 }

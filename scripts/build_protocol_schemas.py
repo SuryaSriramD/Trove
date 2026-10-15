@@ -57,9 +57,10 @@ commands={
 'LinkCollection':tagged('container.linkCollection',{'containerId':D('Id'),'collectionId':D('Id')}),
 'CreateTask':tagged('task.create',{'recordId':D('Id'),'pageId':D('Id'),'title':S,'collectionId':D('Id'),'statusPropertyId':D('Id')},['recordId','pageId','title']),
 'EnsureTasks':tagged('tasks.ensure',{key:D('Id') for key in ['pageId','collectionId','titlePropertyId','statusPropertyId','duePropertyId','defaultOptionId','doneOptionId']}),
-'PromoteTask':tagged('task.promote',{'recordId':D('Id'),'statusPropertyId':D('Id')}),
+'PromoteTask':tagged('task.promote',{'recordId':D('Id'),'statusPropertyId':D('Id'),'duePropertyId':D('Id')},['recordId','statusPropertyId']),
 'SetTaskStatus':tagged('task.setStatus',{'recordId':D('Id'),'statusOptionId':D('Id')}),
 'AttachFile':tagged('file.attach',{'fileId':D('Id'),'ingestHandle':D('Id'),'pageId':D('Id'),'blockId':D('Id')},['fileId','ingestHandle','pageId']),
+'RecordMeetingExtraction':tagged('meeting.extraction.record',{'proposalId':D('Id'),'itemId':{'type':'string','minLength':1,'maxLength':128},'title':{'type':'string','minLength':1,'maxLength':512},'body':{'type':'string','maxLength':100000}}),
 'CreateMeeting':tagged('meeting.create',{'meetingId':D('Id'),'pageId':D('Id'),'recordingFileId':D('Id'),'startedAt':D('Timestamp')}),
 'AppendTranscript':tagged('meeting.appendSegments',{'meetingId':D('Id'),'segments':arr(obj({'segmentId':D('Id'),'blockId':D('Id'),'startMs':N,'endMs':N,'text':S,'speakerLabel':S},['segmentId','blockId','startMs','endMs','text']),256)}),
 'FinalizeMeeting':tagged('meeting.finalize',{'meetingId':D('Id'),'durationMs':N}),
@@ -119,6 +120,13 @@ commands['SaveAutomation']['properties']['rule']=R('AutomationRule')
 defs.update(commands)
 defs['Command']={'oneOf':[R(n) for n in commands]}
 header={'contractVersion':{'const':1},'requestId':D('Id'),'workspaceId':D('Id')}
+defs['MeetingExtractionResult']=obj({'version':{'const':1},'proposalId':D('Id'),'itemId':{'type':'string','minLength':1,'maxLength':128},'meetingId':D('Id'),'evidenceHash':{'type':'string','pattern':'^[0-9a-f]{64}$'},'kind':enum('page','task'),'title':S,'body':S,'pageId':D('Id'),'recordId':D('Id'),'appliedAt':D('Timestamp'),'stale':B},['version','proposalId','itemId','meetingId','evidenceHash','kind','title','body','pageId','stale'])
+defs['MeetingExtractionApplyResult']=obj({'pageId':D('Id'),'recordId':S,'kind':enum('page','task'),'proposalId':D('Id'),'itemId':S,'reused':B})
+defs['MeetingExtractionPrepareRequest']=obj({**header,'meetingId':D('Id'),'kind':enum('page','task'),'draftId':D('Id'),'itemIndex':{'type':'integer','minimum':0,'maximum':249}},[*header,'meetingId','kind'])
+defs['MeetingExtractionPrepareRequest']['dependentRequired']={'draftId':['itemIndex'],'itemIndex':['draftId']}
+defs['MeetingExtractionListRequest']=obj({**header,'meetingId':D('Id')})
+defs['MeetingExtractionCreateRequest']=obj({**header,'meetingId':D('Id'),'evidenceHash':{'type':'string','pattern':'^[0-9a-f]{64}$'},'kind':enum('page','task'),'title':{'type':'string','minLength':1,'maxLength':512},'body':{'type':'string','maxLength':100000},'proposalId':D('Id'),'itemId':{'type':'string','minLength':1,'maxLength':128}},[*header,'meetingId','evidenceHash','kind','title','body'])
+defs['MeetingExtractionCreateRequest']['dependentRequired']={'proposalId':['itemId'],'itemId':['proposalId']}
 defs['AutomationOptionsRequest']=obj({**header,'pageId':D('Id')})
 defs['TemplatePropertyDecision']={'oneOf':[obj({'sourcePropertyId':D('Id'),'action':{'const':'omit'}}),obj({'sourcePropertyId':D('Id'),'action':{'const':'map'},'targetPropertyId':D('Id'),'value':json_value})]}
 defs['TemplatePreviewRequest']=obj({**header,'templateId':D('Id'),'title':{'type':'string','minLength':1,'maxLength':2000},'collectionId':D('Id'),'propertyDecisions':arr(R('TemplatePropertyDecision'),256)},[*header,'templateId','title'])

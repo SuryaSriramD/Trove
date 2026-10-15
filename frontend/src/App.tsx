@@ -1,5 +1,6 @@
 import { OperationHistory } from "./OperationHistory";
 import { PageFreshness, ReviewQueue } from "./PageFreshness";
+import { TaskEditor } from "./tasks/TaskEditor";
 import SupportBundlePanel from "./SupportBundlePanel";
 import { useEffect, useState, useCallback, useMemo, useRef } from "react";
 import {
@@ -1276,6 +1277,7 @@ export default function App() {
                       </button>
                     </div>
                   </div>
+                  {w.taskFacets.length > 0 && <section aria-label="Tasks on Home"><h2>Your tasks</h2>{w.taskFacets.slice(0, 5).map(f => <TaskEditor key={f.recordId} workspace={w} recordId={f.recordId} openPage={navigate} onCommitted={refresh} onError={errorHandler}/>)}</section>}
                 </>
               ) : surface === "Tasks" ? (
                 <>
@@ -1300,42 +1302,7 @@ export default function App() {
                     <button className="primary">Add task</button>
                   </form>
                   <div className="task-list">
-                    {w.taskFacets.map((f) => {
-                      const r = w.records.find((r) => r.id === f.recordId);
-                      const p = r ? visibleById.get(r.pageId) : undefined;
-                      const prop = w.properties.find(
-                        (p) => p.id === f.statusPropertyId,
-                      );
-                      const value = r?.values.find(
-                        (v) => v.propertyId === f.statusPropertyId,
-                      )?.value;
-                      const option = (prop?.config as any)?.options?.find(
-                        (o: any) => o.id === value,
-                      );
-                      return r && p ? (
-                        <div className="task-row" key={r.id}>
-                          <input
-                            type="checkbox"
-                            aria-label={`Complete ${p.title}`}
-                            checked={option?.group === "done"}
-                            onChange={() => void toggleTask(r.id)}
-                          />
-                          <button
-                            className={option?.group === "done" ? "done" : ""}
-                            onClick={() => navigate(p.id)}
-                          >
-                            {p.title}
-                          </button>
-                          <span>
-                            {
-                              w.collections.find((c) => c.id === r.collectionId)
-                                ?.title
-                            }
-                          </span>
-                          <small>{option?.label}</small>
-                        </div>
-                      ) : null;
-                    })}
+                    {w.taskFacets.map(f => <TaskEditor key={f.recordId} workspace={w} recordId={f.recordId} openPage={navigate} onCommitted={refresh} onError={errorHandler}/>)}
                   </div>
                   {!w.taskFacets.length && (
                     <div className="empty-state">
