@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"os"
 	"path/filepath"
@@ -11,16 +12,17 @@ import (
 
 	"github.com/wailsapp/wails/v2/pkg/runtime"
 	"trove.local/phase0/internal/native"
-	"trove.local/phase0/internal/workspace"
 )
 
 type nativeState struct {
-	mu            sync.Mutex
-	manager       *native.Manager
-	supervisor    *native.Supervisor
-	catalog       []native.Pack
-	cancellations map[string]context.CancelFunc
-	err           string
+	mu                sync.Mutex
+	manager           *native.Manager
+	supervisor        *native.Supervisor
+	catalog           []native.Pack
+	cancellations     map[string]context.CancelFunc
+	operations        map[string]modelOperation
+	operationRevision uint64
+	err               string
 }
 
 func nativeBundlePath() string {
@@ -92,24 +94,30 @@ func (a *App) nativeDispatch(method string, raw json.RawMessage) string {
 	success := func(v any) string { b, _ := json.Marshal(map[string]any{"ok": true, "result": v}); return string(b) }
 	switch method {
 	case "models.list", "models.status":
+		n.mu.Lock()
+		observedRevision := n.operationRevision
+		n.mu.Unlock()
 		packs, err := n.manager.List()
 		if err != nil {
 			return errorEnvelope("INTERNAL", err.Error())
 		}
-		return success(map[string]any{"packs": packs, "catalog": n.catalog, "runtime": map[string]any{"available": n.supervisor != nil, "visionAvailable": n.supervisor.VisionAvailable(), "error": n.err}})
+		return success(map[string]any{"packs": packs, "operations": n.modelOperations(packs, observedRevision), "catalog": n.catalog, "runtime": map[string]any{"available": n.supervisor != nil, "visionAvailable": n.supervisor.VisionAvailable(), "error": n.err}})
 	case "models.cancel":
-		n.mu.Lock()
-		cancel := n.cancellations[input.PackID]
-		n.mu.Unlock()
-		if cancel != nil {
-			cancel()
+		result, ok := n.cancelModelOperation(input.PackID)
+		if !ok {
+			return errorEnvelope("NOT_FOUND", "No model operation is active")
 		}
-		return success(map[string]any{"packId": input.PackID, "state": "cancellation_requested"})
+		return success(result)
 	case "models.remove":
+		n.mu.Lock()
+		defer n.mu.Unlock()
+		if n.cancellations[input.PackID] != nil {
+			return errorEnvelope("RESOURCE_EXHAUSTED", "Model acquisition is still running")
+		}
 		if err := n.manager.Remove(input.PackID); err != nil {
 			return errorEnvelope("RESOURCE_EXHAUSTED", err.Error())
 		}
-		return success(map[string]any{"packId": input.PackID, "state": "removed"})
+		return success(n.updateModelOperationLocked(input.PackID, "removed", 0, ""))
 	case "models.acquire":
 		var pack *native.Pack
 		for _, p := range n.catalog {
@@ -129,20 +137,18 @@ func (a *App) nativeDispatch(method string, raw json.RawMessage) string {
 		}
 		ctx, cancel := context.WithCancel(a.ctx)
 		n.cancellations[pack.ID] = cancel
+		started := n.startModelOperationLocked(pack.ID, "acquiring")
 		n.mu.Unlock()
-		id := workspace.NewID()
 		go func() {
 			defer cancel()
-			defer func() { n.mu.Lock(); delete(n.cancellations, pack.ID); n.mu.Unlock() }()
 			err := n.manager.Acquire(ctx, *pack, a.modelProgress(pack.ID, "acquiring"))
-			event := map[string]any{"packId": pack.ID, "state": "ready"}
+			state, failure := "ready", ""
 			if err != nil {
-				event["state"] = "interrupted"
-				event["error"] = err.Error()
+				state, failure = "interrupted", err.Error()
 			}
-			runtime.EventsEmit(a.ctx, "models:progress", event)
+			runtime.EventsEmit(a.ctx, "models:progress", n.updateModelOperation(pack.ID, state, -1, failure))
 		}()
-		return success(map[string]any{"acquisitionId": id, "packId": pack.ID, "state": "acquiring"})
+		return success(started)
 	default:
 		return errorEnvelope("INVALID_REQUEST", "Unknown model operation")
 	}
@@ -183,10 +189,10 @@ func (a *App) PickModelPack(packID string) error {
 	}
 	ctx, cancel := context.WithCancel(a.ctx)
 	n.cancellations[packID] = cancel
+	started := n.startModelOperationLocked(packID, "importing")
 	n.mu.Unlock()
 	defer cancel()
-	defer func() { n.mu.Lock(); delete(n.cancellations, packID); n.mu.Unlock() }()
-	runtime.EventsEmit(a.ctx, "models:progress", map[string]any{"packId": packID, "state": "importing", "bytes": 0})
+	runtime.EventsEmit(a.ctx, "models:progress", started)
 	if pack.Projector != nil {
 		path, pickErr := runtime.OpenFileDialog(a.ctx, runtime.OpenDialogOptions{Title: "Import matching verified vision projector"})
 		if pickErr != nil {
@@ -209,11 +215,14 @@ func (a *App) PickModelPack(packID string) error {
 	if err != nil {
 		state = "failed"
 	}
-	event := map[string]any{"packId": packID, "state": state}
+	failure := ""
 	if err != nil {
-		event["error"] = err.Error()
+		failure = err.Error()
 	}
-	runtime.EventsEmit(a.ctx, "models:progress", event)
+	if errors.Is(err, context.Canceled) {
+		state = "interrupted"
+	}
+	runtime.EventsEmit(a.ctx, "models:progress", n.updateModelOperation(packID, state, -1, failure))
 	return err
 }
 
@@ -224,7 +233,7 @@ func (a *App) modelProgress(packID, state string) func(int64) {
 			return
 		}
 		last = time.Now()
-		runtime.EventsEmit(a.ctx, "models:progress", map[string]any{"packId": packID, "bytes": bytes, "state": state})
+		runtime.EventsEmit(a.ctx, "models:progress", a.native.updateModelOperation(packID, state, bytes, ""))
 	}
 }
 
