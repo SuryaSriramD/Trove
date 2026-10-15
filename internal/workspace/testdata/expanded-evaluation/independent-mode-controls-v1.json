@@ -1,0 +1,1247 @@
+{
+  "schemaVersion": 1,
+  "family": "independent_mode_controls_v1",
+  "createdAtUTC": "2026-10-15T19:50:50Z",
+  "createdAtLocal": "2026-10-16T01:20:50+05:30",
+  "kind": "synthetic_independent_predeclared_controls",
+  "description": "Sixteen fresh controls locked before inspecting any proposed production mode or answer-relevance patch. Four cases per requested mode; complete title/case/punctuation, graph/message semantics, literal and selected-code preservation, and balanced supported/absent benefits with explicit suggestion policy.",
+  "independence": {
+    "productionCandidatePatchInspected": false,
+    "newCaseModelOutputsObserved": false,
+    "sourceCheckoutRead": "022684124746ae8c7bafc244dbae516bfd7fa46a",
+    "readScope": [
+      "existing expanded mode case shape/oracles/runner",
+      "existing original transfer runner",
+      "existing mode corpus examples"
+    ],
+    "frozenExecutionCheckoutModified": false
+  },
+  "requestBoundary": "Only mode, title, source, prompt, selection and useMemory enter the production request. Expected facts, goldens, counterexamples and oracle metadata are evaluation-only and must never be included in model context.",
+  "model": {
+    "pack": "01990000-0000-7000-8000-000000000106",
+    "contextTokens": 8192,
+    "outputTokens": 512,
+    "generationAttemptsPerCase": 1,
+    "hiddenRetries": 0
+  },
+  "executionPolicy": {
+    "beforeRuns": 1,
+    "afterRuns": 1,
+    "sameModelHelperHarnessFixtureBytes": true,
+    "recordEveryAttemptAndFailure": true,
+    "missingSkippedInterruptedAreNotPasses": true,
+    "noPromptOrOracleTuningFromPilotOutputs": true,
+    "separateFreshEvidenceDirectories": true,
+    "nativeModelSlotRequired": true
+  },
+  "balance": {
+    "database": 4,
+    "mermaid": 4,
+    "code_comment": 4,
+    "expand": 4,
+    "expandBenefitState": {
+      "supported": 2,
+      "absent": 2
+    },
+    "expandSuggestionPolicy": {
+      "forbidden": 2,
+      "required-labeled": 2
+    }
+  },
+  "compatibility": {
+    "baseShape": "expandedModeCase with explicit versioned semanticOracle metadata and optional selection",
+    "automaticExecutionEnabled": false,
+    "notDropInForLegacy42CaseLoader": true,
+    "adapterRequirements": [
+      "Separate locked loader; never replace heldout-modes.json or transfer-20261009.json.",
+      "Carry selection into AIRequest and validate exact unselected prefix/suffix in prepared replacement proposals.",
+      "Use Mermaid semantic parsing for requested flowchart direction and sequence message order/arrow kind; line matching or accepted parse alone is insufficient.",
+      "Keep Go non-comment AST/token/literal identity and useful accurate comment assessment separate.",
+      "Evaluate every prose clause against locked source and explicit suggestion policy; keyword presence alone is not semantic success.",
+      "Run golden and locked counterexample checks before the native pilot.",
+      "Retain raw actual request, supplied evidence, system/user prompts, grammar, output, one-generation count, proposal review boundary and exact canonical snapshots."
+    ],
+    "automatedExecutionIsNotSemanticPass": true
+  },
+  "releaseQualified": false,
+  "cases": [
+    {
+      "id": "mode-control-db-complete-title",
+      "mode": "database",
+      "title": "Database schema request",
+      "source": "",
+      "prompt": "Create a table database called \"Juniper Equipment Checkout\". Include exactly these columns: Asset ID as text; Returned? as a checkbox; Fee (USD) as a decimal number. Do not add sample records. Return only the canonical schema.",
+      "selection": "",
+      "useMemory": false,
+      "memories": [],
+      "outsidePages": [],
+      "oracle": "database_exact_v1",
+      "manualSemanticReviewRequired": true,
+      "allClausesMustPass": true,
+      "expectedTitle": "Juniper Equipment Checkout",
+      "properties": [
+        {
+          "name": "Asset ID",
+          "type": "text",
+          "config": {}
+        },
+        {
+          "name": "Returned?",
+          "type": "checkbox",
+          "config": {}
+        },
+        {
+          "name": "Fee (USD)",
+          "type": "number",
+          "config": {
+            "format": "decimal"
+          }
+        }
+      ],
+      "view": "table",
+      "proposal": "create_database",
+      "golden": "{\"title\": \"Juniper Equipment Checkout\", \"properties\": [{\"name\": \"Asset ID\", \"type\": \"text\", \"config\": {}}, {\"name\": \"Returned?\", \"type\": \"checkbox\", \"config\": {}}, {\"name\": \"Fee (USD)\", \"type\": \"number\", \"config\": {\"format\": \"decimal\"}}], \"view\": \"table\"}",
+      "required": [
+        "Preserve the entire requested database title, including exact capitalization, spaces and punctuation.",
+        "Return one JSON object with title, properties and view; no commentary, fences, sample rows or additional keys.",
+        "Use exactly the requested property names, types and configurations; property ordering is not significant.",
+        "Prepare only an unapplied database proposal; canonical workspace content remains unchanged."
+      ],
+      "forbidden": [
+        "Dropping a title word or normalizing its punctuation/capitalization.",
+        "Adding inferred properties, sample records, defaults or formulas."
+      ],
+      "counterexamples": [
+        {
+          "kind": "truncated_or_normalized_title",
+          "output": "{\"title\": \"Juniper Equipment\", \"properties\": [{\"name\": \"Asset ID\", \"type\": \"text\", \"config\": {}}, {\"name\": \"Returned?\", \"type\": \"checkbox\", \"config\": {}}, {\"name\": \"Fee (USD)\", \"type\": \"number\", \"config\": {\"format\": \"decimal\"}}], \"view\": \"table\"}",
+          "mustReject": true,
+          "reason": "The full exact title is a required output value."
+        },
+        {
+          "kind": "property_case_changed",
+          "output": "{\"title\": \"Juniper Equipment Checkout\", \"properties\": [{\"name\": \"asset id\", \"type\": \"text\", \"config\": {}}, {\"name\": \"Returned?\", \"type\": \"checkbox\", \"config\": {}}, {\"name\": \"Fee (USD)\", \"type\": \"number\", \"config\": {\"format\": \"decimal\"}}], \"view\": \"table\"}",
+          "mustReject": true,
+          "reason": "Property names are exact, case-sensitive requested values."
+        },
+        {
+          "kind": "property_type_changed",
+          "output": "{\"title\": \"Juniper Equipment Checkout\", \"properties\": [{\"name\": \"Asset ID\", \"type\": \"checkbox\", \"config\": {}}, {\"name\": \"Returned?\", \"type\": \"checkbox\", \"config\": {}}, {\"name\": \"Fee (USD)\", \"type\": \"number\", \"config\": {\"format\": \"decimal\"}}], \"view\": \"table\"}",
+          "mustReject": true,
+          "reason": "The first requested text property must remain text."
+        },
+        {
+          "kind": "unrequested_rows",
+          "output": "{\"title\": \"Juniper Equipment Checkout\", \"properties\": [{\"name\": \"Asset ID\", \"type\": \"text\", \"config\": {}}, {\"name\": \"Returned?\", \"type\": \"checkbox\", \"config\": {}}, {\"name\": \"Fee (USD)\", \"type\": \"number\", \"config\": {\"format\": \"decimal\"}}], \"view\": \"table\", \"rows\": [{\"invented\": \"sample\"}]}",
+          "mustReject": true,
+          "reason": "A syntactically valid object must still reject unrequested sample records."
+        }
+      ]
+    },
+    {
+      "id": "mode-control-db-case-sensitive",
+      "mode": "database",
+      "title": "Database schema request",
+      "source": "",
+      "prompt": "Create a table database called \"API Follow-up Register\". Include exactly these columns: assetURL as text; HTTP status as a decimal number; Verified as a checkbox. Do not add sample records. Return only the canonical schema.",
+      "selection": "",
+      "useMemory": false,
+      "memories": [],
+      "outsidePages": [],
+      "oracle": "database_exact_v1",
+      "manualSemanticReviewRequired": true,
+      "allClausesMustPass": true,
+      "expectedTitle": "API Follow-up Register",
+      "properties": [
+        {
+          "name": "assetURL",
+          "type": "text",
+          "config": {}
+        },
+        {
+          "name": "HTTP status",
+          "type": "number",
+          "config": {
+            "format": "decimal"
+          }
+        },
+        {
+          "name": "Verified",
+          "type": "checkbox",
+          "config": {}
+        }
+      ],
+      "view": "table",
+      "proposal": "create_database",
+      "golden": "{\"title\": \"API Follow-up Register\", \"properties\": [{\"name\": \"assetURL\", \"type\": \"text\", \"config\": {}}, {\"name\": \"HTTP status\", \"type\": \"number\", \"config\": {\"format\": \"decimal\"}}, {\"name\": \"Verified\", \"type\": \"checkbox\", \"config\": {}}], \"view\": \"table\"}",
+      "required": [
+        "Preserve the entire requested database title, including exact capitalization, spaces and punctuation.",
+        "Return one JSON object with title, properties and view; no commentary, fences, sample rows or additional keys.",
+        "Use exactly the requested property names, types and configurations; property ordering is not significant.",
+        "Prepare only an unapplied database proposal; canonical workspace content remains unchanged."
+      ],
+      "forbidden": [
+        "Dropping a title word or normalizing its punctuation/capitalization.",
+        "Adding inferred properties, sample records, defaults or formulas."
+      ],
+      "counterexamples": [
+        {
+          "kind": "truncated_or_normalized_title",
+          "output": "{\"title\": \"Api Follow-Up Register\", \"properties\": [{\"name\": \"assetURL\", \"type\": \"text\", \"config\": {}}, {\"name\": \"HTTP status\", \"type\": \"number\", \"config\": {\"format\": \"decimal\"}}, {\"name\": \"Verified\", \"type\": \"checkbox\", \"config\": {}}], \"view\": \"table\"}",
+          "mustReject": true,
+          "reason": "The full exact title is a required output value."
+        },
+        {
+          "kind": "property_case_changed",
+          "output": "{\"title\": \"API Follow-up Register\", \"properties\": [{\"name\": \"asseturl\", \"type\": \"text\", \"config\": {}}, {\"name\": \"HTTP status\", \"type\": \"number\", \"config\": {\"format\": \"decimal\"}}, {\"name\": \"Verified\", \"type\": \"checkbox\", \"config\": {}}], \"view\": \"table\"}",
+          "mustReject": true,
+          "reason": "Property names are exact, case-sensitive requested values."
+        },
+        {
+          "kind": "property_type_changed",
+          "output": "{\"title\": \"API Follow-up Register\", \"properties\": [{\"name\": \"assetURL\", \"type\": \"checkbox\", \"config\": {}}, {\"name\": \"HTTP status\", \"type\": \"number\", \"config\": {\"format\": \"decimal\"}}, {\"name\": \"Verified\", \"type\": \"checkbox\", \"config\": {}}], \"view\": \"table\"}",
+          "mustReject": true,
+          "reason": "The first requested text property must remain text."
+        },
+        {
+          "kind": "unrequested_rows",
+          "output": "{\"title\": \"API Follow-up Register\", \"properties\": [{\"name\": \"assetURL\", \"type\": \"text\", \"config\": {}}, {\"name\": \"HTTP status\", \"type\": \"number\", \"config\": {\"format\": \"decimal\"}}, {\"name\": \"Verified\", \"type\": \"checkbox\", \"config\": {}}], \"view\": \"table\", \"rows\": [{\"invented\": \"sample\"}]}",
+          "mustReject": true,
+          "reason": "A syntactically valid object must still reject unrequested sample records."
+        }
+      ]
+    },
+    {
+      "id": "mode-control-db-punctuation",
+      "mode": "database",
+      "title": "Database schema request",
+      "source": "",
+      "prompt": "Create a table database called \"Small Parts: Returns (West)\". Include exactly these columns: Lot # as text; QA/pass? as a checkbox; Unit-cost as a decimal number. Do not add sample records. Return only the canonical schema.",
+      "selection": "",
+      "useMemory": false,
+      "memories": [],
+      "outsidePages": [],
+      "oracle": "database_exact_v1",
+      "manualSemanticReviewRequired": true,
+      "allClausesMustPass": true,
+      "expectedTitle": "Small Parts: Returns (West)",
+      "properties": [
+        {
+          "name": "Lot #",
+          "type": "text",
+          "config": {}
+        },
+        {
+          "name": "QA/pass?",
+          "type": "checkbox",
+          "config": {}
+        },
+        {
+          "name": "Unit-cost",
+          "type": "number",
+          "config": {
+            "format": "decimal"
+          }
+        }
+      ],
+      "view": "table",
+      "proposal": "create_database",
+      "golden": "{\"title\": \"Small Parts: Returns (West)\", \"properties\": [{\"name\": \"Lot #\", \"type\": \"text\", \"config\": {}}, {\"name\": \"QA/pass?\", \"type\": \"checkbox\", \"config\": {}}, {\"name\": \"Unit-cost\", \"type\": \"number\", \"config\": {\"format\": \"decimal\"}}], \"view\": \"table\"}",
+      "required": [
+        "Preserve the entire requested database title, including exact capitalization, spaces and punctuation.",
+        "Return one JSON object with title, properties and view; no commentary, fences, sample rows or additional keys.",
+        "Use exactly the requested property names, types and configurations; property ordering is not significant.",
+        "Prepare only an unapplied database proposal; canonical workspace content remains unchanged."
+      ],
+      "forbidden": [
+        "Dropping a title word or normalizing its punctuation/capitalization.",
+        "Adding inferred properties, sample records, defaults or formulas."
+      ],
+      "counterexamples": [
+        {
+          "kind": "truncated_or_normalized_title",
+          "output": "{\"title\": \"Small Parts Returns West\", \"properties\": [{\"name\": \"Lot #\", \"type\": \"text\", \"config\": {}}, {\"name\": \"QA/pass?\", \"type\": \"checkbox\", \"config\": {}}, {\"name\": \"Unit-cost\", \"type\": \"number\", \"config\": {\"format\": \"decimal\"}}], \"view\": \"table\"}",
+          "mustReject": true,
+          "reason": "The full exact title is a required output value."
+        },
+        {
+          "kind": "property_case_changed",
+          "output": "{\"title\": \"Small Parts: Returns (West)\", \"properties\": [{\"name\": \"lot #\", \"type\": \"text\", \"config\": {}}, {\"name\": \"QA/pass?\", \"type\": \"checkbox\", \"config\": {}}, {\"name\": \"Unit-cost\", \"type\": \"number\", \"config\": {\"format\": \"decimal\"}}], \"view\": \"table\"}",
+          "mustReject": true,
+          "reason": "Property names are exact, case-sensitive requested values."
+        },
+        {
+          "kind": "property_type_changed",
+          "output": "{\"title\": \"Small Parts: Returns (West)\", \"properties\": [{\"name\": \"Lot #\", \"type\": \"checkbox\", \"config\": {}}, {\"name\": \"QA/pass?\", \"type\": \"checkbox\", \"config\": {}}, {\"name\": \"Unit-cost\", \"type\": \"number\", \"config\": {\"format\": \"decimal\"}}], \"view\": \"table\"}",
+          "mustReject": true,
+          "reason": "The first requested text property must remain text."
+        },
+        {
+          "kind": "unrequested_rows",
+          "output": "{\"title\": \"Small Parts: Returns (West)\", \"properties\": [{\"name\": \"Lot #\", \"type\": \"text\", \"config\": {}}, {\"name\": \"QA/pass?\", \"type\": \"checkbox\", \"config\": {}}, {\"name\": \"Unit-cost\", \"type\": \"number\", \"config\": {\"format\": \"decimal\"}}], \"view\": \"table\", \"rows\": [{\"invented\": \"sample\"}]}",
+          "mustReject": true,
+          "reason": "A syntactically valid object must still reject unrequested sample records."
+        }
+      ]
+    },
+    {
+      "id": "mode-control-db-multiword-slash",
+      "mode": "database",
+      "title": "Database schema request",
+      "source": "",
+      "prompt": "Create a table database called \"Aster / Cedar exchange\". Include exactly these columns: Parcel label as text; Received as a checkbox; Quantity as a decimal number. Do not add sample records. Return only the canonical schema.",
+      "selection": "",
+      "useMemory": false,
+      "memories": [],
+      "outsidePages": [],
+      "oracle": "database_exact_v1",
+      "manualSemanticReviewRequired": true,
+      "allClausesMustPass": true,
+      "expectedTitle": "Aster / Cedar exchange",
+      "properties": [
+        {
+          "name": "Parcel label",
+          "type": "text",
+          "config": {}
+        },
+        {
+          "name": "Received",
+          "type": "checkbox",
+          "config": {}
+        },
+        {
+          "name": "Quantity",
+          "type": "number",
+          "config": {
+            "format": "decimal"
+          }
+        }
+      ],
+      "view": "table",
+      "proposal": "create_database",
+      "golden": "{\"title\": \"Aster / Cedar exchange\", \"properties\": [{\"name\": \"Parcel label\", \"type\": \"text\", \"config\": {}}, {\"name\": \"Received\", \"type\": \"checkbox\", \"config\": {}}, {\"name\": \"Quantity\", \"type\": \"number\", \"config\": {\"format\": \"decimal\"}}], \"view\": \"table\"}",
+      "required": [
+        "Preserve the entire requested database title, including exact capitalization, spaces and punctuation.",
+        "Return one JSON object with title, properties and view; no commentary, fences, sample rows or additional keys.",
+        "Use exactly the requested property names, types and configurations; property ordering is not significant.",
+        "Prepare only an unapplied database proposal; canonical workspace content remains unchanged."
+      ],
+      "forbidden": [
+        "Dropping a title word or normalizing its punctuation/capitalization.",
+        "Adding inferred properties, sample records, defaults or formulas."
+      ],
+      "counterexamples": [
+        {
+          "kind": "truncated_or_normalized_title",
+          "output": "{\"title\": \"Aster / Cedar\", \"properties\": [{\"name\": \"Parcel label\", \"type\": \"text\", \"config\": {}}, {\"name\": \"Received\", \"type\": \"checkbox\", \"config\": {}}, {\"name\": \"Quantity\", \"type\": \"number\", \"config\": {\"format\": \"decimal\"}}], \"view\": \"table\"}",
+          "mustReject": true,
+          "reason": "The full exact title is a required output value."
+        },
+        {
+          "kind": "property_case_changed",
+          "output": "{\"title\": \"Aster / Cedar exchange\", \"properties\": [{\"name\": \"parcel label\", \"type\": \"text\", \"config\": {}}, {\"name\": \"Received\", \"type\": \"checkbox\", \"config\": {}}, {\"name\": \"Quantity\", \"type\": \"number\", \"config\": {\"format\": \"decimal\"}}], \"view\": \"table\"}",
+          "mustReject": true,
+          "reason": "Property names are exact, case-sensitive requested values."
+        },
+        {
+          "kind": "property_type_changed",
+          "output": "{\"title\": \"Aster / Cedar exchange\", \"properties\": [{\"name\": \"Parcel label\", \"type\": \"checkbox\", \"config\": {}}, {\"name\": \"Received\", \"type\": \"checkbox\", \"config\": {}}, {\"name\": \"Quantity\", \"type\": \"number\", \"config\": {\"format\": \"decimal\"}}], \"view\": \"table\"}",
+          "mustReject": true,
+          "reason": "The first requested text property must remain text."
+        },
+        {
+          "kind": "unrequested_rows",
+          "output": "{\"title\": \"Aster / Cedar exchange\", \"properties\": [{\"name\": \"Parcel label\", \"type\": \"text\", \"config\": {}}, {\"name\": \"Received\", \"type\": \"checkbox\", \"config\": {}}, {\"name\": \"Quantity\", \"type\": \"number\", \"config\": {\"format\": \"decimal\"}}], \"view\": \"table\", \"rows\": [{\"invented\": \"sample\"}]}",
+          "mustReject": true,
+          "reason": "A syntactically valid object must still reject unrequested sample records."
+        }
+      ]
+    },
+    {
+      "id": "mode-control-mermaid-linear",
+      "mode": "mermaid",
+      "title": "Diagram request",
+      "source": "",
+      "prompt": "Draw a Mermaid flowchart from left to right: Pack goes to Seal, and Seal goes to Store. Use those exact node IDs and only those two edges. Do not add labels, styling, links, fences or commentary.",
+      "selection": "",
+      "useMemory": false,
+      "memories": [],
+      "outsidePages": [],
+      "oracle": "mermaid_semantic_v1",
+      "manualSemanticReviewRequired": true,
+      "allClausesMustPass": true,
+      "diagram": {
+        "kind": "flowchart",
+        "direction": "LR",
+        "nodes": [
+          "Pack",
+          "Seal",
+          "Store"
+        ],
+        "edges": [
+          {
+            "from": "Pack",
+            "to": "Seal",
+            "kind": "-->",
+            "label": ""
+          },
+          {
+            "from": "Seal",
+            "to": "Store",
+            "kind": "-->",
+            "label": ""
+          }
+        ]
+      },
+      "edges": [
+        [
+          "Pack",
+          "Seal"
+        ],
+        [
+          "Seal",
+          "Store"
+        ]
+      ],
+      "golden": "flowchart LR\nPack --> Seal\nSeal --> Store",
+      "proposal": "mermaid",
+      "required": [
+        "Parse as Mermaid of the explicitly requested diagram kind and direction.",
+        "Preserve the exact case-sensitive node identity set and directed edge multiset; no added, dropped, reversed or duplicated edges.",
+        "Semantically equivalent whitespace, semicolons or edge statement order are allowed.",
+        "No display labels, links, styles, fences or commentary; the proposal remains unapplied."
+      ],
+      "forbidden": [
+        "Converting a branch into a linear chain.",
+        "Treating differently cased node IDs as the same node.",
+        "Substituting another valid Mermaid diagram kind."
+      ],
+      "counterexamples": [
+        {
+          "kind": "missing_edge",
+          "output": "flowchart LR\nPack --> Seal",
+          "mustReject": true,
+          "reason": "A diagram that parses but drops one required relationship fails."
+        },
+        {
+          "kind": "reversed_edge",
+          "output": "flowchart LR\nSeal --> Pack\nSeal --> Store",
+          "mustReject": true,
+          "reason": "Edge direction is part of the source meaning."
+        },
+        {
+          "kind": "node_case_changed",
+          "output": "flowchart LR\npACK --> Seal\nSeal --> Store",
+          "mustReject": true,
+          "reason": "Case-sensitive node identities must not be normalized."
+        },
+        {
+          "kind": "extra_edge",
+          "output": "flowchart LR\nPack --> Seal\nSeal --> Store\nSpare --> Pack",
+          "mustReject": true,
+          "reason": "Additional nodes and relationships were not requested."
+        }
+      ]
+    },
+    {
+      "id": "mode-control-mermaid-branch",
+      "mode": "mermaid",
+      "title": "Diagram request",
+      "source": "",
+      "prompt": "Draw a top-to-bottom Mermaid flowchart with these exact edges: Receive to Check; Check to Accept; Check to Reject; Accept to Archive; Reject to Rework. Keep both branches. Use the given node IDs without labels, styling, links, fences or commentary.",
+      "selection": "",
+      "useMemory": false,
+      "memories": [],
+      "outsidePages": [],
+      "oracle": "mermaid_semantic_v1",
+      "manualSemanticReviewRequired": true,
+      "allClausesMustPass": true,
+      "diagram": {
+        "kind": "flowchart",
+        "direction": "TD",
+        "nodes": [
+          "Accept",
+          "Archive",
+          "Check",
+          "Receive",
+          "Reject",
+          "Rework"
+        ],
+        "edges": [
+          {
+            "from": "Receive",
+            "to": "Check",
+            "kind": "-->",
+            "label": ""
+          },
+          {
+            "from": "Check",
+            "to": "Accept",
+            "kind": "-->",
+            "label": ""
+          },
+          {
+            "from": "Check",
+            "to": "Reject",
+            "kind": "-->",
+            "label": ""
+          },
+          {
+            "from": "Accept",
+            "to": "Archive",
+            "kind": "-->",
+            "label": ""
+          },
+          {
+            "from": "Reject",
+            "to": "Rework",
+            "kind": "-->",
+            "label": ""
+          }
+        ]
+      },
+      "edges": [
+        [
+          "Receive",
+          "Check"
+        ],
+        [
+          "Check",
+          "Accept"
+        ],
+        [
+          "Check",
+          "Reject"
+        ],
+        [
+          "Accept",
+          "Archive"
+        ],
+        [
+          "Reject",
+          "Rework"
+        ]
+      ],
+      "golden": "flowchart TD\nReceive --> Check\nCheck --> Accept\nCheck --> Reject\nAccept --> Archive\nReject --> Rework",
+      "proposal": "mermaid",
+      "required": [
+        "Parse as Mermaid of the explicitly requested diagram kind and direction.",
+        "Preserve the exact case-sensitive node identity set and directed edge multiset; no added, dropped, reversed or duplicated edges.",
+        "Semantically equivalent whitespace, semicolons or edge statement order are allowed.",
+        "No display labels, links, styles, fences or commentary; the proposal remains unapplied."
+      ],
+      "forbidden": [
+        "Converting a branch into a linear chain.",
+        "Treating differently cased node IDs as the same node.",
+        "Substituting another valid Mermaid diagram kind."
+      ],
+      "counterexamples": [
+        {
+          "kind": "missing_edge",
+          "output": "flowchart TD\nReceive --> Check\nCheck --> Accept\nCheck --> Reject\nAccept --> Archive",
+          "mustReject": true,
+          "reason": "A diagram that parses but drops one required relationship fails."
+        },
+        {
+          "kind": "reversed_edge",
+          "output": "flowchart TD\nCheck --> Receive\nCheck --> Accept\nCheck --> Reject\nAccept --> Archive\nReject --> Rework",
+          "mustReject": true,
+          "reason": "Edge direction is part of the source meaning."
+        },
+        {
+          "kind": "node_case_changed",
+          "output": "flowchart TD\nrECEIVE --> Check\nCheck --> Accept\nCheck --> Reject\nAccept --> Archive\nReject --> Rework",
+          "mustReject": true,
+          "reason": "Case-sensitive node identities must not be normalized."
+        },
+        {
+          "kind": "extra_edge",
+          "output": "flowchart TD\nReceive --> Check\nCheck --> Accept\nCheck --> Reject\nAccept --> Archive\nReject --> Rework\nSpare --> Receive",
+          "mustReject": true,
+          "reason": "Additional nodes and relationships were not requested."
+        }
+      ]
+    },
+    {
+      "id": "mode-control-mermaid-case-distinct",
+      "mode": "mermaid",
+      "title": "Diagram request",
+      "source": "",
+      "prompt": "Draw a left-to-right Mermaid flowchart with the exact edges load to LOAD and LOAD to Loaded. These are three distinct node IDs. Do not add labels, other edges, styling, links, fences or commentary.",
+      "selection": "",
+      "useMemory": false,
+      "memories": [],
+      "outsidePages": [],
+      "oracle": "mermaid_semantic_v1",
+      "manualSemanticReviewRequired": true,
+      "allClausesMustPass": true,
+      "diagram": {
+        "kind": "flowchart",
+        "direction": "LR",
+        "nodes": [
+          "LOAD",
+          "Loaded",
+          "load"
+        ],
+        "edges": [
+          {
+            "from": "load",
+            "to": "LOAD",
+            "kind": "-->",
+            "label": ""
+          },
+          {
+            "from": "LOAD",
+            "to": "Loaded",
+            "kind": "-->",
+            "label": ""
+          }
+        ]
+      },
+      "edges": [
+        [
+          "load",
+          "LOAD"
+        ],
+        [
+          "LOAD",
+          "Loaded"
+        ]
+      ],
+      "golden": "flowchart LR\nload --> LOAD\nLOAD --> Loaded",
+      "proposal": "mermaid",
+      "required": [
+        "Parse as Mermaid of the explicitly requested diagram kind and direction.",
+        "Preserve the exact case-sensitive node identity set and directed edge multiset; no added, dropped, reversed or duplicated edges.",
+        "Semantically equivalent whitespace, semicolons or edge statement order are allowed.",
+        "No display labels, links, styles, fences or commentary; the proposal remains unapplied."
+      ],
+      "forbidden": [
+        "Converting a branch into a linear chain.",
+        "Treating differently cased node IDs as the same node.",
+        "Substituting another valid Mermaid diagram kind."
+      ],
+      "counterexamples": [
+        {
+          "kind": "missing_edge",
+          "output": "flowchart LR\nload --> LOAD",
+          "mustReject": true,
+          "reason": "A diagram that parses but drops one required relationship fails."
+        },
+        {
+          "kind": "reversed_edge",
+          "output": "flowchart LR\nLOAD --> load\nLOAD --> Loaded",
+          "mustReject": true,
+          "reason": "Edge direction is part of the source meaning."
+        },
+        {
+          "kind": "node_case_changed",
+          "output": "flowchart LR\nLOAD --> LOAD\nLOAD --> Loaded",
+          "mustReject": true,
+          "reason": "Case-sensitive node identities must not be normalized."
+        },
+        {
+          "kind": "extra_edge",
+          "output": "flowchart LR\nload --> LOAD\nLOAD --> Loaded\nSpare --> load",
+          "mustReject": true,
+          "reason": "Additional nodes and relationships were not requested."
+        }
+      ]
+    },
+    {
+      "id": "mode-control-mermaid-sequence-type",
+      "mode": "mermaid",
+      "title": "Message exchange request",
+      "source": "",
+      "prompt": "Create a Mermaid sequence diagram with participants Sensor, Gate and Console in that order. Sensor sends Gate a solid-arrow message named reading. Gate returns a dashed-arrow message named acknowledged to Sensor. Gate then sends Console a solid-arrow message named accepted. Keep that message order. Return only the diagram, without a fence.",
+      "selection": "",
+      "useMemory": false,
+      "memories": [],
+      "outsidePages": [],
+      "oracle": "mermaid_semantic_v1",
+      "manualSemanticReviewRequired": true,
+      "allClausesMustPass": true,
+      "diagram": {
+        "kind": "sequenceDiagram",
+        "participants": [
+          "Sensor",
+          "Gate",
+          "Console"
+        ],
+        "messages": [
+          {
+            "from": "Sensor",
+            "to": "Gate",
+            "kind": "->>",
+            "label": "reading"
+          },
+          {
+            "from": "Gate",
+            "to": "Sensor",
+            "kind": "-->>",
+            "label": "acknowledged"
+          },
+          {
+            "from": "Gate",
+            "to": "Console",
+            "kind": "->>",
+            "label": "accepted"
+          }
+        ]
+      },
+      "golden": "sequenceDiagram\nparticipant Sensor\nparticipant Gate\nparticipant Console\nSensor->>Gate: reading\nGate-->>Sensor: acknowledged\nGate->>Console: accepted",
+      "proposal": "mermaid",
+      "required": [
+        "The parsed kind is sequenceDiagram, with exactly the requested participants in order.",
+        "Preserve the ordered message list, exact participant/label case, direction and solid versus dashed arrow kind.",
+        "Ignore formatting-only whitespace; no added messages, actors, notes, links, styling, fences or commentary.",
+        "Retain an unapplied diagram proposal and unchanged canonical content."
+      ],
+      "forbidden": [
+        "Replacing the sequence with a flowchart having the same entity names.",
+        "Changing the acknowledgement into a forward or solid message."
+      ],
+      "counterexamples": [
+        {
+          "kind": "wrong_diagram_type",
+          "output": "flowchart LR\nSensor --> Gate\nGate --> Sensor\nGate --> Console",
+          "mustReject": true,
+          "reason": "The same entity relationships do not satisfy a requested sequence diagram."
+        },
+        {
+          "kind": "arrow_kind_changed",
+          "output": "sequenceDiagram\nparticipant Sensor\nparticipant Gate\nparticipant Console\nSensor->>Gate: reading\nGate->>Sensor: acknowledged\nGate->>Console: accepted",
+          "mustReject": true,
+          "reason": "A dashed reply must not become a solid send."
+        },
+        {
+          "kind": "message_order_changed",
+          "output": "sequenceDiagram\nparticipant Sensor\nparticipant Gate\nparticipant Console\nSensor->>Gate: reading\nGate->>Console: accepted\nGate-->>Sensor: acknowledged",
+          "mustReject": true,
+          "reason": "Message ordering is semantically meaningful."
+        },
+        {
+          "kind": "participant_case_changed",
+          "output": "sequenceDiagram\nparticipant sensor\nparticipant Gate\nparticipant Console\nsensor->>Gate: reading\nGate-->>sensor: acknowledged\nGate->>Console: accepted",
+          "mustReject": true,
+          "reason": "Exact participant identities must remain case-sensitive."
+        }
+      ]
+    },
+    {
+      "id": "mode-control-go-escaped-newline",
+      "mode": "code_comment",
+      "title": "Go source",
+      "source": "func Pair() string { return \"first\\nsecond\" }",
+      "prompt": "Add a useful Go comment to Pair explaining its return value. Preserve the function and string literal exactly; return only the complete commented function.",
+      "selection": "",
+      "useMemory": false,
+      "memories": [],
+      "outsidePages": [],
+      "oracle": "go_comment_token_ast_v1",
+      "manualSemanticReviewRequired": true,
+      "allClausesMustPass": true,
+      "expectedCode": "func Pair() string { return \"first\\nsecond\" }",
+      "requireComment": true,
+      "golden": "// Pair returns two words separated by a newline.\nfunc Pair() string { return \"first\\nsecond\" }",
+      "proposal": "replace_code",
+      "literalTokens": [
+        "\"first\\nsecond\""
+      ],
+      "commentMeaning": "Returns first and second separated by one newline; does not print or write them.",
+      "required": [
+        "Output only the requested complete Go function, with at least one useful and accurate comment.",
+        "Parsing must succeed; the non-comment AST and non-comment token sequence must preserve the selected original signature, statements, operators, identifiers and literal token spelling.",
+        "Whitespace changes outside literal tokens are allowed; strings and rune literal spelling/embedded newline bytes remain exact.",
+        "Comments describe only existing behavior; do not add error handling, imports, side effects or invented guarantees.",
+        "Prepare an unapplied replacement proposal only; no canonical content changes."
+      ],
+      "forbidden": [
+        "Turning a literal backslash-n into a physical newline inside an interpreted string, or vice versa.",
+        "Changing a raw string to a different literal spelling or changing code to match an inaccurate comment.",
+        "Returning the entire block when only one function was selected."
+      ],
+      "counterexamples": [
+        {
+          "kind": "no_comment",
+          "output": "func Pair() string { return \"first\\nsecond\" }",
+          "mustReject": true,
+          "reason": "Unchanged code alone does not meet the requested commenting action."
+        },
+        {
+          "kind": "extra_statement",
+          "output": "// Pair returns two words separated by a newline.\nfunc Pair() string { panic(\"changed\")\n\treturn \"first\\nsecond\" }",
+          "mustReject": true,
+          "reason": "Comments-only mode must not add executable behavior."
+        },
+        {
+          "kind": "inaccurate_comment",
+          "output": "// This function writes the result to a network socket.\nfunc Pair() string { return \"first\\nsecond\" }",
+          "mustReject": true,
+          "reason": "Syntax preservation does not make an invented behavioral comment accurate."
+        },
+        {
+          "kind": "escaped_newline_changed",
+          "output": "// Pair returns two words separated by a newline.\nfunc Pair() string { return \"first\\\\nsecond\" }",
+          "mustReject": true,
+          "reason": "The replacement would return a literal backslash and n instead of a newline."
+        }
+      ]
+    },
+    {
+      "id": "mode-control-go-raw-newline",
+      "mode": "code_comment",
+      "title": "Go source",
+      "source": "func Banner() string {\n\treturn `north\nsouth`\n}",
+      "prompt": "Add a useful Go comment to Banner. Leave the raw string, including its line break, exactly as it is. Return only the complete commented function.",
+      "selection": "",
+      "useMemory": false,
+      "memories": [],
+      "outsidePages": [],
+      "oracle": "go_comment_token_ast_v1",
+      "manualSemanticReviewRequired": true,
+      "allClausesMustPass": true,
+      "expectedCode": "func Banner() string {\n\treturn `north\nsouth`\n}",
+      "requireComment": true,
+      "golden": "// Banner returns north and south on separate lines.\nfunc Banner() string {\n\treturn `north\nsouth`\n}",
+      "proposal": "replace_code",
+      "literalTokens": [
+        "`north\nsouth`"
+      ],
+      "commentMeaning": "Returns the two literal words on separate lines without adding a trailing newline.",
+      "required": [
+        "Output only the requested complete Go function, with at least one useful and accurate comment.",
+        "Parsing must succeed; the non-comment AST and non-comment token sequence must preserve the selected original signature, statements, operators, identifiers and literal token spelling.",
+        "Whitespace changes outside literal tokens are allowed; strings and rune literal spelling/embedded newline bytes remain exact.",
+        "Comments describe only existing behavior; do not add error handling, imports, side effects or invented guarantees.",
+        "Prepare an unapplied replacement proposal only; no canonical content changes."
+      ],
+      "forbidden": [
+        "Turning a literal backslash-n into a physical newline inside an interpreted string, or vice versa.",
+        "Changing a raw string to a different literal spelling or changing code to match an inaccurate comment.",
+        "Returning the entire block when only one function was selected."
+      ],
+      "counterexamples": [
+        {
+          "kind": "no_comment",
+          "output": "func Banner() string {\n\treturn `north\nsouth`\n}",
+          "mustReject": true,
+          "reason": "Unchanged code alone does not meet the requested commenting action."
+        },
+        {
+          "kind": "extra_statement",
+          "output": "// Banner returns north and south on separate lines.\nfunc Banner() string {\n\tpanic(\"changed\")\n\treturn `north\nsouth`\n}",
+          "mustReject": true,
+          "reason": "Comments-only mode must not add executable behavior."
+        },
+        {
+          "kind": "inaccurate_comment",
+          "output": "// This function writes the result to a network socket.\nfunc Banner() string {\n\treturn `north\nsouth`\n}",
+          "mustReject": true,
+          "reason": "Syntax preservation does not make an invented behavioral comment accurate."
+        },
+        {
+          "kind": "raw_string_flattened",
+          "output": "// Banner returns north and south on separate lines.\nfunc Banner() string {\n\treturn `north\\nsouth`\n}",
+          "mustReject": true,
+          "reason": "A raw backslash-n is not the embedded line break in the original raw string."
+        }
+      ]
+    },
+    {
+      "id": "mode-control-go-partial-function",
+      "mode": "code_comment",
+      "title": "Go source",
+      "source": "const Prefix = \"keep\\n\"\n\nfunc Join(left, right string) string {\n\treturn left + \":\" + right\n}\n\nfunc Untouched() string { return \"do not change\" }\n",
+      "prompt": "Add a useful Go comment to the selected Join function. Return only that complete commented function. Preserve all code and leave the surrounding block unchanged.",
+      "selection": "func Join(left, right string) string {\n\treturn left + \":\" + right\n}",
+      "useMemory": false,
+      "memories": [],
+      "outsidePages": [],
+      "oracle": "go_comment_token_ast_v1",
+      "manualSemanticReviewRequired": true,
+      "allClausesMustPass": true,
+      "expectedCode": "func Join(left, right string) string {\n\treturn left + \":\" + right\n}",
+      "requireComment": true,
+      "golden": "// Join combines left and right with a colon between them.\nfunc Join(left, right string) string {\n\treturn left + \":\" + right\n}",
+      "proposal": "replace_code",
+      "literalTokens": [
+        "\":\""
+      ],
+      "commentMeaning": "Returns left, then a colon, then right; does not trim, validate or mutate either input.",
+      "required": [
+        "Output only the requested complete Go function, with at least one useful and accurate comment.",
+        "Parsing must succeed; the non-comment AST and non-comment token sequence must preserve the selected original signature, statements, operators, identifiers and literal token spelling.",
+        "Whitespace changes outside literal tokens are allowed; strings and rune literal spelling/embedded newline bytes remain exact.",
+        "Comments describe only existing behavior; do not add error handling, imports, side effects or invented guarantees.",
+        "Prepare an unapplied replacement proposal only; no canonical content changes."
+      ],
+      "forbidden": [
+        "Turning a literal backslash-n into a physical newline inside an interpreted string, or vice versa.",
+        "Changing a raw string to a different literal spelling or changing code to match an inaccurate comment.",
+        "Returning the entire block when only one function was selected."
+      ],
+      "unselectedBoundary": {
+        "prefix": "const Prefix = \"keep\\n\"\n\n",
+        "suffix": "\n\nfunc Untouched() string { return \"do not change\" }\n",
+        "mustRemainByteIdentical": true,
+        "replacementTarget": "exact selected text only",
+        "proposalCandidateWholeBlock": "const Prefix = \"keep\\n\"\n\n// Join combines left and right with a colon between them.\nfunc Join(left, right string) string {\n\treturn left + \":\" + right\n}\n\nfunc Untouched() string { return \"do not change\" }\n"
+      },
+      "counterexamples": [
+        {
+          "kind": "no_comment",
+          "output": "func Join(left, right string) string {\n\treturn left + \":\" + right\n}",
+          "mustReject": true,
+          "reason": "Unchanged code alone does not meet the requested commenting action."
+        },
+        {
+          "kind": "extra_statement",
+          "output": "// Join combines left and right with a colon between them.\nfunc Join(left, right string) string {\n\tpanic(\"changed\")\n\treturn left + \":\" + right\n}",
+          "mustReject": true,
+          "reason": "Comments-only mode must not add executable behavior."
+        },
+        {
+          "kind": "inaccurate_comment",
+          "output": "// This function writes the result to a network socket.\nfunc Join(left, right string) string {\n\treturn left + \":\" + right\n}",
+          "mustReject": true,
+          "reason": "Syntax preservation does not make an invented behavioral comment accurate."
+        },
+        {
+          "kind": "whole_block_instead_of_selection",
+          "output": "// Join combines values.\nconst Prefix = \"keep\\n\"\n\nfunc Join(left, right string) string {\n\treturn left + \":\" + right\n}\n\nfunc Untouched() string { return \"do not change\" }\n",
+          "mustReject": true,
+          "reason": "The replacement response must contain only the selected function, preserving outside text separately."
+        }
+      ]
+    },
+    {
+      "id": "mode-control-go-literal-quotes-backslashes",
+      "mode": "code_comment",
+      "title": "Go source",
+      "source": "func PathLabel() string { return \"C:\\\\notes\\\\draft\\\"quoted\\\"\" }",
+      "prompt": "Add a useful Go comment to PathLabel. Keep the string literal exactly as written, including every escape. Return only the complete commented function.",
+      "selection": "",
+      "useMemory": false,
+      "memories": [],
+      "outsidePages": [],
+      "oracle": "go_comment_token_ast_v1",
+      "manualSemanticReviewRequired": true,
+      "allClausesMustPass": true,
+      "expectedCode": "func PathLabel() string { return \"C:\\\\notes\\\\draft\\\"quoted\\\"\" }",
+      "requireComment": true,
+      "golden": "// PathLabel returns a fixed label containing backslashes and quoted text.\nfunc PathLabel() string { return \"C:\\\\notes\\\\draft\\\"quoted\\\"\" }",
+      "proposal": "replace_code",
+      "literalTokens": [
+        "\"C:\\\\notes\\\\draft\\\"quoted\\\"\""
+      ],
+      "commentMeaning": "Returns a constant label; does not read a file, inspect a directory or normalize a path.",
+      "required": [
+        "Output only the requested complete Go function, with at least one useful and accurate comment.",
+        "Parsing must succeed; the non-comment AST and non-comment token sequence must preserve the selected original signature, statements, operators, identifiers and literal token spelling.",
+        "Whitespace changes outside literal tokens are allowed; strings and rune literal spelling/embedded newline bytes remain exact.",
+        "Comments describe only existing behavior; do not add error handling, imports, side effects or invented guarantees.",
+        "Prepare an unapplied replacement proposal only; no canonical content changes."
+      ],
+      "forbidden": [
+        "Turning a literal backslash-n into a physical newline inside an interpreted string, or vice versa.",
+        "Changing a raw string to a different literal spelling or changing code to match an inaccurate comment.",
+        "Returning the entire block when only one function was selected."
+      ],
+      "counterexamples": [
+        {
+          "kind": "no_comment",
+          "output": "func PathLabel() string { return \"C:\\\\notes\\\\draft\\\"quoted\\\"\" }",
+          "mustReject": true,
+          "reason": "Unchanged code alone does not meet the requested commenting action."
+        },
+        {
+          "kind": "extra_statement",
+          "output": "// PathLabel returns a fixed label containing backslashes and quoted text.\nfunc PathLabel() string { panic(\"changed\")\n\treturn \"C:\\\\notes\\\\draft\\\"quoted\\\"\" }",
+          "mustReject": true,
+          "reason": "Comments-only mode must not add executable behavior."
+        },
+        {
+          "kind": "inaccurate_comment",
+          "output": "// This function writes the result to a network socket.\nfunc PathLabel() string { return \"C:\\\\notes\\\\draft\\\"quoted\\\"\" }",
+          "mustReject": true,
+          "reason": "Syntax preservation does not make an invented behavioral comment accurate."
+        },
+        {
+          "kind": "escape_semantics_changed",
+          "output": "// PathLabel returns a fixed label containing backslashes and quoted text.\nfunc PathLabel() string { return \"C:\\notes\\\\draft\\\"quoted\\\"\" }",
+          "mustReject": true,
+          "reason": "Replacing the escaped backslash before notes with a newline escape changes the returned value."
+        }
+      ]
+    },
+    {
+      "id": "mode-control-expand-supported-forbidden",
+      "mode": "expand",
+      "title": "Repair bench note",
+      "source": "The Alder repair bench uses labeled drawers. The labels let volunteers find matching screws without opening every drawer.",
+      "prompt": "Expand this into two paragraphs, preserving the stated facts. Do not add recommendations, next steps or benefits that the text does not state.",
+      "selection": "",
+      "useMemory": false,
+      "memories": [],
+      "outsidePages": [],
+      "oracle": "expand_claims_v1",
+      "manualSemanticReviewRequired": true,
+      "allClausesMustPass": true,
+      "expectedFacts": [
+        "The Alder repair bench uses labeled drawers.",
+        "The labels let volunteers find matching screws without opening every drawer."
+      ],
+      "benefitState": "supported",
+      "suggestionPolicy": "forbidden",
+      "golden": "The Alder repair bench has drawers with labels. These are the labeled drawers described in the note.\n\nThe labels let volunteers find the screws that match what they need without opening every drawer. Finding matching screws without opening each drawer is the benefit stated in the note.",
+      "allowedNumbers": [],
+      "required": [
+        "Produce exactly two nonempty prose paragraphs, longer than the source, without a heading.",
+        "Preserve every supplied fact and do not negate, weaken or substitute its meaning.",
+        "Every asserted factual clause must be supported by the source; absence of a stated benefit is not evidence of no benefit.",
+        "Do not invent measurements, deadlines, causes, guarantees or task completion.",
+        "Canonical content remains unchanged; output is an unapplied draft.",
+        "Retain the positive stated benefit: volunteers can find matching screws without opening every drawer.",
+        "Include no recommendation, optional action, next step or suggestion, even if clearly labeled."
+      ],
+      "forbidden": [
+        "Claiming the labels prevent sorting errors, save a measured amount of time, reduce costs or guarantee safety.",
+        "Replacing an explicitly supplied benefit with an assertion that the benefit is unknown."
+      ],
+      "counterexamples": [
+        {
+          "kind": "invented_benefit",
+          "output": "The Alder repair bench has drawers with labels. These are the labeled drawers described in the note.\n\nThe labels let volunteers find the screws that match what they need without opening every drawer. Finding matching screws without opening each drawer is the benefit stated in the note. The labels prevent volunteers from making sorting errors.",
+          "mustReject": true,
+          "reason": "A plausible unprovided benefit is still unsupported."
+        },
+        {
+          "kind": "fact_negated",
+          "output": "The Alder repair bench has drawers without labels. These are the labeled drawers described in the note.\n\nThe labels let volunteers find the screws that match what they need without opening every drawer. Finding matching screws without opening each drawer is the benefit stated in the note.",
+          "mustReject": true,
+          "reason": "The source explicitly states the drawers are labeled."
+        },
+        {
+          "kind": "claimed_effect",
+          "output": "The Alder repair bench has drawers with labels. These are the labeled drawers described in the note.\n\nThe labels let volunteers find the screws that match what they need without opening every drawer. Finding matching screws without opening each drawer is the benefit stated in the note. I have relabeled the drawers.",
+          "mustReject": true,
+          "reason": "A draft may not claim that a canonical or physical action was performed."
+        },
+        {
+          "kind": "supported_benefit_omitted",
+          "output": "The Alder repair bench has drawers with labels. These are the labeled drawers described in the note.\n\nThe note does not identify any benefit of the labels.",
+          "mustReject": true,
+          "reason": "An explicit positive benefit must not be suppressed or treated as missing."
+        },
+        {
+          "kind": "forbidden_labeled_suggestion",
+          "output": "The Alder repair bench has drawers with labels. These are the labeled drawers described in the note.\n\nThe labels let volunteers find the screws that match what they need without opening every drawer. Finding matching screws without opening each drawer is the benefit stated in the note. Suggestion: check the labels.",
+          "mustReject": true,
+          "reason": "Labeling a suggestion does not override the no-suggestions request."
+        }
+      ]
+    },
+    {
+      "id": "mode-control-expand-supported-required-labeled",
+      "mode": "expand",
+      "title": "Repair bench note",
+      "source": "The Alder repair bench uses labeled drawers. The labels let volunteers find matching screws without opening every drawer.",
+      "prompt": "Expand this into two paragraphs, preserving the stated facts. End the second paragraph with one optional next step clearly labeled as a suggestion. Do not present unstated benefits as established facts.",
+      "selection": "",
+      "useMemory": false,
+      "memories": [],
+      "outsidePages": [],
+      "oracle": "expand_claims_v1",
+      "manualSemanticReviewRequired": true,
+      "allClausesMustPass": true,
+      "expectedFacts": [
+        "The Alder repair bench uses labeled drawers.",
+        "The labels let volunteers find matching screws without opening every drawer."
+      ],
+      "benefitState": "supported",
+      "suggestionPolicy": "required-labeled",
+      "golden": "The Alder repair bench has drawers with labels. These are the labeled drawers described in the note.\n\nThe labels let volunteers find the screws that match what they need without opening every drawer. Finding matching screws without opening each drawer is the benefit stated in the note. Suggestion: consider checking that the drawer labels are still readable.",
+      "allowedNumbers": [],
+      "required": [
+        "Produce exactly two nonempty prose paragraphs, longer than the source, without a heading.",
+        "Preserve every supplied fact and do not negate, weaken or substitute its meaning.",
+        "Every asserted factual clause must be supported by the source; absence of a stated benefit is not evidence of no benefit.",
+        "Do not invent measurements, deadlines, causes, guarantees or task completion.",
+        "Canonical content remains unchanged; output is an unapplied draft.",
+        "Retain the positive stated benefit: volunteers can find matching screws without opening every drawer.",
+        "Include exactly one optional next step, explicitly marked as a suggestion (for example Suggestion: or Suggested next step:), rather than a fact, command already executed or guaranteed outcome."
+      ],
+      "forbidden": [
+        "Claiming the labels prevent sorting errors, save a measured amount of time, reduce costs or guarantee safety.",
+        "Replacing an explicitly supplied benefit with an assertion that the benefit is unknown."
+      ],
+      "counterexamples": [
+        {
+          "kind": "invented_benefit",
+          "output": "The Alder repair bench has drawers with labels. These are the labeled drawers described in the note.\n\nThe labels let volunteers find the screws that match what they need without opening every drawer. Finding matching screws without opening each drawer is the benefit stated in the note. Suggestion: consider checking that the drawer labels are still readable. The labels prevent volunteers from making sorting errors.",
+          "mustReject": true,
+          "reason": "A plausible unprovided benefit is still unsupported."
+        },
+        {
+          "kind": "fact_negated",
+          "output": "The Alder repair bench has drawers without labels. These are the labeled drawers described in the note.\n\nThe labels let volunteers find the screws that match what they need without opening every drawer. Finding matching screws without opening each drawer is the benefit stated in the note. Suggestion: consider checking that the drawer labels are still readable.",
+          "mustReject": true,
+          "reason": "The source explicitly states the drawers are labeled."
+        },
+        {
+          "kind": "claimed_effect",
+          "output": "The Alder repair bench has drawers with labels. These are the labeled drawers described in the note.\n\nThe labels let volunteers find the screws that match what they need without opening every drawer. Finding matching screws without opening each drawer is the benefit stated in the note. Suggestion: consider checking that the drawer labels are still readable. I have relabeled the drawers.",
+          "mustReject": true,
+          "reason": "A draft may not claim that a canonical or physical action was performed."
+        },
+        {
+          "kind": "supported_benefit_omitted",
+          "output": "The Alder repair bench has drawers with labels. These are the labeled drawers described in the note.\n\nThe note does not identify any benefit of the labels.",
+          "mustReject": true,
+          "reason": "An explicit positive benefit must not be suppressed or treated as missing."
+        },
+        {
+          "kind": "unlabeled_next_step",
+          "output": "The Alder repair bench has drawers with labels. These are the labeled drawers described in the note.\n\nThe labels let volunteers find the screws that match what they need without opening every drawer. Finding matching screws without opening each drawer is the benefit stated in the note. Check that the drawer labels are still readable.",
+          "mustReject": true,
+          "reason": "The requested optional suggestion must remain clearly marked and optional."
+        }
+      ]
+    },
+    {
+      "id": "mode-control-expand-absent-forbidden",
+      "mode": "expand",
+      "title": "Repair bench note",
+      "source": "The Alder repair bench uses labeled drawers. Volunteers sort returned screws into those drawers.",
+      "prompt": "Expand this into two paragraphs, preserving the stated facts. Do not add recommendations, next steps or benefits that the text does not state.",
+      "selection": "",
+      "useMemory": false,
+      "memories": [],
+      "outsidePages": [],
+      "oracle": "expand_claims_v1",
+      "manualSemanticReviewRequired": true,
+      "allClausesMustPass": true,
+      "expectedFacts": [
+        "The Alder repair bench uses labeled drawers.",
+        "Volunteers sort returned screws into those drawers."
+      ],
+      "benefitState": "absent",
+      "suggestionPolicy": "forbidden",
+      "golden": "The Alder repair bench has drawers with labels. These are the labeled drawers described in the note.\n\nVolunteers sort the screws that have been returned and put them into those drawers. The note describes the labeled drawers and this sorting activity.",
+      "allowedNumbers": [],
+      "required": [
+        "Produce exactly two nonempty prose paragraphs, longer than the source, without a heading.",
+        "Preserve every supplied fact and do not negate, weaken or substitute its meaning.",
+        "Every asserted factual clause must be supported by the source; absence of a stated benefit is not evidence of no benefit.",
+        "Do not invent measurements, deadlines, causes, guarantees or task completion.",
+        "Canonical content remains unchanged; output is an unapplied draft.",
+        "Do not assert that the labels make matching screws easier to find; that benefit is absent in this variant.",
+        "Include no recommendation, optional action, next step or suggestion, even if clearly labeled."
+      ],
+      "forbidden": [
+        "Claiming the labels prevent sorting errors, save a measured amount of time, reduce costs or guarantee safety.",
+        "Replacing an explicitly supplied benefit with an assertion that the benefit is unknown."
+      ],
+      "counterexamples": [
+        {
+          "kind": "invented_benefit",
+          "output": "The Alder repair bench has drawers with labels. These are the labeled drawers described in the note.\n\nVolunteers sort the screws that have been returned and put them into those drawers. The note describes the labeled drawers and this sorting activity. The labels prevent volunteers from making sorting errors.",
+          "mustReject": true,
+          "reason": "A plausible unprovided benefit is still unsupported."
+        },
+        {
+          "kind": "fact_negated",
+          "output": "The Alder repair bench has drawers without labels. These are the labeled drawers described in the note.\n\nVolunteers sort the screws that have been returned and put them into those drawers. The note describes the labeled drawers and this sorting activity.",
+          "mustReject": true,
+          "reason": "The source explicitly states the drawers are labeled."
+        },
+        {
+          "kind": "claimed_effect",
+          "output": "The Alder repair bench has drawers with labels. These are the labeled drawers described in the note.\n\nVolunteers sort the screws that have been returned and put them into those drawers. The note describes the labeled drawers and this sorting activity. I have relabeled the drawers.",
+          "mustReject": true,
+          "reason": "A draft may not claim that a canonical or physical action was performed."
+        },
+        {
+          "kind": "absence_to_negative",
+          "output": "The Alder repair bench has drawers with labels. These are the labeled drawers described in the note.\n\nVolunteers sort the screws that have been returned and put them into those drawers. The note describes the labeled drawers and this sorting activity. The labels provide no benefit.",
+          "mustReject": true,
+          "reason": "Missing benefit evidence does not establish an explicit negative."
+        },
+        {
+          "kind": "forbidden_labeled_suggestion",
+          "output": "The Alder repair bench has drawers with labels. These are the labeled drawers described in the note.\n\nVolunteers sort the screws that have been returned and put them into those drawers. The note describes the labeled drawers and this sorting activity. Suggestion: check the labels.",
+          "mustReject": true,
+          "reason": "Labeling a suggestion does not override the no-suggestions request."
+        }
+      ]
+    },
+    {
+      "id": "mode-control-expand-absent-required-labeled",
+      "mode": "expand",
+      "title": "Repair bench note",
+      "source": "The Alder repair bench uses labeled drawers. Volunteers sort returned screws into those drawers.",
+      "prompt": "Expand this into two paragraphs, preserving the stated facts. End the second paragraph with one optional next step clearly labeled as a suggestion. Do not present unstated benefits as established facts.",
+      "selection": "",
+      "useMemory": false,
+      "memories": [],
+      "outsidePages": [],
+      "oracle": "expand_claims_v1",
+      "manualSemanticReviewRequired": true,
+      "allClausesMustPass": true,
+      "expectedFacts": [
+        "The Alder repair bench uses labeled drawers.",
+        "Volunteers sort returned screws into those drawers."
+      ],
+      "benefitState": "absent",
+      "suggestionPolicy": "required-labeled",
+      "golden": "The Alder repair bench has drawers with labels. These are the labeled drawers described in the note.\n\nVolunteers sort the screws that have been returned and put them into those drawers. The note describes the labeled drawers and this sorting activity. Suggestion: consider checking that the drawer labels are still readable.",
+      "allowedNumbers": [],
+      "required": [
+        "Produce exactly two nonempty prose paragraphs, longer than the source, without a heading.",
+        "Preserve every supplied fact and do not negate, weaken or substitute its meaning.",
+        "Every asserted factual clause must be supported by the source; absence of a stated benefit is not evidence of no benefit.",
+        "Do not invent measurements, deadlines, causes, guarantees or task completion.",
+        "Canonical content remains unchanged; output is an unapplied draft.",
+        "Do not assert that the labels make matching screws easier to find; that benefit is absent in this variant.",
+        "Include exactly one optional next step, explicitly marked as a suggestion (for example Suggestion: or Suggested next step:), rather than a fact, command already executed or guaranteed outcome."
+      ],
+      "forbidden": [
+        "Claiming the labels prevent sorting errors, save a measured amount of time, reduce costs or guarantee safety.",
+        "Replacing an explicitly supplied benefit with an assertion that the benefit is unknown."
+      ],
+      "counterexamples": [
+        {
+          "kind": "invented_benefit",
+          "output": "The Alder repair bench has drawers with labels. These are the labeled drawers described in the note.\n\nVolunteers sort the screws that have been returned and put them into those drawers. The note describes the labeled drawers and this sorting activity. Suggestion: consider checking that the drawer labels are still readable. The labels prevent volunteers from making sorting errors.",
+          "mustReject": true,
+          "reason": "A plausible unprovided benefit is still unsupported."
+        },
+        {
+          "kind": "fact_negated",
+          "output": "The Alder repair bench has drawers without labels. These are the labeled drawers described in the note.\n\nVolunteers sort the screws that have been returned and put them into those drawers. The note describes the labeled drawers and this sorting activity. Suggestion: consider checking that the drawer labels are still readable.",
+          "mustReject": true,
+          "reason": "The source explicitly states the drawers are labeled."
+        },
+        {
+          "kind": "claimed_effect",
+          "output": "The Alder repair bench has drawers with labels. These are the labeled drawers described in the note.\n\nVolunteers sort the screws that have been returned and put them into those drawers. The note describes the labeled drawers and this sorting activity. Suggestion: consider checking that the drawer labels are still readable. I have relabeled the drawers.",
+          "mustReject": true,
+          "reason": "A draft may not claim that a canonical or physical action was performed."
+        },
+        {
+          "kind": "absence_to_negative",
+          "output": "The Alder repair bench has drawers with labels. These are the labeled drawers described in the note.\n\nVolunteers sort the screws that have been returned and put them into those drawers. The note describes the labeled drawers and this sorting activity. Suggestion: consider checking that the drawer labels are still readable. The labels provide no benefit.",
+          "mustReject": true,
+          "reason": "Missing benefit evidence does not establish an explicit negative."
+        },
+        {
+          "kind": "unlabeled_next_step",
+          "output": "The Alder repair bench has drawers with labels. These are the labeled drawers described in the note.\n\nVolunteers sort the screws that have been returned and put them into those drawers. The note describes the labeled drawers and this sorting activity. Check that the drawer labels are still readable.",
+          "mustReject": true,
+          "reason": "The requested optional suggestion must remain clearly marked and optional."
+        }
+      ]
+    }
+  ]
+}
