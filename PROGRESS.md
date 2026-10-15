@@ -2,7 +2,7 @@
 
 **The single current development and progress tracker for this project.** Read and update this file for every meaningful implementation change, investigation, test result, decision, blocker and handoff. This is not an automatically running monitor.
 
-Last updated: **2026-10-15 22:51 IST**. User-facing dates use **Asia/Kolkata (IST, UTC+05:30)**; source artifacts may retain UTC timestamps.
+Last updated: **2026-10-15 23:00 IST**. User-facing dates use **Asia/Kolkata (IST, UTC+05:30)**; source artifacts may retain UTC timestamps.
 
 This file consolidates the original 51-item backlog, the newly selected desktop scope, current qualification, next actions and development history. Earlier status pages are historical snapshots. Machine-readable contracts, the legacy registry and immutable qualification records remain supporting inputs/evidence; they are not additional human progress dashboards. Their frozen bytes must not be rewritten to make a status look current.
 
@@ -33,7 +33,7 @@ Candidate 7's focused 22-case prompt experiment was rejected and production prom
 
 | Location | Branch / source | Current interpretation |
 | --- | --- | --- |
-| Primary project: `/Volumes/HD-B1/HD-Projects/Trove` | `codex/macos-feature-completion`, current integrated source `100398b` | Baseline `ee14f0c`; shared foundations `0ed5350`, G02 `2b421a4`, G03 `950cea5`/`6e713bc` and G01 page merge `2279bf0`/`a3f9e54` integrated. See the development log for subsequent commits and current verification. |
+| Primary project: `/Volumes/HD-B1/HD-Projects/Trove` | `codex/macos-feature-completion`, current integrated source `0125f7c` | Baseline `ee14f0c`; shared foundations `0ed5350`, G02 `2b421a4`, G03 `950cea5`/`6e713bc` and G01 page merge `2279bf0`/`a3f9e54` integrated. See the development log for subsequent commits and current verification. |
 | Latest development worktree: `/Users/suryasriramduvvuri/.codex/worktrees/macos-p0-title-context/Trove` | `codex/macos-p0-title-context`, `299e43df9b716f771125d939ad320c3cb595f2c7` | Candidate 7 source. One descendant commit containing tests, fixtures, telemetry and execution documentation. |
 
 Keep candidate 7's execution in its declared worktree. Review and integrate the descendant commit separately; do not rebuild a package just to align a checkout. A product/binary/policy change requires a new candidate and affected fresh evidence.
@@ -1087,6 +1087,12 @@ Final autofill workspace and protocol suite passed **37 tests/subtests, zero ski
 **API/P2 integration:** Reviewed Notion worker `4d9b9ad` is integrated: exact successful page/database/data-source archive responses produce version-1 capture/root/object/raw-hash proof and explicit deletion review, with final mapping/finished-capture and local graph-closure guards. Omission/403/404/partial enumeration remains retained, and first-seen archived objects remain inert. Worker passed 172 affected race tests and 22 final focused tests (overlap), including native backup/restore; coordinator integration checks follow. P2 worker `85c5261` passed 19 service/HTTP/contract tests, one native test, eight overlapping strict contract checks and 13 browser scenarios; root reviewed its source without a blocker, integration follows. These are controlled service/browser/native boundaries, not physical OCR/device or model-quality acceptance.
 
 **G02 correction:** The final source audit found no existing task-facet detachment service/UI despite D001 and G02 requirement 3. Earlier editing/promotion/extraction implementation labels remain valid at their scope; detachment is an explicit implementation gap under repair. The plan preserves record/page/property identity and offers reviewed occurrence conversion, or removal for leaf occurrences; nested occurrence children must survive conversion. Grouped undo must preserve unrelated edits. Known image-quality failures and live-account/device/final release campaigns remain separate.
+
+### DEV-039 — 2026-10-15 23:00 IST: P2 continuity integration and follow-up review
+
+**Source and verification:** Notion deletion proof integrated as `a221a5c`; bounded freshness repair as `408ffcf`; P2 request-identity fencing and OCR cancellation as `e75e3bc`. Combined affected workspace/hosting/contracts/native race checks passed **96 tests/subtests, zero failures/skips** (`/private/tmp/trove-p2-notion-lifecycle-integrated-20261015-v1.jsonl`). TypeScript and both generated schema/type drift checks passed. These checks cover controlled service/native boundaries, not physical OCR, live accounts or final release qualification. Reviewed legacy Notion compatibility regression `f84ef0b` integrated as `0125f7c`: old resumed captures retain their API version and require direct archive evidence; current captures reject the removed alias. Worker focused race evidence is 12 passes, zero failures/skips; root rerun is pending.
+
+**Independent review corrections:** Follow-up review of the initial OCR integration confirmed two remaining defects: cancellation after canonical OCR persistence could report that prior text was preserved, and overlapping workspace opens could install an OCR runtime outside the old runtime's cancellation boundary. Both have assigned corrective implementation and deterministic regressions. This appends corrections to the initial review and pass evidence rather than treating those checks as proof of absent defects. Task-facet detachment remains active, including explicit occurrence conversion/removal, guarded grouped undo and persistence/recovery tests. No new candidate, release acceptance or overall completion percentage is claimed.
 
 <a id="commit-history"></a>
 ## Recorded source-development history
