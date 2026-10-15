@@ -193,6 +193,11 @@ defs['ConnectorSnapshot']=obj({'version':{'const':1},'id':S,'accountId':D('Id'),
 defs['ConnectedSourceReference']=obj({'snapshotId':{'type':'string','minLength':1,'maxLength':2048},'remoteRevision':{'type':'string','minLength':1,'maxLength':2048},'contentHash':D('Hash')})
 defs['ConnectedEvidence']=obj({'version':{'const':1},'receiptId':D('Id'),'snapshotId':short_string,'accountId':D('Id'),'accountRevision':S,'selectionId':short_string,'provider':connector_kind,'remoteId':short_string,'remoteRevision':short_string,'contentHash':D('Hash'),'url':S,'checkedAt':D('Timestamp'),'partial':B})
 defs['ConnectedSource']=obj({'connected':R('ConnectedEvidence'),'title':S,'text':{'type':'string','maxLength':262144}})
+# Sharing review is separate from connector selection and binds one recipient.
+defs['ConnectedSharingTarget']=obj({'provider':enum('codex','claude_code','mcp'),'account':{'type':'string','minLength':1,'maxLength':512}})
+defs['ConnectedSharingPreview']=obj({'id':D('Id'),'hash':D('Hash'),'target':R('ConnectedSharingTarget'),'sources':{**arr(R('ConnectedSource'),12),'minItems':1},'expiresAt':D('Timestamp'),'notice':S})
+defs['ConnectedSharingPreviewRequest']=obj({**header,'target':R('ConnectedSharingTarget'),'sources':{**arr(R('ConnectedSourceReference'),12),'minItems':1}})
+defs['ConnectedSharingApproval']=obj({'id':D('Id'),'hash':D('Hash')})
 defs['ConnectorRegistration']=obj({'kind':connector_kind,'clientId':{'type':'string','maxLength':512},'dynamicClientRegistration':B,'endpoint':short_string},['kind','clientId'])
 defs['ConnectorAuthAttempt']=obj({'id':D('Id'),'kind':connector_kind,'state':enum('waiting','authorized','verifying','complete','failed','expired','cancelled'),'message':S,'userCode':S,'verificationUrl':S,'expiresAt':D('Timestamp')},['id','kind','state','message','expiresAt'])
 defs['ConnectorListRequest']=obj(header)

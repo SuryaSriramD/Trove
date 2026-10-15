@@ -2653,6 +2653,29 @@ type ServiceConnectedSource struct {
 	Title     string                   `json:"title"`
 	Text      string                   `json:"text"`
 }
+type ServiceConnectedSharingTarget struct {
+	Provider string `json:"provider"`
+	Account  string `json:"account"`
+}
+type ServiceConnectedSharingPreview struct {
+	Id        DomainId                      `json:"id"`
+	Hash      DomainHash                    `json:"hash"`
+	Target    ServiceConnectedSharingTarget `json:"target"`
+	Sources   []ServiceConnectedSource      `json:"sources"`
+	ExpiresAt DomainTimestamp               `json:"expiresAt"`
+	Notice    string                        `json:"notice"`
+}
+type ServiceConnectedSharingPreviewRequest struct {
+	ContractVersion int64                             `json:"contractVersion"`
+	RequestId       DomainId                          `json:"requestId"`
+	WorkspaceId     DomainId                          `json:"workspaceId"`
+	Target          ServiceConnectedSharingTarget     `json:"target"`
+	Sources         []ServiceConnectedSourceReference `json:"sources"`
+}
+type ServiceConnectedSharingApproval struct {
+	Id   DomainId   `json:"id"`
+	Hash DomainHash `json:"hash"`
+}
 type ServiceConnectorRegistration struct {
 	Kind                      string  `json:"kind"`
 	ClientId                  string  `json:"clientId"`
