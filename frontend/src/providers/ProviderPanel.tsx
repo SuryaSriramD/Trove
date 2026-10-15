@@ -3,7 +3,10 @@ import { useEffect, useRef, useState } from "react";
 import { dispatch, envelope, type WorkspaceSnapshot } from "../api";
 import "./providers.css";
 import { RemoteMCPPanel } from "./RemoteMCPPanel";
-import { ManagedProviderPanel } from "./ManagedProviderPanel";
+import {
+  ManagedProviderPanel,
+  type SelectedConnectedSource,
+} from "./ManagedProviderPanel";
 type ContextPreview = {
   pages: { pageId: string; title: string; revision: string; blocks?: number }[];
   notice: string;
@@ -45,18 +48,20 @@ export function ProviderPanel(
 ) {
   return (
     <ProviderPanelContent
-      key={`${props.workspace.workspaceId}:${props.workspace.scopeGrantId}`}
+      key={`${props.workspace.workspaceId}:${props.workspace.scopeGrantId}:${JSON.stringify(props.connectedSources ?? [])}`}
       {...props}
     />
   );
 }
 
 function ProviderPanelContent({
+  connectedSources = [],
   skill,
   skillProvider,
   workspace,
   onCommitted,
 }: {
+  connectedSources?: SelectedConnectedSource[];
   skill?: SkillExecution;
   skillProvider?: "codex" | "claude_code";
   workspace: WorkspaceSnapshot;
@@ -74,7 +79,9 @@ function ProviderPanelContent({
     } | null>(null),
     [error, setError] = useState(""),
     [busy, setBusy] = useState(false),
-    [provider, setProvider] = useState<string>(skillProvider ?? "mcp"),
+    [provider, setProvider] = useState<string>(
+      skillProvider ?? (connectedSources.length ? "codex" : "mcp"),
+    ),
     [handoff, setHandoff] = useState(""),
     [objective, setObjective] = useState("");
   const active = useRef(true);
@@ -133,10 +140,10 @@ function ProviderPanelContent({
     >
       <h2>Providers and workspace access</h2>
       <p>
-        Local AI remains the default. Connect a client to selected pages, then
+        Local AI remains the default. Select an account and context below, then
         review every proposed change here. Connections expire when Trove closes.
       </p>
-      <RemoteMCPPanel workspace={workspace} />
+      {!connectedSources.length && <RemoteMCPPanel workspace={workspace} />}
       <label>
         Provider{" "}
         <select
@@ -148,13 +155,16 @@ function ProviderPanelContent({
             setPreview(null);
           }}
         >
-          <option value="mcp">Paired local MCP client</option>
+          {!connectedSources.length && (
+            <option value="mcp">Paired local MCP client</option>
+          )}
           <option value="claude_code">Claude Code</option>
           <option value="codex">Codex</option>
         </select>
       </label>
       {provider !== "mcp" ? (
         <ManagedProviderPanel
+          connectedSources={connectedSources}
           skill={skill}
           key={workspace.workspaceId + provider}
           workspace={workspace}
