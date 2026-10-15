@@ -102,6 +102,16 @@ class EvidenceAccounting(unittest.TestCase):
   self.assertIsNotNone(m.validate_canonical_inventory({'canonicalInventory':audit},self.root,'Runner/a'))
  def test_foreign_case_inventory_cannot_be_substituted(self):
   self.assertIsNotNone(m.validate_canonical_inventory({'canonicalInventory':self.canonical('b')},self.root,'Runner/a'))
+ def test_review_exclusions_require_explicit_family_contract(self):
+  audit=self.canonical()
+  for phase in ['before','after']:
+   self.mutate_snapshot(audit,phase,lambda snap:snap['excludedTables'].update({'personal_review_runs':'Derived receipt','personal_review_model_runs':'Derived binding'}))
+  report={'canonicalInventory':audit,'mutationHistoryCountUnchanged':True,'family':'reviews'}
+  self.assertIsNotNone(m.validate_canonical_inventory(report,self.root,'Runner/a'))
+  self.assertIsNone(m.validate_canonical_inventory(report,self.root,'Runner/a',m.REVIEW_EXCLUDED_TABLES))
+  for phase in ['before','after']:
+   self.mutate_snapshot(audit,phase,lambda snap:snap['excludedTables'].update({'personal_review_activation':'not permitted'}))
+  self.assertIsNotNone(m.validate_canonical_inventory(report,self.root,'Runner/a',m.REVIEW_EXCLUDED_TABLES))
  def test_snapshot_link_cannot_be_substituted(self):
   audit=self.canonical();path=pathlib.Path(audit['after']['path']);raw=path.read_bytes();path.unlink()
   other=self.root/'foreign.json';other.write_bytes(raw);path.symlink_to(other)

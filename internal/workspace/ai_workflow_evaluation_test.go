@@ -19,6 +19,7 @@ import (
 )
 
 type workflowCase struct {
+	Source             string `json:"source"`
 	ID                 string `json:"id"`
 	Scenario           string `json:"scenario"`
 	Expected           string `json:"expected"`
