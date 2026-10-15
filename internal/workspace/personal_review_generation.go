@@ -244,7 +244,9 @@ func (k *Kernel) capturePersonalReviewGeneration(ctx context.Context, e contract
 	}
 	r.Warning = "Analysis uses at most four source excerpts per selected page, with record fields read from current canonical values and ten approved relevant memories; it is not a complete workspace audit."
 	if omitted > 0 {
-		r.Warning += fmt.Sprintf(" %d additional excerpts were omitted by the capture bound.", omitted)
+		// The per-page query stops at its first excess row, so this is a lower
+		// bound rather than a complete count of excerpts outside the quota.
+		r.Warning += fmt.Sprintf(" Additional excerpts omitted by the capture bound: at least %d.", omitted)
 	}
 	return k.validateReviewGenerationSnapshot(ctx, tx, e, *r)
 }

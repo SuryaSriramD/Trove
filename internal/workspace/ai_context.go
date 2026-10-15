@@ -78,11 +78,7 @@ func prepareAIContextWithSystem(ctx context.Context, r AIRequest, sources []AIEv
 		// counting tokens. Keep the exact current request last so generic rules
 		// cannot displace its requested facts or presentation. Neither source
 		// data nor the request is interpreted to construct a generated answer.
-		tail += memoryContext + aiCitedResponseContract
-		if r.Mode == "answer" {
-			tail += aiAnswerabilityContract
-		}
-		tail += selection + request
+		tail += memoryContext + aiCitedResponseContract + selection + request
 	} else if groundedProse {
 		// The system's prose policy and exact final user request share the
 		// complete token measurement. No source or request text is parsed to

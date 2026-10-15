@@ -148,6 +148,11 @@ func prepareAdvancedAI(ctx context.Context, k *Kernel, e contracts.ServiceExecut
 						return Fail("INVALID_REQUEST", "The model received only an excerpt of this code block; select the exact code to replace and generate a new draft")
 					}
 				}
+				if run.Request.Mode == "code_comment" {
+					if err := validateAIGoCommentChange(str(data["language"]), p.Before, after); err != nil {
+						return err
+					}
+				}
 			}
 			p.After = after
 			data["source"] = after
