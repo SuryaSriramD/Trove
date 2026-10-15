@@ -42,8 +42,8 @@ func retainedPortableMappings(ctx context.Context, q querier, p *ImportPlan) (ma
 			if item.MappingID != m.ID || !item.Committed || strings.Contains(item.ExternalID, "#copy=") {
 				continue
 			}
-			key := ""
-			if item.Kind == "portable_collection" {
+			key := item.PortableIdentity
+			if key == "" && item.Kind == "portable_collection" {
 				for _, c := range prior.PortableCollections {
 					if c.Locator != item.Locator {
 						continue
@@ -54,7 +54,7 @@ func retainedPortableMappings(ctx context.Context, q querier, p *ImportPlan) (ma
 						}
 					}
 				}
-			} else if item.Kind == "markdown" || item.Kind == "html" {
+			} else if key == "" && (item.Kind == "markdown" || item.Kind == "html") {
 				kind, id := importIdentity(item.Locator)
 				if kind == "external_id" {
 					key = portableSourceKey("page", id)
