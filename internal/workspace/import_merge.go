@@ -374,7 +374,7 @@ func prepareImportMerge(ctx context.Context, q querier, p *ImportPlan, item *Imp
 	if !known {
 		status = "unavailable"
 	}
-	item.Merge = &ImportMergeReview{ID: NewID(), Version: 1, BaselineStatus: status, LocalDeleted: deleted, Fields: mergeImportFields(base.Fields, local.Fields, incoming.Fields, known), Resolutions: []ImportFieldChoice{}}
+	item.Merge = &ImportMergeReview{ID: NewID(), Version: 1, BaselineStatus: status, LocalDeleted: deleted, Fields: mergeImportContentFields(base.Fields, local.Fields, incoming.Fields, known), Resolutions: []ImportFieldChoice{}}
 	for i := range item.Merge.Fields {
 		field := &item.Merge.Fields[i]
 		if (strings.HasPrefix(field.Path, "/attachments/") || strings.HasPrefix(field.Path, "/blocks/")) && field.Base.Present && !field.Incoming.Present && field.Local.Present {
@@ -496,6 +496,9 @@ func materializeImportMerge(item *ImportItem) error {
 		if value.Present {
 			fields[f.Path] = value.Value
 		}
+	}
+	if err := expandImportSiblingOrders(fields, item.Merge); err != nil {
+		return err
 	}
 	if err := json.Unmarshal(fields["/title"], &item.Title); err != nil {
 		return Fail("INVALID_REQUEST", "Merged title must be present text")
