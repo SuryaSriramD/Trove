@@ -251,7 +251,11 @@ func addLocalDatabaseFields(ctx context.Context, q querier, snapshot *ImportSnap
 	}
 	for _, r := range records {
 		guard("record", string(r.Id), string(r.Revision))
-		guard("page", string(r.PageId), string(r.Revision))
+		var pageRevision string
+		if err := q.QueryRowContext(ctx, "SELECT revision FROM pages WHERE id=?", r.PageId).Scan(&pageRevision); err != nil {
+			return err
+		}
+		guard("page", string(r.PageId), pageRevision)
 		snapshot.Fields["/records/"+string(r.Id)] = marshal(r.PageId)
 		for _, value := range r.Values {
 			var titleValue map[string]any
@@ -348,6 +352,78 @@ func validateReviewedImportDatabase(ctx context.Context, q querier, p *ImportPla
 				return err
 			}
 		}
+	}
+	return validateReviewedImportDerivedGraph(ctx, q, p)
+}
+
+func validateReviewedImportDerivedGraph(ctx context.Context, q querier, p *ImportPlan) error {
+	if !p.TypedDatabaseMerge || p.NotionCopyGraph {
+		return nil
+	}
+	props := map[string]contracts.DomainPropertyDefinition{}
+	rows, err := q.QueryContext(ctx, "SELECT id,collection_id,type,config_json FROM properties")
+	if err != nil {
+		return err
+	}
+	for rows.Next() {
+		var prop contracts.DomainPropertyDefinition
+		var config string
+		if err = rows.Scan(&prop.Id, &prop.CollectionId, &prop.Type, &config); err != nil {
+			rows.Close()
+			return err
+		}
+		prop.Config = json.RawMessage(config)
+		props[string(prop.Id)] = prop
+	}
+	err = rows.Err()
+	rows.Close()
+	if err != nil {
+		return err
+	}
+	for i := range p.Items {
+		item := &p.Items[i]
+		if item.Kind != "portable_collection" {
+			continue
+		}
+		fields := selectedImportDatabaseFields(item)
+		for _, path := range sortedImportPaths(fields, "/schema/") {
+			var prop contracts.DomainPropertyDefinition
+			if err = json.Unmarshal(fields[path], &prop); err != nil {
+				return err
+			}
+			prop.Id, prop.CollectionId = contracts.DomainId(strings.TrimPrefix(path, "/schema/")), contracts.DomainId(item.CollectionID)
+			props[string(prop.Id)] = prop
+		}
+	}
+	collections := map[string]*PortableCollectionImport{}
+	graph := map[string][]string{}
+	for id, prop := range props {
+		collection := string(prop.CollectionId)
+		if collections[collection] == nil {
+			collections[collection] = &PortableCollectionImport{CollectionID: collection}
+		}
+		collections[collection].Properties = append(collections[collection].Properties, prop)
+		var config map[string]any
+		_ = json.Unmarshal(prop.Config, &config)
+		raw := asObject(config["raw"])
+		if prop.Type == "formula" {
+			if deps, err := formulaDependencies(str(raw["translatedExpression"])); err == nil {
+				graph[id] = deps
+			}
+		}
+		if prop.Type == "rollup" && str(raw["targetPropertyId"]) != "" {
+			graph[id] = []string{str(raw["targetPropertyId"])}
+		}
+	}
+	if graphCycle(graph) {
+		return Fail("CONFLICT", "Reviewed formula/rollup choices form a dependency cycle")
+	}
+	plans := []PortableCollectionImport{}
+	for _, collection := range collections {
+		plans = append(plans, *collection)
+	}
+	if err = validatePortableDatabaseGraph(plans, nil); err != nil {
+		return Fail("CONFLICT", "Reviewed property graph is inconsistent: "+err.Error())
 	}
 	return nil
 }
