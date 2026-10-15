@@ -50,6 +50,11 @@ type ExternalChunk struct {
 	Text      string `json:"text"`
 }
 
+type externalScanSource struct {
+	entry  ExternalSource
+	chunks []ExternalChunk
+}
+
 func init() {
 	RegisterInitializer(func(ctx context.Context, k *Kernel) error {
 		return k.write(ctx, func(tx *sql.Tx) error { _, err := tx.ExecContext(ctx, externalIndexSchema); return err })
@@ -109,10 +114,19 @@ func (k *Kernel) ApproveIndexRoot(ctx context.Context, e contracts.ServiceExecut
 		if err := requireOwnerScope(k, e); err != nil {
 			return err
 		}
-		_, err := tx.ExecContext(ctx, "INSERT INTO external_roots(id,path,identity,repository) VALUES(?,?,?,?) ON CONFLICT(path) DO UPDATE SET identity=excluded.identity,repository=excluded.repository,approved=1", out.ID, out.Path, out.Identity, out.Repository)
+		_, err := tx.ExecContext(ctx, "INSERT INTO external_roots(id,path,identity,repository) VALUES(?,?,?,?) ON CONFLICT(path) DO UPDATE SET identity=excluded.identity,repository=excluded.repository,approved=1,last_scan=''", out.ID, out.Path, out.Identity, out.Repository)
 		if err == nil {
 			err = tx.QueryRowContext(ctx, "SELECT id FROM external_roots WHERE path=?", out.Path).Scan(&out.ID)
 		}
+		if err != nil {
+			return err
+		}
+		// A new native approval starts a new scan. Retain reference identities,
+		// but never expose text collected under a prior directory selection.
+		if _, err = tx.ExecContext(ctx, "UPDATE external_sources SET state='missing' WHERE root_id=?", out.ID); err != nil {
+			return err
+		}
+		_, err = tx.ExecContext(ctx, "DELETE FROM external_chunks WHERE source_id IN(SELECT id FROM external_sources WHERE root_id=?)", out.ID)
 		return err
 	})
 	return out, err
@@ -352,7 +366,7 @@ func scanExternalRoot(ctx context.Context, k *Kernel, e contracts.ServiceExecuti
 		return nil, err
 	}
 	var selected ExternalRoot
-	err := k.db.QueryRowContext(ctx, "SELECT id,path,identity,repository,approved FROM external_roots WHERE id=?", str(r["rootId"])).Scan(&selected.ID, &selected.Path, &selected.Identity, &selected.Repository, &selected.Approved)
+	err := k.db.QueryRowContext(ctx, "SELECT id,path,identity,repository,approved,last_scan FROM external_roots WHERE id=?", str(r["rootId"])).Scan(&selected.ID, &selected.Path, &selected.Identity, &selected.Repository, &selected.Approved, &selected.LastScan)
 	if err != nil {
 		return nil, err
 	}
@@ -362,37 +376,21 @@ func scanExternalRoot(ctx context.Context, k *Kernel, e contracts.ServiceExecuti
 	root, err := os.OpenRoot(selected.Path)
 	if err != nil {
 		if os.IsNotExist(err) {
-			_ = k.write(ctx, func(tx *sql.Tx) error {
-				if _, er := tx.ExecContext(ctx, "UPDATE external_sources SET state='missing' WHERE root_id=?", selected.ID); er != nil {
-					return er
-				}
-				_, er := tx.ExecContext(ctx, "DELETE FROM external_chunks WHERE source_id IN(SELECT id FROM external_sources WHERE root_id=?)", selected.ID)
-				return er
-			})
+			_ = invalidateExternalScan(ctx, k, e, selected)
 		}
 		return nil, err
 	}
 	defer root.Close()
 	identity, identityErr := platformfs.RootIdentity(root)
 	if identityErr != nil || identity != selected.Identity {
-		_ = k.write(ctx, func(tx *sql.Tx) error {
-			if err := requireOwnerScope(k, e); err != nil {
-				return err
-			}
-			if _, err := tx.ExecContext(ctx, "UPDATE external_sources SET state='missing' WHERE root_id=?", selected.ID); err != nil {
-				return err
-			}
-			_, err := tx.ExecContext(ctx, "DELETE FROM external_chunks WHERE source_id IN(SELECT id FROM external_sources WHERE root_id=?)", selected.ID)
-			return err
-		})
+		_ = invalidateExternalScan(ctx, k, e, selected)
 		return nil, Fail("SCOPE_DENIED", "Approved folder identity changed; select it again")
 	}
-	type source struct {
-		entry  ExternalSource
-		chunks []ExternalChunk
-	}
-	sources := []source{}
+	sources := []externalScanSource{}
 	stamp := now()
+	if stamp == selected.LastScan {
+		stamp = time.Now().UTC().Add(time.Nanosecond).Format(time.RFC3339Nano)
+	}
 	err = walkApprovedRoot(ctx, root, func(name string, f *os.File, info fs.FileInfo) error {
 		b, er := io.ReadAll(io.LimitReader(f, (4<<20)+1))
 		if er != nil {
@@ -409,23 +407,22 @@ func scanExternalRoot(ctx context.Context, k *Kernel, e contracts.ServiceExecuti
 		if err != nil {
 			return err
 		}
-		sources = append(sources, source{ExternalSource{NewID(), selected.ID, name, identity, importDigest(b), "present", lang, stamp}, chunks})
+		sources = append(sources, externalScanSource{ExternalSource{NewID(), selected.ID, name, identity, importDigest(b), "present", lang, stamp}, chunks})
 		return ctx.Err()
 	})
 	if err != nil {
 		return nil, err
 	}
+	return publishExternalScan(ctx, k, e, selected, sources, stamp)
+}
+func publishExternalScan(ctx context.Context, k *Kernel, e contracts.ServiceExecutionContext, selected ExternalRoot, sources []externalScanSource, stamp string) (any, error) {
 	moved := 0
-	err = k.write(ctx, func(tx *sql.Tx) error {
+	err := k.write(ctx, func(tx *sql.Tx) error {
 		if err := requireOwnerScope(k, e); err != nil {
 			return err
 		}
-		var approved bool
-		if err := tx.QueryRowContext(ctx, "SELECT approved FROM external_roots WHERE id=?", selected.ID).Scan(&approved); err != nil {
+		if err := requireCurrentExternalScan(ctx, tx, selected); err != nil {
 			return err
-		}
-		if !approved {
-			return Fail("SCOPE_DENIED", "Folder approval was revoked during scan")
 		}
 		// Keep absent identities and page reference rows. Only their derived chunks disappear.
 		if _, err := tx.ExecContext(ctx, "UPDATE external_sources SET state='missing' WHERE root_id=?", selected.ID); err != nil {
@@ -477,6 +474,38 @@ func scanExternalRoot(ctx context.Context, k *Kernel, e contracts.ServiceExecuti
 		return err
 	})
 	return map[string]any{"indexed": len(sources), "moved": moved, "scannedAt": stamp}, err
+}
+
+// Enumeration is outside the single writer. Recheck its exact root selection
+// and the last successful scan inside the publication/invalidating transaction.
+func requireCurrentExternalScan(ctx context.Context, q querier, selected ExternalRoot) error {
+	var current ExternalRoot
+	err := q.QueryRowContext(ctx, "SELECT path,identity,repository,approved,last_scan FROM external_roots WHERE id=?", selected.ID).Scan(&current.Path, &current.Identity, &current.Repository, &current.Approved, &current.LastScan)
+	if err != nil {
+		return err
+	}
+	if !current.Approved {
+		return Fail("SCOPE_DENIED", "Folder approval was revoked during scan")
+	}
+	if current.Path != selected.Path || current.Identity != selected.Identity || current.Repository != selected.Repository || current.LastScan != selected.LastScan {
+		return Fail("CONFLICT", "Folder selection or completed scan changed; refresh the current folder again")
+	}
+	return nil
+}
+func invalidateExternalScan(ctx context.Context, k *Kernel, e contracts.ServiceExecutionContext, selected ExternalRoot) error {
+	return k.write(ctx, func(tx *sql.Tx) error {
+		if err := requireOwnerScope(k, e); err != nil {
+			return err
+		}
+		if err := requireCurrentExternalScan(ctx, tx, selected); err != nil {
+			return err
+		}
+		if _, err := tx.ExecContext(ctx, "UPDATE external_sources SET state='missing' WHERE root_id=?", selected.ID); err != nil {
+			return err
+		}
+		_, err := tx.ExecContext(ctx, "DELETE FROM external_chunks WHERE source_id IN(SELECT id FROM external_sources WHERE root_id=?)", selected.ID)
+		return err
+	})
 }
 func revokeExternalRoot(ctx context.Context, k *Kernel, e contracts.ServiceExecutionContext, r map[string]any) (any, error) {
 	if err := requireOwnerScope(k, e); err != nil {
