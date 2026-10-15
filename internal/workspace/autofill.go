@@ -10,6 +10,7 @@ import (
 	"sort"
 	"strings"
 	"time"
+	"unicode/utf8"
 
 	"trove.local/phase0/contracts"
 )
@@ -37,7 +38,14 @@ type AutofillCell struct {
 	Reason        string                             `json:"reason"`
 	GeneratedAt   string                             `json:"generatedAt,omitempty"`
 }
+type AutofillModel struct {
+	PackID         string `json:"packId"`
+	SHA256         string `json:"sha256"`
+	SourceRevision string `json:"sourceRevision"`
+	RuntimeCommit  string `json:"runtimeCommit"`
+}
 type AutofillBatch struct {
+	Model         *AutofillModel                      `json:"model,omitempty"`
 	Version       int                                 `json:"version"`
 	ID            string                              `json:"id"`
 	ActorID       string                              `json:"actorId"`
@@ -291,6 +299,43 @@ func listAutofill(ctx context.Context, k *Kernel, e contracts.ServiceExecutionCo
 	}
 	return out, nil
 }
+
+// BindAutofillModel is called only by the trusted native adapter after checking
+// the installed artifact; renderer payloads cannot supply model provenance.
+func (k *Kernel) BindAutofillModel(ctx context.Context, e contracts.ServiceExecutionContext, id string, model AutofillModel) error {
+	return k.write(ctx, func(tx *sql.Tx) error {
+		b, err := readAutofill(ctx, k, tx, e, id)
+		if err != nil {
+			return err
+		}
+		if b.State == "running" || b.State == "applied" {
+			return Fail("CONFLICT", "Autofill is already running or applied")
+		}
+		if model.PackID != b.Input.ModelPackID || contracts.Validate("service", "AutofillModel", marshal(model)) != nil {
+			return Fail("INVALID_REQUEST", "Verified model artifact identity is required")
+		}
+		if b.Model != nil && string(marshal(b.Model)) != string(marshal(model)) {
+			return Fail("CONFLICT", "Model artifact changed; create a new batch")
+		}
+		b.Model = &model
+		return saveAutofill(ctx, tx, b)
+	})
+}
+func (k *Kernel) ValidateAutofillSources(ctx context.Context, e contracts.ServiceExecutionContext, id string) error {
+	tx, err := k.db.BeginTx(ctx, &sql.TxOptions{ReadOnly: true})
+	if err != nil {
+		return err
+	}
+	defer tx.Rollback()
+	b, err := readAutofill(ctx, k, tx, e, id)
+	if err != nil {
+		return err
+	}
+	if b.State != "running" {
+		return Fail("CONFLICT", "Autofill is no longer generating")
+	}
+	return autofillCurrent(ctx, k, tx, e, b)
+}
 func (k *Kernel) StartAutofill(ctx context.Context, e contracts.ServiceExecutionContext, id string) (AutofillBatch, error) {
 	var b AutofillBatch
 	err := k.write(ctx, func(tx *sql.Tx) error {
@@ -390,9 +435,18 @@ func (k *Kernel) GenerateAutofill(ctx context.Context, e contracts.ServiceExecut
 	saveCtx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 	err := k.write(saveCtx, func(tx *sql.Tx) error {
-		current, err := readAutofill(saveCtx, k, tx, e, b.ID)
-		if err != nil {
+		// Finalizing this already-owned flight must work even after a grant is
+		// revoked. It changes only derived run state and exposes no source data.
+		var raw string
+		if err := tx.QueryRowContext(saveCtx, "SELECT body_json FROM autofill_batches WHERE id=? AND actor_id=?", b.ID, e.Actor.ActorId).Scan(&raw); err != nil {
 			return err
+		}
+		var current AutofillBatch
+		if err := json.Unmarshal([]byte(raw), &current); err != nil {
+			return err
+		}
+		if current.State != "running" {
+			return Fail("CONFLICT", "Autofill is no longer generating")
 		}
 		current.State = "review"
 		current.Error = ""
@@ -403,7 +457,7 @@ func (k *Kernel) GenerateAutofill(ctx context.Context, e contracts.ServiceExecut
 		b = current
 		return saveAutofill(saveCtx, tx, current)
 	})
-	if onProgress != nil && err == nil {
+	if onProgress != nil && err == nil && k.authorize(e) == nil {
 		onProgress(b)
 	}
 	if err != nil {
@@ -436,12 +490,32 @@ func decodeAutofill(raw string) (string, any, string) {
 	fail := func() (string, any, string) {
 		return "error", nil, "Malformed or unsupported model output; nothing was applied"
 	}
-	if len(raw) > 32768 || !aiValidJSONSurrogates(raw) {
+	if len(raw) > 32768 || !utf8.ValidString(raw) || !aiValidJSONSurrogates(raw) {
 		return fail()
 	}
 	dec := json.NewDecoder(strings.NewReader(raw))
-	var obj map[string]json.RawMessage
-	if err := dec.Decode(&obj); err != nil || len(obj) != 3 {
+	obj := map[string]json.RawMessage{}
+	start, err := dec.Token()
+	if err != nil || start != json.Delim('{') {
+		return fail()
+	}
+	for dec.More() {
+		token, err := dec.Token()
+		key, ok := token.(string)
+		if err != nil || !ok || (key != "outcome" && key != "value" && key != "reason") {
+			return fail()
+		}
+		if _, exists := obj[key]; exists {
+			return fail()
+		}
+		var value json.RawMessage
+		if dec.Decode(&value) != nil {
+			return fail()
+		}
+		obj[key] = value
+	}
+	end, err := dec.Token()
+	if err != nil || end != json.Delim('}') || len(obj) != 3 {
 		return fail()
 	}
 	var extra any

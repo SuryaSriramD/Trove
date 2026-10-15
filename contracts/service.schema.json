@@ -4268,6 +4268,226 @@
       ],
       "additionalProperties": false
     },
+    "AutofillModel": {
+      "type": "object",
+      "properties": {
+        "packId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "sha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "sourceRevision": {
+          "type": "string"
+        },
+        "runtimeCommit": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "packId",
+        "sha256",
+        "sourceRevision",
+        "runtimeCommit"
+      ],
+      "additionalProperties": false
+    },
+    "AutofillSource": {
+      "type": "object",
+      "properties": {
+        "propertyId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "name": {
+          "type": "string"
+        },
+        "type": {
+          "type": "string"
+        },
+        "definition": {
+          "$ref": "domain.schema.json#/$defs/PropertyDefinition"
+        },
+        "value": {
+          "type": [
+            "object",
+            "array",
+            "string",
+            "number",
+            "integer",
+            "boolean",
+            "null"
+          ]
+        },
+        "present": {
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "propertyId",
+        "name",
+        "type",
+        "definition",
+        "value",
+        "present"
+      ],
+      "additionalProperties": false
+    },
+    "AutofillCell": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "recordId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "pageId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "property": {
+          "$ref": "domain.schema.json#/$defs/PropertyDefinition"
+        },
+        "sources": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/AutofillSource"
+          },
+          "maxItems": 32
+        },
+        "before": {
+          "type": [
+            "object",
+            "array",
+            "string",
+            "number",
+            "integer",
+            "boolean",
+            "null"
+          ]
+        },
+        "beforePresent": {
+          "type": "boolean"
+        },
+        "overwrite": {
+          "type": "boolean"
+        },
+        "state": {
+          "type": "string",
+          "enum": [
+            "pending",
+            "skipped",
+            "value",
+            "no_value",
+            "error"
+          ]
+        },
+        "value": {
+          "type": [
+            "object",
+            "array",
+            "string",
+            "number",
+            "integer",
+            "boolean",
+            "null"
+          ]
+        },
+        "reason": {
+          "type": "string"
+        },
+        "generatedAt": {
+          "$ref": "domain.schema.json#/$defs/Timestamp"
+        }
+      },
+      "required": [
+        "id",
+        "recordId",
+        "pageId",
+        "property",
+        "sources",
+        "before",
+        "beforePresent",
+        "overwrite",
+        "state",
+        "value",
+        "reason"
+      ],
+      "additionalProperties": false
+    },
+    "AutofillBatch": {
+      "type": "object",
+      "properties": {
+        "version": {
+          "const": 1
+        },
+        "id": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "actorId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "input": {
+          "$ref": "#/$defs/AutofillInput"
+        },
+        "promptVersion": {
+          "const": 1
+        },
+        "state": {
+          "type": "string",
+          "enum": [
+            "draft",
+            "running",
+            "interrupted",
+            "review",
+            "applied"
+          ]
+        },
+        "cells": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/AutofillCell"
+          },
+          "maxItems": 128
+        },
+        "expectedRevisions": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/ExpectedRevision"
+          },
+          "maxItems": 400
+        },
+        "createdAt": {
+          "$ref": "domain.schema.json#/$defs/Timestamp"
+        },
+        "appliedIds": {
+          "type": "array",
+          "items": {
+            "$ref": "domain.schema.json#/$defs/Id"
+          },
+          "maxItems": 128
+        },
+        "error": {
+          "type": "string"
+        },
+        "model": {
+          "$ref": "#/$defs/AutofillModel"
+        }
+      },
+      "required": [
+        "version",
+        "id",
+        "actorId",
+        "input",
+        "promptVersion",
+        "state",
+        "cells",
+        "expectedRevisions",
+        "createdAt",
+        "appliedIds"
+      ],
+      "additionalProperties": false
+    },
     "AutofillCreateRequest": {
       "type": "object",
       "properties": {

@@ -2331,6 +2331,48 @@ type ServiceNativeBackupSummary struct {
 	Excluded    []string `json:"excluded"`
 	Restoration []string `json:"restoration"`
 }
+type ServiceAutofillModel struct {
+	PackId         DomainId `json:"packId"`
+	Sha256         string   `json:"sha256"`
+	SourceRevision string   `json:"sourceRevision"`
+	RuntimeCommit  string   `json:"runtimeCommit"`
+}
+type ServiceAutofillSource struct {
+	PropertyId DomainId                 `json:"propertyId"`
+	Name       string                   `json:"name"`
+	Type       string                   `json:"type"`
+	Definition DomainPropertyDefinition `json:"definition"`
+	Value      json.RawMessage          `json:"value"`
+	Present    bool                     `json:"present"`
+}
+type ServiceAutofillCell struct {
+	Id            DomainId                 `json:"id"`
+	RecordId      DomainId                 `json:"recordId"`
+	PageId        DomainId                 `json:"pageId"`
+	Property      DomainPropertyDefinition `json:"property"`
+	Sources       []ServiceAutofillSource  `json:"sources"`
+	Before        json.RawMessage          `json:"before"`
+	BeforePresent bool                     `json:"beforePresent"`
+	Overwrite     bool                     `json:"overwrite"`
+	State         string                   `json:"state"`
+	Value         json.RawMessage          `json:"value"`
+	Reason        string                   `json:"reason"`
+	GeneratedAt   *DomainTimestamp         `json:"generatedAt,omitempty"`
+}
+type ServiceAutofillBatch struct {
+	Version           int64                     `json:"version"`
+	Id                DomainId                  `json:"id"`
+	ActorId           DomainId                  `json:"actorId"`
+	Input             ServiceAutofillInput      `json:"input"`
+	PromptVersion     int64                     `json:"promptVersion"`
+	State             string                    `json:"state"`
+	Cells             []ServiceAutofillCell     `json:"cells"`
+	ExpectedRevisions []ServiceExpectedRevision `json:"expectedRevisions"`
+	CreatedAt         DomainTimestamp           `json:"createdAt"`
+	AppliedIds        []DomainId                `json:"appliedIds"`
+	Error             *string                   `json:"error,omitempty"`
+	Model             *ServiceAutofillModel     `json:"model,omitempty"`
+}
 type ServiceAutofillCreateRequest struct {
 	ContractVersion int64                `json:"contractVersion"`
 	RequestId       DomainId             `json:"requestId"`

@@ -2,7 +2,7 @@
 
 **The single current development and progress tracker for this project.** Read and update this file for every meaningful implementation change, investigation, test result, decision, blocker and handoff. This is not an automatically running monitor.
 
-Last updated: **2026-10-15 18:34 IST**. User-facing dates use **Asia/Kolkata (IST, UTC+05:30)**; source artifacts may retain UTC timestamps.
+Last updated: **2026-10-15 19:06 IST**. User-facing dates use **Asia/Kolkata (IST, UTC+05:30)**; source artifacts may retain UTC timestamps.
 
 This file consolidates the original 51-item backlog, the newly selected desktop scope, current qualification, next actions and development history. Earlier status pages are historical snapshots. Machine-readable contracts, the legacy registry and immutable qualification records remain supporting inputs/evidence; they are not additional human progress dashboards. Their frozen bytes must not be rewritten to make a status look current.
 
@@ -33,7 +33,7 @@ Candidate 7's focused 22-case prompt experiment was rejected and production prom
 
 | Location | Branch / source | Current interpretation |
 | --- | --- | --- |
-| Primary project: `/Volumes/HD-B1/HD-Projects/Trove` | `codex/macos-feature-completion`, current integrated source `5cb0951` | Baseline `ee14f0c`; shared foundations `0ed5350`, G02 `2b421a4`, G03 `950cea5`/`6e713bc` and G01 page merge `2279bf0`/`a3f9e54` integrated. See the development log for subsequent commits and current verification. |
+| Primary project: `/Volumes/HD-B1/HD-Projects/Trove` | `codex/macos-feature-completion`, current integrated source `cc1b0ca` | Baseline `ee14f0c`; shared foundations `0ed5350`, G02 `2b421a4`, G03 `950cea5`/`6e713bc` and G01 page merge `2279bf0`/`a3f9e54` integrated. See the development log for subsequent commits and current verification. |
 | Latest development worktree: `/Users/suryasriramduvvuri/.codex/worktrees/macos-p0-title-context/Trove` | `codex/macos-p0-title-context`, `299e43df9b716f771125d939ad320c3cb595f2c7` | Candidate 7 source. One descendant commit containing tests, fixtures, telemetry and execution documentation. |
 
 Keep candidate 7's execution in its declared worktree. Review and integrate the descendant commit separately; do not rebuild a package just to align a checkout. A product/binary/policy change requires a new candidate and affected fresh evidence.
@@ -705,16 +705,16 @@ These are additional/reconciled requirements from the October 12 review, scoped 
 
 | ID | Deliverable / source state | Owner / depends on | Remaining work and completion evidence |
 | --- | --- | --- | --- |
-| G01 | Re-import consistency — contract exists; reconciliation pending | A,D / D002, FIX-001/002 | Audit ZIP/API paths against base/local/incoming rules, visible conflicts, complete-source deletion and idempotent stale-review rejection; preserve raw bytes and local edits. |
+| G01 | Re-import consistency — page/typed/CSV implementation integrated; attachment/recovery gaps active | A,D / D002, FIX-001/002 | Audit ZIP/API paths against base/local/incoming rules, visible conflicts, complete-source deletion and idempotent stale-review rejection; preserve raw bytes and local edits. |
 | G02 | One task authority — implementation integrated; acceptance pending | A,B,C / D001 | Verify page todo, Home/Tasks and database projections agree for title/status/due, promotion, duplicate extraction, deletion, restart and restore. |
 | G03 | OS protection + encrypted portable backups — implementation integrated; acceptance pending | D,F / CORE-010, REL-005/006 | Document copied-backup/lost-device boundaries; add passphrase-encrypted native archive, complete authenticated staging, verified preview and fresh-destination restore. Wrong key/tampering/truncation/crash must not activate a destination. Native format compatibility stays. |
 | G04 | Concrete quality and support contract — partly specified | A,E,F / EVAL-*, REL-007 | Retain existing thresholds, name actual hardware/OS/model/language/workloads, lock new independent rubrics before measurement, report task/citation/speech quality and correction effort. New accuracy percentages and RAM targets remain proposals. |
-| G05 | Meeting controls and retention — partial foundation | B,D,E,F / CORE-005, REL-003/004 | Implement/verify visible input and start/pause/resume/stop, consent/permission/device/low-disk handling, recoverable gaps, correction history/source anchors, stale derived outputs, and distinct audio/transcript/index/backup retention. No hidden pruning. |
+| G05 | Meeting controls and retention — implementation integrated; native acceptance pending | B,D,E,F / CORE-005, REL-003/004 | Implement/verify visible input and start/pause/resume/stop, consent/permission/device/low-disk handling, recoverable gaps, correction history/source anchors, stale derived outputs, and distinct audio/transcript/index/backup retention. No hidden pruning. |
 | G06 | Personal background reminders — planned | A,B,F / task authority, native notifications | Separate reminder time from due date; opt-in agent, acknowledged schedule publication, snooze/dismiss/inbox and sleep/restart/DST/restore handling. Agent never opens canonical workspace SQLite; Complete task uses desktop owner. Track uncertain OS delivery honestly. |
 | G07 | Reusable AI skills — implementation in progress | A,B,E / AI-001, permission/review contracts | Version instructions/inputs/output/scopes/tools; manual invocation, selected sources, cancellation and provider handoff. Imported skills are inert; no new permission from their text. Proposed writes use existing guarded approval. |
-| G08 | AI database autofill — planned | A,B,C,E / AI-001, G07 | Selected rows/properties, typed values, blank-first behavior, overwrite preview, provenance, source/schema/model revisions, cancellation/resume and grouped undo. Stale outputs cannot overwrite manual edits. |
+| G08 | AI database autofill — implementation integrated; acceptance pending | A,B,C,E / AI-001, G07 | Selected rows/properties, typed values, blank-first behavior, overwrite preview, provenance, source/schema/model revisions, cancellation/resume and grouped undo. Stale outputs cannot overwrite manual edits. |
 | G09 | Page review/freshness lifecycle — implementation in progress | A,B,E / history, search/AI evidence | Store human-reviewed revision/date/expiry; invalidate after content change/expiry; expose queue and citation/search status. Separate from generative personal review and do not label a badge machine-proven truth. |
-| G10 | Record layouts + previewed dependency rescheduling — grouped-undo foundation in progress | A,B,C / PARITY-003/004, guarded mutations | G10-LAYOUT: stable property-ID layouts, sections/header/sidebar, overrides/reset without data deletion. G10-SCHEDULE: explicit full affected-date preview, duration preservation, cycle/constraint checks, calendar/timezone rules, atomic apply and grouped undo. Existing dependency links remain compatible. |
+| G10 | Record layouts + previewed dependency rescheduling — implementation integrated; acceptance pending | A,B,C / PARITY-003/004, guarded mutations | G10-LAYOUT: stable property-ID layouts, sections/header/sidebar, overrides/reset without data deletion. G10-SCHEDULE: explicit full affected-date preview, duration preservation, cycle/constraint checks, calendar/timezone rules, atomic apply and grouped undo. Existing dependency links remain compatible. |
 | G11 | Phone capture and continuity — deferred by user | B,D,F / desktop completion | Record desktop-first positioning and revisit a companion only after desktop work. No mobile client or two-way mobile sync is being implemented in this plan. |
 | G12 | Broad connected-app platform — planned | A,D,E / CONN-00–06 | Six named adapters, selected-source refresh and explicitly reviewed external writes; real authorization, provenance, stale/offline/denied/deleted distinctions and revocation. No automatic two-way sync. |
 
@@ -904,6 +904,22 @@ This section begins with reconstructed milestones from retained evidence and the
 
 **Evidence/limitations:** Service/root/contracts compilation and frontend TypeScript passed at the initial checkpoint. New focused regressions initially exposed a typed-ID-to-string bug in journal preparation (corrected); existing-value grouped undo also depends on G10's pending shared normalization repair. These checks are not a G08 pass or feature acceptance. Tests and browser workflow verification continue after integration. No real model was invoked. Initial implementation provenance records prompt version and selected model-pack identity; exact model artifact provenance and further stale/retry review remain next.
 
+### DEV-021 — 15 October 2026, 18:56 IST: G05/G08/G10 integration and connector preparation
+
+**Source:** G08 checkpoint `33906a3`, G10 integrated `92955e5`, explicit CSV identity `1f7a26c`, G05 correction/retention `cc1b0ca`; current G08 hardening changes remain uncommitted. Shared schema conflicts were combined at the generator source and all consumers regenerated. G10 supplies the scalar journal normalization required by autofill undo. G05 archived-summary projection follow-up `a798931` is ready for integration.
+
+**Implemented:** Stable property-ID layouts with defaults/overrides/reset/history; complete guarded dependency schedules with calendar/working-week and explicit timezone; corrected stable transcript segments and reviewed category-specific retention; persisted manual autofill source/schema snapshots, typed per-cell outcomes, explicit overwrite review, bounded local generation, cancellation/resume, idempotent atomic application, provenance and grouped undo. Autofill now records the verified model artifact hash/source/runtime identity and rejects changing that identity on resume. Grant revocation interrupts the flight durably; source changes during generation cannot publish a suggestion.
+
+**Evidence:** Combined service/native/root/contracts campaign at `cc1b0ca` plus G08 hardening passed **176 tests/subtests, zero failures/skips**, `/private/tmp/trove-g05-g08-g10-integrated-race.jsonl`. The separately built stalled-startup fixture supplies the previously missing microphone case; these remain device-free native tests. Initial G08 typed-ID failure is corrected. Final output-decoder/source-validation follow-up: workspace suite has **12 passes**, `/private/tmp/trove-autofill-final-race.jsonl`; root/contracts compilation still running at this entry, so not yet reported complete. TypeScript and **56 frontend unit tests** passed. Autofill actual-component browser test with mocked dispatcher passed (`/private/tmp/trove-autofill-browser.json`): cancellation, reload/resume, separate overwrite review, apply and undo. Production frontend build is still running. Worker G10 evidence: 13 service races plus one mocked browser; G05 follow-up:154 test/subtest passes and four mocked browser passes; these separate runs are not additive product-completion counts.
+
+**Connector findings and next action:** Begin CONN-00 framework and native account lifecycle while workers complete G06, G09/P2 and import attachment/conversation gaps. Firecrawl developer search succeeded; page scrape hit exhausted credits, so official documentation was read through the available web tool. [Google installed-app OAuth](https://developers.google.com/identity/protocols/oauth2/native-app) requires system-browser/local callback and supports PKCE; installed-app incremental authorization is unsupported. [Desktop Picker](https://developers.google.com/workspace/drive/picker/guides/desktop-mobile-picker) requires `drive.file` alone and returns explicit selected IDs, so Drive Picker grants must remain separate from Calendar/Gmail grants even when account-lifecycle code is shared. [GitHub App device flow](https://docs.github.com/en/apps/creating-github-apps/authenticating-with-a-github-app/generating-a-user-access-token-for-a-github-app) supports native user tokens without a bundled confidential secret. Registrations and authorized live-account validation remain dependent checks, not completed integrations. No real models/accounts, physical devices, release candidate or release approval is claimed.
+
+### DEV-022 — 15 October 2026, 18:58 IST: autofill final follow-up and build correction
+
+Final autofill workspace and protocol suite passed **37 tests/subtests, zero skips** at `cc1b0ca` plus current G08 changes (`/private/tmp/trove-autofill-final-race.jsonl`), including duplicate-key output rejection, source changes during generation, grant revocation with resumable state, model artifact changes, overwrite guards and existing-value undo. The same command's desktop package failed to compile because a concurrently running Vite build replaced files under embedded `frontend/dist`; this is retained as a failed campaign, not counted as a desktop pass. Frontend production build subsequently completed successfully with bundler size/directive/timing warnings (`/private/tmp/trove-autofill-build.log`). Corrective desktop-only race/compile rerun is now serialized after the build. Future frontend rebuild and desktop embedding checks must be sequential. No candidate was packaged and this build duration is not controlled performance evidence.
+
+**19:06 correction:** The serialized desktop race/compile rerun passed **87 tests/subtests, zero failures/skips**, `/private/tmp/trove-autofill-root-final-race.jsonl`. G08 hardening, generated contracts and the actual-component browser fixture are ready to checkpoint. This corrects the earlier build overlap without erasing its failed result. The newly started connector package contains types only and is not included in this implementation claim.
+
 <a id="commit-history"></a>
 ## Recorded source-development history
 
@@ -1060,6 +1076,10 @@ Complete reachable primary + candidate-7 lineage at initial consolidation: **133
 | `97201e7` | 2026-10-15 18:25 | Integrate acknowledged meeting capture controls |
 | `45ef173` | 2026-10-15 18:33 | Integrate typed collection re-import |
 | `5cb0951` | 2026-10-15 18:33 | Preflight import graphs and reconstruct evidenced baselines |
+| `33906a3` | 2026-10-15 18:44 | Checkpoint persisted reviewed autofill |
+| `92955e5` | 2026-10-15 18:45 | Integrate layouts, scheduling and scalar undo repair |
+| `1f7a26c` | 2026-10-15 18:45 | Bind explicit CSV source keys |
+| `cc1b0ca` | 2026-10-15 18:48 | Integrate transcript correction and retention |
 
 </details>
 
