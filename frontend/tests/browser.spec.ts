@@ -198,6 +198,7 @@ test.beforeEach(async ({ page }, testInfo) => {
                 for(const block of state.blocks) texts.set(block.pageId,(texts.get(block.pageId)??"")+" "+JSON.stringify(block.data));
                 return ok({hits:state.pages.filter((p:any)=>!p.deletedAt&&!p.archivedAt&&(p.title+" "+(texts.get(p.id)??"")).toLocaleLowerCase().includes(needle)).slice(0,req.limit).map((p:any)=>({title:p.title,kind:"page",location:{pageId:p.id,sourceRevision:p.revision}})),partial:false});
               }
+              if (method === "page.reviewQueue") return ok({ items: [], partial: false });
               if (method === "pageDisplay.get") return ok({pageId:req.pageId,fullWidth:false,presentation:false,revision:state.pages.find((p:any)=>p.id===req.pageId)?.revision ?? "1"});
               if (method === "editor.lock") return ok((state as any).pageLock ?? {locked:false,revision:"0"});
               if (method === "editor.setLock") { (state as any).pageLock={locked:req.locked,revision:String(Number(req.expectedRevision)+1)};return ok((state as any).pageLock); }
@@ -2030,4 +2031,133 @@ test("G05 retention requires exact effect review and cancellation writes nothing
   expect(requests).toHaveLength(1);
   expect(requests[0].commands[0]).toMatchObject({selected: ["audio", "transcripts"], previewHash: "audio:transcripts"});
   expect(requests[0].mutation.expectedRevisions).toEqual([{target: {entityType: "meeting", entityId: id(510)}, revision: "1"}]);
+});
+
+for (const changedWorkspace of [false, true])
+  test(`shell continuity: delayed snapshot cannot replace ${changedWorkspace ? "new workspace" : "newer source"}`, async ({page})=>{
+    await expect(page.getByRole("button",{name:"🌱 A garden of ideas",exact:true}).first()).toBeVisible();
+    await page.evaluate(()=>{
+      const w=window as any, app=w.go.main.App, previous=app.Dispatch;
+      let first=true;
+      app.Dispatch=async(method:string,raw:string)=>{
+        const response=await previous(method,raw);
+        if(method==="workspace.snapshot"&&first){first=false;return new Promise(resolve=>{w.releaseOldSnapshot=()=>resolve(response)})}
+        return response;
+      };
+      w.emitFixtureEvent("workspace:changed");
+    });
+    await expect.poll(()=>page.evaluate(()=>Boolean((window as any).releaseOldSnapshot))).toBe(true);
+    await page.evaluate((changedWorkspace)=>{
+      const w=window as any,state=w.fixtureState();
+      state.pages[0].title="Current authoritative workspace";
+      state.snapshotCursor="2";
+      if(changedWorkspace){state.workspaceId="019a1234-5678-7000-8000-000000000700";state.scopeGrantId="019a1234-5678-7000-8000-000000000701";for(const page of state.pages)page.workspaceId=state.workspaceId;}
+      w.emitFixtureEvent("workspace:changed");
+    },changedWorkspace);
+    await page.evaluate(()=>(window as any).releaseOldSnapshot());
+    await expect(page.getByRole("button",{name:"🌱 Current authoritative workspace",exact:true}).first()).toBeVisible();
+    await expect(page.getByRole("button",{name:"🌱 A garden of ideas",exact:true})).toHaveCount(0);
+  });
+
+test("shell continuity: native block link resolves only its scoped page",async({page})=>{
+ await page.evaluate(()=>{
+  const w=window as any,app=w.go.main.App,previous=app.Dispatch;
+  w.scopedReads=[];
+  app.Dispatch=async(method:string,raw:string)=>{
+   const response=await previous(method,raw),req=JSON.parse(raw);
+   if(method==="workspace.snapshot"){const parsed=JSON.parse(response);parsed.result.contentMode="shell";parsed.result.blocks=[];return JSON.stringify(parsed)}
+   if(method==="readPage")w.scopedReads.push(req);
+   return response;
+  };
+  let pending=`trove://page/${w.fixtureState().pages[0].id}/block/${w.fixtureState().blocks[1].id}?workspace=${w.fixtureState().workspaceId}`;
+  app.PendingDeepLink=async()=>{const value=pending;pending="";return value};
+  w.emitFixtureEvent("native:openURL");
+ });
+ await expect(page.getByRole("textbox",{name:"Page title"})).toHaveValue("A garden of ideas");
+ await expect(page.locator(`[data-block-id="${id(11)}"]`)).toHaveClass(/source-highlight/);
+ const reads=await page.evaluate(()=>(window as any).scopedReads);
+ expect(reads.length).toBeGreaterThan(0);
+ expect(reads.every((r:any)=>r.workspaceId===id(1)&&r.pageId===id(2))).toBe(true);
+ const requests=await page.evaluate(()=>(window as any).fixtureRequests.filter((r:any)=>r.method==="workspace.snapshot"));
+ expect(requests.every((r:any)=>r.contentMode==="shell")).toBe(true);
+});
+
+test("shell continuity: superseded snapshot failure cannot replace current state",async({page})=>{
+ await page.evaluate(()=>{
+  const w=window as any,app=w.go.main.App,previous=app.Dispatch;let first=true;
+  app.Dispatch=async(method:string,raw:string)=>{
+   if(method==="workspace.snapshot"&&first){first=false;return new Promise(resolve=>{w.releaseOldSnapshot=()=>resolve(JSON.stringify({ok:false,error:{code:"WORKSPACE_LOCKED",message:"Obsolete workspace unavailable"}}))})}
+   return previous(method,raw);
+  };
+  w.emitFixtureEvent("workspace:changed");
+ });
+ await expect.poll(()=>page.evaluate(()=>Boolean((window as any).releaseOldSnapshot))).toBe(true);
+ await page.evaluate(()=>{const w=window as any;w.fixtureState().pages[0].title="Current after failure";w.fixtureState().snapshotCursor="3";w.emitFixtureEvent("workspace:changed")});
+ await page.evaluate(()=>(window as any).releaseOldSnapshot());
+ await expect(page.getByRole("button",{name:"🌱 Current after failure",exact:true}).first()).toBeVisible();
+ await expect(page.getByText("Obsolete workspace unavailable",{exact:false})).toHaveCount(0);
+});
+
+test("shell continuity: block resolution cannot navigate after workspace changes",async({page})=>{
+ await page.evaluate(()=>{
+  const w=window as any,app=w.go.main.App,previous=app.Dispatch;let held=false;
+  app.Dispatch=async(method:string,raw:string)=>{
+   const response=await previous(method,raw);
+   if(method==="workspace.snapshot"){const parsed=JSON.parse(response);parsed.result.contentMode="shell";parsed.result.blocks=[];return JSON.stringify(parsed)}
+   if(method==="readPage"&&!held){held=true;return new Promise(resolve=>{w.releaseLinkedPage=()=>resolve(response)})}
+   return response;
+  };
+  let pending=`trove://page/${w.fixtureState().pages[0].id}/block/${w.fixtureState().blocks[1].id}`;
+  app.PendingDeepLink=async()=>{const value=pending;pending="";return value};w.emitFixtureEvent("native:openURL");
+ });
+ await expect.poll(()=>page.evaluate(()=>Boolean((window as any).releaseLinkedPage))).toBe(true);
+ await page.evaluate(()=>{const w=window as any,state=w.fixtureState();state.workspaceId="019a1234-5678-7000-8000-000000000700";state.scopeGrantId="019a1234-5678-7000-8000-000000000701";state.pages[0].workspaceId=state.workspaceId;state.pages[0].title="Replacement workspace page";w.emitFixtureEvent("workspace:changed")});
+ await expect(page.getByRole("button",{name:"🌱 Replacement workspace page",exact:true}).first()).toBeVisible();
+ await page.evaluate(()=>(window as any).releaseLinkedPage());
+ await page.evaluate(()=>new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve))));
+ await expect(page.getByRole("textbox",{name:"Page title"})).toHaveCount(0);
+ await expect(page.locator(".app-footer")).not.toContainText("Opened linked block");
+});
+
+for(const mode of ["denied","deleted","moved","revision"])
+ test(`shell continuity: scoped block resolution rejects ${mode} target`,async({page})=>{
+  await page.evaluate((mode)=>{
+   const w=window as any,app=w.go.main.App,previous=app.Dispatch;
+   app.Dispatch=async(method:string,raw:string)=>{
+    const response=await previous(method,raw),parsed=JSON.parse(response);
+    if(method==="workspace.snapshot"){parsed.result.contentMode="shell";parsed.result.blocks=[];return JSON.stringify(parsed)}
+    if(method==="readPage"){
+     if(mode==="denied")return JSON.stringify({ok:false,error:{code:"SCOPE_DENIED",message:"Linked source is inaccessible"}});
+     if(mode==="deleted")parsed.result.page.deletedAt="2026-10-15T12:00:00Z";
+     if(mode==="moved")parsed.result.blocks=parsed.result.blocks.map((b:any)=>({...b,pageId:"019a1234-5678-7000-8000-000000000901"}));
+     if(mode==="revision")parsed.result.page.revision="2";
+     return JSON.stringify(parsed);
+    }
+    return response;
+   };
+   let pending=`trove://page/${w.fixtureState().pages[0].id}/block/${w.fixtureState().blocks[1].id}`;
+   app.PendingDeepLink=async()=>{const value=pending;pending="";return value};w.emitFixtureEvent("native:openURL");
+  },mode);
+  await expect(page.getByRole("alert")).toContainText(mode==="denied"?"inaccessible":mode==="revision"?"changed while opening":"unavailable");
+  await expect(page.getByRole("textbox",{name:"Page title"})).toHaveCount(0);
+ });
+
+test("shell continuity: manual navigation supersedes a held block link",async({page})=>{
+ await page.evaluate(()=>{
+  const w=window as any,app=w.go.main.App,previous=app.Dispatch;let held=false;
+  app.Dispatch=async(method:string,raw:string)=>{
+   const response=await previous(method,raw);
+   if(method==="workspace.snapshot"){const parsed=JSON.parse(response);parsed.result.contentMode="shell";parsed.result.blocks=[];return JSON.stringify(parsed)}
+   if(method==="readPage"&&!held){held=true;return new Promise(resolve=>{w.releaseLinkedPage=()=>resolve(response)})}
+   return response;
+  };
+  let pending=`trove://page/${w.fixtureState().pages[0].id}/block/${w.fixtureState().blocks[1].id}`;
+  app.PendingDeepLink=async()=>{const value=pending;pending="";return value};w.emitFixtureEvent("native:openURL");
+ });
+ await expect.poll(()=>page.evaluate(()=>Boolean((window as any).releaseLinkedPage))).toBe(true);
+ await navSurface(page,"Search");
+ await page.evaluate(()=>(window as any).releaseLinkedPage());
+ await page.evaluate(()=>new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve))));
+ await expect(page.getByRole("searchbox",{name:"Search text"})).toBeVisible();
+ await expect(page.getByRole("textbox",{name:"Page title"})).toHaveCount(0);
 });
