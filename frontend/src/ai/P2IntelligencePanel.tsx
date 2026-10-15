@@ -89,6 +89,8 @@ type OCRStatus = {
   minimumConfidence: number;
 };
 type OCR = {
+  persisted?: boolean;
+  indexingState?: "ready" | "pending";
   engine: string;
   extractorVersion: string;
   modelSha256?: string;
@@ -209,7 +211,11 @@ function P2IntelligenceContent({
       const result = await dispatch<OCR>("ocr.run", input);
       if (currentScope() && request === ocrRequest.current) {
         setOCR(result);
-        setOCRNotice("Image text extracted.");
+        setOCRNotice(
+          result.indexingState === "pending"
+            ? "Image text saved. Search indexing is pending."
+            : "Image text extracted and saved.",
+        );
       }
     } catch (error) {
       if (currentScope() && request === ocrRequest.current) {

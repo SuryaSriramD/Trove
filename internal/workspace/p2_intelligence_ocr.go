@@ -184,8 +184,13 @@ func runOCR(ctx context.Context, k *Kernel, e contracts.ServiceExecutionContext,
 	if err != nil {
 		return nil, err
 	}
+	// The extraction is durable now. Cancellation may stop the derived index
+	// refresh, but cannot make this committed replacement become a cancelled
+	// mutation. search_dirty was committed with the extraction for safe retry.
+	indexingState := "ready"
 	if err = k.FlushSearch(ctx); err != nil {
-		return nil, err
+		indexingState = "pending"
+		warning = strings.TrimSpace(warning + " Extracted text was saved. Search indexing is pending and will retry on the next search or index refresh.")
 	}
-	return map[string]any{"fileId": fileID, "sourceRevision": meta.Revision, "state": state, "text": text, "warning": warning, "acceptedLines": len(lines), "rejectedLines": rejected, "extractorVersion": runtime.capability.ExtractorVersion, "engine": runtime.capability.Engine, "languages": runtime.capability.Languages, "modelSha256": runtime.capability.ModelSHA256}, nil
+	return map[string]any{"persisted": true, "indexingState": indexingState, "fileId": fileID, "sourceRevision": meta.Revision, "state": state, "text": text, "warning": warning, "acceptedLines": len(lines), "rejectedLines": rejected, "extractorVersion": runtime.capability.ExtractorVersion, "engine": runtime.capability.Engine, "languages": runtime.capability.Languages, "modelSha256": runtime.capability.ModelSHA256}, nil
 }
