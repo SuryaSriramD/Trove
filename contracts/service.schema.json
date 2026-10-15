@@ -4268,6 +4268,852 @@
       ],
       "additionalProperties": false
     },
+    "ConnectorIdentity": {
+      "type": "object",
+      "properties": {
+        "subject": {
+          "type": "string",
+          "maxLength": 2048
+        },
+        "label": {
+          "type": "string",
+          "maxLength": 2048
+        },
+        "provider": {
+          "type": "string",
+          "maxLength": 2048
+        }
+      },
+      "required": [
+        "subject",
+        "label",
+        "provider"
+      ],
+      "additionalProperties": false
+    },
+    "ConnectorSelection": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "maxLength": 2048
+        },
+        "kind": {
+          "type": "string",
+          "maxLength": 64
+        },
+        "label": {
+          "type": "string",
+          "maxLength": 1000
+        },
+        "query": {
+          "type": "string",
+          "maxLength": 2000
+        },
+        "parentId": {
+          "type": "string",
+          "maxLength": 2048
+        }
+      },
+      "required": [
+        "id",
+        "kind",
+        "label"
+      ],
+      "additionalProperties": false
+    },
+    "ConnectorAccount": {
+      "type": "object",
+      "properties": {
+        "version": {
+          "const": 1
+        },
+        "id": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "kind": {
+          "type": "string",
+          "enum": [
+            "google_calendar",
+            "google_drive",
+            "gmail",
+            "github",
+            "notion",
+            "mcp"
+          ]
+        },
+        "identity": {
+          "$ref": "#/$defs/ConnectorIdentity"
+        },
+        "registrationId": {
+          "type": "string"
+        },
+        "revision": {
+          "type": "string"
+        },
+        "state": {
+          "type": "string",
+          "enum": [
+            "active",
+            "disconnected",
+            "restored_inactive",
+            "access_revoked",
+            "reauth_required"
+          ]
+        },
+        "selections": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/ConnectorSelection"
+          },
+          "maxItems": 100
+        },
+        "endpoint": {
+          "type": "string",
+          "maxLength": 2048
+        },
+        "updatedAt": {
+          "$ref": "domain.schema.json#/$defs/Timestamp"
+        }
+      },
+      "required": [
+        "version",
+        "id",
+        "kind",
+        "identity",
+        "registrationId",
+        "revision",
+        "state",
+        "selections",
+        "updatedAt"
+      ],
+      "additionalProperties": false
+    },
+    "ConnectorAction": {
+      "type": "object",
+      "properties": {
+        "version": {
+          "const": 1
+        },
+        "kind": {
+          "type": "string",
+          "maxLength": 128
+        },
+        "selectionId": {
+          "type": "string",
+          "maxLength": 2048
+        },
+        "remoteId": {
+          "type": "string",
+          "maxLength": 2048
+        },
+        "expectedRevision": {
+          "type": "string",
+          "maxLength": 2048
+        },
+        "arguments": {
+          "type": "object",
+          "maxProperties": 100,
+          "additionalProperties": {
+            "type": [
+              "object",
+              "array",
+              "string",
+              "number",
+              "integer",
+              "boolean",
+              "null"
+            ]
+          }
+        },
+        "effects": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "maxLength": 4000
+          },
+          "maxItems": 100
+        }
+      },
+      "required": [
+        "version",
+        "kind",
+        "selectionId",
+        "arguments",
+        "effects"
+      ],
+      "additionalProperties": false
+    },
+    "ConnectorReceipt": {
+      "type": "object",
+      "properties": {
+        "version": {
+          "const": 1
+        },
+        "proposalId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "outcome": {
+          "type": "string",
+          "enum": [
+            "succeeded",
+            "failed",
+            "unknown"
+          ]
+        },
+        "remoteId": {
+          "type": "string"
+        },
+        "remoteRevision": {
+          "type": "string"
+        },
+        "url": {
+          "type": "string"
+        },
+        "detail": {
+          "type": "string"
+        },
+        "recordedAt": {
+          "$ref": "domain.schema.json#/$defs/Timestamp"
+        }
+      },
+      "required": [
+        "version",
+        "proposalId",
+        "outcome",
+        "detail",
+        "recordedAt"
+      ],
+      "additionalProperties": false
+    },
+    "ConnectorProposal": {
+      "type": "object",
+      "properties": {
+        "version": {
+          "const": 1
+        },
+        "id": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "accountId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "accountRevision": {
+          "type": "string"
+        },
+        "identity": {
+          "$ref": "#/$defs/ConnectorIdentity"
+        },
+        "action": {
+          "$ref": "#/$defs/ConnectorAction"
+        },
+        "hash": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "state": {
+          "type": "string",
+          "enum": [
+            "review",
+            "sending",
+            "succeeded",
+            "failed",
+            "unknown",
+            "discarded",
+            "restored_inactive"
+          ]
+        },
+        "createdAt": {
+          "$ref": "domain.schema.json#/$defs/Timestamp"
+        },
+        "receipt": {
+          "$ref": "#/$defs/ConnectorReceipt"
+        }
+      },
+      "required": [
+        "version",
+        "id",
+        "accountId",
+        "accountRevision",
+        "identity",
+        "action",
+        "hash",
+        "state",
+        "createdAt"
+      ],
+      "additionalProperties": false
+    },
+    "ConnectorRefresh": {
+      "type": "object",
+      "properties": {
+        "version": {
+          "const": 1
+        },
+        "id": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "accountId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "accountRevision": {
+          "type": "string"
+        },
+        "state": {
+          "type": "string",
+          "enum": [
+            "running",
+            "paused",
+            "interrupted",
+            "complete",
+            "restored_inactive"
+          ]
+        },
+        "selectionIndex": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "cursor": {
+          "type": "string"
+        },
+        "pages": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "items": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "error": {
+          "type": "string"
+        },
+        "retryAfter": {
+          "$ref": "domain.schema.json#/$defs/Timestamp"
+        }
+      },
+      "required": [
+        "version",
+        "id",
+        "accountId",
+        "accountRevision",
+        "state",
+        "selectionIndex",
+        "cursor",
+        "pages",
+        "items"
+      ],
+      "additionalProperties": false
+    },
+    "ConnectorSnapshot": {
+      "type": "object",
+      "properties": {
+        "version": {
+          "const": 1
+        },
+        "id": {
+          "type": "string"
+        },
+        "accountId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "selectionId": {
+          "type": "string"
+        },
+        "remoteId": {
+          "type": "string"
+        },
+        "kind": {
+          "type": "string"
+        },
+        "title": {
+          "type": "string"
+        },
+        "text": {
+          "type": "string"
+        },
+        "url": {
+          "type": "string"
+        },
+        "remoteRevision": {
+          "type": "string"
+        },
+        "state": {
+          "type": "string",
+          "enum": [
+            "present",
+            "removed",
+            "inaccessible",
+            "deselected",
+            "disconnected",
+            "restored_inactive"
+          ]
+        },
+        "content": {
+          "type": [
+            "object",
+            "array",
+            "string",
+            "number",
+            "integer",
+            "boolean",
+            "null"
+          ]
+        },
+        "retrievedAt": {
+          "$ref": "domain.schema.json#/$defs/Timestamp"
+        },
+        "externalAiAllowed": {
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "version",
+        "id",
+        "accountId",
+        "selectionId",
+        "remoteId",
+        "kind",
+        "title",
+        "text",
+        "url",
+        "remoteRevision",
+        "state",
+        "content",
+        "retrievedAt",
+        "externalAiAllowed"
+      ],
+      "additionalProperties": false
+    },
+    "ConnectorRegistration": {
+      "type": "object",
+      "properties": {
+        "kind": {
+          "type": "string",
+          "enum": [
+            "google_calendar",
+            "google_drive",
+            "gmail",
+            "github",
+            "notion",
+            "mcp"
+          ]
+        },
+        "clientId": {
+          "type": "string",
+          "maxLength": 512
+        },
+        "endpoint": {
+          "type": "string",
+          "maxLength": 2048
+        }
+      },
+      "required": [
+        "kind",
+        "clientId"
+      ],
+      "additionalProperties": false
+    },
+    "ConnectorAuthAttempt": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "kind": {
+          "type": "string",
+          "enum": [
+            "google_calendar",
+            "google_drive",
+            "gmail",
+            "github",
+            "notion",
+            "mcp"
+          ]
+        },
+        "state": {
+          "type": "string",
+          "enum": [
+            "waiting",
+            "authorized",
+            "verifying",
+            "complete",
+            "failed",
+            "expired",
+            "cancelled"
+          ]
+        },
+        "message": {
+          "type": "string"
+        },
+        "userCode": {
+          "type": "string"
+        },
+        "verificationUrl": {
+          "type": "string"
+        },
+        "expiresAt": {
+          "$ref": "domain.schema.json#/$defs/Timestamp"
+        }
+      },
+      "required": [
+        "id",
+        "kind",
+        "state",
+        "message",
+        "expiresAt"
+      ],
+      "additionalProperties": false
+    },
+    "ConnectorListRequest": {
+      "type": "object",
+      "properties": {
+        "contractVersion": {
+          "const": 1
+        },
+        "requestId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "workspaceId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        }
+      },
+      "required": [
+        "contractVersion",
+        "requestId",
+        "workspaceId"
+      ],
+      "additionalProperties": false
+    },
+    "ConnectorSelectionsRequest": {
+      "type": "object",
+      "properties": {
+        "contractVersion": {
+          "const": 1
+        },
+        "requestId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "workspaceId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "accountId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "expectedRevision": {
+          "type": "string"
+        },
+        "selections": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/ConnectorSelection"
+          },
+          "maxItems": 100
+        }
+      },
+      "required": [
+        "contractVersion",
+        "requestId",
+        "workspaceId",
+        "accountId",
+        "expectedRevision",
+        "selections"
+      ],
+      "additionalProperties": false
+    },
+    "ConnectorSearchRequest": {
+      "type": "object",
+      "properties": {
+        "contractVersion": {
+          "const": 1
+        },
+        "requestId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "workspaceId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "query": {
+          "type": "string",
+          "maxLength": 1000
+        }
+      },
+      "required": [
+        "contractVersion",
+        "requestId",
+        "workspaceId",
+        "query"
+      ],
+      "additionalProperties": false
+    },
+    "ConnectorAccountRequest": {
+      "type": "object",
+      "properties": {
+        "contractVersion": {
+          "const": 1
+        },
+        "requestId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "workspaceId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "accountId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        }
+      },
+      "required": [
+        "contractVersion",
+        "requestId",
+        "workspaceId",
+        "accountId"
+      ],
+      "additionalProperties": false
+    },
+    "ConnectorProposalRequest": {
+      "type": "object",
+      "properties": {
+        "contractVersion": {
+          "const": 1
+        },
+        "requestId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "workspaceId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "proposalId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        }
+      },
+      "required": [
+        "contractVersion",
+        "requestId",
+        "workspaceId",
+        "proposalId"
+      ],
+      "additionalProperties": false
+    },
+    "ConnectorAuthBeginRequest": {
+      "type": "object",
+      "properties": {
+        "contractVersion": {
+          "const": 1
+        },
+        "requestId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "workspaceId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "registration": {
+          "$ref": "#/$defs/ConnectorRegistration"
+        },
+        "accountId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "expectedRevision": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "contractVersion",
+        "requestId",
+        "workspaceId",
+        "registration"
+      ],
+      "additionalProperties": false
+    },
+    "ConnectorAuthAttemptRequest": {
+      "type": "object",
+      "properties": {
+        "contractVersion": {
+          "const": 1
+        },
+        "requestId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "workspaceId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "attemptId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        }
+      },
+      "required": [
+        "contractVersion",
+        "requestId",
+        "workspaceId",
+        "attemptId"
+      ],
+      "additionalProperties": false
+    },
+    "ConnectorDisconnectRequest": {
+      "type": "object",
+      "properties": {
+        "contractVersion": {
+          "const": 1
+        },
+        "requestId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "workspaceId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "accountId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "expectedRevision": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "contractVersion",
+        "requestId",
+        "workspaceId",
+        "accountId",
+        "expectedRevision"
+      ],
+      "additionalProperties": false
+    },
+    "ConnectorDiscoverRequest": {
+      "type": "object",
+      "properties": {
+        "contractVersion": {
+          "const": 1
+        },
+        "requestId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "workspaceId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "accountId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "cursor": {
+          "type": "string",
+          "maxLength": 32768
+        }
+      },
+      "required": [
+        "contractVersion",
+        "requestId",
+        "workspaceId",
+        "accountId",
+        "cursor"
+      ],
+      "additionalProperties": false
+    },
+    "ConnectorRefreshRequest": {
+      "type": "object",
+      "properties": {
+        "contractVersion": {
+          "const": 1
+        },
+        "requestId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "workspaceId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "accountId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "resumeId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        }
+      },
+      "required": [
+        "contractVersion",
+        "requestId",
+        "workspaceId",
+        "accountId"
+      ],
+      "additionalProperties": false
+    },
+    "ConnectorPrepareRequest": {
+      "type": "object",
+      "properties": {
+        "contractVersion": {
+          "const": 1
+        },
+        "requestId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "workspaceId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "accountId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "action": {
+          "$ref": "#/$defs/ConnectorAction"
+        }
+      },
+      "required": [
+        "contractVersion",
+        "requestId",
+        "workspaceId",
+        "accountId",
+        "action"
+      ],
+      "additionalProperties": false
+    },
+    "ConnectorExecuteRequest": {
+      "type": "object",
+      "properties": {
+        "contractVersion": {
+          "const": 1
+        },
+        "requestId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "workspaceId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "proposalId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "hash": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        }
+      },
+      "required": [
+        "contractVersion",
+        "requestId",
+        "workspaceId",
+        "proposalId",
+        "hash"
+      ],
+      "additionalProperties": false
+    },
+    "ConnectorCancelRequest": {
+      "type": "object",
+      "properties": {
+        "contractVersion": {
+          "const": 1
+        },
+        "requestId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "workspaceId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "operationId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        }
+      },
+      "required": [
+        "contractVersion",
+        "requestId",
+        "workspaceId",
+        "operationId"
+      ],
+      "additionalProperties": false
+    },
     "AutofillModel": {
       "type": "object",
       "properties": {

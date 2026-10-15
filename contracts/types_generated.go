@@ -2331,6 +2331,190 @@ type ServiceNativeBackupSummary struct {
 	Excluded    []string `json:"excluded"`
 	Restoration []string `json:"restoration"`
 }
+type ServiceConnectorIdentity struct {
+	Subject  string `json:"subject"`
+	Label    string `json:"label"`
+	Provider string `json:"provider"`
+}
+type ServiceConnectorSelection struct {
+	Id       string  `json:"id"`
+	Kind     string  `json:"kind"`
+	Label    string  `json:"label"`
+	Query    *string `json:"query,omitempty"`
+	ParentId *string `json:"parentId,omitempty"`
+}
+type ServiceConnectorAccount struct {
+	Version        int64                       `json:"version"`
+	Id             DomainId                    `json:"id"`
+	Kind           string                      `json:"kind"`
+	Identity       ServiceConnectorIdentity    `json:"identity"`
+	RegistrationId string                      `json:"registrationId"`
+	Revision       string                      `json:"revision"`
+	State          string                      `json:"state"`
+	Selections     []ServiceConnectorSelection `json:"selections"`
+	Endpoint       *string                     `json:"endpoint,omitempty"`
+	UpdatedAt      DomainTimestamp             `json:"updatedAt"`
+}
+type ServiceConnectorAction struct {
+	Version          int64                      `json:"version"`
+	Kind             string                     `json:"kind"`
+	SelectionId      string                     `json:"selectionId"`
+	RemoteId         *string                    `json:"remoteId,omitempty"`
+	ExpectedRevision *string                    `json:"expectedRevision,omitempty"`
+	Arguments        map[string]json.RawMessage `json:"arguments"`
+	Effects          []string                   `json:"effects"`
+}
+type ServiceConnectorReceipt struct {
+	Version        int64           `json:"version"`
+	ProposalId     DomainId        `json:"proposalId"`
+	Outcome        string          `json:"outcome"`
+	RemoteId       *string         `json:"remoteId,omitempty"`
+	RemoteRevision *string         `json:"remoteRevision,omitempty"`
+	Url            *string         `json:"url,omitempty"`
+	Detail         string          `json:"detail"`
+	RecordedAt     DomainTimestamp `json:"recordedAt"`
+}
+type ServiceConnectorProposal struct {
+	Version         int64                    `json:"version"`
+	Id              DomainId                 `json:"id"`
+	AccountId       DomainId                 `json:"accountId"`
+	AccountRevision string                   `json:"accountRevision"`
+	Identity        ServiceConnectorIdentity `json:"identity"`
+	Action          ServiceConnectorAction   `json:"action"`
+	Hash            string                   `json:"hash"`
+	State           string                   `json:"state"`
+	CreatedAt       DomainTimestamp          `json:"createdAt"`
+	Receipt         *ServiceConnectorReceipt `json:"receipt,omitempty"`
+}
+type ServiceConnectorRefresh struct {
+	Version         int64            `json:"version"`
+	Id              DomainId         `json:"id"`
+	AccountId       DomainId         `json:"accountId"`
+	AccountRevision string           `json:"accountRevision"`
+	State           string           `json:"state"`
+	SelectionIndex  int64            `json:"selectionIndex"`
+	Cursor          string           `json:"cursor"`
+	Pages           int64            `json:"pages"`
+	Items           int64            `json:"items"`
+	Error           *string          `json:"error,omitempty"`
+	RetryAfter      *DomainTimestamp `json:"retryAfter,omitempty"`
+}
+type ServiceConnectorSnapshot struct {
+	Version           int64           `json:"version"`
+	Id                string          `json:"id"`
+	AccountId         DomainId        `json:"accountId"`
+	SelectionId       string          `json:"selectionId"`
+	RemoteId          string          `json:"remoteId"`
+	Kind              string          `json:"kind"`
+	Title             string          `json:"title"`
+	Text              string          `json:"text"`
+	Url               string          `json:"url"`
+	RemoteRevision    string          `json:"remoteRevision"`
+	State             string          `json:"state"`
+	Content           json.RawMessage `json:"content"`
+	RetrievedAt       DomainTimestamp `json:"retrievedAt"`
+	ExternalAiAllowed bool            `json:"externalAiAllowed"`
+}
+type ServiceConnectorRegistration struct {
+	Kind     string  `json:"kind"`
+	ClientId string  `json:"clientId"`
+	Endpoint *string `json:"endpoint,omitempty"`
+}
+type ServiceConnectorAuthAttempt struct {
+	Id              DomainId        `json:"id"`
+	Kind            string          `json:"kind"`
+	State           string          `json:"state"`
+	Message         string          `json:"message"`
+	UserCode        *string         `json:"userCode,omitempty"`
+	VerificationUrl *string         `json:"verificationUrl,omitempty"`
+	ExpiresAt       DomainTimestamp `json:"expiresAt"`
+}
+type ServiceConnectorListRequest struct {
+	ContractVersion int64    `json:"contractVersion"`
+	RequestId       DomainId `json:"requestId"`
+	WorkspaceId     DomainId `json:"workspaceId"`
+}
+type ServiceConnectorSelectionsRequest struct {
+	ContractVersion  int64                       `json:"contractVersion"`
+	RequestId        DomainId                    `json:"requestId"`
+	WorkspaceId      DomainId                    `json:"workspaceId"`
+	AccountId        DomainId                    `json:"accountId"`
+	ExpectedRevision string                      `json:"expectedRevision"`
+	Selections       []ServiceConnectorSelection `json:"selections"`
+}
+type ServiceConnectorSearchRequest struct {
+	ContractVersion int64    `json:"contractVersion"`
+	RequestId       DomainId `json:"requestId"`
+	WorkspaceId     DomainId `json:"workspaceId"`
+	Query           string   `json:"query"`
+}
+type ServiceConnectorAccountRequest struct {
+	ContractVersion int64    `json:"contractVersion"`
+	RequestId       DomainId `json:"requestId"`
+	WorkspaceId     DomainId `json:"workspaceId"`
+	AccountId       DomainId `json:"accountId"`
+}
+type ServiceConnectorProposalRequest struct {
+	ContractVersion int64    `json:"contractVersion"`
+	RequestId       DomainId `json:"requestId"`
+	WorkspaceId     DomainId `json:"workspaceId"`
+	ProposalId      DomainId `json:"proposalId"`
+}
+type ServiceConnectorAuthBeginRequest struct {
+	ContractVersion  int64                        `json:"contractVersion"`
+	RequestId        DomainId                     `json:"requestId"`
+	WorkspaceId      DomainId                     `json:"workspaceId"`
+	Registration     ServiceConnectorRegistration `json:"registration"`
+	AccountId        *DomainId                    `json:"accountId,omitempty"`
+	ExpectedRevision *string                      `json:"expectedRevision,omitempty"`
+}
+type ServiceConnectorAuthAttemptRequest struct {
+	ContractVersion int64    `json:"contractVersion"`
+	RequestId       DomainId `json:"requestId"`
+	WorkspaceId     DomainId `json:"workspaceId"`
+	AttemptId       DomainId `json:"attemptId"`
+}
+type ServiceConnectorDisconnectRequest struct {
+	ContractVersion  int64    `json:"contractVersion"`
+	RequestId        DomainId `json:"requestId"`
+	WorkspaceId      DomainId `json:"workspaceId"`
+	AccountId        DomainId `json:"accountId"`
+	ExpectedRevision string   `json:"expectedRevision"`
+}
+type ServiceConnectorDiscoverRequest struct {
+	ContractVersion int64    `json:"contractVersion"`
+	RequestId       DomainId `json:"requestId"`
+	WorkspaceId     DomainId `json:"workspaceId"`
+	AccountId       DomainId `json:"accountId"`
+	Cursor          string   `json:"cursor"`
+}
+type ServiceConnectorRefreshRequest struct {
+	ContractVersion int64     `json:"contractVersion"`
+	RequestId       DomainId  `json:"requestId"`
+	WorkspaceId     DomainId  `json:"workspaceId"`
+	AccountId       DomainId  `json:"accountId"`
+	ResumeId        *DomainId `json:"resumeId,omitempty"`
+}
+type ServiceConnectorPrepareRequest struct {
+	ContractVersion int64                  `json:"contractVersion"`
+	RequestId       DomainId               `json:"requestId"`
+	WorkspaceId     DomainId               `json:"workspaceId"`
+	AccountId       DomainId               `json:"accountId"`
+	Action          ServiceConnectorAction `json:"action"`
+}
+type ServiceConnectorExecuteRequest struct {
+	ContractVersion int64    `json:"contractVersion"`
+	RequestId       DomainId `json:"requestId"`
+	WorkspaceId     DomainId `json:"workspaceId"`
+	ProposalId      DomainId `json:"proposalId"`
+	Hash            string   `json:"hash"`
+}
+type ServiceConnectorCancelRequest struct {
+	ContractVersion int64    `json:"contractVersion"`
+	RequestId       DomainId `json:"requestId"`
+	WorkspaceId     DomainId `json:"workspaceId"`
+	OperationId     DomainId `json:"operationId"`
+}
 type ServiceAutofillModel struct {
 	PackId         DomainId `json:"packId"`
 	Sha256         string   `json:"sha256"`

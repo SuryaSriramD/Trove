@@ -179,6 +179,7 @@ func (a *App) shutdown(context.Context) {
 	a.stopAI()
 	a.stopProviderRemote()
 	a.stopProviders()
+	a.stopConnectors()
 	a.stopProviderClaude()
 	a.stopProviderAuth()
 	if a.native != nil {
@@ -218,6 +219,7 @@ func (a *App) openLocked(path string, create bool) error {
 	a.stopAI()
 	a.stopProviderRemote()
 	a.stopProviders()
+	a.stopConnectors()
 	a.stopProviderClaude()
 	a.stopProviderAuth()
 	var k *workspace.Kernel
@@ -302,6 +304,11 @@ func (a *App) Dispatch(method, raw string) string {
 		a.lifecycle.RLock()
 		defer a.lifecycle.RUnlock()
 		return a.reviewCancel(json.RawMessage(raw))
+	}
+	if strings.HasPrefix(method, "connectors.native.") {
+		a.lifecycle.RLock()
+		defer a.lifecycle.RUnlock()
+		return a.connectorDispatch(method, json.RawMessage(raw))
 	}
 	if method == "autofill.generate" || method == "autofill.cancel" {
 		a.lifecycle.Lock()

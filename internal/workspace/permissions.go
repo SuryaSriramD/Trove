@@ -99,6 +99,21 @@ func (k *Kernel) authorizePage(ctx context.Context, q querier, e contracts.Servi
 // Caller must first validate the execution context against the current grant.
 // Keep membership checks in the caller's transaction, never in a scope cache.
 func (k *Kernel) authorizePageScope(ctx context.Context, q querier, e contracts.ServiceExecutionContext, page string) error {
+	if e.Actor.Kind == "external_client" {
+		// Gmail context remains unqualified for external AI even after deliberate
+		// canonical import or a portable round trip. Imported instructions cannot
+		// override this policy, and a page-title edit does not clear provenance.
+		var restricted int
+		if err := q.QueryRowContext(ctx, `SELECT COUNT(*) FROM pages p WHERE p.id=? AND (
+EXISTS(SELECT 1 FROM json_tree(p.provenance_json) j WHERE
+ (j.key='sourceSystem' AND j.value='connector:gmail') OR (j.key='provider' AND j.value='gmail')) OR
+EXISTS(SELECT 1 FROM import_mappings m WHERE m.local_id=p.id AND m.source_system='connector:gmail'))`, page).Scan(&restricted); err != nil {
+			return err
+		}
+		if restricted > 0 {
+			return Fail("SCOPE_DENIED", "Gmail-derived context is disabled for external AI pending separate qualification")
+		}
+	}
 	switch s := e.Scope.Value.(type) {
 	case contracts.DomainScopeVariant1:
 		if string(s.WorkspaceId) == k.id {
