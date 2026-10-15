@@ -22,7 +22,7 @@ async function installMeetingAudioFixture(page: any) {
     state.snapshotCursor = "2";
     const app = (window as any).go.main.App, previous = app.Dispatch;
     app.MeetingRecordings = async () => [];
-    app.Dispatch = async (method: string, raw: string) => method === "meetings.drafts" ? JSON.stringify({ ok: true, result: [] }) : previous(method, raw);
+    app.Dispatch = async (method: string, raw: string) => ["meetings.drafts", "meetings.extractions"].includes(method) ? JSON.stringify({ ok: true, result: [] }) : previous(method, raw);
     const metrics = (window as any).audioLifecycle = { created: [] as string[], revoked: [] as string[], aborted: [] as string[] };
     const create = URL.createObjectURL.bind(URL), revoke = URL.revokeObjectURL.bind(URL), originalFetch = window.fetch.bind(window);
     URL.createObjectURL = blob => { const url = create(blob); metrics.created.push(url); return url; };

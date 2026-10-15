@@ -4619,6 +4619,79 @@
         "pink",
         "red"
       ]
+    },
+    "SemanticContentIdentity": {
+      "type": "object",
+      "properties": {
+        "version": {
+          "const": 1
+        },
+        "digest": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        }
+      },
+      "required": [
+        "version",
+        "digest"
+      ],
+      "additionalProperties": false
+    },
+    "HumanReviewEvent": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/Id"
+        },
+        "pageId": {
+          "$ref": "#/$defs/Id"
+        },
+        "actorId": {
+          "$ref": "#/$defs/Id"
+        },
+        "reviewedAt": {
+          "$ref": "#/$defs/Timestamp"
+        },
+        "expiresAt": {
+          "$ref": "#/$defs/Timestamp"
+        },
+        "contentIdentity": {
+          "$ref": "#/$defs/SemanticContentIdentity"
+        }
+      },
+      "required": [
+        "id",
+        "pageId",
+        "actorId",
+        "reviewedAt",
+        "contentIdentity"
+      ],
+      "additionalProperties": false
+    },
+    "PageFreshness": {
+      "type": "object",
+      "properties": {
+        "state": {
+          "enum": [
+            "never_reviewed",
+            "reviewed",
+            "stale",
+            "expired"
+          ],
+          "type": "string"
+        },
+        "contentIdentity": {
+          "$ref": "#/$defs/SemanticContentIdentity"
+        },
+        "review": {
+          "$ref": "#/$defs/HumanReviewEvent"
+        }
+      },
+      "required": [
+        "state",
+        "contentIdentity"
+      ],
+      "additionalProperties": false
     }
   }
 }

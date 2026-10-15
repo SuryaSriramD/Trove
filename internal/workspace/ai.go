@@ -26,14 +26,15 @@ type AIRequest struct {
 	ModelPackID    string `json:"modelPackId"`
 }
 type AIEvidence struct {
-	Number         int                      `json:"number"`
-	Title          string                   `json:"title"`
-	Text           string                   `json:"text"`
-	Location       contracts.DomainLocation `json:"location"`
-	MemoryID       string                   `json:"memoryId,omitempty"`
-	MemoryRevision string                   `json:"memoryRevision,omitempty"`
-	MemoryKind     string                   `json:"memoryKind,omitempty"`
-	State          string                   `json:"state,omitempty"`
+	Freshness      *contracts.DomainPageFreshness `json:"freshness,omitempty"`
+	Number         int                            `json:"number"`
+	Title          string                         `json:"title"`
+	Text           string                         `json:"text"`
+	Location       contracts.DomainLocation       `json:"location"`
+	MemoryID       string                         `json:"memoryId,omitempty"`
+	MemoryRevision string                         `json:"memoryRevision,omitempty"`
+	MemoryKind     string                         `json:"memoryKind,omitempty"`
+	State          string                         `json:"state,omitempty"`
 }
 type AICitation struct {
 	Number   int                      `json:"number"`
@@ -366,6 +367,16 @@ func (k *Kernel) aiSources(ctx context.Context, e contracts.ServiceExecutionCont
 		}
 		out = append(out, prefix...)
 	}
+	for i := range out {
+		if out[i].MemoryID != "" {
+			continue
+		}
+		freshness, err := pageFreshness(ctx, k.db, string(out[i].Location.PageId), time.Now())
+		if err != nil {
+			return nil, "", err
+		}
+		out[i].Freshness = &freshness
+	}
 	return out, warning, nil
 }
 
@@ -518,6 +529,13 @@ func (k *Kernel) AIRun(ctx context.Context, e contracts.ServiceExecutionContext,
 	states := map[int]string{}
 	for i := range run.Sources {
 		run.Sources[i].State = "current"
+		if run.Sources[i].MemoryID == "" {
+			freshness, err := pageFreshness(ctx, k.db, string(run.Sources[i].Location.PageId), time.Now())
+			if err != nil {
+				return AIRun{}, err
+			}
+			run.Sources[i].Freshness = &freshness
+		}
 		if k.aiEvidenceValid(ctx, e, run.Sources[i]) != nil {
 			run.Sources[i].State = "stale"
 		}

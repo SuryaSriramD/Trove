@@ -8,7 +8,7 @@ type Pack = { id: string; name: string; kind: string; qualificationOnly?: boolea
 type Claim = { text: string; segmentIds: string[] };
 type Intelligence = { summary: Claim[]; keyPoints: Claim[]; decisions: Claim[]; questions: Claim[]; actionItems: Claim[] };
 type Draft = { id: string; state: string; stale: boolean; evidenceHash: string; body: Intelligence };
-type Source = { evidenceHash: string; segments: { text: string; segmentId: string }[] };
+type Extraction = { version: 1; proposalId: string; itemId: string; meetingId: string; evidenceHash: string; title: string; body: string; kind: "page" | "task"; pageId: string; appliedAt?: string; stale: boolean };
 type Bridge = { StartMeetingRecording(title: string): Promise<Recording>; StopMeetingRecording(id: string): Promise<Recording>; SaveMeetingRecording(id: string): Promise<Recording>; MeetingRecordings(): Promise<Recording[]>; PickMeetingAudio(title: string): Promise<Recording> };
 const bridge = () => window.go?.main.App as unknown as Bridge | undefined;
 const timestamp = (ms: number) => `${Math.floor(ms / 60000)}:${String(Math.floor(ms / 1000) % 60).padStart(2, "0")}`;
@@ -28,7 +28,8 @@ export function MeetingPanel({ workspace: w, onRefresh, onNavigate, pageId }: { 
   const [playbackLoading, setPlaybackLoading] = useState(false);
   const [playbackSource, setPlaybackSource] = useState<{ fileId: string; url: string } | null>(null);
   const [drafts, setDrafts] = useState<Draft[]>([]);
-  const [review, setReview] = useState<{ meetingId: string; evidenceHash: string; title: string; body: string; kind: "page" | "task" } | null>(null);
+  const [review, setReview] = useState<Extraction | null>(null);
+  const [extractions, setExtractions] = useState<Extraction[]>([]);
   const audio = useRef<HTMLAudioElement>(null);
   const meetings = w.meetings.filter(m => (!pageId || m.pageId === pageId) && w.pages.some(p => p.id === m.pageId && !p.deletedAt));
   const meeting = meetings.find(m => m.id === selected) ?? meetings[0];
@@ -90,9 +91,10 @@ export function MeetingPanel({ workspace: w, onRefresh, onNavigate, pageId }: { 
     return () => { disposed = true; clearInterval(timer); off?.(); };
   }, [refresh]);
   const loadDrafts = useCallback(async () => {
-    if (!meeting) { setDrafts([]); return; }
+    if (!meeting) { setDrafts([]); setExtractions([]); return; }
     const result = await dispatch<Draft[]>("meetings.drafts", { ...envelope(w), meetingId: meeting.id });
     setDrafts(result);
+    setExtractions(await dispatch<Extraction[]>("meetings.extractions", { ...envelope(w), meetingId: meeting.id }));
   }, [meeting?.id, w.snapshotCursor]);
   useEffect(() => { void loadDrafts().catch(e => setError(e.message)); }, [loadDrafts, jobs.filter(j => j.kind === "SUMMARIZE_MEETING").map(j => `${j.jobId}:${j.state}`).join(",")]);
   async function run(action: () => Promise<void>) {
@@ -104,11 +106,11 @@ export function MeetingPanel({ workspace: w, onRefresh, onNavigate, pageId }: { 
     if (audio.current) { audio.current.currentTime = ms / 1000; void audio.current.play().catch(() => undefined); }
     onNavigate({ pageId: page.id, blockId, transcript: { meetingId: meeting.id, segmentId, startMs: ms, endMs: segments.find(s => s.id === segmentId)?.endMs ?? ms }, sourceRevision: page.revision });
   }
-  async function convert(kind: "page" | "task", text?: string, expectedEvidenceHash?: string) {
+  async function convert(kind: "page" | "task", draftId?: string, itemIndex?: number) {
     if (!meeting) return;
-    const source = await dispatch<Source>("meetings.source", { ...envelope(w), meetingId: meeting.id });
-    if (expectedEvidenceHash && source.evidenceHash !== expectedEvidenceHash) throw new Error("Transcript evidence changed. Regenerate this action item before reviewing it.");
-    setReview({ meetingId: meeting.id, evidenceHash: source.evidenceHash, title: text?.slice(0, 200) ?? `Notes from ${page?.title ?? "recording"}`, body: text ?? source.segments.map(s => s.text).join("\n\n"), kind });
+    const extraction = await dispatch<Extraction>("meetings.prepareExtraction", { ...envelope(w), meetingId: meeting.id, kind, ...(draftId === undefined ? {} : { draftId, itemIndex }) });
+    if (extraction.appliedAt) { setNotice("This proposal was already applied. Opening the existing result."); onNavigate({ pageId: extraction.pageId, sourceRevision: w.pages.find(page => page.id === extraction.pageId)?.revision ?? "1" }); return; }
+    setReview(extraction); await loadDrafts();
   }
   const activeJobs = jobs.filter(j => j.payload.meetingId === meeting?.id);
   return <section className={`meeting-panel ${pageId ? "meeting-inline" : ""}`} aria-label="Meeting recordings and transcripts">
@@ -137,12 +139,13 @@ export function MeetingPanel({ workspace: w, onRefresh, onNavigate, pageId }: { 
       {activeJobs.slice(0, 5).map(job => <div className="meeting-job" key={job.jobId}><span>{job.kind === "TRANSCRIBE_AUDIO" ? "Transcription" : "Meeting notes"}: {job.state}</span>{job.progress?.total ? <progress max={job.progress.total} value={job.progress.completed} aria-label="Processing progress"/> : null}<small>{job.error?.message ?? job.progress?.message}</small>{["queued", "running", "retry_wait"].includes(job.state) && <button onClick={() => void run(async () => { await dispatch("cancelJob", { ...envelope(w), jobId: job.jobId, expectedRevision: job.revision }); })}>Cancel processing</button>}</div>)}
       <div className="meeting-transcript"><h3>Transcript</h3>{segments.length ? segments.map(segment => <div className="transcript-segment" key={segment.id}><button onClick={() => navigate(segment.startMs, segment.id, segment.blockId)} title="Play from this timestamp">{timestamp(segment.startMs)}</button><p>{segment.text}</p></div>) : <p>Timestamped text appears here as each audio segment finishes. You can continue editing while it runs.</p>}</div>
       <div className="meeting-actions"><label>Summary model<select value={chat} onChange={e => setChat(e.target.value)}><option value="">Choose an instruction model</option>{packs.filter(p => p.kind === "chat" && !p.qualificationOnly).map(p => <option key={p.id} value={p.id}>{p.name}</option>)}</select></label><button disabled={busy || !chat || !segments.length || meeting.state !== "ready" || activeJobs.some(j => j.kind === "SUMMARIZE_MEETING" && ["running", "queued", "retry_wait"].includes(j.state))} onClick={() => void run(async () => { await dispatch("enqueueJob", { ...envelope(w), kind: "SUMMARIZE_MEETING", idempotencyKey: requestID(), payload: { kind: "summarize", meetingId: meeting.id, sourceRevision: page.revision, modelPackId: chat } }); })}>Generate meeting notes for review</button></div>
+      {extractions.length > 0 && <section aria-label="Saved extraction reviews"><h3>Extracted pages and tasks</h3>{extractions.map(item => <div key={`${item.proposalId}:${item.itemId}`}><span>{item.title} · {item.appliedAt ? "Applied" : item.stale ? "Source changed" : "Awaiting review"}</span>{item.appliedAt ? <button onClick={() => onNavigate({ pageId: item.pageId, sourceRevision: w.pages.find(page => page.id === item.pageId)?.revision ?? "1" })}>Open existing {item.kind}</button> : <button disabled={busy || item.stale} onClick={() => setReview(item)}>Resume review</button>}</div>)}</section>}
       {drafts.map(draft => <div className="meeting-draft" key={draft.id}><h3>{draft.state === "applied" ? "Approved meeting notes" : "Review proposed meeting notes"}</h3>{draft.stale && <p role="alert">Transcript evidence changed. Generate a fresh draft before approval.</p>}
-        {([ ["Summary", "summary"], ["Key points", "keyPoints"], ["Decisions", "decisions"], ["Questions", "questions"], ["Proposed action items", "actionItems"] ] as const).map(([name, key]) => draft.body[key]?.length > 0 && <div key={key}><h4>{name}</h4>{draft.body[key].map((claim, index) => <p key={index}>{claim.text}{claim.segmentIds.map(id => { const s = segments.find(s => s.id === id); return s && <button className="meeting-citation" key={id} onClick={() => navigate(s.startMs, s.id, s.blockId)}>[{timestamp(s.startMs)}]</button>; })}{key === "actionItems" && !draft.stale && <button disabled={busy} onClick={() => void run(() => convert("task", claim.text, draft.evidenceHash))}>Review task</button>}</p>)}</div>)}
+        {([ ["Summary", "summary"], ["Key points", "keyPoints"], ["Decisions", "decisions"], ["Questions", "questions"], ["Proposed action items", "actionItems"] ] as const).map(([name, key]) => draft.body[key]?.length > 0 && <div key={key}><h4>{name}</h4>{draft.body[key].map((claim, index) => <p key={index}>{claim.text}{claim.segmentIds.map(id => { const s = segments.find(s => s.id === id); return s && <button className="meeting-citation" key={id} onClick={() => navigate(s.startMs, s.id, s.blockId)}>[{timestamp(s.startMs)}]</button>; })}{key === "actionItems" && !draft.stale && <button disabled={busy} onClick={() => void run(() => convert("task", draft.id, index))}>Review task</button>}</p>)}</div>)}
         {draft.state === "draft" && <button className="primary" disabled={busy || draft.stale} onClick={() => void run(async () => { await dispatch("meetings.applyDraft", { ...envelope(w), draftId: draft.id }); await loadDrafts(); })}>Approve and add notes to page</button>}
       </div>)}
     </div>}
-    {review && <div className="meeting-review" role="dialog" aria-label={`Review ${review.kind} from voice note`}><h3>Review new {review.kind}</h3><label>Title<input value={review.title} maxLength={512} onChange={e => setReview({ ...review, title: e.target.value })}/></label><label>Content<textarea value={review.body} onChange={e => setReview({ ...review, body: e.target.value })}/></label><p>This creates a canonical {review.kind} with a link to the source meeting.</p><button disabled={busy || !review.title.trim()} className="primary" onClick={() => void run(async () => { const result = await dispatch<{ pageId: string }>("meetings.createFromTranscript", { ...envelope(w), ...review }); setReview(null); onNavigate({ pageId: result.pageId, sourceRevision: "1" }); })}>Approve and create {review.kind}</button><button onClick={() => setReview(null)}>Cancel</button></div>}
+    {review && <div className="meeting-review" role="dialog" aria-label={`Review ${review.kind} from voice note`}><h3>Review new {review.kind}</h3><label>Title<input value={review.title} maxLength={512} onChange={e => setReview({ ...review, title: e.target.value })}/></label><label>Content<textarea value={review.body} onChange={e => setReview({ ...review, body: e.target.value })}/></label><p>This creates a canonical {review.kind} with a link to the source meeting.</p><button disabled={busy || !review.title.trim()} className="primary" onClick={() => void run(async () => { const result = await dispatch<{ pageId: string }>("meetings.createFromTranscript", { ...envelope(w), meetingId: review.meetingId, evidenceHash: review.evidenceHash, proposalId: review.proposalId, itemId: review.itemId, kind: review.kind, title: review.title, body: review.body }); setReview(null); await loadDrafts(); onNavigate({ pageId: result.pageId, sourceRevision: "1" }); })}>Approve and create {review.kind}</button><button onClick={() => setReview(null)}>Cancel</button></div>}
     {!pageId && !meetings.length && !recordings.length && <div className="empty-state"><h3>Keep your next conversation</h3><p>Start a microphone recording or choose a local audio file.</p></div>}
   </section>;
 }

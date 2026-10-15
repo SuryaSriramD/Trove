@@ -1,3 +1,4 @@
+import { TaskEditor } from "../tasks/TaskEditor";
 import React, { createContext, useContext, useEffect, useState } from "react";
 import { Node, Extension, mergeAttributes } from "@tiptap/core";
 import {
@@ -187,41 +188,15 @@ function Mermaid({ source }: { source: string }) {
 }
 export function AtomBody(props: NodeViewProps) {
   const { node, updateAttributes } = props;
-  const { workspace: w, toggleTask, openPage, pageId, onError, onCommitted, readOnly } = useContext(EditorContext);
+  const { workspace: w, openPage, pageId, onError, onCommitted, readOnly } = useContext(EditorContext);
   const d = node.attrs.data;
   const kind = node.attrs.kind;
   const update = (patch: any) => updateAttributes({ data: { ...d, ...patch } });
   const file = w?.files.find((f) => f.id === d.fileId);
-  const record = w?.records.find((r) => r.id === d.taskRecordId);
-  const page = w?.pages.find((p) => p.id === record?.pageId);
-  const facet = w?.taskFacets.find((t) => t.recordId === record?.id);
-  const property = w?.properties.find((p) => p.id === facet?.statusPropertyId);
-  const option = record?.values.find(
-    (v) => v.propertyId === property?.id,
-  )?.value;
-  const done =
-    (property?.config as any)?.options?.find((o: any) => o.id === option)
-      ?.group === "done";
   let body: React.ReactNode;
   if (kind === "divider") body = <hr />;
   else if (kind === "todo")
-    body = (
-      <div className="todo-block">
-        <input
-          type="checkbox"
-          aria-label={`Complete ${page?.title ?? "unavailable task"}`}
-          checked={done}
-          disabled={!record || !page || !!page.deletedAt}
-          onChange={() => toggleTask(d.taskRecordId)}
-        />
-        <button
-          className={done ? "done" : ""}
-          onClick={() => page && openPage(page.id)}
-        >
-          {page?.title ?? "Unavailable task"}
-        </button>
-      </div>
-    );
+    body = w ? <TaskEditor workspace={w} recordId={d.taskRecordId} openPage={openPage} onCommitted={onCommitted} onError={onError} readOnly={readOnly}/> : <span>Unavailable task</span>;
   else if (kind === "code") body = <CodeBlock data={d} update={update} owner={props.editor} readOnly={readOnly} onError={onError}/>;
   else if (kind === "mermaid")
     body = (

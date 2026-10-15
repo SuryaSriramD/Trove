@@ -1,3 +1,4 @@
+import { freshnessLabel } from "../PageFreshness";
 import { useEffect, useState } from "react";
 import {
   batch,
@@ -7,7 +8,7 @@ import {
   type WorkspaceSnapshot,
   type S,
 } from "../api";
-import type { Location, Memory } from "../../../contracts/generated/domain";
+import type { Location, Memory, PageFreshness } from "../../../contracts/generated/domain";
 import "./ai.css";
 import { Suggestions } from "./Suggestions";
 import {
@@ -22,6 +23,7 @@ type Citation = {
   state: string;
 };
 type Source = Citation & {
+ freshness?: PageFreshness;
   text: string;
   memoryId?: string;
   memoryKind?: "preference" | "decision" | "project_context";
@@ -521,6 +523,7 @@ export function AIPanel({
                   [{s.number}] {s.title}
                   {s.state && s.state !== "current" ? " · source changed" : ""}
                 </button>
+                {s.freshness&&<small>{freshnessLabel(s.freshness)} · human review status</small>}
                 <p>{s.text}</p>
               </div>
             ))}

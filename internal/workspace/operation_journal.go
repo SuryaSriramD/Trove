@@ -1,0 +1,341 @@
+package workspace
+
+import (
+	"context"
+	"database/sql"
+	"encoding/json"
+	"errors"
+	"sort"
+
+	"trove.local/phase0/contracts"
+)
+
+type journalEntry struct {
+	ChangedFields    []string       `json:"changedFields,omitempty"`
+	PageID           string         `json:"pageId"`
+	Target           string         `json:"target"`
+	Before           map[string]any `json:"before"`
+	After            map[string]any `json:"after"`
+	PropertyRevision string         `json:"propertyRevision,omitempty"`
+}
+
+func init() {
+	RegisterInitializer(func(ctx context.Context, k *Kernel) error {
+		return k.write(ctx, func(tx *sql.Tx) error {
+			_, err := tx.ExecContext(ctx, `CREATE TABLE IF NOT EXISTS operation_journal(id TEXT PRIMARY KEY,version INTEGER NOT NULL CHECK(version=1),label TEXT NOT NULL,actor_id TEXT NOT NULL,created_at TEXT NOT NULL,state TEXT NOT NULL CHECK(state IN('applied','undone')),entries_json TEXT NOT NULL,undone_at TEXT);`)
+			return err
+		})
+	})
+	RegisterCommand("operation.apply", func(m *Mutation, c map[string]any) error {
+		if len(m.Request.Commands) != 1 {
+			return Fail("INVALID_REQUEST", "A grouped operation must be an isolated batch")
+		}
+		actions := []map[string]any{}
+		if err := json.Unmarshal(marshal(c["actions"]), &actions); err != nil {
+			return err
+		}
+		return applyJournal(m, str(c["operationId"]), str(c["label"]), actions)
+	})
+	RegisterCommand("operation.undo", undoJournal)
+	RegisterQuery("operations.previewUndo", previewUndoJournal)
+	RegisterQuery("operations.list", listJournal)
+}
+func journalCurrent(ctx context.Context, q querier, action map[string]any) (journalEntry, error) {
+	entry := journalEntry{}
+	kind := str(action["kind"])
+	switch kind {
+	case "record.setValue", "record.clearValue":
+		record, property := str(action["recordId"]), str(action["propertyId"])
+		definition, err := propertyDefinition(ctx, q, property)
+		if err != nil {
+			return entry, err
+		}
+		if !p2FormType(definition.Type) {
+			return entry, Fail("INVALID_REQUEST", "Grouped operations support editable scalar properties only")
+		}
+		if err := q.QueryRowContext(ctx, "SELECT page_id FROM records WHERE id=?", record).Scan(&entry.PageID); err != nil {
+			return entry, err
+		}
+		if err := q.QueryRowContext(ctx, "SELECT revision FROM properties WHERE id=?", property).Scan(&entry.PropertyRevision); err != nil {
+			return entry, err
+		}
+		entry.Target = "value:" + record + ":" + property
+		var typ, raw string
+		var version int
+		err = q.QueryRowContext(ctx, "SELECT property_type,schema_version,value_json FROM property_values WHERE record_id=? AND property_id=?", record, property).Scan(&typ, &version, &raw)
+		if errors.Is(err, sql.ErrNoRows) {
+			entry.Before = map[string]any{"kind": "record.clearValue", "recordId": record, "propertyId": property}
+			return entry, nil
+		}
+		if err != nil {
+			return entry, err
+		}
+		var value any
+		if err = json.Unmarshal([]byte(raw), &value); err != nil {
+			return entry, err
+		}
+		entry.Before = map[string]any{"kind": "record.setValue", "recordId": record, "propertyId": property, "value": map[string]any{"type": typ, "schemaVersion": version, "value": value}}
+	case "page.update":
+		entry.PageID = str(action["pageId"])
+		entry.Target = "title:" + entry.PageID
+		var title string
+		if err := q.QueryRowContext(ctx, "SELECT title FROM pages WHERE id=?", entry.PageID).Scan(&title); err != nil {
+			return entry, err
+		}
+		entry.Before = map[string]any{"kind": "page.update", "pageId": entry.PageID, "title": title}
+	case "page.display.set":
+		entry.PageID = str(action["pageId"])
+		entry.Target = "display:" + entry.PageID
+		d, err := readPageDisplay(ctx, q, entry.PageID)
+		if err != nil {
+			return entry, err
+		}
+		entry.Before = map[string]any{"kind": "page.display.set", "pageId": entry.PageID, "fullWidth": d.FullWidth, "presentation": d.Presentation}
+	default:
+		return entry, Fail("INVALID_REQUEST", "Unsupported journal action")
+	}
+	return entry, nil
+}
+func runJournalAction(m *Mutation, action map[string]any) error {
+	if err := contracts.Validate("service", "JournalAction", marshal(action)); err != nil {
+		return Fail("INVALID_REQUEST", "Invalid grouped action")
+	}
+	handler := commandHandlers[str(action["kind"])]
+	if handler == nil {
+		return Fail("INVALID_REQUEST", "Unknown grouped action")
+	}
+	return handler(m, action)
+}
+func applyJournal(m *Mutation, id, label string, actions []map[string]any) error {
+	if len(actions) < 1 || len(actions) > 128 {
+		return Fail("RESOURCE_EXHAUSTED", "A group needs 1–128 changes")
+	}
+	var exists int
+	if err := m.Tx.QueryRowContext(m.Context, "SELECT count(*) FROM operation_journal WHERE id=?", id).Scan(&exists); err != nil {
+		return err
+	}
+	if exists != 0 {
+		return Fail("CONFLICT", "Operation identity already exists")
+	}
+	entries := []journalEntry{}
+	seen := map[string]bool{}
+	for _, action := range actions {
+		if err := contracts.Validate("service", "JournalAction", marshal(action)); err != nil {
+			return Fail("INVALID_REQUEST", "Invalid grouped action")
+		}
+		entry, err := journalCurrent(m.Context, m.Tx, action)
+		if err != nil {
+			return err
+		}
+		if seen[entry.Target] {
+			return Fail("INVALID_REQUEST", "An operation cannot change the same field twice")
+		}
+		seen[entry.Target] = true
+		if err = m.AuthorizePage(entry.PageID); err != nil {
+			return err
+		}
+		if err = runJournalAction(m, action); err != nil {
+			return err
+		}
+		after, err := journalCurrent(m.Context, m.Tx, action)
+		if err != nil {
+			return err
+		}
+		entry.After = after.Before
+		if str(action["kind"]) == "page.display.set" {
+			for _, key := range []string{"fullWidth", "presentation"} {
+				if entry.Before[key] != entry.After[key] {
+					entry.ChangedFields = append(entry.ChangedFields, key)
+				}
+			}
+		}
+		if string(marshal(entry.Before)) != string(marshal(entry.After)) {
+			entries = append(entries, entry)
+		}
+	}
+	_, err := m.Exec("INSERT INTO operation_journal VALUES(?,1,?,?,?,'applied',?,NULL)", id, label, m.Execution.Actor.ActorId, now(), string(marshal(entries)))
+	return err
+}
+func loadJournal(ctx context.Context, k *Kernel, q querier, e contracts.ServiceExecutionContext, id string) (string, []journalEntry, error) {
+	var version int
+	var label, state, raw string
+	err := q.QueryRowContext(ctx, "SELECT version,label,state,entries_json FROM operation_journal WHERE id=?", id).Scan(&version, &label, &state, &raw)
+	if err != nil {
+		return "", nil, err
+	}
+	if version != 1 {
+		return "", nil, Fail("UNSUPPORTED_VERSION", "Unsupported operation journal")
+	}
+	entries := []journalEntry{}
+	if err = json.Unmarshal([]byte(raw), &entries); err != nil {
+		return "", nil, err
+	}
+	for _, entry := range entries {
+		if err = k.authorizePage(ctx, q, e, entry.PageID); err != nil {
+			return "", nil, err
+		}
+	}
+	if state != "applied" {
+		return "", nil, Fail("CONFLICT", "Operation was already undone")
+	}
+	return label, entries, nil
+}
+func checkJournalCurrent(ctx context.Context, q querier, entry journalEntry) error {
+	current, err := journalCurrent(ctx, q, entry.After)
+	if err != nil {
+		return err
+	}
+	matches := string(marshal(current.Before)) == string(marshal(entry.After))
+	if len(entry.ChangedFields) > 0 {
+		matches = true
+		for _, key := range entry.ChangedFields {
+			if current.Before[key] != entry.After[key] {
+				matches = false
+			}
+		}
+	}
+	if !matches || current.PropertyRevision != entry.PropertyRevision {
+		return Fail("CONFLICT", "An affected field or its property changed after this operation")
+	}
+	return nil
+}
+func undoJournal(m *Mutation, c map[string]any) error {
+	if len(m.Request.Commands) != 1 {
+		return Fail("INVALID_REQUEST", "Undo must be an isolated batch")
+	}
+	_, entries, err := loadJournal(m.Context, m.Kernel, m.Tx, m.Execution, str(c["operationId"]))
+	if err != nil {
+		return err
+	}
+	// Check all postconditions before any inverse. The enclosing writer transaction
+	// also rolls back every inverse if a later guard or validator fails.
+	for _, entry := range entries {
+		if err = checkJournalCurrent(m.Context, m.Tx, entry); err != nil {
+			return err
+		}
+	}
+	for i := len(entries) - 1; i >= 0; i-- {
+		inverse, inverseErr := journalInverse(m.Context, m.Tx, entries[i])
+		if inverseErr != nil {
+			return inverseErr
+		}
+		if err = runJournalAction(m, inverse); err != nil {
+			return err
+		}
+	}
+	_, err = m.Exec("UPDATE operation_journal SET state='undone',undone_at=? WHERE id=? AND state='applied'", now(), c["operationId"])
+	return err
+}
+func previewUndoJournal(ctx context.Context, k *Kernel, e contracts.ServiceExecutionContext, r map[string]any) (any, error) {
+	tx, err := k.db.BeginTx(ctx, &sql.TxOptions{ReadOnly: true})
+	if err != nil {
+		return nil, err
+	}
+	defer tx.Rollback()
+	id := str(r["operationId"])
+	label, entries, err := loadJournal(ctx, k, tx, e, id)
+	if err != nil {
+		return nil, err
+	}
+	targets := map[string]contracts.ServiceExpectedRevision{}
+	add := func(kind, id string) error {
+		var revision string
+		if err := tx.QueryRowContext(ctx, "SELECT revision FROM "+entityTables[kind]+" WHERE id=?", id).Scan(&revision); err != nil {
+			return err
+		}
+		if err := k.authorizeEntity(ctx, tx, e, kind, id); err != nil {
+			return err
+		}
+		targets[kind+":"+id] = required(kind, id, revision)
+		return nil
+	}
+	actions := []map[string]any{}
+	for i := len(entries) - 1; i >= 0; i-- {
+		entry := entries[i]
+		if err = checkJournalCurrent(ctx, tx, entry); err != nil {
+			return nil, err
+		}
+		if err = add("page", entry.PageID); err != nil {
+			return nil, err
+		}
+		var record, collection string
+		err = tx.QueryRowContext(ctx, "SELECT id,collection_id FROM records WHERE page_id=?", entry.PageID).Scan(&record, &collection)
+		if err == nil {
+			if err = add("record", record); err != nil {
+				return nil, err
+			}
+			if err = add("collection", collection); err != nil {
+				return nil, err
+			}
+		} else if !errors.Is(err, sql.ErrNoRows) {
+			return nil, err
+		}
+		if property := str(entry.Before["propertyId"]); property != "" {
+			if err = add("property", property); err != nil {
+				return nil, err
+			}
+		}
+		inverse, err := journalInverse(ctx, tx, entry)
+		if err != nil {
+			return nil, err
+		}
+		actions = append(actions, inverse)
+	}
+	keys := []string{}
+	for key := range targets {
+		keys = append(keys, key)
+	}
+	sort.Strings(keys)
+	guards := []contracts.ServiceExpectedRevision{}
+	for _, key := range keys {
+		guards = append(guards, targets[key])
+	}
+	return map[string]any{"operationId": id, "label": label, "actions": actions, "expectedRevisions": guards, "command": map[string]any{"kind": "operation.undo", "operationId": id}}, nil
+}
+func listJournal(ctx context.Context, k *Kernel, e contracts.ServiceExecutionContext, r map[string]any) (any, error) {
+	page := str(r["pageId"])
+	if err := k.authorizePage(ctx, k.db, e, page); err != nil {
+		return nil, err
+	}
+	rows, err := k.db.QueryContext(ctx, `SELECT id,label,created_at,state,entries_json FROM operation_journal WHERE EXISTS(SELECT 1 FROM json_each(entries_json) WHERE json_extract(value,'$.pageId')=?) ORDER BY created_at DESC,id DESC LIMIT 50`, page)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	items := []any{}
+	for rows.Next() {
+		var id, label, created, state, raw string
+		if err = rows.Scan(&id, &label, &created, &state, &raw); err != nil {
+			return nil, err
+		}
+		var entries []journalEntry
+		if err = json.Unmarshal([]byte(raw), &entries); err != nil {
+			return nil, err
+		}
+		allowed := true
+		for _, entry := range entries {
+			if k.authorizePage(ctx, k.db, e, entry.PageID) != nil {
+				allowed = false
+				break
+			}
+		}
+		if allowed {
+			items = append(items, map[string]any{"id": id, "label": label, "createdAt": created, "state": state})
+		}
+	}
+	return map[string]any{"operations": items}, rows.Err()
+}
+
+func journalInverse(ctx context.Context, q querier, entry journalEntry) (map[string]any, error) {
+	if len(entry.ChangedFields) == 0 {
+		return entry.Before, nil
+	}
+	current, err := journalCurrent(ctx, q, entry.After)
+	if err != nil {
+		return nil, err
+	}
+	for _, key := range entry.ChangedFields {
+		current.Before[key] = entry.Before[key]
+	}
+	return current.Before, nil
+}
