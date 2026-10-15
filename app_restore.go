@@ -97,6 +97,9 @@ func (a *App) PreviewNativeRestore() (string, error) {
 		return "", err
 	}
 	id := a.saveRestorePreview(nativeRestorePreview{source: source, manifest: manifest})
+	return nativeRestorePreviewResponse(id, source, manifest)
+}
+func nativeRestorePreviewResponse(id, source string, manifest workspace.BackupManifest) (string, error) {
 	warnings := []string{"Restores into a new folder. Your open workspace remains unchanged.", "All retained history, import evidence, managed assets and declared recording journals are included. Search is rebuilt.", "Pending approvals and old file/restore handles are revoked. Approved memory states are preserved.", restoredMemoryWarning}
 	if manifest.FormatVersion == 1 {
 		warnings = append(warnings, "This legacy backup did not inventory recording drafts. Only its declared data can be restored.")
