@@ -491,6 +491,422 @@
       ],
       "additionalProperties": false
     },
+    "RecordLayoutSection": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "title": {
+          "type": "string",
+          "maxLength": 120
+        },
+        "placement": {
+          "type": "string",
+          "enum": [
+            "header",
+            "sidebar"
+          ]
+        },
+        "propertyIds": {
+          "type": "array",
+          "items": {
+            "$ref": "domain.schema.json#/$defs/Id"
+          },
+          "maxItems": 256,
+          "uniqueItems": true
+        }
+      },
+      "required": [
+        "id",
+        "title",
+        "placement",
+        "propertyIds"
+      ],
+      "additionalProperties": false
+    },
+    "RecordLayout": {
+      "type": "object",
+      "properties": {
+        "version": {
+          "const": 1
+        },
+        "sections": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/RecordLayoutSection"
+          },
+          "maxItems": 32
+        },
+        "hiddenPropertyIds": {
+          "type": "array",
+          "items": {
+            "$ref": "domain.schema.json#/$defs/Id"
+          },
+          "maxItems": 256,
+          "uniqueItems": true
+        }
+      },
+      "required": [
+        "version",
+        "sections",
+        "hiddenPropertyIds"
+      ],
+      "additionalProperties": false
+    },
+    "SchedulingPolicy": {
+      "type": "object",
+      "properties": {
+        "version": {
+          "const": 1
+        },
+        "calendar": {
+          "type": "string",
+          "enum": [
+            "calendar_days",
+            "working_week"
+          ]
+        },
+        "timezone": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "weekdays": {
+          "type": "array",
+          "items": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 6
+          },
+          "maxItems": 7,
+          "uniqueItems": true
+        }
+      },
+      "required": [
+        "version",
+        "calendar",
+        "timezone",
+        "weekdays"
+      ],
+      "additionalProperties": false
+    },
+    "SchedulingInput": {
+      "type": "object",
+      "properties": {
+        "collectionId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "datePropertyId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "recordId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "newStart": {
+          "type": "string",
+          "minLength": 10,
+          "maxLength": 40
+        },
+        "policy": {
+          "$ref": "#/$defs/SchedulingPolicy"
+        }
+      },
+      "required": [
+        "collectionId",
+        "datePropertyId",
+        "recordId",
+        "newStart",
+        "policy"
+      ],
+      "additionalProperties": false
+    },
+    "SchedulingRecord": {
+      "type": "object",
+      "properties": {
+        "recordId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "pageId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "title": {
+          "type": "string"
+        },
+        "before": {
+          "$ref": "domain.schema.json#/$defs/property_date_v1"
+        },
+        "after": {
+          "$ref": "domain.schema.json#/$defs/property_date_v1"
+        },
+        "dependencyRecordIds": {
+          "type": "array",
+          "items": {
+            "$ref": "domain.schema.json#/$defs/Id"
+          },
+          "maxItems": 128
+        },
+        "reason": {
+          "type": "string",
+          "enum": [
+            "requested",
+            "dependency",
+            "slack_preserved",
+            "prerequisite"
+          ]
+        },
+        "changed": {
+          "type": "boolean"
+        },
+        "duration": {
+          "type": "string"
+        },
+        "dstEffects": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "maxItems": 8
+        }
+      },
+      "required": [
+        "recordId",
+        "pageId",
+        "title",
+        "before",
+        "after",
+        "dependencyRecordIds",
+        "reason",
+        "changed",
+        "duration",
+        "dstEffects"
+      ],
+      "additionalProperties": false
+    },
+    "SchedulingPlan": {
+      "type": "object",
+      "properties": {
+        "version": {
+          "const": 1
+        },
+        "id": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "hash": {
+          "$ref": "domain.schema.json#/$defs/Hash"
+        },
+        "input": {
+          "$ref": "#/$defs/SchedulingInput"
+        },
+        "requiredRevisions": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/ExpectedRevision"
+          },
+          "maxItems": 1000
+        },
+        "records": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/SchedulingRecord"
+          },
+          "maxItems": 450
+        }
+      },
+      "required": [
+        "version",
+        "id",
+        "hash",
+        "input",
+        "requiredRevisions",
+        "records"
+      ],
+      "additionalProperties": false
+    },
+    "JournalAction": {
+      "oneOf": [
+        {
+          "type": "object",
+          "properties": {
+            "kind": {
+              "const": "record.setValue"
+            },
+            "recordId": {
+              "$ref": "domain.schema.json#/$defs/Id"
+            },
+            "propertyId": {
+              "$ref": "domain.schema.json#/$defs/Id"
+            },
+            "value": {
+              "type": "object",
+              "properties": {
+                "type": {
+                  "type": "string",
+                  "enum": [
+                    "text",
+                    "number",
+                    "select",
+                    "multi_select",
+                    "status",
+                    "checkbox",
+                    "date",
+                    "url",
+                    "email",
+                    "phone"
+                  ]
+                },
+                "schemaVersion": {
+                  "type": "integer",
+                  "minimum": 1
+                },
+                "value": {
+                  "type": [
+                    "object",
+                    "array",
+                    "string",
+                    "number",
+                    "integer",
+                    "boolean",
+                    "null"
+                  ]
+                }
+              },
+              "required": [
+                "type",
+                "schemaVersion",
+                "value"
+              ],
+              "additionalProperties": false
+            }
+          },
+          "required": [
+            "kind",
+            "recordId",
+            "propertyId",
+            "value"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "kind": {
+              "const": "record.clearValue"
+            },
+            "recordId": {
+              "$ref": "domain.schema.json#/$defs/Id"
+            },
+            "propertyId": {
+              "$ref": "domain.schema.json#/$defs/Id"
+            }
+          },
+          "required": [
+            "kind",
+            "recordId",
+            "propertyId"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "kind": {
+              "const": "page.update"
+            },
+            "pageId": {
+              "$ref": "domain.schema.json#/$defs/Id"
+            },
+            "title": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "kind",
+            "pageId",
+            "title"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "kind": {
+              "const": "page.display.set"
+            },
+            "pageId": {
+              "$ref": "domain.schema.json#/$defs/Id"
+            },
+            "fullWidth": {
+              "type": "boolean"
+            },
+            "presentation": {
+              "type": "boolean"
+            }
+          },
+          "required": [
+            "kind",
+            "pageId",
+            "fullWidth",
+            "presentation"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "kind": {
+              "const": "collection.layout.set"
+            },
+            "collectionId": {
+              "$ref": "domain.schema.json#/$defs/Id"
+            },
+            "layout": {
+              "oneOf": [
+                {
+                  "$ref": "#/$defs/RecordLayout"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            }
+          },
+          "required": [
+            "kind",
+            "collectionId",
+            "layout"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "kind": {
+              "const": "record.layout.set"
+            },
+            "recordId": {
+              "$ref": "domain.schema.json#/$defs/Id"
+            },
+            "layout": {
+              "oneOf": [
+                {
+                  "$ref": "#/$defs/RecordLayout"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            }
+          },
+          "required": [
+            "kind",
+            "recordId",
+            "layout"
+          ],
+          "additionalProperties": false
+        }
+      ]
+    },
     "AutomationTemplateAction": {
       "type": "object",
       "properties": {
@@ -948,6 +1364,191 @@
         "paused",
         "trigger",
         "actions"
+      ],
+      "additionalProperties": false
+    },
+    "SkillDefinition": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 200
+        },
+        "purpose": {
+          "type": "string",
+          "maxLength": 1000
+        },
+        "instructions": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 4000
+        },
+        "inputDescription": {
+          "type": "string",
+          "maxLength": 500
+        },
+        "expectedOutput": {
+          "type": "string",
+          "maxLength": 1000
+        },
+        "mode": {
+          "type": "string",
+          "enum": [
+            "answer",
+            "summarize",
+            "generate",
+            "workspace_agent"
+          ]
+        },
+        "sourcePageIds": {
+          "type": "array",
+          "items": {
+            "$ref": "domain.schema.json#/$defs/Id"
+          },
+          "maxItems": 32,
+          "uniqueItems": true
+        },
+        "tools": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": [
+              "readPage",
+              "search.query",
+              "queryRecords",
+              "resolveCitation",
+              "allocateIds",
+              "proposeChanges",
+              "proposeActions"
+            ]
+          },
+          "maxItems": 7,
+          "uniqueItems": true
+        }
+      },
+      "required": [
+        "name",
+        "purpose",
+        "instructions",
+        "inputDescription",
+        "expectedOutput",
+        "mode",
+        "sourcePageIds",
+        "tools"
+      ],
+      "additionalProperties": false
+    },
+    "SkillRunReference": {
+      "type": "object",
+      "properties": {
+        "skillId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "version": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "invocationId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "input": {
+          "type": "string",
+          "maxLength": 1000
+        },
+        "sourcePageIds": {
+          "type": "array",
+          "items": {
+            "$ref": "domain.schema.json#/$defs/Id"
+          },
+          "maxItems": 32,
+          "uniqueItems": true
+        },
+        "tools": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": [
+              "readPage",
+              "search.query",
+              "queryRecords",
+              "resolveCitation",
+              "allocateIds",
+              "proposeChanges",
+              "proposeActions"
+            ]
+          },
+          "maxItems": 7,
+          "uniqueItems": true
+        },
+        "previewHash": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        }
+      },
+      "required": [
+        "skillId",
+        "version",
+        "invocationId",
+        "input",
+        "sourcePageIds",
+        "tools"
+      ],
+      "additionalProperties": false
+    },
+    "AutofillInput": {
+      "type": "object",
+      "properties": {
+        "collectionId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "recordIds": {
+          "type": "array",
+          "items": {
+            "$ref": "domain.schema.json#/$defs/Id"
+          },
+          "maxItems": 128,
+          "minItems": 1,
+          "uniqueItems": true
+        },
+        "sourcePropertyIds": {
+          "type": "array",
+          "items": {
+            "$ref": "domain.schema.json#/$defs/Id"
+          },
+          "maxItems": 32,
+          "minItems": 1,
+          "uniqueItems": true
+        },
+        "targetPropertyIds": {
+          "type": "array",
+          "items": {
+            "$ref": "domain.schema.json#/$defs/Id"
+          },
+          "maxItems": 32,
+          "minItems": 1,
+          "uniqueItems": true
+        },
+        "instructions": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 4000
+        },
+        "modelPackId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "includeNonempty": {
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "collectionId",
+        "recordIds",
+        "sourcePropertyIds",
+        "targetPropertyIds",
+        "instructions",
+        "modelPackId",
+        "includeNonempty"
       ],
       "additionalProperties": false
     },
@@ -1632,6 +2233,9 @@
         },
         "statusPropertyId": {
           "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "duePropertyId": {
+          "$ref": "domain.schema.json#/$defs/Id"
         }
       },
       "required": [
@@ -1685,6 +2289,114 @@
         "fileId",
         "ingestHandle",
         "pageId"
+      ],
+      "additionalProperties": false
+    },
+    "RecordMeetingExtraction": {
+      "type": "object",
+      "properties": {
+        "kind": {
+          "const": "meeting.extraction.record"
+        },
+        "proposalId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "itemId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "title": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 512
+        },
+        "body": {
+          "type": "string",
+          "maxLength": 100000
+        }
+      },
+      "required": [
+        "kind",
+        "proposalId",
+        "itemId",
+        "title",
+        "body"
+      ],
+      "additionalProperties": false
+    },
+    "CorrectMeetingSegment": {
+      "type": "object",
+      "properties": {
+        "kind": {
+          "const": "meeting.correctSegment"
+        },
+        "meetingId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "segmentId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "text": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 16000
+        },
+        "startMs": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "endMs": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        }
+      },
+      "required": [
+        "kind",
+        "meetingId",
+        "segmentId",
+        "text",
+        "startMs",
+        "endMs"
+      ],
+      "additionalProperties": false
+    },
+    "ApplyMeetingRetention": {
+      "type": "object",
+      "properties": {
+        "kind": {
+          "const": "meeting.retention.apply"
+        },
+        "meetingId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "selected": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": [
+              "audio",
+              "transcripts",
+              "generated",
+              "indexes",
+              "memory"
+            ]
+          },
+          "maxItems": 5,
+          "uniqueItems": true
+        },
+        "previewHash": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        }
+      },
+      "required": [
+        "kind",
+        "meetingId",
+        "selected",
+        "previewHash"
       ],
       "additionalProperties": false
     },
@@ -2276,6 +2988,9 @@
         },
         "confirmed": {
           "type": "boolean"
+        },
+        "operationId": {
+          "$ref": "domain.schema.json#/$defs/Id"
         }
       },
       "required": [
@@ -2383,6 +3098,219 @@
       ],
       "additionalProperties": false
     },
+    "SetCollectionLayout": {
+      "type": "object",
+      "properties": {
+        "kind": {
+          "const": "collection.layout.set"
+        },
+        "collectionId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "layout": {
+          "oneOf": [
+            {
+              "$ref": "#/$defs/RecordLayout"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "required": [
+        "kind",
+        "collectionId",
+        "layout"
+      ],
+      "additionalProperties": false
+    },
+    "SetRecordLayout": {
+      "type": "object",
+      "properties": {
+        "kind": {
+          "const": "record.layout.set"
+        },
+        "recordId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "layout": {
+          "oneOf": [
+            {
+              "$ref": "#/$defs/RecordLayout"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "required": [
+        "kind",
+        "recordId",
+        "layout"
+      ],
+      "additionalProperties": false
+    },
+    "ApplyScheduling": {
+      "type": "object",
+      "properties": {
+        "kind": {
+          "const": "scheduling.apply"
+        },
+        "plan": {
+          "$ref": "#/$defs/SchedulingPlan"
+        }
+      },
+      "required": [
+        "kind",
+        "plan"
+      ],
+      "additionalProperties": false
+    },
+    "ApplyOperation": {
+      "type": "object",
+      "properties": {
+        "kind": {
+          "const": "operation.apply"
+        },
+        "operationId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "label": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 200
+        },
+        "actions": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/JournalAction"
+          },
+          "maxItems": 128,
+          "minItems": 1
+        }
+      },
+      "required": [
+        "kind",
+        "operationId",
+        "label",
+        "actions"
+      ],
+      "additionalProperties": false
+    },
+    "UndoOperation": {
+      "type": "object",
+      "properties": {
+        "kind": {
+          "const": "operation.undo"
+        },
+        "operationId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        }
+      },
+      "required": [
+        "kind",
+        "operationId"
+      ],
+      "additionalProperties": false
+    },
+    "ReviewPage": {
+      "type": "object",
+      "properties": {
+        "kind": {
+          "const": "page.review"
+        },
+        "pageId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "contentIdentity": {
+          "$ref": "domain.schema.json#/$defs/SemanticContentIdentity"
+        },
+        "expiresAt": {
+          "$ref": "domain.schema.json#/$defs/Timestamp"
+        }
+      },
+      "required": [
+        "kind",
+        "pageId",
+        "contentIdentity"
+      ],
+      "additionalProperties": false
+    },
+    "SaveSkill": {
+      "type": "object",
+      "properties": {
+        "kind": {
+          "const": "skill.save"
+        },
+        "skillId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "pageId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "expectedVersion": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "definition": {
+          "$ref": "#/$defs/SkillDefinition"
+        },
+        "archived": {
+          "type": "boolean"
+        },
+        "imported": {
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "kind",
+        "skillId",
+        "pageId",
+        "expectedVersion",
+        "definition",
+        "archived",
+        "imported"
+      ],
+      "additionalProperties": false
+    },
+    "ApplyAutofill": {
+      "type": "object",
+      "properties": {
+        "kind": {
+          "const": "autofill.applyReviewed"
+        },
+        "batchId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "cellIds": {
+          "type": "array",
+          "items": {
+            "$ref": "domain.schema.json#/$defs/Id"
+          },
+          "maxItems": 128,
+          "minItems": 1,
+          "uniqueItems": true
+        },
+        "overwriteCellIds": {
+          "type": "array",
+          "items": {
+            "$ref": "domain.schema.json#/$defs/Id"
+          },
+          "maxItems": 128,
+          "uniqueItems": true
+        }
+      },
+      "required": [
+        "kind",
+        "batchId",
+        "cellIds",
+        "overwriteCellIds"
+      ],
+      "additionalProperties": false
+    },
     "Command": {
       "oneOf": [
         {
@@ -2458,6 +3386,15 @@
           "$ref": "#/$defs/AttachFile"
         },
         {
+          "$ref": "#/$defs/RecordMeetingExtraction"
+        },
+        {
+          "$ref": "#/$defs/CorrectMeetingSegment"
+        },
+        {
+          "$ref": "#/$defs/ApplyMeetingRetention"
+        },
+        {
           "$ref": "#/$defs/CreateMeeting"
         },
         {
@@ -2525,8 +3462,982 @@
         },
         {
           "$ref": "#/$defs/DismissPersonalReview"
+        },
+        {
+          "$ref": "#/$defs/SetCollectionLayout"
+        },
+        {
+          "$ref": "#/$defs/SetRecordLayout"
+        },
+        {
+          "$ref": "#/$defs/ApplyScheduling"
+        },
+        {
+          "$ref": "#/$defs/ApplyOperation"
+        },
+        {
+          "$ref": "#/$defs/UndoOperation"
+        },
+        {
+          "$ref": "#/$defs/ReviewPage"
+        },
+        {
+          "$ref": "#/$defs/SaveSkill"
+        },
+        {
+          "$ref": "#/$defs/ApplyAutofill"
         }
       ]
+    },
+    "SchedulingPreviewRequest": {
+      "type": "object",
+      "properties": {
+        "contractVersion": {
+          "const": 1
+        },
+        "requestId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "workspaceId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "input": {
+          "$ref": "#/$defs/SchedulingInput"
+        }
+      },
+      "required": [
+        "contractVersion",
+        "requestId",
+        "workspaceId",
+        "input"
+      ],
+      "additionalProperties": false
+    },
+    "RecordLayoutRequest": {
+      "type": "object",
+      "properties": {
+        "contractVersion": {
+          "const": 1
+        },
+        "requestId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "workspaceId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "collectionId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "recordId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        }
+      },
+      "required": [
+        "contractVersion",
+        "requestId",
+        "workspaceId",
+        "collectionId"
+      ],
+      "additionalProperties": false
+    },
+    "RecordLayoutResult": {
+      "type": "object",
+      "properties": {
+        "collectionId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "recordId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "defaultLayout": {
+          "oneOf": [
+            {
+              "$ref": "#/$defs/RecordLayout"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "overrideLayout": {
+          "oneOf": [
+            {
+              "$ref": "#/$defs/RecordLayout"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "effectiveLayout": {
+          "$ref": "#/$defs/RecordLayout"
+        },
+        "missingPropertyIds": {
+          "type": "array",
+          "items": {
+            "$ref": "domain.schema.json#/$defs/Id"
+          },
+          "maxItems": 8448
+        }
+      },
+      "required": [
+        "collectionId",
+        "defaultLayout",
+        "overrideLayout",
+        "effectiveLayout",
+        "missingPropertyIds"
+      ],
+      "additionalProperties": false
+    },
+    "MeetingRetentionPreviewRequest": {
+      "type": "object",
+      "properties": {
+        "contractVersion": {
+          "const": 1
+        },
+        "requestId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "workspaceId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "meetingId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "selected": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": [
+              "audio",
+              "transcripts",
+              "generated",
+              "indexes",
+              "memory"
+            ]
+          },
+          "maxItems": 5,
+          "uniqueItems": true
+        }
+      },
+      "required": [
+        "contractVersion",
+        "requestId",
+        "workspaceId",
+        "meetingId",
+        "selected"
+      ],
+      "additionalProperties": false
+    },
+    "MeetingRetentionCategory": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "enum": [
+            "audio",
+            "transcripts",
+            "generated",
+            "indexes",
+            "memory",
+            "history",
+            "backups"
+          ]
+        },
+        "count": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "action": {
+          "type": "string"
+        },
+        "detail": {
+          "type": "string"
+        },
+        "selectable": {
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "id",
+        "count",
+        "action",
+        "detail",
+        "selectable"
+      ],
+      "additionalProperties": false
+    },
+    "MeetingRetentionPreview": {
+      "type": "object",
+      "properties": {
+        "version": {
+          "const": 1
+        },
+        "meetingId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "pageId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "categories": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/MeetingRetentionCategory"
+          },
+          "maxItems": 7
+        },
+        "selected": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": [
+              "audio",
+              "transcripts",
+              "generated",
+              "indexes",
+              "memory"
+            ]
+          },
+          "maxItems": 5
+        },
+        "expectedRevisions": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/ExpectedRevision"
+          },
+          "maxItems": 1000
+        },
+        "command": {
+          "$ref": "#/$defs/ApplyMeetingRetention"
+        },
+        "warnings": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "maxItems": 16
+        },
+        "canApply": {
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "version",
+        "meetingId",
+        "pageId",
+        "categories",
+        "selected",
+        "expectedRevisions",
+        "command",
+        "warnings",
+        "canApply"
+      ],
+      "additionalProperties": false
+    },
+    "MeetingExtractionResult": {
+      "type": "object",
+      "properties": {
+        "version": {
+          "const": 1
+        },
+        "proposalId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "itemId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "meetingId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "evidenceHash": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "kind": {
+          "type": "string",
+          "enum": [
+            "page",
+            "task"
+          ]
+        },
+        "title": {
+          "type": "string"
+        },
+        "body": {
+          "type": "string"
+        },
+        "pageId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "recordId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "appliedAt": {
+          "$ref": "domain.schema.json#/$defs/Timestamp"
+        },
+        "stale": {
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "version",
+        "proposalId",
+        "itemId",
+        "meetingId",
+        "evidenceHash",
+        "kind",
+        "title",
+        "body",
+        "pageId",
+        "stale"
+      ],
+      "additionalProperties": false
+    },
+    "MeetingExtractionApplyResult": {
+      "type": "object",
+      "properties": {
+        "pageId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "recordId": {
+          "type": "string"
+        },
+        "kind": {
+          "type": "string",
+          "enum": [
+            "page",
+            "task"
+          ]
+        },
+        "proposalId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "itemId": {
+          "type": "string"
+        },
+        "reused": {
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "pageId",
+        "recordId",
+        "kind",
+        "proposalId",
+        "itemId",
+        "reused"
+      ],
+      "additionalProperties": false
+    },
+    "MeetingExtractionPrepareRequest": {
+      "type": "object",
+      "properties": {
+        "contractVersion": {
+          "const": 1
+        },
+        "requestId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "workspaceId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "meetingId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "kind": {
+          "type": "string",
+          "enum": [
+            "page",
+            "task"
+          ]
+        },
+        "draftId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "itemIndex": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 249
+        }
+      },
+      "required": [
+        "contractVersion",
+        "requestId",
+        "workspaceId",
+        "meetingId",
+        "kind"
+      ],
+      "additionalProperties": false,
+      "dependentRequired": {
+        "draftId": [
+          "itemIndex"
+        ],
+        "itemIndex": [
+          "draftId"
+        ]
+      }
+    },
+    "MeetingExtractionListRequest": {
+      "type": "object",
+      "properties": {
+        "contractVersion": {
+          "const": 1
+        },
+        "requestId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "workspaceId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "meetingId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        }
+      },
+      "required": [
+        "contractVersion",
+        "requestId",
+        "workspaceId",
+        "meetingId"
+      ],
+      "additionalProperties": false
+    },
+    "MeetingExtractionCreateRequest": {
+      "type": "object",
+      "properties": {
+        "contractVersion": {
+          "const": 1
+        },
+        "requestId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "workspaceId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "meetingId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "evidenceHash": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "kind": {
+          "type": "string",
+          "enum": [
+            "page",
+            "task"
+          ]
+        },
+        "title": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 512
+        },
+        "body": {
+          "type": "string",
+          "maxLength": 100000
+        },
+        "proposalId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "itemId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        }
+      },
+      "required": [
+        "contractVersion",
+        "requestId",
+        "workspaceId",
+        "meetingId",
+        "evidenceHash",
+        "kind",
+        "title",
+        "body"
+      ],
+      "additionalProperties": false,
+      "dependentRequired": {
+        "proposalId": [
+          "itemId"
+        ],
+        "itemId": [
+          "proposalId"
+        ]
+      }
+    },
+    "NativeAudioInput": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 1024
+        },
+        "name": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 1024
+        },
+        "isDefault": {
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "id",
+        "name",
+        "isDefault"
+      ],
+      "additionalProperties": false
+    },
+    "NativeCaptureControlAck": {
+      "type": "object",
+      "properties": {
+        "controlId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "action": {
+          "type": "string",
+          "enum": [
+            "pause",
+            "resume",
+            "stop"
+          ]
+        },
+        "state": {
+          "type": "string",
+          "enum": [
+            "paused",
+            "recording",
+            "stopped"
+          ]
+        },
+        "bytes": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "capturedSamples": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "durationMs": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        }
+      },
+      "required": [
+        "controlId",
+        "action",
+        "state",
+        "bytes",
+        "capturedSamples",
+        "durationMs"
+      ],
+      "additionalProperties": false
+    },
+    "NativeRecordingGap": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "kind": {
+          "type": "string",
+          "enum": [
+            "pause",
+            "interruption"
+          ]
+        },
+        "sampleOffset": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "startedAt": {
+          "$ref": "domain.schema.json#/$defs/Timestamp"
+        },
+        "endedAt": {
+          "$ref": "domain.schema.json#/$defs/Timestamp"
+        },
+        "durationMs": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "reason": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "kind",
+        "sampleOffset",
+        "startedAt"
+      ],
+      "additionalProperties": false
+    },
+    "NativeRecordingDraft": {
+      "type": "object",
+      "properties": {
+        "version": {
+          "const": 1
+        },
+        "id": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "title": {
+          "type": "string"
+        },
+        "actorId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "startedAt": {
+          "$ref": "domain.schema.json#/$defs/Timestamp"
+        },
+        "state": {
+          "type": "string",
+          "enum": [
+            "recording",
+            "paused",
+            "captured",
+            "interrupted",
+            "saved"
+          ]
+        },
+        "bytes": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "durationMs": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "pageId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "meetingId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "fileId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "error": {
+          "type": "string"
+        },
+        "inputDeviceId": {
+          "type": "string"
+        },
+        "disclosureAcknowledgedAt": {
+          "$ref": "domain.schema.json#/$defs/Timestamp"
+        },
+        "lastControlId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "gaps": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/NativeRecordingGap"
+          },
+          "maxItems": 10000
+        },
+        "segments": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "startByte": {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 9007199254740991
+              },
+              "endByte": {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 9007199254740991
+              },
+              "sha256": {
+                "type": "string",
+                "pattern": "^[0-9a-f]{64}$"
+              }
+            },
+            "required": [
+              "startByte",
+              "endByte",
+              "sha256"
+            ],
+            "additionalProperties": false
+          },
+          "maxItems": 100000
+        }
+      },
+      "required": [
+        "id",
+        "title",
+        "actorId",
+        "startedAt",
+        "state",
+        "bytes",
+        "durationMs",
+        "pageId",
+        "meetingId",
+        "segments"
+      ],
+      "additionalProperties": false
+    },
+    "NativeBackupProgress": {
+      "type": "object",
+      "properties": {
+        "version": {
+          "const": 1
+        },
+        "phase": {
+          "type": "string",
+          "enum": [
+            "idle",
+            "choosing",
+            "snapshot",
+            "encrypting",
+            "authenticating",
+            "verifying",
+            "review",
+            "restoring",
+            "complete"
+          ]
+        },
+        "bytes": {
+          "type": "string",
+          "pattern": "^(0|[1-9][0-9]*)$"
+        },
+        "totalBytes": {
+          "type": "string",
+          "pattern": "^(0|[1-9][0-9]*)$"
+        }
+      },
+      "required": [
+        "version",
+        "phase",
+        "bytes",
+        "totalBytes"
+      ],
+      "additionalProperties": false
+    },
+    "NativeBackupSummary": {
+      "type": "object",
+      "properties": {
+        "version": {
+          "const": 1
+        },
+        "format": {
+          "const": "age-passphrase/native-tar-v1"
+        },
+        "included": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "maxItems": 32
+        },
+        "excluded": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "maxItems": 32
+        },
+        "restoration": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "maxItems": 32
+        }
+      },
+      "required": [
+        "version",
+        "format",
+        "included",
+        "excluded",
+        "restoration"
+      ],
+      "additionalProperties": false
+    },
+    "AutofillCreateRequest": {
+      "type": "object",
+      "properties": {
+        "contractVersion": {
+          "const": 1
+        },
+        "requestId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "workspaceId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "input": {
+          "$ref": "#/$defs/AutofillInput"
+        }
+      },
+      "required": [
+        "contractVersion",
+        "requestId",
+        "workspaceId",
+        "input"
+      ],
+      "additionalProperties": false
+    },
+    "AutofillControlRequest": {
+      "type": "object",
+      "properties": {
+        "contractVersion": {
+          "const": 1
+        },
+        "requestId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "workspaceId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "batchId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        }
+      },
+      "required": [
+        "contractVersion",
+        "requestId",
+        "workspaceId",
+        "batchId"
+      ],
+      "additionalProperties": false
+    },
+    "AutofillListRequest": {
+      "type": "object",
+      "properties": {
+        "contractVersion": {
+          "const": 1
+        },
+        "requestId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "workspaceId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "collectionId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        }
+      },
+      "required": [
+        "contractVersion",
+        "requestId",
+        "workspaceId",
+        "collectionId"
+      ],
+      "additionalProperties": false
+    },
+    "AutofillApplyRequest": {
+      "type": "object",
+      "properties": {
+        "contractVersion": {
+          "const": 1
+        },
+        "requestId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "workspaceId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "batchId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "cellIds": {
+          "type": "array",
+          "items": {
+            "$ref": "domain.schema.json#/$defs/Id"
+          },
+          "maxItems": 128,
+          "minItems": 1,
+          "uniqueItems": true
+        },
+        "overwriteCellIds": {
+          "type": "array",
+          "items": {
+            "$ref": "domain.schema.json#/$defs/Id"
+          },
+          "maxItems": 128,
+          "uniqueItems": true
+        }
+      },
+      "required": [
+        "contractVersion",
+        "requestId",
+        "workspaceId",
+        "batchId",
+        "cellIds",
+        "overwriteCellIds"
+      ],
+      "additionalProperties": false
+    },
+    "SkillsListRequest": {
+      "type": "object",
+      "properties": {
+        "contractVersion": {
+          "const": 1
+        },
+        "requestId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "workspaceId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "skillId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        }
+      },
+      "required": [
+        "contractVersion",
+        "requestId",
+        "workspaceId"
+      ],
+      "additionalProperties": false
+    },
+    "SkillPreviewRequest": {
+      "type": "object",
+      "properties": {
+        "contractVersion": {
+          "const": 1
+        },
+        "requestId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "workspaceId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "skill": {
+          "$ref": "#/$defs/SkillRunReference"
+        },
+        "provider": {
+          "type": "string",
+          "enum": [
+            "local",
+            "codex",
+            "claude_code"
+          ]
+        }
+      },
+      "required": [
+        "contractVersion",
+        "requestId",
+        "workspaceId",
+        "skill",
+        "provider"
+      ],
+      "additionalProperties": false
     },
     "AutomationOptionsRequest": {
       "type": "object",
@@ -2832,6 +4743,244 @@
         "requestId",
         "workspaceId",
         "collectionId"
+      ],
+      "additionalProperties": false
+    },
+    "OperationsListResult": {
+      "type": "object",
+      "properties": {
+        "operations": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "$ref": "domain.schema.json#/$defs/Id"
+              },
+              "label": {
+                "type": "string"
+              },
+              "createdAt": {
+                "$ref": "domain.schema.json#/$defs/Timestamp"
+              },
+              "state": {
+                "type": "string",
+                "enum": [
+                  "applied",
+                  "undone"
+                ]
+              }
+            },
+            "required": [
+              "id",
+              "label",
+              "createdAt",
+              "state"
+            ],
+            "additionalProperties": false
+          },
+          "maxItems": 50
+        }
+      },
+      "required": [
+        "operations"
+      ],
+      "additionalProperties": false
+    },
+    "OperationsListRequest": {
+      "type": "object",
+      "properties": {
+        "contractVersion": {
+          "const": 1
+        },
+        "requestId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "workspaceId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "pageId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        }
+      },
+      "required": [
+        "contractVersion",
+        "requestId",
+        "workspaceId",
+        "pageId"
+      ],
+      "additionalProperties": false
+    },
+    "OperationPreviewUndoRequest": {
+      "type": "object",
+      "properties": {
+        "contractVersion": {
+          "const": 1
+        },
+        "requestId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "workspaceId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "operationId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        }
+      },
+      "required": [
+        "contractVersion",
+        "requestId",
+        "workspaceId",
+        "operationId"
+      ],
+      "additionalProperties": false
+    },
+    "OperationPreviewUndoResult": {
+      "type": "object",
+      "properties": {
+        "operationId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "label": {
+          "type": "string"
+        },
+        "actions": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/JournalAction"
+          },
+          "maxItems": 128
+        },
+        "expectedRevisions": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/ExpectedRevision"
+          },
+          "maxItems": 1000
+        },
+        "command": {
+          "$ref": "#/$defs/UndoOperation"
+        }
+      },
+      "required": [
+        "operationId",
+        "label",
+        "actions",
+        "expectedRevisions",
+        "command"
+      ],
+      "additionalProperties": false
+    },
+    "PageFreshnessRequest": {
+      "type": "object",
+      "properties": {
+        "contractVersion": {
+          "const": 1
+        },
+        "requestId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "workspaceId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "pageId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        }
+      },
+      "required": [
+        "contractVersion",
+        "requestId",
+        "workspaceId",
+        "pageId"
+      ],
+      "additionalProperties": false
+    },
+    "PageFreshnessResult": {
+      "type": "object",
+      "properties": {
+        "pageId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "freshness": {
+          "$ref": "domain.schema.json#/$defs/PageFreshness"
+        },
+        "history": {
+          "type": "array",
+          "items": {
+            "$ref": "domain.schema.json#/$defs/HumanReviewEvent"
+          },
+          "maxItems": 100
+        }
+      },
+      "required": [
+        "pageId",
+        "freshness",
+        "history"
+      ],
+      "additionalProperties": false
+    },
+    "ReviewQueueRequest": {
+      "type": "object",
+      "properties": {
+        "contractVersion": {
+          "const": 1
+        },
+        "requestId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "workspaceId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "afterPageId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "limit": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 100
+        }
+      },
+      "required": [
+        "contractVersion",
+        "requestId",
+        "workspaceId",
+        "limit"
+      ],
+      "additionalProperties": false
+    },
+    "ReviewQueueResult": {
+      "type": "object",
+      "properties": {
+        "items": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "pageId": {
+                "$ref": "domain.schema.json#/$defs/Id"
+              },
+              "title": {
+                "type": "string"
+              },
+              "freshness": {
+                "$ref": "domain.schema.json#/$defs/PageFreshness"
+              }
+            },
+            "required": [
+              "pageId",
+              "title",
+              "freshness"
+            ],
+            "additionalProperties": false
+          },
+          "maxItems": 100
+        },
+        "nextPageId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        }
+      },
+      "required": [
+        "items"
       ],
       "additionalProperties": false
     },
@@ -4519,6 +6668,9 @@
             "deleted",
             "unavailable"
           ]
+        },
+        "freshness": {
+          "$ref": "domain.schema.json#/$defs/PageFreshness"
         }
       },
       "required": [
@@ -4612,6 +6764,9 @@
         },
         "historicalSnapshotRef": {
           "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "freshness": {
+          "$ref": "domain.schema.json#/$defs/PageFreshness"
         }
       },
       "required": [
@@ -6075,6 +8230,9 @@
         },
         "resumeRunId": {
           "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "skill": {
+          "$ref": "#/$defs/SkillRunReference"
         }
       },
       "required": [

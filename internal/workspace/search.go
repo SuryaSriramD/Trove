@@ -10,6 +10,7 @@ import (
 	"fmt"
 	"math"
 	"strings"
+	"time"
 	"unicode"
 
 	"trove.local/phase0/contracts"
@@ -264,11 +265,14 @@ func indexSearchPage(ctx context.Context, tx *sql.Tx, page string) error {
 	if err == nil && !deleted.Valid {
 		// Memory pages are evidence/policy records, never an alternate source of
 		// authoritative task values. Inactive memory is excluded at retrieval too.
-		var hidden int
+		var hidden, excluded int
 		if e := tx.QueryRowContext(ctx, "SELECT count(*) FROM memory_entries WHERE page_id=? AND status<>'active'", page).Scan(&hidden); e != nil {
 			return e
 		}
-		if hidden == 0 {
+		if e := tx.QueryRowContext(ctx, "SELECT count(*) FROM meetings m JOIN meeting_retention_v1 r ON r.meeting_id=m.id WHERE m.page_id=? AND r.exclude_search=1", page).Scan(&excluded); e != nil {
+			return e
+		}
+		if hidden == 0 && excluded == 0 {
 			kind := "page"
 			var task int
 			if e := tx.QueryRowContext(ctx, "SELECT count(*) FROM task_facets t JOIN records r ON r.id=t.record_id WHERE r.page_id=?", page).Scan(&task); e != nil {
@@ -623,6 +627,11 @@ func searchQuery(ctx context.Context, k *Kernel, e contracts.ServiceExecutionCon
 			return nil, err
 		}
 		if live == 1 && k.authorizePage(ctx, k.db, e, page) == nil && (requested == nil || k.authorizePage(ctx, k.db, *requested, page) == nil) {
+			freshness, err := pageFreshness(ctx, k.db, page, time.Now())
+			if err != nil {
+				return nil, err
+			}
+			hit.Freshness = &freshness
 			current = append(current, hit)
 		}
 	}

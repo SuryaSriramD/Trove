@@ -22,7 +22,7 @@ async function installMeetingAudioFixture(page: any) {
     state.snapshotCursor = "2";
     const app = (window as any).go.main.App, previous = app.Dispatch;
     app.MeetingRecordings = async () => [];
-    app.Dispatch = async (method: string, raw: string) => method === "meetings.drafts" ? JSON.stringify({ ok: true, result: [] }) : previous(method, raw);
+    app.Dispatch = async (method: string, raw: string) => ["meetings.drafts", "meetings.extractions"].includes(method) ? JSON.stringify({ ok: true, result: [] }) : previous(method, raw);
     const metrics = (window as any).audioLifecycle = { created: [] as string[], revoked: [] as string[], aborted: [] as string[] };
     const create = URL.createObjectURL.bind(URL), revoke = URL.revokeObjectURL.bind(URL), originalFetch = window.fetch.bind(window);
     URL.createObjectURL = blob => { const url = create(blob); metrics.created.push(url); return url; };
@@ -1347,7 +1347,7 @@ test("Phase 2 native restore is reviewed before mutation and retention keeps all
   });
   await navSurface(page, "Settings");
   await expect(page.getByRole("combobox", { name: "Backup retention count" })).toHaveValue("0");
-  await page.getByRole("button", { name: "Choose backup to review…" }).click();
+  await page.getByRole("button", { name: "Choose legacy backup folder…" }).click();
   await expect(page.getByRole("article", { name: "Native restore preview" })).toBeVisible();
   expect(await page.evaluate(() => (window as any).restores)).toBe(0);
   await page.getByRole("button", { name: "Restore into a new folder…" }).click();
@@ -1894,4 +1894,140 @@ test("provider disconnect stays available while approval is pending", async ({ p
   await disconnect.click();
   await expect.poll(() => page.evaluate(() => (window as any).providerDisconnects)).toBe(1);
   await expect(page.getByText("mcp · disconnected", { exact: true })).toBeVisible();
+});
+
+test("G05 capture disclosure, selected input and acknowledged pause controls", async ({ page }) => {
+  await installMeetingAudioFixture(page);
+  await page.evaluate(() => {
+    const app = (window as any).go.main.App;
+    let draft: any = null;
+    (window as any).captureCalls = [];
+    app.MeetingAudioInputs = async () => [{ id: "usb-mic", name: "USB microphone", isDefault: false }];
+    app.MeetingRecordings = async () => draft ? [draft] : [];
+    app.StartMeetingRecordingWithOptions = async (title: string, input: string, disclosure: boolean) => {
+      (window as any).captureCalls.push({ title, input, disclosure });
+      draft = { version: 1, id: "capture", title: title || "Meeting recording", actorId: "owner", startedAt: "2026-10-15T00:00:00Z", state: "recording", durationMs: 1000, bytes: 64000, pageId: "page", meetingId: "meeting", segments: [] };
+      return draft;
+    };
+    app.ControlMeetingRecording = async (_id: string, action: string) => {
+      await new Promise<void>(resolve => { (window as any).acknowledgeCapture = resolve; });
+      draft.state = action === "pause" ? "paused" : "recording";
+      return draft;
+    };
+  });
+  await navSurface(page, "Meetings");
+  const record = page.getByRole("button", { name: "Record microphone" });
+  await expect(record).toBeDisabled();
+  await page.getByRole("button", { name: "Refresh audio inputs" }).click();
+  await page.getByLabel("Audio input", { exact: true }).selectOption("usb-mic");
+  await page.getByRole("checkbox", { name: /I have told participants/ }).check();
+  await record.click();
+  expect(await page.evaluate(() => (window as any).captureCalls)).toEqual([{ title: "", input: "usb-mic", disclosure: true }]);
+  await page.getByRole("button", { name: "Pause recording", exact: true }).click();
+  await expect(page.getByRole("button", { name: "Pause recording", exact: true })).toBeDisabled();
+  await expect(page.getByRole("button", { name: "Resume recording", exact: true })).toHaveCount(0);
+  await page.evaluate(() => (window as any).acknowledgeCapture());
+  await expect(page.getByRole("button", { name: "Resume recording", exact: true })).toBeEnabled();
+  await expect(page.locator(".recording-recovery")).toContainText("0:01");
+});
+
+test("G05 delayed meeting drafts never appear under a different selection", async ({ page }) => {
+  await installMeetingAudioFixture(page);
+  await page.evaluate(() => {
+    const app = (window as any).go.main.App, previous = app.Dispatch;
+    app.Dispatch = async (method: string, raw: string) => {
+      const request = JSON.parse(raw);
+      if (method === "meetings.drafts") {
+        if (request.meetingId.endsWith("510")) {
+          await new Promise<void>(resolve => { (window as any).releaseOldMeetingDraft = resolve; });
+          return JSON.stringify({ ok: true, result: [{ id: "old-draft", state: "draft", stale: false, evidenceHash: "old", body: { summary: [{ text: "OLD MEETING ONLY", segmentIds: [] }] } }] });
+        }
+        return JSON.stringify({ ok: true, result: [] });
+      }
+      return previous(method, raw);
+    };
+  });
+  await navSurface(page, "Meetings");
+  await expect.poll(() => page.evaluate(() => !!(window as any).releaseOldMeetingDraft)).toBe(true);
+  await page.getByRole("button", { name: /^Second audio recording/ }).click();
+  await page.evaluate(() => (window as any).releaseOldMeetingDraft());
+  await expect(page.locator(".meeting-detail h2")).toHaveText("Second audio recording");
+  await expect(page.getByText("OLD MEETING ONLY")).toHaveCount(0);
+});
+
+test("G05 transcript correction keeps stable identities and reviewed revision guards", async ({ page }) => {
+  await installMeetingAudioFixture(page);
+  await page.evaluate(() => {
+    const state = (window as any).fixtureState();
+    state.transcriptSegments = [{ id: "019a1234-5678-7000-8000-000000000530", meetingId: state.meetings[0].id, blockId: state.blocks[1].id, startMs: 0, endMs: 1000, text: "Original transcript", revision: "7" }];
+    (window as any).emitFixtureEvent("workspace:changed");
+    const app = (window as any).go.main.App, previous = app.Dispatch;
+    app.Dispatch = async (method: string, raw: string) => {
+      const req = JSON.parse(raw);
+      if (method === "batch" && req.commands[0]?.kind === "meeting.correctSegment") {
+        (window as any).correctionRequest = req;
+        return JSON.stringify({ok: true, result: {}});
+      }
+      return previous(method, raw);
+    };
+  });
+  await navSurface(page, "Meetings");
+  await page.getByRole("button", { name: "Correct transcript segment" }).click();
+  await page.getByLabel("Corrected text").fill("Corrected transcript");
+  await page.getByLabel("Start in milliseconds").fill("50");
+  await page.getByRole("button", { name: "Cancel correction" }).click();
+  expect(await page.evaluate(() => (window as any).correctionRequest)).toBeUndefined();
+  await page.getByRole("button", { name: "Correct transcript segment" }).click();
+  await page.getByLabel("Corrected text").fill("Corrected transcript");
+  await page.getByLabel("Start in milliseconds").fill("50");
+  await page.getByRole("button", { name: "Save transcript correction" }).click();
+  const request = await page.evaluate(() => (window as any).correctionRequest);
+  expect(request.commands[0]).toMatchObject({kind: "meeting.correctSegment", meetingId: id(510), segmentId: id(530), text: "Corrected transcript", startMs: 50, endMs: 1000});
+  expect(request.mutation.expectedRevisions).toEqual(expect.arrayContaining([
+    {target: {entityType: "page", entityId: id(2)}, revision: "1"},
+    {target: {entityType: "block", entityId: id(11)}, revision: "1"},
+    {target: {entityType: "meeting", entityId: id(510)}, revision: "1"},
+    {target: {entityType: "transcript_segment", entityId: id(530)}, revision: "7"},
+  ]));
+});
+
+test("G05 retention requires exact effect review and cancellation writes nothing", async ({ page }) => {
+  await installMeetingAudioFixture(page);
+  await page.evaluate(() => {
+    const app = (window as any).go.main.App, previous = app.Dispatch;
+    (window as any).retentionWrites = [];
+    app.Dispatch = async (method: string, raw: string) => {
+      const req = JSON.parse(raw);
+      if (method === "meetings.retentionPreview") return JSON.stringify({ok: true, result: {
+        version: 1, meetingId: req.meetingId, pageId: "019a1234-5678-7000-8000-000000000002", selected: req.selected,
+        expectedRevisions: [{target: {entityType: "meeting", entityId: req.meetingId}, revision: "1"}],
+        categories: [{id: "audio", count: 1, action: "Detach current recording", detail: "History and backups retain audio bytes.", selectable: true}, {id: "transcripts", count: 2, action: "Remove current transcript", detail: "Approved tasks remain.", selectable: true}, {id: "history", count: 4, action: "Keep history", detail: "Automatic history pruning remains off.", selectable: false}],
+        command: {kind: "meeting.retention.apply", meetingId: req.meetingId, selected: req.selected, previewHash: req.selected.join(":")},
+        warnings: ["Approved tasks and subsequent edits remain unchanged."], canApply: req.selected.length > 0,
+      }});
+      if (method === "batch" && req.commands[0]?.kind === "meeting.retention.apply") { (window as any).retentionWrites.push(req); return JSON.stringify({ok:true,result:{}}); }
+      return previous(method, raw);
+    };
+  });
+  await navSurface(page, "Meetings");
+  await page.getByRole("button", {name: "Review meeting retention", exact: true}).click();
+  const dialog = page.getByRole("dialog", {name: "Review meeting retention choices"});
+  await expect(dialog.getByRole("checkbox", {name: /Keep history/})).toBeDisabled();
+  await dialog.getByRole("checkbox", {name: /Detach current recording/}).check();
+  await expect(dialog.getByRole("button", {name: "Apply reviewed retention"})).toBeDisabled();
+  await dialog.getByRole("button", {name: "Preview selected retention"}).click();
+  await expect(dialog.getByRole("button", {name: "Apply reviewed retention"})).toBeEnabled();
+  await dialog.getByRole("button", {name: "Cancel", exact: true}).click();
+  expect(await page.evaluate(() => (window as any).retentionWrites)).toEqual([]);
+  await page.getByRole("button", {name: "Review meeting retention", exact: true}).click();
+  await dialog.getByRole("checkbox", {name: /Detach current recording/}).check();
+  await dialog.getByRole("button", {name: "Preview selected retention"}).click();
+  await dialog.getByRole("checkbox", {name: /Remove current transcript/}).check();
+  await expect(dialog.getByRole("button", {name: "Apply reviewed retention"})).toBeDisabled();
+  await dialog.getByRole("button", {name: "Preview selected retention"}).click();
+  await dialog.getByRole("button", {name: "Apply reviewed retention"}).click();
+  const requests = await page.evaluate(() => (window as any).retentionWrites);
+  expect(requests).toHaveLength(1);
+  expect(requests[0].commands[0]).toMatchObject({selected: ["audio", "transcripts"], previewHash: "audio:transcripts"});
+  expect(requests[0].mutation.expectedRevisions).toEqual([{target: {entityType: "meeting", entityId: id(510)}, revision: "1"}]);
 });

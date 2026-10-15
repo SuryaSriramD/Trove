@@ -323,7 +323,7 @@ test.beforeEach(async ({ page }) => {
                   state.taskFacets.push({
                     recordId: c.recordId,
                     statusPropertyId: c.statusPropertyId,
-                    duePropertyId: null,
+                    duePropertyId: c.duePropertyId ?? null,
                   });
                   changes.add(
                     state.records.find((r: any) => r.id === c.recordId),
@@ -844,4 +844,54 @@ test("formula editing requires a current successful preview and retains captured
   await expect(
     page.getByRole("button", { name: "Save formula v2", exact: true }),
   ).toBeDisabled();
+});
+
+test("task promotion explicitly binds due and canonical task editors share title status and date", async ({page}) => {
+  const row=page.locator('.db-table tbody tr').filter({has:page.getByLabel('Title for Prepare prototype')});
+  await row.getByRole('button',{name:'Make task',exact:true}).click();
+  await expect(page.getByRole('dialog',{name:'Promote record to task'})).toBeVisible();
+  expect(await page.evaluate(()=>(window as any).dbCommands.filter((c:any)=>c.kind==='task.promote'))).toHaveLength(0);
+  await page.getByLabel('Task promotion due property').selectOption(id(13));
+  await page.getByRole('button',{name:'Confirm task',exact:true}).click();
+  const promotion=await page.evaluate(()=>(window as any).dbRequests.filter((r:any)=>r.method==='batch').at(-1));
+  expect(promotion.commands[0]).toEqual({kind:'task.promote',recordId:id(30),statusPropertyId:id(12),duePropertyId:id(13)});
+  expect(promotion.mutation.expectedRevisions.some((g:any)=>g.target.entityId===id(13))).toBe(true);
+  const navigation=page.getByRole('navigation',{name:'Workspace',exact:true});
+  await navigation.getByRole('button',{name:/Tasks/}).click();
+  await page.getByLabel('Task title for Prepare prototype').fill('Prepare reviewed prototype');
+  await page.getByLabel('Task title for Prepare prototype').press('Enter');
+  await expect(page.getByLabel('Task title for Prepare reviewed prototype')).toHaveValue('Prepare reviewed prototype');
+  await page.getByLabel('Task status for Prepare reviewed prototype').selectOption(id(21));
+  await expect(page.getByLabel('Complete Prepare reviewed prototype')).toBeChecked();
+  await page.locator('.canonical-task-due summary').click();
+  await page.getByLabel('Due for Prepare reviewed prototype start').fill('2026-10-16');
+  await page.getByLabel('Due for Prepare reviewed prototype end').fill('2026-10-18');
+  await page.getByRole('button',{name:'Save date',exact:true}).click();
+  await expect.poll(()=>page.evaluate(()=>(window as any).dbState().records[0].values.find((v:any)=>v.propertyId.endsWith('000000000013')).value.start)).toBe('2026-10-16');
+  await navigation.getByRole('button',{name:/Home/}).click();
+  await expect(page.getByLabel('Task title for Prepare reviewed prototype')).toHaveValue('Prepare reviewed prototype');
+  await expect(page.getByLabel('Task status for Prepare reviewed prototype')).toHaveValue(id(21));
+  await page.reload();
+  await expect(page.getByLabel('Task title for Prepare reviewed prototype')).toBeVisible();
+  await navigation.getByRole('button',{name:/Pages$/}).click();
+  await expect(page.getByLabel('Title for Prepare reviewed prototype')).toBeVisible();
+  const state=await page.evaluate(()=>(window as any).dbState());
+  expect(state.records[0].id).toBe(id(30));expect(state.records[0].pageId).toBe(id(4));expect(state.records).toHaveLength(2);
+  await page.evaluate(() => {
+    const state=(window as any).dbState();
+    state.blocks=[601,602].map((n,i)=>({id:`019a1234-5678-7000-8000-${String(n).padStart(12,'0')}`,pageId:state.records[0].pageId,parentBlockId:null,sortKey:String(i+1).padStart(12,'0'),type:'todo',schemaVersion:1,data:{taskRecordId:state.records[0].id},revision:'1'}));
+    localStorage.setItem('databaseFixture',JSON.stringify(state));
+  });
+  await page.reload();
+  await navigation.getByRole('button',{name:/Pages$/}).click();
+  await page.getByLabel('Open Prepare reviewed prototype page').first().click();
+  const body=page.getByRole('textbox',{name:'Page body',exact:true});
+  await expect(body.getByLabel('Task title for Prepare reviewed prototype')).toHaveCount(2);
+  await body.getByLabel('Task title for Prepare reviewed prototype').first().fill('Edited from occurrence');
+  await body.getByLabel('Task title for Prepare reviewed prototype').first().press('Enter');
+  await expect(body.getByLabel('Task title for Edited from occurrence')).toHaveCount(2);
+  await body.getByLabel('Task status for Edited from occurrence').first().selectOption(id(20));
+  await expect(body.getByLabel('Complete Edited from occurrence').first()).not.toBeChecked();
+  await expect(body.getByLabel('Complete Edited from occurrence').last()).not.toBeChecked();
+
 });

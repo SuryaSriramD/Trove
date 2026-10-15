@@ -8,6 +8,8 @@
 #include <nlohmann/json.hpp>
 #include <chrono>
 #include <thread>
+#include <mutex>
+#include <deque>
 #include <sys/stat.h>
 #ifndef _WIN32
 #include <poll.h>
@@ -51,9 +53,9 @@ static HMODULE capture_system_library(const char *name) {
 
 using json=nlohmann::json;
 #ifdef TROVE_CAPTURE_FIXTURE_ONLY
-constexpr const char *CAPTURE_COMMIT="miniaudio-0.11.25-trove-microphone-v1-fixture";
+constexpr const char *CAPTURE_COMMIT="miniaudio-0.11.25-trove-microphone-v2-fixture";
 #else
-constexpr const char *CAPTURE_COMMIT="miniaudio-0.11.25-trove-microphone-v1";
+constexpr const char *CAPTURE_COMMIT="miniaudio-0.11.25-trove-microphone-v2";
 #endif
 static CaptureBuffer buffer;
 static std::atomic<bool> cancelled{false};
@@ -97,13 +99,23 @@ void event(json value){
  value["backend"]=backend;value["permissionState"]=permission;value["deviceState"]=device_state;
  value["signalObserved"]=buffer.signal.load();frame(value);
 }
+bool valid_uuid(const std::string &id);
 struct Control {
- std::atomic<bool> stop{false};std::thread reader;
+ std::atomic<bool> stop{false};std::mutex mutex;std::deque<json> queue;std::thread reader;
  Control():reader([this]{
-  try{auto control=read_frame(3,&stop);if(control.size()!=2||control.value("kind","")!="cancel"||control.value("requestId","")!=request_id)buffer.failure.store(3);}
-  catch(...){}
-  if(!stop.load()){cancelled.store(true);buffer.accepting.store(false);}
+  try{while(!stop.load()){
+   auto command=read_frame(3,&stop);
+   if(command.value("requestId","")!=request_id)throw std::runtime_error("wrong capture");
+   if(command.size()==2&&command.value("kind","")=="cancel"){cancelled.store(true);buffer.accepting.store(false);return;}
+   auto action=command.value("action","");
+   if(command.size()!=4||command.value("kind","")!="control"||!valid_uuid(command.value("controlId",""))||
+      (action!="pause"&&action!="resume"&&action!="stop"))throw std::runtime_error("invalid control");
+   std::lock_guard<std::mutex> guard(mutex);
+   if(queue.size()>=16)throw std::runtime_error("control limit");
+   queue.push_back(command);
+  }}catch(...){if(!stop.load()){cancelled.store(true);buffer.accepting.store(false);}}
  }){}
+ bool next(json &command){std::lock_guard<std::mutex> guard(mutex);if(queue.empty())return false;command=queue.front();queue.pop_front();return true;}
  ~Control(){stop.store(true);if(reader.joinable())reader.join();}
 };
 const char *error_code(ma_result result){
@@ -180,13 +192,13 @@ struct Device {
   if(device_ready){ma_device_uninit(&device);device_ready=false;}
   if(context_ready){ma_context_uninit(&context);context_ready=false;}
  }
- void start(){
+ void open_context(bool consent){
   ma_context_config context_config=ma_context_config_init();
 #ifdef _WIN32
   backend="wasapi";ma_backend selected=ma_backend_wasapi;
 #elif defined(__APPLE__)
   backend="coreaudio";ma_backend selected=ma_backend_coreaudio;
-  request_mac_consent();
+  if(consent)request_mac_consent();
 #else
   backend="pulseaudio";ma_backend selected=ma_backend_pulseaudio;
   // Initial Ubuntu support is the current user's local desktop audio server.
@@ -208,12 +220,42 @@ struct Device {
   if(std::strcmp(permission,"authorized")!=0)permission="unknown";
   device_state="starting";
   device_error(ma_context_init(&selected,1,&context_config,&context));context_ready=true;
+ }
+ std::string identity(const ma_device_id &id){
+#if defined(__APPLE__)
+  return std::string(id.coreaudio,strnlen(id.coreaudio,sizeof(id.coreaudio)));
+#elif defined(_WIN32)
+  // Encode only the terminated WASAPI identifier, not uninitialized union padding.
+  std::string result="wasapi:";const char *hex="0123456789abcdef";
+  for(size_t i=0;i<64&&id.wasapi[i];i++){auto value=uint16_t(id.wasapi[i]);for(int shift=12;shift>=0;shift-=4)result+=hex[(value>>shift)&15];}return result;
+#else
+  return std::string(id.pulse,strnlen(id.pulse,sizeof(id.pulse)));
+#endif
+ }
+ json inputs(){
+  ma_device_info *list=nullptr;ma_uint32 count=0;
+  device_error(ma_context_get_devices(&context,nullptr,nullptr,&list,&count));
+  if(count>256)throw CaptureFailure("AUDIO_LIMIT","too many audio inputs");
+  json result=json::array();
+  for(ma_uint32 i=0;i<count;i++)result.push_back({{"id",identity(list[i].id)},{"name",list[i].name},{"isDefault",bool(list[i].isDefault)}});
+  return result;
+ }
+ void start(const std::string &input){
+  open_context(true);
+  ma_device_id selected_id{};
   ma_device_config config=ma_device_config_init(ma_device_type_capture);
+  if(!input.empty()){
+   ma_device_info *list=nullptr;ma_uint32 count=0;bool found=false;
+   device_error(ma_context_get_devices(&context,nullptr,nullptr,&list,&count));
+   for(ma_uint32 i=0;i<count;i++)if(identity(list[i].id)==input){selected_id=list[i].id;found=true;break;}
+   if(!found)throw CaptureFailure("DEVICE_UNAVAILABLE","selected microphone is no longer available");
+   config.capture.pDeviceID=&selected_id;
+  }
   config.capture.format=ma_format_f32;config.capture.channels=1;config.sampleRate=16000;
   config.periodSizeInMilliseconds=20;config.capture.shareMode=ma_share_mode_shared;
   config.dataCallback=[](ma_device*,void*,const void *input,ma_uint32 count){buffer.push(static_cast<const float*>(input),count);};
   config.notificationCallback=[](const ma_device_notification *notification){
-   if((notification->type==ma_device_notification_type_stopped||notification->type==ma_device_notification_type_interruption_began)&&buffer.accepting.load()){
+   if((notification->type==ma_device_notification_type_stopped&&buffer.accepting.load())||notification->type==ma_device_notification_type_rerouted||notification->type==ma_device_notification_type_interruption_began){
     buffer.failure.store(3);buffer.accepting.store(false);
    }
   };
@@ -221,17 +263,29 @@ struct Device {
   if(cancelled.load()){buffer.accepting.store(false);return;}
   device_error(ma_device_start(&device));if(std::strcmp(permission,"authorized")!=0)permission="access_opened";device_state="opened";
  }
+ void pause(){buffer.accepting.store(false);device_error(ma_device_stop(&device));device_state="paused";}
+ void resume(){buffer.accepting.store(true);device_error(ma_device_start(&device));device_state="opened";}
 };
 #endif
+void inputs(const json &request){
+ request_id=request.value("requestId","");
+ if(request.size()!=3||request.value("protocolVersion",0)!=1||!valid_uuid(request_id))throw CaptureFailure("INVALID_INPUT","invalid input enumeration");
+#ifdef TROVE_CAPTURE_FIXTURE_ONLY
+ auto list=json::array({{{"id","fixture-input"},{"name","Synthetic fixture"},{"isDefault",true}}});
+#else
+ Device device;device.open_context(false);auto list=device.inputs();
+#endif
+ event({{"kind","inputs"},{"inputs",list}});
+}
 void record(const json &request){
- static const std::vector<std::string> keys={"protocolVersion","requestId","kind","durationMs","maxBytes","synthetic","requestPermission"};
+ static const std::vector<std::string> keys={"protocolVersion","requestId","kind","durationMs","maxBytes","synthetic","requestPermission","inputDeviceId"};
  if(!request.is_object()||request.size()!=keys.size())throw CaptureFailure("INVALID_INPUT","unexpected capture request fields");
  for(const auto &key:keys)if(!request.contains(key))throw CaptureFailure("INVALID_INPUT","missing capture request field");
  if(!request["requestId"].is_string())throw CaptureFailure("INVALID_INPUT","invalid capture identity");
  request_id=request["requestId"].get<std::string>();
  if(!valid_uuid(request_id)||request["protocolVersion"]!=1||request["kind"]!="record"||
     !request["durationMs"].is_number_integer()||!request["maxBytes"].is_number_integer()||
-    !request["synthetic"].is_boolean()||!request["requestPermission"].is_boolean())throw CaptureFailure("INVALID_INPUT","invalid capture request");
+    !request["synthetic"].is_boolean()||!request["requestPermission"].is_boolean()||!request["inputDeviceId"].is_string()||request["inputDeviceId"].get<std::string>().size()>1024)throw CaptureFailure("INVALID_INPUT","invalid capture request");
  int64_t duration=request["durationMs"],maximum=request["maxBytes"];
  if(duration<1||duration>7200000||maximum<4||maximum>512LL<<20||maximum%4)throw CaptureFailure("INVALID_INPUT","capture bounds");
  synthetic=request["synthetic"];
@@ -250,13 +304,44 @@ void record(const json &request){
 #endif
 #ifndef TROVE_CAPTURE_FIXTURE_ONLY
  Device device;
- if(!synthetic)device.start();
+ if(!synthetic)device.start(request["inputDeviceId"]);
 #else
  if(!synthetic)throw CaptureFailure("UNSUPPORTED_PLATFORM","this fixture binary has no device backend");
+ if(request["inputDeviceId"]!=""&&request["inputDeviceId"]!="fixture-input")throw CaptureFailure("DEVICE_UNAVAILABLE","selected fixture input unavailable");
 #endif
- auto started=std::chrono::steady_clock::now(),deadline=started+std::chrono::milliseconds(duration),last_data=started;
+ auto last_data=std::chrono::steady_clock::now();
+ bool paused=false,stopped=false;
  uint64_t previous_frames=0;
- while(buffer.accepting.load()&&!cancelled.load()&&std::chrono::steady_clock::now()<deadline){
+ while(!cancelled.load()&&!stopped&&!buffer.failure.load()&&(paused||buffer.accepting.load())){
+  json command;
+  while(control.next(command)){
+   auto action=command["action"].get<std::string>();
+   if(action=="pause"&&!paused){
+    buffer.accepting.store(false);
+#ifndef TROVE_CAPTURE_FIXTURE_ONLY
+    device.pause();
+#endif
+    drain();paused=true;device_state="paused";
+   }else if(action=="resume"&&paused){
+#ifndef TROVE_CAPTURE_FIXTURE_ONLY
+    device.resume();
+#else
+    buffer.accepting.store(true);
+#endif
+    paused=false;device_state="opened";last_data=std::chrono::steady_clock::now();
+   }else if(action=="stop"){
+    buffer.accepting.store(false);
+#ifndef TROVE_CAPTURE_FIXTURE_ONLY
+    device.stop();
+#endif
+    drain();stopped=true;device_state="stopped";
+   }
+   worker_sync(4);
+   event({{"kind","control_ack"},{"controlId",command["controlId"]},{"action",action},{"state",action=="stop"?"stopped":paused?"paused":"recording"},{"capturedSamples",bytes/4},{"durationMs",bytes/64}});
+   if(stopped)break;
+  }
+  if(stopped)break;
+  if(paused){std::this_thread::sleep_for(std::chrono::milliseconds(5));continue;}
 #ifdef TROVE_CAPTURE_FIXTURE_ONLY
   {
    std::array<float,800> chunk;uint64_t at=buffer.written.load();
@@ -321,12 +406,12 @@ int main(int argc,char **argv){
   frame({{"kind","hello"},{"protocolVersion",1},{"runtime","microphone"},{"runtimeCommit",CAPTURE_COMMIT},
    {"architecture",WORKER_ARCHITECTURE},{"capabilities",json::array({
 #ifdef TROVE_CAPTURE_FIXTURE_ONLY
-    "record_synthetic"
+    "record_synthetic", "capture_controls_v1", "input_devices_v1"
 #else
-    "record"
+    "record", "capture_controls_v1", "input_devices_v1"
 #endif
    })}});
-  record(read_frame(0));return 0;
+  auto request=read_frame(0);if(request.value("kind","")=="inputs")inputs(request);else record(request);return 0;
  }catch(const CaptureFailure &error){
   buffer.accepting.store(false);try{worker_sync(4);event({{"kind","error"},{"code",error.code},{"message",error.what()}});}catch(...){}return 1;
  }catch(const std::exception &){

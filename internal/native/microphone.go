@@ -14,9 +14,11 @@ import (
 	"runtime"
 	"sync"
 	"time"
+
+	"trove.local/phase0/internal/platformfs"
 )
 
-const MicrophoneCommit = "miniaudio-0.11.25-trove-microphone-v1"
+const MicrophoneCommit = "miniaudio-0.11.25-trove-microphone-v2"
 
 func validMicrophoneIdentity(h Helper, platform string) bool {
 	return h.Name == "microphone-worker" && h.Runtime == "microphone" && ((platform == "darwin" && (h.RuntimeCommit == "trove-microphone-v1" || h.RuntimeCommit == MicrophoneCommit)) || ((platform == "windows" || platform == "linux") && h.RuntimeCommit == MicrophoneCommit))
@@ -28,6 +30,8 @@ type CaptureRequest struct {
 	MaxBytes          int64
 	RequestPermission bool
 	Synthetic         bool
+	InputDeviceID     string
+	Controller        *CaptureController
 }
 type CaptureResult struct {
 	Bytes           int64  `json:"bytes"`
@@ -54,6 +58,9 @@ func (s *Supervisor) Capture(ctx context.Context, r CaptureRequest, destination 
 // The injectable duration is internal test plumbing, never a user/provider input.
 func (s *Supervisor) captureWithStartupLimit(ctx context.Context, r CaptureRequest, destination *os.File, onEvent func(json.RawMessage), startupLimit time.Duration) (CaptureResult, error) {
 	var result CaptureResult
+	if r.Controller != nil {
+		defer r.Controller.finish()
+	}
 	if err := ctx.Err(); err != nil {
 		return result, err
 	}
@@ -68,7 +75,7 @@ func (s *Supervisor) captureWithStartupLimit(ctx context.Context, r CaptureReque
 	if r.Synthetic && h.RuntimeCommit == MicrophoneCommit {
 		return result, errors.New("INVALID_INPUT: production microphone cannot synthesize recordings")
 	}
-	if !uuidPattern.MatchString(r.RequestID) || r.DurationMS < 1 || r.DurationMS > 7200000 || r.MaxBytes < 4 || r.MaxBytes > 512<<20 || r.MaxBytes%4 != 0 || (!r.Synthetic && !r.RequestPermission) {
+	if len(r.InputDeviceID) > 1024 || !uuidPattern.MatchString(r.RequestID) || r.DurationMS < 1 || r.DurationMS > 7200000 || r.MaxBytes < 4 || r.MaxBytes > 512<<20 || r.MaxBytes%4 != 0 || (!r.Synthetic && !r.RequestPermission) {
 		return result, errors.New("APPROVAL_REQUIRED: explicit microphone action required")
 	}
 	if destination == nil {
@@ -86,7 +93,12 @@ func (s *Supervisor) captureWithStartupLimit(ctx context.Context, r CaptureReque
 		return result, e
 	}
 	defer release()
-	run, timeout := context.WithTimeout(run, time.Duration(r.DurationMS+30000)*time.Millisecond)
+	// Captured duration is bounded by samples. Pauses do not consume the audio budget.
+	wallLimit := time.Duration(r.DurationMS+30000) * time.Millisecond
+	if r.Controller != nil {
+		wallLimit = 24 * time.Hour
+	}
+	run, timeout := context.WithTimeout(run, wallLimit)
 	defer timeout()
 	run, cancel := context.WithCancelCause(run)
 	defer cancel(context.Canceled)
@@ -99,6 +111,8 @@ func (s *Supervisor) captureWithStartupLimit(ctx context.Context, r CaptureReque
 	}
 	defer controlR.Close()
 	defer controlW.Close()
+	var controlMu sync.Mutex
+	writeControl := func(value any) error { controlMu.Lock(); defer controlMu.Unlock(); return WriteFrame(controlW, value) }
 	dir, e := privateWorkerDirectory("trove-recording-")
 	if e != nil {
 		return result, e
@@ -153,6 +167,9 @@ func (s *Supervisor) captureWithStartupLimit(ctx context.Context, r CaptureReque
 				deadline = nil
 				cancel(errCaptureStartup)
 			case <-ticker.C:
+				if free, err := platformfs.AvailableBytes(filepath.Dir(destination.Name())); err == nil && free < 8<<20 {
+					cancel(errors.New("LOW_DISK: capture stopped with flushed audio retained; free space before recovery"))
+				}
 				if stat, err := destination.Stat(); err == nil && stat.Size() > r.MaxBytes {
 					cancel(errors.New("AUDIO_LIMIT: capture output exceeds request"))
 				}
@@ -160,7 +177,7 @@ func (s *Supervisor) captureWithStartupLimit(ctx context.Context, r CaptureReque
 					cancel(errors.New("AUDIO_LIMIT: capture memory budget"))
 				}
 			case <-run.Done():
-				_ = WriteFrame(controlW, map[string]any{"kind": "cancel", "requestId": r.RequestID})
+				_ = writeControl(map[string]any{"kind": "cancel", "requestId": r.RequestID})
 				select {
 				case <-stopped:
 					return
@@ -199,8 +216,11 @@ func (s *Supervisor) captureWithStartupLimit(ctx context.Context, r CaptureReque
 	if e = json.Unmarshal(raw, &hello); e != nil || hello.Kind != "hello" || hello.Runtime != "microphone" || hello.RuntimeCommit != h.RuntimeCommit || hello.ProtocolVersion != 1 || hello.Architecture != runtime.GOARCH {
 		return fail(errors.New("microphone hello mismatch"))
 	}
-	canRecord := false
+	canRecord, canControl := false, false
 	for _, capability := range hello.Capabilities {
+		if capability == "capture_controls_v1" {
+			canControl = true
+		}
 		if capability == "record" || r.Synthetic && capability == "record_synthetic" {
 			canRecord = true
 		}
@@ -208,10 +228,20 @@ func (s *Supervisor) captureWithStartupLimit(ctx context.Context, r CaptureReque
 	if !canRecord {
 		return fail(errors.New("microphone capability mismatch"))
 	}
-	if e = WriteFrame(in, map[string]any{"protocolVersion": 1, "requestId": r.RequestID, "kind": "record", "durationMs": r.DurationMS, "maxBytes": r.MaxBytes, "synthetic": r.Synthetic, "requestPermission": r.RequestPermission}); e != nil {
+	if (r.Controller != nil || r.InputDeviceID != "") && !canControl {
+		return fail(errors.New("microphone controls require the current helper"))
+	}
+	request := map[string]any{"protocolVersion": 1, "requestId": r.RequestID, "kind": "record", "durationMs": r.DurationMS, "maxBytes": r.MaxBytes, "synthetic": r.Synthetic, "requestPermission": r.RequestPermission}
+	if canControl {
+		request["inputDeviceId"] = r.InputDeviceID
+	}
+	if e = WriteFrame(in, request); e != nil {
 		return fail(e)
 	}
 	in.Close()
+	if r.Controller != nil {
+		r.Controller.attach(r.RequestID, writeControl)
+	}
 	seq := int64(0)
 	previousBytes := int64(0)
 	terminal := false
@@ -245,6 +275,13 @@ func (s *Supervisor) captureWithStartupLimit(ctx context.Context, r CaptureReque
 			if ev.Bytes > 0 {
 				firstPCMOnce.Do(func() { close(firstPCM) })
 			}
+		case "control_ack":
+			var ack CaptureControlAck
+			if r.Controller == nil || json.Unmarshal(raw, &ack) != nil || ack.Bytes != ev.Bytes || ack.CapturedSamples != ev.Bytes/4 || ack.DurationMS != ev.Bytes/64 || !r.Controller.accepts(ack) {
+				return fail(errors.New("invalid capture acknowledgement"))
+			}
+			// An acknowledged pause also proves startup completed without counting the gap as audio.
+			firstPCMOnce.Do(func() { close(firstPCM) })
 		case "result":
 			terminal = true
 			_ = json.Unmarshal(raw, &result)
@@ -259,6 +296,13 @@ func (s *Supervisor) captureWithStartupLimit(ctx context.Context, r CaptureReque
 		}
 		if onEvent != nil {
 			onEvent(raw)
+		}
+		if ev.Kind == "control_ack" {
+			var ack CaptureControlAck
+			_ = json.Unmarshal(raw, &ack)
+			if !r.Controller.acknowledge(ack) {
+				return fail(errors.New("invalid capture acknowledgement"))
+			}
 		}
 	}
 	if e = cmd.Wait(); e != nil {
@@ -287,8 +331,8 @@ func (s *Supervisor) captureWithStartupLimit(ctx context.Context, r CaptureReque
 		}
 		offset += count
 	}
-	if errors.Is(context.Cause(run), errCaptureStartup) {
-		return result, errCaptureStartup
+	if cause := context.Cause(run); cause != nil && !errors.Is(cause, context.Canceled) {
+		return result, cause
 	}
 	return result, nil
 }

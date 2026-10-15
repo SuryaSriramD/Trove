@@ -465,3 +465,13 @@
 .db-formula-editor textarea { display:block; min-height:100px; width:100%; font-family:monospace; }
 .db-formula-editor pre { white-space:pre-wrap; overflow-wrap:anywhere; max-height:240px; overflow:auto; }
 .db-formula-preview { padding:12px; background:var(--surface); border-radius:6px; }
+
+.record-layout { margin:16px 0; padding:12px; border:1px solid var(--line,#ddd); border-radius:8px; }
+.record-layout-grid { display:grid; grid-template-columns:minmax(0,2fr) minmax(0,1fr); gap:24px; }
+.record-layout-field,.record-layout-assignments label { display:grid; grid-template-columns:minmax(120px,1fr) minmax(0,2fr); gap:12px; align-items:center; margin:10px 0; }
+.record-layout fieldset,.scheduling-panel fieldset { display:flex; flex-wrap:wrap; gap:12px; margin:12px 0; }
+.record-layout input,.record-layout select,.scheduling-panel input,.scheduling-panel select { max-width:100%; }
+.scheduling-panel { margin:16px 0; padding:12px; border:1px solid var(--line,#ddd); border-radius:8px; }
+.scheduling-panel table { width:100%; margin:12px 0; border-collapse:collapse; }
+.scheduling-panel td,.scheduling-panel th { text-align:left; border-bottom:1px solid var(--line,#ddd); padding:8px; overflow-wrap:anywhere; }
+@media(max-width:700px) { .record-layout-grid { grid-template-columns:1fr; } }

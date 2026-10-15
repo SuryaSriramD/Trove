@@ -57,9 +57,12 @@ commands={
 'LinkCollection':tagged('container.linkCollection',{'containerId':D('Id'),'collectionId':D('Id')}),
 'CreateTask':tagged('task.create',{'recordId':D('Id'),'pageId':D('Id'),'title':S,'collectionId':D('Id'),'statusPropertyId':D('Id')},['recordId','pageId','title']),
 'EnsureTasks':tagged('tasks.ensure',{key:D('Id') for key in ['pageId','collectionId','titlePropertyId','statusPropertyId','duePropertyId','defaultOptionId','doneOptionId']}),
-'PromoteTask':tagged('task.promote',{'recordId':D('Id'),'statusPropertyId':D('Id')}),
+'PromoteTask':tagged('task.promote',{'recordId':D('Id'),'statusPropertyId':D('Id'),'duePropertyId':D('Id')},['recordId','statusPropertyId']),
 'SetTaskStatus':tagged('task.setStatus',{'recordId':D('Id'),'statusOptionId':D('Id')}),
 'AttachFile':tagged('file.attach',{'fileId':D('Id'),'ingestHandle':D('Id'),'pageId':D('Id'),'blockId':D('Id')},['fileId','ingestHandle','pageId']),
+'RecordMeetingExtraction':tagged('meeting.extraction.record',{'proposalId':D('Id'),'itemId':{'type':'string','minLength':1,'maxLength':128},'title':{'type':'string','minLength':1,'maxLength':512},'body':{'type':'string','maxLength':100000}}),
+ 'CorrectMeetingSegment':tagged('meeting.correctSegment',{'meetingId':D('Id'),'segmentId':D('Id'),'text':{'type':'string','minLength':1,'maxLength':16000},'startMs':N,'endMs':N}),
+ 'ApplyMeetingRetention':tagged('meeting.retention.apply',{'meetingId':D('Id'),'selected':{**arr(enum('audio','transcripts','generated','indexes','memory'),5),'uniqueItems':True},'previewHash':{'type':'string','pattern':'^[0-9a-f]{64}$'}}),
 'CreateMeeting':tagged('meeting.create',{'meetingId':D('Id'),'pageId':D('Id'),'recordingFileId':D('Id'),'startedAt':D('Timestamp')}),
 'AppendTranscript':tagged('meeting.appendSegments',{'meetingId':D('Id'),'segments':arr(obj({'segmentId':D('Id'),'blockId':D('Id'),'startMs':N,'endMs':N,'text':S,'speakerLabel':S},['segmentId','blockId','startMs','endMs','text']),256)}),
 'FinalizeMeeting':tagged('meeting.finalize',{'meetingId':D('Id'),'durationMs':N}),
@@ -93,6 +96,23 @@ commands.update({
  'AcceptPersonalReview':tagged('review.accept',{'pageId':D('Id'),'runId':D('Id'),'blockId':D('Id'),'approved':{'const':True}}),
  'DismissPersonalReview':tagged('review.dismiss',{'pageId':D('Id'),'runId':D('Id')}),
 })
+# Record layouts contain stable references only; values remain canonical record data.
+defs['RecordLayoutSection']=obj({'id':D('Id'),'title':{'type':'string','maxLength':120},'placement':enum('header','sidebar'),'propertyIds':{**arr(D('Id'),256),'uniqueItems':True}})
+defs['RecordLayout']=obj({'version':{'const':1},'sections':arr(R('RecordLayoutSection'),32),'hiddenPropertyIds':{**arr(D('Id'),256),'uniqueItems':True}})
+nullable_layout={'oneOf':[R('RecordLayout'),{'type':'null'}]}
+commands['SetCollectionLayout']=tagged('collection.layout.set',{'collectionId':D('Id'),'layout':nullable_layout})
+commands['SetRecordLayout']=tagged('record.layout.set',{'recordId':D('Id'),'layout':nullable_layout})
+defs['SchedulingPolicy']=obj({'version':{'const':1},'calendar':enum('calendar_days','working_week'),'timezone':{'type':'string','minLength':1,'maxLength':128},'weekdays':{'type':'array','items':{'type':'integer','minimum':0,'maximum':6},'maxItems':7,'uniqueItems':True}})
+defs['SchedulingInput']=obj({'collectionId':D('Id'),'datePropertyId':D('Id'),'recordId':D('Id'),'newStart':{'type':'string','minLength':10,'maxLength':40},'policy':R('SchedulingPolicy')})
+defs['SchedulingRecord']=obj({'recordId':D('Id'),'pageId':D('Id'),'title':S,'before':D('property_date_v1'),'after':D('property_date_v1'),'dependencyRecordIds':arr(D('Id'),128),'reason':enum('requested','dependency','slack_preserved','prerequisite'),'changed':B,'duration':S,'dstEffects':arr(S,8)})
+defs['SchedulingPlan']=obj({'version':{'const':1},'id':D('Id'),'hash':D('Hash'),'input':R('SchedulingInput'),'requiredRevisions':arr(R('ExpectedRevision'),1000),'records':arr(R('SchedulingRecord'),450)})
+commands['ApplyScheduling']=tagged('scheduling.apply',{'plan':R('SchedulingPlan')})
+journal_value=tagged('record.setValue',{'recordId':D('Id'),'propertyId':D('Id'),'value':obj({'type':enum('text','number','select','multi_select','status','checkbox','date','url','email','phone'),'schemaVersion':{'type':'integer','minimum':1},'value':json_value})})
+defs['JournalAction']={'oneOf':[journal_value,commands['ClearValue'],tagged('page.update',{'pageId':D('Id'),'title':S}),commands['SetPageDisplay'],commands['SetCollectionLayout'],commands['SetRecordLayout']]}
+commands['ApplyOperation']=tagged('operation.apply',{'operationId':D('Id'),'label':{'type':'string','minLength':1,'maxLength':200},'actions':{**arr(R('JournalAction'),128),'minItems':1}})
+commands['UndoOperation']=tagged('operation.undo',{'operationId':D('Id')})
+commands['RunRowButton']['properties']['operationId']=D('Id')
+commands['ReviewPage']=tagged('page.review',{'pageId':D('Id'),'contentIdentity':D('SemanticContentIdentity'),'expiresAt':D('Timestamp')},['pageId','contentIdentity'])
 commands['CreateTask']['dependentRequired']={'collectionId':['statusPropertyId'],'statusPropertyId':['collectionId']}
 commands['ProposeMemory']['oneOf']=[{'required':['content'],'not':{'required':['pageRef']}},{'required':['pageRef'],'not':{'required':['content']}}]
 commands['ProposeMemory']['allOf']=[{'if':{'properties':{'memoryKind':{'const':'project_context'}}},'then':{'required':['pageRef']},'else':{'required':['content']}}]
@@ -110,9 +130,44 @@ defs['AutomationTrigger']=obj({'type':enum('event','schedule'),'collectionId':D(
 defs['AutomationCondition']=obj({'recordId':D('Id'),'propertyId':D('Id'),'op':enum('eq','ne','is_empty'),'value':json_value},['recordId','propertyId','op'])
 defs['AutomationRule']=obj({'id':D('Id'),'name':{'type':'string','minLength':1,'maxLength':200},'enabled':B,'paused':B,'allowedOrigins':arr(enum('user','ai'),2),'trigger':R('AutomationTrigger'),'condition':R('AutomationCondition'),'actions':{**arr(R('AutomationAction'),32),'minItems':1}},['id','name','enabled','paused','trigger','actions'])
 commands['SaveAutomation']['properties']['rule']=R('AutomationRule')
+# Manual skills retain immutable definitions; text never supplies authority.
+defs['SkillDefinition']=obj({'name':{'type':'string','minLength':1,'maxLength':200},'purpose':{'type':'string','maxLength':1000},'instructions':{'type':'string','minLength':1,'maxLength':4000},'inputDescription':{'type':'string','maxLength':500},'expectedOutput':{'type':'string','maxLength':1000},'mode':enum('answer','summarize','generate','workspace_agent'),'sourcePageIds':{**arr(D('Id'),32),'uniqueItems':True},'tools':{**arr(enum('readPage','search.query','queryRecords','resolveCitation','allocateIds','proposeChanges','proposeActions'),7),'uniqueItems':True}})
+defs['SkillRunReference']=obj({'skillId':D('Id'),'version':{'type':'integer','minimum':1},'invocationId':D('Id'),'input':{'type':'string','maxLength':1000},'sourcePageIds':{**arr(D('Id'),32),'uniqueItems':True},'tools':{**arr(enum('readPage','search.query','queryRecords','resolveCitation','allocateIds','proposeChanges','proposeActions'),7),'uniqueItems':True},'previewHash':{'type':'string','pattern':'^[0-9a-f]{64}$'}},['skillId','version','invocationId','input','sourcePageIds','tools'])
+commands['SaveSkill']=tagged('skill.save',{'skillId':D('Id'),'pageId':D('Id'),'expectedVersion':N,'definition':R('SkillDefinition'),'archived':B,'imported':B})
+# Selected-row autofill persists proposals; only reviewed scalar effects commit.
+defs['AutofillInput']=obj({'collectionId':D('Id'),'recordIds':{**arr(D('Id'),128),'minItems':1,'uniqueItems':True},'sourcePropertyIds':{**arr(D('Id'),32),'minItems':1,'uniqueItems':True},'targetPropertyIds':{**arr(D('Id'),32),'minItems':1,'uniqueItems':True},'instructions':{'type':'string','minLength':1,'maxLength':4000},'modelPackId':D('Id'),'includeNonempty':B})
+autofill_selection={'batchId':D('Id'),'cellIds':{**arr(D('Id'),128),'minItems':1,'uniqueItems':True},'overwriteCellIds':{**arr(D('Id'),128),'uniqueItems':True}}
+commands['ApplyAutofill']=tagged('autofill.applyReviewed',autofill_selection)
 defs.update(commands)
 defs['Command']={'oneOf':[R(n) for n in commands]}
 header={'contractVersion':{'const':1},'requestId':D('Id'),'workspaceId':D('Id')}
+defs['SchedulingPreviewRequest']=obj({**header,'input':R('SchedulingInput')})
+defs['RecordLayoutRequest']=obj({**header,'collectionId':D('Id'),'recordId':D('Id')},[*header,'collectionId'])
+defs['RecordLayoutResult']=obj({'collectionId':D('Id'),'recordId':D('Id'),'defaultLayout':nullable_layout,'overrideLayout':nullable_layout,'effectiveLayout':R('RecordLayout'),'missingPropertyIds':arr(D('Id'),8448)},['collectionId','defaultLayout','overrideLayout','effectiveLayout','missingPropertyIds'])
+defs['MeetingRetentionPreviewRequest']=obj({**header,'meetingId':D('Id'),'selected':{**arr(enum('audio','transcripts','generated','indexes','memory'),5),'uniqueItems':True}})
+defs['MeetingRetentionCategory']=obj({'id':enum('audio','transcripts','generated','indexes','memory','history','backups'),'count':N,'action':S,'detail':S,'selectable':B})
+defs['MeetingRetentionPreview']=obj({'version':{'const':1},'meetingId':D('Id'),'pageId':D('Id'),'categories':arr(R('MeetingRetentionCategory'),7),'selected':arr(enum('audio','transcripts','generated','indexes','memory'),5),'expectedRevisions':arr(R('ExpectedRevision'),1000),'command':R('ApplyMeetingRetention'),'warnings':arr(S,16),'canApply':B})
+defs['MeetingExtractionResult']=obj({'version':{'const':1},'proposalId':D('Id'),'itemId':{'type':'string','minLength':1,'maxLength':128},'meetingId':D('Id'),'evidenceHash':{'type':'string','pattern':'^[0-9a-f]{64}$'},'kind':enum('page','task'),'title':S,'body':S,'pageId':D('Id'),'recordId':D('Id'),'appliedAt':D('Timestamp'),'stale':B},['version','proposalId','itemId','meetingId','evidenceHash','kind','title','body','pageId','stale'])
+defs['MeetingExtractionApplyResult']=obj({'pageId':D('Id'),'recordId':S,'kind':enum('page','task'),'proposalId':D('Id'),'itemId':S,'reused':B})
+defs['MeetingExtractionPrepareRequest']=obj({**header,'meetingId':D('Id'),'kind':enum('page','task'),'draftId':D('Id'),'itemIndex':{'type':'integer','minimum':0,'maximum':249}},[*header,'meetingId','kind'])
+defs['MeetingExtractionPrepareRequest']['dependentRequired']={'draftId':['itemIndex'],'itemIndex':['draftId']}
+defs['MeetingExtractionListRequest']=obj({**header,'meetingId':D('Id')})
+defs['MeetingExtractionCreateRequest']=obj({**header,'meetingId':D('Id'),'evidenceHash':{'type':'string','pattern':'^[0-9a-f]{64}$'},'kind':enum('page','task'),'title':{'type':'string','minLength':1,'maxLength':512},'body':{'type':'string','maxLength':100000},'proposalId':D('Id'),'itemId':{'type':'string','minLength':1,'maxLength':128}},[*header,'meetingId','evidenceHash','kind','title','body'])
+defs['MeetingExtractionCreateRequest']['dependentRequired']={'proposalId':['itemId'],'itemId':['proposalId']}
+# Native-only backup output. Passphrases deliberately have no dispatcher/job
+# request definition and never enter a persisted request or model payload.
+defs['NativeAudioInput']=obj({'id':{'type':'string','minLength':1,'maxLength':1024},'name':{'type':'string','minLength':1,'maxLength':1024},'isDefault':B})
+defs['NativeCaptureControlAck']=obj({'controlId':D('Id'),'action':enum('pause','resume','stop'),'state':enum('paused','recording','stopped'),'bytes':N,'capturedSamples':N,'durationMs':N})
+defs['NativeRecordingGap']=obj({'id':D('Id'),'kind':enum('pause','interruption'),'sampleOffset':N,'startedAt':D('Timestamp'),'endedAt':D('Timestamp'),'durationMs':N,'reason':S},['id','kind','sampleOffset','startedAt'])
+defs['NativeRecordingDraft']=obj({'version':{'const':1},'id':D('Id'),'title':S,'actorId':D('Id'),'startedAt':D('Timestamp'),'state':enum('recording','paused','captured','interrupted','saved'),'bytes':N,'durationMs':N,'pageId':D('Id'),'meetingId':D('Id'),'fileId':D('Id'),'error':S,'inputDeviceId':S,'disclosureAcknowledgedAt':D('Timestamp'),'lastControlId':D('Id'),'gaps':arr(R('NativeRecordingGap'),10000),'segments':arr(obj({'startByte':N,'endByte':N,'sha256':{'type':'string','pattern':'^[0-9a-f]{64}$'}}),100000)},['id','title','actorId','startedAt','state','bytes','durationMs','pageId','meetingId','segments'])
+defs['NativeBackupProgress']=obj({'version':{'const':1},'phase':enum('idle','choosing','snapshot','encrypting','authenticating','verifying','review','restoring','complete'),'bytes':{'type':'string','pattern':'^(0|[1-9][0-9]*)$'},'totalBytes':{'type':'string','pattern':'^(0|[1-9][0-9]*)$'}})
+defs['NativeBackupSummary']=obj({'version':{'const':1},'format':{'const':'age-passphrase/native-tar-v1'},'included':arr(S,32),'excluded':arr(S,32),'restoration':arr(S,32)})
+defs['AutofillCreateRequest']=obj({**header,'input':R('AutofillInput')})
+defs['AutofillControlRequest']=obj({**header,'batchId':D('Id')})
+defs['AutofillListRequest']=obj({**header,'collectionId':D('Id')})
+defs['AutofillApplyRequest']=obj({**header,**autofill_selection})
+defs['SkillsListRequest']=obj({**header,'skillId':D('Id')},list(header))
+defs['SkillPreviewRequest']=obj({**header,'skill':R('SkillRunReference'),'provider':enum('local','codex','claude_code')})
 defs['AutomationOptionsRequest']=obj({**header,'pageId':D('Id')})
 defs['TemplatePropertyDecision']={'oneOf':[obj({'sourcePropertyId':D('Id'),'action':{'const':'omit'}}),obj({'sourcePropertyId':D('Id'),'action':{'const':'map'},'targetPropertyId':D('Id'),'value':json_value})]}
 defs['TemplatePreviewRequest']=obj({**header,'templateId':D('Id'),'title':{'type':'string','minLength':1,'maxLength':2000},'collectionId':D('Id'),'propertyDecisions':arr(R('TemplatePropertyDecision'),256)},[*header,'templateId','title'])
@@ -121,6 +176,14 @@ defs['TemplatePreviewResult']=obj({'previewId':D('Id'),'pageId':D('Id'),'recordI
 defs['TemplateCaptureRequest']=obj({**header,'pageId':D('Id'),'name':{'type':'string','minLength':1,'maxLength':200},'expectedPageRevision':D('Revision')})
 defs['DatabaseP2Request']=obj({**header,'collectionId':D('Id')})
 defs['DatabaseChartRequest']=obj({**header,'collectionId':D('Id')})
+defs['OperationsListResult']=obj({'operations':arr(obj({'id':D('Id'),'label':S,'createdAt':D('Timestamp'),'state':enum('applied','undone')}),50)})
+defs['OperationsListRequest']=obj({**header,'pageId':D('Id')})
+defs['OperationPreviewUndoRequest']=obj({**header,'operationId':D('Id')})
+defs['OperationPreviewUndoResult']=obj({'operationId':D('Id'),'label':S,'actions':arr(R('JournalAction'),128),'expectedRevisions':arr(R('ExpectedRevision')),'command':R('UndoOperation')})
+defs['PageFreshnessRequest']=obj({**header,'pageId':D('Id')})
+defs['PageFreshnessResult']=obj({'pageId':D('Id'),'freshness':D('PageFreshness'),'history':arr(D('HumanReviewEvent'),100)})
+defs['ReviewQueueRequest']=obj({**header,'afterPageId':D('Id'),'limit':{'type':'integer','minimum':1,'maximum':100}},[*header,'limit'])
+defs['ReviewQueueResult']=obj({'items':arr(obj({'pageId':D('Id'),'title':S,'freshness':D('PageFreshness')}),100),'nextPageId':D('Id')},['items'])
 defs['PageDisplayGetRequest']=obj({**header,'pageId':D('Id')})
 defs['GraphQueryRequest']=obj({**header,'pageId':D('Id'),'query':{'type':'string','maxLength':8192},'includeSemantic':B,'limit':{'type':'integer','minimum':1,'maximum':100}},list(header))
 defs['OCRStatusRequest']=obj(header)
@@ -181,10 +244,10 @@ defs['HistoryRecoveryPointResult']=obj({'recoveryPointId':D('Id'),'createdAt':D(
 defs['QueryRecordsRequest']=obj({**header,'collectionId':D('Id'),'viewId':D('Id'),'cursor':S,'limit':{'type':'integer','minimum':1,'maximum':200}},[*header,'collectionId','limit'])
 defs['QueryRecordsResult']=obj({'recordIds':arr(D('Id'),200),'records':arr(D('Record'),200),'nextCursor':S,'snapshotCursor':{'oneOf':[D('Revision'),{'const':'0'}]}},['recordIds','records','snapshotCursor'])
 defs['SearchRequest']=obj({**header,'query':{'type':'string','maxLength':8192},'scope':D('Scope'),'limit':{'type':'integer','minimum':1,'maximum':100},'mode':enum('keyword','hybrid')})
-defs['SearchHit']=obj({'location':D('Location'),'excerpt':S,'contentHash':{'type':'string','pattern':'^[0-9a-f]{64}$'},'score':{'type':'number'},'sourceState':enum('current','stale','deleted','unavailable')})
+defs['SearchHit']=obj({'location':D('Location'),'excerpt':S,'contentHash':{'type':'string','pattern':'^[0-9a-f]{64}$'},'score':{'type':'number'},'sourceState':enum('current','stale','deleted','unavailable'),'freshness':D('PageFreshness')},['location','excerpt','contentHash','score','sourceState'])
 defs['SearchResult']=obj({'hits':arr(R('SearchHit'),100),'snapshotCursor':{'oneOf':[D('Revision'),{'const':'0'}]},'indexGeneration':D('Id'),'partial':B})
 defs['ResolveCitationRequest']=obj({**header,'location':D('Location')})
-defs['ResolveCitationResult']=obj({'location':D('Location'),'state':enum('current','stale','deleted','unavailable'),'currentRevision':D('Revision'),'excerpt':S,'historicalSnapshotRef':D('Id')},['location','state'])
+defs['ResolveCitationResult']=obj({'location':D('Location'),'state':enum('current','stale','deleted','unavailable'),'currentRevision':D('Revision'),'excerpt':S,'historicalSnapshotRef':D('Id'),'freshness':D('PageFreshness')},['location','state'])
 defs['ReadEventsRequest']=obj({**header,'afterCursor':{'oneOf':[D('Revision'),{'const':'0'}]},'limit':{'type':'integer','minimum':1,'maximum':500}})
 defs['ReadEventsResult']=obj({'events':arr(R('CommittedChangeEvent'),500),'nextCursor':{'oneOf':[D('Revision'),{'const':'0'}]},'requiresSnapshot':B})
 defs['CancelRequest']=obj({**header,'cancellationId':D('Id')})
@@ -218,7 +281,7 @@ defs.update({
  'ProviderManagedStatusRequest':obj(header),
  'ProviderModelsRequest':obj({**header,'registrationId':D('Id')}),
  'ProviderDiscoverRequest':obj({**header,'provider':enum('codex','claude_code')}),
- 'ProviderManagedStartRequest':obj({**header,'provider':enum('codex','claude_code'),'registrationId':{'type':'string','minLength':1,'maxLength':256},'billingMode':enum('chatgpt_plan','claude_subscription','anthropic_api'),'model':{'type':'string','minLength':1,'maxLength':128},'prompt':{'type':'string','minLength':1,'maxLength':65536},'pageIds':{**arr(D('Id'),100),'minItems':1,'uniqueItems':True},'tools':{**arr(enum('readPage','search.query','queryRecords','resolveCitation','allocateIds','proposeChanges','proposeActions'),7),'minItems':1,'uniqueItems':True},'previewHash':{'type':'string','pattern':'^[a-f0-9]{64}$'},'resumeRunId':D('Id')},[*header,'provider','registrationId','billingMode','model','prompt','pageIds','tools','previewHash']),
+ 'ProviderManagedStartRequest':obj({**header,'provider':enum('codex','claude_code'),'registrationId':{'type':'string','minLength':1,'maxLength':256},'billingMode':enum('chatgpt_plan','claude_subscription','anthropic_api'),'model':{'type':'string','minLength':1,'maxLength':128},'prompt':{'type':'string','minLength':1,'maxLength':65536},'pageIds':{**arr(D('Id'),100),'minItems':1,'uniqueItems':True},'tools':{**arr(enum('readPage','search.query','queryRecords','resolveCitation','allocateIds','proposeChanges','proposeActions'),7),'minItems':1,'uniqueItems':True},'previewHash':{'type':'string','pattern':'^[a-f0-9]{64}$'},'resumeRunId':D('Id'),'skill':R('SkillRunReference')},[*header,'provider','registrationId','billingMode','model','prompt','pageIds','tools','previewHash']),
  'ProviderManagedCancelRequest':obj({**header,'runId':D('Id')})
 })
 # Native account operations expose metadata only, never OAuth URLs or tokens.

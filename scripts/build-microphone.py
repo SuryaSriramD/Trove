@@ -109,7 +109,7 @@ def main():
         'architecture': TARGETS[target]['arch']}
     sidecar = {'schemaVersion': 1, 'platform': TARGETS[target]['os'], 'helper': record,
         'testOnly': args.fixture_only, 'deviceBackendCompiled': not args.fixture_only, 'startupStallFixture': args.fixture_startup_stall,
-        'capabilities': ['record_synthetic'] if args.fixture_only else ['record'],
+        'capabilities': ['record_synthetic', 'capture_controls_v1', 'input_devices_v1'] if args.fixture_only else ['record', 'capture_controls_v1', 'input_devices_v1'],
         'permissionState': 'not_requested', 'deviceState': 'not_probed', 'deviceQualification': 'Unqualified',
         'runtimeSystemLibraries': ['kernel32.dll', 'user32.dll', 'advapi32.dll', 'ole32.dll', 'avrt.dll', 'mmdevapi.dll'] if target == 'windows-amd64' else [],
         'sourcePin': pin, 'sourceSha256': {p.name: file_digest(p) for p in (

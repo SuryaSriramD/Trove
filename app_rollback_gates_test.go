@@ -131,6 +131,9 @@ func TestRollbackPendingActionsDoNotConsumeReviewsCancelOrBeginIO(t *testing.T) 
 	defer appRecordings.Delete(a)
 	actions := map[string]func() error{
 		"backup":            func() error { _, e := a.CreateBackup(); return e },
+		"encrypted backup":  func() error { _, e := a.CreateEncryptedBackup("unused"); return e },
+		"encrypted preview": func() error { _, e := a.PreviewEncryptedBackup("unused"); return e },
+		"backup progress":   func() error { _, e := a.NativeBackupProgress(); return e },
 		"import picker":     func() error { _, e := a.PickImportFolder(); return e },
 		"index picker":      func() error { _, e := a.PickIndexRoot(true); return e },
 		"screenshot":        func() error { _, e := a.CaptureScreenshot(); return e },
@@ -146,6 +149,9 @@ func TestRollbackPendingActionsDoNotConsumeReviewsCancelOrBeginIO(t *testing.T) 
 		"reveal clipper":    a.ShowClipperExtension,
 		"model picker":      func() error { return a.PickModelPack("pack") },
 		"start capture":     func() error { _, e := a.StartMeetingRecording("title"); return e },
+		"disclosed capture": func() error { _, e := a.StartMeetingRecordingWithOptions("title", "input", true); return e },
+		"capture inputs":    func() error { _, e := a.MeetingAudioInputs(); return e },
+		"pause capture":     func() error { _, e := a.ControlMeetingRecording("recording", "pause"); return e },
 		"stop capture":      func() error { _, e := a.StopMeetingRecording("recording"); return e },
 		"save capture":      func() error { _, e := a.SaveMeetingRecording("recording"); return e },
 		"audio picker":      func() error { _, e := a.PickMeetingAudio("title"); return e },
@@ -165,6 +171,8 @@ func TestRollbackPendingActionsDoNotConsumeReviewsCancelOrBeginIO(t *testing.T) 
 		t.Run(name, func(t *testing.T) { check(t, action()) })
 	}
 	a.CancelUpdateOperation()
+	a.CancelBackupOperation()
+	a.CloseNativeRestorePreview(review)
 	if cancelled {
 		t.Fatal("pending operation cancelled an existing native operation")
 	}

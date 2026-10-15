@@ -1,3 +1,5 @@
+import { RecordLayout } from "./RecordLayout";
+import { SchedulingPanel } from "./SchedulingPanel";
 import { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import {
   qualificationFrames,
@@ -35,6 +37,7 @@ import {
   type RecordGroup,
 } from "./model";
 import "./database.css";
+import { AutofillPanel } from "./AutofillPanel";
 import { VirtualRows } from "./VirtualRows";
 import { Timeline } from "./Timeline";
 import { FormulaEditor } from "./FormulaEditor";
@@ -85,6 +88,7 @@ export default function DatabaseView({
   openPage,
 }: Props) {
   const [selected, setSelected] = useState(collectionId ?? "");
+  const [promotion, setPromotion] = useState<{ record: D.Record; statusId: string; dueId: string } | null>(null);
   const [active, setActive] = useState("");
   const [records, setRecords] = useState<D.Record[]>([]);
   const qualificationLoad = useRef<{
@@ -321,28 +325,19 @@ export default function DatabaseView({
       );
   };
   const promote = (r: D.Record) => {
-    const p = w.pages.find((p) => p.id === r.pageId),
-      status = properties.find(
-        (p) =>
-          p.type === "status" &&
-          (p.config as any).doneOptionId &&
-          (p.config as any).reopenOptionId,
-      );
-    if (!p || !status) {
-      onError(Error("Add a status property with task mappings first."));
-      return;
-    }
-    void run(() =>
-      batch(
-        w,
-        [{ kind: "task.promote", recordId: r.id, statusPropertyId: status.id }],
-        uniqueGuards([
-          ...pageGuards(w, p),
-          guard("property", status.id, status.revision),
-        ]),
-      ),
-    );
+    const status = properties.find(p => p.type === "status" && (p.config as any).doneOptionId && (p.config as any).reopenOptionId);
+    if (!status) { onError(Error("Add a status property with task mappings first.")); return; }
+    setPromotion({ record: r, statusId: status.id, dueId: "" });
   };
+  async function confirmPromotion() {
+    if (!promotion) return;
+    const page = w.pages.find(p => p.id === promotion.record.pageId), status = properties.find(p => p.id === promotion.statusId), due = properties.find(p => p.id === promotion.dueId);
+    if (!page || !status) return;
+    await run(async () => {
+      await batch(w, [{ kind: "task.promote", recordId: promotion.record.id, statusPropertyId: status.id, ...(due ? { duePropertyId: due.id } : {}) }], uniqueGuards([...pageGuards(w, page), guard("property", status.id, status.revision), ...(due ? [guard("property", due.id, due.revision)] : [])]));
+      setPromotion(null);
+    });
+  }
   function cell(r: D.Record, p: D.PropertyDefinition) {
     if (p.type === "title")
       return (
@@ -580,6 +575,7 @@ export default function DatabaseView({
           onError={onError}
         />
       )}
+      {collection && <><RecordLayout workspace={w} collectionId={collection.id} onCommitted={onCommitted} onError={onError} /><SchedulingPanel key={collection.id} workspace={w} collection={collection} records={records} onCommitted={onCommitted} onError={onError} /></>}
       <div className="db-header">
         <div>
           {!collectionId && (
@@ -686,6 +682,12 @@ export default function DatabaseView({
               ＋ Property
             </button>
           </div>
+          {promotion && <div className="task-promotion" role="dialog" aria-label="Promote record to task"><strong>Make {titleFor(promotion.record)} a task</strong>
+            <label>Status property<select aria-label="Task promotion status" value={promotion.statusId} onChange={e => setPromotion({ ...promotion, statusId: e.target.value })}>{properties.filter(p => p.type === "status" && (p.config as any).doneOptionId && (p.config as any).reopenOptionId).map(p => <option key={p.id} value={p.id}>{p.name}</option>)}</select></label>
+            <label>Due property<select aria-label="Task promotion due property" value={promotion.dueId} onChange={e => setPromotion({ ...promotion, dueId: e.target.value })}><option value="">No due property</option>{properties.filter(p => p.type === "date").map(p => <option key={p.id} value={p.id}>{p.name}</option>)}</select></label>
+            <p>The record, page and existing property values stay in this database.</p><button disabled={busy} onClick={() => void confirmPromotion()}>Confirm task</button><button disabled={busy} onClick={() => setPromotion(null)}>Cancel</button>
+          </div>}
+          <AutofillPanel workspace={w} collection={collection} records={records} onCommitted={onCommitted} onError={onError} openPage={openPage} />
           <AdvancedDatabasePanel
             workspace={w}
             collection={collection}
@@ -896,7 +898,7 @@ export default function DatabaseView({
     </section>
   );
 }
-function ValueEditor({
+export function ValueEditor({
   property: p,
   value,
   workspace: w,
@@ -1121,7 +1123,7 @@ function ValueEditor({
       );
   }
 }
-function DateEditor({
+export function DateEditor({
   label,
   value,
   disabled,

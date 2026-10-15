@@ -1,3 +1,5 @@
+import type { SkillExecution } from "./SkillsPanel";
+import { freshnessLabel } from "../PageFreshness";
 import { useEffect, useState } from "react";
 import {
   batch,
@@ -7,7 +9,11 @@ import {
   type WorkspaceSnapshot,
   type S,
 } from "../api";
-import type { Location, Memory } from "../../../contracts/generated/domain";
+import type {
+  Location,
+  Memory,
+  PageFreshness,
+} from "../../../contracts/generated/domain";
 import "./ai.css";
 import { Suggestions } from "./Suggestions";
 import {
@@ -22,6 +28,7 @@ type Citation = {
   state: string;
 };
 type Source = Citation & {
+  freshness?: PageFreshness;
   text: string;
   memoryId?: string;
   memoryKind?: "preference" | "decision" | "project_context";
@@ -31,6 +38,7 @@ type Run = {
   conversationId: string;
   state: string;
   request: {
+    skill?: S.SkillRunReference;
     mode: string;
     prompt: string;
     pageId?: string;
@@ -60,6 +68,7 @@ type Pack = {
   qualificationOnly?: boolean;
 };
 export type AIPanelProps = {
+  skill?: SkillExecution;
   workspace: WorkspaceSnapshot;
   pageId?: string;
   onNavigate: (location: Location) => void;
@@ -75,6 +84,7 @@ const plainText = (value: unknown): string => {
 };
 
 export function AIPanel({
+  skill,
   workspace,
   pageId,
   onNavigate,
@@ -82,13 +92,13 @@ export function AIPanel({
 }: AIPanelProps) {
   const [scope, setScope] = useState(pageId ? "page" : "workspace"),
     [project, setProject] = useState("");
-  const [mode, setMode] = useState("answer"),
-    [prompt, setPrompt] = useState(""),
+  const [mode, setMode] = useState(skill?.mode ?? "answer"),
+    [prompt, setPrompt] = useState(skill?.prompt ?? ""),
     [selection, setSelection] = useState(""),
     [block, setBlock] = useState("");
   const [models, setModels] = useState<Pack[]>([]),
     [model, setModel] = useState(""),
-    [useMemory, setUseMemory] = useState(true);
+    [useMemory, setUseMemory] = useState(!skill);
   const [runs, setRuns] = useState<Run[]>([]),
     [current, setCurrent] = useState<Run | null>(null),
     [conversation, setConversation] = useState("");
@@ -123,7 +133,10 @@ export function AIPanel({
       .catch(() => {});
   }, []);
   async function loadRuns() {
-    const r = await dispatch<Run[]>("ai.runs", envelope(workspace));
+    const all = await dispatch<Run[]>("ai.runs", envelope(workspace));
+    const r = all.filter(
+      (r) => !skill || r.request.skill?.skillId === skill.reference.skillId,
+    );
     setRuns(r);
     return r;
   }
@@ -132,8 +145,20 @@ export function AIPanel({
     dispatch<Run[]>("ai.runs", envelope(workspace))
       .then((r) => {
         if (active) {
-          setRuns(r);
-          setCurrent(r[0] ?? null);
+          const matching = r.filter(
+            (r) =>
+              !skill || r.request.skill?.skillId === skill.reference.skillId,
+          );
+          setRuns(matching);
+          setCurrent(
+            skill
+              ? (matching.find(
+                  (r) =>
+                    r.request.skill?.invocationId ===
+                    skill.reference.invocationId,
+                ) ?? null)
+              : (matching[0] ?? null),
+          );
         }
       })
       .catch((e) => setError(String(e)));
@@ -211,6 +236,7 @@ export function AIPanel({
         ...envelope(workspace),
         mode,
         prompt,
+        ...(skill ? { skill: skill.reference } : {}),
         modelPackId: model,
         useMemory,
         ...(conversation ? { conversationId: conversation } : {}),
@@ -296,7 +322,7 @@ export function AIPanel({
   }
   return (
     <section className="ai-panel" aria-label="Local AI and approved memory">
-      <h2>Local AI</h2>
+      <h2>{skill ? "Local skill execution" : "Local AI"}</h2>
       {pageId && (
         <Suggestions
           workspace={workspace}
@@ -309,62 +335,66 @@ export function AIPanel({
         applying them.
       </p>
       <div className="ai-controls">
-        <select
-          aria-label="AI source scope"
-          value={scope}
-          onChange={(e) => setScope(e.target.value)}
-        >
-          <option value="workspace">Workspace</option>
-          <option value="page" disabled={!page}>
-            Current page{page ? ` · ${page.title}` : ""}
-          </option>
-          <option value="project">Project</option>
-        </select>
-        {scope === "project" && (
-          <select
-            aria-label="AI project"
-            value={project}
-            onChange={(e) => setProject(e.target.value)}
-          >
-            <option value="">Choose project</option>
-            {workspace.containers
-              .filter((c) => c.kind === "project")
-              .map((c) => (
-                <option key={c.id} value={c.id}>
-                  {workspace.pages.find((p) => p.id === c.owningPageId)
-                    ?.title ?? c.id}
+        {!skill && (
+          <>
+            <select
+              aria-label="AI source scope"
+              value={scope}
+              onChange={(e) => setScope(e.target.value)}
+            >
+              <option value="workspace">Workspace</option>
+              <option value="page" disabled={!page}>
+                Current page{page ? ` · ${page.title}` : ""}
+              </option>
+              <option value="project">Project</option>
+            </select>
+            {scope === "project" && (
+              <select
+                aria-label="AI project"
+                value={project}
+                onChange={(e) => setProject(e.target.value)}
+              >
+                <option value="">Choose project</option>
+                {workspace.containers
+                  .filter((c) => c.kind === "project")
+                  .map((c) => (
+                    <option key={c.id} value={c.id}>
+                      {workspace.pages.find((p) => p.id === c.owningPageId)
+                        ?.title ?? c.id}
+                    </option>
+                  ))}
+              </select>
+            )}
+            <select
+              aria-label="Writing operation"
+              value={mode}
+              onChange={(e) => setMode(e.target.value)}
+            >
+              {[
+                "answer",
+                "rewrite",
+                "summarize",
+                "explain",
+                "shorten",
+                "expand",
+                "outline",
+                "generate",
+                "database",
+                "schema",
+                "mermaid",
+                "code_explain",
+                "code_refactor",
+                "code_comment",
+                "organize",
+                "workspace_agent",
+              ].map((v) => (
+                <option key={v} value={v}>
+                  {v}
                 </option>
               ))}
-          </select>
+            </select>
+          </>
         )}
-        <select
-          aria-label="Writing operation"
-          value={mode}
-          onChange={(e) => setMode(e.target.value)}
-        >
-          {[
-            "answer",
-            "rewrite",
-            "summarize",
-            "explain",
-            "shorten",
-            "expand",
-            "outline",
-            "generate",
-            "database",
-            "schema",
-            "mermaid",
-            "code_explain",
-            "code_refactor",
-            "code_comment",
-            "organize",
-            "workspace_agent",
-          ].map((v) => (
-            <option key={v} value={v}>
-              {v}
-            </option>
-          ))}
-        </select>
         <select
           aria-label="Local instruction model"
           value={model}
@@ -413,6 +443,7 @@ export function AIPanel({
       )}
       <textarea
         aria-label="AI prompt"
+        readOnly={!!skill}
         placeholder="Ask a question or describe the draft you want…"
         value={prompt}
         onChange={(e) => setPrompt(e.target.value)}
@@ -423,6 +454,7 @@ export function AIPanel({
           <input
             type="checkbox"
             checked={useMemory}
+            disabled={!!skill}
             onChange={(e) => setUseMemory(e.target.checked)}
           />{" "}
           Use approved memory
@@ -521,100 +553,121 @@ export function AIPanel({
                   [{s.number}] {s.title}
                   {s.state && s.state !== "current" ? " · source changed" : ""}
                 </button>
+                {s.freshness && (
+                  <small>
+                    {freshnessLabel(s.freshness)} · human review status
+                  </small>
+                )}
                 <p>{s.text}</p>
               </div>
             ))}
           </details>
-          {current.state === "completed" && (
-            <details className="ai-review">
-              <summary>Review a page or task change</summary>
-              <p>
-                {current.request.mode === "workspace_agent"
-                  ? "Review the destinations and each proposed change. If the plan needs corrections, change your request and generate a fresh plan."
-                  : "Edit the proposed text, then inspect the exact changes before approval. A text replacement removes formatting in replaced text."}
-              </p>
-              {current.request.mode !== "workspace_agent" && (
-                <>
-                  <textarea
-                    aria-label="Reviewed draft text"
-                    value={draft || current.text}
-                    onChange={(e) => {
-                      setDraft(e.target.value);
-                      setProposal(null);
-                    }}
-                  />
-                  <select
-                    aria-label="Reviewed action"
-                    value={action}
-                    onChange={(e) => {
-                      setAction(e.target.value);
-                      setProposal(null);
-                    }}
-                  >
-                    <option value="append">Append blocks to source page</option>
-                    <option value="replace_block">
-                      Replace selected source block/text
-                    </option>
-                    <option value="replace_page">
-                      Replace plain text page
-                    </option>
-                    <option value="create_page">Create page</option>
-                    <option value="create_task">Create task</option>
-                    <option value="create_database">
-                      Create database from JSON draft
-                    </option>
-                    <option value="mermaid">Insert or update Mermaid</option>
-                    <option value="replace_code">
-                      Replace selected code (never execute)
-                    </option>
-                    <option value="workspace_patch">
-                      Review named workspace plan
-                    </option>
-                  </select>
-                  {action.startsWith("create_") && (
-                    <input
-                      aria-label="New page or task title"
-                      placeholder="Title"
-                      value={title}
+          {current.state === "completed" &&
+            (!skill ||
+              skill.reference.tools.some(
+                (t) => t === "proposeActions" || t === "proposeChanges",
+              )) && (
+              <details className="ai-review">
+                <summary>Review a page or task change</summary>
+                <p>
+                  {current.request.mode === "workspace_agent"
+                    ? "Review the destinations and each proposed change. If the plan needs corrections, change your request and generate a fresh plan."
+                    : "Edit the proposed text, then inspect the exact changes before approval. A text replacement removes formatting in replaced text."}
+                </p>
+                {current.request.mode !== "workspace_agent" && (
+                  <>
+                    <textarea
+                      aria-label="Reviewed draft text"
+                      value={draft || current.text}
                       onChange={(e) => {
-                        setTitle(e.target.value);
+                        setDraft(e.target.value);
                         setProposal(null);
                       }}
                     />
-                  )}
-                </>
-              )}
-              <button disabled={busy} onClick={review}>
-                Preview exact changes
-              </button>
-              {proposal && (
-                <div className="ai-proposal">
-                  <strong>
-                    {proposal.commands.length} reviewed changes ·{" "}
-                    {proposal.kind}
-                  </strong>
-                  {proposal.title && <h4>{proposal.title}</h4>}
-                  {proposal.before && (
-                    <>
-                      <h4>Before</h4>
-                      <pre>{proposal.before}</pre>
-                    </>
-                  )}
-                  <h4>
-                    {proposal.kind === "append" ? "Blocks to append" : "After"}
-                  </h4>
-                  <pre>{proposal.after}</pre>
-                  <button disabled={busy} onClick={apply}>
-                    Approve and apply these changes
-                  </button>
-                  <button onClick={() => setProposal(null)}>
-                    Discard preview
-                  </button>
-                </div>
-              )}
-            </details>
-          )}
+                    <select
+                      aria-label="Reviewed action"
+                      value={action}
+                      onChange={(e) => {
+                        setAction(e.target.value);
+                        setProposal(null);
+                      }}
+                    >
+                      <option value="append">
+                        Append blocks to source page
+                      </option>
+                      <option value="replace_block">
+                        Replace selected source block/text
+                      </option>
+                      <option value="replace_page">
+                        Replace plain text page
+                      </option>
+                      <option value="create_page">Create page</option>
+                      <option value="create_task">Create task</option>
+                      <option value="create_database">
+                        Create database from JSON draft
+                      </option>
+                      <option value="mermaid">Insert or update Mermaid</option>
+                      <option value="replace_code">
+                        Replace selected code (never execute)
+                      </option>
+                      <option value="workspace_patch">
+                        Review named workspace plan
+                      </option>
+                    </select>
+                    {action.startsWith("create_") && (
+                      <input
+                        aria-label="New page or task title"
+                        placeholder="Title"
+                        value={title}
+                        onChange={(e) => {
+                          setTitle(e.target.value);
+                          setProposal(null);
+                        }}
+                      />
+                    )}
+                  </>
+                )}
+                <button disabled={busy} onClick={review}>
+                  Preview exact changes
+                </button>
+                {proposal && (
+                  <div className="ai-proposal">
+                    <strong>
+                      {proposal.commands.length} reviewed changes ·{" "}
+                      {proposal.kind}
+                    </strong>
+                    {proposal.title && <h4>{proposal.title}</h4>}
+                    {proposal.before && (
+                      <>
+                        <h4>Before</h4>
+                        <pre>{proposal.before}</pre>
+                      </>
+                    )}
+                    <h4>
+                      {proposal.kind === "append"
+                        ? "Blocks to append"
+                        : "After"}
+                    </h4>
+                    <pre>{proposal.after}</pre>
+                    <button disabled={busy} onClick={apply}>
+                      Approve and apply these changes
+                    </button>
+                    <button onClick={() => setProposal(null)}>
+                      Discard preview
+                    </button>
+                  </div>
+                )}
+              </details>
+            )}
         </article>
+      )}
+      {skill && current?.request.skill && (
+        <button
+          disabled={running}
+          onClick={() => skill.onRetry?.(current.request.skill!)}
+        >
+          Review retry with original skill scope
+        </button>
       )}
       <details>
         <summary>Saved conversations · {runs.length}</summary>
@@ -629,15 +682,18 @@ export function AIPanel({
               setProposal(null);
             }}
           >
+            {r.request.skill ? `Skill v${r.request.skill.version} · ` : ""}
             {r.request.prompt || r.request.mode} · {r.state}
           </button>
         ))}
       </details>
-      <MemoryPanel
-        workspace={workspace}
-        pageId={pageId}
-        onCommitted={onCommitted}
-      />
+      {!skill && (
+        <MemoryPanel
+          workspace={workspace}
+          pageId={pageId}
+          onCommitted={onCommitted}
+        />
+      )}
     </section>
   );
 }

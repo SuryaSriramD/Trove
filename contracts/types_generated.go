@@ -868,6 +868,23 @@ type DomainImportResolution struct {
 	Fields                 []DomainImportFieldResolution   `json:"fields"`
 }
 type DomainColorToken string
+type DomainSemanticContentIdentity struct {
+	Version int64  `json:"version"`
+	Digest  string `json:"digest"`
+}
+type DomainHumanReviewEvent struct {
+	Id              DomainId                      `json:"id"`
+	PageId          DomainId                      `json:"pageId"`
+	ActorId         DomainId                      `json:"actorId"`
+	ReviewedAt      DomainTimestamp               `json:"reviewedAt"`
+	ExpiresAt       *DomainTimestamp              `json:"expiresAt,omitempty"`
+	ContentIdentity DomainSemanticContentIdentity `json:"contentIdentity"`
+}
+type DomainPageFreshness struct {
+	State           string                        `json:"state"`
+	ContentIdentity DomainSemanticContentIdentity `json:"contentIdentity"`
+	Review          *DomainHumanReviewEvent       `json:"review,omitempty"`
+}
 type DomainImportNormalizedSnapshot struct {
 	Version        int64                      `json:"version"`
 	SourceRevision *string                    `json:"sourceRevision,omitempty"`
@@ -964,6 +981,116 @@ type ServiceP2DatabaseConfig struct {
 	Form    ServiceP2FormConfig  `json:"form"`
 	Buttons []ServiceP2RowButton `json:"buttons"`
 }
+type ServiceRecordLayoutSection struct {
+	Id          DomainId   `json:"id"`
+	Title       string     `json:"title"`
+	Placement   string     `json:"placement"`
+	PropertyIds []DomainId `json:"propertyIds"`
+}
+type ServiceRecordLayout struct {
+	Version           int64                        `json:"version"`
+	Sections          []ServiceRecordLayoutSection `json:"sections"`
+	HiddenPropertyIds []DomainId                   `json:"hiddenPropertyIds"`
+}
+type ServiceSchedulingPolicy struct {
+	Version  int64   `json:"version"`
+	Calendar string  `json:"calendar"`
+	Timezone string  `json:"timezone"`
+	Weekdays []int64 `json:"weekdays"`
+}
+type ServiceSchedulingInput struct {
+	CollectionId   DomainId                `json:"collectionId"`
+	DatePropertyId DomainId                `json:"datePropertyId"`
+	RecordId       DomainId                `json:"recordId"`
+	NewStart       string                  `json:"newStart"`
+	Policy         ServiceSchedulingPolicy `json:"policy"`
+}
+type ServiceSchedulingRecord struct {
+	RecordId            DomainId             `json:"recordId"`
+	PageId              DomainId             `json:"pageId"`
+	Title               string               `json:"title"`
+	Before              DomainPropertyDateV1 `json:"before"`
+	After               DomainPropertyDateV1 `json:"after"`
+	DependencyRecordIds []DomainId           `json:"dependencyRecordIds"`
+	Reason              string               `json:"reason"`
+	Changed             bool                 `json:"changed"`
+	Duration            string               `json:"duration"`
+	DstEffects          []string             `json:"dstEffects"`
+}
+type ServiceSchedulingPlan struct {
+	Version           int64                     `json:"version"`
+	Id                DomainId                  `json:"id"`
+	Hash              DomainHash                `json:"hash"`
+	Input             ServiceSchedulingInput    `json:"input"`
+	RequiredRevisions []ServiceExpectedRevision `json:"requiredRevisions"`
+	Records           []ServiceSchedulingRecord `json:"records"`
+}
+type ServiceJournalActionValue interface{ isServiceJournalAction() }
+type ServiceJournalAction struct{ Value ServiceJournalActionValue }
+
+func (ServiceJournalActionVariant1) isServiceJournalAction() {}
+func (ServiceJournalActionVariant2) isServiceJournalAction() {}
+func (ServiceJournalActionVariant3) isServiceJournalAction() {}
+func (ServiceJournalActionVariant4) isServiceJournalAction() {}
+func (ServiceJournalActionVariant5) isServiceJournalAction() {}
+func (ServiceJournalActionVariant6) isServiceJournalAction() {}
+func (v ServiceJournalAction) MarshalJSON() ([]byte, error)  { return json.Marshal(v.Value) }
+func (v *ServiceJournalAction) UnmarshalJSON(data []byte) error {
+	var fields map[string]json.RawMessage
+	if err := json.Unmarshal(data, &fields); err != nil {
+		return err
+	}
+	if matchesVariant(fields, []string{"kind", "recordId", "propertyId", "value"}, map[string]string{"kind": "\"record.setValue\""}, map[string][]string{}, []string{"kind", "recordId", "propertyId", "value"}) {
+		var result ServiceJournalActionVariant1
+		if err := json.Unmarshal(data, &result); err != nil {
+			return err
+		}
+		v.Value = result
+		return nil
+	}
+	if matchesVariant(fields, []string{"kind", "recordId", "propertyId"}, map[string]string{"kind": "\"record.clearValue\""}, map[string][]string{}, []string{"kind", "recordId", "propertyId"}) {
+		var result ServiceJournalActionVariant2
+		if err := json.Unmarshal(data, &result); err != nil {
+			return err
+		}
+		v.Value = result
+		return nil
+	}
+	if matchesVariant(fields, []string{"kind", "pageId", "title"}, map[string]string{"kind": "\"page.update\""}, map[string][]string{}, []string{"kind", "pageId", "title"}) {
+		var result ServiceJournalActionVariant3
+		if err := json.Unmarshal(data, &result); err != nil {
+			return err
+		}
+		v.Value = result
+		return nil
+	}
+	if matchesVariant(fields, []string{"kind", "pageId", "fullWidth", "presentation"}, map[string]string{"kind": "\"page.display.set\""}, map[string][]string{}, []string{"kind", "pageId", "fullWidth", "presentation"}) {
+		var result ServiceJournalActionVariant4
+		if err := json.Unmarshal(data, &result); err != nil {
+			return err
+		}
+		v.Value = result
+		return nil
+	}
+	if matchesVariant(fields, []string{"kind", "collectionId", "layout"}, map[string]string{"kind": "\"collection.layout.set\""}, map[string][]string{}, []string{"kind", "collectionId", "layout"}) {
+		var result ServiceJournalActionVariant5
+		if err := json.Unmarshal(data, &result); err != nil {
+			return err
+		}
+		v.Value = result
+		return nil
+	}
+	if matchesVariant(fields, []string{"kind", "recordId", "layout"}, map[string]string{"kind": "\"record.layout.set\""}, map[string][]string{}, []string{"kind", "recordId", "layout"}) {
+		var result ServiceJournalActionVariant6
+		if err := json.Unmarshal(data, &result); err != nil {
+			return err
+		}
+		v.Value = result
+		return nil
+	}
+	return fmt.Errorf("unknown or incomplete ServiceJournalAction variant")
+}
+
 type ServiceAutomationTemplateAction struct {
 	Kind         string    `json:"kind"`
 	TemplateId   DomainId  `json:"templateId"`
@@ -1073,6 +1200,34 @@ type ServiceAutomationRule struct {
 	Trigger        ServiceAutomationTrigger    `json:"trigger"`
 	Condition      *ServiceAutomationCondition `json:"condition,omitempty"`
 	Actions        []ServiceAutomationAction   `json:"actions"`
+}
+type ServiceSkillDefinition struct {
+	Name             string     `json:"name"`
+	Purpose          string     `json:"purpose"`
+	Instructions     string     `json:"instructions"`
+	InputDescription string     `json:"inputDescription"`
+	ExpectedOutput   string     `json:"expectedOutput"`
+	Mode             string     `json:"mode"`
+	SourcePageIds    []DomainId `json:"sourcePageIds"`
+	Tools            []string   `json:"tools"`
+}
+type ServiceSkillRunReference struct {
+	SkillId       DomainId   `json:"skillId"`
+	Version       int64      `json:"version"`
+	InvocationId  DomainId   `json:"invocationId"`
+	Input         string     `json:"input"`
+	SourcePageIds []DomainId `json:"sourcePageIds"`
+	Tools         []string   `json:"tools"`
+	PreviewHash   *string    `json:"previewHash,omitempty"`
+}
+type ServiceAutofillInput struct {
+	CollectionId      DomainId   `json:"collectionId"`
+	RecordIds         []DomainId `json:"recordIds"`
+	SourcePropertyIds []DomainId `json:"sourcePropertyIds"`
+	TargetPropertyIds []DomainId `json:"targetPropertyIds"`
+	Instructions      string     `json:"instructions"`
+	ModelPackId       DomainId   `json:"modelPackId"`
+	IncludeNonempty   bool       `json:"includeNonempty"`
 }
 type ServiceCreatePage struct {
 	Kind         string    `json:"kind"`
@@ -1257,9 +1412,10 @@ type ServiceEnsureTasks struct {
 	DoneOptionId     DomainId `json:"doneOptionId"`
 }
 type ServicePromoteTask struct {
-	Kind             string   `json:"kind"`
-	RecordId         DomainId `json:"recordId"`
-	StatusPropertyId DomainId `json:"statusPropertyId"`
+	Kind             string    `json:"kind"`
+	RecordId         DomainId  `json:"recordId"`
+	StatusPropertyId DomainId  `json:"statusPropertyId"`
+	DuePropertyId    *DomainId `json:"duePropertyId,omitempty"`
 }
 type ServiceSetTaskStatus struct {
 	Kind           string   `json:"kind"`
@@ -1272,6 +1428,27 @@ type ServiceAttachFile struct {
 	IngestHandle DomainId  `json:"ingestHandle"`
 	PageId       DomainId  `json:"pageId"`
 	BlockId      *DomainId `json:"blockId,omitempty"`
+}
+type ServiceRecordMeetingExtraction struct {
+	Kind       string   `json:"kind"`
+	ProposalId DomainId `json:"proposalId"`
+	ItemId     string   `json:"itemId"`
+	Title      string   `json:"title"`
+	Body       string   `json:"body"`
+}
+type ServiceCorrectMeetingSegment struct {
+	Kind      string   `json:"kind"`
+	MeetingId DomainId `json:"meetingId"`
+	SegmentId DomainId `json:"segmentId"`
+	Text      string   `json:"text"`
+	StartMs   int64    `json:"startMs"`
+	EndMs     int64    `json:"endMs"`
+}
+type ServiceApplyMeetingRetention struct {
+	Kind        string   `json:"kind"`
+	MeetingId   DomainId `json:"meetingId"`
+	Selected    []string `json:"selected"`
+	PreviewHash string   `json:"previewHash"`
 }
 type ServiceCreateMeeting struct {
 	Kind            string          `json:"kind"`
@@ -1391,11 +1568,12 @@ type ServiceSubmitLocalForm struct {
 	} `json:"values"`
 }
 type ServiceRunRowButton struct {
-	Kind         string   `json:"kind"`
-	CollectionId DomainId `json:"collectionId"`
-	RecordId     DomainId `json:"recordId"`
-	ButtonId     DomainId `json:"buttonId"`
-	Confirmed    bool     `json:"confirmed"`
+	Kind         string    `json:"kind"`
+	CollectionId DomainId  `json:"collectionId"`
+	RecordId     DomainId  `json:"recordId"`
+	ButtonId     DomainId  `json:"buttonId"`
+	Confirmed    bool      `json:"confirmed"`
+	OperationId  *DomainId `json:"operationId,omitempty"`
 }
 type ServiceSetPageDisplay struct {
 	Kind         string   `json:"kind"`
@@ -1421,57 +1599,113 @@ type ServiceDismissPersonalReview struct {
 	PageId DomainId `json:"pageId"`
 	RunId  DomainId `json:"runId"`
 }
+type ServiceSetCollectionLayout struct {
+	Kind         string               `json:"kind"`
+	CollectionId DomainId             `json:"collectionId"`
+	Layout       *ServiceRecordLayout `json:"layout"`
+}
+type ServiceSetRecordLayout struct {
+	Kind     string               `json:"kind"`
+	RecordId DomainId             `json:"recordId"`
+	Layout   *ServiceRecordLayout `json:"layout"`
+}
+type ServiceApplyScheduling struct {
+	Kind string                `json:"kind"`
+	Plan ServiceSchedulingPlan `json:"plan"`
+}
+type ServiceApplyOperation struct {
+	Kind        string                 `json:"kind"`
+	OperationId DomainId               `json:"operationId"`
+	Label       string                 `json:"label"`
+	Actions     []ServiceJournalAction `json:"actions"`
+}
+type ServiceUndoOperation struct {
+	Kind        string   `json:"kind"`
+	OperationId DomainId `json:"operationId"`
+}
+type ServiceReviewPage struct {
+	Kind            string                        `json:"kind"`
+	PageId          DomainId                      `json:"pageId"`
+	ContentIdentity DomainSemanticContentIdentity `json:"contentIdentity"`
+	ExpiresAt       *DomainTimestamp              `json:"expiresAt,omitempty"`
+}
+type ServiceSaveSkill struct {
+	Kind            string                 `json:"kind"`
+	SkillId         DomainId               `json:"skillId"`
+	PageId          DomainId               `json:"pageId"`
+	ExpectedVersion int64                  `json:"expectedVersion"`
+	Definition      ServiceSkillDefinition `json:"definition"`
+	Archived        bool                   `json:"archived"`
+	Imported        bool                   `json:"imported"`
+}
+type ServiceApplyAutofill struct {
+	Kind             string     `json:"kind"`
+	BatchId          DomainId   `json:"batchId"`
+	CellIds          []DomainId `json:"cellIds"`
+	OverwriteCellIds []DomainId `json:"overwriteCellIds"`
+}
 type ServiceCommandValue interface{ isServiceCommand() }
 type ServiceCommand struct{ Value ServiceCommandValue }
 
-func (ServiceCreatePage) isServiceCommand()             {}
-func (ServiceUpdatePage) isServiceCommand()             {}
-func (ServiceMovePage) isServiceCommand()               {}
-func (ServiceTrashPage) isServiceCommand()              {}
-func (ServiceInsertBlock) isServiceCommand()            {}
-func (ServiceUpdateBlock) isServiceCommand()            {}
-func (ServiceDeleteBlock) isServiceCommand()            {}
-func (ServiceMoveBlock) isServiceCommand()              {}
-func (ServiceReorderBlocks) isServiceCommand()          {}
-func (ServiceCreateCollection) isServiceCommand()       {}
-func (ServiceAddProperty) isServiceCommand()            {}
-func (ServiceCreateRecord) isServiceCommand()           {}
-func (ServiceSetFormula) isServiceCommand()             {}
-func (ServiceSetValue) isServiceCommand()               {}
-func (ServiceClearValue) isServiceCommand()             {}
-func (ServiceSaveView) isServiceCommand()               {}
-func (ServiceSetProjectScope) isServiceCommand()        {}
-func (ServiceCreateContainer) isServiceCommand()        {}
-func (ServiceLinkCollection) isServiceCommand()         {}
-func (ServiceCreateTask) isServiceCommand()             {}
-func (ServiceEnsureTasks) isServiceCommand()            {}
-func (ServicePromoteTask) isServiceCommand()            {}
-func (ServiceSetTaskStatus) isServiceCommand()          {}
-func (ServiceAttachFile) isServiceCommand()             {}
-func (ServiceCreateMeeting) isServiceCommand()          {}
-func (ServiceAppendTranscript) isServiceCommand()       {}
-func (ServiceFinalizeMeeting) isServiceCommand()        {}
-func (ServiceProposeMemory) isServiceCommand()          {}
-func (ServiceApproveMemory) isServiceCommand()          {}
-func (ServiceForgetMemory) isServiceCommand()           {}
-func (ServiceUpdateMemory) isServiceCommand()           {}
-func (ServiceSetMemoryStatus) isServiceCommand()        {}
-func (ServiceApplyImportPlan) isServiceCommand()        {}
-func (ServiceRestoreRevision) isServiceCommand()        {}
-func (ServiceApplyTemplate) isServiceCommand()          {}
-func (ServiceConfigureCollection) isServiceCommand()    {}
-func (ServiceConfigureRecord) isServiceCommand()        {}
-func (ServiceSaveAutomation) isServiceCommand()         {}
-func (ServiceRunAutomation) isServiceCommand()          {}
-func (ServiceStateAutomation) isServiceCommand()        {}
-func (ServiceConfigureP2Database) isServiceCommand()    {}
-func (ServiceSubmitLocalForm) isServiceCommand()        {}
-func (ServiceRunRowButton) isServiceCommand()           {}
-func (ServiceSetPageDisplay) isServiceCommand()         {}
-func (ServiceActivatePersonalReview) isServiceCommand() {}
-func (ServiceAcceptPersonalReview) isServiceCommand()   {}
-func (ServiceDismissPersonalReview) isServiceCommand()  {}
-func (v ServiceCommand) MarshalJSON() ([]byte, error)   { return json.Marshal(v.Value) }
+func (ServiceCreatePage) isServiceCommand()              {}
+func (ServiceUpdatePage) isServiceCommand()              {}
+func (ServiceMovePage) isServiceCommand()                {}
+func (ServiceTrashPage) isServiceCommand()               {}
+func (ServiceInsertBlock) isServiceCommand()             {}
+func (ServiceUpdateBlock) isServiceCommand()             {}
+func (ServiceDeleteBlock) isServiceCommand()             {}
+func (ServiceMoveBlock) isServiceCommand()               {}
+func (ServiceReorderBlocks) isServiceCommand()           {}
+func (ServiceCreateCollection) isServiceCommand()        {}
+func (ServiceAddProperty) isServiceCommand()             {}
+func (ServiceCreateRecord) isServiceCommand()            {}
+func (ServiceSetFormula) isServiceCommand()              {}
+func (ServiceSetValue) isServiceCommand()                {}
+func (ServiceClearValue) isServiceCommand()              {}
+func (ServiceSaveView) isServiceCommand()                {}
+func (ServiceSetProjectScope) isServiceCommand()         {}
+func (ServiceCreateContainer) isServiceCommand()         {}
+func (ServiceLinkCollection) isServiceCommand()          {}
+func (ServiceCreateTask) isServiceCommand()              {}
+func (ServiceEnsureTasks) isServiceCommand()             {}
+func (ServicePromoteTask) isServiceCommand()             {}
+func (ServiceSetTaskStatus) isServiceCommand()           {}
+func (ServiceAttachFile) isServiceCommand()              {}
+func (ServiceRecordMeetingExtraction) isServiceCommand() {}
+func (ServiceCorrectMeetingSegment) isServiceCommand()   {}
+func (ServiceApplyMeetingRetention) isServiceCommand()   {}
+func (ServiceCreateMeeting) isServiceCommand()           {}
+func (ServiceAppendTranscript) isServiceCommand()        {}
+func (ServiceFinalizeMeeting) isServiceCommand()         {}
+func (ServiceProposeMemory) isServiceCommand()           {}
+func (ServiceApproveMemory) isServiceCommand()           {}
+func (ServiceForgetMemory) isServiceCommand()            {}
+func (ServiceUpdateMemory) isServiceCommand()            {}
+func (ServiceSetMemoryStatus) isServiceCommand()         {}
+func (ServiceApplyImportPlan) isServiceCommand()         {}
+func (ServiceRestoreRevision) isServiceCommand()         {}
+func (ServiceApplyTemplate) isServiceCommand()           {}
+func (ServiceConfigureCollection) isServiceCommand()     {}
+func (ServiceConfigureRecord) isServiceCommand()         {}
+func (ServiceSaveAutomation) isServiceCommand()          {}
+func (ServiceRunAutomation) isServiceCommand()           {}
+func (ServiceStateAutomation) isServiceCommand()         {}
+func (ServiceConfigureP2Database) isServiceCommand()     {}
+func (ServiceSubmitLocalForm) isServiceCommand()         {}
+func (ServiceRunRowButton) isServiceCommand()            {}
+func (ServiceSetPageDisplay) isServiceCommand()          {}
+func (ServiceActivatePersonalReview) isServiceCommand()  {}
+func (ServiceAcceptPersonalReview) isServiceCommand()    {}
+func (ServiceDismissPersonalReview) isServiceCommand()   {}
+func (ServiceSetCollectionLayout) isServiceCommand()     {}
+func (ServiceSetRecordLayout) isServiceCommand()         {}
+func (ServiceApplyScheduling) isServiceCommand()         {}
+func (ServiceApplyOperation) isServiceCommand()          {}
+func (ServiceUndoOperation) isServiceCommand()           {}
+func (ServiceReviewPage) isServiceCommand()              {}
+func (ServiceSaveSkill) isServiceCommand()               {}
+func (ServiceApplyAutofill) isServiceCommand()           {}
+func (v ServiceCommand) MarshalJSON() ([]byte, error)    { return json.Marshal(v.Value) }
 func (v *ServiceCommand) UnmarshalJSON(data []byte) error {
 	var fields map[string]json.RawMessage
 	if err := json.Unmarshal(data, &fields); err != nil {
@@ -1645,7 +1879,7 @@ func (v *ServiceCommand) UnmarshalJSON(data []byte) error {
 		v.Value = result
 		return nil
 	}
-	if matchesVariant(fields, []string{"kind", "recordId", "statusPropertyId"}, map[string]string{"kind": "\"task.promote\""}, map[string][]string{}, []string{"kind", "recordId", "statusPropertyId"}) {
+	if matchesVariant(fields, []string{"kind", "recordId", "statusPropertyId"}, map[string]string{"kind": "\"task.promote\""}, map[string][]string{}, []string{"kind", "recordId", "statusPropertyId", "duePropertyId"}) {
 		var result ServicePromoteTask
 		if err := json.Unmarshal(data, &result); err != nil {
 			return err
@@ -1663,6 +1897,30 @@ func (v *ServiceCommand) UnmarshalJSON(data []byte) error {
 	}
 	if matchesVariant(fields, []string{"kind", "fileId", "ingestHandle", "pageId"}, map[string]string{"kind": "\"file.attach\""}, map[string][]string{}, []string{"kind", "fileId", "ingestHandle", "pageId", "blockId"}) {
 		var result ServiceAttachFile
+		if err := json.Unmarshal(data, &result); err != nil {
+			return err
+		}
+		v.Value = result
+		return nil
+	}
+	if matchesVariant(fields, []string{"kind", "proposalId", "itemId", "title", "body"}, map[string]string{"kind": "\"meeting.extraction.record\""}, map[string][]string{}, []string{"kind", "proposalId", "itemId", "title", "body"}) {
+		var result ServiceRecordMeetingExtraction
+		if err := json.Unmarshal(data, &result); err != nil {
+			return err
+		}
+		v.Value = result
+		return nil
+	}
+	if matchesVariant(fields, []string{"kind", "meetingId", "segmentId", "text", "startMs", "endMs"}, map[string]string{"kind": "\"meeting.correctSegment\""}, map[string][]string{}, []string{"kind", "meetingId", "segmentId", "text", "startMs", "endMs"}) {
+		var result ServiceCorrectMeetingSegment
+		if err := json.Unmarshal(data, &result); err != nil {
+			return err
+		}
+		v.Value = result
+		return nil
+	}
+	if matchesVariant(fields, []string{"kind", "meetingId", "selected", "previewHash"}, map[string]string{"kind": "\"meeting.retention.apply\""}, map[string][]string{}, []string{"kind", "meetingId", "selected", "previewHash"}) {
+		var result ServiceApplyMeetingRetention
 		if err := json.Unmarshal(data, &result); err != nil {
 			return err
 		}
@@ -1813,7 +2071,7 @@ func (v *ServiceCommand) UnmarshalJSON(data []byte) error {
 		v.Value = result
 		return nil
 	}
-	if matchesVariant(fields, []string{"kind", "collectionId", "recordId", "buttonId", "confirmed"}, map[string]string{"kind": "\"database.rowButtonRun\""}, map[string][]string{}, []string{"kind", "collectionId", "recordId", "buttonId", "confirmed"}) {
+	if matchesVariant(fields, []string{"kind", "collectionId", "recordId", "buttonId", "confirmed"}, map[string]string{"kind": "\"database.rowButtonRun\""}, map[string][]string{}, []string{"kind", "collectionId", "recordId", "buttonId", "confirmed", "operationId"}) {
 		var result ServiceRunRowButton
 		if err := json.Unmarshal(data, &result); err != nil {
 			return err
@@ -1853,9 +2111,265 @@ func (v *ServiceCommand) UnmarshalJSON(data []byte) error {
 		v.Value = result
 		return nil
 	}
+	if matchesVariant(fields, []string{"kind", "collectionId", "layout"}, map[string]string{"kind": "\"collection.layout.set\""}, map[string][]string{}, []string{"kind", "collectionId", "layout"}) {
+		var result ServiceSetCollectionLayout
+		if err := json.Unmarshal(data, &result); err != nil {
+			return err
+		}
+		v.Value = result
+		return nil
+	}
+	if matchesVariant(fields, []string{"kind", "recordId", "layout"}, map[string]string{"kind": "\"record.layout.set\""}, map[string][]string{}, []string{"kind", "recordId", "layout"}) {
+		var result ServiceSetRecordLayout
+		if err := json.Unmarshal(data, &result); err != nil {
+			return err
+		}
+		v.Value = result
+		return nil
+	}
+	if matchesVariant(fields, []string{"kind", "plan"}, map[string]string{"kind": "\"scheduling.apply\""}, map[string][]string{}, []string{"kind", "plan"}) {
+		var result ServiceApplyScheduling
+		if err := json.Unmarshal(data, &result); err != nil {
+			return err
+		}
+		v.Value = result
+		return nil
+	}
+	if matchesVariant(fields, []string{"kind", "operationId", "label", "actions"}, map[string]string{"kind": "\"operation.apply\""}, map[string][]string{}, []string{"kind", "operationId", "label", "actions"}) {
+		var result ServiceApplyOperation
+		if err := json.Unmarshal(data, &result); err != nil {
+			return err
+		}
+		v.Value = result
+		return nil
+	}
+	if matchesVariant(fields, []string{"kind", "operationId"}, map[string]string{"kind": "\"operation.undo\""}, map[string][]string{}, []string{"kind", "operationId"}) {
+		var result ServiceUndoOperation
+		if err := json.Unmarshal(data, &result); err != nil {
+			return err
+		}
+		v.Value = result
+		return nil
+	}
+	if matchesVariant(fields, []string{"kind", "pageId", "contentIdentity"}, map[string]string{"kind": "\"page.review\""}, map[string][]string{}, []string{"kind", "pageId", "contentIdentity", "expiresAt"}) {
+		var result ServiceReviewPage
+		if err := json.Unmarshal(data, &result); err != nil {
+			return err
+		}
+		v.Value = result
+		return nil
+	}
+	if matchesVariant(fields, []string{"kind", "skillId", "pageId", "expectedVersion", "definition", "archived", "imported"}, map[string]string{"kind": "\"skill.save\""}, map[string][]string{}, []string{"kind", "skillId", "pageId", "expectedVersion", "definition", "archived", "imported"}) {
+		var result ServiceSaveSkill
+		if err := json.Unmarshal(data, &result); err != nil {
+			return err
+		}
+		v.Value = result
+		return nil
+	}
+	if matchesVariant(fields, []string{"kind", "batchId", "cellIds", "overwriteCellIds"}, map[string]string{"kind": "\"autofill.applyReviewed\""}, map[string][]string{}, []string{"kind", "batchId", "cellIds", "overwriteCellIds"}) {
+		var result ServiceApplyAutofill
+		if err := json.Unmarshal(data, &result); err != nil {
+			return err
+		}
+		v.Value = result
+		return nil
+	}
 	return fmt.Errorf("unknown or incomplete ServiceCommand variant")
 }
 
+type ServiceSchedulingPreviewRequest struct {
+	ContractVersion int64                  `json:"contractVersion"`
+	RequestId       DomainId               `json:"requestId"`
+	WorkspaceId     DomainId               `json:"workspaceId"`
+	Input           ServiceSchedulingInput `json:"input"`
+}
+type ServiceRecordLayoutRequest struct {
+	ContractVersion int64     `json:"contractVersion"`
+	RequestId       DomainId  `json:"requestId"`
+	WorkspaceId     DomainId  `json:"workspaceId"`
+	CollectionId    DomainId  `json:"collectionId"`
+	RecordId        *DomainId `json:"recordId,omitempty"`
+}
+type ServiceRecordLayoutResult struct {
+	CollectionId       DomainId             `json:"collectionId"`
+	RecordId           *DomainId            `json:"recordId,omitempty"`
+	DefaultLayout      *ServiceRecordLayout `json:"defaultLayout"`
+	OverrideLayout     *ServiceRecordLayout `json:"overrideLayout"`
+	EffectiveLayout    ServiceRecordLayout  `json:"effectiveLayout"`
+	MissingPropertyIds []DomainId           `json:"missingPropertyIds"`
+}
+type ServiceMeetingRetentionPreviewRequest struct {
+	ContractVersion int64    `json:"contractVersion"`
+	RequestId       DomainId `json:"requestId"`
+	WorkspaceId     DomainId `json:"workspaceId"`
+	MeetingId       DomainId `json:"meetingId"`
+	Selected        []string `json:"selected"`
+}
+type ServiceMeetingRetentionCategory struct {
+	Id         string `json:"id"`
+	Count      int64  `json:"count"`
+	Action     string `json:"action"`
+	Detail     string `json:"detail"`
+	Selectable bool   `json:"selectable"`
+}
+type ServiceMeetingRetentionPreview struct {
+	Version           int64                             `json:"version"`
+	MeetingId         DomainId                          `json:"meetingId"`
+	PageId            DomainId                          `json:"pageId"`
+	Categories        []ServiceMeetingRetentionCategory `json:"categories"`
+	Selected          []string                          `json:"selected"`
+	ExpectedRevisions []ServiceExpectedRevision         `json:"expectedRevisions"`
+	Command           ServiceApplyMeetingRetention      `json:"command"`
+	Warnings          []string                          `json:"warnings"`
+	CanApply          bool                              `json:"canApply"`
+}
+type ServiceMeetingExtractionResult struct {
+	Version      int64            `json:"version"`
+	ProposalId   DomainId         `json:"proposalId"`
+	ItemId       string           `json:"itemId"`
+	MeetingId    DomainId         `json:"meetingId"`
+	EvidenceHash string           `json:"evidenceHash"`
+	Kind         string           `json:"kind"`
+	Title        string           `json:"title"`
+	Body         string           `json:"body"`
+	PageId       DomainId         `json:"pageId"`
+	RecordId     *DomainId        `json:"recordId,omitempty"`
+	AppliedAt    *DomainTimestamp `json:"appliedAt,omitempty"`
+	Stale        bool             `json:"stale"`
+}
+type ServiceMeetingExtractionApplyResult struct {
+	PageId     DomainId `json:"pageId"`
+	RecordId   string   `json:"recordId"`
+	Kind       string   `json:"kind"`
+	ProposalId DomainId `json:"proposalId"`
+	ItemId     string   `json:"itemId"`
+	Reused     bool     `json:"reused"`
+}
+type ServiceMeetingExtractionPrepareRequest struct {
+	ContractVersion int64     `json:"contractVersion"`
+	RequestId       DomainId  `json:"requestId"`
+	WorkspaceId     DomainId  `json:"workspaceId"`
+	MeetingId       DomainId  `json:"meetingId"`
+	Kind            string    `json:"kind"`
+	DraftId         *DomainId `json:"draftId,omitempty"`
+	ItemIndex       *int64    `json:"itemIndex,omitempty"`
+}
+type ServiceMeetingExtractionListRequest struct {
+	ContractVersion int64    `json:"contractVersion"`
+	RequestId       DomainId `json:"requestId"`
+	WorkspaceId     DomainId `json:"workspaceId"`
+	MeetingId       DomainId `json:"meetingId"`
+}
+type ServiceMeetingExtractionCreateRequest struct {
+	ContractVersion int64     `json:"contractVersion"`
+	RequestId       DomainId  `json:"requestId"`
+	WorkspaceId     DomainId  `json:"workspaceId"`
+	MeetingId       DomainId  `json:"meetingId"`
+	EvidenceHash    string    `json:"evidenceHash"`
+	Kind            string    `json:"kind"`
+	Title           string    `json:"title"`
+	Body            string    `json:"body"`
+	ProposalId      *DomainId `json:"proposalId,omitempty"`
+	ItemId          *string   `json:"itemId,omitempty"`
+}
+type ServiceNativeAudioInput struct {
+	Id        string `json:"id"`
+	Name      string `json:"name"`
+	IsDefault bool   `json:"isDefault"`
+}
+type ServiceNativeCaptureControlAck struct {
+	ControlId       DomainId `json:"controlId"`
+	Action          string   `json:"action"`
+	State           string   `json:"state"`
+	Bytes           int64    `json:"bytes"`
+	CapturedSamples int64    `json:"capturedSamples"`
+	DurationMs      int64    `json:"durationMs"`
+}
+type ServiceNativeRecordingGap struct {
+	Id           DomainId         `json:"id"`
+	Kind         string           `json:"kind"`
+	SampleOffset int64            `json:"sampleOffset"`
+	StartedAt    DomainTimestamp  `json:"startedAt"`
+	EndedAt      *DomainTimestamp `json:"endedAt,omitempty"`
+	DurationMs   *int64           `json:"durationMs,omitempty"`
+	Reason       *string          `json:"reason,omitempty"`
+}
+type ServiceNativeRecordingDraft struct {
+	Version                  *int64                      `json:"version,omitempty"`
+	Id                       DomainId                    `json:"id"`
+	Title                    string                      `json:"title"`
+	ActorId                  DomainId                    `json:"actorId"`
+	StartedAt                DomainTimestamp             `json:"startedAt"`
+	State                    string                      `json:"state"`
+	Bytes                    int64                       `json:"bytes"`
+	DurationMs               int64                       `json:"durationMs"`
+	PageId                   DomainId                    `json:"pageId"`
+	MeetingId                DomainId                    `json:"meetingId"`
+	FileId                   *DomainId                   `json:"fileId,omitempty"`
+	Error                    *string                     `json:"error,omitempty"`
+	InputDeviceId            *string                     `json:"inputDeviceId,omitempty"`
+	DisclosureAcknowledgedAt *DomainTimestamp            `json:"disclosureAcknowledgedAt,omitempty"`
+	LastControlId            *DomainId                   `json:"lastControlId,omitempty"`
+	Gaps                     []ServiceNativeRecordingGap `json:"gaps,omitempty"`
+	Segments                 []struct {
+		StartByte int64  `json:"startByte"`
+		EndByte   int64  `json:"endByte"`
+		Sha256    string `json:"sha256"`
+	} `json:"segments"`
+}
+type ServiceNativeBackupProgress struct {
+	Version    int64  `json:"version"`
+	Phase      string `json:"phase"`
+	Bytes      string `json:"bytes"`
+	TotalBytes string `json:"totalBytes"`
+}
+type ServiceNativeBackupSummary struct {
+	Version     int64    `json:"version"`
+	Format      string   `json:"format"`
+	Included    []string `json:"included"`
+	Excluded    []string `json:"excluded"`
+	Restoration []string `json:"restoration"`
+}
+type ServiceAutofillCreateRequest struct {
+	ContractVersion int64                `json:"contractVersion"`
+	RequestId       DomainId             `json:"requestId"`
+	WorkspaceId     DomainId             `json:"workspaceId"`
+	Input           ServiceAutofillInput `json:"input"`
+}
+type ServiceAutofillControlRequest struct {
+	ContractVersion int64    `json:"contractVersion"`
+	RequestId       DomainId `json:"requestId"`
+	WorkspaceId     DomainId `json:"workspaceId"`
+	BatchId         DomainId `json:"batchId"`
+}
+type ServiceAutofillListRequest struct {
+	ContractVersion int64    `json:"contractVersion"`
+	RequestId       DomainId `json:"requestId"`
+	WorkspaceId     DomainId `json:"workspaceId"`
+	CollectionId    DomainId `json:"collectionId"`
+}
+type ServiceAutofillApplyRequest struct {
+	ContractVersion  int64      `json:"contractVersion"`
+	RequestId        DomainId   `json:"requestId"`
+	WorkspaceId      DomainId   `json:"workspaceId"`
+	BatchId          DomainId   `json:"batchId"`
+	CellIds          []DomainId `json:"cellIds"`
+	OverwriteCellIds []DomainId `json:"overwriteCellIds"`
+}
+type ServiceSkillsListRequest struct {
+	ContractVersion int64     `json:"contractVersion"`
+	RequestId       DomainId  `json:"requestId"`
+	WorkspaceId     DomainId  `json:"workspaceId"`
+	SkillId         *DomainId `json:"skillId,omitempty"`
+}
+type ServiceSkillPreviewRequest struct {
+	ContractVersion int64                    `json:"contractVersion"`
+	RequestId       DomainId                 `json:"requestId"`
+	WorkspaceId     DomainId                 `json:"workspaceId"`
+	Skill           ServiceSkillRunReference `json:"skill"`
+	Provider        string                   `json:"provider"`
+}
 type ServiceAutomationOptionsRequest struct {
 	ContractVersion int64    `json:"contractVersion"`
 	RequestId       DomainId `json:"requestId"`
@@ -1942,6 +2456,59 @@ type ServiceDatabaseChartRequest struct {
 	RequestId       DomainId `json:"requestId"`
 	WorkspaceId     DomainId `json:"workspaceId"`
 	CollectionId    DomainId `json:"collectionId"`
+}
+type ServiceOperationsListResult struct {
+	Operations []struct {
+		Id        DomainId        `json:"id"`
+		Label     string          `json:"label"`
+		CreatedAt DomainTimestamp `json:"createdAt"`
+		State     string          `json:"state"`
+	} `json:"operations"`
+}
+type ServiceOperationsListRequest struct {
+	ContractVersion int64    `json:"contractVersion"`
+	RequestId       DomainId `json:"requestId"`
+	WorkspaceId     DomainId `json:"workspaceId"`
+	PageId          DomainId `json:"pageId"`
+}
+type ServiceOperationPreviewUndoRequest struct {
+	ContractVersion int64    `json:"contractVersion"`
+	RequestId       DomainId `json:"requestId"`
+	WorkspaceId     DomainId `json:"workspaceId"`
+	OperationId     DomainId `json:"operationId"`
+}
+type ServiceOperationPreviewUndoResult struct {
+	OperationId       DomainId                  `json:"operationId"`
+	Label             string                    `json:"label"`
+	Actions           []ServiceJournalAction    `json:"actions"`
+	ExpectedRevisions []ServiceExpectedRevision `json:"expectedRevisions"`
+	Command           ServiceUndoOperation      `json:"command"`
+}
+type ServicePageFreshnessRequest struct {
+	ContractVersion int64    `json:"contractVersion"`
+	RequestId       DomainId `json:"requestId"`
+	WorkspaceId     DomainId `json:"workspaceId"`
+	PageId          DomainId `json:"pageId"`
+}
+type ServicePageFreshnessResult struct {
+	PageId    DomainId                 `json:"pageId"`
+	Freshness DomainPageFreshness      `json:"freshness"`
+	History   []DomainHumanReviewEvent `json:"history"`
+}
+type ServiceReviewQueueRequest struct {
+	ContractVersion int64     `json:"contractVersion"`
+	RequestId       DomainId  `json:"requestId"`
+	WorkspaceId     DomainId  `json:"workspaceId"`
+	AfterPageId     *DomainId `json:"afterPageId,omitempty"`
+	Limit           int64     `json:"limit"`
+}
+type ServiceReviewQueueResult struct {
+	Items []struct {
+		PageId    DomainId            `json:"pageId"`
+		Title     string              `json:"title"`
+		Freshness DomainPageFreshness `json:"freshness"`
+	} `json:"items"`
+	NextPageId *DomainId `json:"nextPageId,omitempty"`
 }
 type ServicePageDisplayGetRequest struct {
 	ContractVersion int64    `json:"contractVersion"`
@@ -2411,11 +2978,12 @@ type ServiceSearchRequest struct {
 	Mode            string      `json:"mode"`
 }
 type ServiceSearchHit struct {
-	Location    DomainLocation `json:"location"`
-	Excerpt     string         `json:"excerpt"`
-	ContentHash string         `json:"contentHash"`
-	Score       float64        `json:"score"`
-	SourceState string         `json:"sourceState"`
+	Location    DomainLocation       `json:"location"`
+	Excerpt     string               `json:"excerpt"`
+	ContentHash string               `json:"contentHash"`
+	Score       float64              `json:"score"`
+	SourceState string               `json:"sourceState"`
+	Freshness   *DomainPageFreshness `json:"freshness,omitempty"`
 }
 type ServiceSearchResult struct {
 	Hits            []ServiceSearchHit `json:"hits"`
@@ -2430,11 +2998,12 @@ type ServiceResolveCitationRequest struct {
 	Location        DomainLocation `json:"location"`
 }
 type ServiceResolveCitationResult struct {
-	Location              DomainLocation  `json:"location"`
-	State                 string          `json:"state"`
-	CurrentRevision       *DomainRevision `json:"currentRevision,omitempty"`
-	Excerpt               *string         `json:"excerpt,omitempty"`
-	HistoricalSnapshotRef *DomainId       `json:"historicalSnapshotRef,omitempty"`
+	Location              DomainLocation       `json:"location"`
+	State                 string               `json:"state"`
+	CurrentRevision       *DomainRevision      `json:"currentRevision,omitempty"`
+	Excerpt               *string              `json:"excerpt,omitempty"`
+	HistoricalSnapshotRef *DomainId            `json:"historicalSnapshotRef,omitempty"`
+	Freshness             *DomainPageFreshness `json:"freshness,omitempty"`
 }
 type ServiceReadEventsRequest struct {
 	ContractVersion int64    `json:"contractVersion"`
@@ -2978,18 +3547,19 @@ type ServiceProviderDiscoverRequest struct {
 	Provider        string   `json:"provider"`
 }
 type ServiceProviderManagedStartRequest struct {
-	ContractVersion int64      `json:"contractVersion"`
-	RequestId       DomainId   `json:"requestId"`
-	WorkspaceId     DomainId   `json:"workspaceId"`
-	Provider        string     `json:"provider"`
-	RegistrationId  string     `json:"registrationId"`
-	BillingMode     string     `json:"billingMode"`
-	Model           string     `json:"model"`
-	Prompt          string     `json:"prompt"`
-	PageIds         []DomainId `json:"pageIds"`
-	Tools           []string   `json:"tools"`
-	PreviewHash     string     `json:"previewHash"`
-	ResumeRunId     *DomainId  `json:"resumeRunId,omitempty"`
+	ContractVersion int64                     `json:"contractVersion"`
+	RequestId       DomainId                  `json:"requestId"`
+	WorkspaceId     DomainId                  `json:"workspaceId"`
+	Provider        string                    `json:"provider"`
+	RegistrationId  string                    `json:"registrationId"`
+	BillingMode     string                    `json:"billingMode"`
+	Model           string                    `json:"model"`
+	Prompt          string                    `json:"prompt"`
+	PageIds         []DomainId                `json:"pageIds"`
+	Tools           []string                  `json:"tools"`
+	PreviewHash     string                    `json:"previewHash"`
+	ResumeRunId     *DomainId                 `json:"resumeRunId,omitempty"`
+	Skill           *ServiceSkillRunReference `json:"skill,omitempty"`
 }
 type ServiceProviderManagedCancelRequest struct {
 	ContractVersion int64    `json:"contractVersion"`
@@ -3631,6 +4201,42 @@ type DomainImportIdentityResolutionVariant1 struct {
 }
 type DomainImportIdentityResolutionVariant2 struct {
 	Choice string `json:"choice"`
+}
+type ServiceJournalActionVariant1 struct {
+	Kind       string   `json:"kind"`
+	RecordId   DomainId `json:"recordId"`
+	PropertyId DomainId `json:"propertyId"`
+	Value      struct {
+		Type          string          `json:"type"`
+		SchemaVersion int64           `json:"schemaVersion"`
+		Value         json.RawMessage `json:"value"`
+	} `json:"value"`
+}
+type ServiceJournalActionVariant2 struct {
+	Kind       string   `json:"kind"`
+	RecordId   DomainId `json:"recordId"`
+	PropertyId DomainId `json:"propertyId"`
+}
+type ServiceJournalActionVariant3 struct {
+	Kind   string   `json:"kind"`
+	PageId DomainId `json:"pageId"`
+	Title  string   `json:"title"`
+}
+type ServiceJournalActionVariant4 struct {
+	Kind         string   `json:"kind"`
+	PageId       DomainId `json:"pageId"`
+	FullWidth    bool     `json:"fullWidth"`
+	Presentation bool     `json:"presentation"`
+}
+type ServiceJournalActionVariant5 struct {
+	Kind         string               `json:"kind"`
+	CollectionId DomainId             `json:"collectionId"`
+	Layout       *ServiceRecordLayout `json:"layout"`
+}
+type ServiceJournalActionVariant6 struct {
+	Kind     string               `json:"kind"`
+	RecordId DomainId             `json:"recordId"`
+	Layout   *ServiceRecordLayout `json:"layout"`
 }
 type ServiceAutomationActionVariant1 struct {
 	Kind         string  `json:"kind"`

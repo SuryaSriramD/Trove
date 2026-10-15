@@ -107,7 +107,7 @@ def validate_native(root, target, lock):
                 raise ValueError('Native runtime differs from baseline')
         else:
             sidecar=json.loads((root/'microphone-worker.json').read_text())
-            if sidecar.get('schemaVersion')!=1 or sidecar.get('platform')!=target.split('-')[0] or sidecar.get('helper')!=helper or helper.get('runtime')!='microphone' or helper.get('runtimeCommit')!='miniaudio-0.11.25-trove-microphone-v1' or sidecar.get('testOnly') is not False or sidecar.get('deviceBackendCompiled') is not True:
+            if sidecar.get('schemaVersion')!=1 or sidecar.get('platform')!=target.split('-')[0] or sidecar.get('helper')!=helper or helper.get('runtime')!='microphone' or helper.get('runtimeCommit')!='miniaudio-0.11.25-trove-microphone-v2' or sidecar.get('testOnly') is not False or sidecar.get('deviceBackendCompiled') is not True:
                 raise ValueError('Production microphone provenance is missing or test-only')
     if not {'llama-worker','whisper-worker','vision-worker'}.issubset(seen):
         raise ValueError('Core local workers are missing')

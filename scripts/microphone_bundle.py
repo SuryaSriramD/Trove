@@ -12,7 +12,7 @@ def microphone_record(output, target):
     expected = {'name': 'microphone-worker', 'runtime': 'microphone',
                 'runtimeCommit': pin['runtimeCommit'], 'architecture': TARGETS[target]['arch']}
     helper = sidecar.get('helper')
-    if sidecar.get('schemaVersion') != 1 or sidecar.get('platform') != TARGETS[target]['os'] or sidecar.get('testOnly') is not False or sidecar.get('deviceBackendCompiled') is not True or sidecar.get('capabilities') != ['record'] or not isinstance(helper, dict):
+    if sidecar.get('schemaVersion') != 1 or sidecar.get('platform') != TARGETS[target]['os'] or sidecar.get('testOnly') is not False or sidecar.get('deviceBackendCompiled') is not True or sidecar.get('capabilities') != ['record', 'capture_controls_v1', 'input_devices_v1'] or not isinstance(helper, dict):
         raise RuntimeError('A matching production microphone sidecar is required.')
     if set(helper) != set(expected) | {'sha256'} or any(helper.get(k) != v for k, v in expected.items()):
         raise RuntimeError('Microphone runtime identity differs from the production pin.')
