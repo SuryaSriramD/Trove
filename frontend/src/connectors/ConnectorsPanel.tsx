@@ -11,6 +11,7 @@ import {
 } from "../api";
 import { ImportExportPanel } from "../imports/ImportExportPanel";
 import { NotionCapturePanel } from "../imports/NotionCapturePanel";
+import { AIPanel } from "../ai/AIPanel";
 import "./connectors.css";
 
 type Account = S.ConnectorAccount;
@@ -117,6 +118,10 @@ function Connections({
   const [query, setQuery] = useState("");
   const [sources, setSources] = useState<Source[]>([]);
   const [preview, setPreview] = useState<Source>();
+  const [aiSources, setAISources] = useState<
+    { reference: S.ConnectedSourceReference; title: string }[]
+  >([]);
+  const [aiOpen, setAIOpen] = useState(false);
   const [planId, setPlanId] = useState("");
   const [proposal, setProposal] = useState<Proposal>();
   const [error, setError] = useState("");
@@ -206,6 +211,8 @@ function Connections({
     setCursor("");
     setHistory(emptyHistory);
     setPreview(undefined);
+    setAISources([]);
+    setAIOpen(false);
     setProposal(undefined);
     setAcquired(undefined);
     setAcquisitionFormat("");
@@ -994,6 +1001,35 @@ function Connections({
           >
             Review import into Trove
           </button>
+          <button
+            disabled={
+              busy ||
+              !["present", "partial"].includes(preview.state) ||
+              aiSources.length >= 12
+            }
+            onClick={() =>
+              void act(async (stamp) => {
+                const reference = await request<S.ConnectedSourceReference>(
+                  "connectors.contextReference",
+                  {
+                    snapshotId: preview.id,
+                    expectedRevision: preview.remoteRevision,
+                  },
+                );
+                if (current(stamp)) {
+                  setAISources((old) => [
+                    ...old.filter(
+                      (s) => s.reference.snapshotId !== reference.snapshotId,
+                    ),
+                    { reference, title: preview.title },
+                  ]);
+                  setAIOpen(false);
+                }
+              })
+            }
+          >
+            Select for local AI
+          </button>
           {previewKind === "notion" &&
             (notionRootKind === "page" ||
               notionRootKind === "database" ||
@@ -1117,6 +1153,43 @@ function Connections({
                 Attach acquired file
               </button>
             </div>
+          )}
+        </section>
+      )}
+      {aiSources.length > 0 && (
+        <section aria-label="Selected local AI sources">
+          <h2>Local AI source selection</h2>
+          <ul>
+            {aiSources.map((source) => (
+              <li key={source.reference.snapshotId}>
+                {source.title}
+                <button
+                  onClick={() => {
+                    setAISources((old) =>
+                      old.filter(
+                        (s) =>
+                          s.reference.snapshotId !==
+                          source.reference.snapshotId,
+                      ),
+                    );
+                    setAIOpen(false);
+                  }}
+                >
+                  Remove {source.title}
+                </button>
+              </li>
+            ))}
+          </ul>
+          <button onClick={() => setAIOpen((open) => !open)}>
+            {aiOpen ? "Close local AI" : "Ask local AI about selected sources"}
+          </button>
+          {aiOpen && (
+            <AIPanel
+              workspace={workspace}
+              connectedSources={aiSources}
+              onNavigate={(location) => onOpenPage(location.pageId)}
+              onCommitted={onChanged}
+            />
           )}
         </section>
       )}

@@ -1,6 +1,6 @@
 import type { SkillExecution } from "./SkillsPanel";
 import { freshnessLabel, useReviewClock } from "../PageFreshness";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
   batch,
   dispatch,
@@ -24,7 +24,8 @@ import {
 type Citation = {
   number: number;
   title: string;
-  location: Location;
+  location?: Location;
+  connected?: S.ConnectedEvidence;
   state: string;
 };
 type Source = Citation & {
@@ -39,6 +40,7 @@ type Run = {
   state: string;
   request: {
     skill?: S.SkillRunReference;
+    connectedSources?: S.ConnectedSourceReference[];
     mode: string;
     prompt: string;
     pageId?: string;
@@ -68,6 +70,7 @@ type Pack = {
   qualificationOnly?: boolean;
 };
 export type AIPanelProps = {
+  connectedSources?: { reference: S.ConnectedSourceReference; title: string }[];
   skill?: SkillExecution;
   workspace: WorkspaceSnapshot;
   pageId?: string;
@@ -83,7 +86,17 @@ const plainText = (value: unknown): string => {
   return "";
 };
 
-export function AIPanel({
+export function AIPanel(props: AIPanelProps) {
+  return (
+    <AIContext
+      key={`${props.workspace.workspaceId}:${props.workspace.scopeGrantId}:${props.pageId ?? ""}:${props.skill?.reference.invocationId ?? ""}:${JSON.stringify(props.connectedSources ?? [])}`}
+      {...props}
+    />
+  );
+}
+
+function AIContext({
+  connectedSources = [],
   skill,
   workspace,
   pageId,
@@ -91,7 +104,28 @@ export function AIPanel({
   onCommitted,
 }: AIPanelProps) {
   useReviewClock();
-  const [scope, setScope] = useState(pageId ? "page" : "workspace"),
+  const connectedOnly = connectedSources.length > 0 && !pageId;
+  const alive = useRef(true);
+  useEffect(() => {
+    alive.current = true;
+    return () => {
+      alive.current = false;
+    };
+  }, []);
+  async function request<T>(method: string, data?: unknown): Promise<T> {
+    if (!alive.current) throw new Error("AI context changed");
+    const result = await dispatch<T>(method, data);
+    if (!alive.current) throw new Error("AI context changed");
+    return result;
+  }
+  const matchesRun = (r: Run) =>
+    (!skill || r.request.skill?.skillId === skill.reference.skillId) &&
+    (!connectedSources.length ||
+      JSON.stringify(r.request.connectedSources ?? []) ===
+        JSON.stringify(connectedSources.map((s) => s.reference)));
+  const [scope, setScope] = useState(
+      connectedOnly ? "connected" : pageId ? "page" : "workspace",
+    ),
     [project, setProject] = useState("");
   const [mode, setMode] = useState(skill?.mode ?? "answer"),
     [prompt, setPrompt] = useState(skill?.prompt ?? ""),
@@ -99,7 +133,7 @@ export function AIPanel({
     [block, setBlock] = useState("");
   const [models, setModels] = useState<Pack[]>([]),
     [model, setModel] = useState(""),
-    [useMemory, setUseMemory] = useState(!skill);
+    [useMemory, setUseMemory] = useState(!skill && !connectedOnly);
   const [runs, setRuns] = useState<Run[]>([]),
     [current, setCurrent] = useState<Run | null>(null),
     [conversation, setConversation] = useState("");
@@ -107,13 +141,17 @@ export function AIPanel({
     [busy, setBusy] = useState(false),
     [draft, setDraft] = useState(""),
     [title, setTitle] = useState("");
+  const [preparing, setPreparing] = useState("");
   const [action, setAction] = useState("append"),
     [proposal, setProposal] = useState<Proposal | null>(null);
   const page = workspace.pages.find((p) => p.id === pageId),
     blocks = workspace.blocks.filter((b) => b.pageId === pageId);
   const running = current?.state === "running";
+  const selectedRun = useRef<Run | null>(null);
+  selectedRun.current = current;
+  const selectionVersion = useRef(0);
   useEffect(() => {
-    dispatch<{ packs: { pack: Pack; state: string }[] }>("models.list")
+    request<{ packs: { pack: Pack; state: string }[] }>("models.list")
       .then((r) => {
         const ready = r.packs
           .filter(
@@ -134,32 +172,29 @@ export function AIPanel({
       .catch(() => {});
   }, []);
   async function loadRuns() {
-    const all = await dispatch<Run[]>("ai.runs", envelope(workspace));
-    const r = all.filter(
-      (r) => !skill || r.request.skill?.skillId === skill.reference.skillId,
-    );
+    const all = await request<Run[]>("ai.runs", envelope(workspace));
+    const r = all.filter(matchesRun);
     setRuns(r);
     return r;
   }
   useEffect(() => {
     let active = true;
-    dispatch<Run[]>("ai.runs", envelope(workspace))
+    const version = selectionVersion.current;
+    request<Run[]>("ai.runs", envelope(workspace))
       .then((r) => {
         if (active) {
-          const matching = r.filter(
-            (r) =>
-              !skill || r.request.skill?.skillId === skill.reference.skillId,
-          );
+          const matching = r.filter(matchesRun);
           setRuns(matching);
-          setCurrent(
-            skill
-              ? (matching.find(
-                  (r) =>
-                    r.request.skill?.invocationId ===
-                    skill.reference.invocationId,
-                ) ?? null)
-              : (matching[0] ?? null),
-          );
+          if (selectionVersion.current === version)
+            setCurrent(
+              skill
+                ? (matching.find(
+                    (r) =>
+                      r.request.skill?.invocationId ===
+                      skill.reference.invocationId,
+                  ) ?? null)
+                : (matching[0] ?? null),
+            );
         }
       })
       .catch((e) => setError(String(e)));
@@ -170,7 +205,7 @@ export function AIPanel({
   useEffect(() => {
     if (!current || current.state === "running") return;
     let live = true;
-    dispatch<Run>("ai.run", { ...envelope(workspace), runId: current.id })
+    request<Run>("ai.run", { ...envelope(workspace), runId: current.id })
       .then((r) => {
         if (live) setCurrent(r);
       })
@@ -195,7 +230,11 @@ export function AIPanel({
           state?: string;
           error?: string;
         };
-        if (e.workspaceId !== workspace.workspaceId) return;
+        if (
+          e.workspaceId !== workspace.workspaceId ||
+          (e.run && !matchesRun(e.run))
+        )
+          return;
         setCurrent((c) =>
           c?.id === e.runId
             ? (e.run ?? {
@@ -207,7 +246,7 @@ export function AIPanel({
             : c,
         );
         if (e.run) {
-          setDraft(e.run.text);
+          if (selectedRun.current?.id === e.runId) setDraft(e.run.text);
           setRuns((r) => [e.run!, ...r.filter((v) => v.id !== e.runId)]);
         }
       }),
@@ -216,8 +255,9 @@ export function AIPanel({
   useEffect(() => {
     if (!running || !current) return;
     const timer = setInterval(() => {
-      dispatch<Run>("ai.run", { ...envelope(workspace), runId: current.id })
+      request<Run>("ai.run", { ...envelope(workspace), runId: current.id })
         .then((r) => {
+          if (selectedRun.current?.id !== r.id || !matchesRun(r)) return;
           if (r.state !== "running") {
             setCurrent(r);
             setDraft(r.text);
@@ -229,17 +269,23 @@ export function AIPanel({
     return () => clearInterval(timer);
   }, [current?.id, running, workspace.workspaceId]);
   async function start() {
+    selectionVersion.current++;
+    const headers = envelope(workspace);
+    setPreparing(headers.requestId);
     setBusy(true);
     setError("");
     setProposal(null);
     try {
-      const r = await dispatch<Run>("ai.start", {
-        ...envelope(workspace),
+      const r = await request<Run>("ai.start", {
+        ...headers,
         mode,
         prompt,
         ...(skill ? { skill: skill.reference } : {}),
         modelPackId: model,
         useMemory,
+        ...(connectedSources.length
+          ? { connectedSources: connectedSources.map((s) => s.reference) }
+          : {}),
         ...(conversation ? { conversationId: conversation } : {}),
         ...(scope === "page" && pageId
           ? { pageId, ...(block ? { blockId: block } : {}), selection }
@@ -252,12 +298,14 @@ export function AIPanel({
     } catch (e) {
       setError(String(e));
     } finally {
+      setPreparing("");
       setBusy(false);
     }
   }
   async function openCitation(c: Citation) {
+    if (!c.location || c.connected) return;
     try {
-      const result = await dispatch<{ state: string }>("resolveCitation", {
+      const result = await request<{ state: string }>("resolveCitation", {
         ...envelope(workspace),
         location: c.location,
       });
@@ -277,7 +325,7 @@ export function AIPanel({
     try {
       if (action === "mermaid")
         await validateMermaidDraft(draft || current.text);
-      const p = await dispatch<Proposal>("ai.prepareAction", {
+      const p = await request<Proposal>("ai.prepareAction", {
         ...envelope(workspace),
         runId: current.id,
         kind:
@@ -300,14 +348,14 @@ export function AIPanel({
     if (!proposal) return;
     setBusy(true);
     try {
-      const result = await dispatch<{ pageId: string }>("ai.applyAction", {
+      const result = await request<{ pageId: string }>("ai.applyAction", {
         ...envelope(workspace),
         proposalId: proposal.id,
       });
       setProposal(null);
       await onCommitted();
       if (!result.pageId) return;
-      const fresh = await dispatch<{ page: { revision: string } }>("readPage", {
+      const fresh = await request<{ page: { revision: string } }>("readPage", {
         ...envelope(workspace),
         pageId: result.pageId,
       });
@@ -335,6 +383,14 @@ export function AIPanel({
         Ask about your sources, write a draft, and review changes before
         applying them.
       </p>
+      {connectedSources.length > 0 && (
+        <p role="note">
+          Selected external evidence:{" "}
+          {connectedSources.map((s) => s.title).join(", ")}. Access and source
+          revisions are checked before generation and publication. This run uses
+          the local model.
+        </p>
+      )}
       <div className="ai-controls">
         {!skill && (
           <>
@@ -343,11 +399,15 @@ export function AIPanel({
               value={scope}
               onChange={(e) => setScope(e.target.value)}
             >
-              <option value="workspace">Workspace</option>
+              {connectedOnly ? (
+                <option value="connected">Selected connected sources</option>
+              ) : (
+                <option value="workspace">Workspace</option>
+              )}
               <option value="page" disabled={!page}>
                 Current page{page ? ` · ${page.title}` : ""}
               </option>
-              <option value="project">Project</option>
+              {!connectedOnly && <option value="project">Project</option>}
             </select>
             {scope === "project" && (
               <select
@@ -455,7 +515,7 @@ export function AIPanel({
           <input
             type="checkbox"
             checked={useMemory}
-            disabled={!!skill}
+            disabled={!!skill || connectedOnly}
             onChange={(e) => setUseMemory(e.target.checked)}
           />{" "}
           Use approved memory
@@ -472,10 +532,25 @@ export function AIPanel({
         >
           Generate locally
         </button>
+        {preparing && (
+          <>
+            <span role="status">Preparing and checking selected sources…</span>
+            <button
+              onClick={() =>
+                request("ai.cancel", {
+                  ...envelope(workspace),
+                  runId: preparing,
+                }).catch((e) => setError(String(e)))
+              }
+            >
+              Cancel preparation
+            </button>
+          </>
+        )}
         {running && (
           <button
             onClick={() =>
-              dispatch("ai.cancel", {
+              request("ai.cancel", {
                 ...envelope(workspace),
                 runId: current.id,
               }).catch((e) => setError(String(e)))
@@ -485,8 +560,9 @@ export function AIPanel({
           </button>
         )}
         <button
-          disabled={running}
+          disabled={running || busy}
           onClick={() => {
+            selectionVersion.current++;
             setConversation("");
             setCurrent(null);
             setProposal(null);
@@ -524,7 +600,25 @@ export function AIPanel({
                 const c = current.citations.find(
                   (c) => `[${c.number}]` === part,
                 );
-                return c ? (
+                return c?.connected ? (
+                  /^https:\/\//.test(c.connected.url) ? (
+                    <a
+                      className="ai-citation"
+                      key={i}
+                      href={c.connected.url}
+                      target="_blank"
+                      rel="noreferrer"
+                      title={`${c.title} · access checked ${c.connected.checkedAt}`}
+                    >
+                      {part}
+                      {c.state !== "current" ? " stale" : ""}
+                    </a>
+                  ) : (
+                    <span key={i}>
+                      {part} · {c.title}
+                    </span>
+                  )
+                ) : c ? (
                   <button
                     className="ai-citation"
                     key={i}
@@ -547,13 +641,38 @@ export function AIPanel({
             <summary>Source context · {current.sources.length}</summary>
             {current.sources.map((s) => (
               <div className="ai-source" key={s.number}>
-                <button
-                  disabled={!!s.state && s.state !== "current"}
-                  onClick={() => openCitation(s)}
-                >
-                  [{s.number}] {s.title}
-                  {s.state && s.state !== "current" ? " · source changed" : ""}
-                </button>
+                {s.connected ? (
+                  <>
+                    <span>
+                      [{s.number}] {s.title} · {s.connected.provider}
+                      {s.connected.partial ? " · partial source" : ""}
+                    </span>
+                    <small>
+                      Access checked{" "}
+                      {new Date(s.connected.checkedAt).toLocaleString()} ·
+                      revision {s.connected.remoteRevision}
+                    </small>
+                    {/^https:\/\//.test(s.connected.url) && (
+                      <a
+                        href={s.connected.url}
+                        target="_blank"
+                        rel="noreferrer"
+                      >
+                        Open external source
+                      </a>
+                    )}
+                  </>
+                ) : (
+                  <button
+                    disabled={!!s.state && s.state !== "current"}
+                    onClick={() => openCitation(s)}
+                  >
+                    [{s.number}] {s.title}
+                    {s.state && s.state !== "current"
+                      ? " · source changed"
+                      : ""}
+                  </button>
+                )}
                 {s.freshness && (
                   <small>
                     {freshnessLabel(s.freshness)} · human review status
@@ -677,6 +796,7 @@ export function AIPanel({
             className="ai-history"
             key={r.id}
             onClick={() => {
+              selectionVersion.current++;
               setCurrent(r);
               setDraft(r.text);
               setConversation(r.conversationId);
@@ -688,7 +808,7 @@ export function AIPanel({
           </button>
         ))}
       </details>
-      {!skill && (
+      {!skill && !connectedOnly && (
         <MemoryPanel
           workspace={workspace}
           pageId={pageId}
