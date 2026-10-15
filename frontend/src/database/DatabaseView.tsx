@@ -1,3 +1,5 @@
+import { RecordLayout } from "./RecordLayout";
+import { SchedulingPanel } from "./SchedulingPanel";
 import { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import {
   qualificationFrames,
@@ -572,6 +574,7 @@ export default function DatabaseView({
           onError={onError}
         />
       )}
+      {collection && <><RecordLayout workspace={w} collectionId={collection.id} onCommitted={onCommitted} onError={onError} /><SchedulingPanel key={collection.id} workspace={w} collection={collection} records={records} onCommitted={onCommitted} onError={onError} /></>}
       <div className="db-header">
         <div>
           {!collectionId && (
@@ -893,7 +896,7 @@ export default function DatabaseView({
     </section>
   );
 }
-function ValueEditor({
+export function ValueEditor({
   property: p,
   value,
   workspace: w,
