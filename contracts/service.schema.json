@@ -5483,6 +5483,123 @@
       ],
       "additionalProperties": false
     },
+    "ConnectedSourceReference": {
+      "type": "object",
+      "properties": {
+        "snapshotId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 2048
+        },
+        "remoteRevision": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 2048
+        },
+        "contentHash": {
+          "$ref": "domain.schema.json#/$defs/Hash"
+        }
+      },
+      "required": [
+        "snapshotId",
+        "remoteRevision",
+        "contentHash"
+      ],
+      "additionalProperties": false
+    },
+    "ConnectedEvidence": {
+      "type": "object",
+      "properties": {
+        "version": {
+          "const": 1
+        },
+        "receiptId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "snapshotId": {
+          "type": "string",
+          "maxLength": 2048
+        },
+        "accountId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "accountRevision": {
+          "type": "string"
+        },
+        "selectionId": {
+          "type": "string",
+          "maxLength": 2048
+        },
+        "provider": {
+          "type": "string",
+          "enum": [
+            "google_calendar",
+            "google_drive",
+            "gmail",
+            "github",
+            "notion",
+            "mcp"
+          ]
+        },
+        "remoteId": {
+          "type": "string",
+          "maxLength": 2048
+        },
+        "remoteRevision": {
+          "type": "string",
+          "maxLength": 2048
+        },
+        "contentHash": {
+          "$ref": "domain.schema.json#/$defs/Hash"
+        },
+        "url": {
+          "type": "string"
+        },
+        "checkedAt": {
+          "$ref": "domain.schema.json#/$defs/Timestamp"
+        },
+        "partial": {
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "version",
+        "receiptId",
+        "snapshotId",
+        "accountId",
+        "accountRevision",
+        "selectionId",
+        "provider",
+        "remoteId",
+        "remoteRevision",
+        "contentHash",
+        "url",
+        "checkedAt",
+        "partial"
+      ],
+      "additionalProperties": false
+    },
+    "ConnectedSource": {
+      "type": "object",
+      "properties": {
+        "connected": {
+          "$ref": "#/$defs/ConnectedEvidence"
+        },
+        "title": {
+          "type": "string"
+        },
+        "text": {
+          "type": "string",
+          "maxLength": 262144
+        }
+      },
+      "required": [
+        "connected",
+        "title",
+        "text"
+      ],
+      "additionalProperties": false
+    },
     "ConnectorRegistration": {
       "type": "object",
       "properties": {

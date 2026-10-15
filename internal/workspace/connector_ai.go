@@ -58,8 +58,11 @@ type ConnectorContext struct {
 func NewConnectorContext(k *Kernel, reader ConnectorContextReader) *ConnectorContext {
 	return &ConnectorContext{kernel: k, reader: reader, receipts: map[string]connectedReceipt{}}
 }
+
+// Hash the knowledge actually supplied to AI. Raw provider metadata may include
+// rotating signed image URLs; adapter RemoteRevision binds the source revision.
 func ConnectorContextHash(s connectors.Snapshot) string {
-	return connectorHash([]any{s.RemoteID, s.RemoteRevision, s.Kind, s.Title, s.Text, s.URL, s.State == "partial", json.RawMessage(s.Content)})
+	return connectorHash([]any{s.RemoteID, s.RemoteRevision, s.Kind, s.Title, s.Text, s.URL, s.State == "partial"})
 }
 func ConnectorContextReference(s connectors.Snapshot) ConnectedSourceReference {
 	return ConnectedSourceReference{s.ID, s.RemoteRevision, ConnectorContextHash(s)}
@@ -208,4 +211,17 @@ func (s AICitation) MarshalJSON() ([]byte, error) {
 		plain
 		Location *contracts.DomainLocation `json:"location,omitempty"`
 	}{plain: plain(s)})
+}
+
+func init() {
+	RegisterQuery("connectors.contextReference", func(ctx context.Context, k *Kernel, e contracts.ServiceExecutionContext, r map[string]any) (any, error) {
+		snapshot, err := k.ConnectorSnapshot(ctx, e, str(r["snapshotId"]))
+		if err != nil {
+			return nil, err
+		}
+		if str(r["expectedRevision"]) == "" || snapshot.RemoteRevision != str(r["expectedRevision"]) {
+			return nil, Fail("CONFLICT", "External preview changed; inspect it again before selecting AI context")
+		}
+		return ConnectorContextReference(snapshot), nil
+	})
 }
