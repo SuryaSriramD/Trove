@@ -107,7 +107,7 @@ func (b *ProviderBridge) connect(ctx context.Context, identity ProviderConnectio
 			return ProviderConnection{}, Fail("INVALID_REQUEST", "Duplicate context page")
 		}
 		seen[p] = true
-		if err := b.kernel.authorizePage(ctx, b.kernel.db, b.owner, p); err != nil {
+		if err := b.authorizeSharedPageMetadata(ctx, p); err != nil {
 			return ProviderConnection{}, err
 		}
 		var n int
@@ -440,7 +440,7 @@ func (b *ProviderBridge) PreviewContext(ctx context.Context, pages []string) (an
 		return nil, Fail("RESOURCE_EXHAUSTED", "Context is limited to 100 pages")
 	}
 	for _, id := range pages {
-		if err := b.kernel.authorizePage(ctx, b.kernel.db, b.owner, id); err != nil {
+		if err := b.authorizeSharedPageMetadata(ctx, id); err != nil {
 			return nil, err
 		}
 		p, err := readPageTx(ctx, b.kernel.db, id)
@@ -498,5 +498,21 @@ func (b *ProviderBridge) BindSkill(ctx context.Context, id string, ref SkillRunR
 		return Fail("SCOPE_DENIED", "Skill invocation belongs to another actor")
 	}
 	c.skillInvocation = ref.InvocationID
+	return nil
+}
+
+// Context manifests disclose titles as well as page identities. Apply the same
+// existing Gmail-derived policy before metadata reaches an external runtime.
+func (b *ProviderBridge) authorizeSharedPageMetadata(ctx context.Context, page string) error {
+	if err := b.kernel.authorizePage(ctx, b.kernel.db, b.owner, page); err != nil {
+		return err
+	}
+	restricted, err := pageExternalContextRestricted(ctx, b.kernel.db, page)
+	if err != nil {
+		return err
+	}
+	if restricted {
+		return Fail("SCOPE_DENIED", "Gmail-derived context is not qualified for external AI")
+	}
 	return nil
 }
