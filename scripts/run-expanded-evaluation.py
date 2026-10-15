@@ -10,6 +10,7 @@ FAMILIES = {
     'context': ('context.json', 'TestRealLocalWorkflowContext', 12),
     'related': ('related.json', 'TestRealLocalWorkflowRelated', 12),
     'memory-lifecycle': ('memory-lifecycle.json', 'TestRealLocalWorkflowMemoryLifecycle', 12),
+    'reviews': ('reviews.json', 'TestRealLocalWorkflowReviews', 12),
 }
 
 def digest(path):
@@ -41,7 +42,7 @@ def _unique_json(pairs):
     return result
 
 
-def _snapshot_binding(binding, root, test_name, phase):
+def _snapshot_binding(binding, root, test_name, phase, expected_excluded=None):
     import base64
     if not isinstance(binding, dict) or binding.get('retained') is not True:
         raise ValueError('canonical snapshot is not durably retained')
@@ -61,7 +62,8 @@ def _snapshot_binding(binding, root, test_name, phase):
     if data.get('schemaVersion') != 1 or data.get('testName') != test_name or not data.get('scope'):
         raise ValueError('canonical snapshot scope/test identity differs')
     excluded, tables, assets = data.get('excludedTables'), data.get('tables'), data.get('assets')
-    if not isinstance(excluded, dict) or set(excluded) != CANONICAL_EXCLUDED_TABLES or not all(isinstance(v, str) and v for v in excluded.values()):
+    if expected_excluded is None: expected_excluded = CANONICAL_EXCLUDED_TABLES
+    if not isinstance(excluded, dict) or set(excluded) != expected_excluded or not all(isinstance(v, str) and v for v in excluded.values()):
         raise ValueError('canonical snapshot exclusions differ from the reviewed scope')
     if not isinstance(tables, dict) or not CANONICAL_REQUIRED_TABLES.issubset(tables) or set(tables) & set(excluded):
         raise ValueError('canonical snapshot omits protected content tables')
@@ -115,7 +117,7 @@ def _snapshot_binding(binding, root, test_name, phase):
     return data
 
 
-def validate_canonical_inventory(report, root, test_name):
+def validate_canonical_inventory(report, root, test_name, expected_excluded=None):
     """Return a validation error; old count-only reports never qualify new runs."""
     try:
         if root is None:
@@ -123,8 +125,8 @@ def validate_canonical_inventory(report, root, test_name):
         audit = report.get('canonicalInventory')
         if not isinstance(audit, dict) or audit.get('schemaVersion') != 1 or audit.get('error'):
             raise ValueError('canonical inventory report missing or failed')
-        before = _snapshot_binding(audit.get('before'), root, test_name, 'before')
-        after = _snapshot_binding(audit.get('after'), root, test_name, 'after')
+        before = _snapshot_binding(audit.get('before'), root, test_name, 'before', expected_excluded)
+        after = _snapshot_binding(audit.get('after'), root, test_name, 'after', expected_excluded)
         if pathlib.Path(audit['before']['path']).parent != pathlib.Path(audit['after']['path']).parent:
             raise ValueError('canonical snapshot pair belongs to different observations')
         checks = {
@@ -254,6 +256,91 @@ def validate_memory_report(report, case):
     return errors
 
 
+REVIEW_FACT = 'The security review is incomplete. Launch cannot proceed until that review is approved.'
+REVIEW_DOCUMENTATION = 'Documentation is ready.'
+REVIEW_SUGGESTION = 'Suggestion: request security review approval.'
+REVIEW_GENERATION_CASES = frozenset(('daily-summary', 'weekly-summary', 'unresolved-tasks', 'changed-decision', 'risk-suggestion', 'no-owner', 'categories'))
+REVIEW_BOUNDARY_CASES = frozenset(('stale-destination', 'forgotten-memory', 'cancel-retry', 'restart', 'dedup-import'))
+REVIEW_EXCLUDED_TABLES = CANONICAL_EXCLUDED_TABLES | {'personal_review_runs', 'personal_review_model_runs'}
+REVIEW_ASSERTIONS = {case: {'canonicalPreserved'} for case in REVIEW_GENERATION_CASES | REVIEW_BOUNDARY_CASES}
+for _case in REVIEW_ASSERTIONS:
+    if _case != 'restart': REVIEW_ASSERTIONS[_case].add('reservedBudget')
+    if _case not in ('restart', 'forgotten-memory'):
+        REVIEW_ASSERTIONS[_case].update(('sourceScope', 'independentAnswerOracle', 'currentCitations', 'readyUnapplied', 'approvalRequired'))
+        if _case != 'stale-destination': REVIEW_ASSERTIONS[_case].update(('reviewedOnce', 'reviewedContentPresent', 'occurrenceDedup'))
+REVIEW_ASSERTIONS['weekly-summary'].add('omissionsDisclosed')
+REVIEW_ASSERTIONS['changed-decision'].add('memoryIncluded')
+REVIEW_ASSERTIONS['risk-suggestion'].add('suggestionAppliedExactly')
+REVIEW_ASSERTIONS['stale-destination'].add('staleApplyRejected')
+REVIEW_ASSERTIONS['forgotten-memory'].add('forgetInvalidates')
+REVIEW_ASSERTIONS['cancel-retry'].update(('cancelledInert', 'boundedRetry'))
+REVIEW_ASSERTIONS['restart'].add('restartInert')
+REVIEW_PORTABLE_TABLES = ('personal_review_activation', 'personal_review_runs', 'personal_review_model_runs', 'ai_proposals')
+REVIEW_ASSERTIONS['dedup-import'].update({'portableNoGeneration', *('portableInert-' + table for table in REVIEW_PORTABLE_TABLES)})
+
+
+def review_expected_draft(case):
+    category = 'risks' if case == 'risk-suggestion' else 'decisions' if case == 'categories' else 'summary'
+    claims = [{'category': category, 'text': REVIEW_FACT, 'quote': REVIEW_FACT}]
+    actions = []
+    if case == 'weekly-summary': claims.append({'category': 'summary', 'text': REVIEW_DOCUMENTATION, 'quote': REVIEW_DOCUMENTATION})
+    if case == 'unresolved-tasks': claims = [{'category': 'summary', 'text': 'Security review is open.', 'quote': 'Status: To do'}]
+    if case == 'risk-suggestion': actions.append({'kind': 'update_page', 'target': 'Current security decision', 'body': REVIEW_SUGGESTION})
+    return {'claims': claims, 'actions': actions}
+
+
+def validate_review_report(report, case):
+    errors = []
+    model_case = case in REVIEW_GENERATION_CASES
+    if type(report.get('generationAttempts')) is not int or report['generationAttempts'] != int(model_case): errors.append('review native generation count differs')
+    if report.get('serviceBoundaryOnly') is not (not model_case): errors.append('service-only boundary is not explicitly distinguished')
+    expected_invocations = 0 if case == 'restart' else 2 if case == 'cancel-retry' else 1
+    if type(report.get('generatorInvocations')) is not int or report['generatorInvocations'] != expected_invocations: errors.append('review callback count differs')
+    bindings, plan = report['sourceBindings'], report['plan']
+    ids = [bindings[k] for k in ('source', 'destination', 'private')]
+    if not all(isinstance(v, str) and v for v in ids) or len(set(ids)) != 3: errors.append('review source identities conflated')
+    if plan['generative']['modelPackId'] != report['modelPackId'] or plan.get('enabled') is not True: errors.append('review model/activation config differs')
+    category = 'risks' if case == 'risk-suggestion' else 'decisions' if case == 'categories' else 'summary'
+    actions = ['append_review', 'append_page'] if case == 'risk-suggestion' else ['append_review']
+    if plan['generative']['categories'] != [category] or plan['generative']['allowedActions'] != actions or plan['generative']['actionPageIds'] != [bindings['source']]: errors.append('selected categories/action destinations differ')
+    selected = [bindings['source']]
+    if case == 'weekly-summary': selected.append(bindings['documentation'])
+    if case == 'unresolved-tasks': selected.extend((bindings['openTask'], bindings['completedTask']))
+    if plan['sourcePageIds'] != selected or bindings['private'] in selected: errors.append('selected source set differs')
+    if plan['schedule']['frequency'] != ('weekly' if case == 'weekly-summary' else 'daily') or plan['schedule']['timezone'] != 'UTC': errors.append('review recurrence identity differs')
+    if plan['includeMemory'] is not (case in ('changed-decision', 'forgotten-memory')): errors.append('review memory control differs')
+    if case == 'restart':
+        if report.get('finalStatus') != 'cancelled' or report.get('nextRunId') != '': errors.append('restart resumed interrupted occurrence')
+        return errors
+    if not all(type(report.get(k)) is int for k in ('promptTokens', 'outputCap', 'contextTokens')) or report['promptTokens'] < 0 or report['outputCap'] != 1024 or report['contextTokens'] != 8192 or report['promptTokens'] + 1024 + 16 > 8192: errors.append('review token budget not proved')
+    if 'PRIVATE-REVIEW-73' in report['preparedPrompt']: errors.append('unselected private source entered review context')
+    if case in ('changed-decision', 'forgotten-memory') and 'The security review is complete. Launch can proceed.' not in report['preparedPrompt']: errors.append('historical memory counterexample absent')
+    if case == 'forgotten-memory':
+        if report.get('finishRejected') is not True or report.get('proposalRejected') is not True or report.get('finalStatus') not in ('failed', 'cancelled'): errors.append('Forget did not invalidate generated review')
+        return errors
+    expected = review_expected_draft(case)
+    if json.loads(report.get('rawDraft', '')) != expected or report.get('actions') != expected['actions']: errors.append('review output differs from independent fact/category/action oracle')
+    sources, citations = report['sources'], report['citations']
+    if report.get('finalStatus') != 'ready' or not citations or report.get('unapprovedApplyRejected') is not True: errors.append('review escaped its unapplied approval boundary')
+    if any(c.get('state') != 'current' or c.get('location', {}).get('pageId') not in selected for c in citations): errors.append('review citations are stale or outside selection')
+    for claim in expected['claims']:
+        supporting = [s for s in sources if not s.get('memoryId') and claim['quote'] in s.get('text', '')]
+        if not any(c.get('number') == s.get('number') and c.get('location') == s.get('location') for s in supporting for c in citations): errors.append('review claim lacks a current canonical supporting citation')
+    if case == 'unresolved-tasks' and any(c.get('location', {}).get('pageId') != bindings['openTask'] for c in citations): errors.append('completed task mislabeled as open')
+    if case == 'weekly-summary' and ('omitted' not in report.get('warning', '') or 'omitted' not in report.get('capturedWarning', '')): errors.append('bounded review omissions not disclosed')
+    if case == 'stale-destination':
+        if report.get('staleApplyRejected') is not True: errors.append('stale destination allowed a reviewed write')
+        return errors
+    effect = report['reviewedEffect']
+    if effect.get('destinationPageId') != bindings['destination'] or effect.get('status') != 'accepted' or not all(type(effect.get(k)) is int for k in ('beforeBlocks', 'afterBlocks', 'retryBlocks')) or effect['beforeBlocks'] < 1 or effect['afterBlocks'] <= effect['beforeBlocks'] or effect['retryBlocks'] != effect['afterBlocks']: errors.append('reviewed effect or duplicate-apply bound differs')
+    if any(claim['text'] not in effect.get('destinationText', '') for claim in expected['claims']): errors.append('approved review content missing from canonical destination')
+    if case == 'risk-suggestion' and REVIEW_SUGGESTION not in effect.get('sourceText', ''): errors.append('reviewed suggestion not applied to exact destination')
+    if report.get('repeatedOccurrenceRunId') != report.get('runId') or not report.get('runId'): errors.append('repeated occurrence changed identity')
+    if case == 'cancel-retry' and report.get('cancelStatus') != 'cancelled': errors.append('cancelled occurrence did not remain inert before retry')
+    if case == 'dedup-import' and (report.get('portableExecutionCounts') != dict.fromkeys(REVIEW_PORTABLE_TABLES, 0) or report.get('portableNextRunId') != ''): errors.append('portable review import activated or replayed execution')
+    return errors
+
+
 def validate_workflow_report(report, case, contract):
     """Independently bind native mode, declared controls, semantic observations
     and the required assertions. A passing mock or an empty assertion map cannot
@@ -267,7 +354,7 @@ def validate_workflow_report(report, case, contract):
         if report.get('engineMode') != 'native' or report.get('releaseQualified') is not False:
             errors.append('native execution mode or release boundary absent')
         family = contract['family']
-        required = CONTEXT_ASSERTIONS[case] if family == 'context' else MEMORY_ASSERTIONS[case] if family == 'memory-lifecycle' else RELATED_ASSERTIONS
+        required = CONTEXT_ASSERTIONS[case] if family == 'context' else MEMORY_ASSERTIONS[case] if family == 'memory-lifecycle' else REVIEW_ASSERTIONS[case] if family == 'reviews' else RELATED_ASSERTIONS
         assertions = report.get('assertions', {})
         if not isinstance(assertions, dict) or not required.issubset(assertions) or any(value is not True for value in assertions.values()):
             errors.append('required assertion missing or failed')
@@ -305,6 +392,8 @@ def validate_workflow_report(report, case, contract):
                         errors.append('current source citation absent')
                 elif claims[0] != {'text': 'The supplied evidence does not answer this question.', 'quote': ''}:
                     errors.append('omitted fact requires exclusive abstention')
+        elif family == 'reviews':
+            errors.extend(validate_review_report(report, case))
         elif family == 'memory-lifecycle':
             errors.extend(validate_memory_report(report, case))
         elif family == 'related':
@@ -384,7 +473,13 @@ def summarize(events, expected, parent, canonical_root=None, expected_requests=N
         if workflow_contract is not None:
             errors.extend('workflow ' + case + ': ' + message for message in validate_workflow_report(r, case, workflow_contract))
         passed = r.get('passed', r.get('automatedTaskPassed')) is True
-        canonical_error = validate_canonical_inventory(r, canonical_root, parent + '/' + case)
+        excluded = REVIEW_EXCLUDED_TABLES if workflow_contract and workflow_contract.get('family') == 'reviews' else None
+        canonical_error = validate_canonical_inventory(r, canonical_root, parent + '/' + case, excluded)
+        if excluded is not None:
+            for name in (['beforeExplicitMutationInventory'] if case == 'forgotten-memory' else ['staleApplyInventory'] if case == 'stale-destination' else []):
+                auxiliary = dict(r, canonicalInventory=r.get(name), mutationHistoryCountUnchanged=True)
+                auxiliary_error = validate_canonical_inventory(auxiliary, canonical_root, parent + '/' + case, excluded)
+                if auxiliary_error: errors.append('review phase ' + name + ': ' + auxiliary_error)
         if canonical_error:
             errors.append('canonical inventory ' + case + ': ' + canonical_error)
         if terminals.get(case) != 'pass' or not passed or r.get('canonicalUnchanged') is not True:
@@ -517,7 +612,7 @@ def main():
                              'corpusSHA256': before[str(corpus_dir / corpus_file)]['sha256']}
                              for case in corpus['cases'] if case['id'] in expected}
     workflow_contract = None
-    if args.family in ('context', 'related', 'memory-lifecycle'):
+    if args.family in ('context', 'related', 'memory-lifecycle', 'reviews'):
         workflow_contract = {'family': args.family, 'modelPackId': args.pack,
                              'corpusSHA256': before[str(corpus_dir / corpus_file)]['sha256']}
     summary = summarize(events, expected, test, out / 'canonical', expected_requests, workflow_contract)

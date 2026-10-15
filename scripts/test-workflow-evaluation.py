@@ -48,6 +48,67 @@ class WorkflowAccounting(unittest.TestCase):
             citations=[{'location': {'pageId': 'primary'}, 'state': 'current'}])
         return report, contract
 
+    def review(self, case='daily-summary'):
+        contract = {'family': 'reviews', 'modelPackId': 'chosen', 'corpusSHA256': 'frozen'}
+        expected = m.review_expected_draft(case)
+        bindings = {'source': 'source', 'destination': 'inbox', 'private': 'private', 'documentation': 'docs', 'openTask': 'open', 'completedTask': 'done'}
+        selected = ['source'] + (['docs'] if case == 'weekly-summary' else ['open', 'done'] if case == 'unresolved-tasks' else [])
+        category = 'risks' if case == 'risk-suggestion' else 'decisions' if case == 'categories' else 'summary'
+        actions = ['append_review', 'append_page'] if case == 'risk-suggestion' else ['append_review']
+        plan = {'enabled': True, 'sourcePageIds': selected, 'includeMemory': case in ('changed-decision', 'forgotten-memory'),
+                'schedule': {'frequency': 'weekly' if case == 'weekly-summary' else 'daily', 'timezone': 'UTC'},
+                'generative': {'modelPackId': 'chosen', 'categories': [category], 'allowedActions': actions, 'actionPageIds': ['source']}}
+        sources, citations = [], []
+        for index, claim in enumerate(expected['claims']):
+            page = 'open' if case == 'unresolved-tasks' else 'docs' if index else 'source'
+            loc = {'pageId': page, 'sourceRevision': '2'}
+            sources.append({'number': index+1, 'text': claim['quote'], 'location': loc})
+            citations.append({'number': index+1, 'state': 'current', 'location': loc})
+        report = dict(contract, engineMode='native', releaseQualified=False,
+            assertions={key: True for key in m.REVIEW_ASSERTIONS[case]},
+            generationAttempts=int(case in m.REVIEW_GENERATION_CASES), serviceBoundaryOnly=case in m.REVIEW_BOUNDARY_CASES,
+            generatorInvocations=0 if case == 'restart' else 2 if case == 'cancel-retry' else 1,
+            sourceBindings=bindings, plan=plan, promptTokens=1200, outputCap=1024, contextTokens=8192,
+            preparedPrompt='The security review is complete. Launch can proceed.' if plan['includeMemory'] else m.REVIEW_FACT,
+            rawDraft=json.dumps(expected), actions=expected['actions'], sources=sources, citations=citations,
+            finalStatus='ready', unapprovedApplyRejected=True, runId='run', repeatedOccurrenceRunId='run',
+            reviewedEffect={'destinationPageId': 'inbox', 'status': 'accepted', 'beforeBlocks': 1, 'afterBlocks': 2, 'retryBlocks': 2,
+                            'destinationText': '\n'.join(c['text'] for c in expected['claims']), 'sourceText': m.REVIEW_FACT + m.REVIEW_SUGGESTION})
+        if case == 'weekly-summary': report.update(warning='Additional excerpts omitted', capturedWarning='Additional excerpts omitted')
+        if case == 'stale-destination': report['staleApplyRejected'] = True
+        if case == 'forgotten-memory': report.update(finishRejected=True, proposalRejected=True, finalStatus='failed')
+        if case == 'restart': report.update(finalStatus='cancelled', nextRunId='')
+        if case == 'cancel-retry': report.update(cancelStatus='cancelled')
+        if case == 'dedup-import': report.update(portableExecutionCounts=dict.fromkeys(m.REVIEW_PORTABLE_TABLES, 0), portableNextRunId='')
+        return report, contract
+
+    def test_review_native_and_service_boundaries_are_distinct(self):
+        for case in m.REVIEW_ASSERTIONS:
+            report, contract = self.review(case)
+            self.assertEqual(m.validate_workflow_report(report, case, contract), [], case)
+            for change in ({'engineMode': 'deterministic'}, {'serviceBoundaryOnly': not report['serviceBoundaryOnly']}, {'generationAttempts': 2}, {'generatorInvocations': 10}, {'assertions': {}}):
+                self.assertTrue(m.validate_workflow_report(dict(report, **change), case, contract), (case, change))
+
+    def test_review_semantics_selection_quotes_and_effect_counterexamples(self):
+        for case in m.REVIEW_GENERATION_CASES:
+            r, c = self.review(case)
+            for change in ({'rawDraft': '{}'}, {'citations': []}, {'sources': []}, {'promptTokens': -1}, {'unapprovedApplyRejected': False}, {'repeatedOccurrenceRunId': 'other'}, {'preparedPrompt': r['preparedPrompt']+'PRIVATE-REVIEW-73'}):
+                self.assertTrue(m.validate_workflow_report(dict(r, **change), case, c), (case, change))
+            for key, value in (('categories', ['summary', 'risks', 'decisions']), ('allowedActions', ['create_task']), ('actionPageIds', ['private'])):
+                bad=copy.deepcopy(r); bad['plan']['generative'][key]=value
+                self.assertTrue(m.validate_workflow_report(bad, case, c))
+            for change in ({'retryBlocks': 3}, {'destinationPageId': 'private'}, {'destinationText': ''}):
+                bad=copy.deepcopy(r); bad['reviewedEffect'].update(change)
+                self.assertTrue(m.validate_workflow_report(bad, case, c))
+        r,c=self.review('unresolved-tasks');r['citations'][0]['location']['pageId']='done'
+        self.assertTrue(m.validate_workflow_report(r, 'unresolved-tasks', c))
+
+    def test_review_forget_restart_stale_and_portable_counterexamples(self):
+        changes = {'forgotten-memory': {'proposalRejected': False}, 'restart': {'nextRunId': 'run'}, 'stale-destination': {'staleApplyRejected': False}, 'cancel-retry': {'cancelStatus': 'ready'}, 'dedup-import': {'portableExecutionCounts': dict.fromkeys(m.REVIEW_PORTABLE_TABLES, 1)}}
+        for case,change in changes.items():
+            r,c=self.review(case)
+            self.assertTrue(m.validate_workflow_report(dict(r, **change), case, c))
+
     def test_memory_generation_and_request_counterexamples(self):
         for case in ('preference-on', 'preference-off'):
             r, c = self.memory(case)
@@ -85,11 +146,12 @@ class WorkflowAccounting(unittest.TestCase):
 
     def test_case_inventory_is_complete_and_frozen(self):
         root = m.ROOT / 'internal/workspace/testdata/expanded-evaluation'
-        for family in ('context', 'related', 'memory-lifecycle'):
+        for family in ('context', 'related', 'memory-lifecycle', 'reviews'):
             filename, _, count = m.FAMILIES[family]
             cases = json.loads((root/filename).read_text())['cases']
             self.assertEqual(count, 12)
             self.assertEqual(len({c['id'] for c in cases}), count)
+        self.assertEqual(set(m.REVIEW_ASSERTIONS), {c['id'] for c in json.loads((root/'reviews.json').read_text())['cases']})
         self.assertEqual(set(m.MEMORY_ASSERTIONS), {c['id'] for c in json.loads((root/'memory-lifecycle.json').read_text())['cases']})
         self.assertEqual(set(m.CONTEXT_ASSERTIONS), {c['id'] for c in json.loads((root/'context.json').read_text())['cases']})
 
