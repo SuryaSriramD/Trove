@@ -82,6 +82,41 @@ class WorkflowAccounting(unittest.TestCase):
         if case == 'dedup-import': report.update(portableExecutionCounts=dict.fromkeys(m.REVIEW_PORTABLE_TABLES, 0), portableNextRunId='')
         return report, contract
 
+    def image(self):
+        corpus=json.loads((m.ROOT/'internal/workspace/testdata/expanded-evaluation/images-execution-v1.json').read_text())
+        cases={case['id']:case for case in corpus['cases']}
+        contract=dict(family='images',modelPackId='chosen',corpusSHA256='locked',imageCases=cases,modelSHA256='a'*64,projectorSHA256='b'*64,helperSHA256='c'*64)
+        case=cases['diagram-1']
+        report=dict(family='images',modelPackId='chosen',corpusSHA256='locked',engineMode='native',releaseQualified=False,
+            assertions=dict.fromkeys(m.IMAGE_ASSERTIONS,True),sourceSHA256=case['sourceSHA256'],sourceKind=case['sourceKind'],
+            question=case['prompt'],expectedMethod=case['method'],productInvocations=1,ocrInvocations=1,
+            result=dict(state='ready',analysisMethod='local_vision_model',text='red',modelHash='a'*64,projectorHash='b'*64,helperHash='c'*64,finishReason='eos',inputTokens=200,outputTokens=2,sampledPeakRSSBytes=500000),
+            ocr={'lines':[]},ocrCapability={'engine':'Apple Vision (local)','extractorVersion':'trove-local-vision-v1'})
+        return report,contract
+
+    def test_image_native_identity_content_and_calls(self):
+        report,contract=self.image()
+        self.assertEqual(m.validate_workflow_report(report,'diagram-1',contract),[])
+        for change in ({'productInvocations':2},{'productInvocations':True},{'ocrInvocations':0},{'engineMode':'deterministic'},{'sourceSHA256':'changed'},{'question':'different'},{'ocrError':'failed'},{'ocr':{'lines':[{'text':'invented','confidence':.2}]}},{'assertions':{}}):
+            self.assertTrue(m.validate_workflow_report(dict(report,**change),'diagram-1',contract),change)
+        for change in ({'text':'red and a cat'},{'text':'blue'},{'modelHash':'f'*64},{'helperHash':'d'*64},{'finishReason':'length'},{'sampledPeakRSSBytes':0},{'state':'partial'}):
+            bad=copy.deepcopy(report);bad['result'].update(change)
+            self.assertTrue(m.validate_workflow_report(bad,'diagram-1',contract),change)
+
+    def test_image_missing_representative_source_cannot_pass(self):
+        report,contract=self.image()
+        self.assertTrue(m.validate_workflow_report(report,'photograph-1',contract))
+        self.assertTrue(m.validate_workflow_report(report,'screenshot-1',contract))
+
+    def test_image_measurement_does_not_claim_model_generation(self):
+        report,contract=self.image();case=contract['imageCases']['boundary-1']
+        report.update(sourceSHA256=case['sourceSHA256'],sourceKind=case['sourceKind'],question=case['prompt'],expectedMethod=case['method'])
+        report['result']=dict(state='ready',analysisMethod='pixel_measurement',finishReason='measurement',text=f"Source pixel measurement ({case['width']} × {case['height']} decoded pixels, before resizing and alpha composition; encoded orientation): the image is exactly uniform white (blank at decoded-pixel level). No objects or text can be identified from spatial pixel variation. No model interpretation or OCR was attempted.")
+        self.assertEqual(m.validate_workflow_report(report,'boundary-1',contract),[])
+        for change in ({'modelHash':'a'*64},{'outputTokens':1},{'sampledPeakRSSBytes':1},{'text':report['result']['text']+' There is a cat.'}):
+            bad=copy.deepcopy(report);bad['result'].update(change)
+            self.assertTrue(m.validate_workflow_report(bad,'boundary-1',contract),change)
+
     def test_review_native_and_service_boundaries_are_distinct(self):
         for case in m.REVIEW_ASSERTIONS:
             report, contract = self.review(case)
