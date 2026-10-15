@@ -142,6 +142,9 @@ func queryRecords(ctx context.Context, k *Kernel, e contracts.ServiceExecutionCo
 	if err = k.authorizeEntity(ctx, tx, e, "collection", collection); err != nil {
 		return nil, err
 	}
+	if err = requireActiveCollection(ctx, tx, collection); err != nil {
+		return nil, err
+	}
 	identity := recordQueryCursor{Version: 2, Collection: collection, View: view, ClockMinute: time.Now().UTC().Truncate(time.Minute).Format(time.RFC3339)}
 	if err = tx.QueryRowContext(ctx, "SELECT revision FROM collections WHERE id=?", collection).Scan(&identity.CollectionRevision); err != nil {
 		return nil, err

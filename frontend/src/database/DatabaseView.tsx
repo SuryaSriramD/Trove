@@ -610,14 +610,18 @@ export default function DatabaseView({
       </div>
       {!collection ? (
         <div className="empty-state">
-          <h3>Give your work some structure.</h3>
-          <p>
-            One collection, shared across every view. Every record has its own
-            page.
-          </p>
-          <button className="primary" onClick={addDatabase}>
-            Create database
-          </button>
+          {collectionId ? (
+            <>
+              <h3>This collection is unavailable.</h3>
+              <p>It may be in Trash or outside your current access. Restore it from its owning page’s history or reviewed operation before using this view.</p>
+            </>
+          ) : (
+            <>
+              <h3>Give your work some structure.</h3>
+              <p>One collection, shared across every view. Every record has its own page.</p>
+              <button className="primary" onClick={addDatabase}>Create database</button>
+            </>
+          )}
         </div>
       ) : (
         <>

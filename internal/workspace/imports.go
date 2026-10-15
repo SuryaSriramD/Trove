@@ -49,6 +49,7 @@ type ImportBlock struct {
 	Data map[string]any `json:"data"`
 }
 type ImportItem struct {
+	CollectionSourceScope   string                                  `json:"collectionSourceScope,omitempty"`
 	PortableIdentity        string                                  `json:"portableIdentity,omitempty"`
 	PageSourceScope         string                                  `json:"pageSourceScope,omitempty"`
 	AttachmentsComplete     bool                                    `json:"attachmentsComplete,omitempty"`
@@ -88,23 +89,24 @@ type ImportItem struct {
 	Provenance              any                                     `json:"provenance,omitempty"`
 }
 type ImportPlan struct {
-	PageDeletionOperationID string                  `json:"pageDeletionOperationId,omitempty"`
-	PageEnumerationScope    string                  `json:"pageEnumerationScope,omitempty"`
-	CSVBindings             []ImportCSVBinding      `json:"csvBindings,omitempty"`
-	EntityIdentities        []ImportEntityIdentity  `json:"entityIdentities,omitempty"`
-	TypedDatabaseMerge      bool                    `json:"typedDatabaseMerge,omitempty"`
-	NormalizerVersion       int                     `json:"normalizerVersion,omitempty"`
-	NotionGraph             bool                    `json:"notionGraph,omitempty"`
-	NotionKeepGraph         bool                    `json:"notionKeepGraph,omitempty"`
-	NotionCopyGraph         bool                    `json:"notionCopyGraph,omitempty"`
-	NotionContainers        []NotionContainerImport `json:"notionContainers,omitempty"`
-	NotionIdentities        []NotionIdentityImport  `json:"notionIdentities,omitempty"`
-	RootParentID            string                  `json:"rootParentPageId,omitempty"`
-	ExpectedParentRevision  string                  `json:"expectedParentRevision,omitempty"`
-	CaptureDigest           string                  `json:"captureDigest,omitempty"`
-	CaptureExtension        string                  `json:"captureExtension,omitempty"`
-	CaptureDestination      string                  `json:"captureDestination,omitempty"`
-	CaptureDestinationTitle string                  `json:"captureDestinationTitle,omitempty"`
+	CollectionEnumerationScope string                  `json:"collectionEnumerationScope,omitempty"`
+	PageDeletionOperationID    string                  `json:"pageDeletionOperationId,omitempty"`
+	PageEnumerationScope       string                  `json:"pageEnumerationScope,omitempty"`
+	CSVBindings                []ImportCSVBinding      `json:"csvBindings,omitempty"`
+	EntityIdentities           []ImportEntityIdentity  `json:"entityIdentities,omitempty"`
+	TypedDatabaseMerge         bool                    `json:"typedDatabaseMerge,omitempty"`
+	NormalizerVersion          int                     `json:"normalizerVersion,omitempty"`
+	NotionGraph                bool                    `json:"notionGraph,omitempty"`
+	NotionKeepGraph            bool                    `json:"notionKeepGraph,omitempty"`
+	NotionCopyGraph            bool                    `json:"notionCopyGraph,omitempty"`
+	NotionContainers           []NotionContainerImport `json:"notionContainers,omitempty"`
+	NotionIdentities           []NotionIdentityImport  `json:"notionIdentities,omitempty"`
+	RootParentID               string                  `json:"rootParentPageId,omitempty"`
+	ExpectedParentRevision     string                  `json:"expectedParentRevision,omitempty"`
+	CaptureDigest              string                  `json:"captureDigest,omitempty"`
+	CaptureExtension           string                  `json:"captureExtension,omitempty"`
+	CaptureDestination         string                  `json:"captureDestination,omitempty"`
+	CaptureDestinationTitle    string                  `json:"captureDestinationTitle,omitempty"`
 
 	PortableCollections []PortableCollectionImport `json:"portableCollections,omitempty"`
 	ID                  string                     `json:"planId"`
@@ -594,7 +596,7 @@ func configurePortableImport(ctx context.Context, k *Kernel, e contracts.Service
 					continue
 				}
 				choice := str(c["choice"])
-				if item.Kind == "source_deleted_page" && choice != "keep_local" && choice != "merge" {
+				if isSourceDeletion(item.Kind) && choice != "keep_local" && choice != "merge" {
 					return Fail("INVALID_REQUEST", "A missing source page can only be kept or explicitly reviewed for deletion")
 				}
 				if choice != "keep_local" && choice != "replace" && choice != "duplicate" && choice != "merge" {

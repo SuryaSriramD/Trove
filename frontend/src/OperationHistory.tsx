@@ -75,6 +75,7 @@ export function OperationHistory({
   }
   if (!operations.length && !error) return null;
   function describe(action: S.OperationPreviewUndoResult["actions"][number]) {
+    if (action.kind === "collection.trash.set") return `${action.trashed ? "Hide collection in Trash" : "Restore collection visibility"} (schema, values and identities retained)`;
     if (action.kind === "page.trash.set") return `${action.trashed ? "Move page to Trash" : "Restore page"} (content, values and identities preserved)`;
     if (action.kind === "record.trash.set") {
       const record = workspace.records.find((r) => r.id === action.recordId);

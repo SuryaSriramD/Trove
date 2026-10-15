@@ -4737,6 +4737,9 @@
         },
         "portableIdentity": {
           "type": "string"
+        },
+        "collectionSourceScope": {
+          "type": "string"
         }
       },
       "required": [

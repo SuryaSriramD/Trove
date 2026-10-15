@@ -388,7 +388,7 @@ func rewriteImportBlock(v any, ids map[string]string) {
 }
 
 func commitImportItem(m *Mutation, p *ImportPlan, item *ImportItem) error {
-	if item.Kind == "source_deleted_page" {
+	if isSourceDeletion(item.Kind) {
 		return nil
 	}
 	if item.Kind == "directory" || item.Kind == "asset" || item.Kind == "rejected" {

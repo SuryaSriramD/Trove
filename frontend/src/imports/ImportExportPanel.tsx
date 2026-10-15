@@ -754,7 +754,7 @@ export function ImportExportPanel({
                                       </option>
                                       <option value="take_incoming">
                                         {(field.path.startsWith("/records/") ||
-                                          field.path === "/exists") &&
+                                          field.path === "/exists" || field.path === "/collectionExists" || field.path.startsWith("/collectionRecords/")) &&
                                         !field.incoming.present
                                           ? "Accept source deletion"
                                           : "Take incoming"}
@@ -839,12 +839,12 @@ export function ImportExportPanel({
                         !notionGraphKinds.has(item.kind)) &&
                         item.kind !== "csv" &&
                         item.kind !== "portable_collection" &&
-                        item.kind !== "source_deleted_page" && (
+                        !item.kind.startsWith("source_deleted_") && (
                           <option value="replace">
                             Replace the page body with incoming content
                           </option>
                         )}
-                      {item.kind !== "source_deleted_page" && (
+                      {!item.kind.startsWith("source_deleted_") && (
                         <option value="duplicate">
                           Import a separate copy
                         </option>

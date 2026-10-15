@@ -76,6 +76,9 @@ func promoteTask(m *Mutation, record, status, dueProperty string) error {
 	if err := m.Tx.QueryRowContext(m.Context, "SELECT collection_id,page_id FROM records WHERE id=?", record).Scan(&collection, &page); err != nil {
 		return err
 	}
+	if err := requireActiveCollection(m.Context, m.Tx, collection); err != nil {
+		return err
+	}
 	if err := m.TouchPage(page); err != nil {
 		return err
 	}
@@ -148,7 +151,7 @@ func promoteTask(m *Mutation, record, status, dueProperty string) error {
 	return err
 }
 func taskSnapshot(ctx context.Context, k *Kernel, tx *sql.Tx, e contracts.ServiceExecutionContext) (any, error) {
-	rows, err := tx.QueryContext(ctx, "SELECT record_id,status_property_id,due_property_id FROM task_facets ORDER BY record_id")
+	rows, err := tx.QueryContext(ctx, "SELECT t.record_id,t.status_property_id,t.due_property_id FROM task_facets t JOIN records r ON r.id=t.record_id JOIN pages p ON p.id=r.page_id WHERE p.deleted_at IS NULL AND NOT EXISTS(SELECT 1 FROM collection_visibility v WHERE v.collection_id=r.collection_id) ORDER BY t.record_id")
 	if err != nil {
 		return nil, err
 	}

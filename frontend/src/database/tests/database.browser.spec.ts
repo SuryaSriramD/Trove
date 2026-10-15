@@ -901,3 +901,25 @@ test("task promotion explicitly binds due and canonical task editors share title
   await expect(body.getByLabel('Complete Edited from occurrence').last()).not.toBeChecked();
 
 });
+
+
+test("linked view retains an unavailable state when its collection is removed", async ({page}) => {
+  await page.evaluate(() => {
+    const state=(window as any).dbState();
+    const id=(n:number)=>`019a1234-5678-7000-8000-${String(n).padStart(12,'0')}`;
+    state.pages.push({...state.pages[0],id:id(60),title:'Linked unavailable collection'});
+    const view=structuredClone(state.views[0]);
+    Object.assign(view,{id:id(62),owningPageId:id(60),name:'Retained linked view'});
+    state.views.push(view);
+    state.collections=[];
+    state.properties=[];
+    state.records=[];
+    localStorage.setItem('databaseFixture',JSON.stringify(state));
+  });
+  await page.reload();
+  await page.locator('.tree-item').filter({hasText:'Linked unavailable collection'}).click();
+  const database=page.getByRole('region',{name:'Database',exact:true});
+  await expect(database).toContainText('This collection is unavailable.');
+  await expect(database.getByRole('button',{name:'Create database',exact:true})).toHaveCount(0);
+  expect(await page.evaluate(()=>(window as any).dbRequests.filter((r:any)=>r.method==='batch').length)).toBe(0);
+});
