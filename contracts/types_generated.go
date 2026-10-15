@@ -2578,7 +2578,11 @@ type ServiceConfigureImportRequest struct {
 	WorkspaceId     DomainId   `json:"workspaceId"`
 	PlanId          DomainId   `json:"planId"`
 	PlanHash        DomainHash `json:"planHash"`
-	Columns         []struct {
+	CsvKeys         []struct {
+		SourceLocator string `json:"sourceLocator"`
+		Index         int64  `json:"index"`
+	} `json:"csvKeys,omitempty"`
+	Columns []struct {
 		SourceLocator string `json:"sourceLocator"`
 		Index         int64  `json:"index"`
 		Type          string `json:"type"`

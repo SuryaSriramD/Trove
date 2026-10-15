@@ -1277,6 +1277,36 @@ test("typed import review shows record and property names and saves the exact fi
   expect(await page.evaluate(() => (window as any).typedReviewRequest)).toMatchObject({ planId: "typed-plan", planHash: "typed-hash-1", resolutions: [{ sourceLocator: "Tasks.csv", fields: [{ path: "/values/record-1/prop-1", choice: "take_incoming" }] }] });
 });
 
+test("CSV import explicitly binds a non-title row key before typed merge", async ({ page }) => {
+  await page.evaluate(() => {
+    const app = (window as any).go.main.App, previous = app.Dispatch;
+    app.PickFile = async () => "csv-key-selection";
+    const item: any = { sourceLocator: "Tasks.csv", kind: "csv", title: "Tasks", outcome: "adapted", reason: "CSV bytes retained", committed: false, columns: [
+      { name: "Name", type: "title", propertyId: "title", samples: ["Same title"] },
+      { name: "Source ID", type: "text", propertyId: "key", samples: ["a", "b"] },
+      { name: "Notes", type: "text", propertyId: "notes", samples: ["First note"] }
+    ] };
+    const plan = { planId: "csv-key-plan", planHash: "key-hash-1", sourceNamespace: "fixture", sourceName: "Tasks.csv", rootPageId: "root", sourceFileId: "source", state: "preview", cursor: 0, initialized: false, sourceCompleteness: "unknown", sourceOmissions: [], unknownCompleteness: [], items: [item] };
+    app.Dispatch = async (method: string, raw: string) => {
+      if (method === "imports.preview") return JSON.stringify({ ok: true, result: plan });
+      if (method === "imports.configure") {
+        (window as any).csvKeyRequest = JSON.parse(raw);
+        item.kind = "portable_collection"; item.csvKeyColumn = "Source ID"; plan.planHash = "key-hash-2";
+        return JSON.stringify({ ok: true, result: plan });
+      }
+      return previous(method, raw);
+    };
+  });
+  await navSurface(page, "Import");
+  await page.getByRole("button", { name: "Choose import file" }).click();
+  const key = page.getByRole("combobox", { name: "Row key for Tasks.csv" });
+  await expect(key.locator("option")).toHaveCount(3);
+  await key.selectOption("1");
+  await expect(page.getByText("Retained row key:", { exact: false })).toBeVisible();
+  await expect(key).toHaveCount(0);
+  expect(await page.evaluate(() => (window as any).csvKeyRequest)).toMatchObject({ planId: "csv-key-plan", planHash: "key-hash-1", csvKeys: [{ sourceLocator: "Tasks.csv", index: 1 }] });
+});
+
 test("Phase 2 AI works without packs and shows reviewed memory controls", async ({ page }) => {
   await navSurface(page, "AI");
   await expect(page.getByRole("heading", { name: "Local AI", exact: true })).toBeVisible();

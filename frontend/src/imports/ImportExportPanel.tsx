@@ -11,6 +11,7 @@ type Column = {
   warning?: string;
 };
 type Item = {
+  csvKeyColumn?: string;
   merge?: {
     baselineStatus: "retained" | "unavailable";
     localDeleted: boolean;
@@ -493,6 +494,21 @@ export function ImportExportPanel({
                     unset. Formula and view definitions are never inferred from
                     display values.
                   </p>
+                  {item.kind === "csv" ? (
+                    <label>
+                      Stable row key
+                      <select
+                        aria-label={`Row key for ${item.sourceLocator}`}
+                        value=""
+                        disabled={busy || running}
+                        onChange={(event) => configure({ csvKeys: [{ sourceLocator: item.sourceLocator, index: Number(event.target.value) }] })}
+                      >
+                        <option value="">Choose a unique source key to enable future merges…</option>
+                        {item.columns!.slice(1).map((column, index) => <option key={column.propertyId} value={index + 1}>{column.name}</option>)}
+                      </select>
+                      <small>Review column types first. Keys must be unique and nonempty. Titles and row positions never identify existing records.</small>
+                    </label>
+                  ) : item.csvKeyColumn ? <p>Retained row key: <strong>{item.csvKeyColumn}</strong>. Re-imports match that source key even when rows move or titles change.</p> : null}
                   <table>
                     <thead>
                       <tr>
@@ -511,6 +527,8 @@ export function ImportExportPanel({
                           <td>
                             {index === 0 ? (
                               "Page title"
+                            ) : item.kind !== "csv" ? (
+                              column.type
                             ) : (
                               <select
                                 aria-label={`Type for ${column.name}`}

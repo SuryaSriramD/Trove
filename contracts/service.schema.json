@@ -5334,6 +5334,28 @@
         "planHash": {
           "$ref": "domain.schema.json#/$defs/Hash"
         },
+        "csvKeys": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "sourceLocator": {
+                "type": "string"
+              },
+              "index": {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 9007199254740991
+              }
+            },
+            "required": [
+              "sourceLocator",
+              "index"
+            ],
+            "additionalProperties": false
+          },
+          "maxItems": 256
+        },
         "columns": {
           "type": "array",
           "items": {
