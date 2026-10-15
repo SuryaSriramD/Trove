@@ -190,10 +190,7 @@ func TestModelLowDiskPreflightPreservesInstalledPack(t *testing.T) {
 	if err = m.Acquire(context.Background(), p, nil); err == nil || !strings.Contains(err.Error(), "RESOURCE_EXHAUSTED") {
 		t.Fatalf("low disk download was admitted: %v", err)
 	}
-	files, _ := os.ReadDir(m.root)
-	if len(files) != 0 {
-		t.Fatal("rejected download left artifacts")
-	}
+	assertNoModelPayload(t, m.root)
 }
 
 func TestAcquisitionDiskExhaustionRetainsResumableBytes(t *testing.T) {
