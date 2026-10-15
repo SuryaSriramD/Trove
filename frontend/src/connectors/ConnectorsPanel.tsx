@@ -10,6 +10,7 @@ import {
   type WorkspaceSnapshot,
 } from "../api";
 import { ImportExportPanel } from "../imports/ImportExportPanel";
+import { NotionCapturePanel } from "../imports/NotionCapturePanel";
 import "./connectors.css";
 
 type Account = S.ConnectorAccount;
@@ -85,7 +86,12 @@ export function ConnectorsPanel(props: {
   onChanged: () => Promise<void> | void;
   onOpenPage: (id: string) => void;
 }) {
-  return <Connections key={props.workspace.workspaceId} {...props} />;
+  return (
+    <Connections
+      key={`${props.workspace.workspaceId}:${props.workspace.scopeGrantId}`}
+      {...props}
+    />
+  );
 }
 function Connections({
   workspace,
@@ -125,6 +131,7 @@ function Connections({
   const epoch = useRef(0);
   const account = accounts.find((a) => a.id === selected);
   const previewKind = accounts.find((a) => a.id === preview?.accountId)?.kind;
+  const notionRootKind = preview?.kind.replace(/^notion_/, "");
   const previewContent = (preview?.content ?? {}) as Record<string, unknown>;
   const formats =
     typeof previewContent.mimeType === "string"
@@ -987,6 +994,30 @@ function Connections({
           >
             Review import into Trove
           </button>
+          {previewKind === "notion" &&
+            (notionRootKind === "page" ||
+              notionRootKind === "database" ||
+              notionRootKind === "data_source") && (
+              <section aria-label="Capture Notion descendants">
+                <p>
+                  To include this root's descendants, typed records and files,
+                  capture through a Notion integration with access to that root.
+                  Its integration token is separate from this connection's OAuth
+                  authorization. Review the captured inventory before importing.
+                </p>
+                <NotionCapturePanel
+                  workspace={workspace}
+                  namespace={`notion-api:${preview.selectionId}`}
+                  initialRoots={[
+                    { kind: notionRootKind, id: preview.remoteId },
+                  ]}
+                  onPlan={(plan) => {
+                    const id = (plan as { planId?: unknown })?.planId;
+                    if (typeof id === "string") setPlanId(id);
+                  }}
+                />
+              </section>
+            )}
           {previewKind === "google_drive" && formats.length > 0 && (
             <label>
               Acquisition format

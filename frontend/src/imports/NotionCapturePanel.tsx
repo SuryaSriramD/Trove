@@ -4,33 +4,62 @@ import type {
   NotionCaptureResult as Capture,
   NotionRoot,
 } from "../../../contracts/generated/service";
-export function NotionCapturePanel({
-  workspace,
-  namespace,
-  onPlan,
-}: {
+type Props = {
   workspace: WorkspaceSnapshot;
   namespace: string;
+  initialRoots?: NotionRoot[];
   onPlan: (plan: unknown) => void;
-}) {
-  const [rootKind, setRootKind] = useState<NotionRoot["kind"]>("page");
-  const [rootIds, setRootIds] = useState(""),
+};
+
+export function NotionCapturePanel(props: Props) {
+  return (
+    <CaptureSession
+      key={`${props.workspace.workspaceId}:${props.workspace.scopeGrantId}:${props.namespace}:${JSON.stringify(props.initialRoots ?? [])}`}
+      {...props}
+    />
+  );
+}
+
+function CaptureSession({
+  workspace,
+  namespace,
+  initialRoots = [],
+  onPlan,
+}: Props) {
+  const [rootKind, setRootKind] = useState<NotionRoot["kind"]>(
+    initialRoots[0]?.kind ?? "page",
+  );
+  const [rootIds, setRootIds] = useState(
+      initialRoots.map((root) => root.id).join(", "),
+    ),
     [token, setToken] = useState(""),
     [capture, setCapture] = useState<Capture>(),
     [recent, setRecent] = useState<Capture[]>([]),
     [busy, setBusy] = useState(false),
     [error, setError] = useState("");
   const pause = useRef(false);
-  const request = <T,>(method: string, data: object = {}) =>
-    dispatch<T>(method, { ...envelope(workspace), ...data });
+  const active = useRef(true);
+  const request = async <T,>(method: string, data: object = {}) => {
+    if (!active.current) throw new Error("Capture context changed");
+    const result = await dispatch<T>(method, {
+      ...envelope(workspace),
+      ...data,
+    });
+    if (!active.current) throw new Error("Capture context changed");
+    return result;
+  };
   const refresh = () =>
     request<Capture[]>("imports.notion.list").then(setRecent);
   useEffect(() => {
-    void refresh().catch((e) => setError(String(e)));
+    active.current = true;
+    void refresh().catch((e) => {
+      if (active.current) setError(String(e));
+    });
     return () => {
+      active.current = false;
       pause.current = true;
     };
-  }, [workspace.workspaceId]);
+  }, []);
   const run = async (start: boolean) => {
     setBusy(true);
     setError("");
@@ -47,25 +76,45 @@ export function NotionCapturePanel({
         : capture;
       if (!current) return;
       setCapture(current);
+      let batches = 0;
       while (
         !pause.current &&
         current.state !== "ready" &&
         current.state !== "finished"
       ) {
-        current = await request<Capture>("imports.notion.step", {
+        const next: Capture = await request<Capture>("imports.notion.step", {
           captureId: current.captureId,
           revision: current.revision,
           token,
         });
+        if (
+          next.captureId !== current.captureId ||
+          next.revision <= current.revision
+        ) {
+          throw new Error(
+            "Capture made no progress. Saved responses are retained; refresh or resume before trying again.",
+          );
+        }
+        current = next;
         setCapture(current);
         if (current.state === "blocked") break;
+        if (
+          ++batches >= 500 &&
+          current.state !== "ready" &&
+          current.state !== "finished"
+        ) {
+          setError(
+            "Capture paused after 500 batches. Resume to continue from the saved cursor.",
+          );
+          break;
+        }
       }
       if (current.state === "ready") setToken("");
       await refresh();
     } catch (e) {
-      setError(String(e));
+      if (active.current) setError(String(e));
     } finally {
-      setBusy(false);
+      if (active.current) setBusy(false);
     }
   };
   const finish = async (partial: boolean) => {
@@ -88,9 +137,9 @@ export function NotionCapturePanel({
       );
       await refresh();
     } catch (e) {
-      setError(String(e));
+      if (active.current) setError(String(e));
     } finally {
-      setBusy(false);
+      if (active.current) setBusy(false);
     }
   };
   return (
@@ -125,6 +174,7 @@ export function NotionCapturePanel({
           Authorized root IDs
           <textarea
             value={rootIds}
+            disabled={busy}
             onChange={(e) => setRootIds(e.target.value)}
             placeholder="Notion UUIDs, separated by commas"
             rows={2}
@@ -136,6 +186,7 @@ export function NotionCapturePanel({
             type="password"
             autoComplete="off"
             value={token}
+            disabled={busy}
             onChange={(e) => setToken(e.target.value)}
           />
         </label>

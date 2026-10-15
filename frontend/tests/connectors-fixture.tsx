@@ -86,6 +86,11 @@ if (fixtureKind) {
   if (fixtureKind === "google_drive")
     source.content = { mimeType: "application/vnd.google-apps.document" };
   if (fixtureKind === "mcp") source.state = "partial";
+  if (fixtureKind === "notion") {
+    source.kind = "notion_page";
+    source.remoteId = id(10);
+    source.selectionId = id(10);
+  }
 }
 window.go = {
   main: {
@@ -97,6 +102,7 @@ window.go = {
         let result: any;
         if (method === "connectors.list")
           result = r.workspaceId === id(9) ? [] : [account];
+        else if (method === "imports.notion.list") result = [];
         else if (method === "connectors.draft")
           result = { revision: "", fields: {} };
         else if (method === "connectors.saveDraft")
