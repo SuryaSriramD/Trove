@@ -240,6 +240,16 @@ func TestMeetingRetentionArchivesProposalsAndForgetsMemoryWithoutErasingEvidence
 	if err != nil || len(visibleDrafts) != 0 {
 		t.Fatal(visibleDrafts, err)
 	}
+	if _, err := k.ApplyMeetingDraft(ctx, e, drafts[0].ID); err == nil {
+		t.Fatal("archived generated notes were approved")
+	}
+	guard, err := k.currentGuard(ctx, "page", source.PageID)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if err = k.recordingBatch(ctx, e, "meeting-draft-"+drafts[0].ID, []any{map[string]any{"kind": "page.update", "pageId": source.PageID, "title": "Should roll back"}}, []contracts.ServiceExpectedRevision{guard}); err == nil {
+		t.Fatal("archived approval bypassed writer fence")
+	}
 	if _, err := k.prepareMeetingExtraction(ctx, e, prepare(1)); err == nil {
 		t.Fatal("archived proposal was re-prepared")
 	}
