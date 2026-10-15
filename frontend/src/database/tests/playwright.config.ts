@@ -21,7 +21,7 @@ export default defineConfig({
       {
         outputFile:
           (globalThis as any).process?.env?.TROVE_BROWSER_REPORT ??
-          "../../../../evidence/phase1-database-browser-tests.json",
+          "test-results/database-browser-report.json",
       },
     ],
   ],

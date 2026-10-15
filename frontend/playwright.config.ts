@@ -18,6 +18,6 @@ export default defineConfig({
   },
   reporter: [
     ["list"],
-    ["json", { outputFile: process.env.TROVE_BROWSER_REPORT ?? "../evidence/phase1-browser-tests.json" }],
+    ["json", { outputFile: process.env.TROVE_BROWSER_REPORT ?? "test-results/browser-report.json" }],
   ],
 });

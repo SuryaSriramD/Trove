@@ -165,6 +165,15 @@ window.go = {
         const request = JSON.parse(raw);
         state.calls.push({ method, ...request });
         const ok = (result: any) => JSON.stringify({ ok: true, result });
+        if (method === "recordLayouts.get")
+          return ok({
+            collectionId: request.collectionId,
+            ...(request.recordId ? { recordId: request.recordId } : {}),
+            defaultLayout: null,
+            overrideLayout: null,
+            effectiveLayout: { version: 1, sections: [], hiddenPropertyIds: [] },
+            missingPropertyIds: [],
+          });
         if (method === "databaseP2")
           return ok({
             config: {
