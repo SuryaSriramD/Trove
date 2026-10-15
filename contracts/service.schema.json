@@ -9698,6 +9698,50 @@
       ],
       "additionalProperties": false
     },
+    "ImportIdentityReviewPreview": {
+      "type": "object",
+      "properties": {
+        "sourceLocator": {
+          "type": "string"
+        },
+        "incomingSourceRevision": {
+          "type": "string"
+        },
+        "identityKind": {
+          "type": "string",
+          "enum": [
+            "external_id",
+            "derived_locator"
+          ]
+        },
+        "externalId": {
+          "type": "string"
+        },
+        "reason": {
+          "type": "string"
+        },
+        "proposedPageId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "choice": {
+          "type": "string",
+          "enum": [
+            "link_existing",
+            "create_new",
+            "skip"
+          ]
+        }
+      },
+      "required": [
+        "sourceLocator",
+        "incomingSourceRevision",
+        "identityKind",
+        "externalId",
+        "reason",
+        "proposedPageId"
+      ],
+      "additionalProperties": false
+    },
     "PreviewImportResult": {
       "type": "object",
       "properties": {
@@ -9721,6 +9765,13 @@
           "type": "array",
           "items": {
             "$ref": "#/$defs/ExpectedRevision"
+          },
+          "maxItems": 10000
+        },
+        "identityReviews": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/ImportIdentityReviewPreview"
           },
           "maxItems": 10000
         }
@@ -9751,6 +9802,33 @@
         },
         "planHash": {
           "$ref": "domain.schema.json#/$defs/Hash"
+        },
+        "identityResolutions": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "sourceLocator": {
+                "type": "string"
+              },
+              "incomingSourceRevision": {
+                "type": "string"
+              },
+              "identityChoice": {
+                "$ref": "domain.schema.json#/$defs/ImportIdentityResolution"
+              },
+              "expectedLocalRevision": {
+                "$ref": "domain.schema.json#/$defs/Revision"
+              }
+            },
+            "required": [
+              "sourceLocator",
+              "incomingSourceRevision",
+              "identityChoice"
+            ],
+            "additionalProperties": false
+          },
+          "maxItems": 10000
         },
         "csvKeys": {
           "type": "array",

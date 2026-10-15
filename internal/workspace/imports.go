@@ -25,6 +25,7 @@ import (
 )
 
 const importSchema = `
+CREATE TABLE IF NOT EXISTS import_reviewed_identities_v1(source_system TEXT NOT NULL,source_namespace TEXT NOT NULL,identity_kind TEXT NOT NULL,identity_value TEXT NOT NULL,source_locator TEXT NOT NULL,binding_json TEXT NOT NULL CHECK(json_valid(binding_json)),PRIMARY KEY(source_system,source_namespace,identity_kind,identity_value,source_locator));
 CREATE TABLE IF NOT EXISTS import_runs(id TEXT PRIMARY KEY,plan_hash TEXT NOT NULL,plan_json TEXT NOT NULL CHECK(json_valid(plan_json)),created_at TEXT NOT NULL,updated_at TEXT NOT NULL);
 CREATE TABLE IF NOT EXISTS import_mapping_state(mapping_id TEXT PRIMARY KEY REFERENCES import_mappings(id),local_revision TEXT NOT NULL);
 CREATE TABLE IF NOT EXISTS import_baselines(mapping_id TEXT PRIMARY KEY REFERENCES import_mappings(id),normalizer_version INTEGER NOT NULL,snapshot_json TEXT NOT NULL CHECK(json_valid(snapshot_json)),source_revision TEXT NOT NULL,raw_file_id TEXT NOT NULL REFERENCES files(id),import_run_id TEXT NOT NULL REFERENCES import_runs(id));
@@ -49,6 +50,8 @@ type ImportBlock struct {
 	Data map[string]any `json:"data"`
 }
 type ImportItem struct {
+	IdentityReview          *ImportIdentityReview                   `json:"identityReview,omitempty"`
+	IdentityAlias           string                                  `json:"identityAlias,omitempty"`
 	SourceDeletionProof     *ImportSourceDeletionProof              `json:"sourceDeletionProof,omitempty"`
 	CollectionSourceScope   string                                  `json:"collectionSourceScope,omitempty"`
 	PortableIdentity        string                                  `json:"portableIdentity,omitempty"`
@@ -522,6 +525,9 @@ func configurePortableImport(ctx context.Context, k *Kernel, e contracts.Service
 		if str(r["planHash"]) != p.Hash {
 			return Fail("CONFLICT", "Preview changed; reload it")
 		}
+		if err := configureImportIdentities(ctx, k, tx, e, &p, asList(r["identityResolutions"])); err != nil {
+			return err
+		}
 		changes, _ := r["columns"].([]any)
 		for _, raw := range changes {
 			c, ok := raw.(map[string]any)
@@ -597,6 +603,9 @@ func configurePortableImport(ctx context.Context, k *Kernel, e contracts.Service
 					continue
 				}
 				choice := str(c["choice"])
+				if item.IdentityReview != nil && choice == "duplicate" {
+					return Fail("CONFLICT", "A reviewed identity cannot be changed by a content choice; create a fresh identity preview")
+				}
 				if isSourceDeletion(item.Kind) && choice != "keep_local" && choice != "merge" {
 					return Fail("INVALID_REQUEST", "A missing source page can only be kept or explicitly reviewed for deletion")
 				}

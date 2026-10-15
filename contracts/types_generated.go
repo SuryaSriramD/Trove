@@ -3673,20 +3673,36 @@ type ServicePreviewImportRequest struct {
 	Channel          string      `json:"channel"`
 	DestinationScope DomainScope `json:"destinationScope"`
 }
+type ServiceImportIdentityReviewPreview struct {
+	SourceLocator          string   `json:"sourceLocator"`
+	IncomingSourceRevision string   `json:"incomingSourceRevision"`
+	IdentityKind           string   `json:"identityKind"`
+	ExternalId             string   `json:"externalId"`
+	Reason                 string   `json:"reason"`
+	ProposedPageId         DomainId `json:"proposedPageId"`
+	Choice                 *string  `json:"choice,omitempty"`
+}
 type ServicePreviewImportResult struct {
-	PlanId            DomainId                  `json:"planId"`
-	PlanHash          DomainHash                `json:"planHash"`
-	Report            ServiceImportReport       `json:"report"`
-	ReimportPlans     []DomainReimportPlan      `json:"reimportPlans"`
-	RequiredRevisions []ServiceExpectedRevision `json:"requiredRevisions"`
+	PlanId            DomainId                             `json:"planId"`
+	PlanHash          DomainHash                           `json:"planHash"`
+	Report            ServiceImportReport                  `json:"report"`
+	ReimportPlans     []DomainReimportPlan                 `json:"reimportPlans"`
+	RequiredRevisions []ServiceExpectedRevision            `json:"requiredRevisions"`
+	IdentityReviews   []ServiceImportIdentityReviewPreview `json:"identityReviews,omitempty"`
 }
 type ServiceConfigureImportRequest struct {
-	ContractVersion int64      `json:"contractVersion"`
-	RequestId       DomainId   `json:"requestId"`
-	WorkspaceId     DomainId   `json:"workspaceId"`
-	PlanId          DomainId   `json:"planId"`
-	PlanHash        DomainHash `json:"planHash"`
-	CsvKeys         []struct {
+	ContractVersion     int64      `json:"contractVersion"`
+	RequestId           DomainId   `json:"requestId"`
+	WorkspaceId         DomainId   `json:"workspaceId"`
+	PlanId              DomainId   `json:"planId"`
+	PlanHash            DomainHash `json:"planHash"`
+	IdentityResolutions []struct {
+		SourceLocator          string                         `json:"sourceLocator"`
+		IncomingSourceRevision string                         `json:"incomingSourceRevision"`
+		IdentityChoice         DomainImportIdentityResolution `json:"identityChoice"`
+		ExpectedLocalRevision  *DomainRevision                `json:"expectedLocalRevision,omitempty"`
+	} `json:"identityResolutions,omitempty"`
+	CsvKeys []struct {
 		SourceLocator string `json:"sourceLocator"`
 		Index         int64  `json:"index"`
 	} `json:"csvKeys,omitempty"`

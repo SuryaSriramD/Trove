@@ -11,6 +11,16 @@ type Column = {
   warning?: string;
 };
 type Item = {
+  hash?: string;
+  externalId?: string;
+  identityKind?: string;
+  identityReview?: {
+    version: 1;
+    reason: string;
+    newPageId: string;
+    choice?: string;
+    localId?: string;
+  };
   csvKeyColumn?: string;
   merge?: {
     baselineStatus: "retained" | "unavailable";
@@ -36,6 +46,111 @@ type Item = {
   committed: boolean;
   columns?: Column[];
 };
+function ImportIdentityDecision({
+  item,
+  workspace,
+  disabled,
+  configure,
+}: {
+  item: Item;
+  workspace: WorkspaceSnapshot;
+  disabled: boolean;
+  configure: (data: object) => Promise<void>;
+}) {
+  const [target, setTarget] = useState("");
+  const review = item.identityReview!;
+  const pages = workspace.pages.filter(
+    (p) =>
+      !p.deletedAt &&
+      !workspace.records.some((r) => r.pageId === p.id) &&
+      !workspace.collections.some((c) => c.owningPageId === p.id),
+  );
+  function choose(choice: "link_existing" | "create_new" | "skip") {
+    const page = pages.find((p) => p.id === target);
+    if (choice === "link_existing" && !page) return;
+    void configure({
+      identityResolutions: [
+        {
+          sourceLocator: item.sourceLocator,
+          incomingSourceRevision: item.hash,
+          identityChoice:
+            choice === "skip"
+              ? { choice }
+              : {
+                  choice,
+                  localKind: "page",
+                  localId: choice === "create_new" ? review.newPageId : target,
+                },
+          ...(page && choice === "link_existing"
+            ? { expectedLocalRevision: page.revision }
+            : {}),
+        },
+      ],
+    });
+  }
+  return (
+    <div className="import-conflict">
+      <strong>{item.sourceLocator}</strong>
+      <p>{review.reason}</p>
+      <p>
+        Source identity: {item.identityKind} · {item.externalId}. Titles and
+        matching bytes do not select a page.
+      </p>
+      {review.choice ? (
+        <p role="status">
+          Identity decision: {review.choice.replaceAll("_", " ")}
+          {review.localId ? ` · ${review.localId}` : ""}. Create a new preview
+          to change this decision.
+        </p>
+      ) : (
+        <>
+          <label>
+            Existing local page{" "}
+            <select
+              aria-label={`Existing page for ${item.sourceLocator}`}
+              disabled={disabled}
+              value={target}
+              onChange={(e) => setTarget(e.target.value)}
+            >
+              <option value="">Choose a page explicitly…</option>
+              {pages.map((p) => (
+                <option key={p.id} value={p.id}>
+                  {p.title} · {p.id}
+                </option>
+              ))}
+            </select>
+          </label>
+          <button
+            type="button"
+            disabled={disabled || !target}
+            onClick={() => choose("link_existing")}
+          >
+            Link existing page for {item.sourceLocator}
+          </button>
+          <button
+            type="button"
+            disabled={disabled}
+            onClick={() => choose("create_new")}
+          >
+            Create new page for {item.sourceLocator}
+          </button>
+          <button
+            type="button"
+            disabled={disabled}
+            onClick={() => choose("skip")}
+          >
+            Skip {item.sourceLocator}
+          </button>
+          <p>
+            A link opens a separate field review using retained source evidence.
+            Skip keeps the source bytes and creates no content for this item;
+            unresolved child or link dependencies prevent application.
+          </p>
+        </>
+      )}
+    </div>
+  );
+}
 type Presence = { present: boolean; value?: unknown };
 const describeField = (value: Presence) =>
   value.present ? JSON.stringify(value.value, null, 2) : "(absent)";
@@ -354,7 +469,11 @@ export function ImportExportPanel({
       }
     });
   const unresolved =
-    plan?.items.filter((i) => i.conflict && !i.choice).length ?? 0;
+    plan?.items.filter(
+      (i) =>
+        (i.identityReview && !i.identityReview.choice) ||
+        (i.conflict && !i.choice),
+    ).length ?? 0;
   return (
     <section
       className="import-export-panel"
@@ -635,13 +754,36 @@ export function ImportExportPanel({
                   </table>
                 </details>
               ))}
-          {plan.items.some((i) => i.conflict) && (
+          {plan.items.some((i) => i.identityReview) && (
+            <details open>
+              <summary>Review source identities</summary>
+              {plan.items
+                .filter((i) => i.identityReview)
+                .map((item) => (
+                  <ImportIdentityDecision
+                    key={item.sourceLocator}
+                    item={item}
+                    workspace={workspace}
+                    disabled={busy || running || plan.initialized}
+                    configure={configure}
+                  />
+                ))}
+            </details>
+          )}
+          {plan.items.some(
+            (i) =>
+              i.conflict && (!i.identityReview || !!i.identityReview.choice),
+          ) && (
             <details open>
               <summary>
                 Review re-import conflicts ({unresolved} unresolved)
               </summary>
               {plan.items
-                .filter((i) => i.conflict)
+                .filter(
+                  (i) =>
+                    i.conflict &&
+                    (!i.identityReview || !!i.identityReview.choice),
+                )
                 .map((item) => (
                   <div className="import-conflict" key={item.sourceLocator}>
                     <strong>{item.sourceLocator}</strong>
@@ -756,7 +898,11 @@ export function ImportExportPanel({
                                       </option>
                                       <option value="take_incoming">
                                         {(field.path.startsWith("/records/") ||
-                                          field.path === "/exists" || field.path === "/collectionExists" || field.path.startsWith("/collectionRecords/")) &&
+                                          field.path === "/exists" ||
+                                          field.path === "/collectionExists" ||
+                                          field.path.startsWith(
+                                            "/collectionRecords/",
+                                          )) &&
                                         !field.incoming.present
                                           ? "Accept source deletion"
                                           : "Take incoming"}
@@ -846,11 +992,12 @@ export function ImportExportPanel({
                             Replace the page body with incoming content
                           </option>
                         )}
-                      {!item.kind.startsWith("source_deleted_") && (
-                        <option value="duplicate">
-                          Import a separate copy
-                        </option>
-                      )}
+                      {!item.identityReview &&
+                        !item.kind.startsWith("source_deleted_") && (
+                          <option value="duplicate">
+                            Import a separate copy
+                          </option>
+                        )}
                     </select>
                   </div>
                 ))}
@@ -903,11 +1050,20 @@ export function ImportExportPanel({
                     : "Commit reviewed import"}
                 </button>
               ))}
-            {plan.initialized && (
-              <button onClick={() => onOpenPage?.(plan.rootPageId)}>
-                Open imported pages
-              </button>
-            )}
+            {plan.initialized &&
+              !(
+                plan.items.some((i) => i.identityReview?.choice === "skip") &&
+                plan.items.every(
+                  (i) =>
+                    !i.pageId ||
+                    i.kind === "folder" ||
+                    i.identityReview?.choice === "skip",
+                )
+              ) && (
+                <button onClick={() => onOpenPage?.(plan.rootPageId)}>
+                  Open imported pages
+                </button>
+              )}
           </div>
           <details open>
             <summary>Complete item inventory and report</summary>

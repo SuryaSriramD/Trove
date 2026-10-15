@@ -119,6 +119,9 @@ func applyPortableImport(m *Mutation, c map[string]any) error {
 	if p.State == "complete" {
 		return nil
 	}
+	if err := validateImportIdentities(m.Context, m.Tx, &p); err != nil {
+		return err
+	}
 	if p.Initialized {
 		for i := range p.Items {
 			if err := checkImportMergeGuards(m, &p.Items[i]); err != nil {
@@ -162,7 +165,7 @@ func applyPortableImport(m *Mutation, c map[string]any) error {
 			if item.Conflict != "" && item.Choice == "" {
 				return Fail("CONFLICT", "Resolve re-import conflict for "+item.Locator)
 			}
-			if item.MappingID != "" {
+			if item.MappingID != "" && item.ExpectedRevision != "" {
 				var revision string
 				var deleted sql.NullString
 				err := m.Tx.QueryRowContext(m.Context, "SELECT revision,deleted_at FROM pages WHERE id=?", item.PageID).Scan(&revision, &deleted)
@@ -256,6 +259,14 @@ func applyPortableImport(m *Mutation, c map[string]any) error {
 		if err := validateReviewedImportDatabase(m.Context, m.Tx, &p); err != nil {
 			return err
 		}
+		if !importHasContent(&p) {
+			p.Initialized, p.Cursor, p.State = true, len(p.Items), "complete"
+			for i := range p.Items {
+				p.Items[i].Committed = true
+			}
+			p.CommittedBatchIDs = append(p.CommittedBatchIDs, string(m.Request.RequestId))
+			return saveImportPlan(m.Context, m.Tx, p)
+		}
 		if err = guardImport(m, "page", p.RootID); err != nil {
 			return err
 		}
@@ -272,7 +283,7 @@ func applyPortableImport(m *Mutation, c map[string]any) error {
 					return err
 				}
 			}
-			if item.PageID != "" && item.Choice != "keep_local" {
+			if item.PageID != "" && item.Choice != "keep_local" && !importIdentitySkipped(item) {
 				pending = append(pending, i)
 			}
 		}
@@ -359,6 +370,9 @@ func applyPortableImport(m *Mutation, c map[string]any) error {
 			item.ExpectedRevision = string(v.After)
 		}
 	}
+	if err := refreshImportIdentityGuards(m.Context, m.Tx, &p); err != nil {
+		return err
+	}
 	p.CommittedBatchIDs = append(p.CommittedBatchIDs, string(m.Request.RequestId))
 	return saveImportPlan(m.Context, m.Tx, p)
 }
@@ -388,6 +402,9 @@ func rewriteImportBlock(v any, ids map[string]string) {
 }
 
 func commitImportItem(m *Mutation, p *ImportPlan, item *ImportItem) error {
+	if importIdentitySkipped(*item) {
+		return nil
+	}
 	if isSourceDeletion(item.Kind) {
 		return nil
 	}
@@ -402,6 +419,9 @@ func commitImportItem(m *Mutation, p *ImportPlan, item *ImportItem) error {
 			}
 			if revision != item.ExpectedRevision {
 				return Fail("CONFLICT", "Page changed after import review")
+			}
+			if err := persistReviewedImportMapping(m, p, item); err != nil {
+				return err
 			}
 			if item.Kind != "portable_collection" {
 				if err := saveImportBaseline(m, p, item); err != nil {
@@ -518,7 +538,7 @@ func commitImportItem(m *Mutation, p *ImportPlan, item *ImportItem) error {
 			return err
 		}
 	}
-	provenance := map[string]any{"sourceSystem": importItemSourceSystem(p, item), "raw": map[string]any{"sourceNamespace": p.Namespace, "sourceLocator": item.Locator, "externalId": item.ExternalID, "rawFileId": item.RawFileID, "importRunId": p.ID, "supplied": item.Provenance, "sourceBlockIdentities": item.BlockSources}}
+	provenance := map[string]any{"sourceSystem": importItemSourceSystem(p, item), "raw": map[string]any{"sourceNamespace": p.Namespace, "sourceLocator": item.Locator, "externalId": item.ExternalID, "rawFileId": item.RawFileID, "importRunId": p.ID, "supplied": item.Provenance, "sourceBlockIdentities": item.BlockSources, "reviewedIdentity": item.IdentityReview}}
 	if _, err := m.Exec("UPDATE pages SET provenance_json=? WHERE id=?", string(marshal(provenance)), item.PageID); err != nil {
 		return err
 	}
@@ -646,25 +666,31 @@ func commitImportItem(m *Mutation, p *ImportPlan, item *ImportItem) error {
 			mapping = NewID()
 			item.MappingID = mapping
 		}
-		_, err := m.Exec(`INSERT INTO import_mappings VALUES(?,?,?,?,? ,?,? ,'page',?,?,?,?,?) ON CONFLICT(workspace_id,source_system,source_namespace,external_kind,identity_kind,identity_value) DO UPDATE SET base_source_revision=excluded.base_source_revision,base_content_hash=excluded.base_content_hash,base_raw_file_id=excluded.base_raw_file_id,last_import_run_id=excluded.last_import_run_id`, mapping, m.Kernel.id, importItemSourceSystem(p, item), p.Namespace, "page", item.IdentityKind, item.ExternalID, item.PageID, item.Hash, item.Hash, item.RawFileID, p.ID)
-		if err != nil {
-			return err
+		if item.IdentityReview != nil {
+			if err := persistReviewedImportMapping(m, p, item); err != nil {
+				return err
+			}
+		} else {
+			_, err := m.Exec(`INSERT INTO import_mappings VALUES(?,?,?,?,? ,?,? ,'page',?,?,?,?,?) ON CONFLICT(workspace_id,source_system,source_namespace,external_kind,identity_kind,identity_value) DO UPDATE SET base_source_revision=excluded.base_source_revision,base_content_hash=excluded.base_content_hash,base_raw_file_id=excluded.base_raw_file_id,last_import_run_id=excluded.last_import_run_id`, mapping, m.Kernel.id, importItemSourceSystem(p, item), p.Namespace, "page", item.IdentityKind, item.ExternalID, item.PageID, item.Hash, item.Hash, item.RawFileID, p.ID)
+			if err != nil {
+				return err
+			}
+			// Resolve the actual mapping ID when an existing identity was updated.
+			if err = m.Tx.QueryRowContext(m.Context, "SELECT id FROM import_mappings WHERE workspace_id=? AND source_system=? AND source_namespace=? AND external_kind='page' AND identity_kind=? AND identity_value=?", m.Kernel.id, importItemSourceSystem(p, item), p.Namespace, item.IdentityKind, item.ExternalID).Scan(&mapping); err != nil {
+				return err
+			}
+			item.MappingID = mapping
 		}
-		// Resolve the actual mapping ID when an existing identity was updated.
-		if err = m.Tx.QueryRowContext(m.Context, "SELECT id FROM import_mappings WHERE workspace_id=? AND source_system=? AND source_namespace=? AND external_kind='page' AND identity_kind=? AND identity_value=?", m.Kernel.id, importItemSourceSystem(p, item), p.Namespace, item.IdentityKind, item.ExternalID).Scan(&mapping); err != nil {
-			return err
-		}
-		item.MappingID = mapping
 		if item.Kind != "portable_collection" {
-			if err = saveImportBaseline(m, p, item); err != nil {
+			if err := saveImportBaseline(m, p, item); err != nil {
 				return err
 			}
 		}
-		if _, err = m.Exec("INSERT OR REPLACE INTO import_observations VALUES(?,?,?,?,?)", mapping, p.ID, item.Hash, item.RawFileID, item.Outcome); err != nil {
+		if _, err := m.Exec("INSERT OR REPLACE INTO import_observations VALUES(?,?,?,?,?)", mapping, p.ID, item.Hash, item.RawFileID, item.Outcome); err != nil {
 			return err
 		}
 		revision := m.touched[guardKey("page", item.PageID)].After
-		if _, err = m.Exec("INSERT OR REPLACE INTO import_mapping_state VALUES(?,?)", mapping, revision); err != nil {
+		if _, err := m.Exec("INSERT OR REPLACE INTO import_mapping_state VALUES(?,?)", mapping, revision); err != nil {
 			return err
 		}
 	}

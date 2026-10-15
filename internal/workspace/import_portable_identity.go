@@ -39,6 +39,11 @@ func retainedPortableMappings(ctx context.Context, q querier, p *ImportPlan) (ma
 			continue
 		}
 		for _, item := range prior.Items {
+			// Reviewed collision/locator bindings are resolved through their exact
+			// versioned alias. They cannot become a single legacy rendition map.
+			if item.IdentityReview != nil {
+				continue
+			}
 			if item.MappingID != m.ID || !item.Committed || strings.Contains(item.ExternalID, "#copy=") {
 				continue
 			}

@@ -99,14 +99,22 @@ func previewCanonicalImport(ctx context.Context, k *Kernel, e contracts.ServiceE
 		return nil, err
 	}
 	p := value.(ImportPlan)
+	identities := []any{}
 	plans := []any{}
 	guards := []any{}
 	for _, item := range p.Items {
-		if item.MappingID == "" {
+		if review := item.IdentityReview; review != nil {
+			identity := map[string]any{"sourceLocator": item.Locator, "incomingSourceRevision": item.Hash, "identityKind": item.IdentityKind, "externalId": item.ExternalID, "reason": review.Reason, "proposedPageId": review.NewPageID}
+			if review.Choice != "" {
+				identity["choice"] = review.Choice
+			}
+			identities = append(identities, identity)
+		}
+		if item.MappingID == "" || item.ExpectedRevision == "" {
 			continue
 		}
 		plans = append(plans, importMergeContract(item, p))
 		guards = append(guards, required("page", item.PageID, item.ExpectedRevision))
 	}
-	return map[string]any{"planId": p.ID, "planHash": p.Hash, "report": portableImportReport(p), "reimportPlans": plans, "requiredRevisions": guards}, nil
+	return map[string]any{"planId": p.ID, "planHash": p.Hash, "report": portableImportReport(p), "identityReviews": identities, "reimportPlans": plans, "requiredRevisions": guards}, nil
 }
