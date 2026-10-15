@@ -23,8 +23,68 @@ func assertExplicitAttachment(t *testing.T, k *Kernel, page string, r ImportAtta
 	t.Helper()
 	kind, source := attachmentReference(r)
 	var count int
-	if err := k.db.QueryRow("SELECT count(*) FROM file_references WHERE page_id=? AND source_kind=? AND source_id=? AND file_id=?", page, kind, source, r.FileID).Scan(&count); err != nil || count != want {
+	if err := k.db.QueryRow("SELECT count(DISTINCT file_id) FROM file_references WHERE page_id=? AND source_kind IN (?,?) AND source_id=? AND file_id=?", page, kind, attachmentLegacyKind(r), source, r.FileID).Scan(&count); err != nil || count != want {
 		t.Fatalf("relationship %s: count=%d want=%d err=%v", marshal(r), count, want, err)
+	}
+}
+
+func TestImportAttachmentExplicitSameBytesSurviveEvidenceDeduplicationAndHistory(t *testing.T) {
+	for _, legacy := range []bool{false, true} {
+		name := "separate evidence reference"
+		if legacy {
+			name = "legacy ambiguous reference"
+		}
+		t.Run(name, func(t *testing.T) {
+			k, e := testKernel(t)
+			body := `<p id="one">Same bytes deliberately attached by the user</p>`
+			first := completeImportFixture(t, k, e, importFixture(t, k, e, map[string]string{"A.html": body}))
+			item := first.Items[0]
+			if legacy {
+				if _, err := k.db.Exec("UPDATE file_references SET source_kind='explicit' WHERE source_kind='import_evidence'"); err != nil {
+					t.Fatal(err)
+				}
+			}
+			file, _ := attachTestFile(t, k, e, item.PageID, stageTestFile(t, k, e, body), false)
+			if file != item.RawFileID {
+				t.Fatal("fixture did not exercise byte deduplication")
+			}
+			var revision string
+			if err := k.db.QueryRow("SELECT revision FROM pages WHERE id=?", item.PageID).Scan(&revision); err != nil {
+				t.Fatal(err)
+			}
+			testOK(t, dbBatch(t, k, e, []any{map[string]any{"kind": "page.update", "pageId": item.PageID, "title": "Changed"}}, "page", item.PageID))
+			testOK(t, restoreTest(t, k, e, item.PageID, revision))
+			var userReference int
+			if err := k.db.QueryRow("SELECT count(*) FROM file_references WHERE page_id=? AND source_kind='explicit_user' AND file_id=?", item.PageID, file).Scan(&userReference); err != nil || userReference != 1 {
+				t.Fatal("history lost explicit user intent", userReference, err)
+			}
+			entries := exportPrivacyEntries(t, k, e, false)
+			assertExportAsset(t, entries, file, body)
+			var manifest portableHierarchy
+			json.Unmarshal([]byte(entries["trove-manifest.json"]), &manifest)
+			count := 0
+			for _, p := range manifest.Pages {
+				if string(p.CanonicalPage.Id) == item.PageID {
+					for _, r := range p.AttachmentRelationships {
+						if r.FileID == file {
+							count++
+						}
+					}
+				}
+			}
+			if count != 1 {
+				t.Fatal("user relationship omitted or duplicated by evidence inference", count)
+			}
+			target, te := testKernel(t)
+			roundtrip := completeImportFixture(t, target, te, importFixture(t, target, te, entries))
+			imported := importedPageNamed(t, roundtrip, item.Title)
+			if len(imported.AttachmentRelationships) != 1 {
+				t.Fatal("same-bytes relationship lost in round trip")
+			}
+			for _, r := range imported.AttachmentRelationships {
+				assertExplicitAttachment(t, target, imported.PageID, r, 1)
+			}
+		})
 	}
 }
 

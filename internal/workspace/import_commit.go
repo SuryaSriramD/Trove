@@ -92,7 +92,7 @@ func importAttach(m *Mutation, page, file string) error {
 	if file == "" {
 		return nil
 	}
-	_, err := m.Exec("INSERT OR IGNORE INTO file_references VALUES(?,'explicit',?,?)", page, file, file)
+	_, err := m.Exec("INSERT OR IGNORE INTO file_references VALUES(?,'import_evidence',?,?)", page, file, file)
 	return err
 }
 func applyPortableImport(m *Mutation, c map[string]any) error {

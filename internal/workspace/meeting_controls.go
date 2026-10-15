@@ -96,7 +96,7 @@ func readMeetingRetention(ctx context.Context, q querier, meeting string) (reten
 		return s, err
 	}
 	if s.Audio != "" {
-		if err = q.QueryRowContext(ctx, "SELECT count(*) FROM file_references WHERE file_id=? AND NOT(page_id=? AND source_kind IN('explicit','meeting'))", s.Audio, s.Page).Scan(&s.OtherAudioReferences); err != nil {
+		if err = q.QueryRowContext(ctx, "SELECT count(*) FROM file_references WHERE file_id=? AND NOT(page_id=? AND source_kind IN('explicit','explicit_user','meeting'))", s.Audio, s.Page).Scan(&s.OtherAudioReferences); err != nil {
 			return s, err
 		}
 	}
@@ -293,7 +293,7 @@ func applyMeetingRetention(m *Mutation, c map[string]any) error {
 			if _, err = m.Exec("UPDATE meetings SET recording_file_id=NULL WHERE id=?", s.Meeting); err != nil {
 				return err
 			}
-			if _, err = m.Exec("DELETE FROM file_references WHERE page_id=? AND file_id=? AND source_kind='explicit'", s.Page, s.Audio); err != nil {
+			if _, err = m.Exec("DELETE FROM file_references WHERE page_id=? AND file_id=? AND source_kind IN('explicit','explicit_user')", s.Page, s.Audio); err != nil {
 				return err
 			}
 		case "transcripts":
