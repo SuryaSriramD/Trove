@@ -25,6 +25,7 @@ import (
 )
 
 type Kernel struct {
+	connectorContext      *ConnectorContext
 	diagnostics           *diagnostics.Store
 	db                    *sql.DB
 	writeDB               *sql.DB
