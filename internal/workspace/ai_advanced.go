@@ -13,16 +13,16 @@ import (
 	"trove.local/phase0/contracts"
 )
 
-const aiDatabaseDraftInstructions = `Return only one JSON object, without Markdown fences or commentary: {"title":"Name","properties":[{"name":"Example","type":"text","config":{}}],"view":"table"}. Do not include a title property; the service creates it. Every property must include name, type and config. Canonical simple types are text, number, checkbox, date, url, email and phone. Use checkbox, never boolean. Number config is {"format":"decimal"}; the other simple types use {}. Do not invent config keys. Supported views are table, list and gallery. Maximum 32 properties. This is a reviewable draft, never an applied change.`
+const aiDatabaseDraftInstructions = `Return only one JSON object, without Markdown fences or commentary: {"title":"Name","properties":[{"name":"Example","type":"text","config":{}}],"view":"table"}. Set title to the full requested database name, preserving every word, case and punctuation without abbreviation. This is separate from the title property, which the service creates; do not include that property. Every property must include name, type and config. Canonical simple types are text, number, checkbox, date, url, email and phone. Use checkbox, never boolean. Number config is {"format":"decimal"}; the other simple types use {}. Do not invent config keys. Supported views are table, list and gallery. Maximum 32 properties. This is a reviewable draft, never an applied change.`
 
 // Structured drafts are data only. Neither validation nor approval executes code.
 var advancedAIInstructions = map[string]string{
 	"database":        aiDatabaseDraftInstructions,
 	"schema":          aiDatabaseDraftInstructions,
-	"mermaid":         `Return only Mermaid source, with no Markdown fence. Use flowchart, sequenceDiagram, stateDiagram-v2, classDiagram, erDiagram, gantt, pie, mindmap or timeline. Do not use links, click actions, HTML or init directives.`,
+	"mermaid":         aiMermaidDraftInstructions,
 	"code_explain":    "Explain the selected code and its assumptions. Never execute it. Distinguish observed behavior from suggestions.",
 	"code_refactor":   aiCodeDraftInstructions + " Preserve intended behavior. The user will review a source diff.",
-	"code_comment":    aiCodeDraftInstructions + " Add useful comments while preserving the function logic, syntax and behavior.",
+	"code_comment":    aiCodeDraftInstructions + aiCommentDraftInstructions,
 	"organize":        "Suggest page organization, tags and links using only the approved source context. Each suggestion must explain why and remain unapplied. Never claim a change was made.",
 	"workspace_agent": actionPlanInstructions,
 }
