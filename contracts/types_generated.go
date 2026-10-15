@@ -881,9 +881,10 @@ type DomainHumanReviewEvent struct {
 	ContentIdentity DomainSemanticContentIdentity `json:"contentIdentity"`
 }
 type DomainPageFreshness struct {
-	State           string                        `json:"state"`
-	ContentIdentity DomainSemanticContentIdentity `json:"contentIdentity"`
-	Review          *DomainHumanReviewEvent       `json:"review,omitempty"`
+	State           string                         `json:"state"`
+	ContentIdentity *DomainSemanticContentIdentity `json:"contentIdentity,omitempty"`
+	Review          *DomainHumanReviewEvent        `json:"review,omitempty"`
+	Message         *string                        `json:"message,omitempty"`
 }
 type DomainImportNormalizedSnapshot struct {
 	Version               int64                      `json:"version"`

@@ -188,10 +188,17 @@ func scanReview(row interface{ Scan(...any) error }) (contracts.DomainHumanRevie
 	return r, err
 }
 func pageFreshness(ctx context.Context, q querier, page string, at time.Time) (contracts.DomainPageFreshness, error) {
-	identity, err := semanticContentIdentity(ctx, q, page)
-	out := contracts.DomainPageFreshness{State: "never_reviewed", ContentIdentity: identity}
-	if err != nil {
-		return out, err
+	identity, identityErr := semanticContentIdentity(ctx, q, page)
+	out := contracts.DomainPageFreshness{State: "never_reviewed", ContentIdentity: &identity}
+	if identityErr != nil {
+		var failure *ServiceFailure
+		if !errors.As(identityErr, &failure) || failure.Code != "RESOURCE_EXHAUSTED" {
+			return out, identityErr
+		}
+		// A bounded review projection must not disable ordinary search, evidence or
+		// queue reads. Preserve the old event, never invent a digest or a new review.
+		message := "Review status is unavailable because this page exceeds the bounded review coverage. Review individual records or a smaller collection."
+		out.State, out.ContentIdentity, out.Message = "unavailable", nil, &message
 	}
 	r, err := scanReview(q.QueryRowContext(ctx, `SELECT id,page_id,actor_id,reviewed_at,expires_at,identity_version,content_digest FROM page_review_events WHERE page_id=? ORDER BY sequence DESC LIMIT 1`, page))
 	if errors.Is(err, sql.ErrNoRows) {
@@ -201,6 +208,9 @@ func pageFreshness(ctx context.Context, q querier, page string, at time.Time) (c
 		return out, err
 	}
 	out.Review = &r
+	if identityErr != nil {
+		return out, nil
+	}
 	out.State = "reviewed"
 	if r.ContentIdentity != identity {
 		out.State = "stale"
@@ -215,6 +225,7 @@ func pageFreshness(ctx context.Context, q querier, page string, at time.Time) (c
 	}
 	return out, nil
 }
+
 func reviewPage(m *Mutation, c map[string]any) error {
 	if m.Execution.Actor.Kind != "user" || m.Execution.Origin != "user" {
 		return Fail("SCOPE_DENIED", "A human review must be recorded by the user")
