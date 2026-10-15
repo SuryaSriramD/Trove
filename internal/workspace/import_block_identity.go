@@ -2,9 +2,81 @@ package workspace
 
 import (
 	"context"
+	"database/sql"
 	"encoding/json"
+	"errors"
 	"strings"
 )
+
+// Synthetic directory pages belong to the versioned import projection. Reuse
+// them only from retained plans referenced by this capture's matched objects;
+// titles and unrelated historical imports are not identity evidence.
+func reconcileImportFolderIDs(ctx context.Context, q querier, p *ImportPlan) error {
+	priorRuns := map[string]bool{}
+	for _, item := range p.Items {
+		if item.MappingID == "" {
+			continue
+		}
+		var run string
+		err := q.QueryRowContext(ctx, "SELECT import_run_id FROM import_baselines WHERE mapping_id=? AND normalizer_version=?", item.MappingID, importNormalizerVersion).Scan(&run)
+		if errors.Is(err, sql.ErrNoRows) {
+			continue
+		}
+		if err != nil {
+			return err
+		}
+		priorRuns[run] = true
+	}
+	byLocator := map[string]map[string]string{}
+	for run := range priorRuns {
+		prior, err := loadImportPlan(ctx, q, run)
+		if err != nil {
+			return err
+		}
+		if prior.NormalizerVersion != importNormalizerVersion || prior.Namespace != p.Namespace || prior.SourceSystem != p.SourceSystem {
+			continue
+		}
+		for _, item := range prior.Items {
+			if item.Kind != "folder" {
+				continue
+			}
+			var revision string
+			err = q.QueryRowContext(ctx, "SELECT revision FROM pages WHERE id=? AND deleted_at IS NULL", item.PageID).Scan(&revision)
+			if errors.Is(err, sql.ErrNoRows) {
+				continue
+			}
+			if err != nil {
+				return err
+			}
+			if byLocator[item.Locator] == nil {
+				byLocator[item.Locator] = map[string]string{}
+			}
+			byLocator[item.Locator][item.PageID] = revision
+		}
+	}
+	ids := map[string]string{}
+	for i := range p.Items {
+		item := &p.Items[i]
+		if item.Kind != "folder" || len(byLocator[item.Locator]) != 1 {
+			continue
+		}
+		for id, revision := range byLocator[item.Locator] {
+			ids[item.PageID] = id
+			item.PageID, item.ExpectedRevision, item.Choice = id, revision, "keep_local"
+			item.Reason += "; existing directory identity retained from the accepted normalized source"
+		}
+	}
+	for i := range p.Items {
+		item := &p.Items[i]
+		if id := ids[item.ParentID]; id != "" {
+			item.ParentID = id
+		}
+		for j := range item.Blocks {
+			rewriteImportBlock(item.Blocks[j].Data, ids)
+		}
+	}
+	return nil
+}
 
 // Only explicit source IDs are reusable after source edits. Positional Markdown
 // lines/anonymous DOM paths are evidence, not invented durable source identity.

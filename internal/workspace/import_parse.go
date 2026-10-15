@@ -384,6 +384,9 @@ func (k *Kernel) parseImportPlan(ctx context.Context, p *ImportPlan) error {
 	p.Items = append(p.Items, rows...)
 	k.restorePortableBlocks(p, manifest)
 	k.restorePortableDatabase(p, manifest)
+	if err := reconcileImportFolderIDs(ctx, k.db, p); err != nil {
+		return err
+	}
 	for i := range p.Items {
 		if err := reconcileImportBlockIDs(ctx, k.db, &p.Items[i]); err != nil {
 			return err

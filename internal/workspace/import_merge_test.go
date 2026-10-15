@@ -4,9 +4,125 @@ import (
 	"context"
 	"database/sql"
 	"encoding/json"
+	"os"
+	"path/filepath"
 	"strings"
 	"testing"
 )
+
+func TestImportMergePartialAPIKeepsIdentityEvidenceForLaterFullCapture(t *testing.T) {
+	k, e := testKernel(t)
+	capture := func(text string) ImportPlan {
+		name := filepath.Join(t.TempDir(), "A.html")
+		if err := os.WriteFile(name, []byte(text), 0600); err != nil {
+			t.Fatal(err)
+		}
+		handle, err := k.RegisterSelection(name)
+		if err != nil {
+			t.Fatal(err)
+		}
+		result, err := previewPortableImport(context.Background(), k, e, map[string]any{"sourceHandle": handle, "sourceNamespace": "partial-identity", "sourceSystem": "notion_api"})
+		if err != nil {
+			t.Fatal(err)
+		}
+		return result.(ImportPlan)
+	}
+	first := completeImportFixture(t, k, e, capture(`<p id="one">one</p><p id="two">two</p>`))
+	secondID := first.Items[0].Blocks[1].ID
+	partial := capture(`<p id="one">one changed</p>`)
+	if partial.Items[0].Choice != "keep_local" {
+		partial = configureMergeFixture(t, k, partial, nil)
+	}
+	completeImportFixture(t, k, e, partial)
+	base, _, known, err := loadImportBaseline(context.Background(), k.db, first.Items[0].MappingID)
+	if err != nil || !known || base.BlockSources[secondID] != "html-id:two" {
+		t.Fatal("omitted block lost its source identity", err)
+	}
+	full := capture(`<p id="one">one changed</p><p id="two">two changed</p>`)
+	full = configureMergeFixture(t, k, full, nil)
+	completeImportFixture(t, k, e, full)
+	var raw string
+	if err = k.db.QueryRow("SELECT data_json FROM blocks WHERE id=?", secondID).Scan(&raw); err != nil || !strings.Contains(raw, "two changed") {
+		t.Fatal("full capture recreated the omitted source block", err)
+	}
+	var count int
+	k.db.QueryRow("SELECT count(*) FROM blocks WHERE page_id=?", first.Items[0].PageID).Scan(&count)
+	if count != 2 {
+		t.Fatal("partial/full capture duplicated blocks", count)
+	}
+}
+
+func TestImportMergeRetainsSyntheticFolderAndLocalPageMove(t *testing.T) {
+	k, e := testKernel(t)
+	first := completeImportFixture(t, k, e, importFixture(t, k, e, map[string]string{"folder/nested/A.html": `<p id="one">one</p>`}))
+	var original ImportItem
+	for _, item := range first.Items {
+		if item.Kind == "html" {
+			original = item
+		}
+	}
+	localParent := createPage(t, k, e, "Local destination")
+	var rev, parentRev, localRev string
+	k.db.QueryRow("SELECT revision FROM pages WHERE id=?", original.PageID).Scan(&rev)
+	k.db.QueryRow("SELECT revision FROM pages WHERE id=?", original.ParentID).Scan(&parentRev)
+	k.db.QueryRow("SELECT revision FROM pages WHERE id=?", localParent).Scan(&localRev)
+	testOK(t, testDispatch(t, k, e, "batch", testRequest(k, e, []any{map[string]any{"kind": "page.move", "pageId": original.PageID, "parentPageId": localParent}}, required("page", original.PageID, rev), required("page", original.ParentID, parentRev), required("page", localParent, localRev))))
+	for iteration := 0; iteration < 2; iteration++ {
+		preview := importFixture(t, k, e, map[string]string{"folder/nested/A.html": `<p id="one">one</p>`})
+		for _, item := range preview.Items {
+			if item.Kind == "html" && (item.Choice != "keep_local" || item.ParentID != original.ParentID) {
+				t.Fatal("unchanged source fabricated a directory move", item.Choice, item.ParentID)
+			}
+		}
+		completeImportFixture(t, k, e, preview)
+	}
+	var parent string
+	k.db.QueryRow("SELECT parent_page_id FROM pages WHERE id=?", original.PageID).Scan(&parent)
+	if parent != localParent {
+		t.Fatal("unchanged import undid the local page move")
+	}
+	var count int
+	k.db.QueryRow("SELECT count(*) FROM pages WHERE title IN ('folder','nested')").Scan(&count)
+	if count != 2 {
+		t.Fatal("reimport duplicated synthetic folders", count)
+	}
+}
+
+func TestImportMergePreservesLocalDisplayPreferences(t *testing.T) {
+	k, e := testKernel(t)
+	first := completeImportFixture(t, k, e, importFixture(t, k, e, map[string]string{"A.html": `<p id="one">one</p>`}))
+	page := first.Items[0].PageID
+	var rev string
+	k.db.QueryRow("SELECT revision FROM pages WHERE id=?", page).Scan(&rev)
+	testOK(t, testDispatch(t, k, e, "batch", testRequest(k, e, []any{map[string]any{"kind": "page.display.set", "pageId": page, "fullWidth": true, "presentation": true}}, required("page", page, rev))))
+	preview := importFixture(t, k, e, map[string]string{"A.html": `<p id="one">incoming</p>`})
+	preview.Items[0].DisplayPreferences = &PageDisplayPreferences{FullWidth: false, Presentation: false}
+	preview.Hash = importPlanHash(preview)
+	if err := k.write(context.Background(), func(tx *sql.Tx) error { return saveImportPlan(context.Background(), tx, preview) }); err != nil {
+		t.Fatal(err)
+	}
+	preview = configureMergeFixture(t, k, preview, nil)
+	completeImportFixture(t, k, e, preview)
+	var wide, presentation bool
+	if err := k.db.QueryRow("SELECT full_width,presentation FROM p2_page_display WHERE page_id=?", page).Scan(&wide, &presentation); err != nil || !wide || !presentation {
+		t.Fatal("content merge rewrote unreviewed display settings", err)
+	}
+}
+
+func TestImportMergeRejectsConflictingSiblingOrderInsteadOfUUIDTieBreak(t *testing.T) {
+	a, b, c := NewID(), NewID(), NewID()
+	makeFields := func(order []string) map[string]json.RawMessage {
+		item := ImportItem{Title: "Order", BlockParents: map[string]string{}}
+		for _, id := range order {
+			item.Blocks = append(item.Blocks, ImportBlock{ID: id, Type: "paragraph", Data: map[string]any{"richText": richImport(id)}})
+		}
+		return snapshotImportItem(&item).Fields
+	}
+	item := ImportItem{Choice: "merge", Merge: &ImportMergeReview{Fields: mergeImportFields(makeFields([]string{a, b, c}), makeFields([]string{b, a, c}), makeFields([]string{a, c, b}), true), Resolutions: []ImportFieldChoice{{Path: "/blocks/" + b + "/order", Choice: "keep_local"}}}}
+	if err := materializeImportMerge(&item); err == nil || !strings.Contains(err.Error(), "sibling order") {
+		t.Fatal("incompatible independent reorders were resolved by UUID ordering", err)
+	}
+}
 
 func TestImportMergeFieldOraclePreservesMissingNullAndIndependentChanges(t *testing.T) {
 	fields := func(v map[string]any) map[string]json.RawMessage {
