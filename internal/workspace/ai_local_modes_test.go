@@ -171,6 +171,8 @@ func TestRealLocalExposedModes(t *testing.T) {
 				t.Fatal(err)
 			}
 			request := AIRequest{Mode: tc.mode, Prompt: tc.prompt, PageID: page, BlockID: block, ModelPackID: pack}
+			controls := newAIEvaluationGenerationControls(request)
+			defer controls.log(t)
 			budget := AIBudget{ContextTokens: 8192, OutputTokens: 512, CountTokens: func(ctx context.Context, prompts []AIPrompt) ([]int, error) {
 				texts := make([]string, len(prompts))
 				for i, p := range prompts {
@@ -186,7 +188,9 @@ func TestRealLocalExposedModes(t *testing.T) {
 			raw := ""
 			metrics := &native.RunMetrics{}
 			completion, generationErr := GeneratePreparedAI(ctx, prepared, func(ctx context.Context, system, prompt string, tokens int, grammar string, stream func(string)) (string, error) {
-				text, err := supervisor.GenerateTextWithGrammarMetrics(ctx, pack, native.ChatPrompt(system, prompt), tokens, grammar, metrics, stream)
+				text, err := controls.generate(func() (string, error) {
+					return supervisor.GenerateTextWithGrammarMetrics(ctx, pack, native.ChatPrompt(system, prompt), tokens, grammar, metrics, stream)
+				})
 				raw = text
 				return text, err
 			}, nil)

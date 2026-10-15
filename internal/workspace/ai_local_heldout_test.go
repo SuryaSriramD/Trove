@@ -65,13 +65,18 @@ func TestRealLocalCitedHeldOutFactsAndAbstention(t *testing.T) {
 	} {
 		t.Run(tc.name, func(t *testing.T) {
 			start := time.Now()
-			prepared, err := prepareAIContext(ctx, AIRequest{Mode: "answer", Prompt: tc.prompt, ModelPackID: pack, UseMemory: true}, tc.sources, nil, "", budget)
+			request := AIRequest{Mode: "answer", Prompt: tc.prompt, ModelPackID: pack, UseMemory: true}
+			controls := newAIEvaluationGenerationControls(request)
+			defer controls.log(t)
+			prepared, err := prepareAIContext(ctx, request, tc.sources, nil, "", budget)
 			if err != nil {
 				t.Fatal(err)
 			}
 			raw := ""
 			completion, err := GeneratePreparedAI(ctx, prepared, func(ctx context.Context, system, prompt string, tokens int, grammar string, stream func(string)) (string, error) {
-				text, err := supervisor.GenerateTextWithGrammar(ctx, pack, native.ChatPrompt(system, prompt), tokens, grammar, stream)
+				text, err := controls.generate(func() (string, error) {
+					return supervisor.GenerateTextWithGrammar(ctx, pack, native.ChatPrompt(system, prompt), tokens, grammar, stream)
+				})
 				raw = text
 				return text, err
 			}, nil)
