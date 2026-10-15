@@ -2,6 +2,7 @@ package workspace
 
 import (
 	"context"
+	"database/sql"
 	"fmt"
 	"net/http"
 	"path/filepath"
@@ -124,12 +125,13 @@ func TestNotionDeniedOrOmittedSourceNeverProvesDeletion(t *testing.T) {
 func TestNotionMalformedObjectStatusRetainsCursor(t *testing.T) {
 	id := strings.Repeat("a", 32)
 	for name, response := range map[string]string{
-		"wrong_id":      `{"object":"page","id":"bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb","in_trash":true}`,
-		"wrong_kind":    fmt.Sprintf(`{"object":"database","id":%q,"in_trash":true}`, id),
-		"string":        fmt.Sprintf(`{"object":"page","id":%q,"in_trash":"true"}`, id),
-		"null":          fmt.Sprintf(`{"object":"page","id":%q,"in_trash":null}`, id),
-		"missing":       fmt.Sprintf(`{"object":"page","id":%q}`, id),
-		"contradictory": fmt.Sprintf(`{"object":"page","id":%q,"in_trash":false,"archived":true}`, id),
+		"wrong_id":             `{"object":"page","id":"bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb","in_trash":true}`,
+		"wrong_kind":           fmt.Sprintf(`{"object":"database","id":%q,"in_trash":true}`, id),
+		"string":               fmt.Sprintf(`{"object":"page","id":%q,"in_trash":"true"}`, id),
+		"null":                 fmt.Sprintf(`{"object":"page","id":%q,"in_trash":null}`, id),
+		"missing":              fmt.Sprintf(`{"object":"page","id":%q}`, id),
+		"legacy_alias_current": fmt.Sprintf(`{"object":"page","id":%q,"archived":true}`, id),
+		"contradictory":        fmt.Sprintf(`{"object":"page","id":%q,"in_trash":false,"archived":true}`, id),
 	} {
 		t.Run(name, func(t *testing.T) {
 			k, e := testKernel(t)
@@ -339,5 +341,62 @@ func TestNotionDeletionProofSurvivesNativeRestore(t *testing.T) {
 	schemaUndo(t, restored, restored.OwnerContext(), done.PageDeletionOperationID)
 	if pageDeleted(t, restored, page) {
 		t.Fatal("restored deletion did not undo")
+	}
+}
+
+func TestNotionResumedLegacyArchivedAliasIsVersionBound(t *testing.T) {
+	// archived was the documented in_trash alias before2026-03-11. Historical
+	// cursors retain their negotiated version; current captures reject this shape.
+	for _, version := range []string{"", "2025-09-03"} {
+		t.Run("version_"+version, func(t *testing.T) {
+			k, e := testKernel(t)
+			ctx := context.Background()
+			id := strings.Repeat("a", 32)
+			first := completeImportFixture(t, k, e, notionDeletionFixture(t, k, id, "false"))
+			page := notionImportedPage(t, first, id)
+			out, err := startNotionCapture(ctx, k, e, map[string]any{"rootIds": []any{id}, "sourceNamespace": "notion-deletion"})
+			if err != nil {
+				t.Fatal(err)
+			}
+			capture := out.(NotionCapture)
+			capture.APIVersion = version
+			if err = k.write(ctx, func(tx *sql.Tx) error { return saveNotionCapture(ctx, tx, capture, capture.Revision) }); err != nil {
+				t.Fatal(err)
+			}
+			client := &http.Client{Transport: notionFixtureTransport(func(r *http.Request) (*http.Response, error) {
+				if r.Header.Get("Notion-Version") != "2025-09-03" || r.URL.Path != "/v1/pages/"+id {
+					t.Fatal("legacy capture changed version or queried descendants", r.Header, r.URL.Path)
+				}
+				return notionResponse(200, fmt.Sprintf(`{"object":"page","id":%q,"archived":true}`, id)), nil
+			})}
+			capture, err = k.CaptureNotionStep(ctx, e, capture.ID, capture.Revision, "fixture-token", client)
+			if err != nil {
+				t.Fatal(err)
+			}
+			if len(capture.Pending) != 0 {
+				t.Fatal("legacy archived page queued children")
+			}
+			out, err = finishNotionCapture(ctx, k, e, map[string]any{"captureId": capture.ID, "revision": float64(capture.Revision)})
+			if err != nil {
+				t.Fatal(err)
+			}
+			preview := out.(ImportPlan)
+			found := false
+			for _, item := range preview.Items {
+				if item.Kind == "source_deleted_page" {
+					found = true
+					if item.PageID != page || item.SourceDeletionProof == nil || item.Merge.BaselineStatus != "retained" {
+						t.Fatal("legacy direct proof mismatched", item)
+					}
+				}
+			}
+			if !found {
+				t.Fatal("known legacy alias did not produce explicit review")
+			}
+			completeImportFixture(t, k, e, approveSourcePageDeletions(t, k, preview))
+			if !pageDeleted(t, k, page) {
+				t.Fatal("reviewed legacy proof did not apply")
+			}
+		})
 	}
 }
