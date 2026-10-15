@@ -5140,6 +5140,7 @@
           "type": "string",
           "enum": [
             "present",
+            "partial",
             "removed",
             "inaccessible",
             "deselected",
@@ -5200,6 +5201,9 @@
         "clientId": {
           "type": "string",
           "maxLength": 512
+        },
+        "dynamicClientRegistration": {
+          "type": "boolean"
         },
         "endpoint": {
           "type": "string",
@@ -5365,6 +5369,50 @@
         "requestId",
         "workspaceId",
         "accountId"
+      ],
+      "additionalProperties": false
+    },
+    "ConnectorDraftRequest": {
+      "type": "object",
+      "properties": {
+        "contractVersion": {
+          "const": 1
+        },
+        "requestId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "workspaceId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "accountId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "expectedRevision": {
+          "type": "string"
+        },
+        "fields": {
+          "type": "object",
+          "maxProperties": 32,
+          "additionalProperties": {
+            "type": [
+              "object",
+              "array",
+              "string",
+              "number",
+              "integer",
+              "boolean",
+              "null"
+            ]
+          }
+        }
+      },
+      "required": [
+        "contractVersion",
+        "requestId",
+        "workspaceId",
+        "accountId",
+        "expectedRevision",
+        "fields"
       ],
       "additionalProperties": false
     },
@@ -5608,6 +5656,43 @@
         "requestId",
         "workspaceId",
         "operationId"
+      ],
+      "additionalProperties": false
+    },
+    "ConnectorSourceRequest": {
+      "type": "object",
+      "properties": {
+        "contractVersion": {
+          "const": 1
+        },
+        "requestId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "workspaceId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "snapshotId": {
+          "type": "string",
+          "maxLength": 2048
+        },
+        "expectedRevision": {
+          "type": "string",
+          "maxLength": 2048
+        },
+        "remoteId": {
+          "type": "string",
+          "maxLength": 2048
+        },
+        "format": {
+          "type": "string",
+          "maxLength": 2048
+        }
+      },
+      "required": [
+        "contractVersion",
+        "requestId",
+        "workspaceId",
+        "snapshotId"
       ],
       "additionalProperties": false
     },

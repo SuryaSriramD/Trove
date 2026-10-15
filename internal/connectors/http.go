@@ -147,7 +147,7 @@ func request(ctx context.Context, s Session, method, target string, input any, h
 		}
 		limited := resp.StatusCode == 429
 		if resp.StatusCode == 403 {
-			limited = resp.Header.Get("Retry-After") != "" || resp.Header.Get("X-RateLimit-Remaining") == "0"
+			limited = s.Account.Kind == GitHub && (resp.Header.Get("Retry-After") != "" || resp.Header.Get("X-RateLimit-Remaining") == "0")
 			if !limited && (s.Account.Kind == GoogleCalendar || s.Account.Kind == GoogleDrive || s.Account.Kind == Gmail) {
 				var details struct {
 					Error struct {

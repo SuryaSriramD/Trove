@@ -113,7 +113,8 @@ func (h *connectorHost) start(ctx context.Context, id, account string, fn func(c
 func (a *App) connectorDispatch(method string, raw json.RawMessage) string {
 	definitions := map[string]string{
 		"connectors.native.authBegin": "ConnectorAuthBeginRequest", "connectors.native.authPoll": "ConnectorAuthAttemptRequest", "connectors.native.authCancel": "ConnectorAuthAttemptRequest",
-		"connectors.native.disconnect": "ConnectorDisconnectRequest", "connectors.native.discover": "ConnectorDiscoverRequest", "connectors.native.refresh": "ConnectorRefreshRequest",
+		"connectors.native.cleanup": "ConnectorAccountRequest", "connectors.native.disconnect": "ConnectorDisconnectRequest", "connectors.native.discover": "ConnectorDiscoverRequest", "connectors.native.refresh": "ConnectorRefreshRequest",
+		"connectors.native.preview": "ConnectorSourceRequest", "connectors.native.import": "ConnectorSourceRequest", "connectors.native.acquire": "ConnectorSourceRequest",
 		"connectors.native.prepare": "ConnectorPrepareRequest", "connectors.native.execute": "ConnectorExecuteRequest", "connectors.native.reconcile": "ConnectorProposalRequest", "connectors.native.cancel": "ConnectorCancelRequest",
 	}
 	definition := definitions[method]
@@ -121,6 +122,9 @@ func (a *App) connectorDispatch(method string, raw json.RawMessage) string {
 		return errorEnvelope("INVALID_REQUEST", "Invalid connector operation")
 	}
 	var r struct {
+		SnapshotID       string                  `json:"snapshotId"`
+		RemoteID         string                  `json:"remoteId"`
+		Format           string                  `json:"format"`
 		WorkspaceID      string                  `json:"workspaceId"`
 		AccountID        string                  `json:"accountId"`
 		ExpectedRevision string                  `json:"expectedRevision"`
@@ -206,6 +210,7 @@ func (a *App) connectorDispatch(method string, raw json.RawMessage) string {
 				_ = host.broker.Forget(ctx, account.RegistrationID)
 				return connectorError(err)
 			}
+			_ = cleanupConnectorCredentials(ctx, k, e, host, account.ID)
 			attempt, _ = host.broker.Attempt(r.AttemptID)
 		}
 		return connectorSuccess(attempt)
@@ -217,6 +222,8 @@ func (a *App) connectorDispatch(method string, raw json.RawMessage) string {
 		}
 		host.mu.Unlock()
 		return connectorSuccess(map[string]any{"state": "cancellation_requested", "operationId": r.OperationID})
+	case "connectors.native.cleanup":
+		return connectorSuccessOrError(map[string]any{"detail": "Protected credential cleanup completed"}, cleanupConnectorCredentials(ctx, k, e, host, r.AccountID))
 	case "connectors.native.disconnect":
 		account, err := k.ConnectorAccount(ctx, e, r.AccountID)
 		if err != nil {
@@ -232,13 +239,19 @@ func (a *App) connectorDispatch(method string, raw json.RawMessage) string {
 			}
 		}
 		host.mu.Unlock()
-		if account.RegistrationID != "" {
-			err = host.broker.Forget(ctx, account.RegistrationID)
-		}
+		err = cleanupConnectorCredentials(ctx, k, e, host, account.ID)
 		if err != nil {
 			return connectorSuccess(map[string]any{"state": "disconnected", "localCredentialCleared": false, "detail": "Connection is inactive. Protected credential deletion failed; retry cleanup on this host."})
 		}
 		return connectorSuccess(map[string]any{"state": "disconnected", "localCredentialCleared": true, "remoteRevoked": false, "detail": "Local access is disconnected. Provider authorization can also be revoked in your provider account settings."})
+	}
+	var source connectors.Snapshot
+	if r.SnapshotID != "" {
+		source, err = k.ConnectorSnapshot(ctx, e, r.SnapshotID)
+		if err != nil {
+			return connectorError(err)
+		}
+		r.AccountID = source.AccountID
 	}
 	if r.ProposalID != "" {
 		proposal, err := k.ConnectorProposal(ctx, e, r.ProposalID)
@@ -261,11 +274,73 @@ func (a *App) connectorDispatch(method string, raw json.RawMessage) string {
 	}
 	switch method {
 	case "connectors.native.discover":
+		identity, identityErr := adapter.Identity(ctx, session)
+		if identityErr != nil {
+			return connectorError(identityErr)
+		}
+		if identityErr = connectors.RequireIdentity(account.Identity, identity); identityErr != nil {
+			return connectorError(identityErr)
+		}
 		options, cursor, err := adapter.Discover(ctx, session, r.Cursor)
 		if err != nil {
 			return connectorError(err)
 		}
 		return connectorSuccess(map[string]any{"selections": options, "nextCursor": cursor})
+	case "connectors.native.preview", "connectors.native.import", "connectors.native.acquire":
+		selection, err := connectors.Selected(account, source.SelectionID)
+		if err != nil {
+			return connectorError(err)
+		}
+		identity, err := adapter.Identity(ctx, session)
+		if err != nil {
+			return connectorError(err)
+		}
+		if err = connectors.RequireIdentity(account.Identity, identity); err != nil {
+			return connectorError(err)
+		}
+		previewer, ok := adapter.(connectors.Previewer)
+		if !ok {
+			return connectorError(connectors.Unsupported("authenticated preview"))
+		}
+		fresh, err := previewer.Preview(ctx, session, selection, source.RemoteID)
+		if err != nil {
+			return connectorError(err)
+		}
+		if fresh.RemoteID != source.RemoteID {
+			return errorEnvelope("CONFLICT", "External preview identity changed")
+		}
+		fresh, err = k.StoreConnectorPreview(ctx, e, account, selection.ID, fresh)
+		if err != nil {
+			return connectorError(err)
+		}
+		if method == "connectors.native.preview" {
+			return connectorSuccess(fresh)
+		}
+		if r.ExpectedRevision == "" || fresh.RemoteRevision != r.ExpectedRevision || (fresh.State != "present" && !(method == "connectors.native.acquire" && fresh.State == "partial")) {
+			return errorEnvelope("CONFLICT", "External content changed or is incomplete; inspect its latest preview")
+		}
+		if method == "connectors.native.import" {
+			plan, err := k.PreviewConnectorImport(ctx, e, fresh.ID, fresh.RemoteRevision)
+			return connectorSuccessOrError(plan, err)
+		}
+		acquirer, ok := adapter.(connectors.Acquirer)
+		if !ok {
+			return connectorError(connectors.Unsupported("file acquisition"))
+		}
+		// Gmail attachment provenance must retain its external-AI restriction
+		// across attachment moves before this native ingress is exposed.
+		if account.Kind == connectors.Gmail {
+			return errorEnvelope("SCOPE_DENIED", "Gmail attachment acquisition is awaiting provenance integration")
+		}
+		file, err := acquirer.Acquire(ctx, session, selection, r.RemoteID, r.Format)
+		if err != nil {
+			return connectorError(err)
+		}
+		if account.Kind == connectors.GoogleDrive && file.RemoteRevision != fresh.RemoteRevision {
+			return errorEnvelope("CONFLICT", "File changed during acquisition; inspect its latest preview")
+		}
+		result, err := k.PrepareConnectorAcquired(ctx, e, account, selection.ID, file)
+		return connectorSuccessOrError(result, err)
 	case "connectors.native.refresh":
 		j, err := k.PrepareConnectorRefresh(ctx, e, account.ID, r.ResumeID)
 		if err != nil {
@@ -301,4 +376,20 @@ func connectorSuccessOrError(result any, err error) string {
 		return connectorError(err)
 	}
 	return connectorSuccess(result)
+}
+
+func cleanupConnectorCredentials(ctx context.Context, k *workspace.Kernel, e contracts.ServiceExecutionContext, h *connectorHost, account string) error {
+	ids, err := k.ConnectorCredentialCleanup(ctx, e, account)
+	if err != nil {
+		return err
+	}
+	for _, id := range ids {
+		if err = h.broker.Forget(ctx, id); err != nil {
+			return err
+		}
+		if err = k.CompleteConnectorCredentialCleanup(ctx, e, account, id); err != nil {
+			return err
+		}
+	}
+	return nil
 }

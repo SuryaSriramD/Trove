@@ -32,6 +32,7 @@ func init() {
 	RegisterInitializer(func(ctx context.Context, k *Kernel) error {
 		return k.write(ctx, func(tx *sql.Tx) error {
 			_, err := tx.ExecContext(ctx, `CREATE TABLE IF NOT EXISTS connector_accounts(id TEXT PRIMARY KEY,body_json TEXT NOT NULL CHECK(json_valid(body_json)));
+CREATE TABLE IF NOT EXISTS connector_credential_cleanup(registration_id TEXT PRIMARY KEY,account_id TEXT NOT NULL);
 CREATE TABLE IF NOT EXISTS connector_account_history(sequence INTEGER PRIMARY KEY AUTOINCREMENT,account_id TEXT NOT NULL,body_json TEXT NOT NULL CHECK(json_valid(body_json)),created_at TEXT NOT NULL);
 CREATE TABLE IF NOT EXISTS connector_snapshots(id TEXT PRIMARY KEY,account_id TEXT NOT NULL,selection_id TEXT NOT NULL,refresh_id TEXT NOT NULL,body_json TEXT NOT NULL CHECK(json_valid(body_json)));
 CREATE INDEX IF NOT EXISTS connector_snapshot_account ON connector_snapshots(account_id,selection_id);
@@ -150,6 +151,11 @@ func (k *Kernel) ConnectConnector(ctx context.Context, e contracts.ServiceExecut
 			if old.Revision != expected || old.Kind != a.Kind || connectors.RequireIdentity(old.Identity, a.Identity) != nil {
 				return Fail("CONFLICT", "Account changed; use a new connection for another identity")
 			}
+			if old.RegistrationID != "" && old.RegistrationID != a.RegistrationID {
+				if _, err = tx.ExecContext(ctx, "INSERT OR IGNORE INTO connector_credential_cleanup VALUES(?,?)", old.RegistrationID, old.ID); err != nil {
+					return err
+				}
+			}
 			a.Selections = old.Selections
 		} else if !errors.Is(err, sql.ErrNoRows) {
 			return err
@@ -221,6 +227,11 @@ func (k *Kernel) DisconnectConnector(ctx context.Context, e contracts.ServiceExe
 		}
 		if a.Revision != expected {
 			return Fail("CONFLICT", "Connection changed; reload before disconnecting")
+		}
+		if a.RegistrationID != "" {
+			if _, err = tx.ExecContext(ctx, "INSERT OR IGNORE INTO connector_credential_cleanup VALUES(?,?)", a.RegistrationID, a.ID); err != nil {
+				return err
+			}
 		}
 		a.State = "disconnected"
 		a.RegistrationID = ""
@@ -391,7 +402,7 @@ func (k *Kernel) RunConnectorRefresh(ctx context.Context, e contracts.ServiceExe
 				item.ID = connectorHash([]string{a.ID, sel.ID, item.RemoteID})
 				item.RetrievedAt = now()
 				item.ExternalAIAllowed = false
-				if item.State != "removed" && item.State != "inaccessible" {
+				if item.State != "removed" && item.State != "inaccessible" && item.State != "partial" {
 					item.State = "present"
 				}
 				if _, err := tx.ExecContext(ctx, "INSERT INTO connector_snapshots(id,account_id,selection_id,refresh_id,body_json) VALUES(?,?,?,?,?) ON CONFLICT(id) DO UPDATE SET refresh_id=excluded.refresh_id,body_json=excluded.body_json", item.ID, a.ID, sel.ID, j.ID, string(marshal(item))); err != nil {
@@ -441,7 +452,7 @@ func connectorSearch(ctx context.Context, k *Kernel, e contracts.ServiceExecutio
 	if len(q) > 1000 {
 		return nil, Fail("INVALID_REQUEST", "Search query is too long")
 	}
-	rows, err := k.db.QueryContext(ctx, `SELECT s.body_json FROM connector_snapshots s JOIN connector_accounts a ON a.id=s.account_id WHERE json_extract(a.body_json,'$.state')='active' AND json_extract(s.body_json,'$.state')='present' AND (instr(lower(json_extract(s.body_json,'$.title')),lower(?))>0 OR instr(lower(json_extract(s.body_json,'$.text')),lower(?))>0) ORDER BY s.id LIMIT 100`, q, q)
+	rows, err := k.db.QueryContext(ctx, `SELECT s.body_json FROM connector_snapshots s JOIN connector_accounts a ON a.id=s.account_id WHERE json_extract(a.body_json,'$.state')='active' AND json_extract(s.body_json,'$.state') IN('present','partial') AND (instr(lower(json_extract(s.body_json,'$.title')),lower(?))>0 OR instr(lower(json_extract(s.body_json,'$.text')),lower(?))>0) ORDER BY s.id LIMIT 100`, q, q)
 	if err != nil {
 		return nil, err
 	}
@@ -743,11 +754,12 @@ func resetConnectorRestore(ctx context.Context, tx *sql.Tx) error {
 	// Forward-compatible restore cannot execute unknown table shapes/triggers.
 	// These optional tables did not exist in earlier readable backups.
 	shapes := map[string]string{
-		"connector_accounts":  `CREATE TABLE connector_accounts(id TEXT PRIMARY KEY,body_json TEXT NOT NULL CHECK(json_valid(body_json)))`,
-		"connector_snapshots": `CREATE TABLE connector_snapshots(id TEXT PRIMARY KEY,account_id TEXT NOT NULL,selection_id TEXT NOT NULL,refresh_id TEXT NOT NULL,body_json TEXT NOT NULL CHECK(json_valid(body_json)))`,
-		"connector_cursors":   `CREATE TABLE connector_cursors(account_id TEXT NOT NULL,selection_id TEXT NOT NULL,account_revision TEXT NOT NULL,cursor TEXT NOT NULL,PRIMARY KEY(account_id,selection_id))`,
-		"connector_refreshes": `CREATE TABLE connector_refreshes(id TEXT PRIMARY KEY,account_id TEXT NOT NULL,body_json TEXT NOT NULL CHECK(json_valid(body_json)))`,
-		"connector_proposals": `CREATE TABLE connector_proposals(id TEXT PRIMARY KEY,account_id TEXT NOT NULL,fingerprint TEXT NOT NULL,body_json TEXT NOT NULL CHECK(json_valid(body_json)))`,
+		"connector_credential_cleanup": `CREATE TABLE connector_credential_cleanup(registration_id TEXT PRIMARY KEY,account_id TEXT NOT NULL)`,
+		"connector_accounts":           `CREATE TABLE connector_accounts(id TEXT PRIMARY KEY,body_json TEXT NOT NULL CHECK(json_valid(body_json)))`,
+		"connector_snapshots":          `CREATE TABLE connector_snapshots(id TEXT PRIMARY KEY,account_id TEXT NOT NULL,selection_id TEXT NOT NULL,refresh_id TEXT NOT NULL,body_json TEXT NOT NULL CHECK(json_valid(body_json)))`,
+		"connector_cursors":            `CREATE TABLE connector_cursors(account_id TEXT NOT NULL,selection_id TEXT NOT NULL,account_revision TEXT NOT NULL,cursor TEXT NOT NULL,PRIMARY KEY(account_id,selection_id))`,
+		"connector_refreshes":          `CREATE TABLE connector_refreshes(id TEXT PRIMARY KEY,account_id TEXT NOT NULL,body_json TEXT NOT NULL CHECK(json_valid(body_json)))`,
+		"connector_proposals":          `CREATE TABLE connector_proposals(id TEXT PRIMARY KEY,account_id TEXT NOT NULL,fingerprint TEXT NOT NULL,body_json TEXT NOT NULL CHECK(json_valid(body_json)))`,
 	}
 	for name, expected := range shapes {
 		var kind, ddl string
@@ -817,5 +829,44 @@ func resetConnectorRestore(ctx context.Context, tx *sql.Tx) error {
 			}
 		}
 	}
+	var cleanupTable int
+	if err := tx.QueryRowContext(ctx, "SELECT COUNT(*) FROM sqlite_schema WHERE type='table' AND name='connector_credential_cleanup'").Scan(&cleanupTable); err != nil {
+		return err
+	}
+	if cleanupTable > 0 {
+		if _, err := tx.ExecContext(ctx, "DELETE FROM connector_credential_cleanup"); err != nil {
+			return err
+		}
+	}
+
 	return nil
+}
+
+func (k *Kernel) ConnectorCredentialCleanup(ctx context.Context, e contracts.ServiceExecutionContext, account string) ([]string, error) {
+	if err := connectorOwner(k, e); err != nil {
+		return nil, err
+	}
+	rows, err := k.db.QueryContext(ctx, "SELECT registration_id FROM connector_credential_cleanup WHERE account_id=?", account)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	out := []string{}
+	for rows.Next() {
+		var id string
+		if err = rows.Scan(&id); err != nil {
+			return nil, err
+		}
+		out = append(out, id)
+	}
+	return out, rows.Err()
+}
+func (k *Kernel) CompleteConnectorCredentialCleanup(ctx context.Context, e contracts.ServiceExecutionContext, account, id string) error {
+	return k.write(ctx, func(tx *sql.Tx) error {
+		if err := connectorOwner(k, e); err != nil {
+			return err
+		}
+		_, err := tx.ExecContext(ctx, "DELETE FROM connector_credential_cleanup WHERE registration_id=? AND account_id=?", id, account)
+		return err
+	})
 }

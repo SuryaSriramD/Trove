@@ -1,0 +1,66 @@
+.connections-panel {
+  max-width: 1100px;
+  margin: auto;
+}
+.connections-panel section {
+  margin: 1.5rem 0;
+  padding: 1rem;
+  border: 1px solid var(--border, #8885);
+  border-radius: 10px;
+}
+.connection-columns {
+  display: grid;
+  grid-template-columns: minmax(170px, 1fr) minmax(0, 3fr);
+  gap: 1.5rem;
+}
+.connection-columns aside {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  padding-top: 1.5rem;
+}
+.connections-panel label {
+  display: block;
+  margin: 0.75rem 0;
+}
+.connections-panel input:not([type="checkbox"]),
+.connections-panel select,
+.connections-panel textarea {
+  display: block;
+  width: 100%;
+  max-width: 700px;
+  margin-top: 0.35rem;
+}
+.connections-panel textarea {
+  min-height: 100px;
+}
+.connections-panel button {
+  margin: 0.25rem 0.5rem 0.25rem 0;
+}
+.connections-panel small {
+  display: block;
+  opacity: 0.75;
+}
+.connection-source {
+  display: block;
+  width: 100%;
+  text-align: left;
+  padding: 0.8rem;
+}
+.connections-panel pre {
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  max-height: 420px;
+  overflow: auto;
+}
+.connection-review {
+  border-color: var(--accent, #a88c50) !important;
+}
+.connection-compose {
+  margin-top: 1.5rem;
+}
+@media (max-width: 760px) {
+  .connection-columns {
+    grid-template-columns: 1fr;
+  }
+}

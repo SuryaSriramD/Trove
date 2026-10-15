@@ -2,6 +2,10 @@ package connectors
 
 func NewAdapter(kind Kind) (Adapter, error) {
 	switch kind {
+	case Notion:
+		return NewNotionAdapter(), nil
+	case MCP:
+		return NewMCPAdapter(), nil
 	case GitHub:
 		return NewGitHubAdapter(), nil
 	case GoogleCalendar, GoogleDrive, Gmail:

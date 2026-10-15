@@ -2537,9 +2537,10 @@ type ServiceConnectorSnapshot struct {
 	ExternalAiAllowed bool            `json:"externalAiAllowed"`
 }
 type ServiceConnectorRegistration struct {
-	Kind     string  `json:"kind"`
-	ClientId string  `json:"clientId"`
-	Endpoint *string `json:"endpoint,omitempty"`
+	Kind                      string  `json:"kind"`
+	ClientId                  string  `json:"clientId"`
+	DynamicClientRegistration *bool   `json:"dynamicClientRegistration,omitempty"`
+	Endpoint                  *string `json:"endpoint,omitempty"`
 }
 type ServiceConnectorAuthAttempt struct {
 	Id              DomainId        `json:"id"`
@@ -2574,6 +2575,14 @@ type ServiceConnectorAccountRequest struct {
 	RequestId       DomainId `json:"requestId"`
 	WorkspaceId     DomainId `json:"workspaceId"`
 	AccountId       DomainId `json:"accountId"`
+}
+type ServiceConnectorDraftRequest struct {
+	ContractVersion  int64                      `json:"contractVersion"`
+	RequestId        DomainId                   `json:"requestId"`
+	WorkspaceId      DomainId                   `json:"workspaceId"`
+	AccountId        DomainId                   `json:"accountId"`
+	ExpectedRevision string                     `json:"expectedRevision"`
+	Fields           map[string]json.RawMessage `json:"fields"`
 }
 type ServiceConnectorProposalRequest struct {
 	ContractVersion int64    `json:"contractVersion"`
@@ -2635,6 +2644,15 @@ type ServiceConnectorCancelRequest struct {
 	RequestId       DomainId `json:"requestId"`
 	WorkspaceId     DomainId `json:"workspaceId"`
 	OperationId     DomainId `json:"operationId"`
+}
+type ServiceConnectorSourceRequest struct {
+	ContractVersion  int64    `json:"contractVersion"`
+	RequestId        DomainId `json:"requestId"`
+	WorkspaceId      DomainId `json:"workspaceId"`
+	SnapshotId       string   `json:"snapshotId"`
+	ExpectedRevision *string  `json:"expectedRevision,omitempty"`
+	RemoteId         *string  `json:"remoteId,omitempty"`
+	Format           *string  `json:"format,omitempty"`
 }
 type ServiceAutofillModel struct {
 	PackId         DomainId `json:"packId"`

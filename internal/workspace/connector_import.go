@@ -28,7 +28,7 @@ func (k *Kernel) ConnectorSnapshot(ctx context.Context, e contracts.ServiceExecu
 	if err != nil {
 		return snapshot, err
 	}
-	if a.State != "active" || snapshot.State != "present" {
+	if a.State != "active" || (snapshot.State != "present" && snapshot.State != "partial") {
 		return snapshot, Fail("SCOPE_DENIED", "This external source is no longer active; refresh its connection")
 	}
 	_, err = connectors.Selected(a, snapshot.SelectionID)
@@ -44,7 +44,9 @@ func (k *Kernel) StoreConnectorPreview(ctx context.Context, e contracts.ServiceE
 	snapshot.Version = 1
 	snapshot.RetrievedAt = now()
 	snapshot.ExternalAIAllowed = false
-	snapshot.State = "present"
+	if snapshot.State != "partial" && snapshot.State != "removed" && snapshot.State != "inaccessible" {
+		snapshot.State = "present"
+	}
 	err := k.write(ctx, func(tx *sql.Tx) error {
 		current, err := activeConnector(ctx, k, tx, e, a.ID, a.Revision)
 		if err != nil {
@@ -67,6 +69,9 @@ func (k *Kernel) PreviewConnectorImport(ctx context.Context, e contracts.Service
 	snapshot, err := k.ConnectorSnapshot(ctx, e, snapshotID)
 	if err != nil {
 		return empty, err
+	}
+	if snapshot.State == "partial" {
+		return empty, Fail("CONFLICT", "This source preview is incomplete; capture complete content before importing it")
 	}
 	if snapshot.RemoteRevision != revision {
 		return empty, Fail("CONFLICT", "External source changed; inspect its fresh preview")

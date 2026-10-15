@@ -23,9 +23,10 @@ import (
 )
 
 type Registration struct {
-	Kind     Kind   `json:"kind"`
-	ClientID string `json:"clientId"`
-	Endpoint string `json:"endpoint,omitempty"`
+	DynamicClientRegistration bool   `json:"dynamicClientRegistration,omitempty"`
+	Kind                      Kind   `json:"kind"`
+	ClientID                  string `json:"clientId"`
+	Endpoint                  string `json:"endpoint,omitempty"`
 }
 type AuthorizationAttempt struct {
 	ID              string `json:"id"`
@@ -40,6 +41,7 @@ type AuthorizationAttempt struct {
 // Only credential storage serializes this private type. It never crosses an
 // application bridge, ordinary service dispatcher or diagnostics boundary.
 type protectedCredential struct {
+	MCP                                   *MCPOAuthState
 	Version                               int
 	WorkspaceID, WorkspacePath, AccountID string
 	Registration                          Registration
@@ -144,6 +146,9 @@ func (b *Broker) finish(id, state, message string, credential *protectedCredenti
 	a.selected = selected
 }
 func (b *Broker) Begin(ctx context.Context, workspaceID, workspacePath, accountID string, r Registration, openURL func(string) error) (AuthorizationAttempt, error) {
+	if r.Kind == MCP || r.Kind == Notion {
+		return b.BeginMCP(ctx, workspaceID, workspacePath, accountID, r, openURL)
+	}
 	if !filepath.IsAbs(workspacePath) || workspaceID == "" || accountID == "" || len(r.ClientID) > 512 || strings.ContainsAny(r.ClientID, "\r\n\x00") {
 		return AuthorizationAttempt{}, fail("INVALID_REQUEST", "Invalid native authorization registration")
 	}
@@ -415,6 +420,7 @@ func (b *Broker) Complete(ctx context.Context, id string, adapter Adapter) (Acco
 	a.public.State = "verifying"
 	b.mu.Unlock()
 	account := Account{Version: 1, ID: credential.AccountID, Kind: credential.Registration.Kind, Endpoint: credential.Registration.Endpoint, RegistrationID: uuid.NewString(), Selections: []Selection{}}
+	account.Identity = credential.Identity
 	s := Session{Account: account, Token: Secret{AccessToken: credential.AccessToken, RefreshToken: credential.RefreshToken, ExpiresAt: credential.ExpiresAt}, Client: b.client}
 	identity, err := adapter.Identity(ctx, s)
 	if err != nil {
@@ -470,6 +476,9 @@ func (b *Broker) Session(ctx context.Context, workspaceID, workspacePath string,
 	var c protectedCredential
 	if json.Unmarshal(data, &c) != nil || c.Version != 1 || c.WorkspaceID != workspaceID || c.WorkspacePath != workspacePath || c.AccountID != a.ID || c.Registration.Kind != a.Kind || c.Registration.Endpoint != a.Endpoint || RequireIdentity(a.Identity, c.Identity) != nil {
 		return Session{}, fail("AUTH_REQUIRED", "Stored authorization does not match this workspace and account")
+	}
+	if a.Kind == MCP || a.Kind == Notion {
+		return b.mcpSession(ctx, &c, a)
 	}
 	if !c.ExpiresAt.IsZero() && time.Until(c.ExpiresAt) < time.Minute {
 		if c.Registration.Kind == GitHub || c.RefreshToken == "" {
