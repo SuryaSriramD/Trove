@@ -103,7 +103,7 @@ func TestProviderConnectedNativeStartCannotInferReviewOrTool(t *testing.T) {
 }
 
 func TestProviderConnectedCancellationDuringFinalAccessWithholdsOutput(t *testing.T) {
-	for _, scenario := range []string{"cancelled", "remote_changed", "unchanged"} {
+	for _, scenario := range []string{"cancelled", "remote_changed", "unchanged", "cancelled_before_launch"} {
 		t.Run(scenario, func(t *testing.T) {
 			ctx := context.Background()
 			k, err := workspace.Create(t.TempDir())
@@ -159,6 +159,21 @@ func TestProviderConnectedCancellationDuringFinalAccessWithholdsOutput(t *testin
 			if err = b.SaveManagedRun(ctx, c.ID, c.Token, r); err != nil {
 				t.Fatal(err)
 			}
+			if scenario == "cancelled_before_launch" {
+				cancelled, cancel := context.WithCancel(ctx)
+				cancel()
+				r.State = "cancelled"
+				r.Message = "Provider preparation stopped before native execution began."
+				out, err := persistManagedProviderResult(cancelled, k, e, b, c, r)
+				if err != nil || out.State != "cancelled" || out.Text != "" || out.Checkpoint != nil {
+					t.Fatal(out, err)
+				}
+				rows, err := k.ManagedRuns(ctx, e)
+				if err != nil || len(rows) != 1 || rows[0].State != "cancelled" || rows[0].Text != "" {
+					t.Fatal("abandoned setup remained starting", rows, err)
+				}
+				return
+			}
 			r.State = "completed"
 			r.Text = "Model output already returned"
 			r.Checkpoint = &providers.ManagedCheckpoint{ThreadID: "private-checkpoint"}
@@ -209,5 +224,77 @@ func TestProviderConnectedCancellationDuringFinalAccessWithholdsOutput(t *testin
 				}
 			}
 		})
+	}
+}
+
+func TestProviderConnectedApprovalReentersNativeHostWithoutAppMutex(t *testing.T) {
+	ctx := context.Background()
+	k, err := workspace.Create(t.TempDir())
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer k.Close()
+	a := NewApp()
+	a.ctx, a.kernel, a.execution = ctx, k, k.OwnerContext()
+	a.completeStartup(nil)
+	page := workspace.NewID()
+	guard := func(rev string) contracts.ServiceExpectedRevision {
+		return contracts.ServiceExpectedRevision{Target: contracts.ServiceEntityRef{EntityType: "page", EntityId: contracts.DomainId(page)}, Revision: rev}
+	}
+	request := map[string]any{"contractVersion": 1, "requestId": workspace.NewID(), "workspaceId": k.ID(), "mutation": map[string]any{"scopeGrantId": a.execution.ScopeGrantId, "idempotencyKey": workspace.NewID(), "expectedRevisions": []contracts.ServiceExpectedRevision{guard("0")}}, "commands": []any{map[string]any{"kind": "page.create", "pageId": page, "title": "Before"}}}
+	raw, _ := json.Marshal(request)
+	if response := k.Dispatch(ctx, a.execution, "batch", raw); !strings.Contains(string(response), `"ok":true`) {
+		t.Fatal(string(response))
+	}
+	account, err := k.ConnectConnector(ctx, a.execution, connectors.Account{Kind: connectors.GitHub, Identity: connectors.Identity{Provider: "github", Subject: "100", Label: "Fixture"}, RegistrationID: workspace.NewID()}, "")
+	if err != nil {
+		t.Fatal(err)
+	}
+	account, err = k.SetConnectorSelections(ctx, a.execution, account.ID, account.Revision, []connectors.Selection{{ID: "org/repo", Kind: "repository", Label: "Selected"}})
+	if err != nil {
+		t.Fatal(err)
+	}
+	source, err := k.StoreConnectorPreview(ctx, a.execution, account, "org/repo", connectors.Snapshot{RemoteID: "issue:1", RemoteRevision: "v1", Title: "Decision", Text: "Friday", State: "present", Content: json.RawMessage(`{}`)})
+	if err != nil {
+		t.Fatal(err)
+	}
+	var check atomic.Bool
+	var checked atomic.Int64
+	k.SetConnectorContextReader(func(context.Context, connectors.Account, connectors.Selection, string) (connectors.Snapshot, error) {
+		if check.Load() {
+			checked.Add(1)
+			if !a.mu.TryLock() {
+				return connectors.Snapshot{}, workspace.Fail("CONFLICT", "Native callback ran under app mutex")
+			}
+			a.mu.Unlock()
+		}
+		return source, nil
+	})
+	b := workspace.NewProviderBridge(k, a.execution)
+	providerHosts.Store(a, &providerHost{bridge: b})
+	defer a.stopProviders()
+	preview, err := b.PreviewConnectedContext(ctx, workspace.ConnectedSharingTarget{Provider: "codex", Account: "registration"}, []workspace.ConnectedSourceReference{workspace.ConnectorContextReference(source)})
+	if err != nil {
+		t.Fatal(err)
+	}
+	c, err := b.ConnectManagedReviewed(ctx, "codex", "registration", "siwc", "chatgpt_plan", []string{page}, []string{"readConnectedSource", "proposeChanges"}, workspace.ConnectedSharingApproval{ID: preview.ID, Hash: preview.Hash})
+	if err != nil {
+		t.Fatal(err)
+	}
+	raw, err = b.Call(ctx, c.ID, c.Token, "proposeChanges", map[string]any{"idempotencyKey": "approved", "commands": []any{map[string]any{"kind": "page.update", "pageId": page, "title": "Reviewed result"}}, "expectedRevisions": []contracts.ServiceExpectedRevision{guard("1")}})
+	if err != nil {
+		t.Fatal(err)
+	}
+	var p struct {
+		Result workspace.ProviderProposal `json:"result"`
+	}
+	if err = json.Unmarshal(raw, &p); err != nil {
+		t.Fatal(err)
+	}
+	check.Store(true)
+	raw, _ = json.Marshal(map[string]any{"contractVersion": 1, "requestId": workspace.NewID(), "workspaceId": k.ID(), "proposalId": p.Result.ID})
+	result := a.Dispatch("providers.approve", string(raw))
+	if !strings.Contains(result, `"ok":true`) || checked.Load() == 0 {
+		t.Fatal("connected approval cannot safely reenter native host", result, checked.Load())
 	}
 }

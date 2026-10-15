@@ -78,6 +78,7 @@ func (a *App) managedProviderDispatch(method string, raw json.RawMessage) string
 		ConnectedSharing *workspace.ConnectedSharingApproval  `json:"connectedSharing,omitempty"`
 		Sources          []workspace.ConnectedSourceReference `json:"sources,omitempty"`
 		Skill            *workspace.SkillRunReference         `json:"skill,omitempty"`
+		RequestID        string                               `json:"requestId"`
 		WorkspaceID      string                               `json:"workspaceId"`
 		Provider         string                               `json:"provider"`
 		RegistrationID   string                               `json:"registrationId"`
@@ -107,6 +108,27 @@ func (a *App) managedProviderDispatch(method string, raw json.RawMessage) string
 	}
 	v, _ := providerHosts.LoadOrStore(a, &providerHost{bridge: workspace.NewProviderBridge(k, execution)})
 	h := v.(*providerHost)
+	var preparation *providerPreparation
+	flow := ctx
+	handedOff := false
+	if method == "providers.start" || method == "providers.connectedPreview" {
+		var prepareErr error
+		flow, preparation, prepareErr = h.beginPreparation(ctx, string(execution.ScopeGrantId), req.RequestID)
+		if prepareErr != nil {
+			if errors.Is(prepareErr, context.Canceled) {
+				return errorEnvelope("CANCELLED", "Provider preparation was cancelled before admission")
+			}
+			return errorEnvelope("RESOURCE_EXHAUSTED", prepareErr.Error())
+		}
+		defer func() {
+			if !handedOff {
+				h.finishPreparation(preparation)
+			}
+		}()
+		var deadlineCancel context.CancelFunc
+		ctx, deadlineCancel = context.WithTimeout(flow, 30*time.Second)
+		defer deadlineCancel()
+	}
 	var selectedRuntime providers.Runtime
 	if method == "providers.start" {
 		selectedConnected := false
@@ -177,12 +199,18 @@ func (a *App) managedProviderDispatch(method string, raw json.RawMessage) string
 	if method == "providers.models" || (method == "providers.start" || method == "providers.connectedPreview") && req.Provider == "codex" {
 		manager, err := a.getProviderAuth()
 		if err != nil {
+			if ctx.Err() != nil {
+				return errorEnvelope("CANCELLED", "Provider preparation was cancelled or timed out")
+			}
 			return errorEnvelope("AUTH_REQUIRED", err.Error())
 		}
 		authCtx, cancel := context.WithTimeout(ctx, 30*time.Second)
 		token, err := manager.AccessToken(authCtx, req.RegistrationID)
 		cancel()
 		if err != nil {
+			if ctx.Err() != nil {
+				return errorEnvelope("CANCELLED", "Provider preparation was cancelled or timed out")
+			}
 			return errorEnvelope("AUTH_REQUIRED", err.Error())
 		}
 		accessToken = token.Value
@@ -195,6 +223,9 @@ func (a *App) managedProviderDispatch(method string, raw json.RawMessage) string
 		var err error
 		claudeConfiguration, accountLabel, err = a.resolveClaudeProfile(ctx, req.RegistrationID, req.BillingMode, selectedRuntime)
 		if err != nil {
+			if ctx.Err() != nil {
+				return errorEnvelope("CANCELLED", "Provider preparation was cancelled or timed out")
+			}
 			return errorEnvelope("AUTH_REQUIRED", err.Error())
 		}
 		identity = claudeConfiguration.Identity
@@ -254,12 +285,14 @@ func (a *App) managedProviderDispatch(method string, raw json.RawMessage) string
 		result = map[string]any{"runs": runs, "activeRunId": active, "runtimes": runtimeStates}
 	case "providers.cancel":
 		h.mu.Lock()
-		if h.managed == nil || h.managed.run.ID != req.RunID {
-			err = errors.New("No matching active provider run")
-		} else {
+		matched := h.managed != nil && h.managed.run.ID == req.RunID
+		if matched {
 			h.managed.cancel()
 		}
 		h.mu.Unlock()
+		if !matched {
+			err = h.cancelPreparation(string(execution.ScopeGrantId), req.RunID)
+		}
 		result = map[string]string{"state": "cancellation_requested"}
 	case "providers.start":
 		r := selectedRuntime
@@ -369,9 +402,26 @@ func (a *App) managedProviderDispatch(method string, raw json.RawMessage) string
 			_ = h.bridge.Disconnect(ctx, connection.ID)
 			break
 		}
-		runCtx, cancel := context.WithCancel(ctx)
+		// A cancelled preparation can race immediately after its starting row
+		// commits. Record that it never launched rather than leaving it starting.
+		defer func() {
+			if !started {
+				stopped := run
+				stopped.State = "cancelled"
+				stopped.Text = ""
+				stopped.Checkpoint = nil
+				stopped.Message = "Provider preparation stopped before native execution began."
+				_, _ = persistManagedProviderResult(flow, k, execution, h.bridge, connection, stopped)
+			}
+		}()
+		runCtx, cancel := context.WithCancel(flow)
 		active := &managedExecution{run: run, cancel: cancel, done: make(chan struct{})}
 		h.mu.Lock()
+		if ctx.Err() != nil || runCtx.Err() != nil {
+			h.mu.Unlock()
+			cancel()
+			return errorEnvelope("CANCELLED", "Provider preparation was cancelled before launch")
+		}
 		if h.managed != nil {
 			h.mu.Unlock()
 			cancel()
@@ -379,9 +429,11 @@ func (a *App) managedProviderDispatch(method string, raw json.RawMessage) string
 			return errorEnvelope("CONFLICT", "Another provider run started")
 		}
 		started = true
+		handedOff = true
 		h.managed = active
 		h.mu.Unlock()
 		go func() {
+			defer h.finishPreparation(preparation)
 			defer close(active.done)
 			defer cancel()
 			h.mu.Lock()
@@ -478,7 +530,13 @@ func (a *App) managedProviderDispatch(method string, raw json.RawMessage) string
 		result = run
 	}
 	if err != nil {
+		if ctx.Err() != nil {
+			return errorEnvelope("CANCELLED", "Provider preparation was cancelled or timed out")
+		}
 		return errorEnvelope("PROVIDER_ERROR", err.Error())
+	}
+	if method == "providers.connectedPreview" && ctx.Err() != nil {
+		return errorEnvelope("CANCELLED", "Provider source review was cancelled before publication")
 	}
 	out, _ := json.Marshal(map[string]any{"ok": true, "result": result})
 	return string(out)
