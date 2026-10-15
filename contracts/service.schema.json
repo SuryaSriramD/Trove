@@ -5050,6 +5050,40 @@
       ],
       "additionalProperties": false
     },
+    "ConnectorUserResolution": {
+      "type": "object",
+      "properties": {
+        "version": {
+          "const": 1
+        },
+        "observation": {
+          "type": "string",
+          "enum": [
+            "applied",
+            "not_applied"
+          ]
+        },
+        "evidence": {
+          "type": "string",
+          "minLength": 10,
+          "maxLength": 4000
+        },
+        "actorId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "recordedAt": {
+          "$ref": "domain.schema.json#/$defs/Timestamp"
+        }
+      },
+      "required": [
+        "version",
+        "observation",
+        "evidence",
+        "actorId",
+        "recordedAt"
+      ],
+      "additionalProperties": false
+    },
     "ConnectorReceipt": {
       "type": "object",
       "properties": {
@@ -5081,6 +5115,9 @@
         },
         "recordedAt": {
           "$ref": "domain.schema.json#/$defs/Timestamp"
+        },
+        "userResolution": {
+          "$ref": "#/$defs/ConnectorUserResolution"
         }
       },
       "required": [
@@ -5125,6 +5162,7 @@
             "succeeded",
             "failed",
             "unknown",
+            "resolved",
             "discarded",
             "restored_inactive"
           ]
@@ -5741,6 +5779,53 @@
         "workspaceId",
         "proposalId",
         "hash"
+      ],
+      "additionalProperties": false
+    },
+    "ConnectorResolveRequest": {
+      "type": "object",
+      "properties": {
+        "contractVersion": {
+          "const": 1
+        },
+        "requestId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "workspaceId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "proposalId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "hash": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "expectedRevision": {
+          "type": "string"
+        },
+        "observation": {
+          "type": "string",
+          "enum": [
+            "applied",
+            "not_applied"
+          ]
+        },
+        "evidence": {
+          "type": "string",
+          "minLength": 10,
+          "maxLength": 4000
+        }
+      },
+      "required": [
+        "contractVersion",
+        "requestId",
+        "workspaceId",
+        "proposalId",
+        "hash",
+        "expectedRevision",
+        "observation",
+        "evidence"
       ],
       "additionalProperties": false
     },

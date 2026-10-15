@@ -2,7 +2,7 @@
 
 **The single current development and progress tracker for this project.** Read and update this file for every meaningful implementation change, investigation, test result, decision, blocker and handoff. This is not an automatically running monitor.
 
-Last updated: **2026-10-15 20:55 IST**. User-facing dates use **Asia/Kolkata (IST, UTC+05:30)**; source artifacts may retain UTC timestamps.
+Last updated: **2026-10-15 21:05 IST**. User-facing dates use **Asia/Kolkata (IST, UTC+05:30)**; source artifacts may retain UTC timestamps.
 
 This file consolidates the original 51-item backlog, the newly selected desktop scope, current qualification, next actions and development history. Earlier status pages are historical snapshots. Machine-readable contracts, the legacy registry and immutable qualification records remain supporting inputs/evidence; they are not additional human progress dashboards. Their frozen bytes must not be rewritten to make a status look current.
 
@@ -33,7 +33,7 @@ Candidate 7's focused 22-case prompt experiment was rejected and production prom
 
 | Location | Branch / source | Current interpretation |
 | --- | --- | --- |
-| Primary project: `/Volumes/HD-B1/HD-Projects/Trove` | `codex/macos-feature-completion`, current integrated source `0c3ff2d` | Baseline `ee14f0c`; shared foundations `0ed5350`, G02 `2b421a4`, G03 `950cea5`/`6e713bc` and G01 page merge `2279bf0`/`a3f9e54` integrated. See the development log for subsequent commits and current verification. |
+| Primary project: `/Volumes/HD-B1/HD-Projects/Trove` | `codex/macos-feature-completion`, current integrated source `12ca8ca` | Baseline `ee14f0c`; shared foundations `0ed5350`, G02 `2b421a4`, G03 `950cea5`/`6e713bc` and G01 page merge `2279bf0`/`a3f9e54` integrated. See the development log for subsequent commits and current verification. |
 | Latest development worktree: `/Users/suryasriramduvvuri/.codex/worktrees/macos-p0-title-context/Trove` | `codex/macos-p0-title-context`, `299e43df9b716f771125d939ad320c3cb595f2c7` | Candidate 7 source. One descendant commit containing tests, fixtures, telemetry and execution documentation. |
 
 Keep candidate 7's execution in its declared worktree. Review and integrate the descendant commit separately; do not rebuild a package just to align a checkout. A product/binary/policy change requires a new candidate and affected fresh evidence.
@@ -977,6 +977,16 @@ Final autofill workspace and protocol suite passed **37 tests/subtests, zero ski
 **Connector follow-up under implementation:** Independent GitHub regressions recorded ten failing tests/subtests for incomplete text, caller-expanded documentation selection and stale cross-account/selection cursors. Corrections preserve UTF-8, disclose partial evidence, use canonical selections and bind versioned cursors; the focused rerun passed 20 tests/subtests. Two MCP regressions reproduced an unreachable binary-acquisition preview and an overlong resource preview; a focused integrated acquisition campaign now passes 20 tests/subtests. Source acquisition is additionally checked against the authenticated preview's exact remote identity/attachment keys and revision. UI format/attachment/recipient controls passed seven browser tests in `/private/tmp/trove-connections-acquisition-browser-v2.json`; v1 had six passes and one action-combobox locator timeout, corrected to the rendered role. TypeScript passed. These fixture successes do not enable Gmail native acquisition: that boundary remains disabled until the worker's durable-origin policy passes integration.
 
 **Next:** Finish populated schema migration, Gmail provenance/history/portable validation, Notion depth/typed capture, folder-index identity repair and remaining evaluation runners. Worker desktop audit has 11 passing navigation/automation/graph browser workflows; a database fixture lacks the newly integrated layout-read contract and requires correction before its rerun. Full functionality integration and all live/native/release acceptance remain pending.
+
+### DEV-029 — 15 October 2026, 21:05 IST: explicit resolution of uncertain external writes
+
+**Source:** `12ca8ca` checkpoints source-bound GitHub cursors, partial UTF-8 previews, authenticated acquisition membership/revisions and the Drive/Gmail/MCP interface controls. Current coordinator work adds an explicit manual-resolution workflow for providers without an automatic receipt lookup. The user must inspect the exact remote result, record applied/not-applied evidence and confirm the inspected account/change. Fresh identity, selection, account revision and proposal hash are rechecked. The append-only receipt keeps its provider outcome **unknown** and stores a separate attributable user inspection; the proposal becomes resolved and cannot be sent again. New work still requires a separate review. This is an implementation choice within CONN-00/G12 reconciliation, not a claim that manual inspection establishes provider-confirmed success.
+
+**Correctness:** Final send admission now rechecks other sending/unknown proposals for the account; a proposal prepared earlier cannot bypass the uncertain-outcome fence. Repeated identical user resolution is idempotent; a differing later attestation cannot overwrite it. Adapter results cannot populate user attestations. An independent source review found no remaining confirmed blocker in authority, revision, delayed-reconciliation, restoration or replay handling; it did not independently rerun tests.
+
+**Checks:** `/private/tmp/trove-connector-manual-resolution-race-v2.jsonl` records **14 focused tests/subtests passed, zero failures/skips**. The first attempt failed to compile because the new code used Actor.Id instead of the actual Actor.ActorId field; corrected before v2. `/private/tmp/trove-connections-manual-resolution-browser-v1.json` records **eight actual-component browser tests passed, zero skips**, including the inspection acknowledgement, retained uncertainty and exactly one remote-send request. TypeScript and whitespace checks passed. Tests use mocked adapters/bridge; no live external write was performed. The final adapter-attestation clearing line is an additional boundary guard and receives the integration rerun below.
+
+**Next:** Integrate reviewed populated schema checkpoint, Gmail origin policy and folder-index identity fixes; enable Gmail acquisition after current-source policy checks. Continue record-deletion reconciliation, deeper Notion capture, remaining review/image runners and desktop job-state recovery. Full feature integration, live/device acceptance and release qualification remain pending.
 
 <a id="commit-history"></a>
 ## Recorded source-development history

@@ -98,14 +98,25 @@ type Proposal struct {
 	Receipt         *Receipt `json:"receipt,omitempty"`
 }
 type Receipt struct {
-	Version        int    `json:"version"`
-	ProposalID     string `json:"proposalId"`
-	Outcome        string `json:"outcome"`
-	RemoteID       string `json:"remoteId,omitempty"`
-	RemoteRevision string `json:"remoteRevision,omitempty"`
-	URL            string `json:"url,omitempty"`
-	Detail         string `json:"detail"`
-	RecordedAt     string `json:"recordedAt"`
+	Version        int             `json:"version"`
+	ProposalID     string          `json:"proposalId"`
+	Outcome        string          `json:"outcome"`
+	RemoteID       string          `json:"remoteId,omitempty"`
+	RemoteRevision string          `json:"remoteRevision,omitempty"`
+	URL            string          `json:"url,omitempty"`
+	Detail         string          `json:"detail"`
+	RecordedAt     string          `json:"recordedAt"`
+	UserResolution *UserResolution `json:"userResolution,omitempty"`
+}
+
+// UserResolution records the owner's inspection separately from the provider
+// outcome. It never turns an uncertain provider acknowledgement into a pass.
+type UserResolution struct {
+	Version     int    `json:"version"`
+	Observation string `json:"observation"`
+	Evidence    string `json:"evidence"`
+	ActorID     string `json:"actorId"`
+	RecordedAt  string `json:"recordedAt"`
 }
 
 // Secret is in-process only. Its fields are deliberately excluded from all

@@ -852,7 +852,56 @@ function Connections({
               >
                 Reconcile outcome
               </button>
+              <ManualResolution
+                key={proposal.id}
+                disabled={
+                  busy ||
+                  accounts.find((a) => a.id === proposal.accountId)?.state !==
+                    "active"
+                }
+                onResolve={(observation, evidence) =>
+                  act(async (stamp) => {
+                    const currentAccount = accounts.find(
+                      (a) => a.id === proposal.accountId,
+                    );
+                    if (!currentAccount)
+                      throw new Error(
+                        "Reload the connection before resolving its outcome",
+                      );
+                    const result = await request<Proposal>(
+                      "connectors.native.resolve",
+                      {
+                        proposalId: proposal.id,
+                        hash: proposal.hash,
+                        expectedRevision: currentAccount.revision,
+                        observation,
+                        evidence,
+                      },
+                    );
+                    if (current(stamp)) setProposal(result);
+                  })
+                }
+              />
             </>
+          )}
+          {proposal.receipt?.userResolution && (
+            <section aria-label="Manual resolution record">
+              <p>
+                Resolved by the user:{" "}
+                {proposal.receipt.userResolution.observation === "applied"
+                  ? "change was applied"
+                  : "change was not applied"}
+                . The provider outcome remains unverified; this proposal cannot
+                be sent again.
+              </p>
+              <p>{proposal.receipt.userResolution.evidence}</p>
+              <small>
+                Recorded{" "}
+                {new Date(
+                  proposal.receipt.userResolution.recordedAt,
+                ).toLocaleString()}
+              </small>
+            </section>
           )}
           {proposal.state === "sending" && (
             <button
@@ -1088,6 +1137,71 @@ function Connections({
         </section>
       )}
     </div>
+  );
+}
+
+function ManualResolution({
+  disabled,
+  onResolve,
+}: {
+  disabled: boolean;
+  onResolve: (
+    observation: "applied" | "not_applied",
+    evidence: string,
+  ) => Promise<void>;
+}) {
+  const [observation, setObservation] = useState<"applied" | "not_applied">(
+    "applied",
+  );
+  const [evidence, setEvidence] = useState("");
+  const [confirmed, setConfirmed] = useState(false);
+  return (
+    <details>
+      <summary>Record a manually verified outcome</summary>
+      <p>
+        Use this after inspecting the remote result when automatic
+        reconciliation cannot confirm it. This records your inspection, retains
+        the uncertain provider receipt, and permits new work requiring a
+        separate review.
+      </p>
+      <label>
+        Inspected outcome
+        <select
+          value={observation}
+          onChange={(e) => setObservation(e.target.value as typeof observation)}
+        >
+          <option value="applied">I confirmed the change was applied</option>
+          <option value="not_applied">
+            I confirmed the change was not applied
+          </option>
+        </select>
+      </label>
+      <label>
+        Evidence from your inspection
+        <textarea
+          value={evidence}
+          maxLength={4000}
+          onChange={(e) => {
+            setEvidence(e.target.value);
+            setConfirmed(false);
+          }}
+        />
+      </label>
+      <label>
+        <input
+          type="checkbox"
+          checked={confirmed}
+          onChange={(e) => setConfirmed(e.target.checked)}
+        />
+        I inspected this exact change in the connected account.
+      </label>
+      <button
+        disabled={disabled || !confirmed || evidence.trim().length < 10}
+        onClick={() => void onResolve(observation, evidence)}
+      >
+        Record manual resolution
+      </button>
+    </details>
   );
 }
 

@@ -142,6 +142,23 @@ window.go = {
             },
           }));
           result = { state: "started" };
+        } else if (method === "connectors.native.resolve") {
+          proposals = proposals.map((p) => ({
+            ...p,
+            state: "resolved",
+            receipt: {
+              ...p.receipt!,
+              outcome: "unknown",
+              userResolution: {
+                version: 1,
+                observation: r.observation,
+                evidence: r.evidence,
+                actorId: id(2),
+                recordedAt: new Date().toISOString(),
+              },
+            },
+          }));
+          result = proposals[0];
         } else if (method === "connectors.native.reconcile") {
           const receipt: S.ConnectorReceipt = {
             version: 1,

@@ -116,6 +116,7 @@ func (a *App) connectorDispatch(method string, raw json.RawMessage) string {
 		"connectors.native.cleanup": "ConnectorAccountRequest", "connectors.native.disconnect": "ConnectorDisconnectRequest", "connectors.native.discover": "ConnectorDiscoverRequest", "connectors.native.refresh": "ConnectorRefreshRequest",
 		"connectors.native.preview": "ConnectorSourceRequest", "connectors.native.import": "ConnectorSourceRequest", "connectors.native.acquire": "ConnectorSourceRequest",
 		"connectors.native.prepare": "ConnectorPrepareRequest", "connectors.native.execute": "ConnectorExecuteRequest", "connectors.native.reconcile": "ConnectorProposalRequest", "connectors.native.cancel": "ConnectorCancelRequest",
+		"connectors.native.resolve": "ConnectorResolveRequest",
 	}
 	definition := definitions[method]
 	if definition == "" || contracts.Validate("service", definition, raw) != nil {
@@ -132,6 +133,8 @@ func (a *App) connectorDispatch(method string, raw json.RawMessage) string {
 		AttemptID        string                  `json:"attemptId"`
 		ProposalID       string                  `json:"proposalId"`
 		Hash             string                  `json:"hash"`
+		Observation      string                  `json:"observation"`
+		Evidence         string                  `json:"evidence"`
 		Cursor           string                  `json:"cursor"`
 		ResumeID         string                  `json:"resumeId"`
 		OperationID      string                  `json:"operationId"`
@@ -374,6 +377,11 @@ func (a *App) connectorDispatch(method string, raw json.RawMessage) string {
 	case "connectors.native.reconcile":
 		receipt, err := k.ReconcileConnectorProposal(ctx, e, r.ProposalID, adapter, session)
 		return connectorSuccessOrError(receipt, err)
+	case "connectors.native.resolve":
+		return host.run(ctx, r.RequestID, account.ID, func(ctx context.Context) string {
+			proposal, err := k.ResolveConnectorProposal(ctx, e, r.ProposalID, r.Hash, r.ExpectedRevision, r.Observation, r.Evidence, adapter, session)
+			return connectorSuccessOrError(proposal, err)
+		})
 	}
 	return errorEnvelope("INVALID_REQUEST", "Unknown connector operation")
 }

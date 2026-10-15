@@ -2515,15 +2515,23 @@ type ServiceConnectorAction struct {
 	Arguments        map[string]json.RawMessage `json:"arguments"`
 	Effects          []string                   `json:"effects"`
 }
+type ServiceConnectorUserResolution struct {
+	Version     int64           `json:"version"`
+	Observation string          `json:"observation"`
+	Evidence    string          `json:"evidence"`
+	ActorId     DomainId        `json:"actorId"`
+	RecordedAt  DomainTimestamp `json:"recordedAt"`
+}
 type ServiceConnectorReceipt struct {
-	Version        int64           `json:"version"`
-	ProposalId     DomainId        `json:"proposalId"`
-	Outcome        string          `json:"outcome"`
-	RemoteId       *string         `json:"remoteId,omitempty"`
-	RemoteRevision *string         `json:"remoteRevision,omitempty"`
-	Url            *string         `json:"url,omitempty"`
-	Detail         string          `json:"detail"`
-	RecordedAt     DomainTimestamp `json:"recordedAt"`
+	Version        int64                           `json:"version"`
+	ProposalId     DomainId                        `json:"proposalId"`
+	Outcome        string                          `json:"outcome"`
+	RemoteId       *string                         `json:"remoteId,omitempty"`
+	RemoteRevision *string                         `json:"remoteRevision,omitempty"`
+	Url            *string                         `json:"url,omitempty"`
+	Detail         string                          `json:"detail"`
+	RecordedAt     DomainTimestamp                 `json:"recordedAt"`
+	UserResolution *ServiceConnectorUserResolution `json:"userResolution,omitempty"`
 }
 type ServiceConnectorProposal struct {
 	Version         int64                    `json:"version"`
@@ -2668,6 +2676,16 @@ type ServiceConnectorExecuteRequest struct {
 	WorkspaceId     DomainId `json:"workspaceId"`
 	ProposalId      DomainId `json:"proposalId"`
 	Hash            string   `json:"hash"`
+}
+type ServiceConnectorResolveRequest struct {
+	ContractVersion  int64    `json:"contractVersion"`
+	RequestId        DomainId `json:"requestId"`
+	WorkspaceId      DomainId `json:"workspaceId"`
+	ProposalId       DomainId `json:"proposalId"`
+	Hash             string   `json:"hash"`
+	ExpectedRevision string   `json:"expectedRevision"`
+	Observation      string   `json:"observation"`
+	Evidence         string   `json:"evidence"`
 }
 type ServiceConnectorCancelRequest struct {
 	ContractVersion int64    `json:"contractVersion"`

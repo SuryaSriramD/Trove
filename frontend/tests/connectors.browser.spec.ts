@@ -107,6 +107,59 @@ test("GitHub accepts the source identifier shown in previews for reviewed update
     "Item: 123",
   );
 });
+
+test("manual reconciliation records inspection without resending an uncertain write", async ({
+  page,
+}) => {
+  await page.goto(url);
+  await page.getByRole("button", { name: "GitHub · Example" }).click();
+  await page.getByRole("button", { name: "Choose sources" }).click();
+  await page.getByLabel("Selected repository").check();
+  await page.getByRole("button", { name: "Save source selection" }).click();
+  await page.getByText("Prepare an external change", { exact: true }).click();
+  await page.getByLabel("Selected destination").selectOption("org/repo");
+  await page
+    .getByLabel("Title", { exact: true })
+    .fill("Inspect remote outcome");
+  await page
+    .getByRole("button", { name: "Prepare review", exact: true })
+    .click();
+  await page
+    .getByRole("button", { name: "Approve and send this exact change" })
+    .click();
+  await page
+    .getByText("Record a manually verified outcome", { exact: true })
+    .click();
+  await expect(
+    page.getByRole("button", { name: "Record manual resolution", exact: true }),
+  ).toBeDisabled();
+  await page
+    .getByLabel("Evidence from your inspection")
+    .fill("I inspected issue 42 and matched the reviewed content and marker.");
+  await page
+    .getByLabel("I inspected this exact change in the connected account.")
+    .check();
+  await page
+    .getByRole("button", { name: "Record manual resolution", exact: true })
+    .click();
+  await expect(page.getByLabel("Manual resolution record")).toContainText(
+    "provider outcome remains unverified",
+  );
+  await expect(
+    page.getByRole("button", { name: "Approve and send this exact change" }),
+  ).toHaveCount(0);
+  const calls = await page.evaluate(() => (window as any).connectorCalls);
+  expect(
+    calls.filter((c: any) => c.method === "connectors.native.execute"),
+  ).toHaveLength(1);
+  expect(
+    calls.find((c: any) => c.method === "connectors.native.resolve").request,
+  ).toMatchObject({
+    hash: "a".repeat(64),
+    expectedRevision: "a2",
+    observation: "applied",
+  });
+});
 test("external writes require selection and review; unknown is reconciled without resend", async ({
   page,
 }) => {
