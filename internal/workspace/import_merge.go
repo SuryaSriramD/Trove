@@ -146,6 +146,9 @@ func snapshotImportItem(item *ImportItem) ImportSnapshot {
 		s.Fields[prefix+"/order"] = marshal(positions[parent])
 		positions[parent]++
 	}
+	for path, relationship := range item.AttachmentRelationships {
+		s.Fields[path] = marshal(relationship)
+	}
 	return s
 }
 func localImportSnapshot(ctx context.Context, q querier, page string) (ImportSnapshot, bool, error) {
@@ -324,6 +327,9 @@ func prepareImportMerge(ctx context.Context, q querier, p *ImportPlan, item *Imp
 	if err != nil {
 		return err
 	}
+	if err := prepareImportAttachmentFields(ctx, q, item, base, &local, &incoming); err != nil {
+		return err
+	}
 	if collection != nil {
 		if err := addLocalDatabaseFields(ctx, q, &local, item, collection); err != nil {
 			return err
@@ -347,6 +353,13 @@ func prepareImportMerge(ctx context.Context, q querier, p *ImportPlan, item *Imp
 		status = "unavailable"
 	}
 	item.Merge = &ImportMergeReview{ID: NewID(), Version: 1, BaselineStatus: status, LocalDeleted: deleted, Fields: mergeImportFields(base.Fields, local.Fields, incoming.Fields, known), Resolutions: []ImportFieldChoice{}}
+	for i := range item.Merge.Fields {
+		field := &item.Merge.Fields[i]
+		if strings.HasPrefix(field.Path, "/attachments/") && field.Base.Present && !field.Incoming.Present && field.Local.Present {
+			// Even a proven complete removal needs an explicit reviewed decision.
+			field.Outcome = "conflict"
+		}
+	}
 	item.Choice = ""
 	item.Conflict = "Review the retained base, local changes and incoming fields"
 	if !known {

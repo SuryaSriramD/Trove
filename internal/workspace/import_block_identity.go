@@ -177,4 +177,8 @@ func remapImportBlockIDs(item *ImportItem, ids map[string]string) {
 		walk(item.Blocks[i].Data)
 	}
 	item.BlockParents, item.BlockSources = parents, sources
+	for path, relationship := range item.AttachmentRelationships {
+		relationship.BlockID = remap(relationship.BlockID)
+		item.AttachmentRelationships[path] = relationship
+	}
 }

@@ -543,6 +543,9 @@ func commitImportItem(m *Mutation, p *ImportPlan, item *ImportItem) error {
 			return err
 		}
 	}
+	if err := applyImportAttachments(m, item); err != nil {
+		return err
+	}
 	if item.Kind == "csv" {
 		if err := guardImport(m, "collection", item.CollectionID); err != nil {
 			return err

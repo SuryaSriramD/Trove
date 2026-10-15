@@ -78,12 +78,14 @@ type portableHierarchy struct {
 	HTMLRenditions []string        `json:"htmlRenditions"`
 	Phase4Metadata json.RawMessage `json:"phase4Metadata"`
 	Pages          []struct {
-		DisplayPreferences *PageDisplayPreferences `json:"displayPreferences,omitempty"`
-		Path               string                  `json:"path"`
-		ParentPath         string                  `json:"parentPath"`
-		Provenance         any                     `json:"provenance"`
-		CanonicalPage      contracts.DomainPage    `json:"canonicalPage"`
-		CanonicalBlocks    []contracts.DomainBlock `json:"canonicalBlocks"`
+		AttachmentRelationshipsVersion int                            `json:"attachmentRelationshipsVersion,omitempty"`
+		AttachmentRelationships        []ImportAttachmentRelationship `json:"attachmentRelationships,omitempty"`
+		DisplayPreferences             *PageDisplayPreferences        `json:"displayPreferences,omitempty"`
+		Path                           string                         `json:"path"`
+		ParentPath                     string                         `json:"parentPath"`
+		Provenance                     any                            `json:"provenance"`
+		CanonicalPage                  contracts.DomainPage           `json:"canonicalPage"`
+		CanonicalBlocks                []contracts.DomainBlock        `json:"canonicalBlocks"`
 	} `json:"pages"`
 	Attachments []struct {
 		ID     string `json:"id"`
@@ -370,6 +372,9 @@ func (k *Kernel) parseImportPlan(ctx context.Context, p *ImportPlan) error {
 	}
 	p.Items = append(p.Items, rows...)
 	k.restorePortableBlocks(p, manifest)
+	if err := restorePortableAttachments(p, manifest); err != nil {
+		return err
+	}
 	k.restorePortableDatabase(p, manifest)
 	if err := restoreCSVKeyBindings(ctx, k.db, p); err != nil {
 		return err
