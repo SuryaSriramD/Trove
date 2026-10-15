@@ -14,7 +14,10 @@ import (
 	"trove.local/phase0/contracts"
 )
 
+const currentRecoveryMetadataVersion = 7
+
 type recoverySnapshot struct {
+	ExternalContextPolicy   *externalContextPolicy         `json:"externalContextPolicy,omitempty"`
 	AttachmentRelationships *[]recoveryAttachmentReference `json:"attachmentRelationships,omitempty"`
 	RecordLayouts           *recoveryLayouts               `json:"recordLayouts,omitempty"`
 	DisplayPreferences      *PageDisplayPreferences        `json:"displayPreferences,omitempty"`
@@ -30,7 +33,12 @@ type recoverySnapshot struct {
 }
 
 func captureRecoverySnapshot(ctx context.Context, q querier, page string, result contracts.ServiceReadPageResult) (json.RawMessage, error) {
-	out := recoverySnapshot{ServiceReadPageResult: result, MetadataVersion: 6}
+	out := recoverySnapshot{ServiceReadPageResult: result, MetadataVersion: currentRecoveryMetadataVersion}
+	policy, policyErr := capturePageExternalContextPolicy(ctx, q, page)
+	if policyErr != nil {
+		return nil, policyErr
+	}
+	out.ExternalContextPolicy = policy
 	display, displayErr := readPageDisplay(ctx, q, page)
 	if displayErr != nil {
 		return nil, displayErr
@@ -156,6 +164,12 @@ func loadRecoverySnapshot(ctx context.Context, q querier, page, revision string)
 	err := q.QueryRowContext(ctx, "SELECT snapshot_json FROM page_snapshots WHERE page_id=? AND revision=?", page, revision).Scan(&raw)
 	if err == nil {
 		err = json.Unmarshal([]byte(raw), &out)
+		if err == nil && (out.MetadataVersion < 0 || out.MetadataVersion > currentRecoveryMetadataVersion) {
+			err = Fail("UNSUPPORTED_SCHEMA", "Historical metadata requires a compatible application")
+		}
+		if err == nil && out.ExternalContextPolicy != nil {
+			err = validateExternalContextPolicy(*out.ExternalContextPolicy)
+		}
 	}
 	return out, raw, err
 }
@@ -551,6 +565,11 @@ func restoreHistory(m *Mutation, c map[string]any) error {
 	}
 	if _, err = m.Exec("INSERT INTO page_metadata(page_id,archived,icon,cover_file_id,archived_at) VALUES(?,?,?,?,?) ON CONFLICT(page_id) DO UPDATE SET archived=excluded.archived,icon=excluded.icon,cover_file_id=excluded.cover_file_id,archived_at=excluded.archived_at", page, snap.Page.ArchivedAt != nil, snap.Page.Icon, snap.Page.CoverFileId, snap.Page.ArchivedAt); err != nil {
 		return err
+	}
+	if snap.ExternalContextPolicy != nil {
+		if err = retainPageExternalContextPolicy(m.Context, m.Tx, page, *snap.ExternalContextPolicy); err != nil {
+			return err
+		}
 	}
 	if err = restoreRecoveryLayouts(m, snap); err != nil {
 		return err

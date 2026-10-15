@@ -301,8 +301,24 @@ func init() {
 		if m.Execution.Actor.Kind != "user" || m.Execution.Origin != "user" {
 			return Fail("APPROVAL_REQUIRED", "Meeting draft approval requires the user")
 		}
+		var archived int
+		if err = m.Tx.QueryRowContext(m.Context, "SELECT count(*) FROM meeting_archived_proposals_v1 WHERE draft_id=?", id).Scan(&archived); err != nil {
+			return err
+		}
+		if archived != 0 {
+			return Fail("CONFLICT", "Generated proposal was archived during review")
+		}
 		if _, ok := m.touched[guardKey("page", page)]; !ok {
 			return Fail("INVALID_REQUEST", "Meeting draft must append to its source page")
+		}
+		policy, err := capturePageExternalContextPolicy(m.Context, m.Tx, page)
+		if err != nil {
+			return err
+		}
+		if policy != nil {
+			if err = retainPageExternalContextPolicy(m.Context, m.Tx, page, *policy); err != nil {
+				return err
+			}
 		}
 		_, err = m.Exec("UPDATE meeting_intelligence SET state='applied' WHERE id=? AND state='draft'", id)
 		return err

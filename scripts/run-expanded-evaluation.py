@@ -7,6 +7,11 @@ FAMILIES = {
     'p0': ('p0-qa-memory.json', 'TestRealLocalExpandedP0QAMemory', 24),
     'p0-holdouts': ('p0-closure-holdouts.json', 'TestRealLocalP0ClosureHoldouts', 12),
     'modes': ('heldout-modes.json', 'TestRealLocalExpandedModes', 42),
+    'context': ('context.json', 'TestRealLocalWorkflowContext', 12),
+    'related': ('related.json', 'TestRealLocalWorkflowRelated', 12),
+    'memory-lifecycle': ('memory-lifecycle.json', 'TestRealLocalWorkflowMemoryLifecycle', 12),
+    'images': ('images-execution-v2.json', 'TestRealLocalWorkflowImages', 24),
+    'reviews': ('reviews.json', 'TestRealLocalWorkflowReviews', 12),
 }
 
 def digest(path):
@@ -38,7 +43,7 @@ def _unique_json(pairs):
     return result
 
 
-def _snapshot_binding(binding, root, test_name, phase):
+def _snapshot_binding(binding, root, test_name, phase, expected_excluded=None):
     import base64
     if not isinstance(binding, dict) or binding.get('retained') is not True:
         raise ValueError('canonical snapshot is not durably retained')
@@ -58,7 +63,8 @@ def _snapshot_binding(binding, root, test_name, phase):
     if data.get('schemaVersion') != 1 or data.get('testName') != test_name or not data.get('scope'):
         raise ValueError('canonical snapshot scope/test identity differs')
     excluded, tables, assets = data.get('excludedTables'), data.get('tables'), data.get('assets')
-    if not isinstance(excluded, dict) or set(excluded) != CANONICAL_EXCLUDED_TABLES or not all(isinstance(v, str) and v for v in excluded.values()):
+    if expected_excluded is None: expected_excluded = CANONICAL_EXCLUDED_TABLES
+    if not isinstance(excluded, dict) or set(excluded) != expected_excluded or not all(isinstance(v, str) and v for v in excluded.values()):
         raise ValueError('canonical snapshot exclusions differ from the reviewed scope')
     if not isinstance(tables, dict) or not CANONICAL_REQUIRED_TABLES.issubset(tables) or set(tables) & set(excluded):
         raise ValueError('canonical snapshot omits protected content tables')
@@ -112,7 +118,7 @@ def _snapshot_binding(binding, root, test_name, phase):
     return data
 
 
-def validate_canonical_inventory(report, root, test_name):
+def validate_canonical_inventory(report, root, test_name, expected_excluded=None):
     """Return a validation error; old count-only reports never qualify new runs."""
     try:
         if root is None:
@@ -120,8 +126,8 @@ def validate_canonical_inventory(report, root, test_name):
         audit = report.get('canonicalInventory')
         if not isinstance(audit, dict) or audit.get('schemaVersion') != 1 or audit.get('error'):
             raise ValueError('canonical inventory report missing or failed')
-        before = _snapshot_binding(audit.get('before'), root, test_name, 'before')
-        after = _snapshot_binding(audit.get('after'), root, test_name, 'after')
+        before = _snapshot_binding(audit.get('before'), root, test_name, 'before', expected_excluded)
+        after = _snapshot_binding(audit.get('after'), root, test_name, 'after', expected_excluded)
         if pathlib.Path(audit['before']['path']).parent != pathlib.Path(audit['after']['path']).parent:
             raise ValueError('canonical snapshot pair belongs to different observations')
         checks = {
@@ -160,7 +166,314 @@ def validate_request_report(report, expected):
     return None
 
 
-def summarize(events, expected, parent, canonical_root=None, expected_requests=None):
+CONTEXT_GENERATION_CASES = frozenset(('short-source', 'near-budget', 'overflow', 'beginning-fact', 'middle-fact', 'ending-fact'))
+CONTEXT_ASSERTIONS = {
+    'short-source': {'reservedBudget', 'noOmission', 'requiredFactRetained', 'oneGeneration', 'generatedSuccessfully', 'independentAnswerOracle', 'currentCitation', 'canonicalPreserved'},
+    'near-budget': {'nearCapacityMeasured', 'reservedBudget', 'requiredFactRetained', 'oneGeneration', 'generatedSuccessfully', 'independentAnswerOracle', 'currentCitation', 'canonicalPreserved'},
+    'overflow': {'reservedBudget', 'omissionDisclosed', 'oneGeneration', 'generatedSuccessfully', 'independentAnswerOracle', 'canonicalPreserved'},
+    'beginning-fact': {'reservedBudget', 'requiredFactRetained', 'oneGeneration', 'generatedSuccessfully', 'independentAnswerOracle', 'currentCitation', 'canonicalPreserved'},
+    'middle-fact': {'reservedBudget', 'omissionDisclosed', 'oneGeneration', 'generatedSuccessfully', 'independentAnswerOracle', 'canonicalPreserved'},
+    'ending-fact': {'reservedBudget', 'omissionDisclosed', 'oneGeneration', 'generatedSuccessfully', 'independentAnswerOracle', 'canonicalPreserved'},
+    'exact-code': {'reservedBudget', 'selectionPreserved', 'unselectedCodePreserved', 'canonicalPreserved'},
+    'oversized-code': {'preparationRejected', 'noRunnableDraft', 'canonicalPreserved'},
+    'framing-cost': {'framingAddsTokens', 'framingRejected'},
+    'during-tokenization': {'preparationRejected', 'noRunnableDraft', 'canonicalPreserved'},
+    'during-generation': {'reservedBudget', 'draftInvalidated', 'proposalRejected', 'canonicalPreserved'},
+    'truncated-output': {'reservedBudget', 'draftInvalidated', 'proposalRejected', 'canonicalPreserved'},
+}
+RELATED_ASSERTIONS = frozenset(('semanticDisclosed', 'relevantRetrieved', 'relevanceAboveDistractor', 'scopeAndSelfFiltered', 'currentRevisions', 'keywordFallbackDisclosed', 'canonicalPreserved'))
+
+
+MEMORY_GENERATION_CASES = frozenset(('preference-on', 'preference-off', 'current-authority', 'constraint'))
+MEMORY_EXCLUDED_CASES = frozenset(('preference-off', 'source-edit', 'source-delete', 'forgotten', 'restore-stale', 'restore-forgotten'))
+MEMORY_ASSERTIONS = {case: {'reservedBudget', 'memoryEligibility', 'canonicalPreserved'} for case in (
+    'preference-on', 'preference-off', 'current-authority', 'constraint', 'source-edit', 'source-delete',
+    'forgotten', 'forget-stream', 'restore-stale', 'restore-forgotten', 'older-backup', 'scope-revoke')}
+for _case in MEMORY_GENERATION_CASES:
+    MEMORY_ASSERTIONS[_case] |= {'oneGeneration', 'generatedSuccessfully', 'independentAnswerOracle', 'currentCitation'}
+for _case in MEMORY_EXCLUDED_CASES:
+    MEMORY_ASSERTIONS[_case].add('memoryContentAbsent')
+for _case in MEMORY_EXCLUDED_CASES - {'preference-off'}:
+    MEMORY_ASSERTIONS[_case].add('relatedSourceExcluded')
+for _case in ('forget-stream', 'scope-revoke'):
+    MEMORY_ASSERTIONS[_case] |= {'publicationRejected', 'proposalRejected'}
+for _case in ('restore-stale', 'restore-forgotten'):
+    MEMORY_ASSERTIONS[_case] |= {'verifiedRestore', 'restoredStatePreserved'}
+MEMORY_ASSERTIONS['older-backup'] |= {'verifiedRestore', 'laterForgetRecorded', 'olderStateRecovered'}
+
+
+def validate_memory_report(report, case):
+    errors = []
+    attempts = 1 if case in MEMORY_GENERATION_CASES else 0
+    if type(report.get('generationAttempts')) is not int or report['generationAttempts'] != attempts:
+        errors.append('memory generation count differs')
+    if not all(type(report.get(k)) is int for k in ('promptTokens', 'outputCap', 'contextTokens')) or report['promptTokens'] < 0 or report['outputCap'] != 512 or report['contextTokens'] != 8192 or report['promptTokens'] + 512 + 16 > 8192:
+        errors.append('memory token budget not proved')
+    request, sources = report['request'], report['sources']
+    if type(request.get('useMemory')) is not bool or request['useMemory'] is not (case != 'preference-off') or request.get('modelPackId') != report['modelPackId']:
+        errors.append('memory request controls differ')
+    memory, primary, supporting = report['memoryId'], request['pageId'], report['supportingPageId']
+    if not all(isinstance(v, str) and v for v in (memory, primary, supporting, report['memoryPageId'])) or primary in (supporting, report['memoryPageId']):
+        errors.append('memory source identities missing or conflated')
+    expected = case not in MEMORY_EXCLUDED_CASES
+    found = [source for source in sources if source.get('memoryId') == memory]
+    if report.get('memoryIncluded') is not expected or bool(found) != expected:
+        errors.append('memory evidence eligibility differs')
+    content = 'Use the heading Launch note for answers about Project Marigold.'
+    if case == 'current-authority': content = 'Project Marigold launches on 9 February 2030.'
+    if case == 'constraint': content = 'Do not suggest weekend due dates.'
+    if report.get('memoryContent') != content or (expected and not any(s.get('text') == content for s in found)) or (not expected and content in report['preparedPrompt']):
+        errors.append('memory context content differs')
+    expected_status = 'stale' if case in ('source-edit', 'source-delete', 'restore-stale') else 'forgotten' if case in ('forgotten', 'restore-forgotten') else 'active'
+    if report.get('memoryStatus') != expected_status:
+        errors.append('persisted memory status differs')
+    if case in MEMORY_EXCLUDED_CASES - {'preference-off'} and report.get('relatedRejected') is not True:
+        errors.append('ineligible memory remains a related-content source')
+    if case in ('restore-stale', 'restore-forgotten', 'older-backup'):
+        if not report.get('backupWorkspaceId') or report.get('restoredWorkspaceId') != report['backupWorkspaceId'] or report.get('restoredIndexRebuilt') is not True:
+            errors.append('verified restored workspace binding absent')
+    if case == 'older-backup':
+        if report.get('sourceAfterBackupStatus') != 'forgotten' or report.get('restoreBoundary') != 'A backup predating Forget retains the earlier approved memory state.' or report.get('nativeRestoreWarningAcceptancePending') is not True or report.get('manualSemanticReviewRequired') is not True:
+            errors.append('older-backup behavior or separate native warning acceptance is obscured')
+    if case in ('forget-stream', 'scope-revoke'):
+        if report.get('proposalRejected') is not True or report.get('finishText') != '':
+            errors.append('invalidated memory draft can publish or apply')
+        if case == 'forget-stream' and (report.get('finishState') != 'failed' or report.get('finishRejected') is not False):
+            errors.append('forgotten memory draft was not invalidated')
+        if case == 'scope-revoke' and report.get('finishRejected') is not True:
+            errors.append('revoked authority did not reject publication')
+    if case in MEMORY_GENERATION_CASES:
+        fact = 'Monday 21 April 2031 is an available due date.' if case == 'constraint' else 'Project Marigold launches on 14 April 2031.'
+        heading = 'Launch note' if case == 'preference-on' else ''
+        answer = json.loads(report.get('rawDraft', ''))
+        if answer != {'title': heading, 'claims': [{'text': fact, 'quote': fact}]}:
+            errors.append('memory answer violates independent fact, heading or constraint oracle')
+        if not any(fact in source.get('text', '') and source.get('location', {}).get('pageId') == primary and not source.get('memoryId') for source in sources):
+            errors.append('current primary evidence missing')
+        citations = report.get('citations', [])
+        allowed = {primary, supporting} if case == 'preference-on' else {primary}
+        if not any(c.get('location', {}).get('pageId') == primary for c in citations) or any(c.get('location', {}).get('pageId') not in allowed or c.get('state') != 'current' for c in citations):
+            errors.append('current source citation missing or contaminated')
+    return errors
+
+
+REVIEW_FACT = 'The security review is incomplete. Launch cannot proceed until that review is approved.'
+REVIEW_DOCUMENTATION = 'Documentation is ready.'
+REVIEW_SUGGESTION = 'Suggestion: request security review approval.'
+REVIEW_GENERATION_CASES = frozenset(('daily-summary', 'weekly-summary', 'unresolved-tasks', 'changed-decision', 'risk-suggestion', 'no-owner', 'categories'))
+REVIEW_BOUNDARY_CASES = frozenset(('stale-destination', 'forgotten-memory', 'cancel-retry', 'restart', 'dedup-import'))
+REVIEW_EXCLUDED_TABLES = CANONICAL_EXCLUDED_TABLES | {'personal_review_runs', 'personal_review_model_runs'}
+REVIEW_ASSERTIONS = {case: {'canonicalPreserved'} for case in REVIEW_GENERATION_CASES | REVIEW_BOUNDARY_CASES}
+for _case in REVIEW_ASSERTIONS:
+    if _case != 'restart': REVIEW_ASSERTIONS[_case].add('reservedBudget')
+    if _case not in ('restart', 'forgotten-memory'):
+        REVIEW_ASSERTIONS[_case].update(('sourceScope', 'independentAnswerOracle', 'currentCitations', 'readyUnapplied', 'approvalRequired'))
+        if _case != 'stale-destination': REVIEW_ASSERTIONS[_case].update(('reviewedOnce', 'reviewedContentPresent', 'occurrenceDedup'))
+REVIEW_ASSERTIONS['weekly-summary'].add('omissionsDisclosed')
+REVIEW_ASSERTIONS['changed-decision'].add('memoryIncluded')
+REVIEW_ASSERTIONS['risk-suggestion'].add('suggestionAppliedExactly')
+REVIEW_ASSERTIONS['stale-destination'].add('staleApplyRejected')
+REVIEW_ASSERTIONS['forgotten-memory'].add('forgetInvalidates')
+REVIEW_ASSERTIONS['cancel-retry'].update(('cancelledInert', 'boundedRetry'))
+REVIEW_ASSERTIONS['restart'].add('restartInert')
+REVIEW_PORTABLE_TABLES = ('personal_review_activation', 'personal_review_runs', 'personal_review_model_runs', 'ai_proposals')
+REVIEW_ASSERTIONS['dedup-import'].update({'portableNoGeneration', *('portableInert-' + table for table in REVIEW_PORTABLE_TABLES)})
+
+
+def review_expected_draft(case):
+    category = 'risks' if case == 'risk-suggestion' else 'decisions' if case == 'categories' else 'summary'
+    claims = [{'category': category, 'text': REVIEW_FACT, 'quote': REVIEW_FACT}]
+    actions = []
+    if case == 'weekly-summary': claims.append({'category': 'summary', 'text': REVIEW_DOCUMENTATION, 'quote': REVIEW_DOCUMENTATION})
+    if case == 'unresolved-tasks': claims = [{'category': 'summary', 'text': 'Security review is open.', 'quote': 'Status: To do'}]
+    if case == 'risk-suggestion': actions.append({'kind': 'update_page', 'target': 'Current security decision', 'body': REVIEW_SUGGESTION})
+    return {'claims': claims, 'actions': actions}
+
+
+def validate_review_report(report, case):
+    errors = []
+    model_case = case in REVIEW_GENERATION_CASES
+    if type(report.get('generationAttempts')) is not int or report['generationAttempts'] != int(model_case): errors.append('review native generation count differs')
+    if report.get('serviceBoundaryOnly') is not (not model_case): errors.append('service-only boundary is not explicitly distinguished')
+    expected_invocations = 0 if case == 'restart' else 2 if case == 'cancel-retry' else 1
+    if type(report.get('generatorInvocations')) is not int or report['generatorInvocations'] != expected_invocations: errors.append('review callback count differs')
+    bindings, plan = report['sourceBindings'], report['plan']
+    ids = [bindings[k] for k in ('source', 'destination', 'private')]
+    if not all(isinstance(v, str) and v for v in ids) or len(set(ids)) != 3: errors.append('review source identities conflated')
+    if plan['generative']['modelPackId'] != report['modelPackId'] or plan.get('enabled') is not True: errors.append('review model/activation config differs')
+    category = 'risks' if case == 'risk-suggestion' else 'decisions' if case == 'categories' else 'summary'
+    actions = ['append_review', 'append_page'] if case == 'risk-suggestion' else ['append_review']
+    if plan['generative']['categories'] != [category] or plan['generative']['allowedActions'] != actions or plan['generative']['actionPageIds'] != [bindings['source']]: errors.append('selected categories/action destinations differ')
+    selected = [bindings['source']]
+    if case == 'weekly-summary': selected.append(bindings['documentation'])
+    if case == 'unresolved-tasks': selected.extend((bindings['openTask'], bindings['completedTask']))
+    if plan['sourcePageIds'] != selected or bindings['private'] in selected: errors.append('selected source set differs')
+    if plan['schedule']['frequency'] != ('weekly' if case == 'weekly-summary' else 'daily') or plan['schedule']['timezone'] != 'UTC': errors.append('review recurrence identity differs')
+    if plan['includeMemory'] is not (case in ('changed-decision', 'forgotten-memory')): errors.append('review memory control differs')
+    if case == 'restart':
+        if report.get('finalStatus') != 'cancelled' or report.get('nextRunId') != '': errors.append('restart resumed interrupted occurrence')
+        return errors
+    if not all(type(report.get(k)) is int for k in ('promptTokens', 'outputCap', 'contextTokens')) or report['promptTokens'] < 0 or report['outputCap'] != 1024 or report['contextTokens'] != 8192 or report['promptTokens'] + 1024 + 16 > 8192: errors.append('review token budget not proved')
+    if 'PRIVATE-REVIEW-73' in report['preparedPrompt']: errors.append('unselected private source entered review context')
+    if case in ('changed-decision', 'forgotten-memory') and 'The security review is complete. Launch can proceed.' not in report['preparedPrompt']: errors.append('historical memory counterexample absent')
+    if case == 'forgotten-memory':
+        if report.get('finishRejected') is not True or report.get('proposalRejected') is not True or report.get('finalStatus') not in ('failed', 'cancelled'): errors.append('Forget did not invalidate generated review')
+        return errors
+    expected = review_expected_draft(case)
+    if json.loads(report.get('rawDraft', '')) != expected or report.get('actions') != expected['actions']: errors.append('review output differs from independent fact/category/action oracle')
+    sources, citations = report['sources'], report['citations']
+    if report.get('finalStatus') != 'ready' or not citations or report.get('unapprovedApplyRejected') is not True: errors.append('review escaped its unapplied approval boundary')
+    if any(c.get('state') != 'current' or c.get('location', {}).get('pageId') not in selected for c in citations): errors.append('review citations are stale or outside selection')
+    for claim in expected['claims']:
+        supporting = [s for s in sources if not s.get('memoryId') and claim['quote'] in s.get('text', '')]
+        if not any(c.get('number') == s.get('number') and c.get('location') == s.get('location') for s in supporting for c in citations): errors.append('review claim lacks a current canonical supporting citation')
+    if case == 'unresolved-tasks' and any(c.get('location', {}).get('pageId') != bindings['openTask'] for c in citations): errors.append('completed task mislabeled as open')
+    if case == 'weekly-summary' and ('omitted' not in report.get('warning', '') or 'omitted' not in report.get('capturedWarning', '')): errors.append('bounded review omissions not disclosed')
+    if case == 'stale-destination':
+        if report.get('staleApplyRejected') is not True: errors.append('stale destination allowed a reviewed write')
+        return errors
+    effect = report['reviewedEffect']
+    if effect.get('destinationPageId') != bindings['destination'] or effect.get('status') != 'accepted' or not all(type(effect.get(k)) is int for k in ('beforeBlocks', 'afterBlocks', 'retryBlocks')) or effect['beforeBlocks'] < 1 or effect['afterBlocks'] <= effect['beforeBlocks'] or effect['retryBlocks'] != effect['afterBlocks']: errors.append('reviewed effect or duplicate-apply bound differs')
+    if any(claim['text'] not in effect.get('destinationText', '') for claim in expected['claims']): errors.append('approved review content missing from canonical destination')
+    if case == 'risk-suggestion' and REVIEW_SUGGESTION not in effect.get('sourceText', ''): errors.append('reviewed suggestion not applied to exact destination')
+    if report.get('repeatedOccurrenceRunId') != report.get('runId') or not report.get('runId'): errors.append('repeated occurrence changed identity')
+    if case == 'cancel-retry' and report.get('cancelStatus') != 'cancelled': errors.append('cancelled occurrence did not remain inert before retry')
+    if case == 'dedup-import' and (report.get('portableExecutionCounts') != dict.fromkeys(REVIEW_PORTABLE_TABLES, 0) or report.get('portableNextRunId') != ''): errors.append('portable review import activated or replayed execution')
+    return errors
+
+
+IMAGE_EXCLUDED_TABLES = CANONICAL_EXCLUDED_TABLES | {'image_descriptions'}
+IMAGE_ASSERTIONS = frozenset(('serviceCompleted', 'independentAnswerOracle', 'provenance', 'ocrOracle', 'originalPreserved', 'canonicalPreserved'))
+
+def validate_image_report(report, case, contract):
+    errors = []
+    expected = contract['imageCases'][case]
+    if not expected.get('source') or not expected.get('sourceSHA256'):
+        return ['authorized source and locked oracle unavailable']
+    for key in ('sourceSHA256', 'sourceKind'):
+        if report.get(key) != expected[key]: errors.append('image ' + key + ' differs')
+    if report.get('question') != expected['prompt'] or report.get('expectedMethod') != expected['method']:
+        errors.append('image prompt or method differs')
+    if type(report.get('productInvocations')) is not int or type(report.get('ocrInvocations')) is not int or report.get('productInvocations') != 1 or report.get('ocrInvocations') != 1:
+        errors.append('one product and one OCR invocation required')
+    result = report.get('result', {})
+    method = expected['method']
+    if method == 'normalization_rejected':
+        if result.get('state') != 'failed' or result.get('text') or not result.get('error', '').startswith('NORMALIZATION_DETAIL_LOST:'):
+            errors.append('lost source detail was not rejected')
+    elif result.get('state') != 'ready' or result.get('analysisMethod') != method:
+        errors.append('ready image analysis method differs')
+    elif method == 'local_vision_model':
+        answer = result.get('text', '').strip().lower()
+        if case.startswith('diagram-'):
+            if answer not in (expected['expected'], expected['expected']+'.'): errors.append('color answer differs or adds unsupported content')
+        elif case in ('boundary-4', 'boundary-5'):
+            if not re.fullmatch(r'(?:a |there is a )?(?:small |tiny )?(?:faint|light) (?:gray|grey) (?:square|mark|dot|patch)(?: (?:on|against) a (?:plain )?white background)?\.?', answer): errors.append('faint-mark answer differs or adds unsupported content')
+        elif not re.fullmatch(r'(?:a |there is a )?(?:small|tiny) (?:black|dark) (?:square|mark|dot)(?: (?:on|against) a (?:plain |white )?white background)?\.?', answer):
+            errors.append('small-mark answer includes unsupported content')
+        for key, identity in (('modelHash','modelSHA256'), ('projectorHash','projectorSHA256'), ('helperHash','helperSHA256')):
+            if result.get(key) != contract[identity] or not re.fullmatch('[0-9a-f]{64}', result.get(key,'')): errors.append('image artifact identity differs: '+key)
+        if result.get('finishReason') != 'eos' or not 0 < result.get('inputTokens',0) <= 8192 or not 0 < result.get('outputTokens',0) <= 512 or result.get('sampledPeakRSSBytes',0) <= 0:
+            errors.append('complete bounded native image metrics absent')
+    elif method == 'pixel_measurement':
+        suffix = {
+            'boundary-1': 'the image is exactly uniform white (blank at decoded-pixel level). No objects or text can be identified from spatial pixel variation. No model interpretation or OCR was attempted.',
+            'boundary-2': 'every source pixel has the same 16-bit RGB value #000000000000 and alpha 65535/65535. This uniform color has no spatial pixel variation to identify objects or text. No model interpretation or OCR was attempted.',
+            'boundary-3': 'every source pixel is fully transparent. Hidden RGB values are not visible content. No visible objects or text can be identified. No model interpretation or OCR was attempted.',
+        }[case]
+        if not re.fullmatch(re.escape(f"Source pixel measurement ({expected['width']} × {expected['height']} decoded pixels, before resizing and alpha composition; encoded orientation): "+suffix),result.get('text','')):
+            errors.append('exact pixel measurement differs')
+        if result.get('finishReason') != 'measurement': errors.append('pixel measurement was not disclosed')
+    if method != 'local_vision_model' and any(result.get(key) for key in ('modelHash','projectorHash','helperHash','inputTokens','outputTokens','sampledPeakRSSBytes')):
+        errors.append('non-model measurement claims model output')
+    ocr = report.get('ocr', {})
+    lines = '\n'.join(line['text'].strip() for line in (ocr.get('lines') or []) if line['text'].strip())
+    if report.get('ocrError') or lines != expected['ocrExpected'] or not report.get('ocrCapability',{}).get('engine') or not report.get('ocrCapability',{}).get('extractorVersion'):
+        errors.append('OCR output or provenance differs')
+    return errors
+
+def validate_workflow_report(report, case, contract):
+    """Independently bind native mode, declared controls, semantic observations
+    and the required assertions. A passing mock or an empty assertion map cannot
+    qualify a native run. The Go tests perform service-only boundary checks too.
+    """
+    errors = []
+    try:
+        for key in ('family', 'modelPackId', 'corpusSHA256'):
+            if report.get(key) != contract[key]:
+                errors.append(key + ' differs from the declared run')
+        if report.get('engineMode') != 'native' or report.get('releaseQualified') is not False:
+            errors.append('native execution mode or release boundary absent')
+        family = contract['family']
+        required = IMAGE_ASSERTIONS if family == 'images' else CONTEXT_ASSERTIONS[case] if family == 'context' else MEMORY_ASSERTIONS[case] if family == 'memory-lifecycle' else REVIEW_ASSERTIONS[case] if family == 'reviews' else RELATED_ASSERTIONS
+        assertions = report.get('assertions', {})
+        if not isinstance(assertions, dict) or not required.issubset(assertions) or any(value is not True for value in assertions.values()):
+            errors.append('required assertion missing or failed')
+        if family == 'context':
+            attempts = 1 if case in CONTEXT_GENERATION_CASES else 0
+            if type(report.get('generationAttempts')) is not int or report['generationAttempts'] != attempts:
+                errors.append('generation attempt count differs')
+            if case not in ('oversized-code', 'during-tokenization', 'framing-cost'):
+                if not all(type(report.get(k)) is int for k in ('promptTokens', 'outputCap', 'contextTokens')) or report['promptTokens'] < 0 or report['outputCap'] != 512 or report['contextTokens'] != 8192 or report['promptTokens'] + report['outputCap'] + 16 > report['contextTokens']:
+                    errors.append('reserved token budget not proved')
+            if case == 'near-budget' and report.get('promptTokens', 0) < (8192 - 512 - 16) * 9 // 10:
+                errors.append('near-capacity workload was not measured near its declared limit')
+            if case == 'framing-cost':
+                raw, framed = report.get('unframedTokens'), report.get('framedTokens')
+                if type(raw) is not int or type(framed) is not int or type(report.get('contextTokens')) is not int or raw < 0 or raw >= framed or raw + 512 + 16 != report.get('contextTokens'):
+                    errors.append('framing boundary not proved')
+            if case in CONTEXT_GENERATION_CASES:
+                fact = 'Project Marigold launches on 14 April 2031.'
+                sources = report.get('sources', [])
+                retained = any(fact in source.get('text', '') for source in sources)
+                if report.get('retainedFact') is not retained:
+                    errors.append('retained fact differs from actual supplied sources')
+                answer = json.loads(report.get('rawDraft', ''))
+                claims = answer.get('claims', [])
+                if answer.get('title') != '' or len(claims) != 1:
+                    errors.append('one answer without heading required')
+                elif retained:
+                    claim = claims[0]
+                    quote = claim.get('quote', '')
+                    if not re.fullmatch(r'(?:Project Marigold (?:launches|will launch|is scheduled to launch) on 14 April 2031|The launch date for Project Marigold is 14 April 2031)\.', claim.get('text', '')) or quote != fact or not any(quote in source.get('text', '') for source in sources):
+                        errors.append('answer lacks declared fact and exact supplied support')
+                    page = report.get('request', {}).get('pageId')
+                    citations = report.get('citations', [])
+                    if len(citations) != 1 or citations[0].get('location', {}).get('pageId') != page or citations[0].get('state') != 'current':
+                        errors.append('current source citation absent')
+                elif claims[0] != {'text': 'The supplied evidence does not answer this question.', 'quote': ''}:
+                    errors.append('omitted fact requires exclusive abstention')
+        elif family == 'images':
+            errors.extend(validate_image_report(report, case, contract))
+        elif family == 'reviews':
+            errors.extend(validate_review_report(report, case))
+        elif family == 'memory-lifecycle':
+            errors.extend(validate_memory_report(report, case))
+        elif family == 'related':
+            if not isinstance(report.get('embeddingIdentity'), str) or not re.fullmatch('[0-9a-f]{64}', report['embeddingIdentity']):
+                errors.append('verified native embedding identity absent')
+            if type(report.get('embeddingCalls')) is not int or report['embeddingCalls'] < 2:
+                errors.append('native indexing/retrieval calls absent')
+            bindings = report['sourceBindings']
+            semantic = report['semanticResults']
+            ids = [hit['location']['pageId'] for hit in semantic['hits']]
+            if semantic.get('mode') != 'semantic' or semantic.get('warning') or len(ids) != len(set(ids)) or bindings['current'] in ids or bindings['restricted'] in ids:
+                errors.append('scoped semantic result disclosure differs')
+            if bindings['relevant'] not in ids or (bindings['irrelevant'] in ids and ids.index(bindings['relevant']) >= ids.index(bindings['irrelevant'])):
+                errors.append('declared relevant source did not outrank distraction')
+            if any(hit['location'].get('sourceRevision') != '2' or not hit.get('excerpt') for hit in semantic['hits']):
+                errors.append('current excerpt provenance absent')
+            fallback = report['keywordFallback']
+            if fallback.get('mode') != 'keyword' or not fallback.get('warning'):
+                errors.append('keyword fallback was not disclosed')
+        else:
+            errors.append('unknown workflow family')
+    except (ValueError, TypeError, KeyError, AttributeError) as error:
+        errors.append('malformed workflow evidence: ' + str(error))
+    return errors
+
+
+def summarize(events, expected, parent, canonical_root=None, expected_requests=None, workflow_contract=None):
     """Require exactly the independently declared cases and their task reports."""
     terminals, reports, errors, buffers = {}, {}, [], {}
     if parent in (FAMILIES['p0'][1], FAMILIES['p0-holdouts'][1]) and expected_requests is None:
@@ -210,8 +523,16 @@ def summarize(events, expected, parent, canonical_root=None, expected_requests=N
                 request_error = validate_request_report(r, expected_requests[case])
                 if request_error:
                     errors.append('request contract ' + case + ': ' + request_error)
+        if workflow_contract is not None:
+            errors.extend('workflow ' + case + ': ' + message for message in validate_workflow_report(r, case, workflow_contract))
         passed = r.get('passed', r.get('automatedTaskPassed')) is True
-        canonical_error = validate_canonical_inventory(r, canonical_root, parent + '/' + case)
+        excluded = IMAGE_EXCLUDED_TABLES if workflow_contract and workflow_contract.get('family') == 'images' else REVIEW_EXCLUDED_TABLES if workflow_contract and workflow_contract.get('family') == 'reviews' else None
+        canonical_error = validate_canonical_inventory(r, canonical_root, parent + '/' + case, excluded)
+        if excluded is not None:
+            for name in (['beforeExplicitMutationInventory'] if case == 'forgotten-memory' else ['staleApplyInventory'] if case == 'stale-destination' else []):
+                auxiliary = dict(r, canonicalInventory=r.get(name), mutationHistoryCountUnchanged=True)
+                auxiliary_error = validate_canonical_inventory(auxiliary, canonical_root, parent + '/' + case, excluded)
+                if auxiliary_error: errors.append('review phase ' + name + ': ' + auxiliary_error)
         if canonical_error:
             errors.append('canonical inventory ' + case + ': ' + canonical_error)
         if terminals.get(case) != 'pass' or not passed or r.get('canonicalUnchanged') is not True:
@@ -292,6 +613,11 @@ def main():
     paths += list((ROOT / 'contracts').rglob('*.json')) + list((ROOT / 'internal').rglob('*.sql'))
     paths += list((ROOT / 'schemas').glob('*.go')) + list((ROOT / 'schemas').glob('*.sql'))
     paths += [ROOT / 'go.mod', ROOT / 'go.sum']
+    if args.family == 'images':
+        pack_manifest = json.loads((models / (args.pack + '.json')).read_text())
+        paths += [corpus_dir / 'images.json', models / (pack_manifest['projector']['id'] + '.model')]
+        paths += [corpus_dir / case['source'] for case in corpus['cases'] if case.get('source')]
+        paths += [path for path in bundle.iterdir() if path.is_file()]
     paths = sorted(set(paths))
     started = time.time()
     before = {str(x): {'sha256': digest(x), 'bytes': x.stat().st_size} for x in paths}
@@ -320,7 +646,7 @@ def main():
     if build_result.returncode:
         manifest.update(state='build_failed', exitCode=build_result.returncode); write(); return 1
     manifest['testBinarySHA256'] = digest(binary)
-    env.update(TROVE_NATIVE_INTEGRATION='1', TROVE_CHAT_EVAL_PACK=args.pack,
+    env.update(TROVE_NATIVE_INTEGRATION='1', TROVE_CHAT_EVAL_PACK=args.pack, TROVE_EMBED_EVAL_PACK=args.pack, TROVE_VISION_EVAL_PACK=args.pack,
                TROVE_MODEL_ROOT=str(models), TROVE_NATIVE_BUNDLE=str(bundle),
                TROVE_AI_CANONICAL_EVIDENCE_DIR=manifest['canonicalEvidenceDirectory'])
     selector = '^' + test + '$'
@@ -343,7 +669,16 @@ def main():
         expected_requests = {case['id']: {'useMemory': case['useMemory'], 'modelPackId': args.pack,
                              'corpusSHA256': before[str(corpus_dir / corpus_file)]['sha256']}
                              for case in corpus['cases'] if case['id'] in expected}
-    summary = summarize(events, expected, test, out / 'canonical', expected_requests)
+    workflow_contract = None
+    if args.family in ('context', 'related', 'memory-lifecycle', 'reviews', 'images'):
+        workflow_contract = {'family': args.family, 'modelPackId': args.pack,
+                             'corpusSHA256': before[str(corpus_dir / corpus_file)]['sha256']}
+    if args.family == 'images':
+        workflow_contract.update(imageCases={case['id']: case for case in corpus['cases']},
+            modelSHA256=before[str(models / (args.pack + '.model'))]['sha256'],
+            projectorSHA256=before[str(models / (pack_manifest['projector']['id'] + '.model'))]['sha256'],
+            helperSHA256=before[str(bundle / 'vision-worker')]['sha256'])
+    summary = summarize(events, expected, test, out / 'canonical', expected_requests, workflow_contract)
     after = {str(x): {'sha256': digest(x), 'bytes': x.stat().st_size} for x in paths}
     summary['inputsUnchanged'] = before == after
     summary['malformedLogLines'] = malformed

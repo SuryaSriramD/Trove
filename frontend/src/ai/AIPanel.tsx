@@ -1,5 +1,5 @@
 import type { SkillExecution } from "./SkillsPanel";
-import { freshnessLabel } from "../PageFreshness";
+import { freshnessLabel, useReviewClock } from "../PageFreshness";
 import { useEffect, useState } from "react";
 import {
   batch,
@@ -90,6 +90,7 @@ export function AIPanel({
   onNavigate,
   onCommitted,
 }: AIPanelProps) {
+  useReviewClock();
   const [scope, setScope] = useState(pageId ? "page" : "workspace"),
     [project, setProject] = useState("");
   const [mode, setMode] = useState(skill?.mode ?? "answer"),

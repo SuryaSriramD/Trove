@@ -4634,7 +4634,11 @@
       "type": "object",
       "properties": {
         "version": {
-          "const": 1
+          "type": "integer",
+          "enum": [
+            1,
+            2
+          ]
         },
         "digest": {
           "type": "string",

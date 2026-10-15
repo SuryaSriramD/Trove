@@ -8,6 +8,7 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
+	"reflect"
 	"testing"
 )
 
@@ -49,7 +50,7 @@ func TestAIEvaluationRequestReportConsumerContract(t *testing.T) {
 				attempts++
 				return `{"title":"","claims":[{"text":"The current region is North.","quote":"The current region is North."}]}`, nil
 			}, nil)
-			if err != nil || attempts != 1 || prepared.Run.Request != request {
+			if err != nil || attempts != 1 || !reflect.DeepEqual(prepared.Run.Request, request) {
 				t.Fatalf("actual prepared request or generation changed: attempts=%d error=%v", attempts, err)
 			}
 			fields := map[string]any{"fixture": "contract-case", "corpusSHA256": "locked-corpus", "useMemory": !useMemory, "modelPackId": "wrong-pack", "generationAttempts": 99}

@@ -22,24 +22,26 @@ import (
 // App is the trusted desktop adapter. It never accepts execution actors or raw
 // workspace paths from a renderer command. Native dialogs mint input handles.
 type App struct {
-	mu              sync.RWMutex
-	lifecycle       sync.RWMutex
-	ctx             context.Context
-	kernel          *workspace.Kernel
-	execution       contracts.ServiceExecutionContext
-	startupError    string
-	pendingDeepLink string
-	stopEvents      func()
-	native          *nativeState
-	jobCancel       context.CancelFunc
-	jobDone         <-chan struct{}
-	uploadGate      chan struct{}
-	startupDone     chan struct{}
-	startupOnce     sync.Once
-	shutdownDone    chan struct{}
-	shutdownOnce    sync.Once
-	rollback        *rollbackChildState
-	performance     *qualificationPerformance
+	mu                sync.RWMutex
+	lifecycle         sync.RWMutex
+	ctx               context.Context
+	kernel            *workspace.Kernel
+	execution         contracts.ServiceExecutionContext
+	startupError      string
+	pendingDeepLink   string
+	stopEvents        func()
+	native            *nativeState
+	jobCancel         context.CancelFunc
+	jobDone           <-chan struct{}
+	uploadGate        chan struct{}
+	startupDone       chan struct{}
+	startupOnce       sync.Once
+	shutdownDone      chan struct{}
+	shutdownOnce      sync.Once
+	rollback          *rollbackChildState
+	performance       *qualificationPerformance
+	reminders         *reminderDesktop
+	reminderBootstrap sync.Once
 }
 
 func NewApp() *App {
@@ -172,6 +174,7 @@ func (a *App) shutdown(context.Context) {
 	a.CancelUpdateOperation()
 	a.cancelBackupOperation()
 	a.closeBackupPreviews()
+	a.stopReminderLoop()
 	a.lifecycle.Lock()
 	defer a.lifecycle.Unlock()
 	a.stopClipper()
@@ -179,6 +182,7 @@ func (a *App) shutdown(context.Context) {
 	a.stopAI()
 	a.stopProviderRemote()
 	a.stopProviders()
+	a.stopConnectors()
 	a.stopProviderClaude()
 	a.stopProviderAuth()
 	if a.native != nil {
@@ -218,6 +222,7 @@ func (a *App) openLocked(path string, create bool) error {
 	a.stopAI()
 	a.stopProviderRemote()
 	a.stopProviders()
+	a.stopConnectors()
 	a.stopProviderClaude()
 	a.stopProviderAuth()
 	var k *workspace.Kernel
@@ -235,6 +240,10 @@ func (a *App) openLocked(path string, create bool) error {
 	return a.installKernelLocked(k)
 }
 func (a *App) installKernelLocked(k *workspace.Kernel) error {
+	if err := a.suspendReminderWorkspace(); err != nil {
+		k.Close()
+		return err
+	}
 	markStartupStage("workspace_open_complete")
 	a.mu.Lock()
 	old := a.kernel
@@ -257,6 +266,7 @@ func (a *App) installKernelLocked(k *workspace.Kernel) error {
 	a.subscribe(k)
 	if a.requireRollbackCommitted() == nil {
 		a.startJobs(k)
+		a.startReminderLoop()
 	}
 	return nil
 }
@@ -302,6 +312,11 @@ func (a *App) Dispatch(method, raw string) string {
 		a.lifecycle.RLock()
 		defer a.lifecycle.RUnlock()
 		return a.reviewCancel(json.RawMessage(raw))
+	}
+	if strings.HasPrefix(method, "connectors.native.") {
+		a.lifecycle.RLock()
+		defer a.lifecycle.RUnlock()
+		return a.connectorDispatch(method, json.RawMessage(raw))
 	}
 	if method == "autofill.generate" || method == "autofill.cancel" {
 		a.lifecycle.Lock()

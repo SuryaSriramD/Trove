@@ -11,10 +11,12 @@ import (
 	"trove.local/phase0/contracts"
 )
 
-// Version 1 covers owned knowledge, not revisions, decoration, or review state.
+// Version 2 adds meeting speaker/timing/audio-binding knowledge. Version 1
+// review events remain readable; an older coverage version requires review.
+// The projection excludes revisions, decoration, and review state.
 // A change to this projection requires a new version, never silent reinterpretation.
 func semanticContentIdentity(ctx context.Context, q querier, page string) (contracts.DomainSemanticContentIdentity, error) {
-	out := contracts.DomainSemanticContentIdentity{Version: 1}
+	out := contracts.DomainSemanticContentIdentity{Version: 2}
 	p, err := readPageTx(ctx, q, page)
 	if err != nil {
 		return out, err
@@ -108,7 +110,18 @@ func semanticContentIdentity(ctx context.Context, q querier, page string) (contr
 		return out, err
 	}
 	var projection any
-	payload := map[string]any{"version": 1, "title": p.Page.Title, "blocks": blocks, "values": values, "assets": assets, "reusableSources": dependencies, "referencedTasks": tasks, "taskFacet": facet}
+	payload := map[string]any{"version": out.Version, "title": p.Page.Title, "blocks": blocks, "values": values, "assets": assets, "reusableSources": dependencies, "referencedTasks": tasks, "taskFacet": facet}
+	meeting := recoverySnapshot{}
+	if err = captureRecoveryMeeting(ctx, q, page, &meeting); err != nil {
+		return out, err
+	}
+	if meeting.Meeting != nil {
+		segments := []any{}
+		for _, segment := range meeting.Segments {
+			segments = append(segments, map[string]any{"id": segment.Id, "blockId": segment.BlockId, "startMs": segment.StartMs, "endMs": segment.EndMs, "text": segment.Text, "speakerLabel": segment.SpeakerLabel})
+		}
+		payload["meeting"] = map[string]any{"id": meeting.Meeting.Id, "startedAt": meeting.Meeting.StartedAt, "durationMs": meeting.Meeting.DurationMs, "recordingFileId": meeting.Meeting.RecordingFileId, "segments": segments}
+	}
 	skillRows, err := q.QueryContext(ctx, "SELECT s.skill_id,s.definition_json FROM skill_versions s WHERE s.page_id=? AND s.version=(SELECT max(version) FROM skill_versions WHERE skill_id=s.skill_id) ORDER BY s.skill_id", page)
 	if err != nil {
 		return out, err
@@ -227,6 +240,26 @@ func reviewPage(m *Mutation, c map[string]any) error {
 	}
 	for source := range recordPages {
 		sourcePages[source] = true
+	}
+	// Direct todo occurrences display canonical task facts even when this page
+	// is not itself a record or reusable source. The review must cover only
+	// knowledge the user is authorized to inspect.
+	taskRows, err := m.Tx.QueryContext(m.Context, `SELECT DISTINCT r.page_id FROM todo_references t JOIN blocks b ON b.id=t.block_id JOIN records r ON r.id=t.task_record_id WHERE b.page_id=?`, page)
+	if err != nil {
+		return err
+	}
+	for taskRows.Next() {
+		var source string
+		if err = taskRows.Scan(&source); err != nil {
+			taskRows.Close()
+			return err
+		}
+		sourcePages[source] = true
+	}
+	err = taskRows.Err()
+	taskRows.Close()
+	if err != nil {
+		return err
 	}
 	for source := range sourcePages {
 		if err = m.AuthorizePage(source); err != nil {

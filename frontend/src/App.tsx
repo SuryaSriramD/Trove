@@ -35,6 +35,8 @@ import { focusSourceLocation } from "./sourceNavigation";
 import { parseDeepLink } from "./deepLinks";
 import { SearchPanel } from "./search/SearchPanel";
 import { MeetingPanel } from "./meetings/MeetingPanel";
+import { ReminderPanel } from "./reminders/ReminderPanel";
+import { ConnectorsPanel } from "./connectors/ConnectorsPanel";
 import { ImportExportPanel } from "./imports/ImportExportPanel";
 import { JobsPanel } from "./JobsPanel";
 import { AIPanel } from "./ai/AIPanel";
@@ -48,6 +50,7 @@ type Surface =
   | "Pages"
   | "Tasks"
   | "Meetings"
+  | "Reminders"
   | "Search"
   | "Import"
   | "Jobs"
@@ -56,6 +59,7 @@ type Surface =
   | "Intelligence"
   | "Automations"
   | "Capture"
+  | "Connections"
   | "Providers"
   | "Settings";
 const nav: [Surface, string][] = [
@@ -64,12 +68,14 @@ const nav: [Surface, string][] = [
   ["Pages", "▤"],
   ["Tasks", "✓"],
   ["Meetings", "◉"],
+  ["Reminders", "◴"],
   ["Search", "⌕"],
   ["Import", "↓"],
   ["Jobs", "↻"],
   ["AI", "✧"],
   ["Skills", "✎"],
   ["Providers", "⇄"],
+  ["Connections", "↗"],
   ["Capture", "⊕"],
   ["Automations", "◷"],
   ["Intelligence", "◇"],
@@ -1362,6 +1368,8 @@ export default function App() {
                   onRefresh={refresh}
                   onNavigate={navigateSource}
                 />
+              ) : surface === "Reminders" ? (
+                <ReminderPanel workspace={w} onRefresh={refresh} onNavigate={navigateSource}/>
               ) : surface === "Import" ? (
                 <ImportExportPanel
                   workspace={w}
@@ -1395,6 +1403,8 @@ export default function App() {
                   onChanged={refresh}
                   onOpenPage={navigate}
                 />
+              ) : surface === "Connections" ? (
+                <ConnectorsPanel workspace={w} onChanged={refresh} onOpenPage={navigate} />
               ) : surface === "Providers" ? (
                 <ProviderPanel workspace={w} onCommitted={refresh} />
               ) : surface === "Jobs" ? (

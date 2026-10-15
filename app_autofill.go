@@ -57,11 +57,29 @@ func (a *App) autofillDispatch(method string, raw json.RawMessage) string {
 	if len(s.flights) > 0 {
 		return errorEnvelope("RESOURCE_EXHAUSTED", "Another local generation is running; cancel it or wait")
 	}
-	if a.native == nil || a.native.supervisor == nil {
+	if a.native == nil || a.native.supervisor == nil || a.native.manager == nil {
 		return errorEnvelope("WORKER_FAILED", "Install and verify an instruction model in Models")
 	}
 	contextTokens, err := a.native.supervisor.GenerationContext(b.Input.ModelPackID)
 	if err != nil {
+		return failure(err)
+	}
+	packs, err := a.native.manager.List()
+	if err != nil {
+		return failure(err)
+	}
+	var provenance *workspace.AutofillModel
+	for _, status := range packs {
+		p := status.Pack
+		if p.ID == b.Input.ModelPackID && status.State == "ready" && p.Kind == "chat" && !p.QualificationOnly {
+			provenance = &workspace.AutofillModel{PackID: p.ID, SHA256: p.SHA256, SourceRevision: p.SourceRevision, RuntimeCommit: p.RuntimeCommit}
+			break
+		}
+	}
+	if provenance == nil {
+		return errorEnvelope("WORKER_FAILED", "The selected model artifact is unavailable")
+	}
+	if err = k.BindAutofillModel(ctx, e, b.ID, *provenance); err != nil {
 		return failure(err)
 	}
 	b, err = k.StartAutofill(ctx, e, b.ID)
@@ -83,6 +101,9 @@ func (a *App) autofillDispatch(method string, raw json.RawMessage) string {
 			}
 			if len(counts) != 1 || counts[0]+tokens+64 > contextTokens {
 				return "", workspace.Fail("RESOURCE_EXHAUSTED", "Selected fields exceed the model context; narrow them in a new batch")
+			}
+			if err = k.ValidateAutofillSources(ctx, e, b.ID); err != nil {
+				return "", err
 			}
 			return a.native.supervisor.GenerateTextWithGrammar(ctx, b.Input.ModelPackID, text, tokens, grammar, stream)
 		}, nil)

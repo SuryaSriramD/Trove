@@ -1458,6 +1458,26 @@ type ServiceSetTaskStatus struct {
 	RecordId       DomainId `json:"recordId"`
 	StatusOptionId DomainId `json:"statusOptionId"`
 }
+type ServicePutReminder struct {
+	Kind             string   `json:"kind"`
+	ReminderId       DomainId `json:"reminderId"`
+	PageId           DomainId `json:"pageId"`
+	ExpectedRevision string   `json:"expectedRevision"`
+	StartDate        string   `json:"startDate"`
+	LocalTime        string   `json:"localTime"`
+	Timezone         string   `json:"timezone"`
+	Frequency        string   `json:"frequency"`
+	Enabled          bool     `json:"enabled"`
+	Private          bool     `json:"private"`
+}
+type ServiceReminderInboxAction struct {
+	Kind                   string           `json:"kind"`
+	OccurrenceId           string           `json:"occurrenceId"`
+	ExpectedAction         string           `json:"expectedAction"`
+	ExpectedActionRevision int64            `json:"expectedActionRevision"`
+	Action                 string           `json:"action"`
+	SnoozedUntil           *DomainTimestamp `json:"snoozedUntil,omitempty"`
+}
 type ServiceAttachFile struct {
 	Kind         string    `json:"kind"`
 	FileId       DomainId  `json:"fileId"`
@@ -1727,6 +1747,8 @@ func (ServiceCreateTask) isServiceCommand()              {}
 func (ServiceEnsureTasks) isServiceCommand()             {}
 func (ServicePromoteTask) isServiceCommand()             {}
 func (ServiceSetTaskStatus) isServiceCommand()           {}
+func (ServicePutReminder) isServiceCommand()             {}
+func (ServiceReminderInboxAction) isServiceCommand()     {}
 func (ServiceAttachFile) isServiceCommand()              {}
 func (ServiceRecordMeetingExtraction) isServiceCommand() {}
 func (ServiceCorrectMeetingSegment) isServiceCommand()   {}
@@ -1949,6 +1971,22 @@ func (v *ServiceCommand) UnmarshalJSON(data []byte) error {
 	}
 	if matchesVariant(fields, []string{"kind", "recordId", "statusOptionId"}, map[string]string{"kind": "\"task.setStatus\""}, map[string][]string{}, []string{"kind", "recordId", "statusOptionId"}) {
 		var result ServiceSetTaskStatus
+		if err := json.Unmarshal(data, &result); err != nil {
+			return err
+		}
+		v.Value = result
+		return nil
+	}
+	if matchesVariant(fields, []string{"kind", "reminderId", "pageId", "expectedRevision", "startDate", "localTime", "timezone", "frequency", "enabled", "private"}, map[string]string{"kind": "\"reminder.put\""}, map[string][]string{"frequency": {"\"once\"", "\"daily\"", "\"weekly\""}}, []string{"kind", "reminderId", "pageId", "expectedRevision", "startDate", "localTime", "timezone", "frequency", "enabled", "private"}) {
+		var result ServicePutReminder
+		if err := json.Unmarshal(data, &result); err != nil {
+			return err
+		}
+		v.Value = result
+		return nil
+	}
+	if matchesVariant(fields, []string{"kind", "occurrenceId", "expectedAction", "expectedActionRevision", "action"}, map[string]string{"kind": "\"reminder.inboxAction\""}, map[string][]string{"expectedAction": {"\"\"", "\"snoozed\"", "\"dismissed\""}, "action": {"\"snoozed\"", "\"dismissed\""}}, []string{"kind", "occurrenceId", "expectedAction", "expectedActionRevision", "action", "snoozedUntil"}) {
+		var result ServiceReminderInboxAction
 		if err := json.Unmarshal(data, &result); err != nil {
 			return err
 		}
@@ -2290,6 +2328,89 @@ type ServiceMeetingRetentionPreviewRequest struct {
 	MeetingId       DomainId `json:"meetingId"`
 	Selected        []string `json:"selected"`
 }
+type ServiceReminderListRequest struct {
+	ContractVersion int64    `json:"contractVersion"`
+	RequestId       DomainId `json:"requestId"`
+	WorkspaceId     DomainId `json:"workspaceId"`
+	Before          *string  `json:"before,omitempty"`
+}
+type ServiceReminderHistoryRequest struct {
+	ContractVersion int64    `json:"contractVersion"`
+	RequestId       DomainId `json:"requestId"`
+	WorkspaceId     DomainId `json:"workspaceId"`
+	ReminderId      DomainId `json:"reminderId"`
+}
+type ServiceReminderRule struct {
+	Id        DomainId       `json:"id"`
+	Revision  DomainRevision `json:"revision"`
+	PageId    DomainId       `json:"pageId"`
+	Title     string         `json:"title"`
+	StartDate string         `json:"startDate"`
+	LocalTime string         `json:"localTime"`
+	Timezone  string         `json:"timezone"`
+	Frequency string         `json:"frequency"`
+	Enabled   bool           `json:"enabled"`
+	Private   bool           `json:"private"`
+}
+type ServiceReminderDelivery struct {
+	Id             string           `json:"id"`
+	ReminderId     DomainId         `json:"reminderId"`
+	Revision       DomainRevision   `json:"revision"`
+	DueAt          DomainTimestamp  `json:"dueAt"`
+	Outcome        string           `json:"outcome"`
+	ActionRevision *int64           `json:"actionRevision,omitempty"`
+	Action         *string          `json:"action,omitempty"`
+	SnoozedUntil   *DomainTimestamp `json:"snoozedUntil,omitempty"`
+	Error          *string          `json:"error,omitempty"`
+}
+type ServiceReminderInboxItem struct {
+	Id             string           `json:"id"`
+	ReminderId     DomainId         `json:"reminderId"`
+	Revision       DomainRevision   `json:"revision"`
+	DueAt          DomainTimestamp  `json:"dueAt"`
+	Outcome        string           `json:"outcome"`
+	ActionRevision *int64           `json:"actionRevision,omitempty"`
+	Action         *string          `json:"action,omitempty"`
+	SnoozedUntil   *DomainTimestamp `json:"snoozedUntil,omitempty"`
+	Error          *string          `json:"error,omitempty"`
+	PageId         DomainId         `json:"pageId"`
+	Title          string           `json:"title"`
+}
+type ServiceReminderState struct {
+	Rules      []ServiceReminderRule      `json:"rules"`
+	Inbox      []ServiceReminderInboxItem `json:"inbox"`
+	More       bool                       `json:"more"`
+	NextCursor *string                    `json:"nextCursor,omitempty"`
+}
+type ServiceReminderSchedule struct {
+	Version              int64                     `json:"version"`
+	Epoch                DomainId                  `json:"epoch"`
+	Generation           int64                     `json:"generation"`
+	WorkspaceId          DomainId                  `json:"workspaceId"`
+	Active               bool                      `json:"active"`
+	Rules                []ServiceReminderRule     `json:"rules"`
+	Overrides            []ServiceReminderDelivery `json:"overrides"`
+	AuthorizationRequest *DomainId                 `json:"authorizationRequest,omitempty"`
+}
+type ServiceReminderReceipt struct {
+	Version        int64                     `json:"version"`
+	Epoch          DomainId                  `json:"epoch"`
+	Generation     int64                     `json:"generation"`
+	Permission     string                    `json:"permission"`
+	AcknowledgedAt DomainTimestamp           `json:"acknowledgedAt"`
+	Deliveries     []ServiceReminderDelivery `json:"deliveries"`
+	Error          *string                   `json:"error,omitempty"`
+}
+type ServiceReminderDesktopStatus struct {
+	Available    bool    `json:"available"`
+	Enabled      bool    `json:"enabled"`
+	Registration string  `json:"registration"`
+	Publication  string  `json:"publication"`
+	Permission   string  `json:"permission"`
+	Epoch        string  `json:"epoch"`
+	Generation   int64   `json:"generation"`
+	Error        *string `json:"error,omitempty"`
+}
 type ServiceMeetingRetentionCategory struct {
 	Id         string `json:"id"`
 	Count      int64  `json:"count"`
@@ -2414,6 +2535,268 @@ type ServiceNativeBackupSummary struct {
 	Included    []string `json:"included"`
 	Excluded    []string `json:"excluded"`
 	Restoration []string `json:"restoration"`
+}
+type ServiceConnectorIdentity struct {
+	Subject  string `json:"subject"`
+	Label    string `json:"label"`
+	Provider string `json:"provider"`
+}
+type ServiceConnectorSelection struct {
+	Id       string  `json:"id"`
+	Kind     string  `json:"kind"`
+	Label    string  `json:"label"`
+	Query    *string `json:"query,omitempty"`
+	ParentId *string `json:"parentId,omitempty"`
+}
+type ServiceConnectorAccount struct {
+	Version        int64                       `json:"version"`
+	Id             DomainId                    `json:"id"`
+	Kind           string                      `json:"kind"`
+	Identity       ServiceConnectorIdentity    `json:"identity"`
+	RegistrationId string                      `json:"registrationId"`
+	Revision       string                      `json:"revision"`
+	State          string                      `json:"state"`
+	Selections     []ServiceConnectorSelection `json:"selections"`
+	Endpoint       *string                     `json:"endpoint,omitempty"`
+	UpdatedAt      DomainTimestamp             `json:"updatedAt"`
+}
+type ServiceConnectorAction struct {
+	Version          int64                      `json:"version"`
+	Kind             string                     `json:"kind"`
+	SelectionId      string                     `json:"selectionId"`
+	RemoteId         *string                    `json:"remoteId,omitempty"`
+	ExpectedRevision *string                    `json:"expectedRevision,omitempty"`
+	Arguments        map[string]json.RawMessage `json:"arguments"`
+	Effects          []string                   `json:"effects"`
+}
+type ServiceConnectorUserResolution struct {
+	Version     int64           `json:"version"`
+	Observation string          `json:"observation"`
+	Evidence    string          `json:"evidence"`
+	ActorId     DomainId        `json:"actorId"`
+	RecordedAt  DomainTimestamp `json:"recordedAt"`
+}
+type ServiceConnectorReceipt struct {
+	Version        int64                           `json:"version"`
+	ProposalId     DomainId                        `json:"proposalId"`
+	Outcome        string                          `json:"outcome"`
+	RemoteId       *string                         `json:"remoteId,omitempty"`
+	RemoteRevision *string                         `json:"remoteRevision,omitempty"`
+	Url            *string                         `json:"url,omitempty"`
+	Detail         string                          `json:"detail"`
+	RecordedAt     DomainTimestamp                 `json:"recordedAt"`
+	UserResolution *ServiceConnectorUserResolution `json:"userResolution,omitempty"`
+}
+type ServiceConnectorProposal struct {
+	Version         int64                    `json:"version"`
+	Id              DomainId                 `json:"id"`
+	AccountId       DomainId                 `json:"accountId"`
+	AccountRevision string                   `json:"accountRevision"`
+	Identity        ServiceConnectorIdentity `json:"identity"`
+	Action          ServiceConnectorAction   `json:"action"`
+	Hash            string                   `json:"hash"`
+	State           string                   `json:"state"`
+	CreatedAt       DomainTimestamp          `json:"createdAt"`
+	Receipt         *ServiceConnectorReceipt `json:"receipt,omitempty"`
+}
+type ServiceConnectorRefresh struct {
+	Version         int64            `json:"version"`
+	Id              DomainId         `json:"id"`
+	AccountId       DomainId         `json:"accountId"`
+	AccountRevision string           `json:"accountRevision"`
+	State           string           `json:"state"`
+	SelectionIndex  int64            `json:"selectionIndex"`
+	Cursor          string           `json:"cursor"`
+	Pages           int64            `json:"pages"`
+	Items           int64            `json:"items"`
+	Error           *string          `json:"error,omitempty"`
+	RetryAfter      *DomainTimestamp `json:"retryAfter,omitempty"`
+}
+type ServiceConnectorSnapshot struct {
+	Version           int64           `json:"version"`
+	Id                string          `json:"id"`
+	AccountId         DomainId        `json:"accountId"`
+	SelectionId       string          `json:"selectionId"`
+	RemoteId          string          `json:"remoteId"`
+	Kind              string          `json:"kind"`
+	Title             string          `json:"title"`
+	Text              string          `json:"text"`
+	Url               string          `json:"url"`
+	RemoteRevision    string          `json:"remoteRevision"`
+	State             string          `json:"state"`
+	Content           json.RawMessage `json:"content"`
+	RetrievedAt       DomainTimestamp `json:"retrievedAt"`
+	ExternalAiAllowed bool            `json:"externalAiAllowed"`
+}
+type ServiceConnectorRegistration struct {
+	Kind                      string  `json:"kind"`
+	ClientId                  string  `json:"clientId"`
+	DynamicClientRegistration *bool   `json:"dynamicClientRegistration,omitempty"`
+	Endpoint                  *string `json:"endpoint,omitempty"`
+}
+type ServiceConnectorAuthAttempt struct {
+	Id              DomainId        `json:"id"`
+	Kind            string          `json:"kind"`
+	State           string          `json:"state"`
+	Message         string          `json:"message"`
+	UserCode        *string         `json:"userCode,omitempty"`
+	VerificationUrl *string         `json:"verificationUrl,omitempty"`
+	ExpiresAt       DomainTimestamp `json:"expiresAt"`
+}
+type ServiceConnectorListRequest struct {
+	ContractVersion int64    `json:"contractVersion"`
+	RequestId       DomainId `json:"requestId"`
+	WorkspaceId     DomainId `json:"workspaceId"`
+}
+type ServiceConnectorSelectionsRequest struct {
+	ContractVersion  int64                       `json:"contractVersion"`
+	RequestId        DomainId                    `json:"requestId"`
+	WorkspaceId      DomainId                    `json:"workspaceId"`
+	AccountId        DomainId                    `json:"accountId"`
+	ExpectedRevision string                      `json:"expectedRevision"`
+	Selections       []ServiceConnectorSelection `json:"selections"`
+}
+type ServiceConnectorSearchRequest struct {
+	ContractVersion int64    `json:"contractVersion"`
+	RequestId       DomainId `json:"requestId"`
+	WorkspaceId     DomainId `json:"workspaceId"`
+	Query           string   `json:"query"`
+}
+type ServiceConnectorAccountRequest struct {
+	ContractVersion int64    `json:"contractVersion"`
+	RequestId       DomainId `json:"requestId"`
+	WorkspaceId     DomainId `json:"workspaceId"`
+	AccountId       DomainId `json:"accountId"`
+}
+type ServiceConnectorDraftRequest struct {
+	ContractVersion  int64                      `json:"contractVersion"`
+	RequestId        DomainId                   `json:"requestId"`
+	WorkspaceId      DomainId                   `json:"workspaceId"`
+	AccountId        DomainId                   `json:"accountId"`
+	ExpectedRevision string                     `json:"expectedRevision"`
+	Fields           map[string]json.RawMessage `json:"fields"`
+}
+type ServiceConnectorProposalRequest struct {
+	ContractVersion int64    `json:"contractVersion"`
+	RequestId       DomainId `json:"requestId"`
+	WorkspaceId     DomainId `json:"workspaceId"`
+	ProposalId      DomainId `json:"proposalId"`
+}
+type ServiceConnectorAuthBeginRequest struct {
+	ContractVersion  int64                        `json:"contractVersion"`
+	RequestId        DomainId                     `json:"requestId"`
+	WorkspaceId      DomainId                     `json:"workspaceId"`
+	Registration     ServiceConnectorRegistration `json:"registration"`
+	AccountId        *DomainId                    `json:"accountId,omitempty"`
+	ExpectedRevision *string                      `json:"expectedRevision,omitempty"`
+}
+type ServiceConnectorAuthAttemptRequest struct {
+	ContractVersion int64    `json:"contractVersion"`
+	RequestId       DomainId `json:"requestId"`
+	WorkspaceId     DomainId `json:"workspaceId"`
+	AttemptId       DomainId `json:"attemptId"`
+}
+type ServiceConnectorDisconnectRequest struct {
+	ContractVersion  int64    `json:"contractVersion"`
+	RequestId        DomainId `json:"requestId"`
+	WorkspaceId      DomainId `json:"workspaceId"`
+	AccountId        DomainId `json:"accountId"`
+	ExpectedRevision string   `json:"expectedRevision"`
+}
+type ServiceConnectorDiscoverRequest struct {
+	ContractVersion int64    `json:"contractVersion"`
+	RequestId       DomainId `json:"requestId"`
+	WorkspaceId     DomainId `json:"workspaceId"`
+	AccountId       DomainId `json:"accountId"`
+	Cursor          string   `json:"cursor"`
+}
+type ServiceConnectorRefreshRequest struct {
+	ContractVersion int64     `json:"contractVersion"`
+	RequestId       DomainId  `json:"requestId"`
+	WorkspaceId     DomainId  `json:"workspaceId"`
+	AccountId       DomainId  `json:"accountId"`
+	ResumeId        *DomainId `json:"resumeId,omitempty"`
+}
+type ServiceConnectorPrepareRequest struct {
+	ContractVersion int64                  `json:"contractVersion"`
+	RequestId       DomainId               `json:"requestId"`
+	WorkspaceId     DomainId               `json:"workspaceId"`
+	AccountId       DomainId               `json:"accountId"`
+	Action          ServiceConnectorAction `json:"action"`
+}
+type ServiceConnectorExecuteRequest struct {
+	ContractVersion int64    `json:"contractVersion"`
+	RequestId       DomainId `json:"requestId"`
+	WorkspaceId     DomainId `json:"workspaceId"`
+	ProposalId      DomainId `json:"proposalId"`
+	Hash            string   `json:"hash"`
+}
+type ServiceConnectorResolveRequest struct {
+	ContractVersion  int64    `json:"contractVersion"`
+	RequestId        DomainId `json:"requestId"`
+	WorkspaceId      DomainId `json:"workspaceId"`
+	ProposalId       DomainId `json:"proposalId"`
+	Hash             string   `json:"hash"`
+	ExpectedRevision string   `json:"expectedRevision"`
+	Observation      string   `json:"observation"`
+	Evidence         string   `json:"evidence"`
+}
+type ServiceConnectorCancelRequest struct {
+	ContractVersion int64    `json:"contractVersion"`
+	RequestId       DomainId `json:"requestId"`
+	WorkspaceId     DomainId `json:"workspaceId"`
+	OperationId     DomainId `json:"operationId"`
+}
+type ServiceConnectorSourceRequest struct {
+	ContractVersion  int64    `json:"contractVersion"`
+	RequestId        DomainId `json:"requestId"`
+	WorkspaceId      DomainId `json:"workspaceId"`
+	SnapshotId       string   `json:"snapshotId"`
+	ExpectedRevision *string  `json:"expectedRevision,omitempty"`
+	RemoteId         *string  `json:"remoteId,omitempty"`
+	Format           *string  `json:"format,omitempty"`
+}
+type ServiceAutofillModel struct {
+	PackId         DomainId `json:"packId"`
+	Sha256         string   `json:"sha256"`
+	SourceRevision string   `json:"sourceRevision"`
+	RuntimeCommit  string   `json:"runtimeCommit"`
+}
+type ServiceAutofillSource struct {
+	PropertyId DomainId                 `json:"propertyId"`
+	Name       string                   `json:"name"`
+	Type       string                   `json:"type"`
+	Definition DomainPropertyDefinition `json:"definition"`
+	Value      json.RawMessage          `json:"value"`
+	Present    bool                     `json:"present"`
+}
+type ServiceAutofillCell struct {
+	Id            DomainId                 `json:"id"`
+	RecordId      DomainId                 `json:"recordId"`
+	PageId        DomainId                 `json:"pageId"`
+	Property      DomainPropertyDefinition `json:"property"`
+	Sources       []ServiceAutofillSource  `json:"sources"`
+	Before        json.RawMessage          `json:"before"`
+	BeforePresent bool                     `json:"beforePresent"`
+	Overwrite     bool                     `json:"overwrite"`
+	State         string                   `json:"state"`
+	Value         json.RawMessage          `json:"value"`
+	Reason        string                   `json:"reason"`
+	GeneratedAt   *DomainTimestamp         `json:"generatedAt,omitempty"`
+}
+type ServiceAutofillBatch struct {
+	Version           int64                     `json:"version"`
+	Id                DomainId                  `json:"id"`
+	ActorId           DomainId                  `json:"actorId"`
+	Input             ServiceAutofillInput      `json:"input"`
+	PromptVersion     int64                     `json:"promptVersion"`
+	State             string                    `json:"state"`
+	Cells             []ServiceAutofillCell     `json:"cells"`
+	ExpectedRevisions []ServiceExpectedRevision `json:"expectedRevisions"`
+	CreatedAt         DomainTimestamp           `json:"createdAt"`
+	AppliedIds        []DomainId                `json:"appliedIds"`
+	Error             *string                   `json:"error,omitempty"`
+	Model             *ServiceAutofillModel     `json:"model,omitempty"`
 }
 type ServiceAutofillCreateRequest struct {
 	ContractVersion int64                `json:"contractVersion"`

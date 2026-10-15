@@ -74,10 +74,7 @@ func TestVisionPairRequiresBothHashesAndLeases(t *testing.T) {
 	if err = m.Remove(p.ID); err != nil {
 		t.Fatal(err)
 	}
-	entries, _ := os.ReadDir(m.root)
-	if len(entries) != 0 {
-		t.Fatal("orphaned pair", entries)
-	}
+	assertNoModelPayload(t, m.root)
 }
 func TestVisionManifestRejectsMixedVersions(t *testing.T) {
 	p := visionFixture([]byte("GGUFmodel"), []byte("GGUFprojector"))

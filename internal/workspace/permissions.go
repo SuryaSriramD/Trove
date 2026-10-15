@@ -99,6 +99,15 @@ func (k *Kernel) authorizePage(ctx context.Context, q querier, e contracts.Servi
 // Caller must first validate the execution context against the current grant.
 // Keep membership checks in the caller's transaction, never in a scope cache.
 func (k *Kernel) authorizePageScope(ctx context.Context, q querier, e contracts.ServiceExecutionContext, page string) error {
+	if e.Actor.Kind == "external_client" {
+		restricted, err := pageExternalContextRestricted(ctx, q, page)
+		if err != nil {
+			return err
+		}
+		if restricted {
+			return Fail("SCOPE_DENIED", "Gmail-derived context is disabled for external AI pending separate qualification")
+		}
+	}
 	switch s := e.Scope.Value.(type) {
 	case contracts.DomainScopeVariant1:
 		if string(s.WorkspaceId) == k.id {
@@ -149,7 +158,16 @@ func (k *Kernel) authorizeEntity(ctx context.Context, q querier, e contracts.Ser
 	case "container":
 		query = "SELECT owning_page_id FROM containers WHERE id=?"
 	case "file":
-		if s, ok := e.Scope.Value.(contracts.DomainScopeVariant1); ok && string(s.WorkspaceId) == k.id {
+		if e.Actor.Kind == "external_client" {
+			var restricted int
+			if err := q.QueryRowContext(ctx, "SELECT count(*) FROM files f JOIN file_external_context_policy p ON p.content_hash=f.content_hash WHERE f.id=?", id).Scan(&restricted); err != nil {
+				return err
+			}
+			if restricted > 0 {
+				return Fail("SCOPE_DENIED", "Gmail-derived attachments are disabled for external AI pending separate qualification")
+			}
+		}
+		if s, ok := e.Scope.Value.(contracts.DomainScopeVariant1); ok && string(s.WorkspaceId) == k.id && e.Actor.Kind != "external_client" {
 			return k.authorize(e)
 		}
 		rows, err := q.QueryContext(ctx, "SELECT page_id FROM attachments WHERE file_id=?", id)

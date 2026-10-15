@@ -15,18 +15,20 @@ import (
 )
 
 type AIRequest struct {
-	Skill          *SkillRunReference `json:"skill,omitempty"`
-	ConversationID string             `json:"conversationId,omitempty"`
-	PageID         string             `json:"pageId,omitempty"`
-	BlockID        string             `json:"blockId,omitempty"`
-	ProjectID      string             `json:"projectId,omitempty"`
-	Mode           string             `json:"mode"`
-	Prompt         string             `json:"prompt"`
-	Selection      string             `json:"selection,omitempty"`
-	UseMemory      bool               `json:"useMemory"`
-	ModelPackID    string             `json:"modelPackId"`
+	ConnectedSources []ConnectedSourceReference `json:"connectedSources,omitempty"`
+	Skill            *SkillRunReference         `json:"skill,omitempty"`
+	ConversationID   string                     `json:"conversationId,omitempty"`
+	PageID           string                     `json:"pageId,omitempty"`
+	BlockID          string                     `json:"blockId,omitempty"`
+	ProjectID        string                     `json:"projectId,omitempty"`
+	Mode             string                     `json:"mode"`
+	Prompt           string                     `json:"prompt"`
+	Selection        string                     `json:"selection,omitempty"`
+	UseMemory        bool                       `json:"useMemory"`
+	ModelPackID      string                     `json:"modelPackId"`
 }
 type AIEvidence struct {
+	Connected      *ConnectedEvidence             `json:"connected,omitempty"`
 	Freshness      *contracts.DomainPageFreshness `json:"freshness,omitempty"`
 	Number         int                            `json:"number"`
 	Title          string                         `json:"title"`
@@ -38,10 +40,11 @@ type AIEvidence struct {
 	State          string                         `json:"state,omitempty"`
 }
 type AICitation struct {
-	Number   int                      `json:"number"`
-	Title    string                   `json:"title"`
-	Location contracts.DomainLocation `json:"location"`
-	State    string                   `json:"state"`
+	Connected *ConnectedEvidence       `json:"connected,omitempty"`
+	Number    int                      `json:"number"`
+	Title     string                   `json:"title"`
+	Location  contracts.DomainLocation `json:"location"`
+	State     string                   `json:"state"`
 }
 type AIRun struct {
 	ID             string       `json:"id"`
@@ -252,7 +255,10 @@ func (k *Kernel) aiSources(ctx context.Context, e contracts.ServiceExecutionCont
 		if n > 0 {
 			return
 		}
-		key := string(marshal(loc))
+		// Distinct indexed excerpts of one block share a navigation location.
+		// Deduplicate exact evidence, not the location: otherwise later chunks
+		// silently disappear before the measured context can report omissions.
+		key := string(marshal(loc)) + ":" + searchDigest(text)
 		if !seen[key] && len(strings.TrimSpace(text)) > 0 {
 			seen[key] = true
 			out = append(out, AIEvidence{Title: title, Text: text, Location: loc})
@@ -293,6 +299,11 @@ func (k *Kernel) aiSources(ctx context.Context, e contracts.ServiceExecutionCont
 			}
 			var loc contracts.DomainLocation
 			json.Unmarshal([]byte(raw), &loc)
+			// The selected block above was loaded in full. Its indexed fragments
+			// would duplicate the literal source and cannot replace that full copy.
+			if r.BlockID != "" && loc.BlockId != nil && string(*loc.BlockId) == r.BlockID {
+				continue
+			}
 			add(title, text, loc)
 		}
 		err = rows.Err()

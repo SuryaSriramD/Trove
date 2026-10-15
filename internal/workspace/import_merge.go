@@ -304,7 +304,7 @@ func prepareImportMerge(ctx context.Context, q querier, p *ImportPlan, item *Imp
 		}
 	}
 	for id, source := range item.BlockSources {
-		if old := bySource[source]; old != "" && (sourceRevision == item.Hash || source == importCSVArtifactIdentity || strings.HasPrefix(source, "normalizer-position:"+item.Hash+":conversation-node:") || strings.HasPrefix(source, "notion-block:") || strings.HasPrefix(source, "html-id:") || strings.HasPrefix(source, "portable-block:") || strings.HasPrefix(source, "conversation-node:")) {
+		if old := bySource[source]; old != "" && (sourceRevision == item.Hash || source == importCSVArtifactIdentity || strings.HasPrefix(source, "normalizer-position:"+item.Hash+":conversation-node:") || strings.HasPrefix(source, "notion-block:") || strings.HasPrefix(source, "html-id:") || strings.HasPrefix(source, "portable-block:") || strings.HasPrefix(source, "conversation-node:") || strings.HasPrefix(source, "connector-field:")) {
 			ids[id] = old
 		}
 	}

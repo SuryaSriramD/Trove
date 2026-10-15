@@ -39,26 +39,43 @@ type Item = {
 type Presence = { present: boolean; value?: unknown };
 const describeField = (value: Presence) =>
   value.present ? JSON.stringify(value.value, null, 2) : "(absent)";
-function describeImportPath(path: string, item: Item, items: Item[], workspace: WorkspaceSnapshot) {
+function describeImportPath(
+  path: string,
+  item: Item,
+  items: Item[],
+  workspace: WorkspaceSnapshot,
+) {
   const parts = path.split("/");
   if (parts[1] === "exists") return "Source page existence (explicit deletion moves only this page to Trash; content and attachments remain recoverable)";
   if (parts[1] === "collectionTitle") return "Collection title";
   if (parts[1] === "records") {
     const record = workspace.records.find((r) => r.id === parts[2]);
-    const name = workspace.pages.find((p) => p.id === record?.pageId)?.title ?? parts[2];
+    const name =
+      workspace.pages.find((p) => p.id === record?.pageId)?.title ?? parts[2];
     return `Record: ${name} (accepting source deletion moves it to Trash; content and attachments remain recoverable)`;
   }
-  if (parts[1] === "attachments") return "Attachment relationship (removal requires review)";
-  if (parts[1] === "siblingOrder") return "Sibling block order (choose the complete list)";
+  if (parts[1] === "attachments")
+    return "Attachment relationship (removal requires review)";
+  if (parts[1] === "siblingOrder")
+    return "Sibling block order (choose the complete list)";
   if (parts[1] !== "schema" && parts[1] !== "values") return path;
   const property = parts[1] === "schema" ? parts[2] : parts[3];
-  const schema = item.merge?.fields.find((field) => field.path === `/schema/${property}`);
-  const definition = (schema?.local.present ? schema.local.value : schema?.incoming.value) as { name?: string } | undefined;
+  const schema = item.merge?.fields.find(
+    (field) => field.path === `/schema/${property}`,
+  );
+  const definition = (
+    schema?.local.present ? schema.local.value : schema?.incoming.value
+  ) as { name?: string } | undefined;
   const name = definition?.name ?? property;
   if (parts[1] === "schema") return `Property: ${name}`;
-  const record = item.merge?.fields.find((field) => field.path === `/records/${parts[2]}`);
-  const page = record?.local.present ? record.local.value : record?.incoming.value;
-  const title = items.find((candidate) => candidate.pageId === page)?.title ?? parts[2];
+  const record = item.merge?.fields.find(
+    (field) => field.path === `/records/${parts[2]}`,
+  );
+  const page = record?.local.present
+    ? record.local.value
+    : record?.incoming.value;
+  const title =
+    items.find((candidate) => candidate.pageId === page)?.title ?? parts[2];
   return `${title} · ${name}`;
 }
 function EditedImportField({
@@ -161,7 +178,9 @@ export function ImportExportPanel({
   workspace,
   onChanged,
   onOpenPage,
+  initialPlanId,
 }: {
+  initialPlanId?: string;
   workspace: WorkspaceSnapshot;
   onChanged: () => Promise<void> | void;
   onOpenPage?: (id: string) => void;
@@ -183,6 +202,20 @@ export function ImportExportPanel({
   const request = <T,>(method: string, data: object = {}) =>
     dispatch<T>(method, { ...envelope(workspace), ...data });
   const refresh = () => request<Recent[]>("imports.list").then(setRecent);
+  useEffect(() => {
+    if (!initialPlanId) return;
+    let active = true;
+    void request<Plan>("imports.plan", { planId: initialPlanId })
+      .then((value) => {
+        if (active) setPlan(value);
+      })
+      .catch((e) => {
+        if (active) setError(String(e));
+      });
+    return () => {
+      active = false;
+    };
+  }, [initialPlanId, workspace.workspaceId]);
   useEffect(() => {
     void refresh().catch((e) => setError(String(e)));
     return () => {
@@ -509,14 +542,39 @@ export function ImportExportPanel({
                         aria-label={`Row key for ${item.sourceLocator}`}
                         value=""
                         disabled={busy || running}
-                        onChange={(event) => configure({ csvKeys: [{ sourceLocator: item.sourceLocator, index: Number(event.target.value) }] })}
+                        onChange={(event) =>
+                          configure({
+                            csvKeys: [
+                              {
+                                sourceLocator: item.sourceLocator,
+                                index: Number(event.target.value),
+                              },
+                            ],
+                          })
+                        }
                       >
-                        <option value="">Choose a unique source key to enable future merges…</option>
-                        {item.columns!.slice(1).map((column, index) => <option key={column.propertyId} value={index + 1}>{column.name}</option>)}
+                        <option value="">
+                          Choose a unique source key to enable future merges…
+                        </option>
+                        {item.columns!.slice(1).map((column, index) => (
+                          <option key={column.propertyId} value={index + 1}>
+                            {column.name}
+                          </option>
+                        ))}
                       </select>
-                      <small>Review column types first. Keys must be unique and nonempty. Titles and row positions never identify existing records.</small>
+                      <small>
+                        Review column types first. Keys must be unique and
+                        nonempty. Titles and row positions never identify
+                        existing records.
+                      </small>
                     </label>
-                  ) : item.csvKeyColumn ? <p>Retained row key: <strong>{item.csvKeyColumn}</strong>. Re-imports match that source key even when rows move or titles change.</p> : null}
+                  ) : item.csvKeyColumn ? (
+                    <p>
+                      Retained row key: <strong>{item.csvKeyColumn}</strong>.
+                      Re-imports match that source key even when rows move or
+                      titles change.
+                    </p>
+                  ) : null}
                   <table>
                     <thead>
                       <tr>
@@ -615,11 +673,35 @@ export function ImportExportPanel({
                               .map((field) => (
                                 <tr key={field.path}>
                                   <td>
-                                    {describeImportPath(field.path, item, plan.items, workspace)}
-                                    {field.path.startsWith("/schema/") || field.path.startsWith("/values/") ? <small className="import-field-path">{field.path}</small> : null}
+                                    {describeImportPath(
+                                      field.path,
+                                      item,
+                                      plan.items,
+                                      workspace,
+                                    )}
+                                    {field.path.startsWith("/schema/") ||
+                                    field.path.startsWith("/values/") ? (
+                                      <small className="import-field-path">
+                                        {field.path}
+                                      </small>
+                                    ) : null}
                                     <br />
                                     {field.outcome}
-                                    {field.path.startsWith("/records/") && field.local.present && typeof field.local.value === "string" && onOpenPage && <button type="button" onClick={() => onOpenPage(field.local.value as string)}>Inspect local record</button>}
+                                    {field.path.startsWith("/records/") &&
+                                      field.local.present &&
+                                      typeof field.local.value === "string" &&
+                                      onOpenPage && (
+                                        <button
+                                          type="button"
+                                          onClick={() =>
+                                            onOpenPage(
+                                              field.local.value as string,
+                                            )
+                                          }
+                                        >
+                                          Inspect local record
+                                        </button>
+                                      )}
                                   </td>
                                   <td>
                                     <pre>{describeField(field.base)}</pre>
@@ -719,7 +801,9 @@ export function ImportExportPanel({
                       onChange={(e) =>
                         configure({
                           choices:
-                            (plan.notionGraph || plan.typedDatabaseMerge) && notionGraphKinds.has(item.kind) && e.target.value !== "merge"
+                            (plan.notionGraph || plan.typedDatabaseMerge) &&
+                            notionGraphKinds.has(item.kind) &&
+                            e.target.value !== "merge"
                               ? plan.items
                                   .filter((i) => notionGraphKinds.has(i.kind))
                                   .map((i) => ({

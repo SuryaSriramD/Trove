@@ -13,7 +13,9 @@ import (
 )
 
 type portableAsset struct {
-	metadata contracts.DomainFile
+	externalPolicy  *externalContextPolicy
+	externalSources []externalAcquisitionSource
+	metadata        contracts.DomainFile
 	// Non-nil only for an isolated source item. Export never changes the managed
 	// original, its identity, or the evidence retained by a native backup.
 	content []byte
@@ -139,6 +141,18 @@ func (k *Kernel) portableAssets(ctx context.Context, tx *sql.Tx, pages map[strin
 			asset, isolateErr := k.portableConversationAsset(ctx, tx, file, item)
 			if isolateErr != nil {
 				return nil, nil, isolateErr
+			}
+			original, policyErr := readFileMetadata(ctx, tx, file)
+			if policyErr != nil {
+				return nil, nil, policyErr
+			}
+			asset.externalSources, policyErr = readExternalAcquisitionSources(ctx, tx, string(original.ContentHash))
+			if policyErr != nil {
+				return nil, nil, policyErr
+			}
+			asset.externalPolicy, policyErr = fileExternalContextPolicy(ctx, tx, string(original.ContentHash))
+			if policyErr != nil {
+				return nil, nil, policyErr
 			}
 			if asset.content == nil {
 				selected[file] = true // The original contains this conversation alone.

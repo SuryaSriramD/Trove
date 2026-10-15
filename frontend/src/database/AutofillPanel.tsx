@@ -9,32 +9,8 @@ import {
 import { p2FieldTypes } from "./P2Model";
 import { displayValue } from "./model";
 
-type Cell = {
-  id: string;
-  recordId: string;
-  pageId: string;
-  property: D.PropertyDefinition;
-  sources: { name: string; value: D.RawValue; present: boolean }[];
-  before: D.RawValue;
-  beforePresent: boolean;
-  overwrite: boolean;
-  state: string;
-  value: D.RawValue;
-  reason: string;
-  generatedAt?: string;
-};
-type Autofill = {
-  version: 1;
-  id: string;
-  input: S.AutofillInput;
-  promptVersion: number;
-  state: string;
-  cells: Cell[];
-  expectedRevisions: S.ExpectedRevision[];
-  createdAt: string;
-  appliedIds: string[];
-  error?: string;
-};
+type Cell = S.AutofillCell;
+type Autofill = S.AutofillBatch;
 export function AutofillPanel({
   workspace: w,
   collection,
@@ -466,6 +442,7 @@ export function AutofillPanel({
                             <pre>
                               {JSON.stringify(
                                 {
+                                  model: current.model,
                                   sources: c.sources,
                                   property: c.property,
                                   generatedAt: c.generatedAt,

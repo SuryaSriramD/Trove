@@ -240,6 +240,16 @@ func TestMeetingRetentionArchivesProposalsAndForgetsMemoryWithoutErasingEvidence
 	if err != nil || len(visibleDrafts) != 0 {
 		t.Fatal(visibleDrafts, err)
 	}
+	if _, err := k.ApplyMeetingDraft(ctx, e, drafts[0].ID); err == nil {
+		t.Fatal("archived generated notes were approved")
+	}
+	guard, err := k.currentGuard(ctx, "page", source.PageID)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if err = k.recordingBatch(ctx, e, "meeting-draft-"+drafts[0].ID, []any{map[string]any{"kind": "page.update", "pageId": source.PageID, "title": "Should roll back"}}, []contracts.ServiceExpectedRevision{guard}); err == nil {
+		t.Fatal("archived approval bypassed writer fence")
+	}
 	if _, err := k.prepareMeetingExtraction(ctx, e, prepare(1)); err == nil {
 		t.Fatal("archived proposal was re-prepared")
 	}
@@ -264,5 +274,23 @@ func TestMeetingRetentionArchivesProposalsAndForgetsMemoryWithoutErasingEvidence
 	current, err := k.MeetingSource(ctx, e, meeting)
 	if err != nil || current.EvidenceHash != source.EvidenceHash {
 		t.Fatal("retention altered unrelated transcript", current, err)
+	}
+}
+
+func TestMeetingRetentionGuardsRecordOwnedMeeting(t *testing.T) {
+	k, e := testKernel(t)
+	f := newDatabase(t, k, e)
+	record, page := newRecord(t, k, e, f, "Meeting record")
+	prepared := stageTestFile(t, k, e, "fixture audio")
+	file := str(prepared["fileId"])
+	meeting := NewID()
+	testOK(t, dbBatch(t, k, e, []any{map[string]any{"kind": "file.attach", "fileId": file, "pageId": page, "ingestHandle": prepared["ingestHandle"]}}, "page", page, "record", record, "collection", f.collection, "file", file))
+	testOK(t, dbBatch(t, k, e, []any{map[string]any{"kind": "meeting.create", "meetingId": meeting, "pageId": page, "recordingFileId": file, "startedAt": now()}}, "page", page, "record", record, "collection", f.collection, "file", file, "meeting", meeting))
+	p := retentionPreviewTest(t, k, e, meeting, "audio", "indexes")
+	testOK(t, testDispatch(t, k, e, "batch", testRequest(k, e, []any{p.Command}, p.ExpectedRevisions...)))
+	var recording *string
+	k.db.QueryRow("SELECT recording_file_id FROM meetings WHERE id=?", meeting).Scan(&recording)
+	if recording != nil {
+		t.Fatal("record-owned meeting retention failed")
 	}
 }

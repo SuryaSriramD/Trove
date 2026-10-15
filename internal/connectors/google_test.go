@@ -667,3 +667,36 @@ func TestGoogleMedia403RateLimitIsNotRevocation(t *testing.T) {
 		t.Fatalf("403 misclassified or exposed: %v", err)
 	}
 }
+
+func TestGoogleDriveAuthenticatedPreviewReadsContentAndMarksTruncation(t *testing.T) {
+	for _, large := range []bool{false, true} {
+		t.Run(stringify(large), func(t *testing.T) {
+			s := googleTestSession(GoogleDrive, func(r *http.Request) (*http.Response, error) {
+				if r.URL.Path == "/drive/v3/about" {
+					return googleTestResponse(200, `{"user":{"permissionId":"subject","displayName":"Owner"}}`), nil
+				}
+				if r.URL.Query().Get("alt") == "media" {
+					body := "Actual retained file content"
+					if large {
+						body = strings.Repeat("x", (256<<10)+1)
+					}
+					return googleTestResponse(200, body), nil
+				}
+				return googleTestResponse(200, driveTestFile("selected", "text/plain", "1")), nil
+			})
+			s.Account.Identity = Identity{Subject: "subject", Provider: "google_drive", Label: "Owner"}
+			s.Account.Selections[0].Kind = "file"
+			got, err := NewGoogleAdapter(GoogleDrive).(Previewer).Preview(context.Background(), s, s.Account.Selections[0], "selected")
+			if err != nil {
+				t.Fatal(err)
+			}
+			if large {
+				if got.State != "partial" || len(got.Text) != 256<<10 {
+					t.Fatal("large preview claimed full content", got.State, len(got.Text))
+				}
+			} else if got.Text != "Actual retained file content" {
+				t.Fatal("metadata replaced file content", got.Text)
+			}
+		})
+	}
+}

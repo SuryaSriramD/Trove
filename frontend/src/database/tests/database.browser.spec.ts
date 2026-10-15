@@ -160,6 +160,12 @@ test.beforeEach(async ({ page }) => {
               requests.push({ method, ...req });
               const ok = (result: any) => JSON.stringify({ ok: true, result });
               if (method === "workspace.snapshot") return ok(state);
+              if (method === "recordLayouts.get") return ok({ collectionId: req.collectionId, ...(req.recordId ? { recordId: req.recordId } : {}), defaultLayout: null, overrideLayout: null, effectiveLayout: { version: 1, sections: [], hiddenPropertyIds: [] }, missingPropertyIds: [] });
+              if (method === "readRecord") {
+                const record = state.records.find((r: any) => r.id === req.recordId);
+                if (!record) throw Error("Record not found");
+                return ok({ record });
+              }
               if (method === "pageDisplay.get") return ok({pageId:req.pageId,fullWidth:false,presentation:false,revision:"1"});
               if (method === "editor.lock") return ok({locked:false,revision:"0"});
               if (method === "editor.templates") return ok({templates:[]});

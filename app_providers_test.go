@@ -105,3 +105,53 @@ func TestDesktopProviderDisconnectInterruptsApproval(t *testing.T) {
 		t.Fatalf("disconnected mutation committed: %s (%v)", raw, err)
 	}
 }
+
+func TestDesktopProviderDisconnectRevokesBeforeManagedProcessExits(t *testing.T) {
+	ctx := context.Background()
+	k, err := workspace.Create(t.TempDir())
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer k.Close()
+	a := NewApp()
+	a.ctx, a.kernel, a.execution = ctx, k, k.OwnerContext()
+	a.completeStartup(nil)
+	bridge := workspace.NewProviderBridge(k, a.execution)
+	page := workspace.NewID()
+	raw, _ := json.Marshal(map[string]any{"contractVersion": 1, "requestId": workspace.NewID(), "workspaceId": k.ID(), "mutation": map[string]any{"scopeGrantId": a.execution.ScopeGrantId, "idempotencyKey": workspace.NewID(), "expectedRevisions": []any{map[string]any{"target": map[string]any{"entityType": "page", "entityId": page}, "revision": "0"}}}, "commands": []any{map[string]any{"kind": "page.create", "pageId": page, "title": "Scoped source"}}})
+	var created struct {
+		OK bool `json:"ok"`
+	}
+	if json.Unmarshal(k.Dispatch(ctx, a.execution, "batch", raw), &created) != nil || !created.OK {
+		t.Fatal("fixture page creation failed")
+	}
+	connection, err := bridge.Connect(ctx, "mcp", []string{page}, []string{"readPage"})
+	if err != nil {
+		t.Fatal(err)
+	}
+	runCtx, cancel := context.WithCancel(ctx)
+	defer cancel()
+	exited := make(chan struct{})
+	h := &providerHost{bridge: bridge, managed: &managedExecution{run: workspace.ManagedRun{ConnectionID: connection.ID}, cancel: cancel, done: exited}}
+	providerHosts.Store(a, h)
+	defer providerHosts.Delete(a)
+	response := make(chan string, 1)
+	raw, _ = json.Marshal(map[string]any{"contractVersion": 1, "workspaceId": k.ID(), "connectionId": connection.ID})
+	go func() { response <- a.Dispatch("providers.disconnect", string(raw)) }()
+	select {
+	case <-runCtx.Done():
+	case <-time.After(3 * time.Second):
+		close(exited)
+		t.Fatal("managed cancellation not requested")
+	}
+	_, readErr := bridge.Call(ctx, connection.ID, connection.Token, "readPage", map[string]any{"pageId": page})
+	close(exited)
+	select {
+	case <-response:
+	case <-time.After(3 * time.Second):
+		t.Fatal("disconnect did not complete")
+	}
+	if readErr == nil {
+		t.Fatal("managed process still had canonical access while disconnect waited for its exit")
+	}
+}
