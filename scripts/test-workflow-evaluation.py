@@ -64,7 +64,7 @@ class WorkflowAccounting(unittest.TestCase):
             loc = {'pageId': page, 'sourceRevision': '2'}
             sources.append({'number': index+1, 'text': claim['quote'], 'location': loc})
             citations.append({'number': index+1, 'state': 'current', 'location': loc})
-        report = dict(contract, engineMode='native', releaseQualified=False,
+        report = dict(contract, engineMode='native', releaseQualified=False, oracleVersion=2,
             assertions={key: True for key in m.REVIEW_ASSERTIONS[case]},
             generationAttempts=int(case in m.REVIEW_GENERATION_CASES), serviceBoundaryOnly=case in m.REVIEW_BOUNDARY_CASES,
             generatorInvocations=0 if case == 'restart' else 2 if case == 'cancel-retry' else 1,
@@ -138,6 +138,37 @@ class WorkflowAccounting(unittest.TestCase):
         r,c=self.review('unresolved-tasks');r['citations'][0]['location']['pageId']='done'
         self.assertTrue(m.validate_workflow_report(r, 'unresolved-tasks', c))
 
+    def test_review_v2_article_equivalence_keeps_facts_quotes_actions_and_effect_exact(self):
+        report, contract = self.review('risk-suggestion')
+        draft = json.loads(report['rawDraft'])
+        draft['claims'][0]['text'] = 'Security review is incomplete. Launch cannot proceed until that review is approved.'
+        report['rawDraft'] = json.dumps(draft)
+        report['reviewedEffect']['destinationText'] = draft['claims'][0]['text']
+        self.assertEqual(m.validate_workflow_report(report, 'risk-suggestion', contract), [])
+        for name, text in {
+            'actor': "Alex's security review is incomplete. Launch cannot proceed until that review is approved.",
+            'date': 'Security review is incomplete until 14 April 2031. Launch cannot proceed until that review is approved.',
+            'negation': 'Security review is complete. Launch can proceed until that review is approved.',
+            'unsupported': draft['claims'][0]['text'] + ' Approval is scheduled.',
+        }.items():
+            bad=copy.deepcopy(report); changed=copy.deepcopy(draft); changed['claims'][0]['text']=text
+            bad['rawDraft']=json.dumps(changed); bad['reviewedEffect']['destinationText']=text
+            self.assertTrue(m.validate_workflow_report(bad, 'risk-suggestion', contract), name)
+        for key, value in (('quote', draft['claims'][0]['quote'][4:]), ('category', 'summary')):
+            bad=copy.deepcopy(report); changed=copy.deepcopy(draft); changed['claims'][0][key]=value
+            bad['rawDraft']=json.dumps(changed)
+            self.assertTrue(m.validate_workflow_report(bad, 'risk-suggestion', contract), key)
+        for key, value in (('kind', 'create_task'), ('target', 'Other decision'), ('body', 'Launch now.')):
+            bad=copy.deepcopy(report); changed=copy.deepcopy(draft); changed['actions'][0][key]=value
+            bad['rawDraft']=json.dumps(changed); bad['actions']=changed['actions']
+            self.assertTrue(m.validate_workflow_report(bad, 'risk-suggestion', contract), key)
+        for mutation in ('old-version', 'missing-effect', 'unsupported-citation'):
+            bad=copy.deepcopy(report)
+            if mutation == 'old-version': bad.pop('oracleVersion')
+            elif mutation == 'missing-effect': bad['reviewedEffect']['destinationText'] = ''
+            else: bad['citations'][0]['location']['pageId']='private'
+            self.assertTrue(m.validate_workflow_report(bad, 'risk-suggestion', contract), mutation)
+
     def test_review_forget_restart_stale_and_portable_counterexamples(self):
         changes = {'forgotten-memory': {'proposalRejected': False}, 'restart': {'nextRunId': 'run'}, 'stale-destination': {'staleApplyRejected': False}, 'cancel-retry': {'cancelStatus': 'ready'}, 'dedup-import': {'portableExecutionCounts': dict.fromkeys(m.REVIEW_PORTABLE_TABLES, 1)}}
         for case,change in changes.items():
@@ -186,7 +217,7 @@ class WorkflowAccounting(unittest.TestCase):
             cases = json.loads((root/filename).read_text())['cases']
             self.assertEqual(count, 12)
             self.assertEqual(len({c['id'] for c in cases}), count)
-        self.assertEqual(set(m.REVIEW_ASSERTIONS), {c['id'] for c in json.loads((root/'reviews.json').read_text())['cases']})
+        self.assertEqual(set(m.REVIEW_ASSERTIONS), {c['id'] for c in json.loads((root/'reviews-execution-v2.json').read_text())['cases']})
         self.assertEqual(set(m.MEMORY_ASSERTIONS), {c['id'] for c in json.loads((root/'memory-lifecycle.json').read_text())['cases']})
         self.assertEqual(set(m.CONTEXT_ASSERTIONS), {c['id'] for c in json.loads((root/'context.json').read_text())['cases']})
 

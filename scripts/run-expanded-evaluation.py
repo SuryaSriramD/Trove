@@ -11,7 +11,7 @@ FAMILIES = {
     'related': ('related.json', 'TestRealLocalWorkflowRelated', 12),
     'memory-lifecycle': ('memory-lifecycle.json', 'TestRealLocalWorkflowMemoryLifecycle', 12),
     'images': ('images-execution-v2.json', 'TestRealLocalWorkflowImages', 24),
-    'reviews': ('reviews.json', 'TestRealLocalWorkflowReviews', 12),
+    'reviews': ('reviews-execution-v2.json', 'TestRealLocalWorkflowReviewsV2', 12),
 }
 
 def digest(path):
@@ -290,8 +290,24 @@ def review_expected_draft(case):
     return {'claims': claims, 'actions': actions}
 
 
+def review_draft_matches_v2(actual, expected):
+    # Only claim prose may omit the initial article; all remaining structure,
+    # source quotations and proposed actions must match the independent oracle.
+    if not isinstance(actual, dict): return False
+    claims = actual.get('claims')
+    if not isinstance(claims, list) or len(claims) != len(expected['claims']): return False
+    normalized = []
+    for claim, wanted in zip(claims, expected['claims']):
+        if not isinstance(claim, dict): return False
+        text, expected_text = claim.get('text'), wanted['text']
+        alternate = expected_text[4].upper() + expected_text[5:] if len(expected_text) > 4 and expected_text.startswith('The ') and 'a' <= expected_text[4] <= 'z' else expected_text
+        normalized.append(dict(claim, text=expected_text) if text in (expected_text, alternate) else claim)
+    return dict(actual, claims=normalized) == expected
+
+
 def validate_review_report(report, case):
     errors = []
+    if report.get('oracleVersion') != 2: errors.append('review report lacks the explicit v2 oracle version')
     model_case = case in REVIEW_GENERATION_CASES
     if type(report.get('generationAttempts')) is not int or report['generationAttempts'] != int(model_case): errors.append('review native generation count differs')
     if report.get('serviceBoundaryOnly') is not (not model_case): errors.append('service-only boundary is not explicitly distinguished')
@@ -320,7 +336,8 @@ def validate_review_report(report, case):
         if report.get('finishRejected') is not True or report.get('proposalRejected') is not True or report.get('finalStatus') not in ('failed', 'cancelled'): errors.append('Forget did not invalidate generated review')
         return errors
     expected = review_expected_draft(case)
-    if json.loads(report.get('rawDraft', '')) != expected or report.get('actions') != expected['actions']: errors.append('review output differs from independent fact/category/action oracle')
+    actual_draft = json.loads(report.get('rawDraft', ''))
+    if not review_draft_matches_v2(actual_draft, expected) or report.get('actions') != expected['actions']: errors.append('review output differs from independent fact/category/action oracle')
     sources, citations = report['sources'], report['citations']
     if report.get('finalStatus') != 'ready' or not citations or report.get('unapprovedApplyRejected') is not True: errors.append('review escaped its unapplied approval boundary')
     if any(c.get('state') != 'current' or c.get('location', {}).get('pageId') not in selected for c in citations): errors.append('review citations are stale or outside selection')
@@ -334,7 +351,8 @@ def validate_review_report(report, case):
         return errors
     effect = report['reviewedEffect']
     if effect.get('destinationPageId') != bindings['destination'] or effect.get('status') != 'accepted' or not all(type(effect.get(k)) is int for k in ('beforeBlocks', 'afterBlocks', 'retryBlocks')) or effect['beforeBlocks'] < 1 or effect['afterBlocks'] <= effect['beforeBlocks'] or effect['retryBlocks'] != effect['afterBlocks']: errors.append('reviewed effect or duplicate-apply bound differs')
-    if any(claim['text'] not in effect.get('destinationText', '') for claim in expected['claims']): errors.append('approved review content missing from canonical destination')
+    actual_claims = actual_draft.get('claims', []) if isinstance(actual_draft, dict) else []
+    if not actual_claims or any(not isinstance(claim, dict) or not isinstance(claim.get('text'), str) or claim['text'] not in effect.get('destinationText', '') for claim in actual_claims): errors.append('approved review content missing from canonical destination')
     if case == 'risk-suggestion' and REVIEW_SUGGESTION not in effect.get('sourceText', ''): errors.append('reviewed suggestion not applied to exact destination')
     if report.get('repeatedOccurrenceRunId') != report.get('runId') or not report.get('runId'): errors.append('repeated occurrence changed identity')
     if case == 'cancel-retry' and report.get('cancelStatus') != 'cancelled': errors.append('cancelled occurrence did not remain inert before retry')
