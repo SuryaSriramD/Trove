@@ -223,7 +223,7 @@ func captureNestedNotion(t *testing.T, k *Kernel, e contracts.ServiceExecutionCo
 	children := map[string][]any{root: {toggle, columnList, original, reference, unknown, missing, mention}, id(1): {list, heading}, id(2): {deep}, id(4): {block(15, "paragraph", "Heading child", false)}, id(5): {left, right}, id(6): {block(8, "paragraph", "API left", false)}, id(7): {block(9, "paragraph", "API right", false)}, id(10): {block(12, "paragraph", "Reusable child", false), cyclic}, id(13): {block(14, "paragraph", "Unsupported child", false)}}
 	client := &http.Client{Transport: notionFixtureTransport(func(r *http.Request) (*http.Response, error) {
 		if strings.Contains(r.URL.Path, "/pages/") {
-			return notionResponse(200, `{"id":"`+root+`","properties":{"title":{"type":"title","title":[{"plain_text":"Nested API"}]}}}`), nil
+			return notionResponse(200, `{"object":"page","in_trash":false,"id":"`+root+`","properties":{"title":{"type":"title","title":[{"plain_text":"Nested API"}]}}}`), nil
 		}
 		parts := strings.Split(r.URL.Path, "/")
 		source := parts[len(parts)-2]
@@ -361,7 +361,7 @@ func TestNotionBlockEvidenceRetainsExactRawRepresentation(t *testing.T) {
 	original := `{ "id":"bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb", "type":"future_widget", "future_widget":{"large":123456789012345678901234567890,"unknown":"kept"} }`
 	client := &http.Client{Transport: notionFixtureTransport(func(r *http.Request) (*http.Response, error) {
 		if strings.Contains(r.URL.Path, "/pages/") {
-			return notionResponse(200, `{"properties":{}}`), nil
+			return notionResponse(200, `{"object":"page","in_trash":false,"id":"`+root+`","properties":{}}`), nil
 		}
 		return notionResponse(200, `{"results":[`+original+`],"has_more":false}`), nil
 	})}

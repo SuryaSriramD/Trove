@@ -50,16 +50,16 @@ func (f *notionDatabaseFixture) client(t *testing.T) *http.Client {
 		}
 		path := r.URL.Path
 		if path == "/v1/databases/"+notionDBA {
-			return notionResponse(200, fmt.Sprintf(`{"object":"database","id":%q,"title":[{"plain_text":"Primary container"}],"data_sources":[{"id":%q,"name":"Projects"},{"id":%q,"name":"People"}]}`, notionDBA, notionSourceA, notionSourceB)), nil
+			return notionResponse(200, fmt.Sprintf(`{"object":"database","in_trash":false,"id":%q,"title":[{"plain_text":"Primary container"}],"data_sources":[{"id":%q,"name":"Projects"},{"id":%q,"name":"People"}]}`, notionDBA, notionSourceA, notionSourceB)), nil
 		}
 		if path == "/v1/databases/"+notionDBB {
-			return notionResponse(200, fmt.Sprintf(`{"object":"database","id":%q,"title":[{"plain_text":"Linked container"}],"data_sources":[]}`, notionDBB)), nil
+			return notionResponse(200, fmt.Sprintf(`{"object":"database","in_trash":false,"id":%q,"title":[{"plain_text":"Linked container"}],"data_sources":[]}`, notionDBB)), nil
 		}
 		if path == "/v1/data_sources/"+notionSourceA {
-			return notionResponse(200, fmt.Sprintf(`{"object":"data_source","id":%q,"title":[{"plain_text":"Projects"}],"parent":{"database_id":%q},"properties":{"Name":{"id":"title","type":"title","title":{}},"Price":{"id":"price","type":"number","number":{"format":"dollar"}},"Notes":{"id":"r%%3Ai","type":"rich_text","rich_text":{}},"Owner":{"id":"owner","type":"relation","relation":{"data_source_id":%q,"type":"single_property"}},"Total":{"id":"calc","type":"formula","formula":{"expression":"prop(\"Price\") * 2"}},"Attachments":{"id":"files","type":"files","files":{}}}}`, notionSourceA, notionDBA, notionSourceB)), nil
+			return notionResponse(200, fmt.Sprintf(`{"object":"data_source","in_trash":false,"id":%q,"title":[{"plain_text":"Projects"}],"parent":{"database_id":%q},"properties":{"Name":{"id":"title","type":"title","title":{}},"Price":{"id":"price","type":"number","number":{"format":"dollar"}},"Notes":{"id":"r%%3Ai","type":"rich_text","rich_text":{}},"Owner":{"id":"owner","type":"relation","relation":{"data_source_id":%q,"type":"single_property"}},"Total":{"id":"calc","type":"formula","formula":{"expression":"prop(\"Price\") * 2"}},"Attachments":{"id":"files","type":"files","files":{}}}}`, notionSourceA, notionDBA, notionSourceB)), nil
 		}
 		if path == "/v1/data_sources/"+notionSourceB {
-			return notionResponse(200, fmt.Sprintf(`{"object":"data_source","id":%q,"title":[{"plain_text":"People"}],"parent":{"database_id":%q},"properties":{"Name":{"id":"title","type":"title","title":{}}}}`, notionSourceB, notionDBA)), nil
+			return notionResponse(200, fmt.Sprintf(`{"object":"data_source","in_trash":false,"id":%q,"title":[{"plain_text":"People"}],"parent":{"database_id":%q},"properties":{"Name":{"id":"title","type":"title","title":{}}}}`, notionSourceB, notionDBA)), nil
 		}
 		if strings.HasSuffix(path, "/templates") {
 			if strings.Contains(path, notionSourceA) {
@@ -79,9 +79,9 @@ func (f *notionDatabaseFixture) client(t *testing.T) *http.Client {
 			if strings.Contains(path, notionSourceB) {
 				id = notionRecordB
 			} else if !strings.Contains(string(body), "query-next") {
-				return notionResponse(200, fmt.Sprintf(`{"object":"list","results":[{"object":"page","id":%q}],"has_more":true,"next_cursor":"query-next"}`, id)), nil
+				return notionResponse(200, fmt.Sprintf(`{"object":"list","results":[{"object":"page","in_trash":false,"id":%q}],"has_more":true,"next_cursor":"query-next"}`, id)), nil
 			}
-			return notionResponse(200, fmt.Sprintf(`{"object":"list","results":[{"object":"page","id":%q}],"has_more":false,"next_cursor":null}`, id)), nil
+			return notionResponse(200, fmt.Sprintf(`{"object":"list","results":[{"object":"page","in_trash":false,"id":%q}],"has_more":false,"next_cursor":null}`, id)), nil
 		}
 		if path == "/v1/views" {
 			id := notionViewA
@@ -141,17 +141,17 @@ func (f *notionDatabaseFixture) client(t *testing.T) *http.Client {
 			}
 		}
 		if path == "/v1/pages/"+notionTemplateA {
-			return notionResponse(200, fmt.Sprintf(`{"object":"page","id":%q,"parent":{"data_source_id":%q},"properties":{"Name":{"id":"title","type":"title","title":[{"plain_text":"Planning template"}]},"Price":{"id":"price","type":"number","number":45.25}}}`, notionTemplateA, notionSourceA)), nil
+			return notionResponse(200, fmt.Sprintf(`{"object":"page","in_trash":false,"id":%q,"parent":{"data_source_id":%q},"properties":{"Name":{"id":"title","type":"title","title":[{"plain_text":"Planning template"}]},"Price":{"id":"price","type":"number","number":45.25}}}`, notionTemplateA, notionSourceA)), nil
 		}
 		if path == "/v1/pages/"+notionRecordA {
 			price := "9007199254740993.000001"
 			if f.changed {
 				price = "42.5"
 			}
-			return notionResponse(200, fmt.Sprintf(`{"object":"page","id":%q,"parent":{"data_source_id":%q},"properties":{"Name":{"id":"title","type":"title","title":[{"plain_text":"truncated"}]},"Price":{"id":"price","type":"number","number":%s},"Notes":{"id":"r%%3Ai","type":"rich_text","rich_text":[{"plain_text":"truncated"}]},"Owner":{"id":"owner","type":"relation","relation":[]},"Total":{"id":"calc","type":"formula","formula":{"type":"number","number":-1}},"Attachments":{"id":"files","type":"files","files":[]}}}`, notionRecordA, notionSourceA, price)), nil
+			return notionResponse(200, fmt.Sprintf(`{"object":"page","in_trash":false,"id":%q,"parent":{"data_source_id":%q},"properties":{"Name":{"id":"title","type":"title","title":[{"plain_text":"truncated"}]},"Price":{"id":"price","type":"number","number":%s},"Notes":{"id":"r%%3Ai","type":"rich_text","rich_text":[{"plain_text":"truncated"}]},"Owner":{"id":"owner","type":"relation","relation":[]},"Total":{"id":"calc","type":"formula","formula":{"type":"number","number":-1}},"Attachments":{"id":"files","type":"files","files":[]}}}`, notionRecordA, notionSourceA, price)), nil
 		}
 		if path == "/v1/pages/"+notionRecordB {
-			return notionResponse(200, fmt.Sprintf(`{"object":"page","id":%q,"parent":{"data_source_id":%q},"properties":{"Name":{"id":"title","type":"title","title":[{"plain_text":"Asha"}]}}}`, notionRecordB, notionSourceB)), nil
+			return notionResponse(200, fmt.Sprintf(`{"object":"page","in_trash":false,"id":%q,"parent":{"data_source_id":%q},"properties":{"Name":{"id":"title","type":"title","title":[{"plain_text":"Asha"}]}}}`, notionRecordB, notionSourceB)), nil
 		}
 		t.Fatalf("Unexpected Notion fixture request %s %s", r.Method, r.URL)
 		return nil, nil
@@ -515,7 +515,7 @@ func TestNotionRepeatedPropertyCursorAndLegacyVersion(t *testing.T) {
 		if r.Header.Get("Notion-Version") != "2025-09-03" {
 			t.Fatal("legacy capture silently upgraded", r.Header)
 		}
-		return notionResponse(200, fmt.Sprintf(`{"id":%q,"properties":{}}`, notionRecordA)), nil
+		return notionResponse(200, fmt.Sprintf(`{"object":"page","archived":false,"id":%q,"properties":{}}`, notionRecordA)), nil
 	})}
 	if _, err := k.CaptureNotionStep(context.Background(), e, legacy.ID, legacy.Revision, "fixture-token", legacyClient); err != nil {
 		t.Fatal(err)
