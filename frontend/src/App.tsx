@@ -166,29 +166,56 @@ export default function App() {
     (e: unknown) => setError(e instanceof Error ? e.message : String(e)),
     [],
   );
-  const refresh = useCallback(async () => {
-    try {
-      const next = await snapshot();
-      for (const key of [
-        "pages",
-        "blocks",
-        "collections",
-        "properties",
-        "records",
-        "views",
-        "files",
-        "meetings",
-        "taskFacets",
-      ])
-        if (!(next as any)[key]) (next as any)[key] = [];
-      setW(next);
-      setError("");
-    } catch (e) {
-      errorHandler(e);
-    } finally {
-      setLoading(false);
+  const appActive = useRef(true);
+  const navigationIntent = useRef(0);
+  const deepLinkRequest = useRef(0);
+  const snapshotGeneration = useRef(0);
+  useEffect(() => {
+    appActive.current = true;
+    return () => {
+      appActive.current = false;
+      navigationIntent.current++;
+      deepLinkRequest.current++;
+      snapshotGeneration.current++;
+    };
+  }, []);
+  const snapshotFlight = useRef<Promise<{ value: WorkspaceSnapshot; generation: number }> | undefined>(undefined);
+  // Serialize shell reads. If a refresh arrives during a read, discard that
+  // response and ask the current native/host owner again. Request start order
+  // cannot identify authority across workspace changes.
+  const readCurrentSnapshot = useCallback(() => {
+    if (!appActive.current) return Promise.reject(new Error("Workspace view is closed."));
+    snapshotGeneration.current++;
+    if (!snapshotFlight.current) {
+      snapshotFlight.current = (async () => {
+        for (;;) {
+          const generation = snapshotGeneration.current;
+          let next: WorkspaceSnapshot;
+          try { next = await snapshot(); }
+          catch (error) {
+            if (!appActive.current) throw error;
+            if (generation !== snapshotGeneration.current) continue;
+            errorHandler(error);
+            throw error;
+          }
+          if (!appActive.current) throw new Error("Workspace view is closed.");
+          if (generation !== snapshotGeneration.current) continue;
+          for (const key of ["pages", "blocks", "collections", "properties", "records", "views", "files", "meetings", "taskFacets"])
+            if (!(next as any)[key]) (next as any)[key] = [];
+          setW(next);
+          setError("");
+          return { value: next, generation };
+        }
+      })().finally(() => {
+        snapshotFlight.current = undefined;
+        if (appActive.current) setLoading(false);
+      });
     }
+    return snapshotFlight.current;
   }, [errorHandler]);
+  const refresh = useCallback(async () => {
+    try { await readCurrentSnapshot(); } catch { /* The current read owns its diagnostic. */ }
+  }, [readCurrentSnapshot]);
   useEffect(() => {
     void refresh();
     const off = window.runtime?.EventsOn(
@@ -416,8 +443,12 @@ export default function App() {
         }))
       : (active && backlinksByPage.get(active)) || [];
   const navigate = useCallback(
-    async (target: string, record = true) => {
+    async (target: string, record = true, stillCurrent?: () => boolean) => {
+      // A new user navigation supersedes pending link resolution. A resolved
+      // link carries its existing intent through this final navigation.
+      const intent = stillCurrent ? navigationIntent.current : ++navigationIntent.current;
       if (flushEditor.current && !(await flushEditor.current())) return false;
+      if (!appActive.current || intent !== navigationIntent.current || (stillCurrent && !stillCurrent())) return false;
       setSourceLocation(null);
       if (nav.some((n) => n[0] === target)) {
         setSurface(target as Surface);
@@ -442,22 +473,44 @@ export default function App() {
   );
   const deepLinkHandler = useRef<(href: string) => Promise<void>>(async () => {});
   deepLinkHandler.current = async (href: string) => {
+    const request = ++deepLinkRequest.current;
+    const intent = ++navigationIntent.current;
+    let generation: number | undefined;
+    const stillCurrent = () => appActive.current && request === deepLinkRequest.current &&
+      intent === navigationIntent.current &&
+      (generation === undefined || generation === snapshotGeneration.current);
     try {
       const target = parseDeepLink(href);
       if (flushEditor.current && !(await flushEditor.current())) return;
-      const current = await snapshot();
+      if (!stillCurrent()) return;
+      const loaded = await readCurrentSnapshot();
+      generation = loaded.generation;
+      const current = loaded.value;
+      if (!stillCurrent()) return;
       if (target.workspaceId && target.workspaceId !== current.workspaceId)
         throw new Error("This link belongs to another workspace. Open that workspace in Settings, then follow the link again.");
       const targetPage = current.pages.find(p => p.id === target.pageId && !p.deletedAt);
       if (!targetPage) throw new Error("The linked page is unavailable in this workspace or is in Trash.");
-      if (target.blockId && !current.blocks.some(b => b.id === target.blockId && b.pageId === target.pageId))
-        throw new Error("The linked block is unavailable or has moved to another page.");
-      setW(current);
-      if (!(await navigate(target.pageId))) return;
+      if (target.blockId) {
+        let blocks = current.blocks;
+        if (current.contentMode === "shell") {
+          const resolved = await dispatch<S.ReadPageResult>("readPage", { ...envelope(current), pageId: target.pageId });
+          if (!stillCurrent()) return;
+          if (resolved.page.id !== targetPage.id || resolved.page.deletedAt)
+            throw new Error("The linked page is unavailable in this workspace or is in Trash.");
+          if (resolved.page.revision !== targetPage.revision)
+            throw new Error("The linked page changed while opening the link. Follow the link again to inspect its current content.");
+          blocks = resolved.blocks;
+        }
+        if (!blocks.some(b => b.id === target.blockId && b.pageId === target.pageId))
+          throw new Error("The linked block is unavailable or has moved to another page.");
+      }
+      if (!stillCurrent() || !(await navigate(target.pageId, true, stillCurrent))) return;
+      if (!stillCurrent()) return;
       setSourceLocation({pageId: target.pageId, sourceRevision: targetPage.revision,
         ...(target.blockId ? {blockId: target.blockId} : {})});
       setStatus(target.blockId ? "Opened linked block." : "Opened linked page.");
-    } catch (error) { errorHandler(error); }
+    } catch (error) { if (stillCurrent()) errorHandler(error); }
   };
   useEffect(() => {
     // Delegate at the application boundary so links inside nested rich editors,
