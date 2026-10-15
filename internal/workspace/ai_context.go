@@ -282,5 +282,5 @@ func aiCitedEvidence(source AIEvidence, title string) []byte {
 }
 
 func aiTitleOnlyEvidence(source AIEvidence) bool {
-	return source.MemoryID == "" && source.Location.BlockId == nil && strings.TrimSpace(source.Text) == strings.TrimSpace(source.Title)
+	return source.Connected == nil && source.MemoryID == "" && source.Location.BlockId == nil && strings.TrimSpace(source.Text) == strings.TrimSpace(source.Title)
 }
