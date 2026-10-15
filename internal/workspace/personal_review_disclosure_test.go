@@ -11,7 +11,7 @@ import (
 func TestPersonalReviewCaptureOmissionCountIsLowerBound(t *testing.T) {
 	k, e := testKernel(t)
 	initial, source, planBlock := generativeReviewFixture(t, k, e)
-	if strings.Contains(initial.Warning, "additional excerpts") {
+	if strings.Contains(strings.ToLower(initial.Warning), "additional excerpts") {
 		t.Fatal("unbounded omission warning for fully captured source", initial.Warning)
 	}
 	for n := 0; n < 6; n++ {
@@ -42,7 +42,7 @@ func TestPersonalReviewCaptureOmissionCountIsLowerBound(t *testing.T) {
 	}
 	// Capture reads only one extra row to detect the quota; it does not count
 	// all four omitted excerpts. The persisted warning must state a lower bound.
-	const warning = "At least 1 additional excerpts were omitted by the capture bound."
+	const warning = "Additional excerpts omitted by the capture bound: at least 1."
 	if !strings.Contains(run.Warning, warning) {
 		t.Fatalf("sentinel presented as an exact omitted count: %q", run.Warning)
 	}

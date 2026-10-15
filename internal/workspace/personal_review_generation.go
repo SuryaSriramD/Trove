@@ -246,7 +246,7 @@ func (k *Kernel) capturePersonalReviewGeneration(ctx context.Context, e contract
 	if omitted > 0 {
 		// The per-page query stops at its first excess row, so this is a lower
 		// bound rather than a complete count of excerpts outside the quota.
-		r.Warning += fmt.Sprintf(" At least %d additional excerpts were omitted by the capture bound.", omitted)
+		r.Warning += fmt.Sprintf(" Additional excerpts omitted by the capture bound: at least %d.", omitted)
 	}
 	return k.validateReviewGenerationSnapshot(ctx, tx, e, *r)
 }
