@@ -127,6 +127,10 @@ defs['MeetingExtractionPrepareRequest']['dependentRequired']={'draftId':['itemIn
 defs['MeetingExtractionListRequest']=obj({**header,'meetingId':D('Id')})
 defs['MeetingExtractionCreateRequest']=obj({**header,'meetingId':D('Id'),'evidenceHash':{'type':'string','pattern':'^[0-9a-f]{64}$'},'kind':enum('page','task'),'title':{'type':'string','minLength':1,'maxLength':512},'body':{'type':'string','maxLength':100000},'proposalId':D('Id'),'itemId':{'type':'string','minLength':1,'maxLength':128}},[*header,'meetingId','evidenceHash','kind','title','body'])
 defs['MeetingExtractionCreateRequest']['dependentRequired']={'proposalId':['itemId'],'itemId':['proposalId']}
+# Native-only backup output. Passphrases deliberately have no dispatcher/job
+# request definition and never enter a persisted request or model payload.
+defs['NativeBackupProgress']=obj({'version':{'const':1},'phase':enum('idle','choosing','snapshot','encrypting','authenticating','verifying','review','restoring','complete'),'bytes':{'type':'string','pattern':'^(0|[1-9][0-9]*)$'},'totalBytes':{'type':'string','pattern':'^(0|[1-9][0-9]*)$'}})
+defs['NativeBackupSummary']=obj({'version':{'const':1},'format':{'const':'age-passphrase/native-tar-v1'},'included':arr(S,32),'excluded':arr(S,32)})
 defs['AutomationOptionsRequest']=obj({**header,'pageId':D('Id')})
 defs['TemplatePropertyDecision']={'oneOf':[obj({'sourcePropertyId':D('Id'),'action':{'const':'omit'}}),obj({'sourcePropertyId':D('Id'),'action':{'const':'map'},'targetPropertyId':D('Id'),'value':json_value})]}
 defs['TemplatePreviewRequest']=obj({**header,'templateId':D('Id'),'title':{'type':'string','minLength':1,'maxLength':2000},'collectionId':D('Id'),'propertyDecisions':arr(R('TemplatePropertyDecision'),256)},[*header,'templateId','title'])

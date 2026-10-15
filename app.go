@@ -65,6 +65,7 @@ func defaultWorkspacePath() (string, error) {
 func (a *App) startup(ctx context.Context) {
 	markStartupStage("native_startup_enter")
 	a.initializeStartup(ctx, func() error {
+		a.cleanupAbandonedBackupStages()
 		a.initNative()
 		markStartupStage("native_runtime_ready")
 		runtime.OnFileDrop(ctx, func(x, y int, paths []string) {
@@ -169,6 +170,8 @@ func (a *App) shutdown(context.Context) {
 	defer markStartupStage("shutdown_complete")
 	a.shutdownOnce.Do(func() { close(a.shutdownDone) })
 	a.CancelUpdateOperation()
+	a.cancelBackupOperation()
+	a.closeBackupPreviews()
 	a.lifecycle.Lock()
 	defer a.lifecycle.Unlock()
 	a.stopClipper()

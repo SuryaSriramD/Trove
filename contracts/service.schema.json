@@ -3012,6 +3012,75 @@
         ]
       }
     },
+    "NativeBackupProgress": {
+      "type": "object",
+      "properties": {
+        "version": {
+          "const": 1
+        },
+        "phase": {
+          "type": "string",
+          "enum": [
+            "idle",
+            "choosing",
+            "snapshot",
+            "encrypting",
+            "authenticating",
+            "verifying",
+            "review",
+            "restoring",
+            "complete"
+          ]
+        },
+        "bytes": {
+          "type": "string",
+          "pattern": "^(0|[1-9][0-9]*)$"
+        },
+        "totalBytes": {
+          "type": "string",
+          "pattern": "^(0|[1-9][0-9]*)$"
+        }
+      },
+      "required": [
+        "version",
+        "phase",
+        "bytes",
+        "totalBytes"
+      ],
+      "additionalProperties": false
+    },
+    "NativeBackupSummary": {
+      "type": "object",
+      "properties": {
+        "version": {
+          "const": 1
+        },
+        "format": {
+          "const": "age-passphrase/native-tar-v1"
+        },
+        "included": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "maxItems": 32
+        },
+        "excluded": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "maxItems": 32
+        }
+      },
+      "required": [
+        "version",
+        "format",
+        "included",
+        "excluded"
+      ],
+      "additionalProperties": false
+    },
     "AutomationOptionsRequest": {
       "type": "object",
       "properties": {
