@@ -2602,6 +2602,31 @@ type ServiceConnectorSnapshot struct {
 	RetrievedAt       DomainTimestamp `json:"retrievedAt"`
 	ExternalAiAllowed bool            `json:"externalAiAllowed"`
 }
+type ServiceConnectedSourceReference struct {
+	SnapshotId     string     `json:"snapshotId"`
+	RemoteRevision string     `json:"remoteRevision"`
+	ContentHash    DomainHash `json:"contentHash"`
+}
+type ServiceConnectedEvidence struct {
+	Version         int64           `json:"version"`
+	ReceiptId       DomainId        `json:"receiptId"`
+	SnapshotId      string          `json:"snapshotId"`
+	AccountId       DomainId        `json:"accountId"`
+	AccountRevision string          `json:"accountRevision"`
+	SelectionId     string          `json:"selectionId"`
+	Provider        string          `json:"provider"`
+	RemoteId        string          `json:"remoteId"`
+	RemoteRevision  string          `json:"remoteRevision"`
+	ContentHash     DomainHash      `json:"contentHash"`
+	Url             string          `json:"url"`
+	CheckedAt       DomainTimestamp `json:"checkedAt"`
+	Partial         bool            `json:"partial"`
+}
+type ServiceConnectedSource struct {
+	Connected ServiceConnectedEvidence `json:"connected"`
+	Title     string                   `json:"title"`
+	Text      string                   `json:"text"`
+}
 type ServiceConnectorRegistration struct {
 	Kind                      string  `json:"kind"`
 	ClientId                  string  `json:"clientId"`

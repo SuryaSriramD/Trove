@@ -115,6 +115,12 @@ func TestConnectedEvidenceWireIdentityAndHostReset(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
+	if err := contracts.Validate("service", "ConnectedEvidence", marshal(source.Connected)); err != nil {
+		t.Fatal(err)
+	}
+	if err := contracts.Validate("service", "ConnectedSourceReference", marshal(ConnectorContextReference(s))); err != nil {
+		t.Fatal(err)
+	}
 	evidence := AIEvidence{Title: source.Title, Text: source.Text, Connected: &source.Connected}
 	var wire map[string]any
 	if err = json.Unmarshal(marshal(evidence), &wire); err != nil {
@@ -130,5 +136,54 @@ func TestConnectedEvidenceWireIdentityAndHostReset(t *testing.T) {
 	k.SetConnectorContextReader(reader)
 	if k.connectedContext().validate(context.Background(), k.db, e, source.Connected) == nil {
 		t.Fatal("host reset restored authority")
+	}
+}
+
+func TestConnectedContextReferenceQueryRequiresCurrentOwnerSelection(t *testing.T) {
+	k, e, a, s := connectedFixture(t)
+	request := map[string]any{"contractVersion": 1, "requestId": NewID(), "workspaceId": k.ID(), "snapshotId": s.ID, "expectedRevision": s.RemoteRevision}
+	result := testDispatch(t, k, e, "connectors.contextReference", request)
+	testOK(t, result)
+	var ref ConnectedSourceReference
+	if err := json.Unmarshal(marshal(result["result"]), &ref); err != nil {
+		t.Fatal(err)
+	}
+	if ref != ConnectorContextReference(s) {
+		t.Fatal("reference differs from canonical preview hash", result)
+	}
+	request["expectedRevision"] = "stale"
+	testCode(t, testDispatch(t, k, e, "connectors.contextReference", request), "CONFLICT")
+	request["expectedRevision"] = s.RemoteRevision
+	external := externalPolicyGrant(k, e)
+	testCode(t, testDispatch(t, k, external, "connectors.contextReference", request), "SCOPE_DENIED")
+	if err := k.DisconnectConnector(context.Background(), e, a.ID, a.Revision); err != nil {
+		t.Fatal(err)
+	}
+	testCode(t, testDispatch(t, k, e, "connectors.contextReference", request), "SCOPE_DENIED")
+}
+
+func TestConnectedContextIgnoresRotatingUnsharedSignedURLs(t *testing.T) {
+	k, e, _, s := connectedFixture(t)
+	ctx := context.Background()
+	s.Content = json.RawMessage(`{"cover":{"url":"https://files.example/cover?signature=old"}}`)
+	a, err := k.ConnectorAccount(ctx, e, s.AccountID)
+	if err != nil {
+		t.Fatal(err)
+	}
+	s, err = k.StoreConnectorPreview(ctx, e, a, s.SelectionID, s)
+	if err != nil {
+		t.Fatal(err)
+	}
+	fresh := s
+	fresh.Content = json.RawMessage(`{"cover":{"url":"https://files.example/cover?signature=new"}}`)
+	h := NewConnectorContext(k, func(context.Context, connectors.Account, connectors.Selection, string) (connectors.Snapshot, error) {
+		return fresh, nil
+	})
+	if _, err = h.Read(ctx, e, ConnectorContextReference(s)); err != nil {
+		t.Fatal("rotating unshared metadata rejected unchanged knowledge", err)
+	}
+	fresh.RemoteRevision = "v2"
+	if _, err = h.Read(ctx, e, ConnectorContextReference(s)); err == nil {
+		t.Fatal("changed remote revision ignored because text stayed equal")
 	}
 }
