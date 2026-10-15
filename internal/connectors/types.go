@@ -138,6 +138,7 @@ type Adapter interface {
 	Reconcile(context.Context, Session, Proposal) (Receipt, error)
 }
 type Acquired struct {
+	RemoteID       string `json:"remoteId,omitempty"`
 	Name           string `json:"name"`
 	MediaType      string `json:"mediaType"`
 	Bytes          []byte `json:"-"`

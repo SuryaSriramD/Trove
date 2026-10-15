@@ -453,7 +453,7 @@ func (g *googleAdapter) gmailAcquire(ctx context.Context, s Session, sel Selecti
 	if name == "" {
 		name = "message-part"
 	}
-	return Acquired{Name: name, MediaType: key.MIME, Bytes: decoded, RemoteRevision: t.History}, nil
+	return Acquired{RemoteID: id, Name: name, MediaType: key.MIME, Bytes: decoded, RemoteRevision: t.History}, nil
 }
 func gmailFindPart(p *gmailPart, id string, depth int) *gmailPart {
 	if depth > 20 {

@@ -279,3 +279,23 @@ func TestMCPAcquisitionRequiresExactRepresentationAndSelection(t *testing.T) {
 		t.Fatal("acquisition called tool")
 	}
 }
+
+func TestMCPAcquiredNamePreservesExactResourceIdentity(t *testing.T) {
+	for _, label := range []string{"Folder/notes.txt", `Folder\notes.txt`, "", "..", "/", strings.Repeat("語", 100)} {
+		t.Run(label, func(t *testing.T) {
+			f := newMCPFixture(t)
+			sel := f.session.Account.Selections[0]
+			sel.Label = label
+			item, err := NewMCPAdapter().(Acquirer).Acquire(context.Background(), f.session, sel, sel.ID, "")
+			if err != nil {
+				t.Fatal(err)
+			}
+			if item.RemoteID != sel.ID || item.Name == "" || item.Name == "." || item.Name == ".." || strings.ContainsAny(item.Name, "/\\\x00") || len(item.Name) > 200 {
+				t.Fatal("unsafe acquisition filename or lost source identity", item.Name, item.RemoteID)
+			}
+			if string(item.Bytes) != "Selected source evidence" {
+				t.Fatal("resource changed")
+			}
+		})
+	}
+}
