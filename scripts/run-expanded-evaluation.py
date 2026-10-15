@@ -9,6 +9,7 @@ FAMILIES = {
     'modes': ('heldout-modes.json', 'TestRealLocalExpandedModes', 42),
     'context': ('context.json', 'TestRealLocalWorkflowContext', 12),
     'related': ('related.json', 'TestRealLocalWorkflowRelated', 12),
+    'memory-lifecycle': ('memory-lifecycle.json', 'TestRealLocalWorkflowMemoryLifecycle', 12),
 }
 
 def digest(path):
@@ -180,6 +181,79 @@ CONTEXT_ASSERTIONS = {
 RELATED_ASSERTIONS = frozenset(('semanticDisclosed', 'relevantRetrieved', 'relevanceAboveDistractor', 'scopeAndSelfFiltered', 'currentRevisions', 'keywordFallbackDisclosed', 'canonicalPreserved'))
 
 
+MEMORY_GENERATION_CASES = frozenset(('preference-on', 'preference-off', 'current-authority', 'constraint'))
+MEMORY_EXCLUDED_CASES = frozenset(('preference-off', 'source-edit', 'source-delete', 'forgotten', 'restore-stale', 'restore-forgotten'))
+MEMORY_ASSERTIONS = {case: {'reservedBudget', 'memoryEligibility', 'canonicalPreserved'} for case in (
+    'preference-on', 'preference-off', 'current-authority', 'constraint', 'source-edit', 'source-delete',
+    'forgotten', 'forget-stream', 'restore-stale', 'restore-forgotten', 'older-backup', 'scope-revoke')}
+for _case in MEMORY_GENERATION_CASES:
+    MEMORY_ASSERTIONS[_case] |= {'oneGeneration', 'generatedSuccessfully', 'independentAnswerOracle', 'currentCitation'}
+for _case in MEMORY_EXCLUDED_CASES:
+    MEMORY_ASSERTIONS[_case].add('memoryContentAbsent')
+for _case in MEMORY_EXCLUDED_CASES - {'preference-off'}:
+    MEMORY_ASSERTIONS[_case].add('relatedSourceExcluded')
+for _case in ('forget-stream', 'scope-revoke'):
+    MEMORY_ASSERTIONS[_case] |= {'publicationRejected', 'proposalRejected'}
+for _case in ('restore-stale', 'restore-forgotten'):
+    MEMORY_ASSERTIONS[_case] |= {'verifiedRestore', 'restoredStatePreserved'}
+MEMORY_ASSERTIONS['older-backup'] |= {'verifiedRestore', 'laterForgetRecorded', 'olderStateRecovered'}
+
+
+def validate_memory_report(report, case):
+    errors = []
+    attempts = 1 if case in MEMORY_GENERATION_CASES else 0
+    if type(report.get('generationAttempts')) is not int or report['generationAttempts'] != attempts:
+        errors.append('memory generation count differs')
+    if not all(type(report.get(k)) is int for k in ('promptTokens', 'outputCap', 'contextTokens')) or report['promptTokens'] < 0 or report['outputCap'] != 512 or report['contextTokens'] != 8192 or report['promptTokens'] + 512 + 16 > 8192:
+        errors.append('memory token budget not proved')
+    request, sources = report['request'], report['sources']
+    if type(request.get('useMemory')) is not bool or request['useMemory'] is not (case != 'preference-off') or request.get('modelPackId') != report['modelPackId']:
+        errors.append('memory request controls differ')
+    memory, primary, supporting = report['memoryId'], request['pageId'], report['supportingPageId']
+    if not all(isinstance(v, str) and v for v in (memory, primary, supporting, report['memoryPageId'])) or primary in (supporting, report['memoryPageId']):
+        errors.append('memory source identities missing or conflated')
+    expected = case not in MEMORY_EXCLUDED_CASES
+    found = [source for source in sources if source.get('memoryId') == memory]
+    if report.get('memoryIncluded') is not expected or bool(found) != expected:
+        errors.append('memory evidence eligibility differs')
+    content = 'Use the heading Launch note for answers about Project Marigold.'
+    if case == 'current-authority': content = 'Project Marigold launches on 9 February 2030.'
+    if case == 'constraint': content = 'Do not suggest weekend due dates.'
+    if report.get('memoryContent') != content or (expected and not any(s.get('text') == content for s in found)) or (not expected and content in report['preparedPrompt']):
+        errors.append('memory context content differs')
+    expected_status = 'stale' if case in ('source-edit', 'source-delete', 'restore-stale') else 'forgotten' if case in ('forgotten', 'restore-forgotten') else 'active'
+    if report.get('memoryStatus') != expected_status:
+        errors.append('persisted memory status differs')
+    if case in MEMORY_EXCLUDED_CASES - {'preference-off'} and report.get('relatedRejected') is not True:
+        errors.append('ineligible memory remains a related-content source')
+    if case in ('restore-stale', 'restore-forgotten', 'older-backup'):
+        if not report.get('backupWorkspaceId') or report.get('restoredWorkspaceId') != report['backupWorkspaceId'] or report.get('restoredIndexRebuilt') is not True:
+            errors.append('verified restored workspace binding absent')
+    if case == 'older-backup':
+        if report.get('sourceAfterBackupStatus') != 'forgotten' or report.get('restoreBoundary') != 'A backup predating Forget retains the earlier approved memory state.' or report.get('nativeRestoreWarningAcceptancePending') is not True or report.get('manualSemanticReviewRequired') is not True:
+            errors.append('older-backup behavior or separate native warning acceptance is obscured')
+    if case in ('forget-stream', 'scope-revoke'):
+        if report.get('proposalRejected') is not True or report.get('finishText') != '':
+            errors.append('invalidated memory draft can publish or apply')
+        if case == 'forget-stream' and (report.get('finishState') != 'failed' or report.get('finishRejected') is not False):
+            errors.append('forgotten memory draft was not invalidated')
+        if case == 'scope-revoke' and report.get('finishRejected') is not True:
+            errors.append('revoked authority did not reject publication')
+    if case in MEMORY_GENERATION_CASES:
+        fact = 'Monday 21 April 2031 is an available due date.' if case == 'constraint' else 'Project Marigold launches on 14 April 2031.'
+        heading = 'Launch note' if case == 'preference-on' else ''
+        answer = json.loads(report.get('rawDraft', ''))
+        if answer != {'title': heading, 'claims': [{'text': fact, 'quote': fact}]}:
+            errors.append('memory answer violates independent fact, heading or constraint oracle')
+        if not any(fact in source.get('text', '') and source.get('location', {}).get('pageId') == primary and not source.get('memoryId') for source in sources):
+            errors.append('current primary evidence missing')
+        citations = report.get('citations', [])
+        allowed = {primary, supporting} if case == 'preference-on' else {primary}
+        if not any(c.get('location', {}).get('pageId') == primary for c in citations) or any(c.get('location', {}).get('pageId') not in allowed or c.get('state') != 'current' for c in citations):
+            errors.append('current source citation missing or contaminated')
+    return errors
+
+
 def validate_workflow_report(report, case, contract):
     """Independently bind native mode, declared controls, semantic observations
     and the required assertions. A passing mock or an empty assertion map cannot
@@ -193,7 +267,7 @@ def validate_workflow_report(report, case, contract):
         if report.get('engineMode') != 'native' or report.get('releaseQualified') is not False:
             errors.append('native execution mode or release boundary absent')
         family = contract['family']
-        required = CONTEXT_ASSERTIONS[case] if family == 'context' else RELATED_ASSERTIONS
+        required = CONTEXT_ASSERTIONS[case] if family == 'context' else MEMORY_ASSERTIONS[case] if family == 'memory-lifecycle' else RELATED_ASSERTIONS
         assertions = report.get('assertions', {})
         if not isinstance(assertions, dict) or not required.issubset(assertions) or any(value is not True for value in assertions.values()):
             errors.append('required assertion missing or failed')
@@ -231,6 +305,8 @@ def validate_workflow_report(report, case, contract):
                         errors.append('current source citation absent')
                 elif claims[0] != {'text': 'The supplied evidence does not answer this question.', 'quote': ''}:
                     errors.append('omitted fact requires exclusive abstention')
+        elif family == 'memory-lifecycle':
+            errors.extend(validate_memory_report(report, case))
         elif family == 'related':
             if not isinstance(report.get('embeddingIdentity'), str) or not re.fullmatch('[0-9a-f]{64}', report['embeddingIdentity']):
                 errors.append('verified native embedding identity absent')
@@ -441,7 +517,7 @@ def main():
                              'corpusSHA256': before[str(corpus_dir / corpus_file)]['sha256']}
                              for case in corpus['cases'] if case['id'] in expected}
     workflow_contract = None
-    if args.family in ('context', 'related'):
+    if args.family in ('context', 'related', 'memory-lifecycle'):
         workflow_contract = {'family': args.family, 'modelPackId': args.pack,
                              'corpusSHA256': before[str(corpus_dir / corpus_file)]['sha256']}
     summary = summarize(events, expected, test, out / 'canonical', expected_requests, workflow_contract)
