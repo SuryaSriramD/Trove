@@ -231,6 +231,12 @@ func prepareImportMerge(ctx context.Context, q querier, p *ImportPlan, item *Imp
 			if strings.HasPrefix(path, "/blocks/") {
 				if _, present := incoming.Fields[path]; !present {
 					incoming.Fields[path] = value
+					// The field and its source identity are one retained piece of
+					// evidence. A later complete capture must reuse the same UUID.
+					id := strings.Split(path, "/")[2]
+					if source := base.BlockSources[id]; source != "" {
+						incoming.BlockSources[id] = source
+					}
 				}
 			}
 		}
@@ -417,7 +423,15 @@ func materializeImportMerge(item *ImportItem) error {
 		}
 	}
 	ordered := []placed{}
+	positions := map[string]map[int]string{}
 	for _, b := range blocks {
+		if positions[b.parent] == nil {
+			positions[b.parent] = map[int]string{}
+		}
+		if prior := positions[b.parent][b.position]; prior != "" {
+			return Fail("CONFLICT", "Merged sibling order is ambiguous; review distinct order values for every affected sibling")
+		}
+		positions[b.parent][b.position] = b.block.ID
 		ordered = append(ordered, b)
 	}
 	sort.Slice(ordered, func(i, j int) bool {

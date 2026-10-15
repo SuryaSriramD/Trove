@@ -450,7 +450,9 @@ func commitImportItem(m *Mutation, p *ImportPlan, item *ImportItem) error {
 			return err
 		}
 	}
-	if item.DisplayPreferences != nil {
+	// Re-import review covers source content. Local presentation is preserved;
+	// display metadata is applied only when creating a new page or explicit copy.
+	if item.DisplayPreferences != nil && item.Merge == nil {
 		if _, err := m.Exec("INSERT INTO p2_page_display VALUES(?,?,?) ON CONFLICT(page_id) DO UPDATE SET full_width=excluded.full_width,presentation=excluded.presentation", item.PageID, item.DisplayPreferences.FullWidth, item.DisplayPreferences.Presentation); err != nil {
 			return err
 		}
