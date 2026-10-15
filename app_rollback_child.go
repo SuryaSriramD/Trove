@@ -73,6 +73,7 @@ func (a *App) confirmRollbackShellReady() {
 			markStartupStage("rollback_committed")
 			state.pending.Store(false)
 			a.startJobs(k)
+			a.startReminderLoop()
 			if a.ctx != nil {
 				runtime.EventsEmit(a.ctx, "workspace:changed", map[string]any{"rollbackCommitted": true})
 			}

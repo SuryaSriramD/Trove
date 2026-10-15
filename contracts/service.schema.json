@@ -2265,6 +2265,108 @@
       ],
       "additionalProperties": false
     },
+    "PutReminder": {
+      "type": "object",
+      "properties": {
+        "kind": {
+          "const": "reminder.put"
+        },
+        "reminderId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "pageId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "expectedRevision": {
+          "type": "string",
+          "pattern": "^(0|[1-9][0-9]{0,18})$"
+        },
+        "startDate": {
+          "type": "string",
+          "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}$"
+        },
+        "localTime": {
+          "type": "string",
+          "pattern": "^[0-9]{2}:[0-9]{2}$"
+        },
+        "timezone": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "frequency": {
+          "type": "string",
+          "enum": [
+            "once",
+            "daily",
+            "weekly"
+          ]
+        },
+        "enabled": {
+          "type": "boolean"
+        },
+        "private": {
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "kind",
+        "reminderId",
+        "pageId",
+        "expectedRevision",
+        "startDate",
+        "localTime",
+        "timezone",
+        "frequency",
+        "enabled",
+        "private"
+      ],
+      "additionalProperties": false
+    },
+    "ReminderInboxAction": {
+      "type": "object",
+      "properties": {
+        "kind": {
+          "const": "reminder.inboxAction"
+        },
+        "occurrenceId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 160
+        },
+        "expectedAction": {
+          "type": "string",
+          "enum": [
+            "",
+            "snoozed",
+            "dismissed"
+          ]
+        },
+        "expectedActionRevision": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "action": {
+          "type": "string",
+          "enum": [
+            "snoozed",
+            "dismissed"
+          ]
+        },
+        "snoozedUntil": {
+          "$ref": "domain.schema.json#/$defs/Timestamp"
+        }
+      },
+      "required": [
+        "kind",
+        "occurrenceId",
+        "expectedAction",
+        "expectedActionRevision",
+        "action"
+      ],
+      "additionalProperties": false
+    },
     "AttachFile": {
       "type": "object",
       "properties": {
@@ -3383,6 +3485,12 @@
           "$ref": "#/$defs/SetTaskStatus"
         },
         {
+          "$ref": "#/$defs/PutReminder"
+        },
+        {
+          "$ref": "#/$defs/ReminderInboxAction"
+        },
+        {
           "$ref": "#/$defs/AttachFile"
         },
         {
@@ -3626,6 +3734,395 @@
         "workspaceId",
         "meetingId",
         "selected"
+      ],
+      "additionalProperties": false
+    },
+    "ReminderListRequest": {
+      "type": "object",
+      "properties": {
+        "contractVersion": {
+          "const": 1
+        },
+        "requestId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "workspaceId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "before": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 160
+        }
+      },
+      "required": [
+        "contractVersion",
+        "requestId",
+        "workspaceId"
+      ],
+      "additionalProperties": false
+    },
+    "ReminderHistoryRequest": {
+      "type": "object",
+      "properties": {
+        "contractVersion": {
+          "const": 1
+        },
+        "requestId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "workspaceId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "reminderId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        }
+      },
+      "required": [
+        "contractVersion",
+        "requestId",
+        "workspaceId",
+        "reminderId"
+      ],
+      "additionalProperties": false
+    },
+    "ReminderRule": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "revision": {
+          "$ref": "domain.schema.json#/$defs/Revision"
+        },
+        "pageId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "title": {
+          "type": "string"
+        },
+        "startDate": {
+          "type": "string"
+        },
+        "localTime": {
+          "type": "string"
+        },
+        "timezone": {
+          "type": "string"
+        },
+        "frequency": {
+          "type": "string",
+          "enum": [
+            "once",
+            "daily",
+            "weekly"
+          ]
+        },
+        "enabled": {
+          "type": "boolean"
+        },
+        "private": {
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "id",
+        "revision",
+        "pageId",
+        "title",
+        "startDate",
+        "localTime",
+        "timezone",
+        "frequency",
+        "enabled",
+        "private"
+      ],
+      "additionalProperties": false
+    },
+    "ReminderDelivery": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "reminderId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "revision": {
+          "$ref": "domain.schema.json#/$defs/Revision"
+        },
+        "dueAt": {
+          "$ref": "domain.schema.json#/$defs/Timestamp"
+        },
+        "outcome": {
+          "type": "string",
+          "enum": [
+            "scheduled",
+            "submitted",
+            "failed",
+            "unknown"
+          ]
+        },
+        "actionRevision": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "action": {
+          "type": "string",
+          "enum": [
+            "snoozed",
+            "dismissed"
+          ]
+        },
+        "snoozedUntil": {
+          "$ref": "domain.schema.json#/$defs/Timestamp"
+        },
+        "error": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "reminderId",
+        "revision",
+        "dueAt",
+        "outcome"
+      ],
+      "additionalProperties": false
+    },
+    "ReminderInboxItem": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "reminderId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "revision": {
+          "$ref": "domain.schema.json#/$defs/Revision"
+        },
+        "dueAt": {
+          "$ref": "domain.schema.json#/$defs/Timestamp"
+        },
+        "outcome": {
+          "type": "string",
+          "enum": [
+            "scheduled",
+            "submitted",
+            "failed",
+            "unknown"
+          ]
+        },
+        "actionRevision": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "action": {
+          "type": "string",
+          "enum": [
+            "snoozed",
+            "dismissed"
+          ]
+        },
+        "snoozedUntil": {
+          "$ref": "domain.schema.json#/$defs/Timestamp"
+        },
+        "error": {
+          "type": "string"
+        },
+        "pageId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "title": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "reminderId",
+        "revision",
+        "dueAt",
+        "outcome",
+        "pageId",
+        "title"
+      ],
+      "additionalProperties": false
+    },
+    "ReminderState": {
+      "type": "object",
+      "properties": {
+        "rules": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/ReminderRule"
+          },
+          "maxItems": 1000
+        },
+        "inbox": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/ReminderInboxItem"
+          },
+          "maxItems": 100
+        },
+        "more": {
+          "type": "boolean"
+        },
+        "nextCursor": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "rules",
+        "inbox",
+        "more"
+      ],
+      "additionalProperties": false
+    },
+    "ReminderSchedule": {
+      "type": "object",
+      "properties": {
+        "version": {
+          "const": 1
+        },
+        "epoch": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "generation": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 9007199254740991
+        },
+        "workspaceId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "active": {
+          "type": "boolean"
+        },
+        "rules": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/ReminderRule"
+          },
+          "maxItems": 1000
+        },
+        "overrides": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/ReminderDelivery"
+          },
+          "maxItems": 100000
+        },
+        "authorizationRequest": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        }
+      },
+      "required": [
+        "version",
+        "epoch",
+        "generation",
+        "workspaceId",
+        "active",
+        "rules",
+        "overrides"
+      ],
+      "additionalProperties": false
+    },
+    "ReminderReceipt": {
+      "type": "object",
+      "properties": {
+        "version": {
+          "const": 1
+        },
+        "epoch": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "generation": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 9007199254740991
+        },
+        "permission": {
+          "type": "string",
+          "enum": [
+            "authorized",
+            "provisional",
+            "denied",
+            "notDetermined",
+            "unknown"
+          ]
+        },
+        "acknowledgedAt": {
+          "$ref": "domain.schema.json#/$defs/Timestamp"
+        },
+        "deliveries": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/ReminderDelivery"
+          },
+          "maxItems": 100000
+        },
+        "error": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "version",
+        "epoch",
+        "generation",
+        "permission",
+        "acknowledgedAt",
+        "deliveries"
+      ],
+      "additionalProperties": false
+    },
+    "ReminderDesktopStatus": {
+      "type": "object",
+      "properties": {
+        "available": {
+          "type": "boolean"
+        },
+        "enabled": {
+          "type": "boolean"
+        },
+        "registration": {
+          "type": "string"
+        },
+        "publication": {
+          "type": "string",
+          "enum": [
+            "pending",
+            "acknowledged",
+            "inactive",
+            "unknown"
+          ]
+        },
+        "permission": {
+          "type": "string"
+        },
+        "epoch": {
+          "type": "string"
+        },
+        "generation": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "error": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "available",
+        "enabled",
+        "registration",
+        "publication",
+        "permission",
+        "epoch",
+        "generation"
       ],
       "additionalProperties": false
     },

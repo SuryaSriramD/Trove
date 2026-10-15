@@ -35,6 +35,7 @@ import { focusSourceLocation } from "./sourceNavigation";
 import { parseDeepLink } from "./deepLinks";
 import { SearchPanel } from "./search/SearchPanel";
 import { MeetingPanel } from "./meetings/MeetingPanel";
+import { ReminderPanel } from "./reminders/ReminderPanel";
 import { ImportExportPanel } from "./imports/ImportExportPanel";
 import { JobsPanel } from "./JobsPanel";
 import { AIPanel } from "./ai/AIPanel";
@@ -48,6 +49,7 @@ type Surface =
   | "Pages"
   | "Tasks"
   | "Meetings"
+  | "Reminders"
   | "Search"
   | "Import"
   | "Jobs"
@@ -64,6 +66,7 @@ const nav: [Surface, string][] = [
   ["Pages", "▤"],
   ["Tasks", "✓"],
   ["Meetings", "◉"],
+  ["Reminders", "◴"],
   ["Search", "⌕"],
   ["Import", "↓"],
   ["Jobs", "↻"],
@@ -1362,6 +1365,8 @@ export default function App() {
                   onRefresh={refresh}
                   onNavigate={navigateSource}
                 />
+              ) : surface === "Reminders" ? (
+                <ReminderPanel workspace={w} onRefresh={refresh} onNavigate={navigateSource}/>
               ) : surface === "Import" ? (
                 <ImportExportPanel
                   workspace={w}

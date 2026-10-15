@@ -40,6 +40,7 @@ type App struct {
 	shutdownOnce    sync.Once
 	rollback        *rollbackChildState
 	performance     *qualificationPerformance
+	reminders       *reminderDesktop
 }
 
 func NewApp() *App {
@@ -172,6 +173,7 @@ func (a *App) shutdown(context.Context) {
 	a.CancelUpdateOperation()
 	a.cancelBackupOperation()
 	a.closeBackupPreviews()
+	a.stopReminderLoop()
 	a.lifecycle.Lock()
 	defer a.lifecycle.Unlock()
 	a.stopClipper()
@@ -237,6 +239,10 @@ func (a *App) openLocked(path string, create bool) error {
 	return a.installKernelLocked(k)
 }
 func (a *App) installKernelLocked(k *workspace.Kernel) error {
+	if err := a.suspendReminderWorkspace(); err != nil {
+		k.Close()
+		return err
+	}
 	markStartupStage("workspace_open_complete")
 	a.mu.Lock()
 	old := a.kernel
@@ -259,6 +265,7 @@ func (a *App) installKernelLocked(k *workspace.Kernel) error {
 	a.subscribe(k)
 	if a.requireRollbackCommitted() == nil {
 		a.startJobs(k)
+		a.startReminderLoop()
 	}
 	return nil
 }

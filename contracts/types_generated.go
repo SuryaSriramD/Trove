@@ -1422,6 +1422,26 @@ type ServiceSetTaskStatus struct {
 	RecordId       DomainId `json:"recordId"`
 	StatusOptionId DomainId `json:"statusOptionId"`
 }
+type ServicePutReminder struct {
+	Kind             string   `json:"kind"`
+	ReminderId       DomainId `json:"reminderId"`
+	PageId           DomainId `json:"pageId"`
+	ExpectedRevision string   `json:"expectedRevision"`
+	StartDate        string   `json:"startDate"`
+	LocalTime        string   `json:"localTime"`
+	Timezone         string   `json:"timezone"`
+	Frequency        string   `json:"frequency"`
+	Enabled          bool     `json:"enabled"`
+	Private          bool     `json:"private"`
+}
+type ServiceReminderInboxAction struct {
+	Kind                   string           `json:"kind"`
+	OccurrenceId           string           `json:"occurrenceId"`
+	ExpectedAction         string           `json:"expectedAction"`
+	ExpectedActionRevision int64            `json:"expectedActionRevision"`
+	Action                 string           `json:"action"`
+	SnoozedUntil           *DomainTimestamp `json:"snoozedUntil,omitempty"`
+}
 type ServiceAttachFile struct {
 	Kind         string    `json:"kind"`
 	FileId       DomainId  `json:"fileId"`
@@ -1670,6 +1690,8 @@ func (ServiceCreateTask) isServiceCommand()              {}
 func (ServiceEnsureTasks) isServiceCommand()             {}
 func (ServicePromoteTask) isServiceCommand()             {}
 func (ServiceSetTaskStatus) isServiceCommand()           {}
+func (ServicePutReminder) isServiceCommand()             {}
+func (ServiceReminderInboxAction) isServiceCommand()     {}
 func (ServiceAttachFile) isServiceCommand()              {}
 func (ServiceRecordMeetingExtraction) isServiceCommand() {}
 func (ServiceCorrectMeetingSegment) isServiceCommand()   {}
@@ -1889,6 +1911,22 @@ func (v *ServiceCommand) UnmarshalJSON(data []byte) error {
 	}
 	if matchesVariant(fields, []string{"kind", "recordId", "statusOptionId"}, map[string]string{"kind": "\"task.setStatus\""}, map[string][]string{}, []string{"kind", "recordId", "statusOptionId"}) {
 		var result ServiceSetTaskStatus
+		if err := json.Unmarshal(data, &result); err != nil {
+			return err
+		}
+		v.Value = result
+		return nil
+	}
+	if matchesVariant(fields, []string{"kind", "reminderId", "pageId", "expectedRevision", "startDate", "localTime", "timezone", "frequency", "enabled", "private"}, map[string]string{"kind": "\"reminder.put\""}, map[string][]string{"frequency": {"\"once\"", "\"daily\"", "\"weekly\""}}, []string{"kind", "reminderId", "pageId", "expectedRevision", "startDate", "localTime", "timezone", "frequency", "enabled", "private"}) {
+		var result ServicePutReminder
+		if err := json.Unmarshal(data, &result); err != nil {
+			return err
+		}
+		v.Value = result
+		return nil
+	}
+	if matchesVariant(fields, []string{"kind", "occurrenceId", "expectedAction", "expectedActionRevision", "action"}, map[string]string{"kind": "\"reminder.inboxAction\""}, map[string][]string{"expectedAction": {"\"\"", "\"snoozed\"", "\"dismissed\""}, "action": {"\"snoozed\"", "\"dismissed\""}}, []string{"kind", "occurrenceId", "expectedAction", "expectedActionRevision", "action", "snoozedUntil"}) {
+		var result ServiceReminderInboxAction
 		if err := json.Unmarshal(data, &result); err != nil {
 			return err
 		}
@@ -2205,6 +2243,89 @@ type ServiceMeetingRetentionPreviewRequest struct {
 	WorkspaceId     DomainId `json:"workspaceId"`
 	MeetingId       DomainId `json:"meetingId"`
 	Selected        []string `json:"selected"`
+}
+type ServiceReminderListRequest struct {
+	ContractVersion int64    `json:"contractVersion"`
+	RequestId       DomainId `json:"requestId"`
+	WorkspaceId     DomainId `json:"workspaceId"`
+	Before          *string  `json:"before,omitempty"`
+}
+type ServiceReminderHistoryRequest struct {
+	ContractVersion int64    `json:"contractVersion"`
+	RequestId       DomainId `json:"requestId"`
+	WorkspaceId     DomainId `json:"workspaceId"`
+	ReminderId      DomainId `json:"reminderId"`
+}
+type ServiceReminderRule struct {
+	Id        DomainId       `json:"id"`
+	Revision  DomainRevision `json:"revision"`
+	PageId    DomainId       `json:"pageId"`
+	Title     string         `json:"title"`
+	StartDate string         `json:"startDate"`
+	LocalTime string         `json:"localTime"`
+	Timezone  string         `json:"timezone"`
+	Frequency string         `json:"frequency"`
+	Enabled   bool           `json:"enabled"`
+	Private   bool           `json:"private"`
+}
+type ServiceReminderDelivery struct {
+	Id             string           `json:"id"`
+	ReminderId     DomainId         `json:"reminderId"`
+	Revision       DomainRevision   `json:"revision"`
+	DueAt          DomainTimestamp  `json:"dueAt"`
+	Outcome        string           `json:"outcome"`
+	ActionRevision *int64           `json:"actionRevision,omitempty"`
+	Action         *string          `json:"action,omitempty"`
+	SnoozedUntil   *DomainTimestamp `json:"snoozedUntil,omitempty"`
+	Error          *string          `json:"error,omitempty"`
+}
+type ServiceReminderInboxItem struct {
+	Id             string           `json:"id"`
+	ReminderId     DomainId         `json:"reminderId"`
+	Revision       DomainRevision   `json:"revision"`
+	DueAt          DomainTimestamp  `json:"dueAt"`
+	Outcome        string           `json:"outcome"`
+	ActionRevision *int64           `json:"actionRevision,omitempty"`
+	Action         *string          `json:"action,omitempty"`
+	SnoozedUntil   *DomainTimestamp `json:"snoozedUntil,omitempty"`
+	Error          *string          `json:"error,omitempty"`
+	PageId         DomainId         `json:"pageId"`
+	Title          string           `json:"title"`
+}
+type ServiceReminderState struct {
+	Rules      []ServiceReminderRule      `json:"rules"`
+	Inbox      []ServiceReminderInboxItem `json:"inbox"`
+	More       bool                       `json:"more"`
+	NextCursor *string                    `json:"nextCursor,omitempty"`
+}
+type ServiceReminderSchedule struct {
+	Version              int64                     `json:"version"`
+	Epoch                DomainId                  `json:"epoch"`
+	Generation           int64                     `json:"generation"`
+	WorkspaceId          DomainId                  `json:"workspaceId"`
+	Active               bool                      `json:"active"`
+	Rules                []ServiceReminderRule     `json:"rules"`
+	Overrides            []ServiceReminderDelivery `json:"overrides"`
+	AuthorizationRequest *DomainId                 `json:"authorizationRequest,omitempty"`
+}
+type ServiceReminderReceipt struct {
+	Version        int64                     `json:"version"`
+	Epoch          DomainId                  `json:"epoch"`
+	Generation     int64                     `json:"generation"`
+	Permission     string                    `json:"permission"`
+	AcknowledgedAt DomainTimestamp           `json:"acknowledgedAt"`
+	Deliveries     []ServiceReminderDelivery `json:"deliveries"`
+	Error          *string                   `json:"error,omitempty"`
+}
+type ServiceReminderDesktopStatus struct {
+	Available    bool    `json:"available"`
+	Enabled      bool    `json:"enabled"`
+	Registration string  `json:"registration"`
+	Publication  string  `json:"publication"`
+	Permission   string  `json:"permission"`
+	Epoch        string  `json:"epoch"`
+	Generation   int64   `json:"generation"`
+	Error        *string `json:"error,omitempty"`
 }
 type ServiceMeetingRetentionCategory struct {
 	Id         string `json:"id"`
