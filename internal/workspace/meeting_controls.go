@@ -59,6 +59,7 @@ type retentionMemory struct{ ID, Page, Revision, PageRevision, Status string }
 type retentionState struct {
 	Meeting, Page, Revision, PageRevision, Audio string
 	RecordID, RecordRevision                     string
+	CollectionID, CollectionRevision             string
 	OtherAudioReferences                         int
 	Segments                                     []MeetingEvidence
 	Proposals                                    []string
@@ -91,7 +92,7 @@ func readMeetingRetention(ctx context.Context, q querier, meeting string) (reten
 	if err != nil {
 		return s, err
 	}
-	err = q.QueryRowContext(ctx, "SELECT id,revision FROM records WHERE page_id=?", s.Page).Scan(&s.RecordID, &s.RecordRevision)
+	err = q.QueryRowContext(ctx, "SELECT r.id,r.revision,c.id,c.revision FROM records r JOIN collections c ON c.id=r.collection_id WHERE r.page_id=?", s.Page).Scan(&s.RecordID, &s.RecordRevision, &s.CollectionID, &s.CollectionRevision)
 	if err != nil && !errors.Is(err, sql.ErrNoRows) {
 		return s, err
 	}
@@ -179,7 +180,7 @@ func retentionAvailable(s retentionState, selected []string) bool {
 func retentionGuards(s retentionState, selected []string) []contracts.ServiceExpectedRevision {
 	guards := []contracts.ServiceExpectedRevision{required("page", s.Page, s.PageRevision), required("meeting", s.Meeting, s.Revision)}
 	if s.RecordID != "" {
-		guards = append(guards, required("record", s.RecordID, s.RecordRevision))
+		guards = append(guards, required("record", s.RecordID, s.RecordRevision), required("collection", s.CollectionID, s.CollectionRevision))
 	}
 	seen := map[string]bool{"page:" + s.Page: true}
 	for _, choice := range selected {
@@ -198,7 +199,16 @@ func retentionGuards(s retentionState, selected []string) []contracts.ServiceExp
 			}
 		}
 	}
-	return guards
+	unique := []contracts.ServiceExpectedRevision{}
+	identities := map[string]bool{}
+	for _, guard := range guards {
+		key := guardKey(guard.Target.EntityType, string(guard.Target.EntityId))
+		if !identities[key] {
+			unique = append(unique, guard)
+			identities[key] = true
+		}
+	}
+	return unique
 }
 func previewMeetingRetention(ctx context.Context, k *Kernel, e contracts.ServiceExecutionContext, r map[string]any) (any, error) {
 	if err := requireOwnerScope(k, e); err != nil {

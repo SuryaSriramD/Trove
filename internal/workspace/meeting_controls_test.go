@@ -276,3 +276,21 @@ func TestMeetingRetentionArchivesProposalsAndForgetsMemoryWithoutErasingEvidence
 		t.Fatal("retention altered unrelated transcript", current, err)
 	}
 }
+
+func TestMeetingRetentionGuardsRecordOwnedMeeting(t *testing.T) {
+	k, e := testKernel(t)
+	f := newDatabase(t, k, e)
+	record, page := newRecord(t, k, e, f, "Meeting record")
+	prepared := stageTestFile(t, k, e, "fixture audio")
+	file := str(prepared["fileId"])
+	meeting := NewID()
+	testOK(t, dbBatch(t, k, e, []any{map[string]any{"kind": "file.attach", "fileId": file, "pageId": page, "ingestHandle": prepared["ingestHandle"]}}, "page", page, "record", record, "collection", f.collection, "file", file))
+	testOK(t, dbBatch(t, k, e, []any{map[string]any{"kind": "meeting.create", "meetingId": meeting, "pageId": page, "recordingFileId": file, "startedAt": now()}}, "page", page, "record", record, "collection", f.collection, "file", file, "meeting", meeting))
+	p := retentionPreviewTest(t, k, e, meeting, "audio", "indexes")
+	testOK(t, testDispatch(t, k, e, "batch", testRequest(k, e, []any{p.Command}, p.ExpectedRevisions...)))
+	var recording *string
+	k.db.QueryRow("SELECT recording_file_id FROM meetings WHERE id=?", meeting).Scan(&recording)
+	if recording != nil {
+		t.Fatal("record-owned meeting retention failed")
+	}
+}
