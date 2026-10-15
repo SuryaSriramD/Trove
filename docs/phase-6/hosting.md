@@ -14,6 +14,8 @@ Use `--create` for a new workspace. The token file is generated privately and is
 
 `--native-bundle` and `--models` attach existing verified local helpers and installed model packs to the worker queue. OCR uses the independently verified optional image helper. Missing packs do not affect ordinary editing. Remote browser capture uses the browser's file picker/upload; the host exposes no remote microphone, arbitrary filesystem picker or provider approval capability. Vendor providers and native desktop workspace switching remain desktop-only. General interactive model generation uses the desktop adapter; hosted background worker operations use explicitly configured installed packs.
 
+Explicitly activated personal reviews run on the host while it owns the workspace. Generative reviews use the selected installed instruction pack through the same bounded review service as the desktop; a missing pack leaves a visible failed run with retry guidance. Cancellation, changed evidence and host shutdown stop generation. Generated text and actions remain proposals until the owner reviews and approves them through the authenticated UI. Restart does not silently repeat an interrupted generation; use the review retry control while its evidence is still current.
+
 ## Moving ownership
 
 Stop the current owner, then run:
