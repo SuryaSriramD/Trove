@@ -332,11 +332,6 @@ func (a *App) connectorDispatch(method string, raw json.RawMessage) string {
 			if !ok {
 				return connectorError(connectors.Unsupported("file acquisition"))
 			}
-			// Gmail attachment provenance must retain its external-AI restriction
-			// across attachment moves before this native ingress is exposed.
-			if account.Kind == connectors.Gmail {
-				return errorEnvelope("SCOPE_DENIED", "Gmail attachment acquisition is awaiting provenance integration")
-			}
 			if !connectorAcquisitionAllowed(account.Kind, fresh, r.RemoteID) {
 				return errorEnvelope("SCOPE_DENIED", "Choose a file from the authenticated source preview")
 			}
