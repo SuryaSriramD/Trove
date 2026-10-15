@@ -112,6 +112,25 @@ func (k *Kernel) parseImportPlan(ctx context.Context, p *ImportPlan) error {
 			_ = json.Unmarshal(b, &manifest)
 		}
 	}
+	canonicalIdentities := map[string]string{}
+	retainedMappings := map[string]portableMapping{}
+	if manifest.Format == "trove-portable" {
+		var err error
+		retainedMappings, err = retainedPortableMappings(ctx, k.db, p)
+		if err != nil {
+			return err
+		}
+		for _, page := range manifest.Pages {
+			if page.CanonicalPage.Id != "" {
+				canonicalIdentities[page.Path] = portableSourceKey("page", string(page.CanonicalPage.Id))
+			}
+		}
+		for _, collection := range manifest.Collections {
+			if collection.ID != "" {
+				canonicalIdentities[collection.Path] = portableSourceKey("collection", collection.ID)
+			}
+		}
+	}
 	initialPages := map[string]string{}
 	for _, item := range p.Items {
 		initialPages[item.Locator] = item.PageID
@@ -174,6 +193,9 @@ func (k *Kernel) parseImportPlan(ctx context.Context, p *ImportPlan) error {
 			_ = json.Unmarshal(b, &manifest)
 		}
 		if item.PageID != "" {
+			if identity := canonicalIdentities[item.Locator]; identity != "" {
+				item.IdentityKind, item.ExternalID = "external_id", identity
+			}
 			if item.IdentityKind == "" {
 				item.IdentityKind, item.ExternalID = importIdentity(item.Locator)
 			}
@@ -188,6 +210,12 @@ func (k *Kernel) parseImportPlan(ctx context.Context, p *ImportPlan) error {
 			seenIDs[key] = true
 			var id, local, hash, revision string
 			err := k.db.QueryRowContext(ctx, `SELECT m.id,m.local_id,m.base_content_hash,COALESCE(p.revision,'0') FROM import_mappings m LEFT JOIN pages p ON p.id=m.local_id WHERE m.workspace_id=? AND m.source_system=? AND m.source_namespace=? AND m.external_kind='page' AND m.identity_kind=? AND m.identity_value=?`, k.id, importItemSourceSystem(p, item), p.Namespace, item.IdentityKind, item.ExternalID).Scan(&id, &local, &hash, &revision)
+			if retained, ok := retainedMappings[canonicalIdentities[item.Locator]]; ok {
+				// Keep the exact historic mapping address; the explicit canonical
+				// key above has already prevented rendition identity collisions.
+				id, local, hash, revision, err = retained.ID, retained.Page, retained.Hash, retained.Revision, nil
+				item.IdentityKind, item.ExternalID = retained.IdentityKind, retained.IdentityValue
+			}
 			if err == nil {
 				item.MappingID = id
 				item.PageID = local
