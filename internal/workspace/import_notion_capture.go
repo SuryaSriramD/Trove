@@ -223,6 +223,9 @@ func (k *Kernel) captureNotionObject(ctx context.Context, s *NotionCapture, p *I
 		item.Title = title
 		item.ExternalID = t.Kind + ":" + t.ID
 		item.IdentityKind = "external_id"
+		if _, known, _ := notionTrashStatus(response); known {
+			item.PageSourceScope = notionObjectScope(t.Kind, t.ID)
+		}
 		item.Blocks = []ImportBlock{}
 		p.Items = append(p.Items, item)
 		if t.Kind == "database" {
