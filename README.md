@@ -1,10 +1,8 @@
 # Trove
 
-The active work is the [C0–C8 completion programme](docs/completion/README.md), tracked against [51 backlog items](docs/completion/registry.json) and the [current PRD/TRD coverage overlay](docs/completion/requirements-reconciliation.md). Core macOS product sources and substantial P1/P2 packages are implemented, with scoped regression, native-worker and model evidence. **No current public release or Windows/Linux release is qualified.**
+**Start with [PROGRESS.md](PROGRESS.md)** for the single current record of project progress: completed development, every original backlog item, newly selected features, current candidate results, blockers, next actions, decisions and the development log.
 
-The optional 7B local pack passes [14 fixed AI mode tasks](docs/completion/ai-modes.md) and separate memory/authority cases; broader quality remains open. Actual device permissions, live provider/Notion accounts, independent clean installation/restore, signing and candidate performance remain explicit gates. Windows new-workspace creation and recovery operations currently stop before data writes because their durability protocol remains unavailable.
-
-The latest packaged [macOS development candidate e481c6a](docs/completion/development-candidate-e481c6a.md) passes its recorded regression suites, packaged data journeys and narrow native support-export checks. The earlier be6fc81 search failure has a separate source repair and native retest; its 8.4-second startup failure remains unexplained. The [October 7 continuation](docs/completion/remaining-plan-execution.md) adds qualification, benchmark, diagnostics, signing and expanded-evaluation source packages. Those later sources have not yet been frozen into a new qualified application.
+Update that file as work progresses, following [AGENTS.md](AGENTS.md). The existing completion documents are historical or technical references; the [machine registry](docs/completion/registry.json), requirement mappings and immutable qualification evidence remain supporting inputs, not competing current progress dashboards.
 
 ## Historical previews
 

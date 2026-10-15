@@ -1,5 +1,7 @@
 # Remaining-work implementation checkpoint — 9 October 2026 UTC
 
+> Historical checkpoint. The single current progress record is [PROGRESS.md](../../PROGRESS.md). Preserve this report as evidence of its dated candidate; add new development updates to the tracker.
+
 Execution dates and times in this checkpoint use UTC. The tested application source is b0ab2a4; the later documentation-publication commit does not change that frozen identity.
 
 This continues the accepted C0–C8 plan. The 51 backlog acceptance statements remain binding. The registry still records **34 implemented, 11 in progress, five open and one awaiting research** at their stated implementation scope. These counts do not mean release readiness. No platform/tier is qualified.

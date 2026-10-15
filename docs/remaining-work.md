@@ -1,5 +1,7 @@
 # Trove remaining work
 
+> Historical audit and acceptance definitions. Use [PROGRESS.md](../PROGRESS.md) for current task status and all development updates. The original item IDs and acceptance wording below remain reference inputs for qualification tooling.
+
 Audit baseline: 1 October 2026. Requirements: Trove PRD and TRD version 3.1. Audited application: Phase 6 development preview 0.6.0, built at build/phase6-preview-1/Trove.app.
 
 This backlog records the remaining work identified by the code, requirements, and release-evidence audit. Trove has a substantial working foundation, but P0 and P1 are not yet fully satisfied. Completing development phases and passing the current tests do not establish complete product acceptance. The immediate objective is reliable everyday use, with content preservation and recovery verified before further feature expansion.

@@ -1,6 +1,8 @@
 # Trove completion programme
 
-This is the active C0–C8 implementation record. The original six phases remain historical. All 51 backlog acceptance criteria remain binding; implementation, targeted verification, and platform release qualification are recorded separately. No completion-phase label grants release approval.
+> Historical completion snapshot. Use [PROGRESS.md](../../PROGRESS.md) for all current progress, decisions, remaining tasks and development updates. The dated claims below are retained as history, not the latest state.
+
+This records the C0–C8 implementation programme at its historical checkpoint. The original six phases remain historical. All 51 backlog acceptance criteria remain binding; implementation, targeted verification, and platform release qualification are recorded separately. No completion-phase label grants release approval.
 
 Baseline source commit: `632d0cd0141dc2dcdc7922274757e10083623616`. Integration branch: `integration`. Editor, recovery and native/tooling work use separate managed worktrees. Shared schema sources are authoritative; regenerate Go and TypeScript consumers together.
 
@@ -20,7 +22,7 @@ Baseline source commit: `632d0cd0141dc2dcdc7922274757e10083623616`. Integration 
 
 C1 prevention work precedes P0 qualification. C2 editor, databases, recovery, retrieval and audio can proceed independently after shared interfaces are agreed. P1 and P2 work do not block the P0 candidate. Windows and Linux each require their own candidate and clean-install evidence.
 
-## Current checkpoint
+## Historical checkpoint — 7 October 2026
 
 The [7 October continuation](remaining-plan-execution.md) records new qualification, performance, diagnostics, signing and expanded-evaluation work, plus Linux process-domain, platform publisher and recovery-publication foundations. Integrated source is `28da3df`; these packages are later than the latest packaged application and do not qualify it retroactively. The complete 24-case P0 AI retry has **21 passes and three unresolved quality failures**; all cases preserve canonical content.
 
@@ -53,7 +55,7 @@ The [60-launch instrumented startup investigation](startup-investigation.md) did
 
 The research report has not been supplied. A separate clean Mac is confirmed unavailable. Windows/Linux environments, authorized datasets, live integration accounts, reachable HTTPS and Apple signing access have not been established. The earlier expanded 7B disk failure is preserved; after storage headroom recovered, a new full run completed with three quality failures. Future runs still require the same storage preflight. Independent implementation can continue. No credentials belong in this record.
 
-## Item index
+## Historical item index
 
 | Item | Owners | Phases | Implementation |
 | --- | --- | --- | --- |
