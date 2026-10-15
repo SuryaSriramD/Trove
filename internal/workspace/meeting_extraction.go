@@ -65,7 +65,7 @@ func init() {
 		if err != nil {
 			return nil, err
 		}
-		rows, err := k.db.QueryContext(ctx, "SELECT "+extractionColumns+" FROM meeting_extraction_items WHERE meeting_id=? ORDER BY created_at,proposal_id,item_id", source.MeetingID)
+		rows, err := k.db.QueryContext(ctx, "SELECT "+extractionColumns+" FROM meeting_extraction_items WHERE meeting_id=? AND (applied_hash<>'' OR proposal_id NOT IN(SELECT draft_id FROM meeting_archived_proposals_v1)) ORDER BY created_at,proposal_id,item_id", source.MeetingID)
 		if err != nil {
 			return nil, err
 		}
@@ -112,7 +112,7 @@ func (k *Kernel) prepareMeetingExtraction(ctx context.Context, e contracts.Servi
 	body := strings.Join(parts, "\n\n")
 	if draft := str(r["draftId"]); draft != "" {
 		var meeting, hash, raw string
-		if err = k.db.QueryRowContext(ctx, "SELECT meeting_id,evidence_hash,body_json FROM meeting_intelligence WHERE id=?", draft).Scan(&meeting, &hash, &raw); err != nil {
+		if err = k.db.QueryRowContext(ctx, "SELECT meeting_id,evidence_hash,body_json FROM meeting_intelligence WHERE id=? AND id NOT IN(SELECT draft_id FROM meeting_archived_proposals_v1)", draft).Scan(&meeting, &hash, &raw); err != nil {
 			return out, err
 		}
 		if meeting != source.MeetingID {
@@ -144,6 +144,13 @@ func (k *Kernel) prepareMeetingExtraction(ctx context.Context, e contracts.Servi
 		out.RecordID = NewID()
 	}
 	err = k.write(ctx, func(tx *sql.Tx) error {
+		var archived int
+		if err := tx.QueryRowContext(ctx, "SELECT count(*) FROM meeting_archived_proposals_v1 WHERE draft_id=?", proposal).Scan(&archived); err != nil {
+			return err
+		}
+		if archived != 0 {
+			return Fail("CONFLICT", "Generated proposal was archived during review")
+		}
 		if err := k.authorizePage(ctx, tx, e, source.PageID); err != nil {
 			return err
 		}
@@ -204,6 +211,13 @@ func (k *Kernel) createMeetingExtraction(ctx context.Context, e contracts.Servic
 		result["reused"] = true
 		return result, nil
 	}
+	var archived int
+	if err = k.db.QueryRowContext(ctx, "SELECT count(*) FROM meeting_archived_proposals_v1 WHERE draft_id=?", x.ProposalID).Scan(&archived); err != nil {
+		return nil, err
+	}
+	if archived != 0 {
+		return nil, Fail("CONFLICT", "Generated proposal is archived")
+	}
 	if source.EvidenceHash != x.EvidenceHash {
 		return nil, Fail("STALE_CITATION", "Transcript changed; review a new extraction")
 	}
@@ -261,6 +275,13 @@ func recordMeetingExtraction(m *Mutation, c map[string]any) error {
 	}
 	if x.AppliedHash != "" {
 		return Fail("ALREADY_COMMITTED", "Extraction was already applied")
+	}
+	var archived int
+	if err = m.Tx.QueryRowContext(m.Context, "SELECT count(*) FROM meeting_archived_proposals_v1 WHERE draft_id=?", x.ProposalID).Scan(&archived); err != nil {
+		return err
+	}
+	if archived != 0 {
+		return Fail("CONFLICT", "Generated proposal was archived during review")
 	}
 	var sourcePage, title string
 	if err = m.Tx.QueryRowContext(m.Context, "SELECT page_id FROM meetings WHERE id=?", x.MeetingID).Scan(&sourcePage); err != nil {

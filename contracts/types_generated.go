@@ -1338,6 +1338,20 @@ type ServiceRecordMeetingExtraction struct {
 	Title      string   `json:"title"`
 	Body       string   `json:"body"`
 }
+type ServiceCorrectMeetingSegment struct {
+	Kind      string   `json:"kind"`
+	MeetingId DomainId `json:"meetingId"`
+	SegmentId DomainId `json:"segmentId"`
+	Text      string   `json:"text"`
+	StartMs   int64    `json:"startMs"`
+	EndMs     int64    `json:"endMs"`
+}
+type ServiceApplyMeetingRetention struct {
+	Kind        string   `json:"kind"`
+	MeetingId   DomainId `json:"meetingId"`
+	Selected    []string `json:"selected"`
+	PreviewHash string   `json:"previewHash"`
+}
 type ServiceCreateMeeting struct {
 	Kind            string          `json:"kind"`
 	MeetingId       DomainId        `json:"meetingId"`
@@ -1531,6 +1545,8 @@ func (ServicePromoteTask) isServiceCommand()             {}
 func (ServiceSetTaskStatus) isServiceCommand()           {}
 func (ServiceAttachFile) isServiceCommand()              {}
 func (ServiceRecordMeetingExtraction) isServiceCommand() {}
+func (ServiceCorrectMeetingSegment) isServiceCommand()   {}
+func (ServiceApplyMeetingRetention) isServiceCommand()   {}
 func (ServiceCreateMeeting) isServiceCommand()           {}
 func (ServiceAppendTranscript) isServiceCommand()        {}
 func (ServiceFinalizeMeeting) isServiceCommand()         {}
@@ -1763,6 +1779,22 @@ func (v *ServiceCommand) UnmarshalJSON(data []byte) error {
 		v.Value = result
 		return nil
 	}
+	if matchesVariant(fields, []string{"kind", "meetingId", "segmentId", "text", "startMs", "endMs"}, map[string]string{"kind": "\"meeting.correctSegment\""}, map[string][]string{}, []string{"kind", "meetingId", "segmentId", "text", "startMs", "endMs"}) {
+		var result ServiceCorrectMeetingSegment
+		if err := json.Unmarshal(data, &result); err != nil {
+			return err
+		}
+		v.Value = result
+		return nil
+	}
+	if matchesVariant(fields, []string{"kind", "meetingId", "selected", "previewHash"}, map[string]string{"kind": "\"meeting.retention.apply\""}, map[string][]string{}, []string{"kind", "meetingId", "selected", "previewHash"}) {
+		var result ServiceApplyMeetingRetention
+		if err := json.Unmarshal(data, &result); err != nil {
+			return err
+		}
+		v.Value = result
+		return nil
+	}
 	if matchesVariant(fields, []string{"kind", "meetingId", "pageId", "recordingFileId", "startedAt"}, map[string]string{"kind": "\"meeting.create\""}, map[string][]string{}, []string{"kind", "meetingId", "pageId", "recordingFileId", "startedAt"}) {
 		var result ServiceCreateMeeting
 		if err := json.Unmarshal(data, &result); err != nil {
@@ -1974,6 +2006,31 @@ func (v *ServiceCommand) UnmarshalJSON(data []byte) error {
 	return fmt.Errorf("unknown or incomplete ServiceCommand variant")
 }
 
+type ServiceMeetingRetentionPreviewRequest struct {
+	ContractVersion int64    `json:"contractVersion"`
+	RequestId       DomainId `json:"requestId"`
+	WorkspaceId     DomainId `json:"workspaceId"`
+	MeetingId       DomainId `json:"meetingId"`
+	Selected        []string `json:"selected"`
+}
+type ServiceMeetingRetentionCategory struct {
+	Id         string `json:"id"`
+	Count      int64  `json:"count"`
+	Action     string `json:"action"`
+	Detail     string `json:"detail"`
+	Selectable bool   `json:"selectable"`
+}
+type ServiceMeetingRetentionPreview struct {
+	Version           int64                             `json:"version"`
+	MeetingId         DomainId                          `json:"meetingId"`
+	PageId            DomainId                          `json:"pageId"`
+	Categories        []ServiceMeetingRetentionCategory `json:"categories"`
+	Selected          []string                          `json:"selected"`
+	ExpectedRevisions []ServiceExpectedRevision         `json:"expectedRevisions"`
+	Command           ServiceApplyMeetingRetention      `json:"command"`
+	Warnings          []string                          `json:"warnings"`
+	CanApply          bool                              `json:"canApply"`
+}
 type ServiceMeetingExtractionResult struct {
 	Version      int64            `json:"version"`
 	ProposalId   DomainId         `json:"proposalId"`
