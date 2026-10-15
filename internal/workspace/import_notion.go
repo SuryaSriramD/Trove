@@ -650,6 +650,9 @@ func finishNotionCapture(ctx context.Context, k *Kernel, e contracts.ServiceExec
 			}
 		}
 		p.NormalizerVersion = importNormalizerVersion
+		if err := reuseImportDatabaseIdentities(ctx, tx, &p); err != nil {
+			return err
+		}
 		for i := range p.Items {
 			if err := prepareImportMerge(ctx, tx, &p, &p.Items[i]); err != nil {
 				return err

@@ -28,6 +28,7 @@ const importSchema = `
 CREATE TABLE IF NOT EXISTS import_runs(id TEXT PRIMARY KEY,plan_hash TEXT NOT NULL,plan_json TEXT NOT NULL CHECK(json_valid(plan_json)),created_at TEXT NOT NULL,updated_at TEXT NOT NULL);
 CREATE TABLE IF NOT EXISTS import_mapping_state(mapping_id TEXT PRIMARY KEY REFERENCES import_mappings(id),local_revision TEXT NOT NULL);
 CREATE TABLE IF NOT EXISTS import_baselines(mapping_id TEXT PRIMARY KEY REFERENCES import_mappings(id),normalizer_version INTEGER NOT NULL,snapshot_json TEXT NOT NULL CHECK(json_valid(snapshot_json)),source_revision TEXT NOT NULL,raw_file_id TEXT NOT NULL REFERENCES files(id),import_run_id TEXT NOT NULL REFERENCES import_runs(id));
+CREATE TABLE IF NOT EXISTS import_entity_ids(source_system TEXT NOT NULL,source_namespace TEXT NOT NULL,entity_kind TEXT NOT NULL,source_identity TEXT NOT NULL,local_id TEXT NOT NULL,PRIMARY KEY(source_system,source_namespace,entity_kind,source_identity));
 `
 const maxImportEntries = 10000
 const maxImportEntryBytes int64 = 64 * 1024 * 1024
@@ -46,38 +47,42 @@ type ImportBlock struct {
 	Data map[string]any `json:"data"`
 }
 type ImportItem struct {
-	Merge              *ImportMergeReview      `json:"merge,omitempty"`
-	Incoming           *ImportSnapshot         `json:"incomingSnapshot,omitempty"`
-	SourceSystem       string                  `json:"sourceSystem,omitempty"`
-	DisplayPreferences *PageDisplayPreferences `json:"displayPreferences,omitempty"`
-	Locator            string                  `json:"sourceLocator"`
-	Kind               string                  `json:"kind"`
-	Outcome            string                  `json:"outcome"`
-	Reason             string                  `json:"reason"`
-	RawFileID          string                  `json:"retainedFileId,omitempty"`
-	Hash               string                  `json:"hash,omitempty"`
-	Size               int64                   `json:"sizeBytes"`
-	PageID             string                  `json:"pageId,omitempty"`
-	ParentID           string                  `json:"parentPageId,omitempty"`
-	Title              string                  `json:"title,omitempty"`
-	ExternalID         string                  `json:"externalId,omitempty"`
-	IdentityKind       string                  `json:"identityKind,omitempty"`
-	MappingID          string                  `json:"mappingId,omitempty"`
-	ExpectedRevision   string                  `json:"expectedRevision,omitempty"`
-	Conflict           string                  `json:"conflict,omitempty"`
-	Choice             string                  `json:"choice,omitempty"`
-	Committed          bool                    `json:"committed"`
-	Blocks             []ImportBlock           `json:"blocks,omitempty"`
-	BlockParents       map[string]string       `json:"blockParents,omitempty"`
-	BlockSources       map[string]string       `json:"blockSources,omitempty"`
-	Columns            []ImportColumn          `json:"columns,omitempty"`
-	Cells              []string                `json:"cells,omitempty"`
-	CollectionID       string                  `json:"collectionId,omitempty"`
-	RecordID           string                  `json:"recordId,omitempty"`
-	CSVSource          string                  `json:"csvSource,omitempty"`
-	Provenance         any                     `json:"provenance,omitempty"`
+	MergeGuards        map[string]string          `json:"mergeGuards,omitempty"`
+	ResolvedFields     map[string]json.RawMessage `json:"resolvedFields,omitempty"`
+	Merge              *ImportMergeReview         `json:"merge,omitempty"`
+	Incoming           *ImportSnapshot            `json:"incomingSnapshot,omitempty"`
+	SourceSystem       string                     `json:"sourceSystem,omitempty"`
+	DisplayPreferences *PageDisplayPreferences    `json:"displayPreferences,omitempty"`
+	Locator            string                     `json:"sourceLocator"`
+	Kind               string                     `json:"kind"`
+	Outcome            string                     `json:"outcome"`
+	Reason             string                     `json:"reason"`
+	RawFileID          string                     `json:"retainedFileId,omitempty"`
+	Hash               string                     `json:"hash,omitempty"`
+	Size               int64                      `json:"sizeBytes"`
+	PageID             string                     `json:"pageId,omitempty"`
+	ParentID           string                     `json:"parentPageId,omitempty"`
+	Title              string                     `json:"title,omitempty"`
+	ExternalID         string                     `json:"externalId,omitempty"`
+	IdentityKind       string                     `json:"identityKind,omitempty"`
+	MappingID          string                     `json:"mappingId,omitempty"`
+	ExpectedRevision   string                     `json:"expectedRevision,omitempty"`
+	Conflict           string                     `json:"conflict,omitempty"`
+	Choice             string                     `json:"choice,omitempty"`
+	Committed          bool                       `json:"committed"`
+	Blocks             []ImportBlock              `json:"blocks,omitempty"`
+	BlockParents       map[string]string          `json:"blockParents,omitempty"`
+	BlockSources       map[string]string          `json:"blockSources,omitempty"`
+	Columns            []ImportColumn             `json:"columns,omitempty"`
+	Cells              []string                   `json:"cells,omitempty"`
+	CollectionID       string                     `json:"collectionId,omitempty"`
+	RecordID           string                     `json:"recordId,omitempty"`
+	CSVSource          string                     `json:"csvSource,omitempty"`
+	Provenance         any                        `json:"provenance,omitempty"`
 }
 type ImportPlan struct {
+	EntityIdentities        []ImportEntityIdentity  `json:"entityIdentities,omitempty"`
+	TypedDatabaseMerge      bool                    `json:"typedDatabaseMerge,omitempty"`
 	NormalizerVersion       int                     `json:"normalizerVersion,omitempty"`
 	NotionGraph             bool                    `json:"notionGraph,omitempty"`
 	NotionKeepGraph         bool                    `json:"notionKeepGraph,omitempty"`

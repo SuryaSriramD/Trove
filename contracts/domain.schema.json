@@ -4709,6 +4709,9 @@
         "version": {
           "const": 1
         },
+        "sourceRevision": {
+          "type": "string"
+        },
         "fields": {
           "type": "object",
           "propertyNames": {

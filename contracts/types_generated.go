@@ -886,9 +886,10 @@ type DomainPageFreshness struct {
 	Review          *DomainHumanReviewEvent       `json:"review,omitempty"`
 }
 type DomainImportNormalizedSnapshot struct {
-	Version      int64                      `json:"version"`
-	Fields       map[string]json.RawMessage `json:"fields"`
-	BlockSources map[string]json.RawMessage `json:"blockSources"`
+	Version        int64                      `json:"version"`
+	SourceRevision *string                    `json:"sourceRevision,omitempty"`
+	Fields         map[string]json.RawMessage `json:"fields"`
+	BlockSources   map[string]json.RawMessage `json:"blockSources"`
 }
 type ServiceEntityRef struct {
 	EntityType string   `json:"entityType"`

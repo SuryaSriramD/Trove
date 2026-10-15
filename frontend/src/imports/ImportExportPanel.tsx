@@ -38,6 +38,20 @@ type Item = {
 type Presence = { present: boolean; value?: unknown };
 const describeField = (value: Presence) =>
   value.present ? JSON.stringify(value.value, null, 2) : "(absent)";
+function describeImportPath(path: string, item: Item, items: Item[]) {
+  const parts = path.split("/");
+  if (parts[1] === "collectionTitle") return "Collection title";
+  if (parts[1] !== "schema" && parts[1] !== "values") return path;
+  const property = parts[1] === "schema" ? parts[2] : parts[3];
+  const schema = item.merge?.fields.find((field) => field.path === `/schema/${property}`);
+  const definition = (schema?.local.present ? schema.local.value : schema?.incoming.value) as { name?: string } | undefined;
+  const name = definition?.name ?? property;
+  if (parts[1] === "schema") return `Property: ${name}`;
+  const record = item.merge?.fields.find((field) => field.path === `/records/${parts[2]}`);
+  const page = record?.local.present ? record.local.value : record?.incoming.value;
+  const title = items.find((candidate) => candidate.pageId === page)?.title ?? parts[2];
+  return `${title} · ${name}`;
+}
 function EditedImportField({
   value,
   disabled,
@@ -96,6 +110,7 @@ function EditedImportField({
 }
 type Plan = {
   notionGraph?: boolean;
+  typedDatabaseMerge?: boolean;
   jobId?: string;
   planId: string;
   planHash: string;
@@ -574,7 +589,8 @@ export function ImportExportPanel({
                               .map((field) => (
                                 <tr key={field.path}>
                                   <td>
-                                    {field.path}
+                                    {describeImportPath(field.path, item, plan.items)}
+                                    {field.path.startsWith("/schema/") || field.path.startsWith("/values/") ? <small className="import-field-path">{field.path}</small> : null}
                                     <br />
                                     {field.outcome}
                                   </td>
@@ -676,7 +692,7 @@ export function ImportExportPanel({
                       onChange={(e) =>
                         configure({
                           choices:
-                            plan.notionGraph && notionGraphKinds.has(item.kind)
+                            (plan.notionGraph || plan.typedDatabaseMerge) && notionGraphKinds.has(item.kind) && e.target.value !== "merge"
                               ? plan.items
                                   .filter((i) => notionGraphKinds.has(i.kind))
                                   .map((i) => ({
