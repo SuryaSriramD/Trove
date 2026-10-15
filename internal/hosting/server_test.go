@@ -198,7 +198,7 @@ func TestHostFreshnessAndGroupedUndoWorkflow(t *testing.T) {
 }
 func TestHostSharedRoutesRetainServiceValidationAndDesktopBoundary(t *testing.T) {
 	h, server := newHost(t)
-	for _, method := range []string{"recordLayouts.get", "scheduling.preview", "skills.preview", "review.propose", "review.apply", "review.cancel", "review.retry", "meetings.prepareExtraction", "meetings.extractions"} {
+	for _, method := range []string{"tasks.detachPreview", "recordLayouts.get", "scheduling.preview", "skills.preview", "review.propose", "review.apply", "review.cancel", "review.retry", "meetings.prepareExtraction", "meetings.extractions"} {
 		t.Run(method, func(t *testing.T) {
 			response := hostCall(t, h, server, method, nil)
 			failure, _ := response["error"].(map[string]any)

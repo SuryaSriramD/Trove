@@ -767,8 +767,290 @@
       ],
       "additionalProperties": false
     },
+    "TaskFacetBinding": {
+      "type": "object",
+      "properties": {
+        "statusPropertyId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "duePropertyId": {
+          "oneOf": [
+            {
+              "$ref": "domain.schema.json#/$defs/Id"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "required": [
+        "statusPropertyId",
+        "duePropertyId"
+      ],
+      "additionalProperties": false
+    },
+    "TaskDetachChoice": {
+      "type": "object",
+      "properties": {
+        "blockId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "action": {
+          "type": "string",
+          "enum": [
+            "convert",
+            "remove"
+          ]
+        }
+      },
+      "required": [
+        "blockId",
+        "action"
+      ],
+      "additionalProperties": false
+    },
+    "TaskDetachOccurrence": {
+      "type": "object",
+      "properties": {
+        "blockId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "pageId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "pageTitle": {
+          "type": "string"
+        },
+        "trashed": {
+          "type": "boolean"
+        },
+        "action": {
+          "type": "string",
+          "enum": [
+            "convert",
+            "remove"
+          ]
+        },
+        "canRemove": {
+          "type": "boolean"
+        },
+        "removalReason": {
+          "type": "string"
+        },
+        "text": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "blockId",
+        "pageId",
+        "pageTitle",
+        "trashed",
+        "action",
+        "canRemove",
+        "removalReason",
+        "text"
+      ],
+      "additionalProperties": false
+    },
+    "TaskDetachReminder": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "revision": {
+          "$ref": "domain.schema.json#/$defs/Revision"
+        },
+        "configuredEnabled": {
+          "type": "boolean"
+        },
+        "eligibleBefore": {
+          "type": "boolean"
+        },
+        "eligibleAfter": {
+          "type": "boolean"
+        },
+        "description": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "revision",
+        "configuredEnabled",
+        "eligibleBefore",
+        "eligibleAfter",
+        "description"
+      ],
+      "additionalProperties": false
+    },
+    "TaskDetachPlan": {
+      "type": "object",
+      "properties": {
+        "version": {
+          "const": 1
+        },
+        "id": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "hash": {
+          "$ref": "domain.schema.json#/$defs/Hash"
+        },
+        "recordId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "pageId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "title": {
+          "type": "string"
+        },
+        "binding": {
+          "$ref": "#/$defs/TaskFacetBinding"
+        },
+        "reminders": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/TaskDetachReminder"
+          },
+          "maxItems": 1000
+        },
+        "occurrences": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/TaskDetachOccurrence"
+          },
+          "maxItems": 127
+        },
+        "requiredRevisions": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/ExpectedRevision"
+          },
+          "maxItems": 1000
+        }
+      },
+      "required": [
+        "version",
+        "id",
+        "hash",
+        "recordId",
+        "pageId",
+        "title",
+        "binding",
+        "reminders",
+        "occurrences",
+        "requiredRevisions"
+      ],
+      "additionalProperties": false
+    },
+    "TaskOccurrenceState": {
+      "type": "object",
+      "properties": {
+        "parentBlockId": {
+          "oneOf": [
+            {
+              "$ref": "domain.schema.json#/$defs/Id"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "sortKey": {
+          "type": "string",
+          "pattern": "^[0-9]{12}$"
+        },
+        "type": {
+          "type": "string",
+          "enum": [
+            "todo",
+            "paragraph"
+          ]
+        },
+        "schemaVersion": {
+          "const": 1
+        },
+        "data": {
+          "type": [
+            "object",
+            "array",
+            "string",
+            "number",
+            "integer",
+            "boolean",
+            "null"
+          ]
+        }
+      },
+      "required": [
+        "parentBlockId",
+        "sortKey",
+        "type",
+        "schemaVersion",
+        "data"
+      ],
+      "additionalProperties": false
+    },
     "JournalAction": {
       "oneOf": [
+        {
+          "type": "object",
+          "properties": {
+            "kind": {
+              "const": "task.facet.set"
+            },
+            "recordId": {
+              "$ref": "domain.schema.json#/$defs/Id"
+            },
+            "binding": {
+              "$ref": "#/$defs/TaskFacetBinding"
+            },
+            "attached": {
+              "type": "boolean"
+            }
+          },
+          "required": [
+            "kind",
+            "recordId",
+            "binding",
+            "attached"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "kind": {
+              "const": "task.occurrence.set"
+            },
+            "blockId": {
+              "$ref": "domain.schema.json#/$defs/Id"
+            },
+            "pageId": {
+              "$ref": "domain.schema.json#/$defs/Id"
+            },
+            "state": {
+              "oneOf": [
+                {
+                  "$ref": "#/$defs/TaskOccurrenceState"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            }
+          },
+          "required": [
+            "kind",
+            "blockId",
+            "pageId",
+            "state"
+          ],
+          "additionalProperties": false
+        },
         {
           "type": "object",
           "properties": {
@@ -3562,6 +3844,77 @@
       ],
       "additionalProperties": false
     },
+    "ApplyTaskDetach": {
+      "type": "object",
+      "properties": {
+        "kind": {
+          "const": "task.detach.apply"
+        },
+        "plan": {
+          "$ref": "#/$defs/TaskDetachPlan"
+        }
+      },
+      "required": [
+        "kind",
+        "plan"
+      ],
+      "additionalProperties": false
+    },
+    "SetTaskFacet": {
+      "type": "object",
+      "properties": {
+        "kind": {
+          "const": "task.facet.set"
+        },
+        "recordId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "binding": {
+          "$ref": "#/$defs/TaskFacetBinding"
+        },
+        "attached": {
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "kind",
+        "recordId",
+        "binding",
+        "attached"
+      ],
+      "additionalProperties": false
+    },
+    "SetTaskOccurrence": {
+      "type": "object",
+      "properties": {
+        "kind": {
+          "const": "task.occurrence.set"
+        },
+        "blockId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "pageId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "state": {
+          "oneOf": [
+            {
+              "$ref": "#/$defs/TaskOccurrenceState"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "required": [
+        "kind",
+        "blockId",
+        "pageId",
+        "state"
+      ],
+      "additionalProperties": false
+    },
     "ApplyOperation": {
       "type": "object",
       "properties": {
@@ -3885,6 +4238,15 @@
           "$ref": "#/$defs/SetRecordTrash"
         },
         {
+          "$ref": "#/$defs/ApplyTaskDetach"
+        },
+        {
+          "$ref": "#/$defs/SetTaskFacet"
+        },
+        {
+          "$ref": "#/$defs/SetTaskOccurrence"
+        },
+        {
           "$ref": "#/$defs/ApplyOperation"
         },
         {
@@ -3900,6 +4262,38 @@
           "$ref": "#/$defs/ApplyAutofill"
         }
       ]
+    },
+    "TaskDetachPreviewRequest": {
+      "type": "object",
+      "properties": {
+        "contractVersion": {
+          "const": 1
+        },
+        "requestId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "workspaceId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "recordId": {
+          "$ref": "domain.schema.json#/$defs/Id"
+        },
+        "choices": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/TaskDetachChoice"
+          },
+          "maxItems": 127
+        }
+      },
+      "required": [
+        "contractVersion",
+        "requestId",
+        "workspaceId",
+        "recordId",
+        "choices"
+      ],
+      "additionalProperties": false
     },
     "SchedulingPreviewRequest": {
       "type": "object",

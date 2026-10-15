@@ -1,3 +1,4 @@
+import { TaskDetachPanel } from "./TaskDetachPanel";
 import { useState } from "react";
 import { batch, pageGuards, type WorkspaceSnapshot } from "../api";
 import { clearProperty, guard, setProperty, setTaskDone, uniqueGuards } from "../database/service";
@@ -37,5 +38,6 @@ export function TaskEditor({ workspace: w, recordId, openPage, onCommitted, onEr
       <select aria-label={`Bind due property for ${page.title}`} value="" disabled={busy || readOnly} onChange={e => { const due = w.properties.find(p => p.id === e.target.value); if (due) void run(() => batch(w, [{ kind: "task.promote", recordId, statusPropertyId: status.id, duePropertyId: due.id }], uniqueGuards([...pageGuards(w, page), guard("property", status.id, status.revision), guard("property", due.id, due.revision)]))); }}>
         <option value="">No due property</option>{w.properties.filter(p => p.collectionId === record.collectionId && p.type === "date").map(p => <option key={p.id} value={p.id}>Use {p.name} for due</option>)}
       </select>}
+    <TaskDetachPanel workspace={w} recordId={recordId} title={page.title} onCommitted={onCommitted} onError={onError} disabled={busy || readOnly}/>
   </div>;
 }

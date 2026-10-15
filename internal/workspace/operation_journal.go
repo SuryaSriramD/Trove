@@ -46,6 +46,8 @@ func journalCurrent(ctx context.Context, q querier, action map[string]any) (jour
 	entry := journalEntry{}
 	kind := str(action["kind"])
 	switch kind {
+	case "task.facet.set", "task.occurrence.set":
+		return taskJournalCurrent(ctx, q, action)
 	case "collection.trash.set":
 		return collectionTrashCurrent(ctx, q, action)
 	case "page.trash.set":
@@ -192,6 +194,9 @@ func applyJournal(m *Mutation, id, label string, actions []map[string]any) error
 		}
 		entry.After = after.Before
 		entry.Tombstone = after.Tombstone
+		if str(action["kind"]) == "task.occurrence.set" && action["state"] == nil {
+			entry.Tombstone = string(m.touched[guardKey("block", str(action["blockId"]))].After)
+		}
 		if str(action["kind"]) == "collection.property.restore" {
 			change := m.touched[guardKey("property", str(action["propertyId"]))]
 			entry.PropertyRevision = string(change.After)
@@ -298,7 +303,7 @@ func previewUndoJournal(ctx context.Context, k *Kernel, e contracts.ServiceExecu
 	add := func(kind, id string) error {
 		var revision string
 		err := tx.QueryRowContext(ctx, "SELECT revision FROM "+entityTables[kind]+" WHERE id=?", id).Scan(&revision)
-		if errors.Is(err, sql.ErrNoRows) && kind == "property" {
+		if errors.Is(err, sql.ErrNoRows) && (kind == "property" || kind == "block") {
 			revision = "0"
 		} else if err != nil {
 			return err
@@ -348,6 +353,37 @@ func previewUndoJournal(ctx context.Context, k *Kernel, e contracts.ServiceExecu
 		inverse, err := journalInverse(ctx, tx, entry)
 		if err != nil {
 			return nil, err
+		}
+		if str(inverse["kind"]) == "task.occurrence.set" {
+			if err := add("block", str(inverse["blockId"])); err != nil {
+				return nil, err
+			}
+			if state, ok := inverse["state"].(map[string]any); ok {
+				if parent := str(state["parentBlockId"]); parent != "" {
+					if err := add("block", parent); err != nil {
+						return nil, err
+					}
+				}
+			}
+		}
+		if str(inverse["kind"]) == "task.facet.set" {
+			var binding taskBinding
+			if err := json.Unmarshal(marshal(inverse["binding"]), &binding); err != nil {
+				return nil, err
+			}
+			if err := add("property", binding.StatusPropertyID); err != nil {
+				return nil, err
+			}
+			if binding.DuePropertyID != nil {
+				if err := add("property", *binding.DuePropertyID); err != nil {
+					return nil, err
+				}
+			}
+			if inverse["attached"] == true {
+				if err := validateTaskBinding(ctx, tx, str(inverse["recordId"]), binding); err != nil {
+					return nil, err
+				}
+			}
 		}
 		if inverse["trashed"] == false && collection != "" && (inverse["kind"] == "page.trash.set" || inverse["kind"] == "record.trash.set") && !restoredCollections[collection] {
 			var hidden int

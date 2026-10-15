@@ -125,6 +125,8 @@ export function OperationHistory({
       return `${title}: restore title to “${action.title}”`;
     if (action.kind === "page.display.set")
       return `${title}: ${action.fullWidth ? "full" : "standard"} width, presentation ${action.presentation ? "on" : "off"}`;
+    if (action.kind === "task.facet.set") return `${title}: ${action.attached ? "restore" : "detach"} task facet, retaining current record values; current task completion determines reminder eligibility`;
+    if (action.kind === "task.occurrence.set") return `${title}: ${action.state?.type === "todo" ? "restore todo occurrence" : action.state ? "restore linked paragraph" : "remove reviewed occurrence"}`;
     const property =
       workspace.properties.find((p) => p.id === action.propertyId)?.name ||
       "Property";
