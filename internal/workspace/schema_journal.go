@@ -69,6 +69,50 @@ func unusedPropertyDependencies(ctx context.Context, q querier, collection, id s
 	if count > 0 {
 		return Fail("CONFLICT", "A task binding still depends on this property")
 	}
+	// Formula dependencies may exist only in executable expression text. Exact
+	// JSON string matching cannot see prop("stable-id") inside an expression.
+	rows, err := q.QueryContext(ctx, "SELECT config_json FROM properties WHERE type='formula' AND id<>?", id)
+	if err != nil {
+		return err
+	}
+	for rows.Next() {
+		var encoded string
+		if err = rows.Scan(&encoded); err != nil {
+			rows.Close()
+			return err
+		}
+		var config map[string]any
+		if json.Unmarshal([]byte(encoded), &config) != nil {
+			rows.Close()
+			return Fail("INTEGRITY_ERROR", "Stored formula configuration is invalid")
+		}
+		raw := asObject(config["raw"])
+		expression := str(raw["translatedExpression"])
+		if expression == "" {
+			continue
+		}
+		var deps []string
+		if number(raw["evaluatorVersion"]) == 2 {
+			_, deps, err = formulaCompileV2(expression)
+		} else {
+			deps, err = formulaDependencies(expression)
+		}
+		if err != nil {
+			rows.Close()
+			return Fail("CONFLICT", "A stored formula has unresolved dependencies; repair it before changing schema")
+		}
+		for _, dep := range deps {
+			if dep == id {
+				rows.Close()
+				return Fail("CONFLICT", "A formula still depends on this property")
+			}
+		}
+	}
+	err = rows.Err()
+	rows.Close()
+	if err != nil {
+		return err
+	}
 	// These are canonical definitions, not historical evidence. An exact stored
 	// ID reference is conservatively retained until its own migration is reviewed.
 	sources := [][2]string{{"properties", "SELECT config_json FROM properties WHERE id<>?"}, {"views", "SELECT query_json FROM views UNION ALL SELECT config_json FROM views"}, {"record_layouts", "SELECT layout_json FROM record_layouts"}, {"p2_database_config", "SELECT config_json FROM p2_database_config"}, {"automation_rules", "SELECT rule_json FROM automation_rules"}}
@@ -110,7 +154,7 @@ func unusedPropertyDependencies(ctx context.Context, q querier, collection, id s
 		}
 	}
 	var raw string
-	err := q.QueryRowContext(ctx, "SELECT config_json FROM p2_database_config WHERE collection_id=?", collection).Scan(&raw)
+	err = q.QueryRowContext(ctx, "SELECT config_json FROM p2_database_config WHERE collection_id=?", collection).Scan(&raw)
 	if err == nil {
 		var cfg P2DatabaseConfig
 		if json.Unmarshal([]byte(raw), &cfg) != nil {
