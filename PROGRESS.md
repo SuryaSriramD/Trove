@@ -2,7 +2,7 @@
 
 **The single current development and progress tracker for this project.** Read and update this file for every meaningful implementation change, investigation, test result, decision, blocker and handoff. This is not an automatically running monitor.
 
-Last updated: **2026-10-16 00:02 IST**. User-facing dates use **Asia/Kolkata (IST, UTC+05:30)**; source artifacts may retain UTC timestamps.
+Last updated: **2026-10-16 00:09 IST**. User-facing dates use **Asia/Kolkata (IST, UTC+05:30)**; source artifacts may retain UTC timestamps.
 
 This file consolidates the original 51-item backlog, the newly selected desktop scope, current qualification, next actions and development history. Earlier status pages are historical snapshots. Machine-readable contracts, the legacy registry and immutable qualification records remain supporting inputs/evidence; they are not additional human progress dashboards. Their frozen bytes must not be rewritten to make a status look current.
 
@@ -16,7 +16,7 @@ This file consolidates the original 51-item backlog, the newly selected desktop 
 | Measure | Recorded result | Meaning |
 | --- | --- | --- |
 | Original backlog | 51 items: 34 source-implemented, 11 in progress, five open, one awaiting source | These are the legacy registry's scoped implementation labels, reconciled here on 13 October. They are not 34 release-complete features. |
-| Latest development package | Full macOS P2 development candidate, source `9a39485`, ID `76951ebbe0ac3d2baec0bd98cc9ba4973b2848d084fe91952d92c445a0d01504` | Built/frozen 15 October; ad-hoc signature. P0/P1/P2 packaged journeys and installed chat/embedding/speech smoke pass; all 66 formal qualification checks remain pending. See DEV-045. |
+| Latest development package | Full macOS P2 development candidate, source `9a39485`, corrected ID `42d3dd5a5c3186b05d1859ccc19f6916d3e67eda446a062c670298c322b444d9` | Same app bytes; corrected immutable model-input binding at DEV-046. Ad-hoc signature; packaged P0/P1/P2 and installed-model smoke pass. Formal qualification is pending. |
 | Historical candidate 7 gates | **3 passed / 52 pending / 0 failed**, out of 55 | Most required work is unexecuted. Zero failed receipts does not mean historical defects were fixed. |
 | Candidate 7 macOS P0 criteria | **395 mapped / 2 proved** | Mapping defines the test; it does not supply a pass. This is not a percentage of working product features. |
 | Source checks for candidate 7 | 654 service race passes, 54 skips; 59 desktop race passes, one skip; 56 frontend unit passes; TypeScript and frontend build; 238 tooling passes; four affected browser passes | Recorded source checks, not rerun by this tracking update. Required skips remain unresolved. |
@@ -1140,6 +1140,14 @@ Final autofill workspace and protocol suite passed **37 tests/subtests, zero ski
 **Packaged operation:** OS-denied-network P0, P1 and P2 create/reopen/restore journeys passed in separate isolated workspaces. A separate packaged native smoke passed installed chat, embedding and speech execution with the pinned audio fixture; production microphone capture is explicitly not run. These are service-driven native-app checks, not manual editor/accessibility, physical recording, notifications, clean-install or performance acceptance. Evidence is in `packaged-p0`, `packaged-p1`, `packaged-p2` and `packaged-native`. Original worker before/after import, signing and editor investigation logs/patches are copied to `review-evidence` without rewriting them.
 
 **Next phase:** Started the consolidated eight-family local-model campaign serially from a clean detached checkout of the frozen `9a39485` source, using the new packaged helpers and synthetic locked corpora. The previous worker branch is preserved. No new result is claimed until each terminal report and its independent consumer checks complete. Known prior image semantic failures, missing authorized representative photos/screenshots, required real accounts/devices, manual quality, controlled performance and signing/install/recovery campaigns remain separately open. Formal qualification currently has 66 pending checks and no granted release approval; the successful development checks above have not been converted into qualification receipts.
+
+### DEV-046 — 2026-10-16 00:09 IST: corrected candidate model-input binding
+
+**Correction to DEV-045:** The first candidate record bound the entire mutable model-cache directory. The packaged native smoke subsequently created three empty ownership lock files for the chat/embedding/speech packs. The qualifier correctly rejected the changed directory inventory; the original candidate `76951eb...` and failed template attempt remain preserved and must not be used as a valid qualification record. `candidate-inventory-correction.json` proves exactly three added `.owner.lock` paths, no removed files and no changed existing bytes. No model weights/manifests or app/helper bytes changed.
+
+A fresh `qualification-v2/candidate.json` now binds each of the 16 installed model/manifest files individually, together with the same app/source/helper/fixture inputs. Its identity is **`42d3dd5a5c3186b05d1859ccc19f6916d3e67eda446a062c670298c322b444d9`**, source `9a39485`. This excludes mutable runtime locks from the model-input set without weakening any bound model hash. The serial evaluation runner already binds exact model/manifest files, so its in-progress evidence is unaffected. Formal candidate service-check execution and packaged-observation preparation have started; no receipt is yet claimed. The completion structural validator passes with the unchanged historical registry/catalog counts and `releaseQualified=false`.
+
+Root fixture follow-ups are complete: the failed rich-layout scenario and clipboard scenario passed in `editor-after.json`; direct table/layout editing, marks, undo/redo and reload passed in `editor-caret-after.json` (two more scenarios). These supplement the retained failed broad run rather than replace it. The eight-family native model campaign remains active; nine early P0 reports received independent read-only semantic inspection without a finding, not family acceptance. Next: complete and review each family's terminal accounting, then reconcile candidate receipts and remaining external/manual prerequisites.
 
 <a id="commit-history"></a>
 ## Recorded source-development history
