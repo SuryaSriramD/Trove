@@ -15,8 +15,9 @@ import (
 )
 
 type recoverySnapshot struct {
-	RecordLayouts      *recoveryLayouts        `json:"recordLayouts,omitempty"`
-	DisplayPreferences *PageDisplayPreferences `json:"displayPreferences,omitempty"`
+	AttachmentRelationships *[]ImportAttachmentRelationship `json:"attachmentRelationships,omitempty"`
+	RecordLayouts           *recoveryLayouts                `json:"recordLayouts,omitempty"`
+	DisplayPreferences      *PageDisplayPreferences         `json:"displayPreferences,omitempty"`
 	contracts.ServiceReadPageResult
 	Record          *contracts.DomainRecord              `json:"record,omitempty"`
 	Task            *contracts.DomainTaskFacet           `json:"task,omitempty"`
@@ -29,7 +30,7 @@ type recoverySnapshot struct {
 }
 
 func captureRecoverySnapshot(ctx context.Context, q querier, page string, result contracts.ServiceReadPageResult) (json.RawMessage, error) {
-	out := recoverySnapshot{ServiceReadPageResult: result, MetadataVersion: 5}
+	out := recoverySnapshot{ServiceReadPageResult: result, MetadataVersion: 6}
 	display, displayErr := readPageDisplay(ctx, q, page)
 	if displayErr != nil {
 		return nil, displayErr
@@ -93,6 +94,11 @@ func captureRecoverySnapshot(ctx context.Context, q querier, page string, result
 		return nil, err
 	}
 	rows.Close()
+	relationships, err := captureRecoveryAttachments(ctx, q, page)
+	if err != nil {
+		return nil, err
+	}
+	out.AttachmentRelationships = &relationships
 	if err = captureRecoveryMeeting(ctx, q, page, &out); err != nil {
 		return nil, err
 	}
@@ -336,6 +342,21 @@ func restoreGuards(ctx context.Context, k *Kernel, q querier, e contracts.Servic
 	collectFileIDs(v, ids)
 	for _, id := range snap.Attachments {
 		ids[string(id)] = true
+	}
+	if snap.AttachmentRelationships != nil {
+		blocks := map[string]bool{}
+		for _, block := range snap.Blocks {
+			blocks[string(block.Id)] = true
+		}
+		for _, relationship := range *snap.AttachmentRelationships {
+			if _, err := decodeAttachment(marshal(relationship)); err != nil {
+				return nil, nil, err
+			}
+			if relationship.BlockID != "" && !blocks[relationship.BlockID] {
+				return nil, nil, Fail("CONFLICT", "Historical attachment references an absent block")
+			}
+			ids[relationship.FileID] = true
+		}
 	}
 	if snap.Record != nil {
 		json.Unmarshal(marshal(snap.Record), &v)
@@ -587,9 +608,20 @@ func restoreHistory(m *Mutation, c map[string]any) error {
 	if _, err = m.Exec("DELETE FROM file_references WHERE page_id=?", page); err != nil {
 		return err
 	}
-	for _, id := range snap.Attachments {
-		if _, err = m.Exec("INSERT INTO file_references VALUES(?,'explicit',?,?)", page, id, id); err != nil {
-			return err
+	if snap.AttachmentRelationships != nil {
+		for _, relationship := range *snap.AttachmentRelationships {
+			kind, source := attachmentReference(relationship)
+			if _, err = m.Exec("INSERT OR IGNORE INTO file_references VALUES(?,?,?,?)", page, kind, source, relationship.FileID); err != nil {
+				return err
+			}
+		}
+	} else {
+		// Older snapshots retained only an aggregate inventory. Preserve their
+		// documented recovery behavior without inventing block ownership.
+		for _, id := range snap.Attachments {
+			if _, err = m.Exec("INSERT INTO file_references VALUES(?,'explicit',?,?)", page, id, id); err != nil {
+				return err
+			}
 		}
 	}
 	_, err = m.Exec("UPDATE restore_previews SET consumed=1 WHERE id=?", c["previewId"])
