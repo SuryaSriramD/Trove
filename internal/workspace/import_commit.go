@@ -119,6 +119,13 @@ func applyPortableImport(m *Mutation, c map[string]any) error {
 	if p.State == "complete" {
 		return nil
 	}
+	if p.Initialized {
+		for i := range p.Items {
+			if err := checkImportMergeGuards(m, &p.Items[i]); err != nil {
+				return err
+			}
+		}
+	}
 	if p.RootParentID != "" {
 		if err = m.AuthorizePage(p.RootParentID); err != nil {
 			return err
@@ -149,6 +156,9 @@ func applyPortableImport(m *Mutation, c map[string]any) error {
 		remap := map[string]string{}
 		for i := range p.Items {
 			item := &p.Items[i]
+			if err := checkImportMergeGuards(m, item); err != nil {
+				return err
+			}
 			if item.Conflict != "" && item.Choice == "" {
 				return Fail("CONFLICT", "Resolve re-import conflict for "+item.Locator)
 			}
@@ -186,8 +196,10 @@ func applyPortableImport(m *Mutation, c map[string]any) error {
 				}
 				remapImportBlockIDs(item, blockIDs)
 				old := item.PageID
-				item.PageID = NewID()
-				remap[old] = item.PageID
+				if remap[old] == "" {
+					remap[old] = NewID()
+				}
+				item.PageID = remap[old]
 				item.MappingID = ""
 				item.ExpectedRevision = ""
 				item.IdentityKind = "derived_locator"
@@ -210,19 +222,36 @@ func applyPortableImport(m *Mutation, c map[string]any) error {
 			}
 		}
 		remapPortableDatabasePages(&p, remap)
+		if p.NotionCopyGraph {
+			for i := range p.Items {
+				item := &p.Items[i]
+				if item.PageID != "" {
+					snapshot := snapshotImportItem(item)
+					if c := importCollectionFor(&p, item); c != nil {
+						addIncomingDatabaseFields(&snapshot, c)
+					}
+					item.Incoming = &snapshot
+					item.ResolvedFields = nil
+					item.MergeGuards = nil
+				}
+			}
+		}
 		// Keeping an existing CSV also keeps all its records. A source CSV never
 		// silently becomes authority for deleting absent or locally created rows.
 		for i := range p.Items {
 			item := &p.Items[i]
 			if item.Kind == "row" || item.Kind == "portable_record" {
 				for _, parent := range p.Items {
-					if parent.Locator == item.CSVSource && parent.Choice == "keep_local" {
+					if parent.Locator == item.CSVSource && parent.Choice == "keep_local" && !p.TypedDatabaseMerge {
 						item.Choice = "keep_local"
 						item.PageID = ""
 						item.Reason += "; retained incoming row while keeping the local database"
 					}
 				}
 			}
+		}
+		if err := validateReviewedImportDatabase(m.Context, m.Tx, &p); err != nil {
+			return err
 		}
 		if err = guardImport(m, "page", p.RootID); err != nil {
 			return err
@@ -297,8 +326,29 @@ func applyPortableImport(m *Mutation, c map[string]any) error {
 		}
 		p.State = "complete"
 	}
+	// Record projections touch their collection during commit validation. Do
+	// that now so the durable next-unit guards include this import's own bump.
+	for _, change := range m.touched {
+		if change.Target.EntityType == "record" {
+			var collection string
+			if err := m.Tx.QueryRowContext(m.Context, "SELECT collection_id FROM records WHERE id=?", change.Target.EntityId).Scan(&collection); err != nil {
+				return err
+			}
+			if err := guardImport(m, "collection", collection); err != nil {
+				return err
+			}
+			if err := m.Touch("collection", collection); err != nil {
+				return err
+			}
+		}
+	}
 	for i := range p.Items {
 		item := &p.Items[i]
+		for key := range item.MergeGuards {
+			if change, ok := m.touched[key]; ok {
+				item.MergeGuards[key] = string(change.After)
+			}
+		}
 		if v, ok := m.touched[guardKey("page", item.PageID)]; ok {
 			item.ExpectedRevision = string(v.After)
 		}
@@ -344,8 +394,10 @@ func commitImportItem(m *Mutation, p *ImportPlan, item *ImportItem) error {
 			if revision != item.ExpectedRevision {
 				return Fail("CONFLICT", "Page changed after import review")
 			}
-			if err := saveImportBaseline(m, p, item); err != nil {
-				return err
+			if item.Kind != "portable_collection" {
+				if err := saveImportBaseline(m, p, item); err != nil {
+					return err
+				}
 			}
 			if _, err := m.Exec("INSERT OR REPLACE INTO import_observations VALUES(?,?,?,?,?)", item.MappingID, p.ID, item.Hash, item.RawFileID, item.Outcome); err != nil {
 				return err
@@ -591,8 +643,10 @@ func commitImportItem(m *Mutation, p *ImportPlan, item *ImportItem) error {
 			return err
 		}
 		item.MappingID = mapping
-		if err = saveImportBaseline(m, p, item); err != nil {
-			return err
+		if item.Kind != "portable_collection" {
+			if err = saveImportBaseline(m, p, item); err != nil {
+				return err
+			}
 		}
 		if _, err = m.Exec("INSERT OR REPLACE INTO import_observations VALUES(?,?,?,?,?)", mapping, p.ID, item.Hash, item.RawFileID, item.Outcome); err != nil {
 			return err

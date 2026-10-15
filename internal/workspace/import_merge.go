@@ -17,9 +17,10 @@ import (
 const importNormalizerVersion = 1
 
 type ImportSnapshot struct {
-	Version      int                        `json:"version"`
-	Fields       map[string]json.RawMessage `json:"fields"`
-	BlockSources map[string]string          `json:"blockSources"`
+	Version        int                        `json:"version"`
+	SourceRevision string                     `json:"sourceRevision,omitempty"`
+	Fields         map[string]json.RawMessage `json:"fields"`
+	BlockSources   map[string]string          `json:"blockSources"`
 }
 type ImportPresence struct {
 	Present bool            `json:"present"`
@@ -133,7 +134,7 @@ func snapshotImportItem(item *ImportItem) ImportSnapshot {
 			item.BlockSources[block.ID] = fmt.Sprintf("normalizer-position:%d", index)
 		}
 	}
-	s := ImportSnapshot{Version: importNormalizerVersion, Fields: map[string]json.RawMessage{"/title": marshal(item.Title), "/parent": marshal(nullable(item.ParentID))}, BlockSources: item.BlockSources}
+	s := ImportSnapshot{Version: importNormalizerVersion, SourceRevision: item.Hash, Fields: map[string]json.RawMessage{"/title": marshal(item.Title), "/parent": marshal(nullable(item.ParentID))}, BlockSources: item.BlockSources}
 	positions := map[string]int{}
 	for _, b := range item.Blocks {
 		parent := item.BlockParents[b.ID]
@@ -197,17 +198,23 @@ func loadImportBaseline(ctx context.Context, q querier, mapping string) (ImportS
 }
 
 func prepareImportMerge(ctx context.Context, q querier, p *ImportPlan, item *ImportItem) error {
-	if item.PageID == "" || item.Kind == "row" || item.Kind == "csv" || item.Kind == "portable_collection" || item.Kind == "portable_record" || p.NotionGraph && notionGraphPage(*item) {
+	if item.PageID == "" || item.Kind == "row" || item.Kind == "csv" {
 		return nil
 	}
 	if item.MappingID == "" {
 		s := snapshotImportItem(item)
+		if c := importCollectionFor(p, item); c != nil {
+			addIncomingDatabaseFields(&s, c)
+		}
 		item.Incoming = &s
 		return nil
 	}
 	base, sourceRevision, known, err := loadImportBaseline(ctx, q, item.MappingID)
 	if err != nil {
 		return err
+	}
+	if base.SourceRevision != "" {
+		sourceRevision = base.SourceRevision
 	}
 	// Populate anonymous positions before reconciling an identical source.
 	_ = snapshotImportItem(item)
@@ -225,6 +232,30 @@ func prepareImportMerge(ctx context.Context, q querier, p *ImportPlan, item *Imp
 	}
 	remapImportBlockIDs(item, ids)
 	incoming := snapshotImportItem(item)
+	collection := importCollectionFor(p, item)
+	if collection != nil {
+		addIncomingDatabaseFields(&incoming, collection)
+		if known {
+			observed := map[string]bool{}
+			for _, record := range collection.Records {
+				for _, property := range record.KnownProperties {
+					observed["/values/"+record.ID+"/"+property] = true
+				}
+			}
+			for path, value := range base.Fields {
+				if strings.HasPrefix(path, "/values/") && !observed[path] {
+					if _, present := incoming.Fields[path]; !present {
+						incoming.Fields[path] = value
+					}
+				}
+				if strings.HasPrefix(path, "/records/") || strings.HasPrefix(path, "/schema/") {
+					if _, present := incoming.Fields[path]; !present {
+						incoming.Fields[path] = value
+					}
+				}
+			}
+		}
+	}
 	if known && p.SourceSystem == "notion_api" && p.SourceCompleteness != "complete" {
 		// An incomplete API enumeration is not evidence that a prior block was deleted.
 		for path, value := range base.Fields {
@@ -245,6 +276,11 @@ func prepareImportMerge(ctx context.Context, q querier, p *ImportPlan, item *Imp
 	if err != nil {
 		return err
 	}
+	if collection != nil {
+		if err := addLocalDatabaseFields(ctx, q, &local, item, collection); err != nil {
+			return err
+		}
+	}
 	// Each run has a new evidence root. It is not a source move. A supplied
 	// parent with a matched identity is still compared as its own field.
 	if item.ParentID == p.RootID {
@@ -255,6 +291,9 @@ func prepareImportMerge(ctx context.Context, q querier, p *ImportPlan, item *Imp
 		}
 	}
 	item.Incoming = &incoming
+	if collection != nil {
+		item.Hash = importDigest(marshal(incoming.Fields))
+	}
 	status := "retained"
 	if !known {
 		status = "unavailable"
@@ -461,6 +500,14 @@ func materializeImportMerge(item *ImportItem) error {
 	// Preserve identity evidence for local-only blocks across subsequent runs.
 	if item.BlockSources == nil {
 		item.BlockSources = map[string]string{}
+	}
+	item.ResolvedFields = fields
+	for _, field := range item.Merge.Fields {
+		if field.Local.Present && (strings.HasPrefix(field.Path, "/schema/") || strings.HasPrefix(field.Path, "/records/")) {
+			if _, present := fields[field.Path]; !present {
+				return Fail("CONFLICT", "Deleting a property or record requires a separately reviewed deletion; retain it in this import")
+			}
+		}
 	}
 	item.Choice = "replace"
 	return nil

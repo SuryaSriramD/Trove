@@ -128,4 +128,4 @@ export type ImportFieldResolution = ({ "path": string; "choice": "keep_local"; }
 export type ImportIdentityResolution = ({ "choice": "link_existing" | "create_new"; "localKind": "container" | "collection" | "view" | "page" | "record" | "block" | "property" | "file" | "meeting"; "localId": Id; } | { "choice": "skip"; });
 export type ImportResolution = { "id": Id; "planId": Id; "mappingId": Id; "expectedLocalRevision": Revision; "incomingSourceRevision": string; "identityChoice"?: ImportIdentityResolution; "deletionChoice"?: "keep_local" | "accept_source_delete" | "restore_source"; "fields": Array<ImportFieldResolution>; };
 export type ColorToken = "gray" | "brown" | "orange" | "yellow" | "green" | "blue" | "purple" | "pink" | "red";
-export type ImportNormalizedSnapshot = { "version": 1; "fields": { [key: string]: unknown }; "blockSources": { [key: string]: unknown }; };
+export type ImportNormalizedSnapshot = { "version": 1; "sourceRevision"?: string; "fields": { [key: string]: unknown }; "blockSources": { [key: string]: unknown }; };

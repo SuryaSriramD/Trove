@@ -392,6 +392,9 @@ func (k *Kernel) parseImportPlan(ctx context.Context, p *ImportPlan) error {
 			return err
 		}
 	}
+	if err := reuseImportDatabaseIdentities(ctx, k.db, p); err != nil {
+		return err
+	}
 	for i := range p.Items {
 		if err := prepareImportMerge(ctx, k.db, p, &p.Items[i]); err != nil {
 			return err

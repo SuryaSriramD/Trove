@@ -1245,6 +1245,38 @@ test("import field review persists an edited decision before enabling commit", a
   expect(await page.evaluate(() => (window as any).mergeReviewCalls)).toEqual([expect.objectContaining({ planId: "merge-plan", planHash: "review-hash-1", resolutions: [{ sourceLocator: "Notes.html", fields: [{ path: "/title", choice: "merged", value: { present: true, value: "Reviewed title" } }] }] })]);
 });
 
+test("typed import review shows record and property names and saves the exact field choice", async ({ page }) => {
+  await page.evaluate(() => {
+    const app = (window as any).go.main.App, previous = app.Dispatch;
+    app.PickFile = async () => "typed-selection";
+    const same = (value: any) => ({ present: true, value });
+    const item: any = { sourceLocator: "Tasks.csv", kind: "portable_collection", title: "Tasks", outcome: "preserved", reason: "Typed source retained", committed: false, conflict: "Review typed changes", choice: "", merge: {
+      baselineStatus: "retained", localDeleted: false, resolutions: [], fields: [
+        { path: "/schema/prop-1", outcome: "unchanged", base: same({ name: "Notes" }), local: same({ name: "Notes" }), incoming: same({ name: "Notes" }) },
+        { path: "/records/record-1", outcome: "unchanged", base: same("page-1"), local: same("page-1"), incoming: same("page-1") },
+        { path: "/values/record-1/prop-1", outcome: "conflict", base: same("Base notes"), local: same("Local notes"), incoming: same("Incoming notes") }
+      ]
+    } };
+    const plan = { planId: "typed-plan", planHash: "typed-hash-1", typedDatabaseMerge: true, sourceNamespace: "fixture", sourceName: "Tasks.zip", rootPageId: "root", sourceFileId: "source", state: "preview", cursor: 0, initialized: false, sourceCompleteness: "unknown", sourceOmissions: [], unknownCompleteness: [], items: [item, { sourceLocator: "row.html", kind: "portable_record", pageId: "page-1", title: "Call customer", outcome: "preserved", reason: "Body retained", committed: false, choice: "keep_local" }] };
+    app.Dispatch = async (method: string, raw: string) => {
+      if (method === "imports.preview") return JSON.stringify({ ok: true, result: plan });
+      if (method === "imports.configure") {
+        const request = JSON.parse(raw); (window as any).typedReviewRequest = request;
+        item.merge.resolutions = request.resolutions[0].fields; item.choice = "merge"; plan.planHash = "typed-hash-2";
+        return JSON.stringify({ ok: true, result: plan });
+      }
+      return previous(method, raw);
+    };
+  });
+  await navSurface(page, "Import");
+  await page.getByRole("button", { name: "Choose import file" }).click();
+  await expect(page.getByText("Call customer · Notes", { exact: false })).toBeVisible();
+  await expect(page.getByRole("button", { name: "Commit reviewed import", exact: true })).toBeDisabled();
+  await page.getByLabel("Resolution for Tasks.csv /values/record-1/prop-1").selectOption("take_incoming");
+  await expect(page.getByRole("button", { name: "Commit reviewed import", exact: true })).toBeEnabled();
+  expect(await page.evaluate(() => (window as any).typedReviewRequest)).toMatchObject({ planId: "typed-plan", planHash: "typed-hash-1", resolutions: [{ sourceLocator: "Tasks.csv", fields: [{ path: "/values/record-1/prop-1", choice: "take_incoming" }] }] });
+});
+
 test("Phase 2 AI works without packs and shows reviewed memory controls", async ({ page }) => {
   await navSurface(page, "AI");
   await expect(page.getByRole("heading", { name: "Local AI", exact: true })).toBeVisible();
