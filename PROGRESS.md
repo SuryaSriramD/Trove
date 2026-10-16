@@ -2,7 +2,7 @@
 
 **The single current development and progress tracker for this project.** Read and update this file for every meaningful implementation change, investigation, test result, decision, blocker and handoff. This is not an automatically running monitor.
 
-Last updated: **2026-10-16 19:26 IST**. User-facing dates use **Asia/Kolkata (IST, UTC+05:30)**; source artifacts may retain UTC timestamps.
+Last updated: **2026-10-16 19:29 IST**. User-facing dates use **Asia/Kolkata (IST, UTC+05:30)**; source artifacts may retain UTC timestamps.
 
 This file consolidates the original 51-item backlog, the newly selected desktop scope, current qualification, next actions and development history. Earlier status pages are historical snapshots. Machine-readable contracts, the legacy registry and immutable qualification records remain supporting inputs/evidence; they are not additional human progress dashboards. Their frozen bytes must not be rewritten to make a status look current.
 
@@ -36,7 +36,7 @@ Candidate 7's focused 22-case prompt experiment was rejected and production prom
 
 | Location | Branch / source | Current interpretation |
 | --- | --- | --- |
-| Primary project: `/Volumes/HD-B1/HD-Projects/Trove` | `codex/macos-feature-completion`, `80ad4ae` plus the reviewed related-content candidate; installed app source `6d017cf` | Repaired P2 app built and independently audited; duplicate bundles archived and removed. Retained mode/review/runtime/query fixes have bounded evidence; answerability, diagram, expansion, relevance and vision quality gaps remain open. Original evidence and rejected experiments are preserved. No release approval. |
+| Primary project: `/Volumes/HD-B1/HD-Projects/Trove` | `codex/macos-feature-completion`, `5f6b920` plus current evidence; related candidate `c3948a2`; installed app source `6d017cf` | Repaired P2 app built and independently audited; duplicate bundles archived and removed. Retained mode/review/runtime/query fixes have bounded evidence; answerability, diagram, expansion, relevance and vision quality gaps remain open. Original evidence and rejected experiments are preserved. No release approval. |
 | Frozen new-candidate execution checkout: `/Users/suryasriramduvvuri/.codex/worktrees/feature-canonical-tasks/Trove` | Detached `9a3948529a1e772b1e5fdb710203e2c1d234d3cc` | Reuses the clean completed worker checkout; original branch `codex/feature-layout-scheduling` remains at `8b739d5`. Completed frozen campaign executed here against the development app helpers; preserve this checkout and its evidence. |
 | Latest development worktree: `/Users/suryasriramduvvuri/.codex/worktrees/macos-p0-title-context/Trove` | `codex/macos-p0-title-context`, `299e43df9b716f771125d939ad320c3cb595f2c7` | Candidate 7 source. One descendant commit containing tests, fixtures, telemetry and execution documentation. |
 
@@ -1367,6 +1367,14 @@ Root fixture follow-ups are complete: the failed rich-layout scenario and clipbo
 **Other evidence and pending work:** Independent all-clause review of all 24 answerability drafts finds six acceptable baseline responses and four candidate responses; frozen automatic grades remain five versus three. Reject `cc48782`, preserve the known regex false-negative and original failed reproduction, and spend no fresh withheld cases on this candidate. The real UI worker's next suite passes ten declared cases, including due dates, promotion/detachment/undo and layout/freshness after restart; its harness-only `fd34b1c` is reviewed and awaiting integration. Vision fixture work establishes a runtime geometry mismatch on 12 fixtures, with explicit-longest-edge probe results matching the selected pinned reference for those transported inputs; raw 2048-pixel source equivalence and actual model quality remain unproved. Automatic review stopped an incomplete early vision edit; no production vision files changed. Coordinator approved the proposed additive provenance fields for a complete unapplied patch review, including helper acknowledgment and unchanged historical absence. Installed app, user data, external accounts and release state remain unchanged.
 
 **Next:** Commit this experimental ranking candidate, integrate the reviewed ten-case UI lane and run one serialized native related AFTER campaign. Retain the ranking change only after independent result assessment. The AI worker prepares unchanged-control pack-105 comparison and a separately pinned stronger optional challenger; no new weights acquired and no default changed.
+
+### DEV-067 — 2026-10-16 19:29 IST: integrate ten-case real UI/storage suite
+
+**Integration:** Reviewed `fd34b1c` is integrated as `5f6b920`, following the related-content candidate `c3948a2`. The UI harness now covers ten declared cases: editor/task persistence, cross-surface title/status/due values, invalid timezone rejection, explicit due-property promotion, cancelled/applied detachment, guarded grouped undo preserving a later name edit, collection/record layout inheritance/reset, content freshness invalidation and exact identities/values after host restart. All writes use visible production UI; read-only host observations verify state. No production interface/permission changes were required.
+
+**Evidence:** Worker [run-08 manifest](/Users/suryasriramduvvuri/.codex/visualizations/2026/10/13/01a1363a-7a42-7700-930e-3083f64ff417/macos-quality-20261016/real-ui/run-08/manifest.json), SHA-256 `3faa3eba83152d0c241cc2313cbae6f9db2dda4a91abc530c41966399bf9d3c3`, records **10/10 passes**, zero retries/skips, unchanged inputs and normal shutdown of both host processes. Token was removed. `suite-v2-checkpoint-binding.json` binds the committed files. Earlier run-07 fixture/time-limit failures remain retained. Primary integration passes **six accounting tests and TypeScript**; logs `/private/tmp/trove-integrated-real-ui-suite-v2-*`. These are Chromium/compiled-overlay workflows against installed production host `6d017cf`, not native WebView or final-release acceptance.
+
+**Next:** Native related-content AFTER runs on this committed source with unchanged installed helper/pack/fixtures. UI worker adds charts/local forms/row actions and conversation/page-display persistence. The reviewed pack-105 comparison harness is permitted to commit, but inference waits for the coordinator to release the serialized slot. Vision remains an unapplied complete-patch review. Live resources and release prerequisites remain pending.
 
 <a id="commit-history"></a>
 ## Recorded source-development history
