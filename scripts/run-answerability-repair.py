@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Explicit, serialized BEFORE/AFTER pilot for the sealed 12 answerability cases.
+"""Explicit, serialized repair or model comparison for the sealed 12 controls.
 
 Review this artifact before use. It never applies patches, changes source, retries
 models, selects a subset, or qualifies release/performance/manual semantics.
@@ -25,6 +25,23 @@ ORIGINAL_CORPUS = 'internal/workspace/testdata/expanded-evaluation/transfer-2026
 ORIGINAL_SHA256 = '1eb8cb07b0047fde8e4f349be53b17613c33200d6fa44bfdbfe8d4d488f886bd'
 TEST = 'TestRealLocalAnswerabilityTransferCases'
 PACK = '01990000-0000-7000-8000-000000000106'
+COMPARISON_PACK = '01990000-0000-7000-8000-000000000105'
+COMPARISON_BASE_SOURCE = 'b93f21c646759f77a5f81afd883e88f2199881e5'
+COMPARISON_HARNESS = {'scripts/run-answerability-repair.py', 'scripts/test-answerability-repair.py'}
+COMPARISON_BASE_HARNESS = {
+    'scripts/run-answerability-repair.py': '8e9934f04cfb2467eb710d5d61766572039c9204ec89a9d041a67086303ca8c7',
+    'scripts/test-answerability-repair.py': 'e95eabc81e83c18ab6f86a4fb957f052a88d15068acc913be7e5558130703ec2',
+}
+COMPARISON_MODEL = {
+    'schemaVersion': 1,
+    'url': 'https://huggingface.co/Qwen/Qwen2.5-1.5B-Instruct-GGUF/resolve/91cad51170dc346986eccefdc2dd33a9da36ead9/qwen2.5-1.5b-instruct-q5_k_m.gguf',
+    'id': COMPARISON_PACK, 'kind': 'chat', 'format': 'gguf', 'license': 'Apache-2.0',
+    'sha256': 'b46661073c18e5b56a41fa320975f866a00def1ff08feef4718e013258896f8c',
+    'sizeBytes': 1285494304, 'estimatedMemoryBytes': 3221225472, 'contextTokens': 8192,
+    'runtimeCommit': 'd2e54583c7452353eb35d40431281f6ee984332f',
+    'sourceRevision': '91cad51170dc346986eccefdc2dd33a9da36ead9',
+    'licenseUrl': 'https://huggingface.co/Qwen/Qwen2.5-1.5B-Instruct-GGUF/blob/91cad51170dc346986eccefdc2dd33a9da36ead9/LICENSE',
+}
 TAGS = 'fts5 sqlite_omit_load_extension'
 NETWORK_POLICY = '(version 1)(allow default)(deny network*)'
 GATES = ('TestAITransferIndependentCorpusAndOracle', 'TestAITransferCanonicalSeedAndScope',
@@ -57,14 +74,14 @@ def load_repository_validator(root):
     return module
 
 
-def input_paths(root, bundle, models, go):
+def input_paths(root, bundle, models, go, pack=PACK):
     paths = {root / name for name in HARNESS}
     for directory in SOURCE_ROOTS:
         for suffix in ('*.go', '*.sql', '*.json', '*.c', '*.h', '*.m', '*.mm', '*.metal'):
             paths.update((root / directory).rglob(suffix))
     paths.update((root / 'go.mod', root / 'go.sum', pathlib.Path(__file__).resolve(), go,
                   bundle / 'manifest.json', bundle / 'llama-worker',
-                  models / (PACK + '.json'), models / (PACK + '.model')))
+                  models / (pack + '.json'), models / (pack + '.model')))
     # Bundle validation can consult other declared helpers even though only llama
     # is invoked by this pilot; bind the actual helper bytes, never an app root.
     manifest = json.loads((bundle / 'manifest.json').read_text())
@@ -85,11 +102,11 @@ def inventory(paths, validator):
     return result
 
 
-def stable_identity(root, bundle, models, go, inputs):
+def stable_identity(root, bundle, models, go, inputs, pack=PACK):
     bindings = {'harness:' + name: inputs[str(root / name)] for name in HARNESS}
     for label, path in [('pilot', pathlib.Path(__file__).resolve()), ('go', go),
                         ('bundleManifest', bundle / 'manifest.json'), ('llama', bundle / 'llama-worker'),
-                        ('modelManifest', models / (PACK + '.json')), ('model', models / (PACK + '.model'))]:
+                        ('modelManifest', models / (pack + '.json')), ('model', models / (pack + '.model'))]:
         bindings[label] = inputs[str(path)]
     return bindings
 
@@ -218,18 +235,18 @@ def comparison_execution_errors(report):
     return errors
 
 
-def validate_answer(report, case, validator):
+def validate_answer(report, case, validator, pack=PACK):
     errors = comparison_execution_errors(report)
     request = report.get('request', {})
     for field, value in [('fixture', case['id']), ('mode', 'answer'), ('useMemory', False),
-                         ('corpusSHA256', CORPUS_SHA256), ('modelPackId', PACK),
+                         ('corpusSHA256', CORPUS_SHA256), ('modelPackId', pack),
                          ('sourceTitle', case['title']), ('source', case['source']),
                          ('prompt', case['prompt']), ('selection', '')]:
         if type(report.get(field)) is not type(value) or report[field] != value:
             errors.append('report binding differs: ' + field)
     if not isinstance(request, dict):
         return errors + ['request is missing']
-    for field, value in [('mode', 'answer'), ('prompt', case['prompt']), ('useMemory', False), ('modelPackId', PACK)]:
+    for field, value in [('mode', 'answer'), ('prompt', case['prompt']), ('useMemory', False), ('modelPackId', pack)]:
         if type(request.get(field)) is not type(value) or request[field] != value:
             errors.append('actual request differs: ' + field)
     if set(request) - {'mode', 'prompt', 'pageId', 'blockId', 'modelPackId', 'useMemory', 'selection', 'conversationId', 'projectId', 'connectedSources', 'skill'} or any(request.get(field) for field in ('selection', 'conversationId', 'projectId', 'connectedSources', 'skill')):
@@ -295,17 +312,84 @@ def validate_answer(report, case, validator):
     return errors
 
 
+def model_comparison_binding_errors(prior, bindings, source_inputs):
+    """Only model artifacts and these reviewed recorder scripts may differ."""
+    errors = []
+    if prior.get('sourceCommit') != COMPARISON_BASE_SOURCE:
+        errors.append('model comparison requires the frozen unchanged-production baseline')
+    ignored = {'model', 'modelManifest', 'pilot'} | {'harness:' + name for name in COMPARISON_HARNESS}
+    previous = prior.get('stableBindings', {})
+    if {k: v for k, v in previous.items() if k not in ignored} != {k: v for k, v in bindings.items() if k not in ignored}:
+        errors.append('non-model runtime, helper, corpus or harness bindings changed')
+    for name, digest in COMPARISON_BASE_HARNESS.items():
+        if previous.get('harness:' + name, {}).get('sha256') != digest:
+            errors.append('baseline recorder identity differs: ' + name)
+    old_source = prior.get('sourceInputs', {})
+    if not isinstance(old_source, dict) or not old_source:
+        errors.append('baseline source inventory missing')
+    else:
+        changes = {name for name in set(old_source) | set(source_inputs) if old_source.get(name) != source_inputs.get(name)}
+        if changes - COMPARISON_HARNESS:
+            errors.append('model comparison changed production or frozen controls: ' + ', '.join(sorted(changes - COMPARISON_HARNESS)))
+    return errors
+
+
+def model_comparison_report_errors(prior, current, memory_budget):
+    errors = []
+    for field in ('preparedSystem', 'preparedPrompt', 'generatorSystem', 'generatorPrompt',
+                  'generatorGrammar', 'generatorGrammarSHA256', 'generatorOutputCap', 'outputCap', 'contextTokens'):
+        if current.get(field) != prior.get(field):
+            errors.append('model comparison changed actual prompt/grammar/budget: ' + field)
+    for field in ('source', 'sourceTitle', 'prompt', 'selection', 'mode', 'useMemory', 'corpusSHA256'):
+        if current.get(field) != prior.get(field):
+            errors.append('model comparison changed requested content: ' + field)
+    def source_identity(report):
+        sources = report.get('sources')
+        if not isinstance(sources, list) or not sources or any(not isinstance(source, dict) for source in sources):
+            raise ValueError('model comparison lacks a structured nonempty source inventory')
+        return [(source.get('number'), source.get('title'), source.get('text')) for source in sources]
+    try:
+        if source_identity(prior) != source_identity(current):
+            errors.append('model comparison changed selected source text or ordering')
+    except ValueError as error:
+        errors.append(str(error))
+    rss = current.get('peakWorkerRSSBytes')
+    if type(rss) is not int or rss <= 0 or rss > memory_budget:
+        errors.append('sampled worker RSS missing or exceeds unchanged native budget')
+    return errors
+
+
+def comparison_resources(model):
+    for field, value in COMPARISON_MODEL.items():
+        if type(model.get(field)) is not type(value) or model[field] != value:
+            fail('challenger manifest differs from reviewed artifact: ' + field)
+    if model.get('architecture') not in ('portable', 'arm64') or model.get('qualificationOnly', False):
+        fail('challenger architecture or instruction eligibility differs')
+    physical = int(subprocess.check_output(['/usr/sbin/sysctl', '-n', 'hw.memsize'], text=True))
+    budget = max(64 << 20, min(16 << 30, physical // 2 - (2 << 30)))
+    if model['estimatedMemoryBytes'] > budget:
+        fail('challenger exceeds existing native admission budget')
+    return {'physicalRAMBytes': physical, 'nativeBudgetBytes': budget,
+            'declaredModelMemoryBytes': model['estimatedMemoryBytes'],
+            'threads': 4, 'contextTokens': 8192, 'outputCap': 512,
+            'nativeTimeoutMs': 180000, 'sampler': 'greedy', 'minimumFreeBytes': 4 << 30}
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     for name in ('root', 'source-commit', 'go', 'go-mod-cache', 'go-build-cache', 'bundle', 'models', 'output'):
         parser.add_argument('--' + name, required=True)
-    parser.add_argument('--phase', choices=('before', 'after'), required=True)
+    parser.add_argument('--phase', choices=('before', 'after', 'model-comparison'), required=True)
+    parser.add_argument('--pack', choices=(PACK, COMPARISON_PACK), default=PACK)
     parser.add_argument('--before-manifest')
     args = parser.parse_args()
     if platform.system() != 'Darwin' or not pathlib.Path('/usr/bin/sandbox-exec').is_file():
         parser.error('macOS sandbox-exec network denial is required')
-    if (args.phase == 'after') != bool(args.before_manifest):
-        parser.error('AFTER requires --before-manifest; BEFORE must not supply one')
+    if (args.phase != 'before') != bool(args.before_manifest):
+        parser.error('AFTER/model comparison require --before-manifest; BEFORE must not supply one')
+    if (args.phase == 'model-comparison') != (args.pack == COMPARISON_PACK):
+        parser.error('the reviewed challenger is available only in model-comparison phase')
+    pack = args.pack
     root, bundle, models, go = [pathlib.Path(value).resolve() for value in (args.root, args.bundle, args.models, args.go)]
     out = pathlib.Path(args.output).resolve()
     if out.is_relative_to(root):
@@ -320,22 +404,28 @@ def main():
         parser.error('sealed case identity/order differs')
     original_ids = [case['id'] for case in json.loads((root / ORIGINAL_CORPUS).read_text())['cases']]
     free = validator.require_space([out.parent, pathlib.Path(tempfile.gettempdir())])
-    paths = input_paths(root, bundle, models, go)
+    paths = input_paths(root, bundle, models, go, pack)
     before = inventory(paths, validator)
-    bindings = stable_identity(root, bundle, models, go, before)
-    model = json.loads((models / (PACK + '.json')).read_text())
-    if model.get('id') != PACK or model.get('kind') != 'chat' or model.get('sha256') != bindings['model']['sha256'] or model.get('sizeBytes') != bindings['model']['bytes'] or model.get('contextTokens') != 8192:
-        parser.error('actual model bytes differ from installed pack106 manifest')
+    bindings = stable_identity(root, bundle, models, go, before, pack)
+    model = json.loads((models / (pack + '.json')).read_text())
+    resources = comparison_resources(model) if args.phase == 'model-comparison' else None
+    if model.get('id') != pack or model.get('kind') != 'chat' or model.get('sha256') != bindings['model']['sha256'] or model.get('sizeBytes') != bindings['model']['bytes'] or model.get('contextTokens') != 8192:
+        parser.error('actual model bytes differ from selected installed manifest')
     helpers = json.loads((bundle / 'manifest.json').read_text())['helpers']
     if len([h for h in helpers if h.get('name') == 'llama-worker' and h.get('sha256') == bindings['llama']['sha256'] and h.get('runtimeCommit') == model.get('runtimeCommit')]) != 1:
         parser.error('actual llama helper differs from declared runtime/model binding')
     comparison = None
+    prior_reports = None
     source_inputs = {str(path.relative_to(root)): before[str(path)] for path in paths if path.is_relative_to(root)}
     if args.before_manifest:
         prior_path = pathlib.Path(args.before_manifest).resolve()
         prior = json.loads(prior_path.read_text(), object_pairs_hook=validator._unique_json)
-        if prior.get('schemaVersion') != 1 or prior.get('family') != 'answerability-transfer-v1' or prior.get('phase') != 'before' or prior.get('state') != 'finished' or prior.get('stableBindings') != bindings or prior.get('sourceCommit') == args.source_commit or prior.get('summary', {}).get('executionComplete') is not True or prior.get('summary', {}).get('inputsUnchanged') is not True or prior.get('goldenPoisonScopePassed') is not True:
+        if prior.get('schemaVersion') != 1 or prior.get('family') != 'answerability-transfer-v1' or prior.get('phase') != 'before' or prior.get('state') != 'finished' or (args.phase == 'after' and prior.get('stableBindings') != bindings) or prior.get('sourceCommit') == args.source_commit or prior.get('summary', {}).get('executionComplete') is not True or prior.get('summary', {}).get('inputsUnchanged') is not True or prior.get('goldenPoisonScopePassed') is not True:
             parser.error('BEFORE manifest lacks complete unchanged comparable execution')
+        if args.phase == 'model-comparison':
+            problems = model_comparison_binding_errors(prior, bindings, source_inputs)
+            if problems:
+                parser.error('; '.join(problems))
         for name, sha in prior.get('outputs', {}).items():
             if pathlib.Path(name).name != name or validator.digest(prior_path.parent / name) != sha:
                 parser.error('retained BEFORE output bytes differ')
@@ -356,16 +446,17 @@ def main():
         if not isinstance(prior_source, dict) or not prior_source:
             parser.error('BEFORE source inventory missing')
         source_changes = {name: {'before': prior_source.get(name), 'after': source_inputs.get(name)} for name in sorted(set(prior_source) | set(source_inputs)) if prior_source.get(name) != source_inputs.get(name)}
-        comparison = {'manifest': str(prior_path), 'sha256': validator.digest(prior_path), 'sourceCommit': prior['sourceCommit'], 'stableBindingsIdentical': True, 'retainedCanonicalRevalidated': True, 'sourceInputChanges': source_changes}
+        comparison = {'manifest': str(prior_path), 'sha256': validator.digest(prior_path), 'sourceCommit': prior['sourceCommit'], 'stableBindingsIdentical': args.phase == 'after', 'productionSourceIdentical': args.phase == 'model-comparison', 'retainedCanonicalRevalidated': True, 'sourceInputChanges': source_changes}
     out.mkdir(mode=0o700)
     reserve = out / '.evidence-reserve'
     reserve.write_bytes(bytes(1024 * 1024))
     manifest = {'schemaVersion': 1, 'family': 'answerability-transfer-v1', 'phase': args.phase,
                 'sourceCommit': args.source_commit, 'workingTreeStatus': git(root, 'status', '--short'),
                 'test': TEST, 'caseIds': IDS, 'caseCount': 12, 'generationAttemptsPerCase': 1,
-                'corpusSHA256': CORPUS_SHA256, 'modelPackId': PACK, 'inputs': before,
+                'corpusSHA256': CORPUS_SHA256, 'modelPackId': pack, 'inputs': before,
                 'stableBindings': bindings, 'sourceInputs': source_inputs, 'beforeComparison': comparison,
                 'networkPolicy': NETWORK_POLICY, 'hardware': platform.platform(), 'initialFreeBytes': free,
+                'resourcePolicy': resources, 'originalDefectEvaluationRequiredSeparately': args.phase == 'model-comparison',
                 'state': 'started', 'startedAtUTC': time.strftime('%Y-%m-%dT%H:%M:%SZ', time.gmtime()),
                 'canonicalEvidenceDirectory': str(out / 'canonical'),
                 'canonicalEvidenceScope': 'Actual repository typed canonical rows and exact asset bytes, excluding only reviewed derived operational tables.',
@@ -400,36 +491,45 @@ def main():
         return 1
     # Recheck source and all inputs after build/gates, before model admission.
     ensure_source(root, args.source_commit)
-    if inventory(input_paths(root, bundle, models, go), validator) != before:
+    if inventory(input_paths(root, bundle, models, go, pack), validator) != before:
         fail('inputs changed before native admission')
-    env.update(TROVE_NATIVE_INTEGRATION='1', TROVE_CHAT_EVAL_PACK=PACK, TROVE_MODEL_ROOT=str(models), TROVE_NATIVE_BUNDLE=str(bundle), TROVE_AI_CANONICAL_EVIDENCE_DIR=manifest['canonicalEvidenceDirectory'])
+    manifest['preAdmissionFreeBytes'] = validator.require_space([out.parent, pathlib.Path(tempfile.gettempdir())])
+    if args.phase == 'model-comparison' and comparison_resources(model) != resources:
+        fail('resource policy changed before admission')
+    env.update(TROVE_NATIVE_INTEGRATION='1', TROVE_CHAT_EVAL_PACK=pack, TROVE_MODEL_ROOT=str(models), TROVE_NATIVE_BUNDLE=str(bundle), TROVE_AI_CANONICAL_EVIDENCE_DIR=manifest['canonicalEvidenceDirectory'])
     command = [str(go), 'tool', 'test2json', '-t', '-p', 'trove.local/phase0/internal/workspace', str(binary), '-test.run', '^' + TEST + '$', '-test.v', '-test.timeout=45m']
     manifest.update(state='native_running', runCommand=command)
     write()
     code, timeout = run_process(sandbox + command, root / 'internal/workspace', env, out / 'results.jsonl', 2730)
     reserve.unlink(missing_ok=True)
     events, malformed = read_events(out / 'results.jsonl')
-    requests = {case: {'useMemory': False, 'modelPackId': PACK, 'corpusSHA256': CORPUS_SHA256} for case in IDS}
+    requests = {case: {'useMemory': False, 'modelPackId': pack, 'corpusSHA256': CORPUS_SHA256} for case in IDS}
     summary = validator.summarize(events, IDS, TEST, out / 'canonical', requests)
     reports, report_errors = extract_reports(events, validator)
     checks = {}
     for case in cases:
         try:
-            checks[case['id']] = validate_answer(reports.get(case['id'], {}), case, validator)
+            checks[case['id']] = validate_answer(reports.get(case['id'], {}), case, validator, pack)
         except (ValueError, TypeError, KeyError, AttributeError) as error:
             checks[case['id']] = ['malformed native task report: ' + str(error)]
-    summary['errors'] += malformed + report_errors
+    model_errors = []
+    if args.phase == 'model-comparison':
+        for case in IDS:
+            model_errors += [case + ': ' + error for error in model_comparison_report_errors(prior_reports.get(case, {}), reports.get(case, {}), resources['nativeBudgetBytes'])]
+    summary['modelComparisonErrors'] = model_errors
+    summary['errors'] += malformed + report_errors + model_errors
     summary['errors'] += [case + ': ' + problem for case, problems in checks.items() for problem in problems]
     terminal, terminal_errors = native_terminals(events)
     summary['errors'] += terminal_errors
-    summary['executionComplete'] = not timeout and not malformed and not report_errors and not terminal_errors and set(reports) == set(IDS) and terminal.get(TEST) in ('pass', 'fail') and all(terminal.get(TEST + '/' + case) in ('pass', 'fail') and not comparison_execution_errors(reports[case]) for case in IDS)
-    summary['inputsUnchanged'] = inventory(input_paths(root, bundle, models, go), validator) == before
+    summary['executionComplete'] = not model_errors and not timeout and not malformed and not report_errors and not terminal_errors and set(reports) == set(IDS) and terminal.get(TEST) in ('pass', 'fail') and all(terminal.get(TEST + '/' + case) in ('pass', 'fail') and not comparison_execution_errors(reports[case]) for case in IDS)
+    summary['inputsUnchanged'] = inventory(input_paths(root, bundle, models, go, pack), validator) == before
     try:
         ensure_source(root, args.source_commit)
     except ValueError as error:
         summary['inputsUnchanged'] = False
         summary['errors'].append(str(error))
     summary['automatedCorpusPassed'] = summary['automatedCorpusPassed'] and terminal.get(TEST) == 'pass' and not code and not timeout and not summary['errors'] and summary['inputsUnchanged'] and summary['executionComplete']
+    summary['originalDefectEvaluationRequiredSeparately'] = args.phase == 'model-comparison'
     summary['manualSemanticReviewPending'] = IDS
     summary['boundedOracleOnly'] = True
     summary['releaseQualified'] = False

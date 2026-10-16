@@ -1,11 +1,13 @@
 #!/usr/bin/env python3
 """Counterexamples for the paired answerability runner; no models are run."""
+import copy
 import hashlib
 import importlib.util
 import json
 import pathlib
 import sys
 import unittest
+from unittest import mock
 sys.dont_write_bytecode = True
 ROOT = pathlib.Path(__file__).resolve().parents[1]
 spec = importlib.util.spec_from_file_location('answerability_repair', ROOT/'scripts/run-answerability-repair.py')
@@ -70,6 +72,85 @@ class ComparisonGuards(unittest.TestCase):
         self.assertTrue(runner.gate_errors(rows[:-1], original))
         rows[-1]['Action'] = 'skip'
         self.assertTrue(runner.gate_errors(rows, original))
+
+
+class ModelComparisonGuards(unittest.TestCase):
+    def bindings(self):
+        stable = {'go': {'sha256': 'go'}, 'llama': {'sha256': 'llama'},
+                  'model': {'sha256': 'baseline'}, 'modelManifest': {'sha256': 'baseline-manifest'},
+                  'harness:corpus': {'sha256': 'frozen-corpus'}, 'pilot': {'sha256': 'old-recorder'}}
+        source = {'internal/workspace/ai_generation.go': {'sha256': 'production'},
+                  runner.CORPUS: {'sha256': runner.CORPUS_SHA256}}
+        for name, digest in runner.COMPARISON_BASE_HARNESS.items():
+            stable['harness:' + name] = {'sha256': digest}
+            source[name] = {'sha256': digest}
+        prior = {'sourceCommit': runner.COMPARISON_BASE_SOURCE, 'stableBindings': stable, 'sourceInputs': source}
+        current = copy.deepcopy(stable); current['model'] = {'sha256': 'challenger'}
+        current['modelManifest'] = {'sha256': 'challenger-manifest'}
+        current['pilot'] = {'sha256': 'new-recorder'}
+        changed_source = copy.deepcopy(source)
+        for name in runner.COMPARISON_HARNESS:
+            current['harness:' + name] = {'sha256': 'new-recorder'}
+            changed_source[name] = {'sha256': 'new-recorder'}
+        return prior, current, changed_source
+
+    def test_only_selected_artifact_and_recorder_changes_are_allowed(self):
+        prior, current, source = self.bindings()
+        self.assertEqual(runner.model_comparison_binding_errors(prior, current, source), [])
+        for key in ('go', 'llama', 'harness:corpus'):
+            mutated = copy.deepcopy(current); mutated[key] = {'sha256': 'changed'}
+            self.assertTrue(runner.model_comparison_binding_errors(prior, mutated, source))
+        for key in ('internal/workspace/ai_generation.go', runner.CORPUS, 'internal/workspace/new_prompt.go'):
+            mutated = copy.deepcopy(source); mutated[key] = {'sha256': 'changed'}
+            self.assertTrue(runner.model_comparison_binding_errors(prior, current, mutated))
+        wrong = copy.deepcopy(prior); wrong['sourceCommit'] = 'other'
+        self.assertTrue(runner.model_comparison_binding_errors(wrong, current, source))
+        wrong = copy.deepcopy(prior); wrong['stableBindings']['harness:scripts/run-answerability-repair.py']['sha256'] = 'unknown'
+        self.assertTrue(runner.model_comparison_binding_errors(wrong, current, source))
+
+    def report(self):
+        return {**completed(), 'preparedSystem': 'system', 'generatorSystem': 'system',
+                'preparedPrompt': 'evidence and question', 'generatorPrompt': 'evidence and question',
+                'generatorOutputCap': 512, 'outputCap': 512, 'contextTokens': 8192,
+                'source': 'fact', 'sourceTitle': 'title', 'prompt': 'question', 'selection': '',
+                'mode': 'answer', 'useMemory': False, 'corpusSHA256': runner.CORPUS_SHA256,
+                'sources': [{'number': 1, 'title': 'title', 'text': 'fact'}],
+                'peakWorkerRSSBytes': 2 << 30}
+
+    def test_actual_generation_inputs_must_be_identical(self):
+        prior = self.report(); current = copy.deepcopy(prior)
+        current.update(promptTokens=999, rawDraft='different model answer', modelPackId=runner.COMPARISON_PACK)
+        self.assertEqual(runner.model_comparison_report_errors(prior, current, 10 << 30), [])
+        for key in ('preparedSystem', 'preparedPrompt', 'generatorSystem', 'generatorPrompt',
+                    'generatorGrammar', 'generatorGrammarSHA256', 'generatorOutputCap', 'outputCap',
+                    'contextTokens', 'source', 'sourceTitle', 'prompt', 'selection', 'mode', 'useMemory', 'corpusSHA256'):
+            changed = copy.deepcopy(current); changed[key] = 'changed'
+            with self.subTest(field=key):
+                self.assertTrue(runner.model_comparison_report_errors(prior, changed, 10 << 30))
+        for sources in (None, [], ['malformed'], [{'number': 1, 'title': 'title', 'text': 'different fact'}]):
+            self.assertTrue(runner.model_comparison_report_errors(prior, {**current, 'sources': sources}, 10 << 30))
+
+    def test_sampled_memory_must_be_positive_and_within_unchanged_budget(self):
+        report = self.report()
+        for rss in (None, True, 0, -1, (10 << 30) + 1):
+            self.assertTrue(runner.model_comparison_report_errors(report, {**report, 'peakWorkerRSSBytes': rss}, 10 << 30))
+
+    def test_pack_pinning_and_native_admission_are_required(self):
+        model = {**runner.COMPARISON_MODEL, 'architecture': 'arm64'}
+        with mock.patch.object(runner.subprocess, 'check_output', return_value=str(24 << 30)):
+            policy = runner.comparison_resources(model)
+            self.assertEqual(policy['nativeBudgetBytes'], 10 << 30)
+            self.assertEqual(policy['minimumFreeBytes'], 4 << 30)
+            for field in runner.COMPARISON_MODEL:
+                changed = {**model, field: 'unreviewed'}
+                with self.subTest(field=field), self.assertRaises(ValueError):
+                    runner.comparison_resources(changed)
+            for field, value in [('architecture', 'x86'), ('qualificationOnly', True)]:
+                with self.assertRaises(ValueError):
+                    runner.comparison_resources({**model, field: value})
+        with mock.patch.object(runner.subprocess, 'check_output', return_value=str(8 << 30)):
+            with self.assertRaisesRegex(ValueError, 'admission'):
+                runner.comparison_resources(model)
 
 
 if __name__ == '__main__':
