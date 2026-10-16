@@ -475,6 +475,11 @@ func canonicalSearch(ctx context.Context, k *Kernel, e contracts.ServiceExecutio
 	return out, nil
 }
 func searchQuery(ctx context.Context, k *Kernel, e contracts.ServiceExecutionContext, r map[string]any) (any, error) {
+	return searchQueryWithRelatedContent(ctx, k, e, r, false)
+}
+
+// The ranking selector is internal, never an untrusted request field.
+func searchQueryWithRelatedContent(ctx context.Context, k *Kernel, e contracts.ServiceExecutionContext, r map[string]any, relatedContent bool) (any, error) {
 	query := str(r["query"])
 	if len(query) > 4096 {
 		return nil, Fail("INVALID_REQUEST", "Search query exceeds 4096 bytes")
@@ -541,6 +546,9 @@ func searchQuery(ctx context.Context, k *Kernel, e contracts.ServiceExecutionCon
 		return out, nil
 	}
 	sqlQuery := `SELECT c.id,c.title,c.kind,c.body,c.location_json,c.content_hash,COALESCE(c.file_id,''),c.document_page,bm25(search_fts,4.0,1.0) FROM search_fts JOIN search_chunks c ON c.rowid=search_fts.rowid JOIN pages p ON p.id=c.page_id AND p.revision=c.source_revision AND p.deleted_at IS NULL WHERE search_fts MATCH ? AND NOT EXISTS(SELECT 1 FROM memory_entries m WHERE m.page_id=p.id AND m.status<>'active')`
+	if relatedContent {
+		sqlQuery += " AND " + relatedContentChunkSQL
+	}
 	args := []any{fts}
 	if page := str(r["pageId"]); page != "" {
 		sqlQuery += " AND c.page_id=?"
@@ -608,7 +616,7 @@ func searchQuery(ctx context.Context, k *Kernel, e contracts.ServiceExecutionCon
 		return nil, err
 	}
 	if mode != "keyword" {
-		hybrid, warning := k.semanticSearch(ctx, tx, e, requested, r, query, out.Hits, kinds, int(limit))
+		hybrid, warning := k.semanticSearch(ctx, tx, e, requested, r, query, out.Hits, kinds, int(limit), relatedContent)
 		if warning != "" {
 			out.Partial = true
 			out.Warning = warning
