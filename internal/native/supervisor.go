@@ -61,20 +61,22 @@ type Request struct {
 	Priority Priority
 }
 type Event struct {
-	Kind            string                    `json:"kind"`
-	RequestID       string                    `json:"requestId"`
-	LeaseToken      string                    `json:"leaseToken"`
-	Sequence        int64                     `json:"sequence"`
-	Text            string                    `json:"text"`
-	Code            string                    `json:"code"`
-	Message         string                    `json:"message"`
-	ResultHandle    contracts.JobsInputHandle `json:"resultHandle"`
-	ProtocolVersion int                       `json:"protocolVersion"`
-	Runtime         string                    `json:"runtime"`
-	RuntimeCommit   string                    `json:"runtimeCommit"`
-	Architecture    string                    `json:"architecture"`
-	Capabilities    []string                  `json:"capabilities"`
-	Progress        json.RawMessage           `json:"progress"`
+	Kind                     string                    `json:"kind"`
+	RequestID                string                    `json:"requestId"`
+	LeaseToken               string                    `json:"leaseToken"`
+	Sequence                 int64                     `json:"sequence"`
+	Text                     string                    `json:"text"`
+	Code                     string                    `json:"code"`
+	Message                  string                    `json:"message"`
+	ResultHandle             contracts.JobsInputHandle `json:"resultHandle"`
+	ProtocolVersion          int                       `json:"protocolVersion"`
+	Runtime                  string                    `json:"runtime"`
+	RuntimeCommit            string                    `json:"runtimeCommit"`
+	Architecture             string                    `json:"architecture"`
+	Capabilities             []string                  `json:"capabilities"`
+	PreprocessingProfileID   string                    `json:"preprocessingProfileId,omitempty"`
+	PreprocessingProfileHash string                    `json:"preprocessingProfileHash,omitempty"`
+	Progress                 json.RawMessage           `json:"progress"`
 }
 
 func NewSupervisor(bundle string, manager *Manager) (*Supervisor, error) {
@@ -246,8 +248,9 @@ func (s *Supervisor) Run(ctx context.Context, r Request, onEvent func(Event)) (j
 		r.Wire.Inputs = append(r.Wire.Inputs, h)
 	}
 	var metadata InputMetadata
+	var visionMetadata VisionMetadata
 	if operation == "image_generate" {
-		if _, e = validateVisionInput(p, r); e != nil {
+		if visionMetadata, e = validateVisionInput(p, r); e != nil {
 			return nil, e
 		}
 		projector, releaseProjector, err := s.manager.leaseProjector(p)
@@ -438,6 +441,11 @@ func (s *Supervisor) Run(ctx context.Context, r Request, onEvent func(Event)) (j
 	if !capable {
 		return fail(errors.New("worker capability mismatch"))
 	}
+	if operation == "image_generate" {
+		if e = validateVisionProfileHello(visionMetadata, event); e != nil {
+			return fail(e)
+		}
+	}
 	if e = WriteFrame(in, r.Wire); e != nil {
 		return fail(e)
 	}
@@ -533,8 +541,17 @@ func (s *Supervisor) Run(ctx context.Context, r Request, onEvent func(Event)) (j
 			}
 		}
 	}
-	if operation == "image_generate" && body.Kind != "image_generation" {
-		return nil, errors.New("image generation result mismatch")
+	if operation == "image_generate" {
+		if body.Kind != "image_generation" {
+			return nil, errors.New("image generation result mismatch")
+		}
+		var imageResult VisionResult
+		if e = json.Unmarshal(raw, &imageResult); e != nil {
+			return nil, e
+		}
+		if e = validateVisionProfileResult(visionMetadata, imageResult); e != nil {
+			return nil, e
+		}
 	}
 	if operation == "generate" && body.Kind != "generation" {
 		return nil, errors.New("generation result mismatch")

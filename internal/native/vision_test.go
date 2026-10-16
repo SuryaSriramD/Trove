@@ -315,7 +315,16 @@ func TestVisionRealCancellationAndExactBudget(t *testing.T) {
 	t.Logf("active generation cancelled and both leases released after %.3fs total", time.Since(start).Seconds())
 	metadata, _ := os.CreateTemp(t.TempDir(), "meta")
 	defer metadata.Close()
-	json.NewEncoder(metadata).Encode(VisionMetadata{SchemaVersion: 1, Question: "What is visible?", ContextTokens: 512, Width: 256, Height: 256})
+	selected, _, release, err := m.lease("01990000-0000-7000-8000-000000000107")
+	if err != nil {
+		t.Fatal(err)
+	}
+	release()
+	meta := visionProfileMetadata(selected, "What is visible?", 256, 256)
+	meta.ContextTokens = 512
+	if err := json.NewEncoder(metadata).Encode(meta); err != nil {
+		t.Fatal(err)
+	}
 	mi, _ := OpenInput(metadata, "text", NewID())
 	ii, _ := OpenInput(f, "image", NewID())
 	wire := contracts.JobsWorkerRequest{ProtocolVersion: 1, RequestId: contracts.DomainId(NewID()), JobId: contracts.DomainId(NewID()), LeaseToken: contracts.DomainId(NewID()), CancellationId: contracts.DomainId(NewID()), Operation: "image_generate", ModelPackId: "01990000-0000-7000-8000-000000000107", Limits: contracts.JobsResourceLimits{Threads: 4, MemoryBytes: s.MemoryBudget(), TimeoutMs: 300000, MaxOutputBytes: 128 << 10, MaxTokens: 512}}

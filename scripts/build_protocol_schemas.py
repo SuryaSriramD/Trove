@@ -423,7 +423,7 @@ j={
 'JobProgressEvent':obj({'contractVersion':{'const':1},'jobId':D('Id'),'jobRevision':D('Revision'),'attempt':{'type':'integer','minimum':0,'maximum':5},'state':R('JobState'),'progress':R('Progress')}),
 'WorkerRequest':obj({'protocolVersion':{'const':1},'requestId':D('Id'),'jobId':D('Id'),'leaseToken':D('Id'),'cancellationId':D('Id'),'operation':enum('generate','embed','transcribe','tokenize','image_generate'),'modelPackId':D('Id'),'limits':R('ResourceLimits'),'inputs':arr(R('InputHandle'),32)}),
 'WorkerOutput':{'oneOf':[
- tagged('hello',{'protocolVersion':{'const':1},'runtime':enum('llama.cpp','whisper.cpp'),'runtimeCommit':{'type':'string','pattern':'^[0-9a-f]{40}$'},'architecture':enum('arm64','amd64'),'capabilities':arr(enum('generate','embed','transcribe','tokenize','image_generate'),5)}),
+ tagged('hello',{'protocolVersion':{'const':1},'runtime':enum('llama.cpp','whisper.cpp'),'runtimeCommit':{'type':'string','pattern':'^[0-9a-f]{40}$'},'architecture':enum('arm64','amd64'),'capabilities':arr(enum('generate','embed','transcribe','tokenize','image_generate','image_preprocessing_profile_v1'),5),'preprocessingProfileId':{'type':'string','maxLength':100,'pattern':'^[a-z0-9][a-z0-9-]+$'},'preprocessingProfileHash':{'type':'string','pattern':'^[0-9a-f]{64}$'}},['protocolVersion','runtime','runtimeCommit','architecture','capabilities']),
  tagged('progress',{'requestId':D('Id'),'sequence':N,'progress':R('Progress')}),
  tagged('token',{'requestId':D('Id'),'sequence':N,'text':{'type':'string','maxLength':16384}}),
  tagged('result',{'requestId':D('Id'),'leaseToken':D('Id'),'sequence':N,'resultHandle':R('InputHandle')}),
@@ -435,12 +435,14 @@ j={
  tagged('embedding',{'modelPackId':D('Id'),'dimension':{'type':'integer','minimum':1,'maximum':8192},'vectors':arr(arr({'type':'number'},8192),256),'locations':arr(D('Location'),256)}),
  tagged('transcript',{'meetingId':D('Id'),'segments':arr(obj({'segmentId':D('Id'),'blockId':D('Id'),'startMs':N,'endMs':N,'text':S}),256)}),
  tagged('token_counts',{'counts':arr({'type':'integer','minimum':1,'maximum':1048576},16)}),
- tagged('image_generation',{'text':{'type':'string','maxLength':16384},'finishReason':enum('eos','length'),'inputTokens':{'type':'integer','minimum':1,'maximum':8192},'outputTokens':{'type':'integer','minimum':0,'maximum':512}})]},
+ tagged('image_generation',{'text':{'type':'string','maxLength':16384},'finishReason':enum('eos','length'),'inputTokens':{'type':'integer','minimum':1,'maximum':8192},'outputTokens':{'type':'integer','minimum':0,'maximum':512},'preprocessingProfileId':{'type':'string','maxLength':100,'pattern':'^[a-z0-9][a-z0-9-]+$'},'preprocessingProfileHash':{'type':'string','pattern':'^[0-9a-f]{64}$'}},['text','finishReason','inputTokens','outputTokens'])]},
 'EnqueueJobRequest':obj({**header,'kind':R('JobKind'),'payload':R('JobPayload'),'idempotencyKey':S}),
 'GetJobRequest':obj({**header,'jobId':D('Id')}),
 'CancelJobRequest':obj({**header,'jobId':D('Id'),'expectedRevision':D('Revision')}),
 'JobResponse':{'oneOf':[obj({'ok':{'const':True},'result':R('Job')}),obj({'ok':{'const':False},'error':{'$ref':'service.schema.json#/$defs/Error'}})]}
 }
+for profile_message in (j['WorkerOutput']['oneOf'][0],j['WorkerResult']['oneOf'][-1]):
+ profile_message['dependentRequired']={'preprocessingProfileId':['preprocessingProfileHash'],'preprocessingProfileHash':['preprocessingProfileId']}
 save('jobs',schema('jobs',j,'Job'))
 
 publish(outputs, check=args.check)
