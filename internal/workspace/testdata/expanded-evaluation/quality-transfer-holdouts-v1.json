@@ -1,0 +1,1915 @@
+{
+  "schemaVersion": 1,
+  "family": "quality_transfer_holdouts_v1",
+  "createdAtUTC": "2026-10-16T13:18:24.094891+00:00",
+  "sourceBaseline": "75f2aa013ad468efe3e65d3e67129ae471056fd8",
+  "description": "Twenty additive synthetic controls sealed before the next production repair is fixed or evaluated. Twelve answerability cases balance four new domains across positive, explicit-negative and absent evidence; eight mode cases cover exact diagram semantics and fact-preserving expansion.",
+  "independence": {
+    "author": "/root/implement_backup",
+    "currentRepairCandidateInspected": false,
+    "freshModelOutputsObserved": false,
+    "priorFailedCampaignsReviewed": true,
+    "priorRejectedPromptExperimentsReviewed": true,
+    "limitation": "The author independently designed fresh cases but knows earlier failure classes. Independence is from the upcoming candidate, not blindness to historical results.",
+    "withholdFromRepairLaneUntilCandidateFixed": true,
+    "readScope": [
+      "existing answerability and independent-mode corpus schemas",
+      "existing evaluation-only loaders/oracles and pinned Mermaid parser adapter"
+    ],
+    "notExposedToRepairLaneByAuthor": true
+  },
+  "balance": {
+    "answer": {
+      "supported-positive": 4,
+      "explicit-negative": 4,
+      "absent": 4
+    },
+    "mermaid": 4,
+    "expand": {
+      "supported-forbidden": 1,
+      "supported-required-labeled": 1,
+      "absent-forbidden": 1,
+      "absent-required-labeled": 1
+    }
+  },
+  "model": {
+    "defaultPack": "01990000-0000-7000-8000-000000000106",
+    "contextTokens": 8192,
+    "outputTokens": 512,
+    "generationAttemptsPerCase": 1,
+    "hiddenRetries": 0,
+    "comparisonPolicy": "Any authorized compatible model comparison is a separately named phase with exact model/helper/prompt/tokenizer identities; no best-of selection or pooled pass grade."
+  },
+  "requestBoundary": {
+    "allowlist": [
+      "mode",
+      "title",
+      "source",
+      "prompt",
+      "selection",
+      "useMemory",
+      "memories",
+      "memoryTitles",
+      "outsidePages"
+    ],
+    "forbiddenInModelContext": [
+      "expected",
+      "answerOracle",
+      "diagram",
+      "golden",
+      "acceptedAlternatives",
+      "counterexamples",
+      "required",
+      "forbidden",
+      "expectedFacts",
+      "benefitState",
+      "suggestionPolicy"
+    ],
+    "canonical": "Seed through canonical services. Retain exact source/current-revision/citation evidence, raw request, system/user/grammar, one native callback, proposals and typed canonical/asset snapshots before and after. Every proposal remains unapplied."
+  },
+  "executionPolicy": {
+    "automaticExecutionEnabled": false,
+    "coordinatorMustBindNewAdditiveHarness": true,
+    "existingCorporaUntouched": true,
+    "goldenAndPoisonGatesBeforeNative": true,
+    "everyAttemptRetained": true,
+    "freshEvidenceDirectoryPerPhase": true,
+    "missingSkippedInterruptedAreNotPasses": true,
+    "manualAllClauseReviewRequired": true,
+    "semanticLabelRule": "A required optional suggestion can be identified in ordinary prose; no exclusive colon-label regex.",
+    "answerGrammarLimit": "Whole-claim regexes are a declared bounded check. Faithful paraphrases outside them require separate semantic classification; never silently regrade frozen automated output.",
+    "proposalAndCanonicalBoundary": "A successful parse/generation does not establish correct requested effects or authorized application."
+  },
+  "releaseQualified": false,
+  "cases": [
+    {
+      "id": "quality-transfer-answer-stage-curtain-supported-positive",
+      "mode": "answer",
+      "title": "Scene curtain materials",
+      "source": "Cotton is the fabric chosen for the Morrow scene curtain. The Morrow scene curtain is four metres wide. The Cedar scene curtain uses linen. The Morrow scene curtain has no printed pattern.",
+      "prompt": "Which fabric has been chosen for the Morrow scene curtain? Answer in one sentence without a heading.",
+      "selection": "",
+      "useMemory": false,
+      "memories": [],
+      "memoryTitles": [],
+      "outsidePages": [],
+      "manualSemanticReviewRequired": true,
+      "allClausesMustPass": true,
+      "domain": "stage-curtain",
+      "variant": "supported-positive",
+      "requestedEntity": "Morrow scene curtain",
+      "requestedAttribute": "chosen fabric",
+      "oracle": "answerability_bounded_v1",
+      "proposal": "none",
+      "golden": "{\"title\":\"\",\"claims\":[{\"text\":\"The fabric chosen for the Morrow scene curtain is cotton.\",\"quote\":\"Cotton is the fabric chosen for the Morrow scene curtain.\"}]}",
+      "expected": {
+        "required": [
+          "Answer only the requested attribute of the requested entity; a true nearby fact is not a relevant answer.",
+          "Every asserted clause must have support in the selected source; preserve scope, value and polarity.",
+          "Use one claim without a heading or unrequested recommendations.",
+          "Retain exact current source citation/identity and unchanged canonical state; do not apply a proposal.",
+          "State the supported positive or explicit-negative answer; do not abstain when evidence answers the question.",
+          "Quote an exact substring of the selected source containing the answer-bearing sentence; the quote need not equal the paraphrased claim."
+        ],
+        "forbidden": [
+          "Using another entity’s attribute value.",
+          "Substituting a different attribute or unrelated negative fact.",
+          "Adding unsupported values, causes, guarantees or an inferred completed action."
+        ],
+        "acceptableExample": "The fabric chosen for the Morrow scene curtain is cotton.",
+        "rejectedExample": "The Cedar scene curtain uses linen.",
+        "manualSemanticReviewRequired": true,
+        "allClausesMustPass": true
+      },
+      "answerOracle": {
+        "heading": "",
+        "abstain": false,
+        "facts": [
+          {
+            "claimPattern": "(?i)^(?:(?:The )?fabric chosen for (?:the )?Morrow scene curtain is cotton|Cotton (?:is|has been chosen as) the fabric (?:chosen )?for the Morrow scene curtain|(?:The )?Morrow scene curtain(?:\\x27s|’s) chosen fabric is cotton)\\.$",
+            "quotePattern": "Cotton is the fabric chosen for the Morrow scene curtain\\.",
+            "validClaim": "The fabric chosen for the Morrow scene curtain is cotton.",
+            "validQuote": "Cotton is the fabric chosen for the Morrow scene curtain.",
+            "support": "source"
+          }
+        ]
+      },
+      "counterexamples": [
+        {
+          "kind": "wrong_entity",
+          "claim": "The Cedar scene curtain uses linen.",
+          "quote": "The Cedar scene curtain uses linen.",
+          "mustReject": true,
+          "reason": "The quotation is genuine but does not answer the requested entity and attribute."
+        },
+        {
+          "kind": "nearby_other_attribute",
+          "claim": "The Morrow scene curtain is four metres wide.",
+          "quote": "The Morrow scene curtain is four metres wide.",
+          "mustReject": true,
+          "reason": "The quotation is genuine but does not answer the requested entity and attribute."
+        },
+        {
+          "kind": "unrelated_negative",
+          "claim": "The Morrow scene curtain has no printed pattern.",
+          "quote": "The Morrow scene curtain has no printed pattern.",
+          "mustReject": true,
+          "reason": "The quotation is genuine but does not answer the requested entity and attribute."
+        },
+        {
+          "kind": "over_abstention",
+          "claim": "The supplied evidence does not answer this question.",
+          "quote": "",
+          "mustReject": true,
+          "reason": "The selected source explicitly answers the question."
+        },
+        {
+          "kind": "opposite_polarity",
+          "claim": "No fabric has been chosen for the Morrow scene curtain.",
+          "quote": "Cotton is the fabric chosen for the Morrow scene curtain.",
+          "mustReject": true,
+          "reason": "An exact quotation does not support reversing its polarity."
+        },
+        {
+          "kind": "wrong_support",
+          "claim": "The fabric chosen for the Morrow scene curtain is cotton.",
+          "quote": "The Cedar scene curtain uses linen.",
+          "mustReject": true,
+          "reason": "A correct claim with evidence about the other entity is not valid support."
+        }
+      ]
+    },
+    {
+      "id": "quality-transfer-answer-stage-curtain-explicit-negative",
+      "mode": "answer",
+      "title": "Scene curtain materials",
+      "source": "No fabric has been chosen for the Morrow scene curtain. The Morrow scene curtain is four metres wide. The Cedar scene curtain uses linen. The Morrow scene curtain has no printed pattern.",
+      "prompt": "Which fabric has been chosen for the Morrow scene curtain? Answer in one sentence without a heading.",
+      "selection": "",
+      "useMemory": false,
+      "memories": [],
+      "memoryTitles": [],
+      "outsidePages": [],
+      "manualSemanticReviewRequired": true,
+      "allClausesMustPass": true,
+      "domain": "stage-curtain",
+      "variant": "explicit-negative",
+      "requestedEntity": "Morrow scene curtain",
+      "requestedAttribute": "chosen fabric",
+      "oracle": "answerability_bounded_v1",
+      "proposal": "none",
+      "golden": "{\"title\":\"\",\"claims\":[{\"text\":\"No fabric has been chosen for the Morrow scene curtain.\",\"quote\":\"No fabric has been chosen for the Morrow scene curtain.\"}]}",
+      "expected": {
+        "required": [
+          "Answer only the requested attribute of the requested entity; a true nearby fact is not a relevant answer.",
+          "Every asserted clause must have support in the selected source; preserve scope, value and polarity.",
+          "Use one claim without a heading or unrequested recommendations.",
+          "Retain exact current source citation/identity and unchanged canonical state; do not apply a proposal.",
+          "State the supported positive or explicit-negative answer; do not abstain when evidence answers the question.",
+          "Quote an exact substring of the selected source containing the answer-bearing sentence; the quote need not equal the paraphrased claim."
+        ],
+        "forbidden": [
+          "Using another entity’s attribute value.",
+          "Substituting a different attribute or unrelated negative fact.",
+          "Adding unsupported values, causes, guarantees or an inferred completed action."
+        ],
+        "acceptableExample": "No fabric has been chosen for the Morrow scene curtain.",
+        "rejectedExample": "The Cedar scene curtain uses linen.",
+        "manualSemanticReviewRequired": true,
+        "allClausesMustPass": true
+      },
+      "answerOracle": {
+        "heading": "",
+        "abstain": false,
+        "facts": [
+          {
+            "claimPattern": "(?i)^(?:No fabric has (?:yet )?been (?:chosen|selected) for (?:the )?Morrow scene curtain|(?:The )?Morrow scene curtain has no (?:chosen|selected) fabric)\\.$",
+            "quotePattern": "No fabric has been chosen for the Morrow scene curtain\\.",
+            "validClaim": "No fabric has been chosen for the Morrow scene curtain.",
+            "validQuote": "No fabric has been chosen for the Morrow scene curtain.",
+            "support": "source"
+          }
+        ]
+      },
+      "counterexamples": [
+        {
+          "kind": "wrong_entity",
+          "claim": "The Cedar scene curtain uses linen.",
+          "quote": "The Cedar scene curtain uses linen.",
+          "mustReject": true,
+          "reason": "The quotation is genuine but does not answer the requested entity and attribute."
+        },
+        {
+          "kind": "nearby_other_attribute",
+          "claim": "The Morrow scene curtain is four metres wide.",
+          "quote": "The Morrow scene curtain is four metres wide.",
+          "mustReject": true,
+          "reason": "The quotation is genuine but does not answer the requested entity and attribute."
+        },
+        {
+          "kind": "unrelated_negative",
+          "claim": "The Morrow scene curtain has no printed pattern.",
+          "quote": "The Morrow scene curtain has no printed pattern.",
+          "mustReject": true,
+          "reason": "The quotation is genuine but does not answer the requested entity and attribute."
+        },
+        {
+          "kind": "over_abstention",
+          "claim": "The supplied evidence does not answer this question.",
+          "quote": "",
+          "mustReject": true,
+          "reason": "The selected source explicitly answers the question."
+        },
+        {
+          "kind": "opposite_polarity",
+          "claim": "The fabric chosen for the Morrow scene curtain is cotton.",
+          "quote": "No fabric has been chosen for the Morrow scene curtain.",
+          "mustReject": true,
+          "reason": "An exact quotation does not support reversing its polarity."
+        },
+        {
+          "kind": "wrong_support",
+          "claim": "No fabric has been chosen for the Morrow scene curtain.",
+          "quote": "The Cedar scene curtain uses linen.",
+          "mustReject": true,
+          "reason": "A correct claim with evidence about the other entity is not valid support."
+        }
+      ]
+    },
+    {
+      "id": "quality-transfer-answer-stage-curtain-absent",
+      "mode": "answer",
+      "title": "Scene curtain materials",
+      "source": "The Morrow scene curtain is four metres wide. The Cedar scene curtain uses linen. The Morrow scene curtain has no printed pattern.",
+      "prompt": "Which fabric has been chosen for the Morrow scene curtain? Answer in one sentence without a heading.",
+      "selection": "",
+      "useMemory": false,
+      "memories": [],
+      "memoryTitles": [],
+      "outsidePages": [],
+      "manualSemanticReviewRequired": true,
+      "allClausesMustPass": true,
+      "domain": "stage-curtain",
+      "variant": "absent",
+      "requestedEntity": "Morrow scene curtain",
+      "requestedAttribute": "chosen fabric",
+      "oracle": "answerability_bounded_v1",
+      "proposal": "none",
+      "golden": "{\"title\":\"\",\"claims\":[{\"text\":\"The supplied evidence does not answer this question.\",\"quote\":\"\"}]}",
+      "expected": {
+        "required": [
+          "Answer only the requested attribute of the requested entity; a true nearby fact is not a relevant answer.",
+          "Every asserted clause must have support in the selected source; preserve scope, value and polarity.",
+          "Use one claim without a heading or unrequested recommendations.",
+          "Retain exact current source citation/identity and unchanged canonical state; do not apply a proposal.",
+          "Use exactly the exclusive evidence-absent abstention with an empty quote.",
+          "Absence of evidence does not establish an explicit negative fact."
+        ],
+        "forbidden": [
+          "Using another entity’s attribute value.",
+          "Substituting a different attribute or unrelated negative fact.",
+          "Adding unsupported values, causes, guarantees or an inferred completed action."
+        ],
+        "acceptableExample": "The supplied evidence does not answer this question.",
+        "rejectedExample": "The Cedar scene curtain uses linen.",
+        "manualSemanticReviewRequired": true,
+        "allClausesMustPass": true
+      },
+      "answerOracle": {
+        "heading": "",
+        "abstain": true,
+        "facts": []
+      },
+      "counterexamples": [
+        {
+          "kind": "wrong_entity",
+          "claim": "The Cedar scene curtain uses linen.",
+          "quote": "The Cedar scene curtain uses linen.",
+          "mustReject": true,
+          "reason": "The quotation is genuine but does not answer the requested entity and attribute."
+        },
+        {
+          "kind": "nearby_other_attribute",
+          "claim": "The Morrow scene curtain is four metres wide.",
+          "quote": "The Morrow scene curtain is four metres wide.",
+          "mustReject": true,
+          "reason": "The quotation is genuine but does not answer the requested entity and attribute."
+        },
+        {
+          "kind": "unrelated_negative",
+          "claim": "The Morrow scene curtain has no printed pattern.",
+          "quote": "The Morrow scene curtain has no printed pattern.",
+          "mustReject": true,
+          "reason": "The quotation is genuine but does not answer the requested entity and attribute."
+        },
+        {
+          "kind": "unsupported_positive",
+          "claim": "The fabric chosen for the Morrow scene curtain is cotton.",
+          "quote": "",
+          "mustReject": true,
+          "reason": "The selected evidence omits the requested attribute; do not infer either polarity."
+        },
+        {
+          "kind": "unsupported_explicit_negative",
+          "claim": "No fabric has been chosen for the Morrow scene curtain.",
+          "quote": "",
+          "mustReject": true,
+          "reason": "The selected evidence omits the requested attribute; do not infer either polarity."
+        }
+      ]
+    },
+    {
+      "id": "quality-transfer-answer-parcel-locker-supported-positive",
+      "mode": "answer",
+      "title": "Parcel locker assignments",
+      "source": "The Fjord parcel locker has six compartments. The access code assigned to the Fjord parcel locker is 8642. The access code for the Ridge parcel locker is 3725. The Fjord parcel locker has no rear door.",
+      "prompt": "What access code has been assigned to the Fjord parcel locker? Answer in one sentence without a heading.",
+      "selection": "",
+      "useMemory": false,
+      "memories": [],
+      "memoryTitles": [],
+      "outsidePages": [],
+      "manualSemanticReviewRequired": true,
+      "allClausesMustPass": true,
+      "domain": "parcel-locker",
+      "variant": "supported-positive",
+      "requestedEntity": "Fjord parcel locker",
+      "requestedAttribute": "assigned access code",
+      "oracle": "answerability_bounded_v1",
+      "proposal": "none",
+      "golden": "{\"title\":\"\",\"claims\":[{\"text\":\"The Fjord parcel locker has the access code 8642.\",\"quote\":\"The access code assigned to the Fjord parcel locker is 8642.\"}]}",
+      "expected": {
+        "required": [
+          "Answer only the requested attribute of the requested entity; a true nearby fact is not a relevant answer.",
+          "Every asserted clause must have support in the selected source; preserve scope, value and polarity.",
+          "Use one claim without a heading or unrequested recommendations.",
+          "Retain exact current source citation/identity and unchanged canonical state; do not apply a proposal.",
+          "State the supported positive or explicit-negative answer; do not abstain when evidence answers the question.",
+          "Quote an exact substring of the selected source containing the answer-bearing sentence; the quote need not equal the paraphrased claim."
+        ],
+        "forbidden": [
+          "Using another entity’s attribute value.",
+          "Substituting a different attribute or unrelated negative fact.",
+          "Adding unsupported values, causes, guarantees or an inferred completed action."
+        ],
+        "acceptableExample": "The Fjord parcel locker has the access code 8642.",
+        "rejectedExample": "The access code for the Ridge parcel locker is 3725.",
+        "manualSemanticReviewRequired": true,
+        "allClausesMustPass": true
+      },
+      "answerOracle": {
+        "heading": "",
+        "abstain": false,
+        "facts": [
+          {
+            "claimPattern": "(?i)^(?:(?:The )?Fjord parcel locker has (?:the )?access code 8642|(?:The )?access code (?:assigned to|for) (?:the )?Fjord parcel locker is 8642|(?:The )?Fjord parcel locker(?:\\x27s|’s) access code is 8642)\\.$",
+            "quotePattern": "The access code assigned to the Fjord parcel locker is 8642\\.",
+            "validClaim": "The Fjord parcel locker has the access code 8642.",
+            "validQuote": "The access code assigned to the Fjord parcel locker is 8642.",
+            "support": "source"
+          }
+        ]
+      },
+      "counterexamples": [
+        {
+          "kind": "wrong_entity",
+          "claim": "The access code for the Ridge parcel locker is 3725.",
+          "quote": "The access code for the Ridge parcel locker is 3725.",
+          "mustReject": true,
+          "reason": "The quotation is genuine but does not answer the requested entity and attribute."
+        },
+        {
+          "kind": "nearby_other_attribute",
+          "claim": "The Fjord parcel locker has six compartments.",
+          "quote": "The Fjord parcel locker has six compartments.",
+          "mustReject": true,
+          "reason": "The quotation is genuine but does not answer the requested entity and attribute."
+        },
+        {
+          "kind": "unrelated_negative",
+          "claim": "The Fjord parcel locker has no rear door.",
+          "quote": "The Fjord parcel locker has no rear door.",
+          "mustReject": true,
+          "reason": "The quotation is genuine but does not answer the requested entity and attribute."
+        },
+        {
+          "kind": "over_abstention",
+          "claim": "The supplied evidence does not answer this question.",
+          "quote": "",
+          "mustReject": true,
+          "reason": "The selected source explicitly answers the question."
+        },
+        {
+          "kind": "opposite_polarity",
+          "claim": "No access code has been assigned to the Fjord parcel locker.",
+          "quote": "The access code assigned to the Fjord parcel locker is 8642.",
+          "mustReject": true,
+          "reason": "An exact quotation does not support reversing its polarity."
+        },
+        {
+          "kind": "wrong_support",
+          "claim": "The Fjord parcel locker has the access code 8642.",
+          "quote": "The access code for the Ridge parcel locker is 3725.",
+          "mustReject": true,
+          "reason": "A correct claim with evidence about the other entity is not valid support."
+        }
+      ]
+    },
+    {
+      "id": "quality-transfer-answer-parcel-locker-explicit-negative",
+      "mode": "answer",
+      "title": "Parcel locker assignments",
+      "source": "The Fjord parcel locker has six compartments. No access code has been assigned to the Fjord parcel locker. The access code for the Ridge parcel locker is 3725. The Fjord parcel locker has no rear door.",
+      "prompt": "What access code has been assigned to the Fjord parcel locker? Answer in one sentence without a heading.",
+      "selection": "",
+      "useMemory": false,
+      "memories": [],
+      "memoryTitles": [],
+      "outsidePages": [],
+      "manualSemanticReviewRequired": true,
+      "allClausesMustPass": true,
+      "domain": "parcel-locker",
+      "variant": "explicit-negative",
+      "requestedEntity": "Fjord parcel locker",
+      "requestedAttribute": "assigned access code",
+      "oracle": "answerability_bounded_v1",
+      "proposal": "none",
+      "golden": "{\"title\":\"\",\"claims\":[{\"text\":\"No access code has been assigned to the Fjord parcel locker.\",\"quote\":\"No access code has been assigned to the Fjord parcel locker.\"}]}",
+      "expected": {
+        "required": [
+          "Answer only the requested attribute of the requested entity; a true nearby fact is not a relevant answer.",
+          "Every asserted clause must have support in the selected source; preserve scope, value and polarity.",
+          "Use one claim without a heading or unrequested recommendations.",
+          "Retain exact current source citation/identity and unchanged canonical state; do not apply a proposal.",
+          "State the supported positive or explicit-negative answer; do not abstain when evidence answers the question.",
+          "Quote an exact substring of the selected source containing the answer-bearing sentence; the quote need not equal the paraphrased claim."
+        ],
+        "forbidden": [
+          "Using another entity’s attribute value.",
+          "Substituting a different attribute or unrelated negative fact.",
+          "Adding unsupported values, causes, guarantees or an inferred completed action."
+        ],
+        "acceptableExample": "No access code has been assigned to the Fjord parcel locker.",
+        "rejectedExample": "The access code for the Ridge parcel locker is 3725.",
+        "manualSemanticReviewRequired": true,
+        "allClausesMustPass": true
+      },
+      "answerOracle": {
+        "heading": "",
+        "abstain": false,
+        "facts": [
+          {
+            "claimPattern": "(?i)^(?:No access code has (?:yet )?been assigned to (?:the )?Fjord parcel locker|(?:The )?Fjord parcel locker has no assigned access code)\\.$",
+            "quotePattern": "No access code has been assigned to the Fjord parcel locker\\.",
+            "validClaim": "No access code has been assigned to the Fjord parcel locker.",
+            "validQuote": "No access code has been assigned to the Fjord parcel locker.",
+            "support": "source"
+          }
+        ]
+      },
+      "counterexamples": [
+        {
+          "kind": "wrong_entity",
+          "claim": "The access code for the Ridge parcel locker is 3725.",
+          "quote": "The access code for the Ridge parcel locker is 3725.",
+          "mustReject": true,
+          "reason": "The quotation is genuine but does not answer the requested entity and attribute."
+        },
+        {
+          "kind": "nearby_other_attribute",
+          "claim": "The Fjord parcel locker has six compartments.",
+          "quote": "The Fjord parcel locker has six compartments.",
+          "mustReject": true,
+          "reason": "The quotation is genuine but does not answer the requested entity and attribute."
+        },
+        {
+          "kind": "unrelated_negative",
+          "claim": "The Fjord parcel locker has no rear door.",
+          "quote": "The Fjord parcel locker has no rear door.",
+          "mustReject": true,
+          "reason": "The quotation is genuine but does not answer the requested entity and attribute."
+        },
+        {
+          "kind": "over_abstention",
+          "claim": "The supplied evidence does not answer this question.",
+          "quote": "",
+          "mustReject": true,
+          "reason": "The selected source explicitly answers the question."
+        },
+        {
+          "kind": "opposite_polarity",
+          "claim": "The Fjord parcel locker has the access code 8642.",
+          "quote": "No access code has been assigned to the Fjord parcel locker.",
+          "mustReject": true,
+          "reason": "An exact quotation does not support reversing its polarity."
+        },
+        {
+          "kind": "wrong_support",
+          "claim": "No access code has been assigned to the Fjord parcel locker.",
+          "quote": "The access code for the Ridge parcel locker is 3725.",
+          "mustReject": true,
+          "reason": "A correct claim with evidence about the other entity is not valid support."
+        }
+      ]
+    },
+    {
+      "id": "quality-transfer-answer-parcel-locker-absent",
+      "mode": "answer",
+      "title": "Parcel locker assignments",
+      "source": "The Fjord parcel locker has six compartments. The access code for the Ridge parcel locker is 3725. The Fjord parcel locker has no rear door.",
+      "prompt": "What access code has been assigned to the Fjord parcel locker? Answer in one sentence without a heading.",
+      "selection": "",
+      "useMemory": false,
+      "memories": [],
+      "memoryTitles": [],
+      "outsidePages": [],
+      "manualSemanticReviewRequired": true,
+      "allClausesMustPass": true,
+      "domain": "parcel-locker",
+      "variant": "absent",
+      "requestedEntity": "Fjord parcel locker",
+      "requestedAttribute": "assigned access code",
+      "oracle": "answerability_bounded_v1",
+      "proposal": "none",
+      "golden": "{\"title\":\"\",\"claims\":[{\"text\":\"The supplied evidence does not answer this question.\",\"quote\":\"\"}]}",
+      "expected": {
+        "required": [
+          "Answer only the requested attribute of the requested entity; a true nearby fact is not a relevant answer.",
+          "Every asserted clause must have support in the selected source; preserve scope, value and polarity.",
+          "Use one claim without a heading or unrequested recommendations.",
+          "Retain exact current source citation/identity and unchanged canonical state; do not apply a proposal.",
+          "Use exactly the exclusive evidence-absent abstention with an empty quote.",
+          "Absence of evidence does not establish an explicit negative fact."
+        ],
+        "forbidden": [
+          "Using another entity’s attribute value.",
+          "Substituting a different attribute or unrelated negative fact.",
+          "Adding unsupported values, causes, guarantees or an inferred completed action."
+        ],
+        "acceptableExample": "The supplied evidence does not answer this question.",
+        "rejectedExample": "The access code for the Ridge parcel locker is 3725.",
+        "manualSemanticReviewRequired": true,
+        "allClausesMustPass": true
+      },
+      "answerOracle": {
+        "heading": "",
+        "abstain": true,
+        "facts": []
+      },
+      "counterexamples": [
+        {
+          "kind": "wrong_entity",
+          "claim": "The access code for the Ridge parcel locker is 3725.",
+          "quote": "The access code for the Ridge parcel locker is 3725.",
+          "mustReject": true,
+          "reason": "The quotation is genuine but does not answer the requested entity and attribute."
+        },
+        {
+          "kind": "nearby_other_attribute",
+          "claim": "The Fjord parcel locker has six compartments.",
+          "quote": "The Fjord parcel locker has six compartments.",
+          "mustReject": true,
+          "reason": "The quotation is genuine but does not answer the requested entity and attribute."
+        },
+        {
+          "kind": "unrelated_negative",
+          "claim": "The Fjord parcel locker has no rear door.",
+          "quote": "The Fjord parcel locker has no rear door.",
+          "mustReject": true,
+          "reason": "The quotation is genuine but does not answer the requested entity and attribute."
+        },
+        {
+          "kind": "unsupported_positive",
+          "claim": "The Fjord parcel locker has the access code 8642.",
+          "quote": "",
+          "mustReject": true,
+          "reason": "The selected evidence omits the requested attribute; do not infer either polarity."
+        },
+        {
+          "kind": "unsupported_explicit_negative",
+          "claim": "No access code has been assigned to the Fjord parcel locker.",
+          "quote": "",
+          "mustReject": true,
+          "reason": "The selected evidence omits the requested attribute; do not infer either polarity."
+        }
+      ]
+    },
+    {
+      "id": "quality-transfer-answer-radio-antenna-supported-positive",
+      "mode": "answer",
+      "title": "Receiver antenna choices",
+      "source": "The Amber receiver has a metal case. A dipole antenna was selected for the Moss receiver. The antenna selected for the Amber receiver is a loop antenna. The Amber receiver has no carrying handle.",
+      "prompt": "Which antenna type has been selected for the Amber receiver? Answer in one sentence without a heading.",
+      "selection": "",
+      "useMemory": false,
+      "memories": [],
+      "memoryTitles": [],
+      "outsidePages": [],
+      "manualSemanticReviewRequired": true,
+      "allClausesMustPass": true,
+      "domain": "radio-antenna",
+      "variant": "supported-positive",
+      "requestedEntity": "Amber receiver",
+      "requestedAttribute": "selected antenna type",
+      "oracle": "answerability_bounded_v1",
+      "proposal": "none",
+      "golden": "{\"title\":\"\",\"claims\":[{\"text\":\"A loop antenna was selected for the Amber receiver.\",\"quote\":\"The antenna selected for the Amber receiver is a loop antenna.\"}]}",
+      "expected": {
+        "required": [
+          "Answer only the requested attribute of the requested entity; a true nearby fact is not a relevant answer.",
+          "Every asserted clause must have support in the selected source; preserve scope, value and polarity.",
+          "Use one claim without a heading or unrequested recommendations.",
+          "Retain exact current source citation/identity and unchanged canonical state; do not apply a proposal.",
+          "State the supported positive or explicit-negative answer; do not abstain when evidence answers the question.",
+          "Quote an exact substring of the selected source containing the answer-bearing sentence; the quote need not equal the paraphrased claim."
+        ],
+        "forbidden": [
+          "Using another entity’s attribute value.",
+          "Substituting a different attribute or unrelated negative fact.",
+          "Adding unsupported values, causes, guarantees or an inferred completed action."
+        ],
+        "acceptableExample": "A loop antenna was selected for the Amber receiver.",
+        "rejectedExample": "A dipole antenna was selected for the Moss receiver.",
+        "manualSemanticReviewRequired": true,
+        "allClausesMustPass": true
+      },
+      "answerOracle": {
+        "heading": "",
+        "abstain": false,
+        "facts": [
+          {
+            "claimPattern": "(?i)^(?:A loop antenna (?:was|has been) selected for (?:the )?Amber receiver|(?:The )?(?:antenna|antenna type) selected for (?:the )?Amber receiver is (?:a )?loop antenna|(?:The )?Amber receiver(?:\\x27s|’s) selected antenna is (?:a )?loop antenna)\\.$",
+            "quotePattern": "The antenna selected for the Amber receiver is a loop antenna\\.",
+            "validClaim": "A loop antenna was selected for the Amber receiver.",
+            "validQuote": "The antenna selected for the Amber receiver is a loop antenna.",
+            "support": "source"
+          }
+        ]
+      },
+      "counterexamples": [
+        {
+          "kind": "wrong_entity",
+          "claim": "A dipole antenna was selected for the Moss receiver.",
+          "quote": "A dipole antenna was selected for the Moss receiver.",
+          "mustReject": true,
+          "reason": "The quotation is genuine but does not answer the requested entity and attribute."
+        },
+        {
+          "kind": "nearby_other_attribute",
+          "claim": "The Amber receiver has a metal case.",
+          "quote": "The Amber receiver has a metal case.",
+          "mustReject": true,
+          "reason": "The quotation is genuine but does not answer the requested entity and attribute."
+        },
+        {
+          "kind": "unrelated_negative",
+          "claim": "The Amber receiver has no carrying handle.",
+          "quote": "The Amber receiver has no carrying handle.",
+          "mustReject": true,
+          "reason": "The quotation is genuine but does not answer the requested entity and attribute."
+        },
+        {
+          "kind": "over_abstention",
+          "claim": "The supplied evidence does not answer this question.",
+          "quote": "",
+          "mustReject": true,
+          "reason": "The selected source explicitly answers the question."
+        },
+        {
+          "kind": "opposite_polarity",
+          "claim": "No antenna type has been selected for the Amber receiver.",
+          "quote": "The antenna selected for the Amber receiver is a loop antenna.",
+          "mustReject": true,
+          "reason": "An exact quotation does not support reversing its polarity."
+        },
+        {
+          "kind": "wrong_support",
+          "claim": "A loop antenna was selected for the Amber receiver.",
+          "quote": "A dipole antenna was selected for the Moss receiver.",
+          "mustReject": true,
+          "reason": "A correct claim with evidence about the other entity is not valid support."
+        }
+      ]
+    },
+    {
+      "id": "quality-transfer-answer-radio-antenna-explicit-negative",
+      "mode": "answer",
+      "title": "Receiver antenna choices",
+      "source": "The Amber receiver has a metal case. A dipole antenna was selected for the Moss receiver. No antenna type has been selected for the Amber receiver. The Amber receiver has no carrying handle.",
+      "prompt": "Which antenna type has been selected for the Amber receiver? Answer in one sentence without a heading.",
+      "selection": "",
+      "useMemory": false,
+      "memories": [],
+      "memoryTitles": [],
+      "outsidePages": [],
+      "manualSemanticReviewRequired": true,
+      "allClausesMustPass": true,
+      "domain": "radio-antenna",
+      "variant": "explicit-negative",
+      "requestedEntity": "Amber receiver",
+      "requestedAttribute": "selected antenna type",
+      "oracle": "answerability_bounded_v1",
+      "proposal": "none",
+      "golden": "{\"title\":\"\",\"claims\":[{\"text\":\"No antenna type has been selected for the Amber receiver.\",\"quote\":\"No antenna type has been selected for the Amber receiver.\"}]}",
+      "expected": {
+        "required": [
+          "Answer only the requested attribute of the requested entity; a true nearby fact is not a relevant answer.",
+          "Every asserted clause must have support in the selected source; preserve scope, value and polarity.",
+          "Use one claim without a heading or unrequested recommendations.",
+          "Retain exact current source citation/identity and unchanged canonical state; do not apply a proposal.",
+          "State the supported positive or explicit-negative answer; do not abstain when evidence answers the question.",
+          "Quote an exact substring of the selected source containing the answer-bearing sentence; the quote need not equal the paraphrased claim."
+        ],
+        "forbidden": [
+          "Using another entity’s attribute value.",
+          "Substituting a different attribute or unrelated negative fact.",
+          "Adding unsupported values, causes, guarantees or an inferred completed action."
+        ],
+        "acceptableExample": "No antenna type has been selected for the Amber receiver.",
+        "rejectedExample": "A dipole antenna was selected for the Moss receiver.",
+        "manualSemanticReviewRequired": true,
+        "allClausesMustPass": true
+      },
+      "answerOracle": {
+        "heading": "",
+        "abstain": false,
+        "facts": [
+          {
+            "claimPattern": "(?i)^(?:No antenna type has (?:yet )?been selected for (?:the )?Amber receiver|(?:The )?Amber receiver has no selected antenna type)\\.$",
+            "quotePattern": "No antenna type has been selected for the Amber receiver\\.",
+            "validClaim": "No antenna type has been selected for the Amber receiver.",
+            "validQuote": "No antenna type has been selected for the Amber receiver.",
+            "support": "source"
+          }
+        ]
+      },
+      "counterexamples": [
+        {
+          "kind": "wrong_entity",
+          "claim": "A dipole antenna was selected for the Moss receiver.",
+          "quote": "A dipole antenna was selected for the Moss receiver.",
+          "mustReject": true,
+          "reason": "The quotation is genuine but does not answer the requested entity and attribute."
+        },
+        {
+          "kind": "nearby_other_attribute",
+          "claim": "The Amber receiver has a metal case.",
+          "quote": "The Amber receiver has a metal case.",
+          "mustReject": true,
+          "reason": "The quotation is genuine but does not answer the requested entity and attribute."
+        },
+        {
+          "kind": "unrelated_negative",
+          "claim": "The Amber receiver has no carrying handle.",
+          "quote": "The Amber receiver has no carrying handle.",
+          "mustReject": true,
+          "reason": "The quotation is genuine but does not answer the requested entity and attribute."
+        },
+        {
+          "kind": "over_abstention",
+          "claim": "The supplied evidence does not answer this question.",
+          "quote": "",
+          "mustReject": true,
+          "reason": "The selected source explicitly answers the question."
+        },
+        {
+          "kind": "opposite_polarity",
+          "claim": "A loop antenna was selected for the Amber receiver.",
+          "quote": "No antenna type has been selected for the Amber receiver.",
+          "mustReject": true,
+          "reason": "An exact quotation does not support reversing its polarity."
+        },
+        {
+          "kind": "wrong_support",
+          "claim": "No antenna type has been selected for the Amber receiver.",
+          "quote": "A dipole antenna was selected for the Moss receiver.",
+          "mustReject": true,
+          "reason": "A correct claim with evidence about the other entity is not valid support."
+        }
+      ]
+    },
+    {
+      "id": "quality-transfer-answer-radio-antenna-absent",
+      "mode": "answer",
+      "title": "Receiver antenna choices",
+      "source": "The Amber receiver has a metal case. A dipole antenna was selected for the Moss receiver. The Amber receiver has no carrying handle.",
+      "prompt": "Which antenna type has been selected for the Amber receiver? Answer in one sentence without a heading.",
+      "selection": "",
+      "useMemory": false,
+      "memories": [],
+      "memoryTitles": [],
+      "outsidePages": [],
+      "manualSemanticReviewRequired": true,
+      "allClausesMustPass": true,
+      "domain": "radio-antenna",
+      "variant": "absent",
+      "requestedEntity": "Amber receiver",
+      "requestedAttribute": "selected antenna type",
+      "oracle": "answerability_bounded_v1",
+      "proposal": "none",
+      "golden": "{\"title\":\"\",\"claims\":[{\"text\":\"The supplied evidence does not answer this question.\",\"quote\":\"\"}]}",
+      "expected": {
+        "required": [
+          "Answer only the requested attribute of the requested entity; a true nearby fact is not a relevant answer.",
+          "Every asserted clause must have support in the selected source; preserve scope, value and polarity.",
+          "Use one claim without a heading or unrequested recommendations.",
+          "Retain exact current source citation/identity and unchanged canonical state; do not apply a proposal.",
+          "Use exactly the exclusive evidence-absent abstention with an empty quote.",
+          "Absence of evidence does not establish an explicit negative fact."
+        ],
+        "forbidden": [
+          "Using another entity’s attribute value.",
+          "Substituting a different attribute or unrelated negative fact.",
+          "Adding unsupported values, causes, guarantees or an inferred completed action."
+        ],
+        "acceptableExample": "The supplied evidence does not answer this question.",
+        "rejectedExample": "A dipole antenna was selected for the Moss receiver.",
+        "manualSemanticReviewRequired": true,
+        "allClausesMustPass": true
+      },
+      "answerOracle": {
+        "heading": "",
+        "abstain": true,
+        "facts": []
+      },
+      "counterexamples": [
+        {
+          "kind": "wrong_entity",
+          "claim": "A dipole antenna was selected for the Moss receiver.",
+          "quote": "A dipole antenna was selected for the Moss receiver.",
+          "mustReject": true,
+          "reason": "The quotation is genuine but does not answer the requested entity and attribute."
+        },
+        {
+          "kind": "nearby_other_attribute",
+          "claim": "The Amber receiver has a metal case.",
+          "quote": "The Amber receiver has a metal case.",
+          "mustReject": true,
+          "reason": "The quotation is genuine but does not answer the requested entity and attribute."
+        },
+        {
+          "kind": "unrelated_negative",
+          "claim": "The Amber receiver has no carrying handle.",
+          "quote": "The Amber receiver has no carrying handle.",
+          "mustReject": true,
+          "reason": "The quotation is genuine but does not answer the requested entity and attribute."
+        },
+        {
+          "kind": "unsupported_positive",
+          "claim": "A loop antenna was selected for the Amber receiver.",
+          "quote": "",
+          "mustReject": true,
+          "reason": "The selected evidence omits the requested attribute; do not infer either polarity."
+        },
+        {
+          "kind": "unsupported_explicit_negative",
+          "claim": "No antenna type has been selected for the Amber receiver.",
+          "quote": "",
+          "mustReject": true,
+          "reason": "The selected evidence omits the requested attribute; do not infer either polarity."
+        }
+      ]
+    },
+    {
+      "id": "quality-transfer-answer-cabinet-finish-supported-positive",
+      "mode": "answer",
+      "title": "Cabinet finish decisions",
+      "source": "The Kelp cabinet has three shelves. Wax is the finish chosen for the Rowan cabinet. The Kelp cabinet has no glass doors. Shellac is the finish chosen for the Kelp cabinet.",
+      "prompt": "Which finish has been chosen for the Kelp cabinet? Answer in one sentence without a heading.",
+      "selection": "",
+      "useMemory": false,
+      "memories": [],
+      "memoryTitles": [],
+      "outsidePages": [],
+      "manualSemanticReviewRequired": true,
+      "allClausesMustPass": true,
+      "domain": "cabinet-finish",
+      "variant": "supported-positive",
+      "requestedEntity": "Kelp cabinet",
+      "requestedAttribute": "chosen finish",
+      "oracle": "answerability_bounded_v1",
+      "proposal": "none",
+      "golden": "{\"title\":\"\",\"claims\":[{\"text\":\"The chosen finish for the Kelp cabinet is shellac.\",\"quote\":\"Shellac is the finish chosen for the Kelp cabinet.\"}]}",
+      "expected": {
+        "required": [
+          "Answer only the requested attribute of the requested entity; a true nearby fact is not a relevant answer.",
+          "Every asserted clause must have support in the selected source; preserve scope, value and polarity.",
+          "Use one claim without a heading or unrequested recommendations.",
+          "Retain exact current source citation/identity and unchanged canonical state; do not apply a proposal.",
+          "State the supported positive or explicit-negative answer; do not abstain when evidence answers the question.",
+          "Quote an exact substring of the selected source containing the answer-bearing sentence; the quote need not equal the paraphrased claim."
+        ],
+        "forbidden": [
+          "Using another entity’s attribute value.",
+          "Substituting a different attribute or unrelated negative fact.",
+          "Adding unsupported values, causes, guarantees or an inferred completed action."
+        ],
+        "acceptableExample": "The chosen finish for the Kelp cabinet is shellac.",
+        "rejectedExample": "Wax is the finish chosen for the Rowan cabinet.",
+        "manualSemanticReviewRequired": true,
+        "allClausesMustPass": true
+      },
+      "answerOracle": {
+        "heading": "",
+        "abstain": false,
+        "facts": [
+          {
+            "claimPattern": "(?i)^(?:(?:The )?(?:chosen finish|finish chosen) for (?:the )?Kelp cabinet is shellac|Shellac is the finish chosen for (?:the )?Kelp cabinet|(?:The )?Kelp cabinet(?:\\x27s|’s) chosen finish is shellac)\\.$",
+            "quotePattern": "Shellac is the finish chosen for the Kelp cabinet\\.",
+            "validClaim": "The chosen finish for the Kelp cabinet is shellac.",
+            "validQuote": "Shellac is the finish chosen for the Kelp cabinet.",
+            "support": "source"
+          }
+        ]
+      },
+      "counterexamples": [
+        {
+          "kind": "wrong_entity",
+          "claim": "Wax is the finish chosen for the Rowan cabinet.",
+          "quote": "Wax is the finish chosen for the Rowan cabinet.",
+          "mustReject": true,
+          "reason": "The quotation is genuine but does not answer the requested entity and attribute."
+        },
+        {
+          "kind": "nearby_other_attribute",
+          "claim": "The Kelp cabinet has three shelves.",
+          "quote": "The Kelp cabinet has three shelves.",
+          "mustReject": true,
+          "reason": "The quotation is genuine but does not answer the requested entity and attribute."
+        },
+        {
+          "kind": "unrelated_negative",
+          "claim": "The Kelp cabinet has no glass doors.",
+          "quote": "The Kelp cabinet has no glass doors.",
+          "mustReject": true,
+          "reason": "The quotation is genuine but does not answer the requested entity and attribute."
+        },
+        {
+          "kind": "over_abstention",
+          "claim": "The supplied evidence does not answer this question.",
+          "quote": "",
+          "mustReject": true,
+          "reason": "The selected source explicitly answers the question."
+        },
+        {
+          "kind": "opposite_polarity",
+          "claim": "No finish has been chosen for the Kelp cabinet.",
+          "quote": "Shellac is the finish chosen for the Kelp cabinet.",
+          "mustReject": true,
+          "reason": "An exact quotation does not support reversing its polarity."
+        },
+        {
+          "kind": "wrong_support",
+          "claim": "The chosen finish for the Kelp cabinet is shellac.",
+          "quote": "Wax is the finish chosen for the Rowan cabinet.",
+          "mustReject": true,
+          "reason": "A correct claim with evidence about the other entity is not valid support."
+        }
+      ]
+    },
+    {
+      "id": "quality-transfer-answer-cabinet-finish-explicit-negative",
+      "mode": "answer",
+      "title": "Cabinet finish decisions",
+      "source": "The Kelp cabinet has three shelves. Wax is the finish chosen for the Rowan cabinet. The Kelp cabinet has no glass doors. No finish has been chosen for the Kelp cabinet.",
+      "prompt": "Which finish has been chosen for the Kelp cabinet? Answer in one sentence without a heading.",
+      "selection": "",
+      "useMemory": false,
+      "memories": [],
+      "memoryTitles": [],
+      "outsidePages": [],
+      "manualSemanticReviewRequired": true,
+      "allClausesMustPass": true,
+      "domain": "cabinet-finish",
+      "variant": "explicit-negative",
+      "requestedEntity": "Kelp cabinet",
+      "requestedAttribute": "chosen finish",
+      "oracle": "answerability_bounded_v1",
+      "proposal": "none",
+      "golden": "{\"title\":\"\",\"claims\":[{\"text\":\"No finish has been chosen for the Kelp cabinet.\",\"quote\":\"No finish has been chosen for the Kelp cabinet.\"}]}",
+      "expected": {
+        "required": [
+          "Answer only the requested attribute of the requested entity; a true nearby fact is not a relevant answer.",
+          "Every asserted clause must have support in the selected source; preserve scope, value and polarity.",
+          "Use one claim without a heading or unrequested recommendations.",
+          "Retain exact current source citation/identity and unchanged canonical state; do not apply a proposal.",
+          "State the supported positive or explicit-negative answer; do not abstain when evidence answers the question.",
+          "Quote an exact substring of the selected source containing the answer-bearing sentence; the quote need not equal the paraphrased claim."
+        ],
+        "forbidden": [
+          "Using another entity’s attribute value.",
+          "Substituting a different attribute or unrelated negative fact.",
+          "Adding unsupported values, causes, guarantees or an inferred completed action."
+        ],
+        "acceptableExample": "No finish has been chosen for the Kelp cabinet.",
+        "rejectedExample": "Wax is the finish chosen for the Rowan cabinet.",
+        "manualSemanticReviewRequired": true,
+        "allClausesMustPass": true
+      },
+      "answerOracle": {
+        "heading": "",
+        "abstain": false,
+        "facts": [
+          {
+            "claimPattern": "(?i)^(?:No finish has (?:yet )?been (?:chosen|selected) for (?:the )?Kelp cabinet|(?:The )?Kelp cabinet has no (?:chosen|selected) finish)\\.$",
+            "quotePattern": "No finish has been chosen for the Kelp cabinet\\.",
+            "validClaim": "No finish has been chosen for the Kelp cabinet.",
+            "validQuote": "No finish has been chosen for the Kelp cabinet.",
+            "support": "source"
+          }
+        ]
+      },
+      "counterexamples": [
+        {
+          "kind": "wrong_entity",
+          "claim": "Wax is the finish chosen for the Rowan cabinet.",
+          "quote": "Wax is the finish chosen for the Rowan cabinet.",
+          "mustReject": true,
+          "reason": "The quotation is genuine but does not answer the requested entity and attribute."
+        },
+        {
+          "kind": "nearby_other_attribute",
+          "claim": "The Kelp cabinet has three shelves.",
+          "quote": "The Kelp cabinet has three shelves.",
+          "mustReject": true,
+          "reason": "The quotation is genuine but does not answer the requested entity and attribute."
+        },
+        {
+          "kind": "unrelated_negative",
+          "claim": "The Kelp cabinet has no glass doors.",
+          "quote": "The Kelp cabinet has no glass doors.",
+          "mustReject": true,
+          "reason": "The quotation is genuine but does not answer the requested entity and attribute."
+        },
+        {
+          "kind": "over_abstention",
+          "claim": "The supplied evidence does not answer this question.",
+          "quote": "",
+          "mustReject": true,
+          "reason": "The selected source explicitly answers the question."
+        },
+        {
+          "kind": "opposite_polarity",
+          "claim": "The chosen finish for the Kelp cabinet is shellac.",
+          "quote": "No finish has been chosen for the Kelp cabinet.",
+          "mustReject": true,
+          "reason": "An exact quotation does not support reversing its polarity."
+        },
+        {
+          "kind": "wrong_support",
+          "claim": "No finish has been chosen for the Kelp cabinet.",
+          "quote": "Wax is the finish chosen for the Rowan cabinet.",
+          "mustReject": true,
+          "reason": "A correct claim with evidence about the other entity is not valid support."
+        }
+      ]
+    },
+    {
+      "id": "quality-transfer-answer-cabinet-finish-absent",
+      "mode": "answer",
+      "title": "Cabinet finish decisions",
+      "source": "The Kelp cabinet has three shelves. Wax is the finish chosen for the Rowan cabinet. The Kelp cabinet has no glass doors.",
+      "prompt": "Which finish has been chosen for the Kelp cabinet? Answer in one sentence without a heading.",
+      "selection": "",
+      "useMemory": false,
+      "memories": [],
+      "memoryTitles": [],
+      "outsidePages": [],
+      "manualSemanticReviewRequired": true,
+      "allClausesMustPass": true,
+      "domain": "cabinet-finish",
+      "variant": "absent",
+      "requestedEntity": "Kelp cabinet",
+      "requestedAttribute": "chosen finish",
+      "oracle": "answerability_bounded_v1",
+      "proposal": "none",
+      "golden": "{\"title\":\"\",\"claims\":[{\"text\":\"The supplied evidence does not answer this question.\",\"quote\":\"\"}]}",
+      "expected": {
+        "required": [
+          "Answer only the requested attribute of the requested entity; a true nearby fact is not a relevant answer.",
+          "Every asserted clause must have support in the selected source; preserve scope, value and polarity.",
+          "Use one claim without a heading or unrequested recommendations.",
+          "Retain exact current source citation/identity and unchanged canonical state; do not apply a proposal.",
+          "Use exactly the exclusive evidence-absent abstention with an empty quote.",
+          "Absence of evidence does not establish an explicit negative fact."
+        ],
+        "forbidden": [
+          "Using another entity’s attribute value.",
+          "Substituting a different attribute or unrelated negative fact.",
+          "Adding unsupported values, causes, guarantees or an inferred completed action."
+        ],
+        "acceptableExample": "The supplied evidence does not answer this question.",
+        "rejectedExample": "Wax is the finish chosen for the Rowan cabinet.",
+        "manualSemanticReviewRequired": true,
+        "allClausesMustPass": true
+      },
+      "answerOracle": {
+        "heading": "",
+        "abstain": true,
+        "facts": []
+      },
+      "counterexamples": [
+        {
+          "kind": "wrong_entity",
+          "claim": "Wax is the finish chosen for the Rowan cabinet.",
+          "quote": "Wax is the finish chosen for the Rowan cabinet.",
+          "mustReject": true,
+          "reason": "The quotation is genuine but does not answer the requested entity and attribute."
+        },
+        {
+          "kind": "nearby_other_attribute",
+          "claim": "The Kelp cabinet has three shelves.",
+          "quote": "The Kelp cabinet has three shelves.",
+          "mustReject": true,
+          "reason": "The quotation is genuine but does not answer the requested entity and attribute."
+        },
+        {
+          "kind": "unrelated_negative",
+          "claim": "The Kelp cabinet has no glass doors.",
+          "quote": "The Kelp cabinet has no glass doors.",
+          "mustReject": true,
+          "reason": "The quotation is genuine but does not answer the requested entity and attribute."
+        },
+        {
+          "kind": "unsupported_positive",
+          "claim": "The chosen finish for the Kelp cabinet is shellac.",
+          "quote": "",
+          "mustReject": true,
+          "reason": "The selected evidence omits the requested attribute; do not infer either polarity."
+        },
+        {
+          "kind": "unsupported_explicit_negative",
+          "claim": "No finish has been chosen for the Kelp cabinet.",
+          "quote": "",
+          "mustReject": true,
+          "reason": "The selected evidence omits the requested attribute; do not infer either polarity."
+        }
+      ]
+    },
+    {
+      "id": "quality-transfer-mermaid-join",
+      "mode": "mermaid",
+      "title": "Diagram request",
+      "source": "",
+      "prompt": "Draw a left-to-right Mermaid flowchart with exactly these edges: Permit to Ready; Parts to Ready; Ready to Build. Both Permit and Parts lead into Ready. Use the exact node IDs and solid directed arrows, without labels, styles, links, fences or commentary.",
+      "selection": "",
+      "useMemory": false,
+      "memories": [],
+      "memoryTitles": [],
+      "outsidePages": [],
+      "manualSemanticReviewRequired": true,
+      "allClausesMustPass": true,
+      "oracle": "mermaid_semantic_v1",
+      "diagram": {
+        "kind": "flowchart",
+        "direction": "LR",
+        "nodes": [
+          "Build",
+          "Parts",
+          "Permit",
+          "Ready"
+        ],
+        "edges": [
+          {
+            "from": "Permit",
+            "to": "Ready",
+            "kind": "-->",
+            "label": ""
+          },
+          {
+            "from": "Parts",
+            "to": "Ready",
+            "kind": "-->",
+            "label": ""
+          },
+          {
+            "from": "Ready",
+            "to": "Build",
+            "kind": "-->",
+            "label": ""
+          }
+        ]
+      },
+      "edges": [
+        [
+          "Permit",
+          "Ready"
+        ],
+        [
+          "Parts",
+          "Ready"
+        ],
+        [
+          "Ready",
+          "Build"
+        ]
+      ],
+      "golden": "flowchart LR\nPermit --> Ready\nParts --> Ready\nReady --> Build",
+      "proposal": "mermaid",
+      "required": [
+        "Actual pinned Mermaid parser accepts a flowchart with the requested direction.",
+        "Exact case-sensitive node set and directed edge multiset; no extra, missing, reversed or duplicate relationships.",
+        "Whitespace, semicolons and edge declaration order may vary without changing meaning.",
+        "Only an unapplied diagram proposal; canonical content remains unchanged."
+      ],
+      "forbidden": [
+        "Replacing a join or cycle with a different graph.",
+        "Merging differently cased IDs.",
+        "Adding styling, metadata, aliases, labels, links or commentary."
+      ],
+      "acceptedAlternatives": [
+        {
+          "kind": "equivalent_statement_order",
+          "output": "flowchart LR; Ready --> Build; Parts --> Ready; Permit --> Ready",
+          "reason": "The graph is unchanged; statement order and whitespace are not semantic."
+        }
+      ],
+      "counterexamples": [
+        {
+          "kind": "missing_edge",
+          "output": "flowchart LR\nPermit --> Ready\nParts --> Ready",
+          "mustReject": true,
+          "reason": "A parsing diagram that omits a required edge fails."
+        },
+        {
+          "kind": "reversed_edge",
+          "output": "flowchart LR\nReady --> Permit\nParts --> Ready\nReady --> Build",
+          "mustReject": true,
+          "reason": "Relationship direction must be preserved."
+        },
+        {
+          "kind": "wrong_direction",
+          "output": "flowchart TD\nPermit --> Ready\nParts --> Ready\nReady --> Build",
+          "mustReject": true,
+          "reason": "The requested layout direction is explicit."
+        },
+        {
+          "kind": "extra_edge",
+          "output": "flowchart LR\nPermit --> Ready\nParts --> Ready\nReady --> Build\nBuild --> Spare",
+          "mustReject": true,
+          "reason": "Unrequested nodes or edges fail even when parsing succeeds."
+        },
+        {
+          "kind": "duplicate_edge",
+          "output": "flowchart LR\nPermit --> Ready\nParts --> Ready\nReady --> Build\nPermit --> Ready",
+          "mustReject": true,
+          "reason": "The requested edge multiset contains no duplicate."
+        }
+      ]
+    },
+    {
+      "id": "quality-transfer-mermaid-cycle",
+      "mode": "mermaid",
+      "title": "Diagram request",
+      "source": "",
+      "prompt": "Draw a bottom-to-top Mermaid flowchart with exactly these edges: Read to Check; Check to Revise; Revise to Read; Check to Publish. Preserve the cycle and the publishing branch. Use the exact node IDs and solid directed arrows, without labels, styles, links, fences or commentary.",
+      "selection": "",
+      "useMemory": false,
+      "memories": [],
+      "memoryTitles": [],
+      "outsidePages": [],
+      "manualSemanticReviewRequired": true,
+      "allClausesMustPass": true,
+      "oracle": "mermaid_semantic_v1",
+      "diagram": {
+        "kind": "flowchart",
+        "direction": "BT",
+        "nodes": [
+          "Check",
+          "Publish",
+          "Read",
+          "Revise"
+        ],
+        "edges": [
+          {
+            "from": "Read",
+            "to": "Check",
+            "kind": "-->",
+            "label": ""
+          },
+          {
+            "from": "Check",
+            "to": "Revise",
+            "kind": "-->",
+            "label": ""
+          },
+          {
+            "from": "Revise",
+            "to": "Read",
+            "kind": "-->",
+            "label": ""
+          },
+          {
+            "from": "Check",
+            "to": "Publish",
+            "kind": "-->",
+            "label": ""
+          }
+        ]
+      },
+      "edges": [
+        [
+          "Read",
+          "Check"
+        ],
+        [
+          "Check",
+          "Revise"
+        ],
+        [
+          "Revise",
+          "Read"
+        ],
+        [
+          "Check",
+          "Publish"
+        ]
+      ],
+      "golden": "flowchart BT\nRead --> Check\nCheck --> Revise\nRevise --> Read\nCheck --> Publish",
+      "proposal": "mermaid",
+      "required": [
+        "Actual pinned Mermaid parser accepts a flowchart with the requested direction.",
+        "Exact case-sensitive node set and directed edge multiset; no extra, missing, reversed or duplicate relationships.",
+        "Whitespace, semicolons and edge declaration order may vary without changing meaning.",
+        "Only an unapplied diagram proposal; canonical content remains unchanged."
+      ],
+      "forbidden": [
+        "Replacing a join or cycle with a different graph.",
+        "Merging differently cased IDs.",
+        "Adding styling, metadata, aliases, labels, links or commentary."
+      ],
+      "acceptedAlternatives": [
+        {
+          "kind": "equivalent_statement_order",
+          "output": "flowchart BT; Check --> Publish; Revise --> Read; Check --> Revise; Read --> Check",
+          "reason": "The graph is unchanged; statement order and whitespace are not semantic."
+        }
+      ],
+      "counterexamples": [
+        {
+          "kind": "missing_edge",
+          "output": "flowchart BT\nRead --> Check\nCheck --> Revise\nRevise --> Read",
+          "mustReject": true,
+          "reason": "A parsing diagram that omits a required edge fails."
+        },
+        {
+          "kind": "reversed_edge",
+          "output": "flowchart BT\nCheck --> Read\nCheck --> Revise\nRevise --> Read\nCheck --> Publish",
+          "mustReject": true,
+          "reason": "Relationship direction must be preserved."
+        },
+        {
+          "kind": "wrong_direction",
+          "output": "flowchart TD\nRead --> Check\nCheck --> Revise\nRevise --> Read\nCheck --> Publish",
+          "mustReject": true,
+          "reason": "The requested layout direction is explicit."
+        },
+        {
+          "kind": "extra_edge",
+          "output": "flowchart BT\nRead --> Check\nCheck --> Revise\nRevise --> Read\nCheck --> Publish\nBuild --> Spare",
+          "mustReject": true,
+          "reason": "Unrequested nodes or edges fail even when parsing succeeds."
+        },
+        {
+          "kind": "duplicate_edge",
+          "output": "flowchart BT\nRead --> Check\nCheck --> Revise\nRevise --> Read\nCheck --> Publish\nRead --> Check",
+          "mustReject": true,
+          "reason": "The requested edge multiset contains no duplicate."
+        }
+      ]
+    },
+    {
+      "id": "quality-transfer-mermaid-distinct-case",
+      "mode": "mermaid",
+      "title": "Diagram request",
+      "source": "",
+      "prompt": "Draw a left-to-right Mermaid flowchart with exactly these edges: mix to MIX; MIX to Bake; mix to Chill. The IDs mix and MIX are different nodes. Use these exact IDs and solid directed arrows, without labels, styles, links, fences or commentary.",
+      "selection": "",
+      "useMemory": false,
+      "memories": [],
+      "memoryTitles": [],
+      "outsidePages": [],
+      "manualSemanticReviewRequired": true,
+      "allClausesMustPass": true,
+      "oracle": "mermaid_semantic_v1",
+      "diagram": {
+        "kind": "flowchart",
+        "direction": "LR",
+        "nodes": [
+          "Bake",
+          "Chill",
+          "MIX",
+          "mix"
+        ],
+        "edges": [
+          {
+            "from": "mix",
+            "to": "MIX",
+            "kind": "-->",
+            "label": ""
+          },
+          {
+            "from": "MIX",
+            "to": "Bake",
+            "kind": "-->",
+            "label": ""
+          },
+          {
+            "from": "mix",
+            "to": "Chill",
+            "kind": "-->",
+            "label": ""
+          }
+        ]
+      },
+      "edges": [
+        [
+          "mix",
+          "MIX"
+        ],
+        [
+          "MIX",
+          "Bake"
+        ],
+        [
+          "mix",
+          "Chill"
+        ]
+      ],
+      "golden": "flowchart LR\nmix --> MIX\nMIX --> Bake\nmix --> Chill",
+      "proposal": "mermaid",
+      "required": [
+        "Actual pinned Mermaid parser accepts a flowchart with the requested direction.",
+        "Exact case-sensitive node set and directed edge multiset; no extra, missing, reversed or duplicate relationships.",
+        "Whitespace, semicolons and edge declaration order may vary without changing meaning.",
+        "Only an unapplied diagram proposal; canonical content remains unchanged."
+      ],
+      "forbidden": [
+        "Replacing a join or cycle with a different graph.",
+        "Merging differently cased IDs.",
+        "Adding styling, metadata, aliases, labels, links or commentary."
+      ],
+      "acceptedAlternatives": [
+        {
+          "kind": "equivalent_statement_order",
+          "output": "flowchart LR; mix --> Chill; MIX --> Bake; mix --> MIX",
+          "reason": "The graph is unchanged; statement order and whitespace are not semantic."
+        }
+      ],
+      "counterexamples": [
+        {
+          "kind": "missing_edge",
+          "output": "flowchart LR\nmix --> MIX\nMIX --> Bake",
+          "mustReject": true,
+          "reason": "A parsing diagram that omits a required edge fails."
+        },
+        {
+          "kind": "reversed_edge",
+          "output": "flowchart LR\nMIX --> mix\nMIX --> Bake\nmix --> Chill",
+          "mustReject": true,
+          "reason": "Relationship direction must be preserved."
+        },
+        {
+          "kind": "wrong_direction",
+          "output": "flowchart TD\nmix --> MIX\nMIX --> Bake\nmix --> Chill",
+          "mustReject": true,
+          "reason": "The requested layout direction is explicit."
+        },
+        {
+          "kind": "extra_edge",
+          "output": "flowchart LR\nmix --> MIX\nMIX --> Bake\nmix --> Chill\nBuild --> Spare",
+          "mustReject": true,
+          "reason": "Unrequested nodes or edges fail even when parsing succeeds."
+        },
+        {
+          "kind": "case_merge",
+          "output": "flowchart LR\nMIX --> MIX\nMIX --> Bake\nMIX --> Chill",
+          "mustReject": true,
+          "reason": "The two explicitly distinct identities must not be collapsed."
+        }
+      ]
+    },
+    {
+      "id": "quality-transfer-mermaid-return-sequence",
+      "mode": "mermaid",
+      "title": "Message exchange request",
+      "source": "",
+      "prompt": "Create a Mermaid sequence diagram with participants Clerk, Ledger and Vault in that order. Clerk sends Ledger a solid-arrow message named request. Ledger sends Vault a solid-arrow message named locate. Vault replies to Ledger with a dashed-arrow message named found. Ledger replies to Clerk with a dashed-arrow message named receipt. Preserve that message order. Return only the diagram, with no fence, styling, notes or additional messages.",
+      "selection": "",
+      "useMemory": false,
+      "memories": [],
+      "memoryTitles": [],
+      "outsidePages": [],
+      "manualSemanticReviewRequired": true,
+      "allClausesMustPass": true,
+      "oracle": "mermaid_semantic_v1",
+      "diagram": {
+        "kind": "sequenceDiagram",
+        "participants": [
+          "Clerk",
+          "Ledger",
+          "Vault"
+        ],
+        "messages": [
+          {
+            "from": "Clerk",
+            "to": "Ledger",
+            "kind": "->>",
+            "label": "request"
+          },
+          {
+            "from": "Ledger",
+            "to": "Vault",
+            "kind": "->>",
+            "label": "locate"
+          },
+          {
+            "from": "Vault",
+            "to": "Ledger",
+            "kind": "-->>",
+            "label": "found"
+          },
+          {
+            "from": "Ledger",
+            "to": "Clerk",
+            "kind": "-->>",
+            "label": "receipt"
+          }
+        ]
+      },
+      "golden": "sequenceDiagram\nparticipant Clerk\nparticipant Ledger\nparticipant Vault\nClerk->>Ledger: request\nLedger->>Vault: locate\nVault-->>Ledger: found\nLedger-->>Clerk: receipt",
+      "proposal": "mermaid",
+      "required": [
+        "Parse as sequenceDiagram with exact participant order and identity.",
+        "Retain exact ordered messages, labels, directions and solid/dashed arrow kinds.",
+        "Formatting-only whitespace is allowed; extra messages, aliases, notes, links and styles are forbidden.",
+        "Preserve canonical content and an unapplied diagram proposal."
+      ],
+      "forbidden": [
+        "Substituting a flowchart.",
+        "Changing a return into a solid forward message.",
+        "Dropping or reordering either reply."
+      ],
+      "counterexamples": [
+        {
+          "kind": "wrong_kind",
+          "output": "flowchart LR\nClerk --> Ledger\nLedger --> Vault\nVault --> Ledger\nLedger --> Clerk",
+          "mustReject": true,
+          "reason": "A flowchart is not a sequence diagram."
+        },
+        {
+          "kind": "arrow_kind_changed",
+          "output": "sequenceDiagram\nparticipant Clerk\nparticipant Ledger\nparticipant Vault\nClerk->>Ledger: request\nLedger->>Vault: locate\nVault->>Ledger: found\nLedger-->>Clerk: receipt",
+          "mustReject": true,
+          "reason": "The reply must be dashed."
+        },
+        {
+          "kind": "reply_order_changed",
+          "output": "sequenceDiagram\nparticipant Clerk\nparticipant Ledger\nparticipant Vault\nClerk->>Ledger: request\nLedger->>Vault: locate\nLedger-->>Clerk: receipt\nVault-->>Ledger: found",
+          "mustReject": true,
+          "reason": "Message order is explicit."
+        },
+        {
+          "kind": "participant_case_changed",
+          "output": "sequenceDiagram\nparticipant Clerk\nparticipant ledger\nparticipant Vault\nClerk->>ledger: request\nledger->>Vault: locate\nVault-->>ledger: found\nledger-->>Clerk: receipt",
+          "mustReject": true,
+          "reason": "Participant identity is case-sensitive."
+        },
+        {
+          "kind": "malformed_reply",
+          "output": "sequenceDiagram\nparticipant Clerk\nparticipant Ledger\nparticipant Vault\nClerk->>Ledger: request\nLedger->>Vault: locate\nVault -->|>> Ledger: found\nLedger-->>Clerk: receipt",
+          "mustReject": true,
+          "reason": "Malformed mixed flowchart/sequence syntax must fail parsing."
+        }
+      ]
+    },
+    {
+      "id": "quality-transfer-expand-supported-forbidden",
+      "mode": "expand",
+      "title": "Bracken tool cart note",
+      "source": "The Bracken tool cart has numbered slots. Each wrench has the same number as its slot, so the number identifies where that wrench belongs.",
+      "prompt": "Expand the selected note into exactly two prose paragraphs without a heading, preserving every stated fact. Do not add recommendations or next steps. Do not present unstated benefits, measurements, causes or completed actions as facts.",
+      "selection": "",
+      "useMemory": false,
+      "memories": [],
+      "memoryTitles": [],
+      "outsidePages": [],
+      "manualSemanticReviewRequired": true,
+      "allClausesMustPass": true,
+      "oracle": "expand_claims_v1",
+      "expectedFacts": [
+        "The Bracken tool cart has numbered slots.",
+        "Each wrench has the same number as its slot.",
+        "The matching number identifies where the wrench belongs."
+      ],
+      "benefitState": "supported",
+      "suggestionPolicy": "forbidden",
+      "golden": "The Bracken tool cart has slots identified by numbers. Its slots are numbered, and each wrench carries the number of its matching slot.\n\nThe matching number identifies where a wrench belongs on the cart. The note describes a correspondence between each wrench’s number and its slot number.",
+      "allowedNumbers": [],
+      "proposal": "none",
+      "required": [
+        "Exactly two nonempty prose paragraphs, longer than the source, without a heading.",
+        "Preserve each supplied fact, entity, quantity and polarity.",
+        "Every factual clause must be entailed by the selected source. Plausibility is insufficient.",
+        "Do not claim an action has occurred; retain unchanged canonical content.",
+        "Retain the supplied matching-number benefit.",
+        "No suggestion or next step, even when labeled."
+      ],
+      "forbidden": [
+        "Invented efficiency, accessibility, safety, error-prevention or cost benefits.",
+        "Unsupported guarantees, completion claims or measurements."
+      ],
+      "counterexamples": [
+        {
+          "kind": "invented_benefit",
+          "output": "The Bracken tool cart has slots identified by numbers. Its slots are numbered, and each wrench carries the number of its matching slot.\n\nThe matching number identifies where a wrench belongs on the cart. The note describes a correspondence between each wrench’s number and its slot number. The numbers prevent every storage error.",
+          "mustReject": true,
+          "reason": "A plausible unsupported benefit is still a fabricated factual clause."
+        },
+        {
+          "kind": "fact_negated",
+          "output": "The Bracken tool cart has unnumbered slots. Its slots are numbered, and each wrench carries the number of its matching slot.\n\nThe matching number identifies where a wrench belongs on the cart. The note describes a correspondence between each wrench’s number and its slot number.",
+          "mustReject": true,
+          "reason": "The supplied layout or numbered-slot fact is reversed."
+        },
+        {
+          "kind": "claimed_effect",
+          "output": "The Bracken tool cart has slots identified by numbers. Its slots are numbered, and each wrench carries the number of its matching slot.\n\nThe matching number identifies where a wrench belongs on the cart. The note describes a correspondence between each wrench’s number and its slot number. I have relabeled every slot.",
+          "mustReject": true,
+          "reason": "A draft does not establish completed external or canonical effects."
+        },
+        {
+          "kind": "supported_benefit_omitted",
+          "output": "The Bracken tool cart has numbered slots. The slots carry numbers.\n\nThe note does not state whether the numbers identify where any wrench belongs.",
+          "mustReject": true,
+          "reason": "Do not discard a supplied benefit or infer its negation from missing evidence."
+        },
+        {
+          "kind": "forbidden_suggestion",
+          "output": "The Bracken tool cart has slots identified by numbers. Its slots are numbered, and each wrench carries the number of its matching slot.\n\nThe matching number identifies where a wrench belongs on the cart. The note describes a correspondence between each wrench’s number and its slot number. Optional suggestion: consider checking that the slot numbers are readable.",
+          "mustReject": true,
+          "reason": "Suggestion policy is explicit; an unmarked command is not an optional suggestion."
+        }
+      ]
+    },
+    {
+      "id": "quality-transfer-expand-supported-required-labeled",
+      "mode": "expand",
+      "title": "Bracken tool cart note",
+      "source": "The Bracken tool cart has numbered slots. Each wrench has the same number as its slot, so the number identifies where that wrench belongs.",
+      "prompt": "Expand the selected note into exactly two prose paragraphs without a heading, preserving every stated fact. End the second paragraph with exactly one optional next step clearly identified as an optional suggestion. Do not present unstated benefits, measurements, causes or completed actions as facts.",
+      "selection": "",
+      "useMemory": false,
+      "memories": [],
+      "memoryTitles": [],
+      "outsidePages": [],
+      "manualSemanticReviewRequired": true,
+      "allClausesMustPass": true,
+      "oracle": "expand_claims_v1",
+      "expectedFacts": [
+        "The Bracken tool cart has numbered slots.",
+        "Each wrench has the same number as its slot.",
+        "The matching number identifies where the wrench belongs."
+      ],
+      "benefitState": "supported",
+      "suggestionPolicy": "required-labeled",
+      "golden": "The Bracken tool cart has slots identified by numbers. Its slots are numbered, and each wrench carries the number of its matching slot.\n\nThe matching number identifies where a wrench belongs on the cart. The note describes a correspondence between each wrench’s number and its slot number. Optional suggestion: consider checking that the slot numbers are readable.",
+      "allowedNumbers": [],
+      "proposal": "none",
+      "required": [
+        "Exactly two nonempty prose paragraphs, longer than the source, without a heading.",
+        "Preserve each supplied fact, entity, quantity and polarity.",
+        "Every factual clause must be entailed by the selected source. Plausibility is insufficient.",
+        "Do not claim an action has occurred; retain unchanged canonical content.",
+        "Retain the supplied matching-number benefit.",
+        "Exactly one optional suggestion at the end; its optional suggestion status must be clear. A colon label is not mandatory."
+      ],
+      "forbidden": [
+        "Invented efficiency, accessibility, safety, error-prevention or cost benefits.",
+        "Unsupported guarantees, completion claims or measurements."
+      ],
+      "acceptedAlternatives": [
+        {
+          "kind": "semantic_suggestion_label",
+          "output": "The Bracken tool cart has slots identified by numbers. Its slots are numbered, and each wrench carries the number of its matching slot.\n\nThe matching number identifies where a wrench belongs on the cart. The note describes a correspondence between each wrench’s number and its slot number. As an optional suggestion, you could check that the slot numbers are readable.",
+          "reason": "The optional suggestion is explicit in prose; no colon label is required."
+        }
+      ],
+      "counterexamples": [
+        {
+          "kind": "invented_benefit",
+          "output": "The Bracken tool cart has slots identified by numbers. Its slots are numbered, and each wrench carries the number of its matching slot.\n\nThe matching number identifies where a wrench belongs on the cart. The note describes a correspondence between each wrench’s number and its slot number. Optional suggestion: consider checking that the slot numbers are readable. The numbers prevent every storage error.",
+          "mustReject": true,
+          "reason": "A plausible unsupported benefit is still a fabricated factual clause."
+        },
+        {
+          "kind": "fact_negated",
+          "output": "The Bracken tool cart has unnumbered slots. Its slots are numbered, and each wrench carries the number of its matching slot.\n\nThe matching number identifies where a wrench belongs on the cart. The note describes a correspondence between each wrench’s number and its slot number. Optional suggestion: consider checking that the slot numbers are readable.",
+          "mustReject": true,
+          "reason": "The supplied layout or numbered-slot fact is reversed."
+        },
+        {
+          "kind": "claimed_effect",
+          "output": "The Bracken tool cart has slots identified by numbers. Its slots are numbered, and each wrench carries the number of its matching slot.\n\nThe matching number identifies where a wrench belongs on the cart. The note describes a correspondence between each wrench’s number and its slot number. Optional suggestion: consider checking that the slot numbers are readable. I have relabeled every slot.",
+          "mustReject": true,
+          "reason": "A draft does not establish completed external or canonical effects."
+        },
+        {
+          "kind": "supported_benefit_omitted",
+          "output": "The Bracken tool cart has numbered slots. The slots carry numbers.\n\nThe note does not state whether the numbers identify where any wrench belongs.",
+          "mustReject": true,
+          "reason": "Do not discard a supplied benefit or infer its negation from missing evidence."
+        },
+        {
+          "kind": "unmarked_imperative",
+          "output": "The Bracken tool cart has slots identified by numbers. Its slots are numbered, and each wrench carries the number of its matching slot.\n\nThe matching number identifies where a wrench belongs on the cart. The note describes a correspondence between each wrench’s number and its slot number. Check every detail now.",
+          "mustReject": true,
+          "reason": "Suggestion policy is explicit; an unmarked command is not an optional suggestion."
+        }
+      ]
+    },
+    {
+      "id": "quality-transfer-expand-absent-forbidden",
+      "mode": "expand",
+      "title": "Lumen seed catalog note",
+      "source": "The Lumen seed catalog uses two columns. Each entry contains a seed name and a storage location.",
+      "prompt": "Expand the selected note into exactly two prose paragraphs without a heading, preserving every stated fact. Do not add recommendations or next steps. Do not present unstated benefits, measurements, causes or completed actions as facts.",
+      "selection": "",
+      "useMemory": false,
+      "memories": [],
+      "memoryTitles": [],
+      "outsidePages": [],
+      "manualSemanticReviewRequired": true,
+      "allClausesMustPass": true,
+      "oracle": "expand_claims_v1",
+      "expectedFacts": [
+        "The Lumen seed catalog uses two columns.",
+        "Each entry contains a seed name and a storage location."
+      ],
+      "benefitState": "absent",
+      "suggestionPolicy": "forbidden",
+      "golden": "The Lumen seed catalog is arranged in two columns. This two-column arrangement is the layout described in the note.\n\nFor each catalog entry, the recorded details are a seed name and a storage location. The note describes those two kinds of information for every entry.",
+      "allowedNumbers": [],
+      "proposal": "none",
+      "required": [
+        "Exactly two nonempty prose paragraphs, longer than the source, without a heading.",
+        "Preserve each supplied fact, entity, quantity and polarity.",
+        "Every factual clause must be entailed by the selected source. Plausibility is insufficient.",
+        "Do not claim an action has occurred; retain unchanged canonical content.",
+        "Absence of a stated benefit is not evidence that there is no benefit.",
+        "No suggestion or next step, even when labeled."
+      ],
+      "forbidden": [
+        "Invented efficiency, accessibility, safety, error-prevention or cost benefits.",
+        "Unsupported guarantees, completion claims or measurements."
+      ],
+      "counterexamples": [
+        {
+          "kind": "invented_benefit",
+          "output": "The Lumen seed catalog is arranged in two columns. This two-column arrangement is the layout described in the note.\n\nFor each catalog entry, the recorded details are a seed name and a storage location. The note describes those two kinds of information for every entry. The layout makes every seed easier to find.",
+          "mustReject": true,
+          "reason": "A plausible unsupported benefit is still a fabricated factual clause."
+        },
+        {
+          "kind": "fact_negated",
+          "output": "The Lumen seed catalog uses one column. This two-column arrangement is the layout described in the note.\n\nFor each catalog entry, the recorded details are a seed name and a storage location. The note describes those two kinds of information for every entry.",
+          "mustReject": true,
+          "reason": "The supplied layout or numbered-slot fact is reversed."
+        },
+        {
+          "kind": "claimed_effect",
+          "output": "The Lumen seed catalog is arranged in two columns. This two-column arrangement is the layout described in the note.\n\nFor each catalog entry, the recorded details are a seed name and a storage location. The note describes those two kinds of information for every entry. I have updated every entry.",
+          "mustReject": true,
+          "reason": "A draft does not establish completed external or canonical effects."
+        },
+        {
+          "kind": "absence_inferred_negative",
+          "output": "The Lumen seed catalog is arranged in two columns. This two-column arrangement is the layout described in the note.\n\nFor each catalog entry, the recorded details are a seed name and a storage location. The note describes those two kinds of information for every entry. The two-column layout provides no benefit.",
+          "mustReject": true,
+          "reason": "Do not discard a supplied benefit or infer its negation from missing evidence."
+        },
+        {
+          "kind": "forbidden_suggestion",
+          "output": "The Lumen seed catalog is arranged in two columns. This two-column arrangement is the layout described in the note.\n\nFor each catalog entry, the recorded details are a seed name and a storage location. The note describes those two kinds of information for every entry. Optional suggestion: consider reviewing an entry’s seed name and storage location.",
+          "mustReject": true,
+          "reason": "Suggestion policy is explicit; an unmarked command is not an optional suggestion."
+        }
+      ]
+    },
+    {
+      "id": "quality-transfer-expand-absent-required-labeled",
+      "mode": "expand",
+      "title": "Lumen seed catalog note",
+      "source": "The Lumen seed catalog uses two columns. Each entry contains a seed name and a storage location.",
+      "prompt": "Expand the selected note into exactly two prose paragraphs without a heading, preserving every stated fact. End the second paragraph with exactly one optional next step clearly identified as an optional suggestion. Do not present unstated benefits, measurements, causes or completed actions as facts.",
+      "selection": "",
+      "useMemory": false,
+      "memories": [],
+      "memoryTitles": [],
+      "outsidePages": [],
+      "manualSemanticReviewRequired": true,
+      "allClausesMustPass": true,
+      "oracle": "expand_claims_v1",
+      "expectedFacts": [
+        "The Lumen seed catalog uses two columns.",
+        "Each entry contains a seed name and a storage location."
+      ],
+      "benefitState": "absent",
+      "suggestionPolicy": "required-labeled",
+      "golden": "The Lumen seed catalog is arranged in two columns. This two-column arrangement is the layout described in the note.\n\nFor each catalog entry, the recorded details are a seed name and a storage location. The note describes those two kinds of information for every entry. Optional suggestion: consider reviewing an entry’s seed name and storage location.",
+      "allowedNumbers": [],
+      "proposal": "none",
+      "required": [
+        "Exactly two nonempty prose paragraphs, longer than the source, without a heading.",
+        "Preserve each supplied fact, entity, quantity and polarity.",
+        "Every factual clause must be entailed by the selected source. Plausibility is insufficient.",
+        "Do not claim an action has occurred; retain unchanged canonical content.",
+        "Absence of a stated benefit is not evidence that there is no benefit.",
+        "Exactly one optional suggestion at the end; its optional suggestion status must be clear. A colon label is not mandatory."
+      ],
+      "forbidden": [
+        "Invented efficiency, accessibility, safety, error-prevention or cost benefits.",
+        "Unsupported guarantees, completion claims or measurements."
+      ],
+      "acceptedAlternatives": [
+        {
+          "kind": "semantic_suggestion_label",
+          "output": "The Lumen seed catalog is arranged in two columns. This two-column arrangement is the layout described in the note.\n\nFor each catalog entry, the recorded details are a seed name and a storage location. The note describes those two kinds of information for every entry. As an optional suggestion, you could review an entry’s seed name and storage location.",
+          "reason": "The optional suggestion is explicit in prose; no colon label is required."
+        }
+      ],
+      "counterexamples": [
+        {
+          "kind": "invented_benefit",
+          "output": "The Lumen seed catalog is arranged in two columns. This two-column arrangement is the layout described in the note.\n\nFor each catalog entry, the recorded details are a seed name and a storage location. The note describes those two kinds of information for every entry. Optional suggestion: consider reviewing an entry’s seed name and storage location. The layout makes every seed easier to find.",
+          "mustReject": true,
+          "reason": "A plausible unsupported benefit is still a fabricated factual clause."
+        },
+        {
+          "kind": "fact_negated",
+          "output": "The Lumen seed catalog uses one column. This two-column arrangement is the layout described in the note.\n\nFor each catalog entry, the recorded details are a seed name and a storage location. The note describes those two kinds of information for every entry. Optional suggestion: consider reviewing an entry’s seed name and storage location.",
+          "mustReject": true,
+          "reason": "The supplied layout or numbered-slot fact is reversed."
+        },
+        {
+          "kind": "claimed_effect",
+          "output": "The Lumen seed catalog is arranged in two columns. This two-column arrangement is the layout described in the note.\n\nFor each catalog entry, the recorded details are a seed name and a storage location. The note describes those two kinds of information for every entry. Optional suggestion: consider reviewing an entry’s seed name and storage location. I have updated every entry.",
+          "mustReject": true,
+          "reason": "A draft does not establish completed external or canonical effects."
+        },
+        {
+          "kind": "absence_inferred_negative",
+          "output": "The Lumen seed catalog is arranged in two columns. This two-column arrangement is the layout described in the note.\n\nFor each catalog entry, the recorded details are a seed name and a storage location. The note describes those two kinds of information for every entry. The two-column layout provides no benefit.",
+          "mustReject": true,
+          "reason": "Do not discard a supplied benefit or infer its negation from missing evidence."
+        },
+        {
+          "kind": "unmarked_imperative",
+          "output": "The Lumen seed catalog is arranged in two columns. This two-column arrangement is the layout described in the note.\n\nFor each catalog entry, the recorded details are a seed name and a storage location. The note describes those two kinds of information for every entry. Check every detail now.",
+          "mustReject": true,
+          "reason": "Suggestion policy is explicit; an unmarked command is not an optional suggestion."
+        }
+      ]
+    }
+  ]
+}
