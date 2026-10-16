@@ -159,7 +159,7 @@ def main():
         manifest['installedHostBuildInfoSHA256'] = digest(evidence / 'installed-host-build-info.txt')
         app_inventory = inventory(app)
         save(evidence / 'app-inventory.json', app_inventory)
-        harness_paths = ['scripts/run-real-ui.py', 'scripts/native_fixture_environment.py', 'scripts/qualification_fixtures.py', 'frontend/playwright.integration.config.ts', 'frontend/tests/real-storage.integration.spec.ts']
+        harness_paths = ['scripts/run-real-ui.py', 'scripts/native_fixture_environment.py', 'scripts/qualification_fixtures.py', 'frontend/playwright.integration.config.ts', 'frontend/tests/real-storage.integration.spec.ts', 'frontend/tests/keyboard-observation.ts']
         inputs = {'appInventorySHA256': object_digest(app_inventory), 'webAssetsSHA256': object_digest(inventory(assets)),
                   'nativeHelpersSHA256': object_digest(inventory(native)), 'hostSHA256': digest(binary), 'installedHostSHA256': digest(installed_binary),
                   'harnessFiles': {name: digest(ROOT / name) for name in harness_paths},
