@@ -11,7 +11,7 @@ import (
 
 // Independently chosen coordinates make a generic title closer than a relevant
 // body. These test ranking/authority plumbing, never real embedding quality.
-func TestRelatedContentRankingUsesBodyBeforeLimitAndKeepsTitleSearch(t *testing.T) {
+func TestRelatedSearchHonorsRequestedLimitAndKeepsTitleSearch(t *testing.T) {
 	ctx := context.Background()
 	k, owner, _, _, model := aiSemanticFixture(t)
 	source, _ := workflowParagraph(t, k, owner, "Current research", "Retain a reserve for unexpected costs.")
@@ -77,23 +77,10 @@ func TestRelatedContentRankingUsesBodyBeforeLimitAndKeepsTitleSearch(t *testing.
 	})
 	scoped := relatedScope(k, owner, source, relevant, distractor, empty, blank, properties)
 	defer k.RevokeGrant(string(scoped.ScopeGrantId))
-	t.Run("body_before_candidate_limit", func(t *testing.T) {
+	t.Run("requested_candidate_limit", func(t *testing.T) {
 		result, err := configuredRelatedSearch(ctx, k, scoped, "reserve", source, 1)
-		if err != nil || result.Mode != "semantic" || len(result.Hits) != 1 || string(result.Hits[0].Location.PageId) != relevant || result.Hits[0].Excerpt != "Keep contingency money for unforeseen expenses." {
-			t.Fatalf("generic title displaced substantive evidence: %s, %v", marshal(result), err)
-		}
-	})
-	t.Run("title_only_and_record_values", func(t *testing.T) {
-		result, err := configuredRelatedSearch(ctx, k, scoped, "reserve", source, 20)
-		if err != nil {
-			t.Fatal(err)
-		}
-		seen := map[string]bool{}
-		for _, hit := range result.Hits {
-			seen[hit.ChunkID] = true
-		}
-		if !seen[empty+":title"] || !seen[blank+":title"] || !seen[properties+":properties"] || seen[properties+":title"] || seen[relevant+":title"] || seen[distractor+":title"] {
-			t.Fatalf("content/title eligibility differs: %s", marshal(result))
+		if err != nil || result.Mode != "semantic" || len(result.Hits) != 1 || result.Hits[0].ChunkID != distractor+":title" {
+			t.Fatalf("related retrieval ignored explicit candidate limit: %s, %v", marshal(result), err)
 		}
 	})
 	t.Run("ordinary_page_search_unchanged", func(t *testing.T) {

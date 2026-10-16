@@ -159,7 +159,7 @@ func optionalID(p *contracts.DomainId) string {
 	}
 	return string(*p)
 }
-func (k *Kernel) semanticSearch(ctx context.Context, tx *sql.Tx, e contracts.ServiceExecutionContext, requested *contracts.ServiceExecutionContext, r map[string]any, query string, keyword []SearchHit, kinds map[string]bool, limit int, relatedContent bool) ([]SearchHit, string) {
+func (k *Kernel) semanticSearch(ctx context.Context, tx *sql.Tx, e contracts.ServiceExecutionContext, requested *contracts.ServiceExecutionContext, r map[string]any, query string, keyword []SearchHit, kinds map[string]bool, limit int) ([]SearchHit, string) {
 	model := str(r["modelPackId"])
 	if model == "" {
 		_ = tx.QueryRowContext(ctx, "SELECT model_pack_id FROM search_embeddings ORDER BY model_pack_id LIMIT 1").Scan(&model)
@@ -212,9 +212,6 @@ func (k *Kernel) semanticSearch(ctx context.Context, tx *sql.Tx, e contracts.Ser
 		return nil, "Search scope is no longer available."
 	}
 	allowed := `SELECT x.rowid FROM search_embeddings x JOIN search_chunks c ON c.id=x.chunk_id AND c.content_hash=x.content_hash JOIN pages p ON p.id=c.page_id AND p.revision=c.source_revision AND p.deleted_at IS NULL WHERE x.model_pack_id=? AND x.dimension=? AND NOT EXISTS(SELECT 1 FROM memory_entries m WHERE m.page_id=p.id AND m.status<>'active')`
-	if relatedContent {
-		allowed += " AND " + relatedContentChunkSQL
-	}
 	args := []any{floatVector(vectors[0]), limit, model, dimension}
 	predicate, scopeArgs := vectorScopeSQL(e.Scope)
 	allowed += " AND (" + predicate + ")"
