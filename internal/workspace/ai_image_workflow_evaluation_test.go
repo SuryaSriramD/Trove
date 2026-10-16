@@ -217,7 +217,7 @@ func TestRealLocalWorkflowImages(t *testing.T) {
 				if err != nil {
 					productionErr = err.Error()
 				}
-				return ImageDescriptionResult{Text: v.Text, AnalysisMethod: v.AnalysisMethod, ModelHash: v.ModelHash, ProjectorHash: v.ProjectorHash, HelperHash: v.HelperHash, PreprocessingProfileID: v.PreprocessingProfileID, PreprocessingProfileHash: v.PreprocessingProfileHash, FinishReason: v.FinishReason, InputTokens: v.InputTokens, OutputTokens: v.OutputTokens, PeakRSSBytes: v.PeakRSSBytes}, err
+				return ImageDescriptionResult{Text: v.Text, AnalysisMethod: v.AnalysisMethod, ModelHash: v.ModelHash, ProjectorHash: v.ProjectorHash, HelperHash: v.HelperHash, FinishReason: v.FinishReason, InputTokens: v.InputTokens, OutputTokens: v.OutputTokens, PeakRSSBytes: v.PeakRSSBytes}, err
 			})
 			report["result"], report["productError"], report["seconds"] = result, productionErr, time.Since(started).Seconds()
 			assert("serviceCompleted", err == nil)
