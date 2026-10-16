@@ -1177,15 +1177,15 @@ test(stage === "create" ? "real-personal-review-create" : "real-personal-review-
     const unrelated = unrelatedRecords(await snapshot(page)), aiBefore = await observe(page, "ai.runs", {});
     let panel = await openIntelligence(page, destination.page.id, "Personal review");
     await panel.getByLabel("Name", { exact: true }).fill(f.name);
-    await panel.getByLabel("Source page", { exact: true }).selectOption(source.page.id);
-    await panel.getByLabel("Additional source pages", { exact: true }).selectOption([additional.page.id]);
+    await panel.getByRole("combobox", { name: "Source page", exact: true }).selectOption(source.page.id);
+    await panel.getByRole("listbox", { name: "Additional source pages", exact: true }).selectOption([additional.page.id]);
     await expect(panel.getByRole("checkbox", { name: "Include approved relevant memories", exact: true })).not.toBeChecked();
     await expect(panel.getByRole("checkbox", { name: "Enable local model analysis for this plan", exact: true })).not.toBeChecked();
-    await panel.getByLabel("Recurrence", { exact: true }).selectOption("weekly");
-    await panel.getByLabel("Review weekday", { exact: true }).selectOption(String(f.weekday));
+    await panel.getByRole("combobox", { name: "Recurrence", exact: true }).selectOption("weekly");
+    await panel.getByRole("combobox", { name: "Review weekday", exact: true }).selectOption(String(f.weekday));
     await panel.getByLabel("Local time", { exact: true }).fill(f.time);
     await panel.getByLabel("Time zone", { exact: true }).fill(f.timezone);
-    await panel.getByLabel("After downtime", { exact: true }).selectOption("skip");
+    await panel.getByRole("combobox", { name: "After downtime", exact: true }).selectOption("skip");
     const created = await uiResponse(page, "batch", () => panel.getByRole("button", { name: "Save review plan on this page", exact: true }).click());
     expect(created.ok).toBe(true);
     await expect(reviewPlanCard(page, f.name)).toContainText("Enabled locally");
@@ -1302,7 +1302,7 @@ test(stage === "create" ? "real-graph-create" : "real-graph-reopen", async ({ pa
     // Existing keyboard block navigation selects canonical atoms; no editor command injection.
     await page.locator(`.tiptap [data-block-id="${source.blocks[0].id}"] .block-text`).click({ position: { x: 8, y: 8 } });
     await page.keyboard.press("Alt+ArrowDown"); await page.keyboard.press("Alt+ArrowDown");
-    await expect(page.locator(".tiptap .ProseMirror-selectednode")).toHaveAttribute("data-block-id", removedLink.id);
+    await expect(page.locator(".tiptap .ProseMirror-selectednode [data-block-id]")).toHaveAttribute("data-block-id", removedLink.id);
     await page.keyboard.press("Backspace");
     await page.getByRole("button", { name: "Save page", exact: true }).click();
     await expect.poll(async () => importedProjection(await snapshot(page), source.page.id).blocks.some((b: any) => b.id === removedLink.id)).toBe(false);
