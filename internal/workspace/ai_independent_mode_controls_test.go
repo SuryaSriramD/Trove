@@ -409,6 +409,10 @@ func TestRealLocalIndependentModeControls(t *testing.T) {
 	if pack != "01990000-0000-7000-8000-000000000106" {
 		t.Fatal("locked pack106 required")
 	}
+	runRealLocalIndependentModeControls(t, pack)
+}
+
+func runRealLocalIndependentModeControls(t *testing.T, pack string) {
 	cases, hash := independentModeControls(t)
 	manager, err := native.NewManager(os.Getenv("TROVE_MODEL_ROOT"))
 	if err != nil {
