@@ -99,7 +99,9 @@ export default function App() {
   const [shell, setW] = useState<WorkspaceSnapshot | null>(null);
   const [pageContent, setPageContent] = useState<{
     workspaceId: string;
+    scopeGrantId: string;
     pageId: string;
+    page: D.Page;
     revision: string;
     blocks: D.Block[];
   } | null>(null);
@@ -115,6 +117,7 @@ export default function App() {
             blocks:
               shell.contentMode === "shell"
                 ? pageContent?.workspaceId === shell.workspaceId &&
+                  pageContent.scopeGrantId === shell.scopeGrantId &&
                   pageContent.pageId === active &&
                   pageContent.revision ===
                     shell.pages.find((p) => p.id === active)?.revision
@@ -319,8 +322,16 @@ export default function App() {
     !w ||
     w.contentMode !== "shell" ||
     (pageContent?.workspaceId === w.workspaceId &&
+      pageContent.scopeGrantId === w.scopeGrantId &&
       pageContent.pageId === page?.id &&
       pageContent.revision === page?.revision);
+  // Keep a live editor's coherent baseline while this same authorized page
+  // refreshes. A newer shell revision must not unmount an unsaved draft or pair
+  // old blocks with new guards. Access/workspace/page changes discard it at once.
+  const retainedEditorContent = w && page && !page.deletedAt &&
+    pageContent?.workspaceId === w.workspaceId &&
+    pageContent.scopeGrantId === w.scopeGrantId && pageContent.pageId === page.id
+      ? pageContent : null;
   useEffect(() => {
     let live = true;
     setPageReadError("");
@@ -339,16 +350,18 @@ export default function App() {
         }
         setPageContent({
           workspaceId: currentWorkspace,
+          scopeGrantId: w.scopeGrantId,
           pageId: page.id,
+          page: result.page,
           revision: result.page.revision,
           blocks: result.blocks,
         });
       })
       .catch((error) => {
-        if (live)
-          setPageReadError(
-            error instanceof Error ? error.message : String(error),
-          );
+        if (!live) return;
+        if (error instanceof Error && ["SCOPE_DENIED", "NOT_FOUND"].includes(error.name))
+          setPageContent(null);
+        setPageReadError(error instanceof Error ? error.message : String(error));
       });
     return () => {
       live = false;
@@ -356,6 +369,7 @@ export default function App() {
     };
   }, [
     w?.workspaceId,
+    w?.scopeGrantId,
     w?.snapshotCursor,
     page?.id,
     page?.revision,
@@ -1211,11 +1225,19 @@ export default function App() {
                   </aside>
                 ))}
               {w.records.filter(r => r.pageId === page.id).map(r => <RecordLayout key={r.id} workspace={w} collectionId={r.collectionId} recordId={r.id} onCommitted={refresh} onError={errorHandler} />)}
-              {pageReady ? (
+              {pageReady || retainedEditorContent ? (
+                <>
+                {!pageReady && (
+                  <div role={pageReadError ? "alert" : "status"}>
+                    {pageReadError || "Refreshing page content; your draft is retained…"}
+                    {pageReadError && <button onClick={() => setPageReadRetry((n) => n + 1)}>Retry loading page</button>}
+                  </div>
+                )}
                 <PageEditor
-                  key={`${page.id}-${editorKey}`}
-                  page={page}
-                  blocks={body}
+                  key={`${w.workspaceId}-${w.scopeGrantId}-${page.id}-${editorKey}`}
+                  page={pageReady ? page : retainedEditorContent!.page}
+                  blocks={pageReady ? body : retainedEditorContent!.blocks}
+                  contentRefreshing={!pageReady}
                   workspace={w}
                   onAttach={() => pickAttachment(page.id)}
                   registerFlush={(flush) => {
@@ -1227,6 +1249,7 @@ export default function App() {
                   openPage={navigate}
                   toggleTask={toggleTask}
                 />
+                </>
               ) : (
                 <div role={pageReadError ? "alert" : "status"}>
                   {pageReadError || "Loading page content…"}
