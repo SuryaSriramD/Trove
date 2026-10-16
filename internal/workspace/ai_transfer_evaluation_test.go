@@ -313,7 +313,9 @@ func runRealLocalAITransferCases(t *testing.T, load func(*testing.T) ([]aiTransf
 			p, prepareErr := k.PrepareAIWithBudget(ctx, e, request, budget)
 			raw, system, prompt, grammar, decoded := "", "", "", "", ""
 			tokens, attempts := 0, 0
-			var generationErr, finishErr, oracleErr, sourceErr error
+			var generationErr, finishErr, oracleErr, sourceErr, nativeCallbackErr error
+			nativeCompleted := false
+			metrics := &native.RunMetrics{}
 			var run AIRun
 			if prepareErr == nil {
 				sourceErr = aiTransferSourceScope(tc, page, block, p.Run.Sources)
@@ -324,8 +326,8 @@ func runRealLocalAITransferCases(t *testing.T, load func(*testing.T) ([]aiTransf
 							return "", fmt.Errorf("single attempt required")
 						}
 						system, prompt, grammar, tokens = s, u, g, n
-						out, err := supervisor.GenerateTextWithGrammarMetrics(ctx, pack, native.ChatPrompt(s, u), n, g, &native.RunMetrics{}, stream)
-						raw = out
+						out, err := supervisor.GenerateTextWithGrammarMetrics(ctx, pack, native.ChatPrompt(s, u), n, g, metrics, stream)
+						raw, nativeCallbackErr, nativeCompleted = out, err, err == nil
 						return out, err
 					}, nil)
 					decoded, generationErr = c.Text, err
@@ -341,7 +343,7 @@ func runRealLocalAITransferCases(t *testing.T, load func(*testing.T) ([]aiTransf
 			canonical := audit.finish(t, k)
 			executionPassed := prepareErr == nil && sourceErr == nil && generationErr == nil && finishErr == nil && attempts == 1 && run.State == "completed" && canonical.Unchanged
 			automatedPassed := executionPassed && oracleErr == nil
-			report, _ := json.Marshal(map[string]any{"fixture": tc.ID, "mode": request.Mode, "useMemory": request.UseMemory, "corpusSHA256": hash, "request": request, "sourceTitle": tc.Title, "source": tc.Source, "selection": tc.Selection, "prompt": tc.Prompt, "modelPackId": pack, "contextTokens": 8192, "outputCap": p.OutputTokens, "promptTokens": p.PromptTokens, "generatorSystem": system, "generatorPrompt": prompt, "generatorOutputCap": tokens, "generatorGrammarSHA256": fmt.Sprintf("%x", sha256.Sum256([]byte(grammar))), "preparedSystem": p.System, "preparedPrompt": p.Prompt, "sources": p.Run.Sources, "rawDraft": raw, "decodedBody": decoded, "displayed": run.Text, "citations": run.Citations, "generationAttempts": attempts, "prepareError": fmt.Sprint(prepareErr), "sourceScopeError": fmt.Sprint(sourceErr), "generationError": fmt.Sprint(generationErr), "finishError": fmt.Sprint(finishErr), "rubricError": fmt.Sprint(oracleErr), "boundedAnswerOracleApplied": tc.AnswerOracle != nil, "latencyMs": latency, "canonicalInventory": canonical, "canonicalUnchanged": canonical.Unchanged, "mutationHistoryCountUnchanged": canonical.MutationHistoryCountUnchanged, "executionPassed": executionPassed, "passed": automatedPassed, "manualSemanticReviewPending": true, "releaseQualified": false})
+			report, _ := json.Marshal(map[string]any{"fixture": tc.ID, "mode": request.Mode, "useMemory": request.UseMemory, "corpusSHA256": hash, "request": request, "sourceTitle": tc.Title, "source": tc.Source, "selection": tc.Selection, "prompt": tc.Prompt, "modelPackId": pack, "contextTokens": 8192, "outputCap": p.OutputTokens, "promptTokens": p.PromptTokens, "generatorSystem": system, "generatorPrompt": prompt, "generatorOutputCap": tokens, "generatorGrammar": grammar, "nativeCallbackCompleted": nativeCompleted, "nativeCallbackError": fmt.Sprint(nativeCallbackErr), "nativeCompletionContract": "GenerateTextWithGrammarMetrics: success validates generation kind, nonempty text and eos", "peakWorkerRSSBytes": metrics.PeakRSSBytes.Load(), "generatorGrammarSHA256": fmt.Sprintf("%x", sha256.Sum256([]byte(grammar))), "preparedSystem": p.System, "preparedPrompt": p.Prompt, "sources": p.Run.Sources, "rawDraft": raw, "decodedBody": decoded, "displayed": run.Text, "citations": run.Citations, "generationAttempts": attempts, "prepareError": fmt.Sprint(prepareErr), "sourceScopeError": fmt.Sprint(sourceErr), "generationError": fmt.Sprint(generationErr), "finishError": fmt.Sprint(finishErr), "rubricError": fmt.Sprint(oracleErr), "boundedAnswerOracleApplied": tc.AnswerOracle != nil, "latencyMs": latency, "canonicalInventory": canonical, "canonicalUnchanged": canonical.Unchanged, "mutationHistoryCountUnchanged": canonical.MutationHistoryCountUnchanged, "executionPassed": executionPassed, "passed": automatedPassed, "manualSemanticReviewPending": true, "releaseQualified": false})
 			t.Log(string(report))
 			if !automatedPassed {
 				t.Error("transfer execution, source scope, bounded answer or canonical preservation failed; every case still needs independent manual review")

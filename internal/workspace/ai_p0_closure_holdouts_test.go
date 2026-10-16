@@ -236,7 +236,10 @@ func TestRealLocalP0ClosureHoldouts(t *testing.T) {
 			}}
 			request := AIRequest{PageID: page, Mode: "answer", Prompt: tc.Prompt, UseMemory: tc.UseMemory, ModelPackID: pack}
 			p, prepareErr := k.PrepareAIWithBudget(ctx, e, request, budget)
-			raw := ""
+			raw, generatedSystem, generatedPrompt, generatedGrammar := "", "", "", ""
+			generatedCap := 0
+			nativeCompleted := false
+			var nativeCallbackErr error
 			attempts := 0
 			metrics := &native.RunMetrics{}
 			var generationErr, finishErr, oracleErr error
@@ -247,8 +250,9 @@ func TestRealLocalP0ClosureHoldouts(t *testing.T) {
 					if attempts != 1 {
 						return "", fmt.Errorf("holdout requires a single generation attempt")
 					}
+					generatedSystem, generatedPrompt, generatedGrammar, generatedCap = system, prompt, grammar, tokens
 					out, err := supervisor.GenerateTextWithGrammarMetrics(ctx, pack, native.ChatPrompt(system, prompt), tokens, grammar, metrics, stream)
-					raw = out
+					raw, nativeCallbackErr, nativeCompleted = out, err, err == nil
 					return out, err
 				}, nil)
 				generationErr = err
@@ -272,7 +276,7 @@ func TestRealLocalP0ClosureHoldouts(t *testing.T) {
 			if n := metrics.PeakRSSBytes.Load(); n > 0 {
 				rss = n
 			}
-			report, _ := json.Marshal(aiEvaluationRequestReport(request, attempts, map[string]any{"fixture": tc.ID, "corpusSHA256": corpusHash, "passed": passed, "canonicalUnchanged": before == after, "mutationHistoryCountUnchanged": before == after, "canonicalInventory": canonicalInventory, "latencyMs": latencyMS, "promptTokens": p.PromptTokens, "outputCap": p.OutputTokens, "warning": p.Run.Warning, "peakWorkerRSSBytes": rss, "prepareError": fmt.Sprint(prepareErr), "generationError": fmt.Sprint(generationErr), "finishError": fmt.Sprint(finishErr), "rubricError": fmt.Sprint(oracleErr), "rawDraft": raw, "displayed": run.Text, "releaseQualified": false}))
+			report, _ := json.Marshal(aiEvaluationRequestReport(request, attempts, map[string]any{"fixture": tc.ID, "corpusSHA256": corpusHash, "passed": passed, "canonicalUnchanged": before == after, "mutationHistoryCountUnchanged": before == after, "canonicalInventory": canonicalInventory, "latencyMs": latencyMS, "promptTokens": p.PromptTokens, "outputCap": p.OutputTokens, "warning": p.Run.Warning, "peakWorkerRSSBytes": rss, "prepareError": fmt.Sprint(prepareErr), "generationError": fmt.Sprint(generationErr), "finishError": fmt.Sprint(finishErr), "rubricError": fmt.Sprint(oracleErr), "rawDraft": raw, "sources": p.Run.Sources, "preparedSystem": p.System, "preparedPrompt": p.Prompt, "generatorSystem": generatedSystem, "generatorPrompt": generatedPrompt, "generatorGrammar": generatedGrammar, "generatorGrammarSHA256": fmt.Sprintf("%x", sha256.Sum256([]byte(generatedGrammar))), "generatorOutputCap": generatedCap, "nativeCallbackCompleted": nativeCompleted, "nativeCallbackError": fmt.Sprint(nativeCallbackErr), "nativeCompletionContract": "GenerateTextWithGrammarMetrics: success validates generation kind, nonempty text and eos", "citations": run.Citations, "displayed": run.Text, "releaseQualified": false}))
 			t.Log(string(report))
 			if !passed {
 				t.Error("P0 closure holdout or canonical-write boundary failed")
