@@ -15,10 +15,8 @@ export async function observeLineEdgeKeys(page: Page) {
           focusText: native?.focusNode?.textContent, focusOffset: native?.focusOffset, selected: native?.toString() },
         modelAvailable: Boolean(editor?.state?.selection), model: editor?.state.selection.toJSON() ?? null, modelText: editor?.state.doc.textContent });
     };
-    document.addEventListener("keydown", event => {
-      capture("keydown-before", event);
-      queueMicrotask(() => capture("keydown-after", event));
-    }, { capture: true, passive: true });
+    document.addEventListener("keydown", event => capture("keydown-before", event), { capture: true, passive: true });
+    document.addEventListener("keydown", event => capture("keydown-bubble", event), { passive: true });
     document.addEventListener("keyup", event => capture("keyup", event), { capture: true, passive: true });
   });
 }

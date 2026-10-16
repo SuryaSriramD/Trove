@@ -415,7 +415,7 @@ for (const [first, extend] of [["Home", "Shift+End"], ["End", "Shift+Home"]]) {
       expect(saved.id).toBe(id(40)); expect(saved.parentBlockId).toBeNull();
       const events = await lineEdgeObservations(page);
       for (const key of ["Home", "End"]) {
-        expect(events.some((event: any) => event.phase === "keydown-after" && event.key === key && event.trusted && event.defaultPrevented)).toBe(true);
+        expect(events.some((event: any) => event.phase === "keydown-bubble" && event.key === key && event.trusted && event.defaultPrevented)).toBe(true);
       }
     } finally {
       await info.attach("line-edge-key-events", { body: JSON.stringify(await lineEdgeObservations(page), null, 2), contentType: "application/json" });
