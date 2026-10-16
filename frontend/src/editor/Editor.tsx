@@ -192,6 +192,9 @@ export function PageEditor({
         if(selection.$head.parent.type.name!=="troveText")return false;
         const pos=end?selection.$head.end():selection.$head.start();
         e.view.dispatch(e.state.tr.setSelection(TextSelection.create(e.state.doc,extend?selection.anchor:pos,pos)).scrollIntoView());
+        // The target can equal the model selection while the click's native
+        // caret still differs. Synchronize it before another key reuses it.
+        e.view.focus();
         return true;
       };
       const leaveAllSelection = (end: boolean) => {
