@@ -58,6 +58,9 @@ func (k *Kernel) portableAssets(ctx context.Context, tx *sql.Tx, pages map[strin
 		mark(plan.RootID, plan.SourceFileID)
 		broad[plan.SourceFileID] = true
 		for _, item := range plan.Items {
+			if plan.RootSkipped {
+				mark(item.PageID, plan.SourceFileID)
+			}
 			mark(plan.RootID, item.RawFileID)
 			mark(item.PageID, item.RawFileID)
 			items[plan.ID+"\x00"+item.Locator] = item

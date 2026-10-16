@@ -120,6 +120,7 @@ type ImportPlan struct {
 	SourceFileID        string                     `json:"sourceFileId"`
 	SourceName          string                     `json:"sourceName"`
 	RootID              string                     `json:"rootPageId"`
+	RootSkipped         bool                       `json:"rootSkipped,omitempty"`
 	State               string                     `json:"state"`
 	Cursor              int                        `json:"cursor"`
 	Initialized         bool                       `json:"initialized"`

@@ -232,6 +232,9 @@ func portableAttachmentRelationships(ctx context.Context, q querier, allowed map
 		}
 		mark(plan.RootID, plan.SourceFileID)
 		for _, item := range plan.Items {
+			if plan.RootSkipped {
+				mark(item.PageID, plan.SourceFileID)
+			}
 			mark(plan.RootID, item.RawFileID)
 			mark(item.PageID, item.RawFileID)
 		}
