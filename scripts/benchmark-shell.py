@@ -12,6 +12,7 @@ import subprocess
 import time
 
 from qualification_fixtures import clone_closed_workspace, private_directory, retain_closed_workspace, sync_directory, sync_tree
+from native_fixture_environment import OS_GLOBAL_LIMITATION, native_fixture_environment, validate_native_fixture_environment
 
 ROOT = Path(__file__).resolve().parents[1]
 
@@ -65,6 +66,7 @@ def measure(app, profiles, iterations, fixture, diagnostics, *, timeout=60, diag
         source_identity = None
         if profile['workspacePath']:
             source_identity = clone_closed_workspace(Path(profile['workspacePath']), workspace)
+        env, isolation = native_fixture_environment(fixture / f'environment-{n}', workspace)
         samples = []
         attempted = 0
         for i in range(iterations):
@@ -75,17 +77,15 @@ def measure(app, profiles, iterations, fixture, diagnostics, *, timeout=60, diag
             log_path = diagnostics / f'{n}-{i}.log'
             trace_path = diagnostics / f'{n}-{i}.trace'
             native_sample = diagnostics / f'{n}-{i}.sample'
-            env = {k: v for k, v in os.environ.items() if not k.startswith(('TROVE_', 'DYLD_'))}
-            env.update(PATH='/usr/bin:/bin:/usr/sbin:/sbin', TROVE_WORKSPACE=str(workspace),
-                       TROVE_MODEL_ROOT=str(fixture / 'empty-models'),
-                       TROVE_SHELL_REPORT=str(report), TROVE_SHELL_QUIT='1',
+            validate_native_fixture_environment(env, isolation)
+            env.update(TROVE_SHELL_REPORT=str(report), TROVE_SHELL_QUIT='1',
                        TROVE_STARTUP_TRACE=str(trace_path))
             started = time.monotonic()
             timed_out = False
             sampling_attempted = False
             with log_path.open('x') as log:
                 process = subprocess.Popen(['/usr/bin/sandbox-exec', '-p', '(version 1)(allow default)(deny network*)', str(binary)],
-                                           env=env, stdout=log, stderr=subprocess.STDOUT)
+                                           env=env, cwd=isolation['temporary'], stdout=log, stderr=subprocess.STDOUT)
                 try:
                     if diagnostic_slow_ms is not None:
                         try:
@@ -142,7 +142,7 @@ def measure(app, profiles, iterations, fixture, diagnostics, *, timeout=60, diag
             failures.append({'pages': n, 'reason': 'Workspace retention failed: ' + str(error)})
         complete = samples_complete and retained is not None
         results.append({'pages': n, 'paragraphBlocks': profile['paragraphBlocks'], 'samples': samples,
-                        'sourceFixtureInventory': source_identity, 'retainedWorkspace': retained,
+                        'sourceFixtureInventory': source_identity, 'retainedWorkspace': retained, 'isolation': isolation,
                         'requestedIterations': iterations, 'attemptedIterations': attempted,
                         'completedIterations': len(samples), 'sampleCollectionComplete': samples_complete, 'complete': complete,
                         'medianMs': statistics.median(values) if values else None,
@@ -164,7 +164,7 @@ def measure(app, profiles, iterations, fixture, diagnostics, *, timeout=60, diag
             'diagnosticTriggerMetric': 'parent executable launch through shutdown; not Go-shell elapsed time',
             'releaseQualified': False,
             'definition': 'Go process initialization to canonical workspace snapshot rendered and two animation frames. Startup includes native validation and Wails initialization. Each sample uses a new app process; OS disk caches are not flushed. The approximate two-second threshold is explicitly interpreted as at most 2.5 seconds, requires every requested iteration to finish, and exact values are retained.',
-            'limitations': ['Developer Mac only; hardware and synthetic workspace definitions are in benchmark-environment.json.',
+            'limitations': [OS_GLOBAL_LIMITATION, 'Developer Mac only; hardware and synthetic workspace definitions are in benchmark-environment.json.',
                            'Diagnostic mode is ineligible for performance promotion, even if no sampling was needed; sampling may perturb timing.',
                            'Does not measure installer/Gatekeeper time or guarantee editor responsiveness during background work.',
                            'A missing readiness report is a failed measurement; it does not by itself distinguish a workspace, bridge, renderer, or visibility problem.']}

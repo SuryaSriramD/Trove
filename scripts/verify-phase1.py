@@ -90,7 +90,7 @@ finally:
         server_log.close()
 if not args.skip_package:
     if run('desktop-build', [sys.executable, 'scripts/build-desktop.py', '--cache', args.cache]):
-        run('packaged-restart-native', [sys.executable, 'scripts/verify-packaged.py', '--models', args.models, '--native'])
+        run('packaged-restart-native', [sys.executable, 'scripts/verify-packaged.py', '--models', args.models, '--native', '--evidence', run_evidence / 'packaged'])
 final_inputs = fingerprint_inputs()
 changed = sorted(name for name in inputs.keys() | final_inputs.keys() if inputs.get(name) != final_inputs.get(name))
 checks.append({'name': 'source-stability', 'result': 'failed' if changed else 'passed', 'changedPaths': changed})

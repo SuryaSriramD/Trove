@@ -30,8 +30,14 @@ class ShellBenchmarkTests(unittest.TestCase):
         class Process:
             pid = 424242
 
-            def __init__(self, _args, *, env, stdout, stderr):
+            def __init__(self, _args, *, env, cwd, stdout, stderr):
                 self.scenario = next(remaining)
+                assert Path(env['HOME']).is_relative_to(fixture.resolve())
+                assert Path(env['TMPDIR']).is_relative_to(fixture.resolve())
+                assert Path(cwd) == Path(env['TMPDIR'])
+                assert Path(env['TROVE_MODEL_ROOT']).is_relative_to(fixture.resolve())
+                assert 'OPENAI_API_KEY' not in env
+                assert not any(key.startswith('DYLD_') for key in env)
                 self.returncode = None
                 self.waits = 0
                 workspace = Path(env['TROVE_WORKSPACE'])
