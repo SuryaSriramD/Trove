@@ -374,3 +374,25 @@ test("changing an enabled embed URL or provider revokes consent before another r
  await embed.getByText('Edit embed',{exact:true}).click();await embed.getByRole('textbox',{name:'Embed source URL',exact:true}).fill('https://vimeo.com/76979871');await expect(embed.locator('iframe[title$="enabled online embed"]')).toHaveCount(0);await expect(embed.getByRole('button',{name:'Enable Vimeo for this view',exact:true})).toBeVisible();expect(calls).toHaveLength(1);
  await embed.getByRole('button',{name:'Enable Vimeo for this view',exact:true}).click();await expect.poll(()=>calls.length).toBe(2);expect(calls[1]).toBe('https://player.vimeo.com/video/76979871?autoplay=0&dnt=1');
 });
+
+
+test("outer toolbar follows stored formatting and selection without canonical edits", async ({ page }) => {
+  const before = await page.evaluate(() => structuredClone((window as any).integrityState().blocks));
+  const paragraph = page.locator(`[data-block-id="${id(40)}"] .block-text`);
+  await paragraph.click();
+  const toolbar = page.getByRole("toolbar", { name: "Text formatting" });
+  await expect(toolbar.getByLabel("Block type")).toHaveValue("paragraph");
+  for (const mark of ["bold", "italic", "underline", "strike"]) {
+    const button = toolbar.getByRole("button", { name: mark, exact: true });
+    await expect(button).toHaveAttribute("aria-pressed", "false");
+    await button.click();
+    await expect(button).toHaveAttribute("aria-pressed", "true");
+    await button.click();
+    await expect(button).toHaveAttribute("aria-pressed", "false");
+  }
+  await page.locator(`[data-block-id="${id(30)}"] .block-text`).click();
+  await expect(toolbar.getByLabel("Block type")).toHaveValue("toggle");
+  await paragraph.click();
+  await expect(toolbar.getByLabel("Block type")).toHaveValue("paragraph");
+  expect(await page.evaluate(() => (window as any).integrityState().blocks)).toEqual(before);
+});

@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { useEditor, EditorContent } from "@tiptap/react";
+import { useEditor, useEditorState, EditorContent } from "@tiptap/react";
 import { createTask as createCanonicalTask } from "../database/service";
 import StarterKit from "@tiptap/starter-kit";
 import { Extension, InputRule } from "@tiptap/core";
@@ -355,6 +355,19 @@ export function PageEditor({
         void saveRef.current();
       }, 800);
     },
+  });
+  // Tiptap 3 does not rerender useEditor on selection/stored-mark transactions.
+  // Subscribe only to toolbar values so choosing formatting or moving the caret
+  // updates the visible controls without treating either as a content edit.
+  const toolbarState = useEditorState({
+    editor,
+    selector: ({ editor }) => ({
+      blockType: editor?.getAttributes("troveText").kind ?? "paragraph",
+      bold: editor?.isActive("bold") ?? false,
+      italic: editor?.isActive("italic") ?? false,
+      underline: editor?.isActive("underline") ?? false,
+      strike: editor?.isActive("strike") ?? false,
+    }),
   });
   editorRef.current = editor;
   function acceptPageLock(next: PageLock) {
@@ -844,7 +857,7 @@ export function PageEditor({
       >
         <select
           aria-label="Block type"
-          value={editor?.getAttributes("troveText").kind ?? "paragraph"}
+          value={toolbarState?.blockType ?? "paragraph"}
           onChange={(e) => {
             const kind = e.target.value;
             editor
@@ -879,9 +892,9 @@ export function PageEditor({
         ].map(([mark, label]) => (
           <button
             key={mark}
-            className={editor?.isActive(mark) ? "active" : ""}
+            className={toolbarState?.[mark as "bold" | "italic" | "underline" | "strike"] ? "active" : ""}
             aria-label={mark}
-            aria-pressed={editor?.isActive(mark)}
+            aria-pressed={toolbarState?.[mark as "bold" | "italic" | "underline" | "strike"] ?? false}
             onMouseDown={(event) => event.preventDefault()}
             onClick={() => editor?.chain().focus().toggleMark(mark).run()}
           >
