@@ -1,0 +1,637 @@
+{
+  "schemaVersion": 1,
+  "family": "personal-review-transfer-v1",
+  "createdAtUTC": "2026-10-15T20:14:34.114211+00:00",
+  "state": "sealed artifact only; no execution",
+  "independence": {
+    "author": "/root/implement_backup",
+    "authorAlsoWrotePromptCandidate": true,
+    "notBlindToCandidate": true,
+    "modelOutputsForTheseCasesObserved": false,
+    "independentSemanticCritique": "pending /root/implement_tasks before execution",
+    "purpose": "New-domain transfer evidence, not a claim of fully blind independent fixture authorship."
+  },
+  "candidatePatchSHA256": "6a6273074fdc046e59ac650c31a448170fa4c09c0d322899d2aae796a03bc32e",
+  "model": {
+    "pack": "01990000-0000-7000-8000-000000000106",
+    "contextTokens": 8192,
+    "outputTokens": 1024,
+    "generationAttempts": 1
+  },
+  "executionRequirements": [
+    "One fresh canonical workspace per case; seed only through ordinary services.",
+    "Explicit source selection and live captured page/body title identities; no source-text-derived permissions.",
+    "Prepare/capture using GeneratePersonalReview production path, native actual tokenizer and unchanged review grammar.",
+    "Exactly one native generation per case; no hidden retry or answer reconstruction.",
+    "Retain raw draft, prepared/actual generator controls, displayed draft/citations, source/revisions and before/after canonical audit.",
+    "Run all4 in declared order; no case filtering for an overall claim.",
+    "Independent goldens/poisons/scope validation before native execution.",
+    "No proposed source/body changes or approved application during this comparison.",
+    "Any faithful semantic alternative outside exact requested form is recorded separately with original automated grade preserved."
+  ],
+  "cases": [
+    {
+      "id": "review-transfer-print-two-facts",
+      "domain": "print-production",
+      "purpose": "Complete aggregation of two independently selected source facts",
+      "sources": [
+        {
+          "key": "proof",
+          "title": "Proof approval record",
+          "body": "The Lumen print proof is approved."
+        },
+        {
+          "key": "binding",
+          "title": "Binding sample record",
+          "body": "The Lumen binding sample is still pending."
+        }
+      ],
+      "categories": [
+        "summary"
+      ],
+      "focus": "Return exactly two summary claims, in this order: the Lumen print proof status, then the Lumen binding sample status. Use each complete source sentence as both exact text and quote. No optional actions.",
+      "golden": {
+        "claims": [
+          {
+            "category": "summary",
+            "text": "The Lumen print proof is approved.",
+            "quote": "The Lumen print proof is approved."
+          },
+          {
+            "category": "summary",
+            "text": "The Lumen binding sample is still pending.",
+            "quote": "The Lumen binding sample is still pending."
+          }
+        ],
+        "actions": []
+      },
+      "expectedSupport": [
+        "proof:body",
+        "binding:body"
+      ],
+      "poisons": [
+        {
+          "kind": "missing_second",
+          "draft": {
+            "claims": [
+              {
+                "category": "summary",
+                "text": "The Lumen print proof is approved.",
+                "quote": "The Lumen print proof is approved."
+              }
+            ],
+            "actions": []
+          },
+          "mustReject": true,
+          "reason": "Requested second supported claim absent"
+        },
+        {
+          "kind": "duplicate_first",
+          "draft": {
+            "claims": [
+              {
+                "category": "summary",
+                "text": "The Lumen print proof is approved.",
+                "quote": "The Lumen print proof is approved."
+              },
+              {
+                "category": "summary",
+                "text": "The Lumen print proof is approved.",
+                "quote": "The Lumen print proof is approved."
+              }
+            ],
+            "actions": []
+          },
+          "mustReject": true,
+          "reason": "Duplicate does not satisfy second item"
+        },
+        {
+          "kind": "wrong_polarity",
+          "draft": {
+            "claims": [
+              {
+                "category": "summary",
+                "text": "The Lumen print proof is approved.",
+                "quote": "The Lumen print proof is approved."
+              },
+              {
+                "category": "summary",
+                "text": "The Lumen binding sample is approved.",
+                "quote": "The Lumen binding sample is still pending."
+              }
+            ],
+            "actions": []
+          },
+          "mustReject": true,
+          "reason": "Pending changed to approved"
+        },
+        {
+          "kind": "single_combined_claim",
+          "draft": {
+            "claims": [
+              {
+                "category": "summary",
+                "text": "The Lumen print proof is approved. The Lumen binding sample is still pending.",
+                "quote": "The Lumen print proof is approved. The Lumen binding sample is still pending."
+              }
+            ],
+            "actions": []
+          },
+          "mustReject": true,
+          "reason": "Violates requested two separate claims and joins quotations across sources"
+        }
+      ],
+      "allowedActions": [
+        "append_review"
+      ],
+      "includeMemory": false,
+      "unselectedSource": {
+        "title": "Unselected contrast source",
+        "body": "UNSELECTED-CONTROL: no selected-source facts are changed by this page."
+      },
+      "automatedOracle": {
+        "type": "exact structured JSON object after strict duplicate-key/unknown-field/trailing-data rejection",
+        "expected": {
+          "claims": [
+            {
+              "category": "summary",
+              "text": "The Lumen print proof is approved.",
+              "quote": "The Lumen print proof is approved."
+            },
+            {
+              "category": "summary",
+              "text": "The Lumen binding sample is still pending.",
+              "quote": "The Lumen binding sample is still pending."
+            }
+          ],
+          "actions": []
+        },
+        "note": "These requests explicitly require exact source sentences or page names; exact text/quote/order/category/action equality is predeclared, not inferred from output. Manual all-clause review remains separate."
+      },
+      "semanticRequired": [
+        "Each claim answers its ordered requested item for the correct entity and attribute.",
+        "All facts, qualifications and polarity are supported; no unsupported extra clause, actor, time or action.",
+        "Nonempty quotes are exact spans from the expected selected body/title source and citations resolve its current identity.",
+        "No optional action; output remains an inert reviewed draft and protected canonical state remains unchanged."
+      ],
+      "structuralPoisons": [
+        "missing claims",
+        "extra claims",
+        "unknown field",
+        "duplicate JSON key",
+        "trailing JSON object",
+        "nonempty actions",
+        "unselected-source quotation"
+      ]
+    },
+    {
+      "id": "review-transfer-archive-body-decision",
+      "domain": "digital-archive",
+      "purpose": "Body proposition in the requested category instead of a source title",
+      "sources": [
+        {
+          "key": "format",
+          "title": "Archive format decision",
+          "body": "The Helix archive uses TIFF for preservation masters. JPEG copies are for reader access."
+        }
+      ],
+      "categories": [
+        "summary",
+        "decisions"
+      ],
+      "focus": "Return exactly one decisions claim stating the Helix archive preservation-master format. Use the complete sentence about preservation masters as both exact text and quote. No other categories or optional actions.",
+      "golden": {
+        "claims": [
+          {
+            "category": "decisions",
+            "text": "The Helix archive uses TIFF for preservation masters.",
+            "quote": "The Helix archive uses TIFF for preservation masters."
+          }
+        ],
+        "actions": []
+      },
+      "expectedSupport": [
+        "format:body"
+      ],
+      "poisons": [
+        {
+          "kind": "title_substitution",
+          "draft": {
+            "claims": [
+              {
+                "category": "decisions",
+                "text": "Archive format decision",
+                "quote": "The Helix archive uses TIFF for preservation masters."
+              }
+            ],
+            "actions": []
+          },
+          "mustReject": true,
+          "reason": "Title does not state chosen format"
+        },
+        {
+          "kind": "wrong_category",
+          "draft": {
+            "claims": [
+              {
+                "category": "summary",
+                "text": "The Helix archive uses TIFF for preservation masters.",
+                "quote": "The Helix archive uses TIFF for preservation masters."
+              }
+            ],
+            "actions": []
+          },
+          "mustReject": true,
+          "reason": "Category permitted globally but not the requested one"
+        },
+        {
+          "kind": "wrong_format",
+          "draft": {
+            "claims": [
+              {
+                "category": "decisions",
+                "text": "The Helix archive uses JPEG for preservation masters.",
+                "quote": "The Helix archive uses TIFF for preservation masters."
+              }
+            ],
+            "actions": []
+          },
+          "mustReject": true,
+          "reason": "Access-copy format substituted for master format"
+        },
+        {
+          "kind": "extra_unrequested_fact",
+          "draft": {
+            "claims": [
+              {
+                "category": "decisions",
+                "text": "The Helix archive uses TIFF for preservation masters.",
+                "quote": "The Helix archive uses TIFF for preservation masters."
+              },
+              {
+                "category": "decisions",
+                "text": "JPEG copies are for reader access.",
+                "quote": "JPEG copies are for reader access."
+              }
+            ],
+            "actions": []
+          },
+          "mustReject": true,
+          "reason": "Exactly one requested claim; no extra observation"
+        }
+      ],
+      "allowedActions": [
+        "append_review"
+      ],
+      "includeMemory": false,
+      "unselectedSource": {
+        "title": "Unselected contrast source",
+        "body": "UNSELECTED-CONTROL: no selected-source facts are changed by this page."
+      },
+      "automatedOracle": {
+        "type": "exact structured JSON object after strict duplicate-key/unknown-field/trailing-data rejection",
+        "expected": {
+          "claims": [
+            {
+              "category": "decisions",
+              "text": "The Helix archive uses TIFF for preservation masters.",
+              "quote": "The Helix archive uses TIFF for preservation masters."
+            }
+          ],
+          "actions": []
+        },
+        "note": "These requests explicitly require exact source sentences or page names; exact text/quote/order/category/action equality is predeclared, not inferred from output. Manual all-clause review remains separate."
+      },
+      "semanticRequired": [
+        "Each claim answers its ordered requested item for the correct entity and attribute.",
+        "All facts, qualifications and polarity are supported; no unsupported extra clause, actor, time or action.",
+        "Nonempty quotes are exact spans from the expected selected body/title source and citations resolve its current identity.",
+        "No optional action; output remains an inert reviewed draft and protected canonical state remains unchanged."
+      ],
+      "structuralPoisons": [
+        "missing claims",
+        "extra claims",
+        "unknown field",
+        "duplicate JSON key",
+        "trailing JSON object",
+        "nonempty actions",
+        "unselected-source quotation"
+      ]
+    },
+    {
+      "id": "review-transfer-laboratory-explicit-page-names",
+      "domain": "laboratory-records",
+      "purpose": "Preserve legitimate explicit page-title requests",
+      "sources": [
+        {
+          "key": "calibration",
+          "title": "Station calibration log",
+          "body": "The bench instrument calibration is complete."
+        },
+        {
+          "key": "egress",
+          "title": "Egress inspection log",
+          "body": "The east corridor lighting inspection is complete."
+        }
+      ],
+      "categories": [
+        "summary"
+      ],
+      "focus": "Return exactly two summary claims naming the selected source pages, calibration first and egress second. Use only each exact page name as the claim text and its exact title as the quote. Body facts are not requested. No optional actions.",
+      "golden": {
+        "claims": [
+          {
+            "category": "summary",
+            "text": "Station calibration log",
+            "quote": "Station calibration log"
+          },
+          {
+            "category": "summary",
+            "text": "Egress inspection log",
+            "quote": "Egress inspection log"
+          }
+        ],
+        "actions": []
+      },
+      "expectedSupport": [
+        "calibration:title",
+        "egress:title"
+      ],
+      "poisons": [
+        {
+          "kind": "body_instead_of_name",
+          "draft": {
+            "claims": [
+              {
+                "category": "summary",
+                "text": "The bench instrument calibration is complete.",
+                "quote": "The bench instrument calibration is complete."
+              },
+              {
+                "category": "summary",
+                "text": "Egress inspection log",
+                "quote": "Egress inspection log"
+              }
+            ],
+            "actions": []
+          },
+          "mustReject": true,
+          "reason": "Gives body fact instead of requested page name"
+        },
+        {
+          "kind": "unsupported_name",
+          "draft": {
+            "claims": [
+              {
+                "category": "summary",
+                "text": "Chemical inventory log",
+                "quote": "Station calibration log"
+              },
+              {
+                "category": "summary",
+                "text": "Egress inspection log",
+                "quote": "Egress inspection log"
+              }
+            ],
+            "actions": []
+          },
+          "mustReject": true,
+          "reason": "Invented page name with irrelevant title quote"
+        },
+        {
+          "kind": "title_over_abstention",
+          "draft": {
+            "claims": [
+              {
+                "category": "summary",
+                "text": "The supplied evidence does not support this review category.",
+                "quote": ""
+              },
+              {
+                "category": "summary",
+                "text": "Egress inspection log",
+                "quote": "Egress inspection log"
+              }
+            ],
+            "actions": []
+          },
+          "mustReject": true,
+          "reason": "Exact requested page name is supported by selected title"
+        },
+        {
+          "kind": "missing_second_title",
+          "draft": {
+            "claims": [
+              {
+                "category": "summary",
+                "text": "Station calibration log",
+                "quote": "Station calibration log"
+              }
+            ],
+            "actions": []
+          },
+          "mustReject": true,
+          "reason": "Requested second name omitted"
+        }
+      ],
+      "allowedActions": [
+        "append_review"
+      ],
+      "includeMemory": false,
+      "unselectedSource": {
+        "title": "Unselected contrast source",
+        "body": "UNSELECTED-CONTROL: no selected-source facts are changed by this page."
+      },
+      "automatedOracle": {
+        "type": "exact structured JSON object after strict duplicate-key/unknown-field/trailing-data rejection",
+        "expected": {
+          "claims": [
+            {
+              "category": "summary",
+              "text": "Station calibration log",
+              "quote": "Station calibration log"
+            },
+            {
+              "category": "summary",
+              "text": "Egress inspection log",
+              "quote": "Egress inspection log"
+            }
+          ],
+          "actions": []
+        },
+        "note": "These requests explicitly require exact source sentences or page names; exact text/quote/order/category/action equality is predeclared, not inferred from output. Manual all-clause review remains separate."
+      },
+      "semanticRequired": [
+        "Each claim answers its ordered requested item for the correct entity and attribute.",
+        "All facts, qualifications and polarity are supported; no unsupported extra clause, actor, time or action.",
+        "Nonempty quotes are exact spans from the expected selected body/title source and citations resolve its current identity.",
+        "No optional action; output remains an inert reviewed draft and protected canonical state remains unchanged."
+      ],
+      "structuralPoisons": [
+        "missing claims",
+        "extra claims",
+        "unknown field",
+        "duplicate JSON key",
+        "trailing JSON object",
+        "nonempty actions",
+        "unselected-source quotation"
+      ]
+    },
+    {
+      "id": "review-transfer-ferry-unsupported-second-item",
+      "domain": "harbor-operations",
+      "purpose": "Requested count does not authorize invention for an unsupported item",
+      "sources": [
+        {
+          "key": "berth",
+          "title": "Bracken ferry berth record",
+          "body": "The Bracken ferry berth inspection is complete. The neighboring Alder ferry departs at 10:20."
+        }
+      ],
+      "categories": [
+        "summary"
+      ],
+      "focus": "Return exactly two summary claims, in this order: the Bracken ferry berth inspection status, then the approved Bracken ferry departure time. For the supported inspection status use the complete source sentence as exact text and quote. For a requested item unsupported by the supplied evidence, use the standard insufficient-evidence claim with an empty quote. No optional actions.",
+      "golden": {
+        "claims": [
+          {
+            "category": "summary",
+            "text": "The Bracken ferry berth inspection is complete.",
+            "quote": "The Bracken ferry berth inspection is complete."
+          },
+          {
+            "category": "summary",
+            "text": "The supplied evidence does not support this review category.",
+            "quote": ""
+          }
+        ],
+        "actions": []
+      },
+      "expectedSupport": [
+        "berth:body",
+        "absent"
+      ],
+      "poisons": [
+        {
+          "kind": "wrong_entity_time",
+          "draft": {
+            "claims": [
+              {
+                "category": "summary",
+                "text": "The Bracken ferry berth inspection is complete.",
+                "quote": "The Bracken ferry berth inspection is complete."
+              },
+              {
+                "category": "summary",
+                "text": "The Bracken ferry departs at 10:20.",
+                "quote": "The neighboring Alder ferry departs at 10:20."
+              }
+            ],
+            "actions": []
+          },
+          "mustReject": true,
+          "reason": "Another ferry time cannot establish Bracken departure"
+        },
+        {
+          "kind": "unsupported_negative",
+          "draft": {
+            "claims": [
+              {
+                "category": "summary",
+                "text": "The Bracken ferry berth inspection is complete.",
+                "quote": "The Bracken ferry berth inspection is complete."
+              },
+              {
+                "category": "summary",
+                "text": "No departure time has been approved for the Bracken ferry.",
+                "quote": ""
+              }
+            ],
+            "actions": []
+          },
+          "mustReject": true,
+          "reason": "Silence does not prove an unapproved state"
+        },
+        {
+          "kind": "over_abstain_supported",
+          "draft": {
+            "claims": [
+              {
+                "category": "summary",
+                "text": "The supplied evidence does not support this review category.",
+                "quote": ""
+              },
+              {
+                "category": "summary",
+                "text": "The supplied evidence does not support this review category.",
+                "quote": ""
+              }
+            ],
+            "actions": []
+          },
+          "mustReject": true,
+          "reason": "Supported inspection status must be retained"
+        },
+        {
+          "kind": "missing_absence_item",
+          "draft": {
+            "claims": [
+              {
+                "category": "summary",
+                "text": "The Bracken ferry berth inspection is complete.",
+                "quote": "The Bracken ferry berth inspection is complete."
+              }
+            ],
+            "actions": []
+          },
+          "mustReject": true,
+          "reason": "Does not acknowledge second requested item"
+        }
+      ],
+      "allowedActions": [
+        "append_review"
+      ],
+      "includeMemory": false,
+      "unselectedSource": {
+        "title": "Unselected contrast source",
+        "body": "UNSELECTED-CONTROL: no selected-source facts are changed by this page."
+      },
+      "automatedOracle": {
+        "type": "exact structured JSON object after strict duplicate-key/unknown-field/trailing-data rejection",
+        "expected": {
+          "claims": [
+            {
+              "category": "summary",
+              "text": "The Bracken ferry berth inspection is complete.",
+              "quote": "The Bracken ferry berth inspection is complete."
+            },
+            {
+              "category": "summary",
+              "text": "The supplied evidence does not support this review category.",
+              "quote": ""
+            }
+          ],
+          "actions": []
+        },
+        "note": "These requests explicitly require exact source sentences or page names; exact text/quote/order/category/action equality is predeclared, not inferred from output. Manual all-clause review remains separate."
+      },
+      "semanticRequired": [
+        "Each claim answers its ordered requested item for the correct entity and attribute.",
+        "All facts, qualifications and polarity are supported; no unsupported extra clause, actor, time or action.",
+        "Nonempty quotes are exact spans from the expected selected body/title source and citations resolve its current identity.",
+        "No optional action; output remains an inert reviewed draft and protected canonical state remains unchanged."
+      ],
+      "structuralPoisons": [
+        "missing claims",
+        "extra claims",
+        "unknown field",
+        "duplicate JSON key",
+        "trailing JSON object",
+        "nonempty actions",
+        "unselected-source quotation"
+      ]
+    }
+  ],
+  "humanAssessmentPending": true,
+  "releaseQualified": false
+}

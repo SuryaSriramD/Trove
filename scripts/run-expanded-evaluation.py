@@ -12,6 +12,7 @@ FAMILIES = {
     'memory-lifecycle': ('memory-lifecycle.json', 'TestRealLocalWorkflowMemoryLifecycle', 12),
     'images': ('images-execution-v2.json', 'TestRealLocalWorkflowImages', 24),
     'reviews': ('reviews-execution-v2.json', 'TestRealLocalWorkflowReviewsV2', 12),
+    'reviews-transfer': ('personal-review-transfer-v1.json', 'TestRealLocalReviewTransfersV1', 4),
 }
 
 def digest(path):
@@ -410,6 +411,66 @@ def validate_image_report(report, case, contract):
         errors.append('OCR output or provenance differs')
     return errors
 
+def validate_review_transfer_report(report, case, contract):
+    errors = []
+    fixture = contract['reviewCases'][case]
+    raw = json.loads(report.get('rawDraft', ''), object_pairs_hook=_unique_json)
+    if raw != fixture['golden']:
+        errors.append('sealed exact review transfer output differs')
+    for key, value in {'generationAttempts': 1, 'generatorInvocations': 1,
+                       'nativeCallbackCompleted': True, 'nativeCallbackError': '<nil>',
+                       'generationError': '<nil>', 'generatorOutputCap': 1024,
+                       'outputCap': 1024, 'contextTokens': 8192,
+                       'generationVersion': 'personal-review-claim-guidance-v2',
+                       'finalStatus': 'ready', 'manualSemanticReviewRequired': True}.items():
+        if type(report.get(key)) is not type(value) or report[key] != value:
+            errors.append('review execution binding differs: ' + key)
+    if type(report.get('peakWorkerRSSBytes')) is not int or report['peakWorkerRSSBytes'] <= 0:
+        errors.append('sampled native review memory absent')
+    tokens = report.get('promptTokens')
+    if type(tokens) is not int or tokens < 0 or tokens + 1024 + 16 > 8192:
+        errors.append('review reserved token budget differs')
+    grammar = report.get('generatorGrammar')
+    if not isinstance(grammar, str) or not grammar or hashlib.sha256(grammar.encode()).hexdigest() != report.get('generatorGrammarSHA256'):
+        errors.append('actual review grammar identity absent')
+    prompt, system = report.get('generatorPrompt', ''), report.get('generatorSystem', '')
+    plan, bindings = report['plan'], report['sourceBindings']
+    if fixture['focus'] not in prompt or not system or fixture['unselectedSource']['body'] in prompt or fixture['unselectedSource']['title'] in prompt:
+        errors.append('actual review prompt scope differs')
+    for key, value in [('query',fixture['focus']), ('includeMemory', False),
+                       ('sourcePageIds',[bindings[s['key']] for s in fixture['sources']])]:
+        # The historical plan omits false includeMemory via omitempty.
+        if plan.get(key, False if key == 'includeMemory' else None) != value:
+            errors.append('review plan differs: ' + key)
+    generative = plan['generative']
+    if generative['categories'] != fixture['categories'] or generative['allowedActions'] != fixture['allowedActions'] or generative['modelPackId'] != contract['modelPackId']:
+        errors.append('review generation configuration differs')
+    sources = report.get('sources', [])
+    permitted = set(bindings.values())
+    if not sources or any(s['location']['pageId'] not in permitted or not s['location'].get('sourceRevision') or type(s.get('number')) is not int or s['number'] < 1 or s.get('state') != 'current' or 'UNSELECTED-CONTROL' in s['text'] or s.get('connected') for s in sources) or len({s.get('number') for s in sources}) != len(sources):
+        errors.append('selected canonical review source identity differs')
+    expected_citations = {}
+    for claim, support in zip(fixture['golden']['claims'], fixture['expectedSupport']):
+        if support != 'absent':
+            key, field = support.split(':')
+            selected = next(s for s in fixture['sources'] if s['key'] == key)
+            location = report['sourceLocations'][support]
+            supporting = [s for s in sources if s['location'] == location and claim['quote'] in s['text']]
+            if claim['quote'] not in selected[field] or location['pageId'] != bindings[key] or not location.get('sourceRevision') or (field == 'title' and location.get('blockId')) or (field == 'body' and not location.get('blockId')) or len(supporting) != 1:
+                errors.append('requested title/body quotation lacks current selected support')
+            else:
+                s = supporting[0]
+                expected_citations[s['number']] = dict(number=s['number'],title=s['title'],location=s['location'],state='current')
+        if claim['text'] not in report.get('displayed',''):
+            errors.append('rendered draft omits requested claim')
+    citations = report.get('citations', [])
+    if len(citations) != len(expected_citations) or any(c != expected_citations.get(c.get('number')) for c in citations):
+        errors.append('review current citation identity differs')
+    if report.get('actions') not in (None, []):
+        errors.append('unexpected proposed effects')
+    return errors
+
+
 def validate_workflow_report(report, case, contract):
     """Independently bind native mode, declared controls, semantic observations
     and the required assertions. A passing mock or an empty assertion map cannot
@@ -423,7 +484,7 @@ def validate_workflow_report(report, case, contract):
         if report.get('engineMode') != 'native' or report.get('releaseQualified') is not False:
             errors.append('native execution mode or release boundary absent')
         family = contract['family']
-        required = IMAGE_ASSERTIONS if family == 'images' else CONTEXT_ASSERTIONS[case] if family == 'context' else MEMORY_ASSERTIONS[case] if family == 'memory-lifecycle' else REVIEW_ASSERTIONS[case] if family == 'reviews' else RELATED_ASSERTIONS
+        required = {'canonicalPreserved','sourceScope','reservedBudget','independentAnswerOracle','readyUnapplied','currentCitations'} if family == 'reviews-transfer' else IMAGE_ASSERTIONS if family == 'images' else CONTEXT_ASSERTIONS[case] if family == 'context' else MEMORY_ASSERTIONS[case] if family == 'memory-lifecycle' else REVIEW_ASSERTIONS[case] if family == 'reviews' else RELATED_ASSERTIONS
         assertions = report.get('assertions', {})
         if not isinstance(assertions, dict) or not required.issubset(assertions) or any(value is not True for value in assertions.values()):
             errors.append('required assertion missing or failed')
@@ -465,6 +526,8 @@ def validate_workflow_report(report, case, contract):
             errors.extend(validate_image_report(report, case, contract))
         elif family == 'reviews':
             errors.extend(validate_review_report(report, case))
+        elif family == 'reviews-transfer':
+            errors.extend(validate_review_transfer_report(report, case, contract))
         elif family == 'memory-lifecycle':
             errors.extend(validate_memory_report(report, case))
         elif family == 'related':
@@ -544,7 +607,7 @@ def summarize(events, expected, parent, canonical_root=None, expected_requests=N
         if workflow_contract is not None:
             errors.extend('workflow ' + case + ': ' + message for message in validate_workflow_report(r, case, workflow_contract))
         passed = r.get('passed', r.get('automatedTaskPassed')) is True
-        excluded = IMAGE_EXCLUDED_TABLES if workflow_contract and workflow_contract.get('family') == 'images' else REVIEW_EXCLUDED_TABLES if workflow_contract and workflow_contract.get('family') == 'reviews' else None
+        excluded = IMAGE_EXCLUDED_TABLES if workflow_contract and workflow_contract.get('family') == 'images' else REVIEW_EXCLUDED_TABLES if workflow_contract and workflow_contract.get('family') in ('reviews','reviews-transfer') else None
         canonical_error = validate_canonical_inventory(r, canonical_root, parent + '/' + case, excluded)
         if excluded is not None:
             for name in (['beforeExplicitMutationInventory'] if case == 'forgotten-memory' else ['staleApplyInventory'] if case == 'stale-destination' else []):
@@ -602,6 +665,8 @@ def main():
     corpus_file, test, count = FAMILIES[args.family]
     corpus_dir = ROOT / 'internal/workspace/testdata/expanded-evaluation'
     corpus = json.loads((corpus_dir / corpus_file).read_text())
+    if args.family == 'reviews-transfer' and (args.cases or args.pack != '01990000-0000-7000-8000-000000000106' or digest(corpus_dir / corpus_file) != '0230b8e02b5da1cdad29643186b2ed87bfb8a875f463f5561a44d1e3987d3e84'):
+        p.error('sealed review transfers require all four cases, exact fixture bytes and pack106')
     expected = [c['id'] for c in corpus['cases']]
     if len(expected) != count or len(set(expected)) != count:
         p.error('locked corpus count/identity mismatch')
@@ -664,6 +729,21 @@ def main():
     if build_result.returncode:
         manifest.update(state='build_failed', exitCode=build_result.returncode); write(); return 1
     manifest['testBinarySHA256'] = digest(binary)
+    if args.family == 'reviews-transfer':
+        gates = [str(binary), '-test.run', '^TestReviewTransfer(SealedGoldensAndPoisons|CapturedScopeAndDrafts)$', '-test.v']
+        with open(out / 'oracle-gates.log','w') as log:
+            gate = subprocess.run(sandbox + gates,cwd=ROOT/'internal/workspace',env=env,stdout=log,stderr=subprocess.STDOUT)
+        gate_text = (out/'oracle-gates.log').read_text()
+        gate_passed = gate.returncode == 0 and all('--- PASS: '+name+' ' in gate_text for name in ('TestReviewTransferSealedGoldensAndPoisons','TestReviewTransferCapturedScopeAndDrafts')) and '--- SKIP:' not in gate_text
+        manifest['sealedOracleScopeGates'] = {'passed':gate_passed,'sha256':digest(out/'oracle-gates.log'),'exitCode':gate.returncode}
+        if not gate_passed:
+            manifest.update(state='oracle_gate_failed',exitCode=gate.returncode);write();return 1
+    try:
+        manifest['preAdmissionFreeBytes'] = require_space([out.parent, pathlib.Path(tempfile.gettempdir())])
+        if {str(x): {'sha256': digest(x), 'bytes': x.stat().st_size} for x in paths} != before:
+            raise ValueError('source, fixture, helper or model inputs changed before native admission')
+    except (OSError, ValueError) as error:
+        manifest.update(state='admission_failed', error=str(error)); write(); return 1
     env.update(TROVE_NATIVE_INTEGRATION='1', TROVE_CHAT_EVAL_PACK=args.pack, TROVE_EMBED_EVAL_PACK=args.pack, TROVE_VISION_EVAL_PACK=args.pack,
                TROVE_MODEL_ROOT=str(models), TROVE_NATIVE_BUNDLE=str(bundle),
                TROVE_AI_CANONICAL_EVIDENCE_DIR=manifest['canonicalEvidenceDirectory'])
@@ -688,9 +768,11 @@ def main():
                              'corpusSHA256': before[str(corpus_dir / corpus_file)]['sha256']}
                              for case in corpus['cases'] if case['id'] in expected}
     workflow_contract = None
-    if args.family in ('context', 'related', 'memory-lifecycle', 'reviews', 'images'):
+    if args.family in ('context', 'related', 'memory-lifecycle', 'reviews', 'reviews-transfer', 'images'):
         workflow_contract = {'family': args.family, 'modelPackId': args.pack,
                              'corpusSHA256': before[str(corpus_dir / corpus_file)]['sha256']}
+    if args.family == 'reviews-transfer':
+        workflow_contract['reviewCases'] = {case['id']:case for case in corpus['cases']}
     if args.family == 'images':
         workflow_contract.update(imageCases={case['id']: case for case in corpus['cases']},
             modelSHA256=before[str(models / (args.pack + '.model'))]['sha256'],
