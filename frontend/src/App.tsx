@@ -326,10 +326,11 @@ export default function App() {
     setPageReadError("");
     if (!w || !page || w.contentMode !== "shell") return;
     const currentWorkspace = w.workspaceId;
+    const controller = new AbortController();
     void dispatch<S.ReadPageResult>("readPage", {
       ...envelope(w),
       pageId: page.id,
-    })
+    }, { signal: controller.signal })
       .then((result) => {
         if (!live) return;
         if (result.page.revision !== page.revision) {
@@ -351,6 +352,7 @@ export default function App() {
       });
     return () => {
       live = false;
+      controller.abort();
     };
   }, [
     w?.workspaceId,
@@ -364,16 +366,19 @@ export default function App() {
     let live = true;
     setRemoteBacklinks([]);
     if (!w || !page || w.contentMode !== "shell") return;
+    const controller = new AbortController();
     void dispatch<{ links: { pageId: string; blockId: string }[] }>(
       "links.backlinks",
       { ...envelope(w), pageId: page.id },
+      { signal: controller.signal },
     )
       .then((result) => {
         if (live) setRemoteBacklinks(result.links);
       })
-      .catch(errorHandler);
+      .catch(error => { if (live) errorHandler(error); });
     return () => {
       live = false;
+      controller.abort();
     };
   }, [w?.workspaceId, w?.snapshotCursor, page?.id, errorHandler]);
   const pageDisplay = display?.pageId === page?.id ? display : null;
@@ -383,18 +388,20 @@ export default function App() {
       setDisplay(null);
       return;
     }
+    const controller = new AbortController();
     void dispatch<{
       pageId: string;
       fullWidth: boolean;
       presentation: boolean;
       revision: string;
-    }>("pageDisplay.get", { ...envelope(w), pageId: page.id })
+    }>("pageDisplay.get", { ...envelope(w), pageId: page.id }, { signal: controller.signal })
       .then((value) => {
         if (current) setDisplay(value);
       })
-      .catch(errorHandler);
+      .catch(error => { if (current) errorHandler(error); });
     return () => {
       current = false;
+      controller.abort();
     };
   }, [w?.workspaceId, page?.id, page?.revision, errorHandler]);
   async function changePageDisplay(change: {

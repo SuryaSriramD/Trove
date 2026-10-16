@@ -1,3 +1,4 @@
+import { dispatchWithHostReadAdmission } from "./hostReadAdmission";
 import type * as D from "../../contracts/generated/domain";
 import type * as S from "../../contracts/generated/service";
 import { bridgeMetric, qualificationStart, qualificationRecord } from "./qualificationPerformance";
@@ -9,6 +10,7 @@ export type WorkspaceSnapshot = D.DomainSnapshot & {
 };
 declare global {
   interface Window {
+    troveHost?: boolean;
     go?: {
       main: {
         App: {
@@ -59,6 +61,7 @@ export function requestID() {
 export async function dispatch<T>(
   method: string,
   request: unknown = {},
+  options: { signal?: AbortSignal } = {},
 ): Promise<T> {
   const bridge = window.go?.main.App;
   if (!bridge)
@@ -69,7 +72,7 @@ export async function dispatch<T>(
   const started = metric ? qualificationStart() : undefined;
   let response;
   try {
-    response = JSON.parse(await bridge.Dispatch(method, JSON.stringify(request)));
+    response = JSON.parse(await dispatchWithHostReadAdmission(window.troveHost === true, method, () => bridge.Dispatch(method, JSON.stringify(request)), options.signal));
   } finally {
     qualificationRecord(metric, started);
   }

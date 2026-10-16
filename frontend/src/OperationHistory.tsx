@@ -26,11 +26,12 @@ export function OperationHistory({
   const [error, setError] = useState("");
   useEffect(() => {
     let active = true;
+    const controller = new AbortController();
     setPreview(undefined);
     dispatch<S.OperationsListResult>("operations.list", {
       ...envelope(workspace),
       pageId,
-    })
+    }, { signal: controller.signal })
       .then((r) => {
         if (active) {
           setOperations(r.operations ?? []);
@@ -42,6 +43,7 @@ export function OperationHistory({
       });
     return () => {
       active = false;
+      controller.abort();
     };
   }, [workspace.workspaceId, workspace.snapshotCursor, pageId]);
   async function inspect(operationId: string) {
