@@ -51,5 +51,21 @@ class RealUIAccountingTests(unittest.TestCase):
         self.assertFalse(runner.assess({}, [])['passed'])
 
 
+class RealUIHostBindingTests(unittest.TestCase):
+    def test_clean_override_requires_exact_checkout_and_no_dirty_files(self):
+        runner.validate_host_override('same', 'same', '')
+        for executing, source, status in [('old', 'new', ''), ('same', 'same', ' M internal/workspace/import_commit.go'), ('same', 'same', '?? untracked.go')]:
+            with self.subTest(executing=executing, source=source, status=status):
+                with self.assertRaises(RuntimeError):
+                    runner.validate_host_override(executing, source, status)
+
+    def test_missing_dirty_or_ambiguous_provenance_is_rejected(self):
+        self.assertEqual(runner.clean_host_revision('build vcs.revision=source\nbuild vcs.modified=false'), 'source')
+        for value in ['build vcs.modified=false', 'build vcs.revision=source\nbuild vcs.modified=true',
+                      'build vcs.revision=one\nbuild vcs.revision=two\nbuild vcs.modified=false']:
+            with self.subTest(value=value), self.assertRaises(RuntimeError):
+                runner.clean_host_revision(value)
+
+
 if __name__ == '__main__':
     unittest.main()
