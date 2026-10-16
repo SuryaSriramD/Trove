@@ -6,6 +6,8 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
+	"runtime"
+	"slices"
 	"testing"
 	"time"
 )
@@ -17,8 +19,17 @@ func TestProductionMicrophoneRejectsBeforePermissionOrDevice(t *testing.T) {
 	if bundle == "" {
 		t.Skip("requires a production helper; no device use")
 	}
-	for _, synthetic := range []bool{false, true} {
-		t.Run(map[bool]string{false: "unapproved", true: "synthetic_forbidden"}[synthetic], func(t *testing.T) {
+	for _, fixture := range []struct {
+		name      string
+		synthetic bool
+		omitInput bool
+		code      string
+	}{
+		{name: "unapproved", code: "APPROVAL_REQUIRED"},
+		{name: "synthetic_forbidden", synthetic: true, code: "INVALID_INPUT"},
+		{name: "missing_input_field", omitInput: true, code: "INVALID_INPUT"},
+	} {
+		t.Run(fixture.name, func(t *testing.T) {
 			ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
 			defer cancel()
 			controlR, controlW, err := os.Pipe()
@@ -65,10 +76,14 @@ func TestProductionMicrophoneRejectsBeforePermissionOrDevice(t *testing.T) {
 				t.Fatal(err)
 			}
 			var hello Event
-			if json.Unmarshal(raw, &hello) != nil || hello.RuntimeCommit != MicrophoneCommit || hello.Kind != "hello" || len(hello.Capabilities) != 1 || hello.Capabilities[0] != "record" {
+			if json.Unmarshal(raw, &hello) != nil || hello.RuntimeCommit != MicrophoneCommit || hello.Kind != "hello" || hello.ProtocolVersion != 1 || hello.Runtime != "microphone" || hello.Architecture != runtime.GOARCH || !slices.Equal(hello.Capabilities, []string{"record", "capture_controls_v1", "input_devices_v1"}) {
 				t.Fatalf("production identity/capability: %s", raw)
 			}
-			err = WriteFrame(input, map[string]any{"protocolVersion": 1, "requestId": NewID(), "kind": "record", "durationMs": 100, "maxBytes": 6400, "synthetic": synthetic, "requestPermission": false})
+			request := map[string]any{"protocolVersion": 1, "requestId": NewID(), "kind": "record", "durationMs": 100, "maxBytes": 6400, "synthetic": fixture.synthetic, "requestPermission": false}
+			if !fixture.omitInput {
+				request["inputDeviceId"] = ""
+			}
+			err = WriteFrame(input, request)
 			if err != nil {
 				t.Fatal(err)
 			}
@@ -81,11 +96,7 @@ func TestProductionMicrophoneRejectsBeforePermissionOrDevice(t *testing.T) {
 				Kind, Code, PermissionState, DeviceState string
 				Bytes                                    int64
 			}
-			code := "APPROVAL_REQUIRED"
-			if synthetic {
-				code = "INVALID_INPUT"
-			}
-			if json.Unmarshal(raw, &event) != nil || event.Kind != "error" || event.Code != code || event.PermissionState != "not_requested" || event.DeviceState != "not_accessed" || event.Bytes != 0 {
+			if json.Unmarshal(raw, &event) != nil || event.Kind != "error" || event.Code != fixture.code || event.PermissionState != "not_requested" || event.DeviceState != "not_accessed" || event.Bytes != 0 {
 				t.Fatalf("unexpected device/permission work: %s", raw)
 			}
 			if err = cmd.Wait(); err == nil {
