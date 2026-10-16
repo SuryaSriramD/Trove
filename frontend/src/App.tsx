@@ -164,6 +164,11 @@ export default function App() {
   const attachmentQueue = useRef<Promise<void>>(Promise.resolve());
   const activeRef = useRef(active);
   const flushEditor = useRef<(() => Promise<boolean>) | null>(null);
+  const titleControl = useRef<{ key: string; commit: () => Promise<boolean> } | null>(null);
+  const [titlePending, setTitlePending] = useState<{ key: string; pending: boolean } | null>(null);
+  type PageSave = { key: string; phase: "title" | "body" | "flushing" };
+  const pageSaveFlight = useRef<PageSave | null>(null);
+  const [pageSave, setPageSave] = useState<PageSave | null>(null);
   activeRef.current = active;
   const errorHandler = useCallback(
     (e: unknown) => setError(e instanceof Error ? e.message : String(e)),
@@ -332,6 +337,54 @@ export default function App() {
     pageContent?.workspaceId === w.workspaceId &&
     pageContent.scopeGrantId === w.scopeGrantId && pageContent.pageId === page.id
       ? pageContent : null;
+  const pageAuthority = w && page && !page.deletedAt
+    ? `${w.workspaceId}-${w.scopeGrantId}-${page.id}` : "";
+  const pageAuthorityRef = useRef(pageAuthority);
+  pageAuthorityRef.current = pageAuthority;
+  const pendingTitle = titlePending?.key === pageAuthority && titlePending.pending;
+  async function saveCurrentPage() {
+    const control = titleControl.current, key = pageAuthority;
+    if (!key || control?.key !== key || pageSaveFlight.current?.key === key) return;
+    const request: PageSave = { key, phase: "title" };
+    pageSaveFlight.current = request;
+    setPageSave(request);
+    try {
+      const saved = await control.commit();
+      if (pageSaveFlight.current !== request || pageAuthorityRef.current !== key) return;
+      if (!saved) { pageSaveFlight.current = null; setPageSave(null); return; }
+      const ready: PageSave = { key, phase: "body" };
+      pageSaveFlight.current = ready;
+      setPageSave(ready);
+    } catch (error) {
+      if (pageSaveFlight.current === request) {
+        pageSaveFlight.current = null;
+        setPageSave(null);
+        errorHandler(error);
+      }
+    }
+  }
+  useEffect(() => {
+    if (!pageSave) return;
+    if (pageSave.key !== pageAuthority || (pageSave.phase === "body" && pageReadError)) {
+      pageSaveFlight.current = null;
+      setPageSave(null);
+      return;
+    }
+    if (pageSave.phase !== "body" || !pageReady || pendingTitle || pageSaveFlight.current !== pageSave) return;
+    const flushing: PageSave = { key: pageSave.key, phase: "flushing" };
+    pageSaveFlight.current = flushing;
+    setPageSave(flushing);
+    void (async () => {
+      try { await flushEditor.current?.(); }
+      catch (error) { if (pageAuthorityRef.current === flushing.key) errorHandler(error); }
+      finally {
+        if (pageSaveFlight.current === flushing) {
+          pageSaveFlight.current = null;
+          setPageSave(null);
+        }
+      }
+    })();
+  }, [pageSave, pageAuthority, pageReady, pageReadError, pendingTitle]);
   useEffect(() => {
     let live = true;
     setPageReadError("");
@@ -1165,9 +1218,14 @@ export default function App() {
                   {page.icon ?? "▤"}
                 </button>
                 <PageTitleInput
-                  key={page.id}
+                  key={pageAuthority}
                   page={page}
                   onCommit={(base, title) => updatePage(base, { title })}
+                  registerCommit={(commit) => {
+                    if (commit) titleControl.current = { key: pageAuthority, commit };
+                    else if (titleControl.current?.key === pageAuthority) titleControl.current = null;
+                  }}
+                  onPendingChange={(pending) => setTitlePending({ key: pageAuthority, pending })}
                 />
                 <div className="page-meta">
                   Your private workspace <span>·</span> Edited{" "}
@@ -1238,6 +1296,8 @@ export default function App() {
                   page={pageReady ? page : retainedEditorContent!.page}
                   blocks={pageReady ? body : retainedEditorContent!.blocks}
                   contentRefreshing={!pageReady}
+                  titlePending={pendingTitle}
+                  onSavePage={() => void saveCurrentPage()}
                   workspace={w}
                   onAttach={() => pickAttachment(page.id)}
                   registerFlush={(flush) => {
