@@ -100,10 +100,14 @@ export function PageEditor({
   registerFlush,
   onAttach,
   contentRefreshing = false,
+  titlePending = false,
+  onSavePage,
 }: {
   page: D.Page;
   blocks: D.Block[];
   contentRefreshing?: boolean;
+  titlePending?: boolean;
+  onSavePage?: () => void;
   workspace: WorkspaceSnapshot;
   onCommitted: () => Promise<void>;
   onAttach?: () => Promise<void>;
@@ -540,6 +544,10 @@ export function PageEditor({
   }, [editor, page.revision, blocks, workspace]);
   async function save() {
     if (!editor || saving.current || lockRef.current.locked) return;
+    if (titlePending) {
+      if (pending.current) setSaveState("Waiting for title save…");
+      return;
+    }
     if (contentRefreshing) {
       if (pending.current) setSaveState("Waiting for page refresh…");
       return;
@@ -638,8 +646,8 @@ export function PageEditor({
     // Resume an unsent draft once its coherent projection arrives. save() still
     // reconciles remote changes and refuses explicit conflicts; it never weakens
     // revision guards or retries an arbitrary failed mutation.
-    if (!contentRefreshing && pending.current) void saveRef.current();
-  }, [contentRefreshing]);
+    if (!contentRefreshing && !titlePending && pending.current) void saveRef.current();
+  }, [contentRefreshing, titlePending]);
   async function togglePageLock() {
     if (lockChanging.current) return;
     lockChanging.current = true;
@@ -955,7 +963,7 @@ export function PageEditor({
         <span role="status" className="save-state">
           {saveState}
         </span>
-        <button onClick={() => void save()} aria-label="Save page">
+        <button onClick={() => onSavePage ? onSavePage() : void save()} aria-label="Save page">
           Save
         </button>
       </div>

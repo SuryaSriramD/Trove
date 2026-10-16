@@ -5,14 +5,50 @@ import type { D } from "./api";
 export function PageTitleInput({
   page,
   onCommit,
+  registerCommit,
+  onPendingChange,
 }: {
   page: D.Page;
   onCommit: (base: D.Page, title: string) => Promise<boolean>;
+  registerCommit?: (commit: (() => Promise<boolean>) | null) => void;
+  onPendingChange?: (pending: boolean) => void;
 }) {
   const [draft, setDraft] = useState(page.title),
     [dirty, setDirty] = useState(false),
     [saving, setSaving] = useState(false);
   const base = useRef(page);
+  const flight = useRef<Promise<boolean> | null>(null);
+  const live = useRef(true);
+  async function commit() {
+    if (flight.current) return flight.current;
+    if (!dirty) return true;
+    const title = draft || "Untitled";
+    if (title === base.current.title) {
+      setDirty(false);
+      return true;
+    }
+    setSaving(true);
+    const attempt = (async () => {
+      try {
+        const saved = await onCommit(base.current, title);
+        if (saved && live.current) setDirty(false);
+        return saved;
+      } finally {
+        flight.current = null;
+        if (live.current) setSaving(false);
+      }
+    })();
+    flight.current = attempt;
+    return attempt;
+  }
+  const commitRef = useRef(commit);
+  commitRef.current = commit;
+  useEffect(() => {
+    live.current = true;
+    registerCommit?.(() => commitRef.current());
+    return () => { live.current = false; registerCommit?.(null); onPendingChange?.(false); };
+  }, []);
+  useEffect(() => { onPendingChange?.(dirty); }, [dirty]);
   useEffect(() => {
     if (!dirty) {
       base.current = page;
@@ -31,20 +67,7 @@ export function PageTitleInput({
         setDirty(true);
         setDraft(e.target.value);
       }}
-      onBlur={async () => {
-        if (!dirty || saving) return;
-        const title = draft || "Untitled";
-        if (title === base.current.title) {
-          setDirty(false);
-          return;
-        }
-        setSaving(true);
-        try {
-          if (await onCommit(base.current, title)) setDirty(false);
-        } finally {
-          setSaving(false);
-        }
-      }}
+      onBlur={() => { void commit(); }}
       onKeyDown={(e) => {
         if (e.key === "Enter") e.currentTarget.blur();
         if (e.key === "Escape") {
