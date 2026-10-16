@@ -1307,7 +1307,10 @@ test(stage === "create" ? "real-graph-create" : "real-graph-reopen", async ({ pa
     await page.getByRole("button", { name: "Save page", exact: true }).click();
     await expect.poll(async () => importedProjection(await snapshot(page), source.page.id).blocks.some((b: any) => b.id === removedLink.id)).toBe(false);
     const final = await snapshot(page), finalSource = importedProjection(final, source.page.id);
-    expect(finalSource.blocks).toEqual(linked.blocks.filter((b: any) => b.id !== removedLink.id));
+    // Deleting a sibling emits a guarded reorder. Each retained sibling is
+    // touched once; its identity, parent, order and values must stay exact.
+    expect(finalSource.blocks).toEqual(linked.blocks.filter((b: any) => b.id !== removedLink.id)
+      .map((b: any) => ({ ...b, revision: String(BigInt(b.revision) + 1n) })));
     expect(importedProjection(final, target.page.id)).toEqual(target); expect(importedProjection(final, removedTarget.page.id)).toEqual(removedTarget);
     expect(unrelatedRecords(final)).toEqual(unrelated);
     const finalGraph = await visibleGraph(page, source.page.id);
