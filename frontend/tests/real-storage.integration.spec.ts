@@ -1,3 +1,4 @@
+import { observeLineEdgeKeys, lineEdgeObservations } from "./keyboard-observation";
 import { test, expect, type Page } from "@playwright/test";
 import fs from "node:fs";
 import path from "node:path";
@@ -1200,10 +1201,15 @@ test(stage === "create" ? "real-personal-review-create" : "real-personal-review-
     expect((await observe(page, "review.list", {})).runs.find((r: any) => r.id === dismissed.id).status).toBe("dismissed");
     const stale = await prepareReview(page, plan, [source, additional]);
     await openPlainPage(page, f.sourceTitle);
-    await page.locator(".tiptap .block-text").click({ position: { x: 8, y: 8 } });
-    await page.keyboard.press("Home"); await page.keyboard.press("Shift+End"); await page.keyboard.insertText(f.changedBody);
-    await page.getByRole("button", { name: "Save page", exact: true }).click();
-    await expect.poll(async () => blockText(importedProjection(await snapshot(page), source.page.id).blocks[0])).toBe(f.changedBody);
+    await observeLineEdgeKeys(page);
+    try {
+      await page.locator(".tiptap .block-text").click({ position: { x: 8, y: 8 } });
+      await page.keyboard.press("Home"); await page.keyboard.press("Shift+End"); await page.keyboard.insertText(f.changedBody);
+      await page.getByRole("button", { name: "Save page", exact: true }).click();
+      await expect.poll(async () => blockText(importedProjection(await snapshot(page), source.page.id).blocks[0])).toBe(f.changedBody);
+    } finally {
+      write(`${stage}-personal-review-key-events.json`, await lineEdgeObservations(page));
+    }
     const changedSource = importedProjection(await snapshot(page), source.page.id);
     expect(changedSource.blocks[0].id).toBe(source.blocks[0].id);
     panel = await openIntelligence(page, destination.page.id, "Personal review");

@@ -1,3 +1,4 @@
+import { observeLineEdgeKeys, lineEdgeObservations } from "./keyboard-observation";
 import { test, expect, type Page, type Locator } from "@playwright/test";
 
 const id = (n: number) => `019a1234-5678-7000-8000-${String(n).padStart(12, "0")}`;
@@ -396,3 +397,28 @@ test("outer toolbar follows stored formatting and selection without canonical ed
   await expect(toolbar.getByLabel("Block type")).toHaveValue("paragraph");
   expect(await page.evaluate(() => (window as any).integrityState().blocks)).toEqual(before);
 });
+
+for (const [first, extend] of [["Home", "Shift+End"], ["End", "Shift+Home"]]) {
+  test(`line edge keyboard ${first} then ${extend} replaces the whole paragraph`, async ({ page }, info) => {
+    const paragraph = page.locator(`[data-block-id="${id(40)}"] .block-text`);
+    await expect(paragraph).toHaveText("Visible sibling");
+    await observeLineEdgeKeys(page);
+    try {
+      await paragraph.click({ position: { x: 8, y: 8 } });
+      await page.keyboard.press(first);
+      await page.keyboard.press(extend);
+      await page.keyboard.insertText("Replaced from the line boundary.");
+      await save(page);
+      await expect(paragraph).toHaveText("Replaced from the line boundary.");
+      const saved = await page.evaluate(id => (window as any).integrityState().blocks.find((block: any) => block.id === id), id(40));
+      expect(saved.data.richText).toEqual([{ text: "Replaced from the line boundary." }]);
+      expect(saved.id).toBe(id(40)); expect(saved.parentBlockId).toBeNull();
+      const events = await lineEdgeObservations(page);
+      for (const key of ["Home", "End"]) {
+        expect(events.some((event: any) => event.phase === "keydown-after" && event.key === key && event.trusted && event.defaultPrevented)).toBe(true);
+      }
+    } finally {
+      await info.attach("line-edge-key-events", { body: JSON.stringify(await lineEdgeObservations(page), null, 2), contentType: "application/json" });
+    }
+  });
+}
