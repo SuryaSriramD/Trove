@@ -261,6 +261,7 @@ type Plan = {
   sourceNamespace: string;
   sourceName: string;
   rootPageId: string;
+  rootSkipped?: boolean;
   sourceFileId: string;
   state: string;
   cursor: number;
@@ -1051,6 +1052,7 @@ export function ImportExportPanel({
                 </button>
               ))}
             {plan.initialized &&
+              !plan.rootSkipped &&
               !(
                 plan.items.some((i) => i.identityReview?.choice === "skip") &&
                 plan.items.every(

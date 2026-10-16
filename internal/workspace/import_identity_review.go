@@ -487,3 +487,72 @@ func refreshImportIdentityGuards(ctx context.Context, q querier, p *ImportPlan) 
 	}
 	return nil
 }
+
+// Suppressing a new presentation container is separate from finishing each
+// reviewed item. Kept items must still retain aliases, baselines and evidence.
+func importKeepsAllMappedContent(p *ImportPlan) bool {
+	kept := false
+	for _, item := range p.Items {
+		if importIdentitySkipped(item) {
+			continue
+		}
+		switch item.Kind {
+		case "folder", "directory", "asset", "rejected":
+			continue
+		}
+		if item.Choice != "keep_local" {
+			return false
+		}
+		if item.PageID != "" && item.MappingID != "" {
+			kept = true
+			continue
+		}
+		// A kept database suppresses its supplied row work before this decision.
+		if item.Kind != "row" && item.Kind != "portable_record" {
+			return false
+		}
+	}
+	return kept
+}
+func retainRootlessImportEvidence(m *Mutation, p *ImportPlan) error {
+	for i := range p.Items {
+		item := &p.Items[i]
+		if item.Kind == "folder" && item.MappingID == "" {
+			item.PageID, item.ParentID = "", ""
+			item.Reason += "; no new directory needed for kept existing content"
+		}
+		if item.PageID == "" || item.Choice != "keep_local" || importIdentitySkipped(*item) {
+			continue
+		}
+		for _, file := range []string{p.SourceFileID, item.RawFileID} {
+			if err := importAttach(m, item.PageID, file); err != nil {
+				return err
+			}
+		}
+	}
+	return nil
+}
+
+func retainKeptTypedRecordProjections(p *ImportPlan) {
+	if !p.TypedDatabaseMerge {
+		return
+	}
+	keptPages, keptCollections := map[string]bool{}, map[string]string{}
+	for _, item := range p.Items {
+		if item.Choice != "keep_local" || item.MappingID == "" || importIdentitySkipped(item) {
+			continue
+		}
+		if item.Kind == "portable_collection" {
+			keptCollections[item.Locator] = item.CollectionID
+		} else if item.Kind != "row" && item.Kind != "portable_record" && item.PageID != "" {
+			keptPages[item.PageID] = true
+		}
+	}
+	for i := range p.Items {
+		item := &p.Items[i]
+		if item.Kind == "portable_record" && item.Choice == "" && item.MappingID == "" && item.CollectionID != "" && keptCollections[item.CSVSource] == item.CollectionID && keptPages[item.PageID] {
+			item.Choice = "keep_local"
+			item.Reason += "; retained row projection of kept canonical page and database"
+		}
+	}
+}

@@ -239,6 +239,9 @@ func applyPortableImport(m *Mutation, c map[string]any) error {
 				}
 			}
 		}
+		// A portable row projects the separately reviewed page and collection.
+		// Retain that projection when both canonical owners are explicitly kept.
+		retainKeptTypedRecordProjections(&p)
 		// Keeping an existing CSV also keeps all its records. A source CSV never
 		// silently becomes authority for deleting absent or locally created rows.
 		for i := range p.Items {
@@ -267,18 +270,25 @@ func applyPortableImport(m *Mutation, c map[string]any) error {
 			p.CommittedBatchIDs = append(p.CommittedBatchIDs, string(m.Request.RequestId))
 			return saveImportPlan(m.Context, m.Tx, p)
 		}
-		if err = guardImport(m, "page", p.RootID); err != nil {
-			return err
-		}
-		if err = pageCommand(m, map[string]any{"kind": "page.create", "pageId": p.RootID, "title": "Import · " + p.SourceName, "parentPageId": nullable(p.RootParentID)}); err != nil {
-			return err
-		}
-		if err = importAttach(m, p.RootID, p.SourceFileID); err != nil {
-			return err
+		p.RootSkipped = importKeepsAllMappedContent(&p)
+		if p.RootSkipped {
+			if err = retainRootlessImportEvidence(m, &p); err != nil {
+				return err
+			}
+		} else {
+			if err = guardImport(m, "page", p.RootID); err != nil {
+				return err
+			}
+			if err = pageCommand(m, map[string]any{"kind": "page.create", "pageId": p.RootID, "title": "Import · " + p.SourceName, "parentPageId": nullable(p.RootParentID)}); err != nil {
+				return err
+			}
+			if err = importAttach(m, p.RootID, p.SourceFileID); err != nil {
+				return err
+			}
 		}
 		pending := []int{}
 		for i, item := range p.Items {
-			if item.RawFileID != "" {
+			if item.RawFileID != "" && !p.RootSkipped {
 				if err = importAttach(m, p.RootID, item.RawFileID); err != nil {
 					return err
 				}
@@ -402,6 +412,9 @@ func rewriteImportBlock(v any, ids map[string]string) {
 }
 
 func commitImportItem(m *Mutation, p *ImportPlan, item *ImportItem) error {
+	if p.RootSkipped && item.Kind == "folder" && item.PageID == "" {
+		return nil
+	}
 	if importIdentitySkipped(*item) {
 		return nil
 	}
