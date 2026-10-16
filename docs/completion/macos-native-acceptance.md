@@ -1,0 +1,57 @@
+# Native macOS acceptance prerequisites and execution routes
+
+This is a reusable preparation guide, not a progress record, automatic monitor or passing observation. `PROGRESS.md` records actual availability/results. The candidate-bound policy owns formal acceptance; the procedures here do not replace its exact scenarios or permit external effects.
+
+Keep one installed desktop app at the selected installation path. Preserve source, models, workspaces, credentials and immutable evidence. Historical bundles remain verified archives; expanding an archive for an exact historical-path check does not transfer that candidate's results to the installed app. Choose a durable final bundle path before the next freeze.
+
+## Resource inventory before execution
+
+For each resource, record `available`, `not_available` or `unknown`, its evidence reference and which scenarios it blocks. A declaration of availability is not a passing scenario. Keep private paths and account details in local operator evidence, not committed reports. Never include credentials, tokens, passphrases or signing keys.
+
+| Resource | Non-activating check or required operator evidence | Dependent work |
+| --- | --- | --- |
+| Exact desktop candidate | Verify the selected app against its retained binary/bundle inventory and source/build provenance. Do not rebuild merely to match a checkout. Archived frozen paths must be restored before their old record can validate. | All candidate observations |
+| Production capture helper | Check manifest/sidecar hashes, architecture, `miniaudio-0.11.25-trove-microphone-v2`, and `record`, `capture_controls_v1`, `input_devices_v1`. The device-free rejection check in [macos-miniaudio.md](macos-miniaudio.md) verifies the actual hello and pre-consent errors. | Meeting capture |
+| Reminder login item | Inspect `Contents/Library/LoginItems/TroveReminders.app`, its `local.trove.desktop.reminders` identifier, executable, source metadata and nested signature evidence. Presence does not prove registration, notification permission or delivery. | Closed-main-app reminders |
+| Private fixture storage | Select writable owner-private local storage, a closed disposable workspace and enough free space for source, backup, private decryption stage, fresh restore and evidence. Calculate the actual copy budget before starting. | Backup, recovery, native workflows |
+| Real input and disclosure | Operator authorizes a recording, acknowledges participant disclosure and identifies a microphone plus a removable input if testing device loss. No enumeration result or silent synthetic waveform proves actual capture. | Permission/device/audio scenarios |
+| Notification/login permissions | Operator explicitly enables the login item and notifications through supported controls. Record denial, Focus/sleep and login-state conditions. Do not inspect/change privacy databases or reset unrelated app permissions. | Reminder submission/recovery |
+| Installed model packs | Use exact compatible retained model, tokenizer, manifest and helper identities. A separately authorized model comparison has its own named phase; do not select the best hidden retry. | Transcription, local AI and concurrency |
+| Representative inputs | Authorized imports, non-silent clean/noisy audio and representative image/document fixtures with independent expected outcomes. Synthetic fixtures remain labeled synthetic. | Fidelity, transcription/image quality and usability |
+| Dedicated connector resources | A registered desktop client ID where required, a dedicated test account and explicit resource selection. Google uses the chosen scopes; GitHub needs selected installed repositories; Notion/outbound MCP need a trusted HTTPS endpoint and compatible negotiated authorization. | Live connected reads and reviewed writes |
+| Managed provider access | Supported local runtime, explicitly selected account/billing/model route and authorized synthetic context. Sign-in alone does not establish inference access or consent to share context. | Codex/Claude execution, cancellation/resume/handoff |
+| Reachable HTTPS environment | Owner-arranged DNS/routing/firewall, trusted certificate and exact client origins/redirects for remote inbound MCP; valid server authorization for outbound MCP. Loopback TLS tests do not establish public reachability. | Remote MCP and hosted UI |
+| Distribution access | Authorized Developer ID fingerprint/Team ID and an already configured notarytool Keychain profile. Do not export keys or enter account credentials into evidence. | Production signing/notarization |
+| Compatible signed application pair | Same publisher, verified identities, compatible storage metadata and rollback handshake support. The current ad-hoc app must not bypass the production verifier. | Update and rollback |
+| Independent clean target | A separate compatible Mac. A fresh HOME, local user or same-host VM can provide supplementary evidence but cannot satisfy an independent-machine requirement. | Clean install and second-install restore |
+
+The production connector interface accepts public application IDs and browser authorization; it does not provision vendor registrations. Native permissions, account availability, organization policy, public HTTPS and signing access remain unknown until the operator supplies actual evidence. Missing prerequisites block only dependent observations.
+
+## Safe local sequence
+
+1. Start from a closed disposable fixture. Record page/record/task identities, typed values, history and attachment hashes. Verify ordinary foreground editing, keyboard/accessibility, native dialogs, clipboard and deep links before adding background work.
+2. Through Recovery, create a passphrase-encrypted archive and a legacy native backup. Enter passphrases directly in the app; do not script or log them. Review actual inclusion/exclusion warnings, then restore to separate unused destinations. Inspect content, relationships, schema, history and asset bytes. Old backups can recover memory from before a later Forget; review restored memory before AI use.
+3. Exercise wrong-passphrase, corrupt/truncated-copy and cancellation cases against copied archives. Use bounded disposable storage for low-space faults rather than filling the system disk. Retain incomplete/failed artifacts; no partial destination may become active. Inspect private-stage cleanup after cancellation and restart without promising forensic erasure.
+4. Only after explicit recording authorization, use Meetings to select the input and acknowledge disclosure. Compare the visible acknowledged pause/resume/stop state with captured samples and journal gaps. Denial, input loss, interrupted finalization and low disk must preserve flushed audio. Correct a transcript, check stale derived results, approve one task once, and preview each retention category; approved tasks and unrelated history survive source cleanup.
+5. Only after explicit reminder opt-in, create a private-text reminder in the disposable workspace. Close the main app, observe the real notification path, then check inbox/receipt state. Cover snooze/dismiss/navigation, task completion, edit/cancel, sleep/restart, timezone/DST and one catch-up summary. Restore stays inactive; old epochs cannot reactivate. A submitted receipt never proves the user saw a notification.
+6. Use the existing reviewed Update/Recovery controls for signed update and rollback pairs. Restore to a new workspace and preserve the newer original. On startup failure, use the welcome-screen pre-migration recovery route without opening a kernel. Never substitute an unsigned/ad-hoc executable for the production signature policy.
+
+## Dedicated live-resource sequence
+
+First authorize and read a bounded selection, then refresh/search/preview and deliberately import. Keep an unselected resource as an access-denial control. Test account switch, revocation, cancellation/pagination, stale revisions and restoration before permitting writes. Restore/import must not restore credentials, activation, ambient context grants or pending external execution.
+
+Use an owned empty calendar, newly created files, a disposable repository with existing test branches, an isolated Notion root and a controlled MCP server. Every write still requires review of exact arguments and effects. Calendar attendee notification behavior is explicit; do not add real attendees by default. Gmail send/reply uses only the designated test mailbox after its recipient/content is reviewed. Gmail-derived external-AI context remains disabled pending its separate qualification. Do not generate timeout-after-send faults against production resources. Preserve an unknown result and reconcile before a new attempt; a manual remote inspection attestation does not rewrite the original provider outcome as confirmed.
+
+Managed provider checks use approved synthetic context and explicitly selected tools. Observe streaming, early and late cancellation, compatible resume, disconnect/revocation, containment canaries and cross-provider handoff. Connected source publication requires current account/selection/revision checks. Skills, imported content and remote tool descriptions never grant permissions.
+
+## Existing harness boundaries
+
+- `scripts/verify-packaged.py`: separate P0/P1/P2 create/reopen processes and optional installed-model smoke under OS-denied network. Its native smoke does not activate a microphone.
+- `internal/native/microphone_production_test.go`: actual production hello and rejection before permission/device access. `capture_control_test.go` and `microphone_portable_test.go` use a separately built device-free fixture for control acknowledgements and startup deadlines. Required fixture skips remain pending.
+- `internal/workspace/backup_portable_test.go`, `recording_controls_test.go`, `meeting_controls_test.go`, `reminders_test.go`, and `app_reminders_test.go`: focused synthetic correctness/recovery cases. They do not establish native dialogs, TCC, login registration or UserNotifications behavior.
+- `frontend/tests/backup-encrypted.browser.spec.ts`, `reminders.browser.spec.ts`, `connectors.browser.spec.ts` and provider/update suites: real components with synthetic service/native boundaries. Do not record them as live OS/account observations.
+- `scripts/record-native-performance.py`: clones a closed selected fixture, requires private storage and waits for visible/focused readiness. It records native timing/resource evidence but does not perform gestures, authorize recording or establish correctness from timings alone. See [native performance observations](native-performance-observations.md).
+- `scripts/qualify-completion.py`: `plan`, `coverage`, `template` and `status` are read-only. `run` executes only the selected gate; `observe` records exact actual evidence after review. No prepared template counts as passed. See [candidate qualification](qualification.md).
+- [Verified updates](verified-updates.md), [rollback readiness](rollback-readiness.md) and [production signing](macos-production-signing.md) retain the existing signed-app, compatible-workspace, recovery and submission boundaries.
+
+Create a new evidence destination per attempt and preserve failed/interrupted results. Freeze the final signed/stapled artifact after source, fixtures and criteria are settled. Qualify devices, live accounts, controlled performance, clean installation and distribution against that exact identity; technical qualification does not authorize publication.
