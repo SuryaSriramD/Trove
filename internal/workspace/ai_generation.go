@@ -93,7 +93,7 @@ func GeneratePreparedAI(ctx context.Context, prepared AIPrepared, generate AIGen
 			emitted++
 		}
 	}
-	grammar, err := aiCitedGrammarForSources(prepared.Run.Sources)
+	grammar, err := aiCitedGrammarForMode(prepared.Run.Request.Mode, prepared.Run.Sources)
 	if err != nil {
 		return AICompletion{}, err
 	}
@@ -110,7 +110,8 @@ func GeneratePreparedAI(ctx context.Context, prepared AIPrepared, generate AIGen
 	return out, nil
 }
 
-// The worker grammar fixes field order. Parse only completed JSON text values;
+// The worker grammar fixes field order per protocol. Accept the historical
+// text-first order and answer v2 evidence-first order. Parse completed text only;
 // never expose a partial escape, supporting quote, or internal object syntax.
 func partialAIClaimTexts(raw string) []string {
 	d := json.NewDecoder(strings.NewReader(raw))
@@ -130,7 +131,20 @@ func partialAIClaimTexts(raw string) []string {
 		return texts
 	}
 	for d.More() {
-		if !expect(json.Delim('{')) || !expect("text") {
+		if !expect(json.Delim('{')) {
+			return texts
+		}
+		field, err := d.Token()
+		if err != nil {
+			return texts
+		}
+		evidenceFirst := field == "quote"
+		if evidenceFirst {
+			quote, err := d.Token()
+			if _, ok := quote.(string); err != nil || !ok || !expect("text") {
+				return texts
+			}
+		} else if field != "text" {
 			return texts
 		}
 		value, err := d.Token()
@@ -142,11 +156,13 @@ func partialAIClaimTexts(raw string) []string {
 			return texts
 		}
 		texts = append(texts, text)
-		if !expect("quote") {
-			return texts
-		}
-		if _, err = d.Token(); err != nil {
-			return texts
+		if !evidenceFirst {
+			if !expect("quote") {
+				return texts
+			}
+			if _, err = d.Token(); err != nil {
+				return texts
+			}
 		}
 		if !expect(json.Delim('}')) {
 			return texts
