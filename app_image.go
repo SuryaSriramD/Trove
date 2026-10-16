@@ -51,7 +51,7 @@ func (a *App) imageDispatch(method string, raw json.RawMessage) string {
 		defer func() { s.mu.Lock(); delete(s.flights, key); s.mu.Unlock() }()
 		_, _ = k.GenerateImageDescription(generation, e, r.ID, func(ctx context.Context, pack, question string, image *os.File) (workspace.ImageDescriptionResult, error) {
 			v, err := a.native.supervisor.GenerateImage(ctx, pack, question, image, nil)
-			return workspace.ImageDescriptionResult{Text: v.Text, PeakRSSBytes: v.PeakRSSBytes, AnalysisMethod: v.AnalysisMethod, ModelHash: v.ModelHash, ProjectorHash: v.ProjectorHash, HelperHash: v.HelperHash, PreprocessingProfileID: v.PreprocessingProfileID, PreprocessingProfileHash: v.PreprocessingProfileHash, FinishReason: v.FinishReason, InputTokens: v.InputTokens, OutputTokens: v.OutputTokens}, err
+			return workspace.ImageDescriptionResult{Text: v.Text, PeakRSSBytes: v.PeakRSSBytes, AnalysisMethod: v.AnalysisMethod, ModelHash: v.ModelHash, ProjectorHash: v.ProjectorHash, HelperHash: v.HelperHash, FinishReason: v.FinishReason, InputTokens: v.InputTokens, OutputTokens: v.OutputTokens}, err
 		})
 	}()
 	return string(reply)

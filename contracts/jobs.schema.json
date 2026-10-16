@@ -569,20 +569,10 @@
                   "embed",
                   "transcribe",
                   "tokenize",
-                  "image_generate",
-                  "image_preprocessing_profile_v1"
+                  "image_generate"
                 ]
               },
               "maxItems": 5
-            },
-            "preprocessingProfileId": {
-              "type": "string",
-              "maxLength": 100,
-              "pattern": "^[a-z0-9][a-z0-9-]+$"
-            },
-            "preprocessingProfileHash": {
-              "type": "string",
-              "pattern": "^[0-9a-f]{64}$"
             }
           },
           "required": [
@@ -593,15 +583,7 @@
             "architecture",
             "capabilities"
           ],
-          "additionalProperties": false,
-          "dependentRequired": {
-            "preprocessingProfileId": [
-              "preprocessingProfileHash"
-            ],
-            "preprocessingProfileHash": [
-              "preprocessingProfileId"
-            ]
-          }
+          "additionalProperties": false
         },
         {
           "type": "object",
@@ -953,15 +935,6 @@
               "type": "integer",
               "minimum": 0,
               "maximum": 512
-            },
-            "preprocessingProfileId": {
-              "type": "string",
-              "maxLength": 100,
-              "pattern": "^[a-z0-9][a-z0-9-]+$"
-            },
-            "preprocessingProfileHash": {
-              "type": "string",
-              "pattern": "^[0-9a-f]{64}$"
             }
           },
           "required": [
@@ -971,15 +944,7 @@
             "inputTokens",
             "outputTokens"
           ],
-          "additionalProperties": false,
-          "dependentRequired": {
-            "preprocessingProfileId": [
-              "preprocessingProfileHash"
-            ],
-            "preprocessingProfileHash": [
-              "preprocessingProfileId"
-            ]
-          }
+          "additionalProperties": false
         }
       ]
     },

@@ -363,56 +363,6 @@ def validate_review_report(report, case):
 
 IMAGE_EXCLUDED_TABLES = CANONICAL_EXCLUDED_TABLES | {'image_descriptions'}
 IMAGE_ASSERTIONS = frozenset(('serviceCompleted', 'independentAnswerOracle', 'provenance', 'ocrOracle', 'originalPreserved', 'canonicalPreserved'))
-IMAGE_PROFILE_PATH = pathlib.Path('internal/native/vision_profile_v1.json')
-# Independent evaluation binding to the reviewed, code-owned bounded profile.
-# A changed profile requires a new explicit harness binding, not a report claim.
-IMAGE_PROFILE_ID = 'smolvlm-500m-idefics3-bounded-v1'
-IMAGE_PROFILE_SHA256 = 'd3288e6d3d3c197c5e31e6d836427a93562315d679519b73eda799fbbef9be2b'
-IMAGE_PROFILE_MODEL = '9d4612de6a42214499e301494a3ecc2be0abdd9de44e663bda63f1152fad1bf4'
-IMAGE_PROFILE_PROJECTOR = '4b2fca922e549e9b9608f4ba56f93565dd5220e935ba5570a2a864a0fcc988a6'
-IMAGE_PROFILE_RUNTIME = 'd2e54583c7452353eb35d40431281f6ee984332f'
-IMAGE_PROFILE_FIELDS = ('preprocessingProfileId', 'preprocessingProfileHash')
-
-def image_input_paths(root, corpus_dir, corpus, bundle, models, pack_manifest):
-    # The embedded JSON affects production requests despite not being Go/SQL.
-    return ([root / IMAGE_PROFILE_PATH, corpus_dir / 'images.json',
-             models / (pack_manifest['projector']['id'] + '.model')]
-            + [corpus_dir / case['source'] for case in corpus['cases'] if case.get('source')]
-            + [path for path in bundle.iterdir() if path.is_file()])
-
-def input_snapshot(paths):
-    return {str(path): {'sha256': digest(path), 'bytes': path.stat().st_size} for path in paths}
-
-def expected_image_profile(profile_path, pack, before, model_path, projector_path):
-    raw = profile_path.read_bytes()
-    actual = {'sha256': hashlib.sha256(raw).hexdigest(), 'bytes': len(raw)}
-    if actual != before[str(profile_path)] or actual['sha256'] != IMAGE_PROFILE_SHA256:
-        raise ValueError('image preprocessing profile differs from locked source bytes')
-    profile = json.loads(raw, object_pairs_hook=_unique_json)
-    if (profile.get('id'), profile.get('modelSHA256'), profile.get('projectorSHA256'), profile.get('runtimeCommit')) != (IMAGE_PROFILE_ID, IMAGE_PROFILE_MODEL, IMAGE_PROFILE_PROJECTOR, IMAGE_PROFILE_RUNTIME):
-        raise ValueError('image preprocessing profile differs from trusted identity')
-    if pack.get('sha256') != before[str(model_path)]['sha256'] or pack.get('projector', {}).get('sha256') != before[str(projector_path)]['sha256']:
-        raise ValueError('image model/projector bytes differ from selected pack')
-    if (pack.get('kind') == 'vision' and type(pack.get('visionVersion')) is int and pack['visionVersion'] == 1
-            and pack.get('runtimeCommit') == IMAGE_PROFILE_RUNTIME and pack.get('sha256') == IMAGE_PROFILE_MODEL
-            and pack.get('projector', {}).get('sha256') == IMAGE_PROFILE_PROJECTOR):
-        return {'id': IMAGE_PROFILE_ID, 'sha256': IMAGE_PROFILE_SHA256}
-    return None
-
-def validate_image_profile(result, method, contract):
-    if 'expectedPreprocessingProfile' not in contract:
-        return ['explicit expected image preprocessing profile is absent']
-    expected = contract['expectedPreprocessingProfile']
-    if expected is not None and (expected != {'id': IMAGE_PROFILE_ID, 'sha256': IMAGE_PROFILE_SHA256}
-            or contract.get('modelSHA256') != IMAGE_PROFILE_MODEL or contract.get('projectorSHA256') != IMAGE_PROFILE_PROJECTOR):
-        return ['expected image preprocessing profile is not trusted for this pair']
-    if method != 'local_vision_model' or expected is None:
-        # Legacy reports remain readable under an explicit None expectation.
-        # Empty/null fields are also fabricated provenance, not an absent field.
-        return ['unexpected image preprocessing provenance'] if any(key in result for key in IMAGE_PROFILE_FIELDS) else []
-    if result.get('preprocessingProfileId') != expected['id'] or result.get('preprocessingProfileHash') != expected['sha256']:
-        return ['required image preprocessing profile is missing or differs']
-    return []
 
 def validate_image_report(report, case, contract):
     errors = []
@@ -427,7 +377,6 @@ def validate_image_report(report, case, contract):
         errors.append('one product and one OCR invocation required')
     result = report.get('result', {})
     method = expected['method']
-    errors.extend(validate_image_profile(result, method, contract))
     if method == 'normalization_rejected':
         if result.get('state') != 'failed' or result.get('text') or not result.get('error', '').startswith('NORMALIZATION_DETAIL_LOST:'):
             errors.append('lost source detail was not rejected')
@@ -749,10 +698,12 @@ def main():
     paths += [ROOT / 'go.mod', ROOT / 'go.sum']
     if args.family == 'images':
         pack_manifest = json.loads((models / (args.pack + '.json')).read_text())
-        paths += image_input_paths(ROOT, corpus_dir, corpus, bundle, models, pack_manifest)
+        paths += [corpus_dir / 'images.json', models / (pack_manifest['projector']['id'] + '.model')]
+        paths += [corpus_dir / case['source'] for case in corpus['cases'] if case.get('source')]
+        paths += [path for path in bundle.iterdir() if path.is_file()]
     paths = sorted(set(paths))
     started = time.time()
-    before = input_snapshot(paths)
+    before = {str(x): {'sha256': digest(x), 'bytes': x.stat().st_size} for x in paths}
     source = subprocess.check_output(['git', 'rev-parse', 'HEAD'], cwd=ROOT, text=True).strip()
     status = subprocess.check_output(['git', 'status', '--short'], cwd=ROOT, text=True)
     manifest = {'schemaVersion': 1, 'sourceCommit': source, 'workingTreeStatus': status,
@@ -762,12 +713,6 @@ def main():
                 'canonicalEvidenceDirectory': str(out / 'canonical'),
                 'canonicalEvidenceScope': 'Retained typed canonical rows and exact asset bytes; runtime temporary workspace itself is not retained.'}
     def write(): atomic_json(out / 'manifest.json', manifest)
-    if args.family == 'images':
-        try:
-            manifest['expectedPreprocessingProfile'] = expected_image_profile(ROOT / IMAGE_PROFILE_PATH, pack_manifest, before,
-                models / (args.pack + '.model'), models / (pack_manifest['projector']['id'] + '.model'))
-        except (OSError, ValueError, KeyError, TypeError) as error:
-            manifest.update(state='admission_failed', error=str(error)); write(); return 1
     write()
     # Deliberately omit ambient provider/API credentials. No account is involved.
     env = {k: os.environ[k] for k in ['PATH', 'HOME', 'TMPDIR', 'SDKROOT', 'DEVELOPER_DIR'] if k in os.environ}
@@ -795,7 +740,7 @@ def main():
             manifest.update(state='oracle_gate_failed',exitCode=gate.returncode);write();return 1
     try:
         manifest['preAdmissionFreeBytes'] = require_space([out.parent, pathlib.Path(tempfile.gettempdir())])
-        if input_snapshot(paths) != before:
+        if {str(x): {'sha256': digest(x), 'bytes': x.stat().st_size} for x in paths} != before:
             raise ValueError('source, fixture, helper or model inputs changed before native admission')
     except (OSError, ValueError) as error:
         manifest.update(state='admission_failed', error=str(error)); write(); return 1
@@ -830,12 +775,11 @@ def main():
         workflow_contract['reviewCases'] = {case['id']:case for case in corpus['cases']}
     if args.family == 'images':
         workflow_contract.update(imageCases={case['id']: case for case in corpus['cases']},
-            expectedPreprocessingProfile=manifest['expectedPreprocessingProfile'],
             modelSHA256=before[str(models / (args.pack + '.model'))]['sha256'],
             projectorSHA256=before[str(models / (pack_manifest['projector']['id'] + '.model'))]['sha256'],
             helperSHA256=before[str(bundle / 'vision-worker')]['sha256'])
     summary = summarize(events, expected, test, out / 'canonical', expected_requests, workflow_contract)
-    after = input_snapshot(paths)
+    after = {str(x): {'sha256': digest(x), 'bytes': x.stat().st_size} for x in paths}
     summary['inputsUnchanged'] = before == after
     summary['malformedLogLines'] = malformed
     summary['automatedCorpusPassed'] &= run.returncode == 0 and before == after and not malformed
