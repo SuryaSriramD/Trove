@@ -109,6 +109,8 @@ def load_policy(path=POLICY):
         raise ValueError('unsupported qualification policy')
     if not policy.get('checks') or not isinstance(policy.get('acceptanceCases'), dict):
         raise ValueError('checks and explicit acceptance mapping registry required')
+    if policy.get('id') == 'trove-completion-release-v2' and 'acceptanceAddendum' not in policy:
+        raise ValueError('full macOS policy requires the accepted addendum')
     seen = set()
     for check in policy['checks']:
         if not re.fullmatch(r'[a-z][a-z0-9-]+', check['id']) or check['id'] in seen:
@@ -315,8 +317,72 @@ def acceptance_catalog(policy, target, tier):
                      'applicability': scope, 'scopeText': metadata, 'evidenceKind': 'observation', 'context': '',
                      'expected': item['acceptance_scenario']})
     rows = decompose_acceptance(policy, rows, target, levels)
+    rows.extend(addendum_acceptance(policy, target, levels))
     return {'target': target, 'tier': tier, 'rows': rows, 'backlogItems': 51,
             'meaning': 'Every original criterion is retained. Explicit child scopes preserve all source wording; unmapped criteria stay pending; research parity is a separate open programme obligation.'}
+
+
+def addendum_acceptance(policy, target, levels):
+    """Bind added scope to the actual accepted document, never just a mapping count."""
+    reference = policy.get('acceptanceAddendum')
+    if reference is None:
+        if policy.get('id') == 'trove-completion-release-v2':
+            raise ValueError('full macOS policy requires the accepted addendum')
+        return []  # Historical/synthetic policies remain readable under their own identity.
+    if not isinstance(reference, dict) or set(reference) != {'path', 'sha256'}:
+        raise ValueError('invalid acceptance addendum reference')
+    relative = Path(reference['path'])
+    if relative.parent.as_posix() != 'docs/completion' or relative.suffix != '.json':
+        raise ValueError('invalid acceptance addendum path')
+    path = ROOT / relative
+    if path.is_symlink() or not path.is_file():
+        raise ValueError('acceptance addendum must be a regular non-symlink file')
+    with path.open('rb') as stream:
+        raw = stream.read((32 << 20) + 1)
+    if len(raw) > 32 << 20 or hashlib.sha256(raw).hexdigest() != reference['sha256']:
+        raise ValueError('acceptance addendum manifest changed')
+    manifest = json.loads(raw, object_pairs_hook=_pairs)
+    if (set(manifest) != {'schemaVersion', 'source', 'sourceSha256', 'criteria'}
+            or manifest['schemaVersion'] != 1
+            or manifest['source'] != 'docs/PRD_SCOPE_ADDENDUM.md'):
+        raise ValueError('invalid acceptance addendum manifest')
+    source = ROOT / manifest['source']
+    if source.is_symlink() or not source.is_file():
+        raise ValueError('accepted addendum source must be a regular non-symlink file')
+    with source.open('rb') as stream:
+        raw = stream.read((32 << 20) + 1)
+    if len(raw) > 32 << 20 or hashlib.sha256(raw).hexdigest() != manifest['sourceSha256']:
+        raise ValueError('accepted addendum source changed')
+    matches = re.findall(r'^(?:- )?\*\*((?:G\d{2})(?:-[A-Z]+)?-A\d+):\*\* (.+)$', raw.decode('utf-8'), re.M)
+    expected = dict(matches)
+    if len(matches) != 36 or len(expected) != len(matches):
+        raise ValueError('accepted addendum must retain all 36 unique scenarios')
+    criteria = manifest['criteria']
+    if not isinstance(criteria, list) or len(criteria) != len(expected):
+        raise ValueError('acceptance addendum omitted scenarios')
+    seen, rows = set(), []
+    for item in criteria:
+        if (not isinstance(item, dict)
+                or set(item) != {'id', 'release', 'targets', 'context', 'expected'}
+                or not isinstance(item['id'], str)
+                or item['id'] in seen or item['id'] not in expected
+                or item['expected'] != expected[item['id']]
+                or item['release'] not in policy['tiers']
+                or not isinstance(item['targets'], list)
+                or any(not isinstance(t, str) for t in item['targets'])
+                or not item['targets'] or len(set(item['targets'])) != len(item['targets'])
+                or not set(item['targets']) <= set(policy['targets'])
+                or not isinstance(item['context'], str) or not item['context'].strip()):
+            raise ValueError('invalid or changed acceptance addendum scenario')
+        seen.add(item['id'])
+        rows.append({'id': 'addendum:' + item['id'], 'sourceId': item['id'],
+                     'release': item['release'], 'targets': item['targets'],
+                     'sourceSha256': manifest['sourceSha256'],
+                     'applicability': 'other_platform' if target not in item['targets'] else
+                         'required' if item['release'] in levels else 'later_tier',
+                     'evidenceKind': 'observation', 'context': item['context'],
+                     'expected': item['expected']})
+    return rows
 
 
 def acceptance_coverage(policy, catalog, receipts=None):

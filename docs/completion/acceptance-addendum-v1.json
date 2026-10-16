@@ -1,0 +1,331 @@
+{
+  "schemaVersion": 1,
+  "source": "docs/PRD_SCOPE_ADDENDUM.md",
+  "sourceSha256": "806e48eb6ab7d960c9762b502dc0c47ce8e135da8dd4efbe1e55cb744d073329",
+  "criteria": [
+    {
+      "id": "G01-A1",
+      "release": "P0",
+      "targets": [
+        "darwin-arm64"
+      ],
+      "context": "Accepted full macOS scope; actual visible workflow and exact preserved canonical/evidence effects.",
+      "expected": "Import, edit both the source and local copy, then re-import. The user can inspect the differences and choose a resolution without losing either retained version."
+    },
+    {
+      "id": "G01-A2",
+      "release": "P0",
+      "targets": [
+        "darwin-arm64"
+      ],
+      "context": "Accepted full macOS scope; actual visible workflow and exact preserved canonical/evidence effects.",
+      "expected": "Exercise source-only, local-only, converged, null-versus-missing, moved, deleted and denied-source cases through ZIP and the applicable HTML/API paths. Results conform to D002 and the source's actual completeness."
+    },
+    {
+      "id": "G01-A3",
+      "release": "P0",
+      "targets": [
+        "darwin-arm64"
+      ],
+      "context": "Accepted full macOS scope; actual visible workflow and exact preserved canonical/evidence effects.",
+      "expected": "Interrupt capture/application, retry and submit a stale resolution. No duplicate canonical object or attachment is created, and newer local edits survive."
+    },
+    {
+      "id": "G02-A1",
+      "release": "P0",
+      "targets": [
+        "darwin-arm64"
+      ],
+      "context": "Accepted full macOS scope; actual visible workflow and exact preserved canonical/evidence effects.",
+      "expected": "Edit title, status and due date from a page occurrence, Tasks/Home and a database. Every surface agrees after restart and native restore."
+    },
+    {
+      "id": "G02-A2",
+      "release": "P0",
+      "targets": [
+        "darwin-arm64"
+      ],
+      "context": "Accepted full macOS scope; actual visible workflow and exact preserved canonical/evidence effects.",
+      "expected": "Promote an existing record, create multiple occurrences, remove one and trash/restore the record. IDs remain stable and no task is silently duplicated or deleted."
+    },
+    {
+      "id": "G02-A3",
+      "release": "P0",
+      "targets": [
+        "darwin-arm64"
+      ],
+      "context": "Accepted full macOS scope; actual visible workflow and exact preserved canonical/evidence effects.",
+      "expected": "Retry extraction/import of an identified task. The existing task is reused or ambiguity is reviewed; equal titles alone do not establish identity."
+    },
+    {
+      "id": "G03-A1",
+      "release": "P0",
+      "targets": [
+        "darwin-arm64"
+      ],
+      "context": "Accepted full macOS scope; actual visible workflow and exact preserved canonical/evidence effects.",
+      "expected": "Restore an encrypted archive on an independent clean installation and compare canonical content, schema, relationships, assets and retained history, not just counts."
+    },
+    {
+      "id": "G03-A2",
+      "release": "P0",
+      "targets": [
+        "darwin-arm64"
+      ],
+      "context": "Accepted full macOS scope; actual visible workflow and exact preserved canonical/evidence effects.",
+      "expected": "Wrong passphrase, tampering, truncation, low disk, cancellation and crash cannot activate a partial destination. Temporary plaintext is handled under a documented cleanup/recovery policy without promising forensic secure erasure."
+    },
+    {
+      "id": "G03-A3",
+      "release": "P0",
+      "targets": [
+        "darwin-arm64"
+      ],
+      "context": "Accepted full macOS scope; actual visible workflow and exact preserved canonical/evidence effects.",
+      "expected": "Existing native archives remain readable, encryption status is visible before export, and no credential or passphrase appears in inspected logs or archive metadata."
+    },
+    {
+      "id": "G04-A1",
+      "release": "P0",
+      "targets": [
+        "darwin-arm64"
+      ],
+      "context": "Accepted full macOS scope; actual visible workflow and exact preserved canonical/evidence effects.",
+      "expected": "Each release claim resolves to a named profile, exact candidate and independent pass condition with actual results and limitations."
+    },
+    {
+      "id": "G04-A2",
+      "release": "P0",
+      "targets": [
+        "darwin-arm64"
+      ],
+      "context": "Accepted full macOS scope; actual visible workflow and exact preserved canonical/evidence effects.",
+      "expected": "Answerable, ambiguous and unanswerable queries plus clean/noisy representative audio are evaluated with frozen expected outcomes and manual review where required."
+    },
+    {
+      "id": "G04-A3",
+      "release": "P0",
+      "targets": [
+        "darwin-arm64"
+      ],
+      "context": "Accepted full macOS scope; actual visible workflow and exact preserved canonical/evidence effects.",
+      "expected": "New rubrics and performance policies are versioned before execution; frozen candidate-7 evidence is neither rewritten nor used to qualify a changed product."
+    },
+    {
+      "id": "G05-A1",
+      "release": "P0",
+      "targets": [
+        "darwin-arm64"
+      ],
+      "context": "Accepted full macOS scope; actual visible workflow and exact preserved canonical/evidence effects.",
+      "expected": "Start/pause/resume/stop a real authorized recording, deny permission and disconnect an input. Indicators and saved audio accurately reflect what occurred."
+    },
+    {
+      "id": "G05-A2",
+      "release": "P0",
+      "targets": [
+        "darwin-arm64"
+      ],
+      "context": "Accepted full macOS scope; actual visible workflow and exact preserved canonical/evidence effects.",
+      "expected": "Interrupt a recording/transcription and simulate low disk. Retained audio is recoverable, gaps/errors are visible and retry does not duplicate transcripts or actions."
+    },
+    {
+      "id": "G05-A3",
+      "release": "P0",
+      "targets": [
+        "darwin-arm64"
+      ],
+      "context": "Accepted full macOS scope; actual visible workflow and exact preserved canonical/evidence effects.",
+      "expected": "Correct a transcript, navigate its evidence, review resulting actions and apply retention choices. Stale derived information is marked or excluded and unrelated source content remains intact."
+    },
+    {
+      "id": "G06-A1",
+      "release": "P1",
+      "targets": [
+        "darwin-arm64"
+      ],
+      "context": "Accepted full macOS scope; actual visible workflow and exact preserved canonical/evidence effects.",
+      "expected": "A configured reminder is submitted through the real OS path with the main app closed; denial and disabled-background behavior are visible in settings/inbox."
+    },
+    {
+      "id": "G06-A2",
+      "release": "P1",
+      "targets": [
+        "darwin-arm64"
+      ],
+      "context": "Accepted full macOS scope; actual visible workflow and exact preserved canonical/evidence effects.",
+      "expected": "Snooze, dismiss, complete, edit and cancel across sleep, restart, timezone/DST changes and concurrent schedule publication. No duplicate canonical effect or unreported stale registration occurs."
+    },
+    {
+      "id": "G06-A3",
+      "release": "P1",
+      "targets": [
+        "darwin-arm64"
+      ],
+      "context": "Accepted full macOS scope; actual visible workflow and exact preserved canonical/evidence effects.",
+      "expected": "Restore a workspace and disable/re-enable the background component. Old epochs cannot reactivate unexpectedly, and uncertain OS outcomes remain explicitly uncertain."
+    },
+    {
+      "id": "G07-A1",
+      "release": "P1",
+      "targets": [
+        "darwin-arm64"
+      ],
+      "context": "Accepted full macOS scope; actual visible workflow and exact preserved canonical/evidence effects.",
+      "expected": "Run a meeting-follow-up or project-review skill on selected sources, inspect evidence and approve selected changes. Unselected pages and disallowed tools remain unavailable."
+    },
+    {
+      "id": "G07-A2",
+      "release": "P1",
+      "targets": [
+        "darwin-arm64"
+      ],
+      "context": "Accepted full macOS scope; actual visible workflow and exact preserved canonical/evidence effects.",
+      "expected": "Edit the skill version, cancel/retry a run and change provider explicitly. History identifies each version/provider and prior writes are not duplicated."
+    },
+    {
+      "id": "G07-A3",
+      "release": "P1",
+      "targets": [
+        "darwin-arm64"
+      ],
+      "context": "Accepted full macOS scope; actual visible workflow and exact preserved canonical/evidence effects.",
+      "expected": "Import a skill containing instructions to grant access or execute arbitrary code. It remains inert and cannot bypass the ordinary permission layer."
+    },
+    {
+      "id": "G08-A1",
+      "release": "P1",
+      "targets": [
+        "darwin-arm64"
+      ],
+      "context": "Accepted full macOS scope; actual visible workflow and exact preserved canonical/evidence effects.",
+      "expected": "Fill selected empty fields while leaving other records, existing manual values and computed fields unchanged. Invalid or unsupported values remain reviewable failures."
+    },
+    {
+      "id": "G08-A2",
+      "release": "P1",
+      "targets": [
+        "darwin-arm64"
+      ],
+      "context": "Accepted full macOS scope; actual visible workflow and exact preserved canonical/evidence effects.",
+      "expected": "Edit a row or schema during generation and then apply. Newer values survive; stale suggestions cannot overwrite them."
+    },
+    {
+      "id": "G08-A3",
+      "release": "P1",
+      "targets": [
+        "darwin-arm64"
+      ],
+      "context": "Accepted full macOS scope; actual visible workflow and exact preserved canonical/evidence effects.",
+      "expected": "Interrupt/resume and repeat an applied batch, then undo. Effects are not duplicated, provenance remains inspectable and unrelated edits are preserved."
+    },
+    {
+      "id": "G09-A1",
+      "release": "P1",
+      "targets": [
+        "darwin-arm64"
+      ],
+      "context": "Accepted full macOS scope; actual visible workflow and exact preserved canonical/evidence effects.",
+      "expected": "Review a page, edit its covered content and pass its review deadline. Status and queue update accurately without altering the underlying knowledge."
+    },
+    {
+      "id": "G09-A2",
+      "release": "P1",
+      "targets": [
+        "darwin-arm64"
+      ],
+      "context": "Accepted full macOS scope; actual visible workflow and exact preserved canonical/evidence effects.",
+      "expected": "Search/cite reviewed and stale pages. Freshness is visible and never presented as machine-verified truth or used to override current contradictory evidence."
+    },
+    {
+      "id": "G09-A3",
+      "release": "P1",
+      "targets": [
+        "darwin-arm64"
+      ],
+      "context": "Accepted full macOS scope; actual visible workflow and exact preserved canonical/evidence effects.",
+      "expected": "Restore an earlier page/workspace revision. Review history remains attributable, elapsed deadlines are honored and stale approved memory remains excluded."
+    },
+    {
+      "id": "G10-LAYOUT-A1",
+      "release": "P1",
+      "targets": [
+        "darwin-arm64"
+      ],
+      "context": "Accepted full macOS scope; actual visible workflow and exact preserved canonical/evidence effects.",
+      "expected": "Reuse a layout across records, rename a property, create an override and reset it. Values and stable references survive restart, undo and restore."
+    },
+    {
+      "id": "G10-LAYOUT-A2",
+      "release": "P1",
+      "targets": [
+        "darwin-arm64"
+      ],
+      "context": "Accepted full macOS scope; actual visible workflow and exact preserved canonical/evidence effects.",
+      "expected": "Remove/change a schema property and open older records. The UI reports or safely omits invalid layout references without losing retained data."
+    },
+    {
+      "id": "G10-SCHEDULE-A1",
+      "release": "P1",
+      "targets": [
+        "darwin-arm64"
+      ],
+      "context": "Accepted full macOS scope; actual visible workflow and exact preserved canonical/evidence effects.",
+      "expected": "Move a predecessor in a chain and a branched graph. Preview every affected date before writing; cancellation changes nothing and grouped undo restores the applied batch."
+    },
+    {
+      "id": "G10-SCHEDULE-A2",
+      "release": "P1",
+      "targets": [
+        "darwin-arm64"
+      ],
+      "context": "Accepted full macOS scope; actual visible workflow and exact preserved canonical/evidence effects.",
+      "expected": "Exercise cycle, missing date, weekend/DST and concurrent-edit cases. The declared calendar/constraint policy determines the result; stale or invalid plans cannot partly apply."
+    },
+    {
+      "id": "G11-A1",
+      "release": "P0",
+      "targets": [
+        "darwin-arm64"
+      ],
+      "context": "Accepted full macOS scope; desktop-boundary decision and release messaging only, not mobile implementation.",
+      "expected": "Record the audience/workflow findings, accepted next scope and unresolved limitations in `PROGRESS.md`. Until a mobile scope decision changes, release messaging shall state the tested desktop/platform boundary. This is decision acceptance, not a mobile implementation pass."
+    },
+    {
+      "id": "G12-A1",
+      "release": "P1",
+      "targets": [
+        "darwin-arm64"
+      ],
+      "context": "Accepted full macOS scope; actual visible workflow and exact preserved canonical/evidence effects.",
+      "expected": "Use a real authorized account/server to select a bounded source set, refresh/search/preview supported content and disconnect. Unselected resources are unavailable and cached results disclose freshness."
+    },
+    {
+      "id": "G12-A2",
+      "release": "P1",
+      "targets": [
+        "darwin-arm64"
+      ],
+      "context": "Accepted full macOS scope; actual visible workflow and exact preserved canonical/evidence effects.",
+      "expected": "Switch accounts, revoke access, interrupt pagination, rotate credentials and hit rate limits. Resume cannot widen scope or mistake denied/partial data for deletion."
+    },
+    {
+      "id": "G12-A3",
+      "release": "P1",
+      "targets": [
+        "darwin-arm64"
+      ],
+      "context": "Accepted full macOS scope; actual visible workflow and exact preserved canonical/evidence effects.",
+      "expected": "Preview and execute a permitted write, then exercise stale remote state and timeout-after-send. The receipt records the actual or unknown outcome; reconciliation prevents duplicate effects."
+    },
+    {
+      "id": "G12-A4",
+      "release": "P1",
+      "targets": [
+        "darwin-arm64"
+      ],
+      "context": "Accepted full macOS scope; actual visible workflow and exact preserved canonical/evidence effects.",
+      "expected": "Restore/import connector state and attempt AI retrieval. No credential, activation, ambient context grant or pending external write is silently restored."
+    }
+  ]
+}

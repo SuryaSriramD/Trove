@@ -1,0 +1,140 @@
+{
+  "schemaVersion": 1,
+  "meaning": "Adapter-specific procedures, not executed acceptance. Every G12 parent requires all six adapters.",
+  "fixtureProfiles": {
+    "gmail-reads": {
+      "recipe": "Designated test mailbox and exact recipient, selected labels/query/threads, acquired attachment and reply-thread oracle.",
+      "independentOracle": "Every adapter enforces selected account/resources and explicit freshness; partial/denied data never implies deletion, restore is inert and Gmail external-AI remains disabled.",
+      "identityRequirement": "Before freezing, select or create the authorized inputs and expected-output manifest independently of the application implementation. Bind the actual input bytes and oracle manifest under candidate.assets.fixtures, or the source archive for source-only review; record SHA-256 and size for every file. The recipe is not an existing dataset or evidence of execution.",
+      "prerequisites": [
+        "connector-gmail-test-resource",
+        "connector-gmail-client-registration",
+        "connector-gmail-policy-readiness",
+        "https-environment"
+      ],
+      "assets": [
+        "fixtures"
+      ]
+    },
+    "gmail-writes": {
+      "recipe": "Designated test mailbox and exact recipient, selected labels/query/threads, acquired attachment and reply-thread oracle.",
+      "independentOracle": "Exact reviewed effects/recipients/arguments only; stale remote/account/grant refused; timeout-after-send remains unknown until reconciled and cannot duplicate execution.",
+      "identityRequirement": "Before freezing, select or create the authorized inputs and expected-output manifest independently of the application implementation. Bind the actual input bytes and oracle manifest under candidate.assets.fixtures, or the source archive for source-only review; record SHA-256 and size for every file. The recipe is not an existing dataset or evidence of execution.",
+      "prerequisites": [
+        "connector-gmail-test-resource",
+        "connector-gmail-client-registration",
+        "connector-gmail-policy-readiness",
+        "https-environment"
+      ],
+      "assets": [
+        "fixtures"
+      ]
+    }
+  },
+  "cases": {
+    "addendum:G12-A1": {
+      "criterionId": "addendum:G12-A1",
+      "criterionSha256": "235e9d3624f3591618f4e485346d24b84c2a525ec2847cfa948a1af25475a33c",
+      "expected": "Use a real authorized account/server to select a bounded source set, refresh/search/preview supported content and disconnect. Unselected resources are unavailable and cached results disclose freshness.",
+      "context": "Accepted full macOS scope; actual visible workflow and exact preserved canonical/evidence effects.",
+      "fixtureProfile": "gmail-reads",
+      "steps": [
+        "Before freeze, prepare the gmail-reads fixture and independently written expected-output manifest. Bind actual input bytes and prerequisite evidence; absent resources leave this exact criterion pending.",
+        "For Gmail only: Refresh selected labels/query/threads and acquired attachments; compose locally and review exact send/reply recipient, body, attachments and threading. Gmail-derived external-AI context stays disabled throughout. For each of six adapters authorize/select/refresh/search/preview/import/disconnect; test account switch, revoke/rotate credentials, interrupted pagination, rate limit, cancel/resume and inert restoration with AI retrieval.",
+        "Exercise this specific source requirement in full: Use a real authorized account/server to select a bounded source set, refresh/search/preview supported content and disconnect. Unselected resources are unavailable and cached results disclose freshness.",
+        "Execute every applicable clause of this criterion for Gmail on the exact candidate. Other adapters are independently required by their own receipts. Retain account/selection/revision identities, exact UI actions and canonical/remote observations without credentials.",
+        "Compare every clause of the exact expected text with observed values and artifacts. Record failed, missing, skipped and unsupported subcases separately; no average or sibling result supplies a pass."
+      ],
+      "assertions": [
+        "Use a real authorized account/server to select a bounded source set, refresh/search/preview supported content and disconnect. Unselected resources are unavailable and cached results disclose freshness.",
+        "Every adapter enforces selected account/resources and explicit freshness; partial/denied data never implies deletion, restore is inert and Gmail external-AI remains disabled.",
+        "Native support, import preservation and source-only implementation are distinct claims. The exact criterion needs all applicable parts and independently prepared expected values; unknown/failed subcases prevent passing."
+      ],
+      "evidenceRequirements": [
+        "Exact candidate/source/helper/model/profile identities and applicable OS, account, device and prerequisite evidence, without secrets.",
+        "Bound fixture and independently prepared oracle manifest; disclose synthetic versus representative sources and authorization.",
+        "Dated criterion-keyed native/UI/action or source-inspection trace, including requested cancellation/stale/negative/recovery paths.",
+        "Criterion-keyed comparison with observed canonical values/IDs, asset/archive hashes and raw outputs; every expected clause links to its own supporting evidence.",
+        "Gmail resource, supported registration, and provider-policy/verification evidence, including explicit unexecuted failure paths. A mock-server pass cannot establish live account compatibility."
+      ]
+    },
+    "addendum:G12-A2": {
+      "criterionId": "addendum:G12-A2",
+      "criterionSha256": "74960ed389db39329d59ef473374b73f3bdc59a3446e7f05cf2aa57c34b3a6d1",
+      "expected": "Switch accounts, revoke access, interrupt pagination, rotate credentials and hit rate limits. Resume cannot widen scope or mistake denied/partial data for deletion.",
+      "context": "Accepted full macOS scope; actual visible workflow and exact preserved canonical/evidence effects.",
+      "fixtureProfile": "gmail-reads",
+      "steps": [
+        "Before freeze, prepare the gmail-reads fixture and independently written expected-output manifest. Bind actual input bytes and prerequisite evidence; absent resources leave this exact criterion pending.",
+        "For Gmail only: Refresh selected labels/query/threads and acquired attachments; compose locally and review exact send/reply recipient, body, attachments and threading. Gmail-derived external-AI context stays disabled throughout. For each of six adapters authorize/select/refresh/search/preview/import/disconnect; test account switch, revoke/rotate credentials, interrupted pagination, rate limit, cancel/resume and inert restoration with AI retrieval.",
+        "Exercise this specific source requirement in full: Switch accounts, revoke access, interrupt pagination, rotate credentials and hit rate limits. Resume cannot widen scope or mistake denied/partial data for deletion.",
+        "Execute every applicable clause of this criterion for Gmail on the exact candidate. Other adapters are independently required by their own receipts. Retain account/selection/revision identities, exact UI actions and canonical/remote observations without credentials.",
+        "Compare every clause of the exact expected text with observed values and artifacts. Record failed, missing, skipped and unsupported subcases separately; no average or sibling result supplies a pass."
+      ],
+      "assertions": [
+        "Switch accounts, revoke access, interrupt pagination, rotate credentials and hit rate limits. Resume cannot widen scope or mistake denied/partial data for deletion.",
+        "Every adapter enforces selected account/resources and explicit freshness; partial/denied data never implies deletion, restore is inert and Gmail external-AI remains disabled.",
+        "Native support, import preservation and source-only implementation are distinct claims. The exact criterion needs all applicable parts and independently prepared expected values; unknown/failed subcases prevent passing."
+      ],
+      "evidenceRequirements": [
+        "Exact candidate/source/helper/model/profile identities and applicable OS, account, device and prerequisite evidence, without secrets.",
+        "Bound fixture and independently prepared oracle manifest; disclose synthetic versus representative sources and authorization.",
+        "Dated criterion-keyed native/UI/action or source-inspection trace, including requested cancellation/stale/negative/recovery paths.",
+        "Criterion-keyed comparison with observed canonical values/IDs, asset/archive hashes and raw outputs; every expected clause links to its own supporting evidence.",
+        "Gmail resource, supported registration, and provider-policy/verification evidence, including explicit unexecuted failure paths. A mock-server pass cannot establish live account compatibility."
+      ]
+    },
+    "addendum:G12-A4": {
+      "criterionId": "addendum:G12-A4",
+      "criterionSha256": "b458df9c041f48e0da47d026ba9d19ab379d42f4eecc17779a6d9f476308b2cb",
+      "expected": "Restore/import connector state and attempt AI retrieval. No credential, activation, ambient context grant or pending external write is silently restored.",
+      "context": "Accepted full macOS scope; actual visible workflow and exact preserved canonical/evidence effects.",
+      "fixtureProfile": "gmail-reads",
+      "steps": [
+        "Before freeze, prepare the gmail-reads fixture and independently written expected-output manifest. Bind actual input bytes and prerequisite evidence; absent resources leave this exact criterion pending.",
+        "For Gmail only: Refresh selected labels/query/threads and acquired attachments; compose locally and review exact send/reply recipient, body, attachments and threading. Gmail-derived external-AI context stays disabled throughout. For each of six adapters authorize/select/refresh/search/preview/import/disconnect; test account switch, revoke/rotate credentials, interrupted pagination, rate limit, cancel/resume and inert restoration with AI retrieval.",
+        "Exercise this specific source requirement in full: Restore/import connector state and attempt AI retrieval. No credential, activation, ambient context grant or pending external write is silently restored.",
+        "Execute every applicable clause of this criterion for Gmail on the exact candidate. Other adapters are independently required by their own receipts. Retain account/selection/revision identities, exact UI actions and canonical/remote observations without credentials.",
+        "Compare every clause of the exact expected text with observed values and artifacts. Record failed, missing, skipped and unsupported subcases separately; no average or sibling result supplies a pass."
+      ],
+      "assertions": [
+        "Restore/import connector state and attempt AI retrieval. No credential, activation, ambient context grant or pending external write is silently restored.",
+        "Every adapter enforces selected account/resources and explicit freshness; partial/denied data never implies deletion, restore is inert and Gmail external-AI remains disabled.",
+        "Native support, import preservation and source-only implementation are distinct claims. The exact criterion needs all applicable parts and independently prepared expected values; unknown/failed subcases prevent passing."
+      ],
+      "evidenceRequirements": [
+        "Exact candidate/source/helper/model/profile identities and applicable OS, account, device and prerequisite evidence, without secrets.",
+        "Bound fixture and independently prepared oracle manifest; disclose synthetic versus representative sources and authorization.",
+        "Dated criterion-keyed native/UI/action or source-inspection trace, including requested cancellation/stale/negative/recovery paths.",
+        "Criterion-keyed comparison with observed canonical values/IDs, asset/archive hashes and raw outputs; every expected clause links to its own supporting evidence.",
+        "Gmail resource, supported registration, and provider-policy/verification evidence, including explicit unexecuted failure paths. A mock-server pass cannot establish live account compatibility."
+      ]
+    },
+    "addendum:G12-A3": {
+      "criterionId": "addendum:G12-A3",
+      "criterionSha256": "fc610424a52dcd98e8e0593701887173612a854fd1afecb341b95512769ee279",
+      "expected": "Preview and execute a permitted write, then exercise stale remote state and timeout-after-send. The receipt records the actual or unknown outcome; reconciliation prevents duplicate effects.",
+      "context": "Accepted full macOS scope; actual visible workflow and exact preserved canonical/evidence effects.",
+      "fixtureProfile": "gmail-writes",
+      "steps": [
+        "Before freeze, prepare the gmail-writes fixture and independently written expected-output manifest. Bind actual input bytes and prerequisite evidence; absent resources leave this exact criterion pending.",
+        "For Gmail only: Refresh selected labels/query/threads and acquired attachments; compose locally and review exact send/reply recipient, body, attachments and threading. Gmail-derived external-AI context stays disabled throughout. After read-boundary acceptance, review and execute each permitted adapter write; inspect remote effect and receipt, inject stale revision and controlled ambiguous-send outcome, reconcile before retry, then restore pending evidence without execution.",
+        "Exercise this specific source requirement in full: Preview and execute a permitted write, then exercise stale remote state and timeout-after-send. The receipt records the actual or unknown outcome; reconciliation prevents duplicate effects.",
+        "Execute every applicable clause of this criterion for Gmail on the exact candidate. Other adapters are independently required by their own receipts. Retain account/selection/revision identities, exact UI actions and canonical/remote observations without credentials.",
+        "Compare every clause of the exact expected text with observed values and artifacts. Record failed, missing, skipped and unsupported subcases separately; no average or sibling result supplies a pass."
+      ],
+      "assertions": [
+        "Preview and execute a permitted write, then exercise stale remote state and timeout-after-send. The receipt records the actual or unknown outcome; reconciliation prevents duplicate effects.",
+        "Exact reviewed effects/recipients/arguments only; stale remote/account/grant refused; timeout-after-send remains unknown until reconciled and cannot duplicate execution.",
+        "Native support, import preservation and source-only implementation are distinct claims. The exact criterion needs all applicable parts and independently prepared expected values; unknown/failed subcases prevent passing."
+      ],
+      "evidenceRequirements": [
+        "Exact candidate/source/helper/model/profile identities and applicable OS, account, device and prerequisite evidence, without secrets.",
+        "Bound fixture and independently prepared oracle manifest; disclose synthetic versus representative sources and authorization.",
+        "Dated criterion-keyed native/UI/action or source-inspection trace, including requested cancellation/stale/negative/recovery paths.",
+        "Criterion-keyed comparison with observed canonical values/IDs, asset/archive hashes and raw outputs; every expected clause links to its own supporting evidence.",
+        "Gmail resource, supported registration, and provider-policy/verification evidence, including explicit unexecuted failure paths. A mock-server pass cannot establish live account compatibility."
+      ]
+    }
+  }
+}

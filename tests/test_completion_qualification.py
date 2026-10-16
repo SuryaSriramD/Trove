@@ -118,8 +118,8 @@ class QualificationTests(unittest.TestCase):
                 coverage=q.acceptance_coverage(self.policy,catalog,{'p0-service-regressions':'passed'})
                 self.assertEqual(coverage['result'],'pending')
                 self.assertEqual(coverage['passedCriteria'],2)
-                if (target,tier)==('darwin-arm64','P0'):
-                    self.assertEqual(coverage['mappedCriteria'],395)
+                if target=='darwin-arm64':
+                    self.assertEqual(coverage['mappedCriteria'],{'P0':411,'P1':659,'P2':697}[tier])
                     self.assertEqual(coverage['unmappedCriteria'],[])
                 else:
                     self.assertEqual(coverage['mappedCriteria'],2)
@@ -274,15 +274,15 @@ class QualificationTests(unittest.TestCase):
                 self.assertGreaterEqual(len(procedure['evidenceRequirements']),4)
                 self.assertNotIn('result',procedure)
                 procedure_ids.add(criterion_id)
-        self.assertEqual(len(procedure_ids),393)
+        self.assertEqual(len(procedure_ids),409)
         coverage=q.acceptance_coverage(self.policy,catalog)
-        self.assertEqual(coverage['mappedCriteria'],395)
+        self.assertEqual(coverage['mappedCriteria'],411)
         self.assertEqual(coverage['passedCriteria'],0)
         self.assertEqual(coverage['result'],'pending')
         self.assertFalse(q.status(self.record,self.policy)['releaseQualified'])
 
     def test_broad_gates_cannot_supply_the_new_exact_observation_results(self):
-        broad={c['id']:'passed' for c in self.policy['checks'] if not c['id'].startswith('p0-acceptance-')}
+        broad={c['id']:'passed' for c in self.policy['checks'] if '-acceptance-' not in c['id']}
         coverage=q.acceptance_coverage(self.policy,q.acceptance_catalog(self.policy,'darwin-arm64','P0'),broad)
         self.assertEqual(coverage['passedCriteria'],2)
         self.assertEqual(coverage['result'],'pending')
