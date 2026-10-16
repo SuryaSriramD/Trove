@@ -518,8 +518,14 @@ func retainRootlessImportEvidence(m *Mutation, p *ImportPlan) error {
 	for i := range p.Items {
 		item := &p.Items[i]
 		if item.Kind == "folder" && item.MappingID == "" {
-			item.PageID, item.ParentID = "", ""
-			item.Reason += "; no new directory needed for kept existing content"
+			// A reconciled directory is evidence for the next capture even when
+			// this import creates no root. Only unused new directories disappear.
+			if item.Choice != "keep_local" || item.ExpectedRevision == "" {
+				item.PageID, item.ParentID = "", ""
+				item.Reason += "; no new directory needed for kept existing content"
+			}
+			// Retaining identity does not attach this capture to existing folders.
+			continue
 		}
 		if item.PageID == "" || item.Choice != "keep_local" || importIdentitySkipped(*item) {
 			continue

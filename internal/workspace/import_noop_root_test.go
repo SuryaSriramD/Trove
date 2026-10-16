@@ -112,6 +112,116 @@ func TestImportNoopRootCancellationResumeAndFreshness(t *testing.T) {
 		t.Fatal("no-op import lost per-item observation", observations)
 	}
 }
+
+func TestImportNoopRetainsFolderEvidenceForFreshCaptureAfterReopen(t *testing.T) {
+	k, e := testKernel(t)
+	source := map[string]string{"folder/nested/A.html": `<p id="one">Retained source knowledge.</p>`}
+	first := completeImportFixture(t, k, e, importFixture(t, k, e, source))
+	original := identityItem(t, first, "folder/nested/A.html")
+	localParent := createPage(t, k, e, "Local destination")
+	testOK(t, dbBatch(t, k, e, []any{map[string]any{"kind": "page.move", "pageId": original.PageID, "parentPageId": localParent}}, "page", original.PageID, "page", original.ParentID, "page", localParent))
+	before := importCanonicalRows(t, k)
+	folders := map[string]ImportItem{}
+	for _, item := range first.Items {
+		if item.Kind == "folder" {
+			if err := k.db.QueryRow("SELECT revision FROM pages WHERE id=?", item.PageID).Scan(&item.ExpectedRevision); err != nil {
+				t.Fatal(err)
+			}
+			folders[item.Locator] = item
+		}
+	}
+	if len(folders) != 2 {
+		t.Fatal("fixture must contain two canonical directory pages", folders)
+	}
+	noop := completeImportFixture(t, k, e, importFixture(t, k, e, source))
+	assertImportRoot(t, k, noop, false)
+	path := k.Path()
+	if err := k.Close(); err != nil {
+		t.Fatal(err)
+	}
+	reopened, err := Open(path)
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer reopened.Close()
+	retained, err := loadImportPlan(context.Background(), reopened.db, noop.ID)
+	if err != nil {
+		t.Fatal(err)
+	}
+	for locator, expected := range folders {
+		item := identityItem(t, retained, locator)
+		if item.PageID != expected.PageID || item.ExpectedRevision != expected.ExpectedRevision || item.Choice != "keep_local" {
+			t.Fatalf("completed no-op lost directory identity: locator=%q expectedId=%q expectedRevision=%q item=%s", locator, expected.PageID, expected.ExpectedRevision, marshal(item))
+		}
+	}
+	// This is a new retained capture, not a replay of the completed plan.
+	fresh := importFixture(t, reopened, reopened.OwnerContext(), source)
+	if fresh.ID == noop.ID {
+		t.Fatal("fixture reused a completed plan")
+	}
+	item := identityItem(t, fresh, original.Locator)
+	if item.PageID != original.PageID || item.ParentID != original.ParentID || item.Choice != "keep_local" {
+		t.Fatalf("fresh capture lost identity or fabricated a parent change: %s", marshal(item))
+	}
+	if item.Merge == nil {
+		t.Fatal("fresh capture omitted the three-way review")
+	}
+	parentFields := 0
+	for _, field := range item.Merge.Fields {
+		if field.Path == "/parent" {
+			parentFields++
+			if field.Outcome != "keep_local" || !equalImportPresence(field.Base, field.Incoming) {
+				t.Fatalf("unchanged source parent conflicts with the local move: %s", marshal(field))
+			}
+		}
+	}
+	if parentFields != 1 {
+		t.Fatal("fresh capture must contain exactly one parent-field decision", parentFields)
+	}
+	done := completeImportFixture(t, reopened, reopened.OwnerContext(), fresh)
+	assertImportRoot(t, reopened, done, false)
+	if !reflect.DeepEqual(before, importCanonicalRows(t, reopened)) {
+		t.Fatal("fresh no-op changed canonical page/block identities, revisions or local parent")
+	}
+	for locator, expected := range folders {
+		item := identityItem(t, done, locator)
+		if item.PageID != expected.PageID || item.ExpectedRevision != expected.ExpectedRevision {
+			t.Fatal("second no-op lost retained directory evidence", locator, item)
+		}
+		var attached int
+		if err := reopened.db.QueryRow("SELECT count(*) FROM file_references WHERE page_id=?", expected.PageID).Scan(&attached); err != nil || attached != 0 {
+			t.Fatal("retaining folder identity attached raw capture evidence to it", locator, attached, err)
+		}
+	}
+}
+
+func TestImportNoopStillSuppressesUnneededNewFolders(t *testing.T) {
+	k, e := testKernel(t)
+	first := completeImportFixture(t, k, e, importFixture(t, k, e, map[string]string{"Old.html": `<p id="one">Keep this local page.</p>`}))
+	old := identityItem(t, first, "Old.html")
+	before := importCanonicalRows(t, k)
+	p := importFixture(t, k, e, map[string]string{"new/nested/New.html": `<p id="one">Keep this local page.</p>`})
+	p = resolveIdentity(t, k, p, "new/nested/New.html", "link_existing", old.PageID)
+	out, err := configurePortableImport(context.Background(), k, e, map[string]any{"planId": p.ID, "planHash": p.Hash, "choices": []any{map[string]any{"sourceLocator": "new/nested/New.html", "choice": "keep_local"}}})
+	if err != nil {
+		t.Fatal(err)
+	}
+	done := completeImportFixture(t, k, e, out.(ImportPlan))
+	assertImportRoot(t, k, done, false)
+	folders := 0
+	for _, item := range done.Items {
+		if item.Kind == "folder" {
+			folders++
+			if item.PageID != "" || item.ParentID != "" || item.ExpectedRevision != "" {
+				t.Fatal("unused new directory became canonical evidence", item)
+			}
+		}
+	}
+	if folders != 2 || !reflect.DeepEqual(before, importCanonicalRows(t, k)) {
+		t.Fatal("keeping a relocated source added a root, folder or canonical revision", folders)
+	}
+}
+
 func TestImportNoopMovedIdentityRetainsEvidenceBackupAndPortableBoundary(t *testing.T) {
 	k, e := testKernel(t)
 	first := completeImportFixture(t, k, e, importFixture(t, k, e, map[string]string{"Old.html": `<p id="body">Current local knowledge.</p>`}))

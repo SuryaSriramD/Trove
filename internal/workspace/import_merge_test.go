@@ -71,7 +71,15 @@ func TestImportMergeRetainsSyntheticFolderAndLocalPageMove(t *testing.T) {
 		preview := importFixture(t, k, e, map[string]string{"folder/nested/A.html": `<p id="one">one</p>`})
 		for _, item := range preview.Items {
 			if item.Kind == "html" && (item.Choice != "keep_local" || item.ParentID != original.ParentID) {
-				t.Fatal("unchanged source fabricated a directory move", item.Choice, item.ParentID)
+				var run string
+				if err := k.db.QueryRow("SELECT import_run_id FROM import_baselines WHERE mapping_id=?", item.MappingID).Scan(&run); err != nil {
+					t.Fatal(err)
+				}
+				prior, err := loadImportPlan(context.Background(), k.db, run)
+				if err != nil {
+					t.Fatal(err)
+				}
+				t.Fatalf("unchanged source fabricated a directory move: iteration=%d choice=%q parent=%q expectedParent=%q mapping=%q identityReview=%s merge=%s priorItems=%s", iteration+1, item.Choice, item.ParentID, original.ParentID, item.MappingID, marshal(item.IdentityReview), marshal(item.Merge), marshal(prior.Items))
 			}
 		}
 		completeImportFixture(t, k, e, preview)
