@@ -7,6 +7,9 @@ workspace, retries a scenario, rebuilds the app, or changes the host allowlist.
 """
 from __future__ import annotations
 import argparse
+import base64
+import io
+import zipfile
 from datetime import datetime, timezone
 import hashlib
 import json
@@ -20,10 +23,10 @@ import time
 import urllib.request
 
 ROOT = Path(__file__).resolve().parents[1]
-EXPECTED = {stage: [f"real-{workflow}-{stage}" for workflow in ("rich", "task", "due", "record-lifecycle", "layout-review", "p2-data", "p2-action", "conversation-display", "schedule-week", "schedule-dst")] for stage in ("create", "reopen")}
+EXPECTED = {stage: [f"real-{workflow}-{stage}" for workflow in ("rich", "task", "due", "record-lifecycle", "layout-review", "p2-data", "p2-action", "conversation-display", "schedule-week", "schedule-dst", "import-merge", "import-resume")] for stage in ("create", "reopen")}
 LIMITATIONS = ["Chromium UI plus production host/services/SQLite; not native Wails WebView acceptance.",
                "No model inference, physical devices, live accounts, performance or release qualification.",
-               "Bounded rich-page, task/record/undo, layout/review, P2 forms/charts/row actions and conversation/display and working-week/DST scheduling continuity; broader import/recovery workflows remain pending."]
+               "Bounded rich-page, task/record/undo, layout/review, P2 forms/charts/row actions and conversation/display and working-week/DST scheduling continuity; broader native/recovery workflows remain pending."]
 
 def now():
     return datetime.now(timezone.utc).isoformat()
@@ -140,7 +143,7 @@ def main():
                   'harnessFiles': {name: digest(ROOT / name) for name in harness_paths},
                   'frontendSourceSHA256': object_digest(inventory(ROOT / 'frontend/src'))}
         manifest['inputs'] = inputs
-        fixture = {'schemaVersion': 1, 'suiteVersion': 4, 'pageTitle': 'Real storage — café తెలుగు',
+        fixture = {'schemaVersion': 1, 'suiteVersion': 5, 'pageTitle': 'Real storage — café తెలుగు',
                    'body': 'A carefully saved idea: café, తెలుగు and 日本語.',
                    'initialTaskTitle': 'Prepare real storage review', 'taskTitle': 'Finish real storage review',
                    'expectedRichMarks': ['bold'], 'expectedTaskStatusGroup': 'done',
@@ -173,6 +176,22 @@ def main():
             'before': date_value('2026-10-25T00:00:00+02:00', '2026-10-26T00:00:00+01:00', zone, True),
             'calendarAfter': date_value('2026-11-01T00:00:00+01:00', '2026-11-02T01:00:00+01:00', zone, True),
             'after': date_value('2026-11-01T00:00:00+01:00', '2026-11-08T01:00:00+01:00', zone, True)}
+        fixture['importMerge'] = {'namespace': 'real-ui-three-way-v5', 'originalFile': 'Original-source-notes.html',
+            'movedFile': 'Moved-source-notes.html', 'originalTitle': 'Original-source-notes', 'movedTitle': 'Moved-source-notes',
+            'localTitle': 'Local import title', 'finalTitle': 'Later local import title',
+            'originalTexts': ['Base local passage', 'Base remote passage'], 'localText': 'Local passage stays mine', 'incomingText': 'Incoming remote evidence',
+            'originalHTML': '<p id="local">Base local passage</p><p id="remote">Base remote passage</p>',
+            'incomingHTML': '<p id="remote">Incoming remote evidence</p><p id="local">Base local passage</p>'}
+        items = [{'file': f'Durable batch item {i:02d}.html', 'text': f'Independent retained passage {i:02d}.'} for i in range(48)]
+        archive = io.BytesIO()
+        with zipfile.ZipFile(archive, 'w', compression=zipfile.ZIP_DEFLATED) as z:
+            for item in items:
+                info = zipfile.ZipInfo(item['file'], date_time=(2026, 10, 16, 0, 0, 0))
+                info.compress_type = zipfile.ZIP_DEFLATED
+                z.writestr(info, '<p id="body">' + item['text'] + '</p>')
+        fixture['importResume'] = {'namespace': 'real-ui-durable-resume-v5', 'file': 'durable-review-batch-v5.zip',
+            'items': items, 'zipBase64': base64.b64encode(archive.getvalue()).decode('ascii'),
+            'zipSHA256': hashlib.sha256(archive.getvalue()).hexdigest()}
         fixture['conversationExport'] = [{'id': 'real-ui-conversation-v3', 'title': fixture['conversationTitle'],
             'create_time': 1760000000, 'current_node': 'reply-ridge', 'mapping': {
                 'root': {'parent': None, 'children': ['question'], 'message': None},
