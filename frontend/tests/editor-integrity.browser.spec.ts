@@ -35,7 +35,8 @@ const initial = {
   ],
   collections:[],properties:[],records:[],views:[],files:[],meetings:[],taskFacets:[],containers:[],containerCollections:[],transcriptSegments:[],projectScopes:[],memories:[],importMappings:[],
 };
-test.beforeEach(async ({page}) => {
+const lineEdgeFirstParagraph = { ...initial, blocks: [block(40, "paragraph", { richText: [{ text: "Fern tray count is 23." }] })] };
+test.beforeEach(async ({page}, info) => {
   await page.addInitScript(({initial}) => {
     if(window!==window.top)return;
     const state = JSON.parse(localStorage.getItem("editor-integrity") ?? "null") ?? initial;
@@ -84,7 +85,7 @@ test.beforeEach(async ({page}) => {
       state.snapshotCursor=String(Number(state.snapshotCursor)+1);persist();
       return ok({requestId:req.requestId,transactionId:makeID(),eventCursor:state.snapshotCursor,revisions,replayed:false});
     }}}};
-  },{initial});
+  },{initial: info.title.startsWith("line edge keyboard first paragraph ") ? lineEdgeFirstParagraph : initial});
   await page.route("**/files/019a1234-5678-7000-8000-000000000091", route=>route.fulfill({contentType:"image/png",body:Buffer.from("iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+a2ioAAAAASUVORK5CYII=","base64")}));
   await page.route("**/files/019a1234-5678-7000-8000-000000000092", route=>route.fulfill({contentType:"application/pdf",body:pdfFixture()}));
   await page.goto(process.env.TROVE_TEST_URL??"http://127.0.0.1:4173");
@@ -398,10 +399,26 @@ test("outer toolbar follows stored formatting and selection without canonical ed
   expect(await page.evaluate(() => (window as any).integrityState().blocks)).toEqual(before);
 });
 
-for (const [first, extend] of [["Home", "Shift+End"], ["End", "Shift+Home"]]) {
-  test(`line edge keyboard ${first} then ${extend} replaces the whole paragraph`, async ({ page }, info) => {
+for (const fixture of [
+  { name: "", text: "Visible sibling", firstParagraph: false },
+  { name: "first paragraph ", text: "Fern tray count is 23.", firstParagraph: true },
+]) for (const [first, extend] of [["Home", "Shift+End"], ["End", "Shift+Home"]]) {
+  test(`line edge keyboard ${fixture.name}${first} then ${extend} replaces the whole paragraph`, async ({ page }, info) => {
     const paragraph = page.locator(`[data-block-id="${id(40)}"] .block-text`);
-    await expect(paragraph).toHaveText("Visible sibling");
+    await expect(paragraph).toHaveText(fixture.text);
+    // Read-only geometry and initial model state bind the first-paragraph race:
+    // a normal fresh editor starts at 1 before the real click moves the DOM caret.
+    const initialSelection = await paragraph.evaluate(element => {
+      const range = document.createRange(); range.selectNodeContents(element);
+      const rectangles = Array.from(range.getClientRects()).filter(rect => rect.width > 0 && rect.height > 0);
+      const editor = (element.closest(".tiptap") as HTMLElement & { editor?: any } | null)?.editor;
+      return { lineTops: [...new Set(rectangles.map(rect => rect.top))],
+        modelAvailable: Boolean(editor?.state?.selection), model: editor?.state.selection.toJSON() ?? null };
+    });
+    await info.attach("line-edge-initial-fixture", { body: JSON.stringify({ ...fixture, blockId: id(40), initialSelection }, null, 2), contentType: "application/json" });
+    expect(initialSelection.lineTops).toHaveLength(1);
+    expect(initialSelection.modelAvailable).toBe(true);
+    if (fixture.firstParagraph) expect(initialSelection.model).toEqual({ type: "text", anchor: 1, head: 1 });
     await observeLineEdgeKeys(page);
     try {
       await paragraph.click({ position: { x: 8, y: 8 } });
