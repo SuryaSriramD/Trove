@@ -280,3 +280,33 @@ func TestAnswerabilityTransferCanonicalSeedAndScope(t *testing.T) {
 func TestRealLocalAnswerabilityTransferCases(t *testing.T) {
 	runRealLocalAITransferCases(t, answerabilityTransferCorpus)
 }
+
+// Comparison is explicit and separate: historical transfer tests remain fixed to
+// pack106. This list is a selector boundary; the runner pins all artifact bytes.
+func answerabilityComparisonPack(pack string) bool {
+	return pack == "01990000-0000-7000-8000-000000000105" || pack == "01990000-0000-7000-8000-000000000109"
+}
+
+func TestRealLocalAnswerabilityModelComparisonCases(t *testing.T) {
+	if os.Getenv("TROVE_NATIVE_INTEGRATION") != "1" {
+		t.Skip("requires explicit native integration")
+	}
+	pack := os.Getenv("TROVE_CHAT_EVAL_PACK")
+	if !answerabilityComparisonPack(pack) {
+		t.Fatal("select exactly a reviewed comparison pack105 or pack109; no fallback")
+	}
+	runRealLocalAITransferCasesForPack(t, answerabilityTransferCorpus, pack)
+}
+
+func TestAnswerabilityModelComparisonPackSelection(t *testing.T) {
+	for _, pack := range []string{"01990000-0000-7000-8000-000000000105", "01990000-0000-7000-8000-000000000109"} {
+		if !answerabilityComparisonPack(pack) {
+			t.Fatal("reviewed comparison selection rejected", pack)
+		}
+	}
+	for _, pack := range []string{"", "01990000-0000-7000-8000-000000000104", "01990000-0000-7000-8000-000000000106", "01990000-0000-7000-8000-000000000999", "../model", "Qwen2.5"} {
+		if answerabilityComparisonPack(pack) {
+			t.Fatal("unreviewed or historical model admitted through comparison entrypoint", pack)
+		}
+	}
+}
