@@ -99,9 +99,11 @@ export function PageEditor({
   toggleTask,
   registerFlush,
   onAttach,
+  contentRefreshing = false,
 }: {
   page: D.Page;
   blocks: D.Block[];
+  contentRefreshing?: boolean;
   workspace: WorkspaceSnapshot;
   onCommitted: () => Promise<void>;
   onAttach?: () => Promise<void>;
@@ -538,6 +540,10 @@ export function PageEditor({
   }, [editor, page.revision, blocks, workspace]);
   async function save() {
     if (!editor || saving.current || lockRef.current.locked) return;
+    if (contentRefreshing) {
+      if (pending.current) setSaveState("Waiting for page refresh…");
+      return;
+    }
     reconcileIncoming();
     if (conflictRef.current) return;
     if (!pending.current && !failed.current) return;
@@ -628,6 +634,12 @@ export function PageEditor({
     }
   }
   saveRef.current = save;
+  useEffect(() => {
+    // Resume an unsent draft once its coherent projection arrives. save() still
+    // reconciles remote changes and refuses explicit conflicts; it never weakens
+    // revision guards or retries an arbitrary failed mutation.
+    if (!contentRefreshing && pending.current) void saveRef.current();
+  }, [contentRefreshing]);
   async function togglePageLock() {
     if (lockChanging.current) return;
     lockChanging.current = true;
