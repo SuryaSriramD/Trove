@@ -20,10 +20,10 @@ import time
 import urllib.request
 
 ROOT = Path(__file__).resolve().parents[1]
-EXPECTED = {stage: [f"real-rich-{stage}", f"real-task-{stage}"] for stage in ("create", "reopen")}
+EXPECTED = {stage: [f"real-{workflow}-{stage}" for workflow in ("rich", "task", "due", "record-lifecycle", "layout-review")] for stage in ("create", "reopen")}
 LIMITATIONS = ["Chromium UI plus production host/services/SQLite; not native Wails WebView acceptance.",
                "No model inference, physical devices, live accounts, performance or release qualification.",
-               "Only rich-page and task title/completion continuity are covered; broader workflows remain pending."]
+               "Bounded rich-page, task due/title/status, record facet/undo and layout/review continuity; imports, scheduling and broader workflows remain pending."]
 
 def now():
     return datetime.now(timezone.utc).isoformat()
@@ -140,10 +140,16 @@ def main():
                   'harnessFiles': {name: digest(ROOT / name) for name in harness_paths},
                   'frontendSourceSHA256': object_digest(inventory(ROOT / 'frontend/src'))}
         manifest['inputs'] = inputs
-        fixture = {'schemaVersion': 1, 'pageTitle': 'Real storage — café తెలుగు',
+        fixture = {'schemaVersion': 1, 'suiteVersion': 2, 'pageTitle': 'Real storage — café తెలుగు',
                    'body': 'A carefully saved idea: café, తెలుగు and 日本語.',
                    'initialTaskTitle': 'Prepare real storage review', 'taskTitle': 'Finish real storage review',
                    'expectedRichMarks': ['bold'], 'expectedTaskStatusGroup': 'done',
+                   'timezone': 'Asia/Kolkata', 'dueTaskTitle': 'Due date continuity fixture',
+                   'dueDates': ['2026-11-06', '2026-11-07', '2026-11-08'],
+                   'lifecycleDatabase': 'Task lifecycle fixture', 'lifecycleTitle': 'Promote this record fixture',
+                   'lifecycleRenamed': 'Later title survives facet undo', 'lifecycleDate': '2026-11-10',
+                   'layoutDatabase': 'Layout review fixture', 'layoutTitle': 'Reviewed layout fixture',
+                   'layoutSection': 'Planning sidebar', 'layoutDates': ['2026-11-12', '2026-11-13'],
                    'expectedCases': EXPECTED}
         save(evidence / 'fixture.json', fixture)
         manifest['fixtureSHA256'] = digest(evidence / 'fixture.json')
@@ -182,7 +188,7 @@ def main():
             test_command = [args.node, str(playwright), 'test', '--config', str(ROOT / 'frontend/playwright.integration.config.ts')]
             entry['testCommand'] = test_command
             with (stage_dir / 'test.log').open('w') as test_log:
-                result = subprocess.run(test_command, env=test_env, cwd=ROOT / 'frontend', stdout=test_log, stderr=subprocess.STDOUT, timeout=180)
+                result = subprocess.run(test_command, env=test_env, cwd=ROOT / 'frontend', stdout=test_log, stderr=subprocess.STDOUT, timeout=480)
             entry['testExitCode'] = result.returncode
             report_path = stage_dir / 'playwright.json'
             report = json.loads(report_path.read_text()) if report_path.exists() else {}

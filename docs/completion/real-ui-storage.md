@@ -2,7 +2,15 @@
 
 `scripts/run-real-ui.py` drives the compiled UI through Chromium against the production `trove-host` packaged inside an existing macOS app. It creates a new local APFS workspace, authenticates through the existing owner-token login, and changes content only through visible controls. Read-only production snapshots independently check exact canonical values and identities. The host is stopped normally and started again before the reopen checks.
 
-The initial version has four declared cases: rich-page creation and task creation, followed by rich-page and task reopen after a real host restart. The page contains Unicode text with bold formatting; task coverage includes create, rename, completion and Tasks-to-Home consistency. These are bounded UI/service/storage checks. Native Wails rendering, input methods, accessibility, microphone, reminders, AI quality, live accounts, performance and broader feature workflows require their own checks.
+Suite version 2 retains the original four rich-page/task case identities and adds six cases. Five independent workflows run before and after a real host restart:
+
+- Unicode rich-page creation with bold formatting.
+- Task creation, rename, completion and Tasks-to-Home consistency.
+- Due-date editing through Tasks, Home and the record page, with explicit timezone and rejected invalid timezone preserving canonical state.
+- Database record promotion with explicit due-property binding, detachment cancellation/application, and grouped undo preserving a later title edit and stable record/page/property identities.
+- Collection layout, record override and reset preserving record values and the existing review event; a subsequent date-value edit makes that same review stale. The automated review event tests persistence, not human acceptance of content.
+
+The reopen cases compare exact canonical values, identities, operation state, layouts and review history with saved pre-restart observations. These are bounded UI/service/storage checks. Native Wails rendering, input methods, accessibility, microphone, reminders, AI quality, live accounts, performance and broader feature workflows require their own checks.
 
 Run from the desired checkout with existing pinned dependencies available in `frontend/node_modules`:
 
