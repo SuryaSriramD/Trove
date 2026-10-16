@@ -81,6 +81,8 @@ class ReviewTransferAccounting(unittest.TestCase):
                 altered=copy.deepcopy(report);altered['citations'][0]['location']['sourceRevision']=value;mutations.append(altered)
             altered=copy.deepcopy(report);altered['citations'][0]['location']['blockId']='wrong-block';mutations.append(altered)
             altered=copy.deepcopy(report);altered['citations'][0]['number']=999;mutations.append(altered)
+            if len(report['citations']) > 1:
+                altered=copy.deepcopy(report);altered['citations'][1]=copy.deepcopy(altered['citations'][0]);mutations.append(altered)
             if any(s.endswith(':title') for s in case['expectedSupport']):
                 altered=copy.deepcopy(report);altered['sources']=[s for s in altered['sources'] if s['location'].get('blockId')];mutations.append(altered)
             for altered in mutations:

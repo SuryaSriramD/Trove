@@ -464,7 +464,7 @@ def validate_review_transfer_report(report, case, contract):
         if claim['text'] not in report.get('displayed',''):
             errors.append('rendered draft omits requested claim')
     citations = report.get('citations', [])
-    if len(citations) != len(expected_citations) or any(c != expected_citations.get(c.get('number')) for c in citations):
+    if len(citations) != len(expected_citations) or {c.get('number') for c in citations} != set(expected_citations) or any(c != expected_citations.get(c.get('number')) for c in citations):
         errors.append('review current citation identity differs')
     if report.get('actions') not in (None, []):
         errors.append('unexpected proposed effects')
