@@ -902,15 +902,24 @@ test(`real-import-merge-${stage}`, async ({ page }) => {
     expect(canonical.page.title).toBe(f.finalTitle);
     expect(canonical.blocks.map(blockText)).toEqual([f.incomingText, f.localText]);
     expect(canonical.blocks.map((b: any) => b.id)).toEqual([original.blocks[1].id, original.blocks[0].id]);
+    const beforeRetry = await snapshot(page);
+    const canonicalIDs = (s: any) => ({ pages: s.pages.map((p: any) => p.id).sort(), blocks: s.blocks.map((b: any) => b.id).sort() });
+    const beforeRetryIDs = canonicalIDs(beforeRetry);
     const retriedPreview = await chooseImport(page, f.namespace, f.movedFile, "text/html", Buffer.from(f.incomingHTML));
+    expect(retriedPreview.sourceNamespace).toBe(f.namespace);
     const retryItem = retriedPreview.items.find((i: any) => i.kind === "html");
-    expect(retryItem.pageId).toBe(originalItem.pageId); expect(retryItem.mappingId).toBe(originalItem.mappingId);
-    expect(retryItem.identityReview).toBeUndefined(); expect(retryItem.choice).toBe("keep_local");
+    expect(retryItem).toMatchObject({ sourceLocator: f.movedFile, externalId: f.movedFile, identityKind: "derived_locator", pageId: originalItem.pageId, mappingId: originalItem.mappingId });
+    expect(retryItem.identityReview).toMatchObject({ version: 1, choice: "link_existing", localId: originalItem.pageId, mappingId: originalItem.mappingId, reason: "Previously reviewed source identity" });
+    expect(retryItem.choice).toBe("keep_local");
+    await expect(page.getByRole("status").filter({ hasText: `Identity decision: link existing · ${originalItem.pageId}` })).toBeVisible();
+    await expect(page.getByRole("button", { name: "Commit reviewed import", exact: true })).toBeEnabled();
     const retry = await finishImport(page, retriedPreview.planId);
-    expect(importedProjection(await snapshot(page), originalItem.pageId)).toEqual(canonical);
+    const afterRetry = await snapshot(page);
+    expect(importedProjection(afterRetry, originalItem.pageId)).toEqual(canonical);
+    expect(canonicalIDs(afterRetry)).toEqual(beforeRetryIDs);
     const retained = await page.getByRole("link", { name: "Original source", exact: true }).getAttribute("href");
     expect(await page.evaluate(async href => (await fetch(href!)).text(), retained)).toBe(f.incomingHTML);
-    write("create-import-merge.json", { initialPlan, originalItem, original, localBefore, movedPreview, reviewed, rejection, refreshed, committed, canonical, retry });
+    write("create-import-merge.json", { initialPlan, originalItem, original, localBefore, movedPreview, reviewed, rejection, refreshed, committed, canonical, beforeRetryIDs, retry });
   }
   const saved = read("create-import-merge.json");
   await openRecentImport(page, saved.retry);
