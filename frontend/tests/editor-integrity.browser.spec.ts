@@ -409,8 +409,12 @@ for (const fixture of [
     // Read-only geometry and initial model state bind the first-paragraph race:
     // a normal fresh editor starts at 1 before the real click moves the DOM caret.
     const initialSelection = await paragraph.evaluate(element => {
-      const range = document.createRange(); range.selectNodeContents(element);
-      const rectangles = Array.from(range.getClientRects()).filter(rect => rect.width > 0 && rect.height > 0);
+      const walker = document.createTreeWalker(element, NodeFilter.SHOW_TEXT);
+      const rectangles: DOMRect[] = [];
+      for (let text = walker.nextNode(); text; text = walker.nextNode()) {
+        const range = document.createRange(); range.selectNodeContents(text);
+        rectangles.push(...Array.from(range.getClientRects()).filter(rect => rect.width > 0 && rect.height > 0));
+      }
       const editor = (element.closest(".tiptap") as HTMLElement & { editor?: any } | null)?.editor;
       return { lineTops: [...new Set(rectangles.map(rect => rect.top))],
         modelAvailable: Boolean(editor?.state?.selection), model: editor?.state.selection.toJSON() ?? null };
