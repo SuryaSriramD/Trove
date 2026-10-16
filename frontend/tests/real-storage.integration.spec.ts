@@ -158,7 +158,7 @@ function dateValue(r: ReturnType<typeof recordProjection>, name: string) {
   return r.record.values.find((v: any) => v.propertyId === property(r, name).id)?.value ?? null;
 }
 const date = (start: string, timezone = fixture.timezone) => ({ start, end: null, timezone, hasTime: false });
-async function observe(page: Page, method: "page.freshness" | "recordLayouts.get" | "operations.list" | "databaseP2" | "databaseChart" | "imports.list" | "imports.plan" | "pageDisplay.get", args: Record<string, unknown>) {
+async function observe(page: Page, method: "page.freshness" | "recordLayouts.get" | "operations.list" | "databaseP2" | "databaseChart" | "imports.list" | "imports.plan" | "pageDisplay.get" | "databaseDerived", args: Record<string, unknown>) {
   const s = await snapshot(page);
   return page.evaluate(async ({ method, args, workspaceId }) => {
     const a = crypto.getRandomValues(new Uint8Array(16)), t = BigInt(Date.now());
@@ -623,4 +623,184 @@ test(`real-conversation-display-${stage}`, async ({ page }) => {
   const display = await observe(page, "pageDisplay.get", { pageId: item.pageId }), expected = read("create-conversation-display.json");
   expect(canonical).toEqual(expected.canonical); expect(review).toEqual(expected.review); expect(display).toEqual(expected.display);
   write(`${stage}-conversation-display-result.json`, { passed: true, canonical, plan, review, display });
+});
+
+
+// Scheduling inputs and expected dates are fixed independently in fixture.json.
+async function setDateRange(page: Page, title: string, value: any) {
+  const label = `Date for ${title}`, control = dateControl(page, label);
+  if ((await control.getAttribute("open")) === null) await control.locator("summary").click();
+  await control.getByRole("checkbox", { name: "Include time", exact: true }).setChecked(value.hasTime);
+  await control.getByLabel(`${label} start`, { exact: true }).fill(value.start);
+  await control.getByLabel(`${label} end`, { exact: true }).fill(value.end ?? "");
+  await control.getByLabel(`${label} timezone`, { exact: true }).fill(value.timezone);
+  await control.getByRole("button", { name: "Save date", exact: true }).click();
+  await expect.poll(async () => dateValue(recordProjection(await snapshot(page), title), "Date")).toEqual(value);
+}
+async function uiResponse(page: Page, method: string, gesture: () => Promise<unknown>) {
+  const response = page.waitForResponse(response => response.url().endsWith("/api") && response.request().postDataJSON()?.method === method);
+  await gesture();
+  const result = await response;
+  expect(result.status()).toBe(200);
+  return result.json();
+}
+async function configureDependencies(page: Page, title: string, dependsOn: string[]) {
+  const panel = page.locator("details.db-advanced");
+  if ((await panel.getAttribute("open")) === null) await panel.locator(":scope > summary").click();
+  await panel.getByRole("combobox", { name: "Record", exact: true }).selectOption({ label: title });
+  await panel.getByRole("listbox", { name: "Depends on", exact: true }).selectOption(dependsOn.map(label => ({ label })));
+  const response = await uiResponse(page, "batch", () => panel.getByRole("button", { name: "Save structure", exact: true }).click());
+  expect(response.ok).toBe(true);
+  await expect(panel.getByRole("button", { name: "Save structure", exact: true })).toBeEnabled();
+}
+async function openSchedule(page: Page, title: string, start: string, timezone: string, calendar: string) {
+  const panel = page.locator("details.scheduling-panel");
+  if ((await panel.getAttribute("open")) === null) await panel.locator(":scope > summary").click();
+  await panel.getByLabel("Reschedule starting record", { exact: true }).selectOption({ label: title });
+  await panel.getByLabel("Reschedule new start", { exact: true }).fill(start);
+  await panel.getByLabel("Reschedule timezone", { exact: true }).fill(timezone);
+  await panel.getByLabel("Reschedule calendar", { exact: true }).selectOption(calendar);
+  return panel;
+}
+async function previewSchedule(page: Page) {
+  const response = await uiResponse(page, "scheduling.preview", () => page.getByRole("button", { name: "Preview complete schedule", exact: true }).click());
+  expect(response.ok).toBe(true);
+  await expect(page.getByRole("region", { name: "Complete scheduling preview", exact: true })).toBeVisible();
+  return response.result;
+}
+function schedulingRows(s: any, titles: string[]) {
+  return titles.map(title => recordProjection(s, title));
+}
+function exactSchedule(plan: any, original: any[], after: any[], reasons: string[]) {
+  expect(plan.records).toHaveLength(original.length);
+  for (let i = 0; i < original.length; i++) {
+    const change = plan.records.find((r: any) => r.recordId === original[i].record.id);
+    expect(change).toMatchObject({ recordId: original[i].record.id, title: original[i].page.title,
+      before: dateValue(original[i], "Date"), after: after[i], reason: reasons[i], changed: reasons[i] !== "slack_preserved" });
+    expect(change.duration).toBe("2 inclusive eligible dates");
+  }
+}
+async function visibleSchedule(page: Page, plan: any) {
+  const preview = page.getByRole("region", { name: "Complete scheduling preview", exact: true });
+  await expect(preview.locator("tbody tr")).toHaveCount(plan.records.length);
+  for (const record of plan.records) {
+    const row = preview.getByRole("row").filter({ has: page.getByRole("rowheader", { name: record.title, exact: true }) });
+    await expect(row).toContainText(record.before.start);
+    await expect(row).toContainText(record.after.start);
+    if (record.after.end) await expect(row).toContainText(record.after.end);
+    await expect(row).toContainText(record.duration);
+    await expect(row).toContainText(record.reason.replaceAll("_", " "));
+  }
+}
+
+test(`real-schedule-week-${stage}`, async ({ page }) => {
+  const f = fixture.scheduleWeek;
+  if (stage === "create") {
+    await createRecord(page, f.database, f.titles[0]);
+    for (const title of f.titles.slice(1)) {
+      await page.getByLabel("New record title", { exact: true }).fill(title);
+      await page.getByRole("button", { name: "Add record", exact: true }).click();
+      await expect(page.getByLabel(`Title for ${title}`, { exact: true })).toBeVisible();
+    }
+    for (let i = 0; i < f.titles.length; i++) await setDateRange(page, f.titles[i], f.before[i]);
+    for (const title of f.titles.slice(1)) await configureDependencies(page, title, [f.titles[0]]);
+    const original = schedulingRows(await snapshot(page), f.titles);
+    const structure = (await observe(page, "databaseDerived", { collectionId: original[0].record.collectionId })).structure;
+    for (const r of original.slice(1)) expect(structure[r.record.id].dependencyRecordIds).toEqual([original[0].record.id]);
+    const panel = await openSchedule(page, f.titles[0], f.after[0].start, f.timezone, "working_week");
+    for (const day of ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"]) await expect(panel.getByRole("checkbox", { name: day, exact: true })).toBeChecked();
+    for (const day of ["Saturday", "Sunday"]) await expect(panel.getByRole("checkbox", { name: day, exact: true })).not.toBeChecked();
+    const baseline = collectionProjection(await snapshot(page), f.database);
+    const cancelledPlan = await previewSchedule(page);
+    exactSchedule(cancelledPlan, original, f.after, ["requested", "dependency", "slack_preserved"]);
+    await visibleSchedule(page, cancelledPlan);
+    await page.getByRole("button", { name: "Cancel schedule", exact: true }).click();
+    await expect(page.getByRole("region", { name: "Complete scheduling preview", exact: true })).toHaveCount(0);
+    expect(collectionProjection(await snapshot(page), f.database)).toEqual(baseline);
+    const stalePlan = await previewSchedule(page);
+    await setStatus(page, f.titles[1], "In progress");
+    const beforeRejected = collectionProjection(await snapshot(page), f.database);
+    const rejected = await uiResponse(page, "batch", () => page.getByRole("button", { name: "Apply reviewed schedule", exact: true }).click());
+    expect(rejected.ok).toBe(false); expect(rejected.error.code).toBe("CONFLICT");
+    await expect(page.getByRole("alert")).toBeVisible();
+    expect(collectionProjection(await snapshot(page), f.database)).toEqual(beforeRejected);
+    const plan = await previewSchedule(page);
+    exactSchedule(plan, original, f.after, ["requested", "dependency", "slack_preserved"]);
+    await visibleSchedule(page, plan);
+    const appliedResponse = await uiResponse(page, "batch", () => page.getByRole("button", { name: "Apply reviewed schedule", exact: true }).click());
+    expect(appliedResponse.ok).toBe(true);
+    await expect(page.getByRole("region", { name: "Complete scheduling preview", exact: true })).toHaveCount(0);
+    const applied = schedulingRows(await snapshot(page), f.titles);
+    expect(applied.map(r => dateValue(r, "Date"))).toEqual(f.after);
+    expect(applied.map(identity)).toEqual(original.map(identity));
+    await page.getByLabel(`Title for ${f.titles[1]}`, { exact: true }).fill(f.renamed);
+    await page.getByLabel(`Title for ${f.titles[1]}`, { exact: true }).press("Enter");
+    await expect(page.getByLabel(`Title for ${f.renamed}`, { exact: true })).toBeVisible();
+    await openRecord(page, f.renamed);
+    await page.getByText("Grouped changes and undo", { exact: true }).click();
+    await page.locator("li").filter({ hasText: "Reschedule dependencies" }).getByRole("button", { name: "Preview undo", exact: true }).click();
+    const undo = page.getByRole("region", { name: "Review grouped undo", exact: true });
+    await expect(undo).toContainText(f.before[0].start); await expect(undo).toContainText(f.before[1].start);
+    await undo.getByRole("button", { name: "Apply reviewed undo", exact: true }).click();
+    const finalTitles = [f.titles[0], f.renamed, f.titles[2]];
+    await expect.poll(async () => schedulingRows(await snapshot(page), finalTitles).map(r => dateValue(r, "Date"))).toEqual(f.before);
+    const canonical = schedulingRows(await snapshot(page), finalTitles);
+    expect(canonical.map(identity)).toEqual(original.map(identity));
+    const status = property(canonical[1], "Status"), statusValue = canonical[1].record.values.find((v: any) => v.propertyId === status.id)?.value;
+    expect(status.config.options.find((o: any) => o.id === statusValue)?.label).toBe("In progress");
+    const operations = await observe(page, "operations.list", { pageId: canonical[1].page.id });
+    const schedules = operations.operations.filter((o: any) => o.label === "Reschedule dependencies");
+    expect(schedules).toHaveLength(1); expect(schedules[0]).toMatchObject({ id: plan.id, state: "undone" });
+    write("create-schedule-week.json", { original, structure, cancelledPlan, stalePlan, rejected, plan, applied, canonical, operations });
+  }
+  await database(page, f.database);
+  const canonical = schedulingRows(await snapshot(page), [f.titles[0], f.renamed, f.titles[2]]), expected = read("create-schedule-week.json");
+  expect(canonical).toEqual(expected.canonical);
+  expect((await observe(page, "databaseDerived", { collectionId: canonical[0].record.collectionId })).structure).toEqual(expected.structure);
+  const operations = await observe(page, "operations.list", { pageId: canonical[1].page.id });
+  expect(operations).toEqual(expected.operations);
+  for (let i = 0; i < canonical.length; i++) await expect(dateControl(page, `Date for ${canonical[i].page.title}`).locator("summary")).toContainText(f.before[i].start);
+  write(`${stage}-schedule-week-result.json`, { passed: true, canonical, operations });
+});
+
+test(`real-schedule-dst-${stage}`, async ({ page }) => {
+  const f = fixture.scheduleDST;
+  if (stage === "create") {
+    await createRecord(page, f.database, f.title);
+    await setDateRange(page, f.title, f.before);
+    const original = recordProjection(await snapshot(page), f.title);
+    const panel = await openSchedule(page, f.title, f.after.start, f.timezone, "calendar_days");
+    const calendarPlan = await previewSchedule(page);
+    expect(calendarPlan.records).toHaveLength(1);
+    expect(calendarPlan.records[0]).toMatchObject({ before: f.before, after: f.calendarAfter, duration: "25h0m0s elapsed eligible time" });
+    await visibleSchedule(page, calendarPlan);
+    await page.getByRole("button", { name: "Cancel schedule", exact: true }).click();
+    expect(recordProjection(await snapshot(page), f.title)).toEqual(original);
+    await panel.getByLabel("Reschedule calendar", { exact: true }).selectOption("working_week");
+    for (const day of ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"]) await panel.getByRole("checkbox", { name: day, exact: true }).uncheck();
+    await panel.getByRole("checkbox", { name: "Sunday", exact: true }).check();
+    const plan = await previewSchedule(page);
+    expect(plan.input.policy).toEqual({ version: 1, calendar: "working_week", timezone: f.timezone, weekdays: [0] });
+    expect(plan.records).toHaveLength(1);
+    expect(plan.records[0]).toMatchObject({ recordId: original.record.id, before: f.before, after: f.after, duration: "25h0m0s elapsed eligible time", changed: true });
+    expect(plan.records[0].dstEffects).toEqual(["UTC offsets: before +02:00 → +01:00; after +01:00 → +01:00. Duration uses elapsed eligible time, including DST effects."]);
+    await visibleSchedule(page, plan);
+    await expect(page.getByRole("region", { name: "Complete scheduling preview", exact: true })).toContainText(plan.records[0].dstEffects[0]);
+    const response = await uiResponse(page, "batch", () => page.getByRole("button", { name: "Apply reviewed schedule", exact: true }).click());
+    expect(response.ok).toBe(true);
+    await expect.poll(async () => dateValue(recordProjection(await snapshot(page), f.title), "Date")).toEqual(f.after);
+    const canonical = recordProjection(await snapshot(page), f.title);
+    expect(identity(canonical)).toEqual(identity(original));
+    const operations = await observe(page, "operations.list", { pageId: canonical.page.id });
+    expect(operations.operations.filter((o: any) => o.label === "Reschedule dependencies")).toHaveLength(1);
+    write("create-schedule-dst.json", { original, calendarPlan, plan, canonical, operations });
+  }
+  await database(page, f.database);
+  const canonical = recordProjection(await snapshot(page), f.title), expected = read("create-schedule-dst.json");
+  expect(canonical).toEqual(expected.canonical);
+  expect(dateValue(canonical, "Date")).toEqual(f.after);
+  const operations = await observe(page, "operations.list", { pageId: canonical.page.id });
+  expect(operations).toEqual(expected.operations);
+  await expect(dateControl(page, `Date for ${f.title}`).locator("summary")).toContainText(f.after.start);
+  write(`${stage}-schedule-dst-result.json`, { passed: true, canonical, operations });
 });

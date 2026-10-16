@@ -2,7 +2,7 @@
 
 `scripts/run-real-ui.py` drives the compiled UI through Chromium against the production `trove-host` packaged inside an existing macOS app. It creates a new local APFS workspace, authenticates through the existing owner-token login, and changes content only through visible controls. Read-only production snapshots independently check exact canonical values and identities. The host is stopped normally and started again before the reopen checks.
 
-Suite version 3 retains the earlier ten case identities and adds six cases. Eight independent workflows run before and after a real host restart:
+Suite version 4 retains the earlier sixteen case identities and adds four cases. Ten independent workflows run before and after a real host restart:
 
 - Unicode rich-page creation with bold formatting.
 - Task creation, rename, completion and Tasks-to-Home consistency.
@@ -13,6 +13,9 @@ Suite version 3 retains the earlier ten case identities and adds six cases. Eigh
 - Required and typed local form validation, followed by valid submissions and exact large/signed decimal chart aggregates linked to their source records.
 - Reviewed row action cancellation, stale-review invalidation after a date edit, atomic application and grouped undo retaining the later date and title.
 - Branched conversation JSON import through the file picker/upload, exact source-byte retention, stable message/parent/reply identities, and full-width/presentation settings preserving content and the review event.
+
+- Working-week dependency scheduling with a complete branch/slack preview, cancellation, stale-plan rejection, atomic application and grouped undo retaining unrelated status/title edits.
+- Explicit calendar-day versus Sunday-only scheduling across Berlin fall DST, preserving 25 elapsed eligible hours and showing offset effects.
 
 The reopen cases compare exact canonical values, identities, operation state, layouts and review history with saved pre-restart observations. These are bounded UI/service/storage checks. Native Wails rendering, input methods, accessibility, microphone, reminders, AI quality, live accounts, performance and broader feature workflows require their own checks.
 
