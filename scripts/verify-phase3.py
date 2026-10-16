@@ -328,9 +328,13 @@ class Qualification:
                 shutil.copyfile(source, target)
         self.command('packaged-p0-restart-native-offline', [sys.executable, ROOT / 'scripts/verify-packaged.py',
                                                         '--p0', '--native', '--offline', '--app', self.args.app,
-                                                        '--models', self.args.models, '--evidence', self.run_dir], timeout=2000)
-        packaged = self.run_dir / 'packaged-integration.json'
+                                                        '--models', self.args.models, '--evidence', self.run_dir / 'packaged-p0'], timeout=2000)
+        packaged = self.run_dir / 'packaged-p0/packaged-integration.json'
         if packaged.is_file():
+            # Preserve the aggregate package's historical artifact name without
+            # allowing the child to write into an already-populated directory.
+            with (self.run_dir / 'packaged-integration.json').open('xb') as copy:
+                copy.write(packaged.read_bytes())
             report = json.loads(packaged.read_text())
             steps = report.get('checks', [])
             self.record('packaged-fixture-completeness', report.get('passed') is True and report.get('networkDeniedByOS') is True
