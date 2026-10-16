@@ -11,7 +11,7 @@ func TestAICodeTransportKeepsLiteralSourceAndHidesProtocol(t *testing.T) {
 	for _, source := range []string{"```go\r\n// retain me\r\nfunc F() int { return 7 }\r\n```\r\n", "  const marker = `\\n`;\n// résumé 🦉\n", "\\ud800 is literal source text", strings.Repeat("x", 16000)} {
 		raw, _ := json.Marshal(map[string]string{"source": source})
 		var stream strings.Builder
-		p := AIPrepared{Run: AIRun{Request: AIRequest{Mode: "code_comment"}}}
+		p := preparedGenerationFixture(t, "code_comment")
 		got, err := GeneratePreparedAI(context.Background(), p, func(_ context.Context, _, _ string, _ int, grammar string, token func(string)) (string, error) {
 			if grammar == "" || token != nil {
 				t.Fatal("protocol was exposed")
@@ -36,14 +36,14 @@ func TestAICodeTransportRejectsAmbiguousIncompleteAndChangedUnicode(t *testing.T
 	cases = append(cases, string(large), strings.Repeat(" ", 384<<10)+`{"source":"a"}`)
 	for _, raw := range cases {
 		emitted := false
-		got, err := GeneratePreparedAI(context.Background(), AIPrepared{Run: AIRun{Request: AIRequest{Mode: "code_refactor"}}}, func(context.Context, string, string, int, string, func(string)) (string, error) { return raw, nil }, func(string) { emitted = true })
+		got, err := GeneratePreparedAI(context.Background(), preparedGenerationFixture(t, "code_refactor"), func(context.Context, string, string, int, string, func(string)) (string, error) { return raw, nil }, func(string) { emitted = true })
 		if err == nil || got.Text != "" || emitted {
 			t.Fatalf("malformed source published: %q %v", got.Text, err)
 		}
 	}
 	ctx, cancel := context.WithCancel(context.Background())
 	cancel()
-	got, err := GeneratePreparedAI(ctx, AIPrepared{Run: AIRun{Request: AIRequest{Mode: "code_comment"}}}, func(context.Context, string, string, int, string, func(string)) (string, error) {
+	got, err := GeneratePreparedAI(ctx, preparedGenerationFixture(t, "code_comment"), func(context.Context, string, string, int, string, func(string)) (string, error) {
 		return `{"source":"safe"}`, nil
 	}, func(string) { t.Fatal("cancelled source published") })
 	if err != context.Canceled || got.Text != "" {

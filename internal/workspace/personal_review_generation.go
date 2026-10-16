@@ -320,6 +320,7 @@ func (k *Kernel) FailPersonalReviewGeneration(ctx context.Context, e contracts.S
 		return storePersonalReviewRun(ctx, tx, r)
 	})
 }
+
 // Claim guidance affects generation only; evidence validation, review and
 // application retain their existing contracts.
 const personalReviewClaimGuidance = `The example claim illustrates the schema, not a one-claim limit. Follow the requested categories and claim count within the supported 1–12 claims. Each claim.text must state the requested observation itself, including every explicitly requested supported fact; a supporting quote alone is not the observation. Use source titles for explicitly requested page names, never in place of body facts. Preserve actors, dates, quantities, negation and conditions. When exact source wording is requested, use the complete requested source sentence(s) in text and quote. Before returning, check that each requested item has a claim. Do not invent facts to reach a count; use the stated insufficient-evidence response for unsupported items.`
@@ -483,7 +484,8 @@ func (k *Kernel) GeneratePersonalReview(ctx context.Context, e contracts.Service
 		destinations = append(destinations, title)
 	}
 	request := AIRequest{ConversationID: NewID(), PageID: r.PageID, Mode: "workspace_agent", Prompt: "Review: " + p.Plan.Name + "\nFocus: " + p.Plan.Query + "\nALLOWED DESTINATIONS (exact JSON strings)\n" + string(marshal(destinations)), UseMemory: p.Plan.IncludeMemory, ModelPackID: r.Generative.ModelPackID}
-	prepared, err := prepareAIContextWithSystem(ctx, request, r.Evidence, nil, r.Warning, budget, personalReviewSystem(*r.Generative))
+	contract := aiGenerationContract{"personal-review-claim-guidance-v2", personalReviewGrammar(*r.Generative)}
+	prepared, err := prepareAIContextWithGeneration(ctx, request, r.Evidence, nil, r.Warning, budget, personalReviewSystem(*r.Generative), &contract)
 	if err != nil {
 		return r, err
 	}
@@ -502,7 +504,7 @@ func (k *Kernel) GeneratePersonalReview(ctx context.Context, e contracts.Service
 		if er = k.validateReviewGenerationSnapshot(ctx, tx, e, current); er != nil {
 			return er
 		}
-		_, er = tx.ExecContext(ctx, "INSERT INTO ai_runs(id,conversation_id,actor_id,state,request_json,sources_json,warning,created_at) VALUES(?,?,?,'running',?,?,?,?)", modelID, request.ConversationID, e.Actor.ActorId, string(marshal(request)), string(marshal(prepared.Run.Sources)), prepared.Run.Warning, prepared.Run.CreatedAt)
+		_, er = tx.ExecContext(ctx, "INSERT INTO ai_runs(id,conversation_id,actor_id,state,request_json,sources_json,warning,created_at,generation_profile_json) VALUES(?,?,?,'running',?,?,?,?,?)", modelID, request.ConversationID, e.Actor.ActorId, string(marshal(request)), string(marshal(prepared.Run.Sources)), prepared.Run.Warning, prepared.Run.CreatedAt, string(marshal(prepared.Run.GenerationProfile)))
 		if er != nil {
 			return er
 		}
@@ -515,7 +517,10 @@ func (k *Kernel) GeneratePersonalReview(ctx context.Context, e contracts.Service
 	if err != nil {
 		return r, err
 	}
-	raw, err := generate(ctx, prepared.System, prepared.Prompt, prepared.OutputTokens, personalReviewGrammar(*r.Generative), func(string) {})
+	if err = validateAIPrepared(prepared); err != nil {
+		return r, err
+	}
+	raw, err := generate(ctx, prepared.System, prepared.Prompt, prepared.OutputTokens, prepared.Grammar, func(string) {})
 	if err != nil {
 		return r, err
 	}

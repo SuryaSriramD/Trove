@@ -50,8 +50,11 @@ func aiRequiresCitations(mode string) bool {
 // provisional stream exposes readable claim text; grammar JSON and supporting
 // quotes stay internal. Unsupported quotes leave an unapplied failed draft.
 func GeneratePreparedAI(ctx context.Context, prepared AIPrepared, generate AIGenerator, onToken func(string)) (AICompletion, error) {
+	if err := validateAIPrepared(prepared); err != nil {
+		return AICompletion{}, err
+	}
 	if prepared.Run.Request.Mode == "workspace_agent" {
-		text, err := generate(ctx, prepared.System, prepared.Prompt, prepared.OutputTokens, actionPlanGrammar(), nil)
+		text, err := generate(ctx, prepared.System, prepared.Prompt, prepared.OutputTokens, prepared.Grammar, nil)
 		return AICompletion{Text: text}, err
 	}
 	if prepared.Run.Request.Mode == "code_refactor" || prepared.Run.Request.Mode == "code_comment" {
@@ -59,12 +62,8 @@ func GeneratePreparedAI(ctx context.Context, prepared AIPrepared, generate AIGen
 	}
 	if len(prepared.Run.Sources) == 0 || !aiRequiresCitations(prepared.Run.Request.Mode) {
 		mode := prepared.Run.Request.Mode
-		grammar := ""
 		database := mode == "database" || mode == "schema"
-		if database {
-			grammar = aiDatabaseDraftGrammar()
-		}
-		text, err := generate(ctx, prepared.System, prepared.Prompt, prepared.OutputTokens, grammar, onToken)
+		text, err := generate(ctx, prepared.System, prepared.Prompt, prepared.OutputTokens, prepared.Grammar, onToken)
 		// Code is literal source: even a complete fence can belong to Markdown
 		// being edited, so it must never be stripped from a code-mode draft.
 		if err == nil && (database || mode == "mermaid") {
@@ -93,11 +92,7 @@ func GeneratePreparedAI(ctx context.Context, prepared AIPrepared, generate AIGen
 			emitted++
 		}
 	}
-	grammar, err := aiCitedGrammarForSources(prepared.Run.Sources)
-	if err != nil {
-		return AICompletion{}, err
-	}
-	result, err := generate(ctx, prepared.System, prepared.Prompt, prepared.OutputTokens, grammar, stream)
+	result, err := generate(ctx, prepared.System, prepared.Prompt, prepared.OutputTokens, prepared.Grammar, stream)
 	out := AICompletion{Text: partial.String()}
 	if err != nil {
 		return out, err

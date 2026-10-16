@@ -259,7 +259,7 @@ func TestAIStructuredDraftUnwrapsOnlyOneCompleteFence(t *testing.T) {
 		{"database", "```json\n{\"title\":\"A\",\"properties\":[],\"view\":\"table\"}\n```", "{\"title\":\"A\",\"properties\":[],\"view\":\"table\"}\n"},
 		{"mermaid", "```mermaid\r\nflowchart LR\r\n A-->B\r\n```\r\n", "flowchart LR\r\n A-->B\r\n"},
 	} {
-		p := AIPrepared{Run: AIRun{Request: AIRequest{Mode: tc.mode}}}
+		p := preparedGenerationFixture(t, tc.mode)
 		result, err := GeneratePreparedAI(context.Background(), p, func(context.Context, string, string, int, string, func(string)) (string, error) { return tc.raw, nil }, nil)
 		if err != nil || result.Text != tc.expected {
 			t.Fatalf("%s body changed: %q, %v", tc.mode, result.Text, err)
@@ -275,7 +275,7 @@ func TestAIStructuredDraftUnwrapsOnlyOneCompleteFence(t *testing.T) {
 		mode    string
 		failure error
 	}{{"rewrite", nil}, {"code_explain", nil}, {"rewrite", context.Canceled}} {
-		p := AIPrepared{Run: AIRun{Request: AIRequest{Mode: tc.mode}}}
+		p := preparedGenerationFixture(t, tc.mode)
 		result, err := GeneratePreparedAI(context.Background(), p, func(context.Context, string, string, int, string, func(string)) (string, error) {
 			return raw, tc.failure
 		}, nil)

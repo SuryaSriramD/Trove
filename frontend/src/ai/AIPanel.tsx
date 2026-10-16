@@ -35,6 +35,7 @@ type Source = Citation & {
   memoryKind?: "preference" | "decision" | "project_context";
 };
 type Run = {
+  generationProfile?: S.AIGenerationProfile;
   id: string;
   conversationId: string;
   state: string;
@@ -637,6 +638,31 @@ function AIContext({
           )}
           {current.warning && <p className="ai-note">{current.warning}</p>}
           {current.error && <p role="alert">{current.error}</p>}
+          <details>
+            <summary>Generation details</summary>
+            {current.generationProfile ? (
+              <dl className="ai-generation-profile">
+                <dt>Generation version</dt>
+                <dd>{current.generationProfile.profileVersion}</dd>
+                <dt>Output token limit</dt>
+                <dd>{current.generationProfile.outputTokens}</dd>
+                <dt>Instruction identity</dt>
+                <dd>
+                  <code>{current.generationProfile.trustedGuidanceSHA256}</code>
+                </dd>
+                <dt>System identity</dt>
+                <dd>
+                  <code>{current.generationProfile.systemSHA256}</code>
+                </dd>
+                <dt>Output grammar identity</dt>
+                <dd>
+                  <code>{current.generationProfile.grammarSHA256}</code>
+                </dd>
+              </dl>
+            ) : (
+              <p>Generation details were not recorded for this run.</p>
+            )}
+          </details>
           <details>
             <summary>Source context · {current.sources.length}</summary>
             {current.sources.map((s) => (

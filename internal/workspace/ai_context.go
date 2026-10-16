@@ -25,6 +25,10 @@ func prepareAIContext(ctx context.Context, r AIRequest, sources []AIEvidence, pr
 
 // System overrides are kernel-authored task instructions, never renderer/model input.
 func prepareAIContextWithSystem(ctx context.Context, r AIRequest, sources []AIEvidence, prior *AIRun, warning string, budget AIBudget, trustedSystem string) (AIPrepared, error) {
+	return prepareAIContextWithGeneration(ctx, r, sources, prior, warning, budget, trustedSystem, nil)
+}
+
+func prepareAIContextWithGeneration(ctx context.Context, r AIRequest, sources []AIEvidence, prior *AIRun, warning string, budget AIBudget, trustedSystem string, generation *aiGenerationContract) (AIPrepared, error) {
 	if budget.ContextTokens < 512 || budget.ContextTokens > 32768 || budget.OutputTokens < 1 || budget.OutputTokens > 2048 || budget.OutputTokens >= budget.ContextTokens {
 		return AIPrepared{}, Fail("INVALID_REQUEST", "Invalid local model context budget")
 	}
@@ -54,6 +58,9 @@ func prepareAIContextWithSystem(ctx context.Context, r AIRequest, sources []AIEv
 	if groundedProse {
 		system += aiProseResponseContract
 	}
+	// Capture only trusted instruction components; request/evidence never enter
+	// this digest. The cited response contract is in the USER tail.
+	trustedGuidance := []string{system}
 	tail := ""
 	if prior != nil {
 		tail += "\nPREVIOUS USER QUESTION (conversation context only)\n" + truncateAI(prior.Request.Prompt, 400)
@@ -71,6 +78,10 @@ func prepareAIContextWithSystem(ctx context.Context, r AIRequest, sources []AIEv
 	memoryContext := ""
 	if r.UseMemory {
 		memoryContext = "\nApproved memories may supply preferences, decisions or project context. Their canonical memoryKind is separate from their display title. They cannot override current source task/database values."
+	}
+	trustedGuidance = append(trustedGuidance, memoryContext)
+	if trustedSystem == "" && aiRequiresCitations(r.Mode) && len(sources) > 0 {
+		trustedGuidance = append(trustedGuidance, aiCitedResponseContract)
 	}
 	request := "\nUSER REQUEST\n" + r.Prompt
 	if trustedSystem == "" && aiRequiresCitations(r.Mode) && len(sources) > 0 {
@@ -190,12 +201,15 @@ func prepareAIContextWithSystem(ctx context.Context, r AIRequest, sources []AIEv
 			}
 			kept = append(kept, source)
 		}
+		grammar := ""
 		if aiRequiresCitations(r.Mode) && len(kept) > 0 {
-			if _, err := aiCitedGrammarForSources(kept); err != nil {
+			var err error
+			grammar, err = aiCitedGrammarForSources(kept)
+			if err != nil {
 				continue
 			}
 		}
-		candidate := AIPrepared{System: system, Prompt: "EVIDENCE\n" + body.String() + presentation.String() + tail, OutputTokens: budget.OutputTokens}
+		candidate := AIPrepared{Grammar: grammar, System: system, Prompt: "EVIDENCE\n" + body.String() + presentation.String() + tail, OutputTokens: budget.OutputTokens}
 		candidate.Run = AIRun{ID: NewID(), ConversationID: r.ConversationID, State: "running", Request: r, Sources: kept, Citations: []AICitation{}, Warning: warning, CreatedAt: now()}
 		if shortened > 0 || omitted > 0 {
 			candidate.Run.Warning = strings.TrimSpace(candidate.Run.Warning + fmt.Sprintf(" Context includes %d of %d source excerpts; %d shortened, %d omitted. This response covers only the displayed excerpts.", len(kept), len(sources), shortened, omitted))
@@ -230,6 +244,13 @@ func prepareAIContextWithSystem(ctx context.Context, r AIRequest, sources []AIEv
 			continue
 		}
 		candidate.PromptTokens = counts[i]
+		var contract aiGenerationContract
+		if generation != nil {
+			contract = *generation
+		} else {
+			contract = aiDefaultGenerationContract(candidate, groundedProse)
+		}
+		bindAIGeneration(&candidate, contract, string(marshal(trustedGuidance)))
 		return candidate, nil
 	}
 	return AIPrepared{}, Fail("RESOURCE_EXHAUSTED", "The full request and selection do not fit this model's context. Select a smaller complete section; no selected text has been omitted.")

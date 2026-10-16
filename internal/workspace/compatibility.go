@@ -13,7 +13,7 @@ import (
 // CurrentStorageGeneration. New binaries snapshot before advancing either value.
 // Version 3 fences pre-framework applications, whose maximum version was 2.
 const CurrentUserVersion = 3
-const CurrentStorageGeneration = 1
+const CurrentStorageGeneration = 2
 
 type CompatibilityDescriptor struct {
 	UserVersion       int `json:"userVersion"`

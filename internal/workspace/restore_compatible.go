@@ -17,7 +17,7 @@ import (
 // initializer, rebuilds an index or starts a job. Extend the frozen cleanup
 // contract explicitly before supporting another storage generation here.
 func RestoreBackupCompatible(ctx context.Context, source, destination string, expected BackupManifest, expectedFormat CompatibilityDescriptor) (result RestoreResult, err error) {
-	if expectedFormat != (CompatibilityDescriptor{3, 1}) {
+	if expectedFormat != (CompatibilityDescriptor{3, 1}) && expectedFormat != (CompatibilityDescriptor{3, 2}) {
 		return result, Fail("UNSUPPORTED_SCHEMA", "Compatible rollback cleanup is unavailable for this storage format")
 	}
 	current, err := VerifyBackup(ctx, source)
@@ -136,7 +136,8 @@ func RestoreBackupCompatible(ctx context.Context, source, destination string, ex
 	return RestoreResult{WorkspaceID: current.WorkspaceID, Destination: destination, BackupID: current.BackupID, Assets: len(current.Assets), RecordingObjects: len(current.Recordings), IndexRebuilt: false}, nil
 }
 
-// These declarations are frozen for format 3/generation 1. Table shape checks
+// These declarations are frozen for format 3/generations 1 and 2. Generation 2
+// adds only nullable ai_runs provenance; permission cleanup is unchanged. Table shape checks
 // reject missing or altered constraints, generated columns, views and virtual
 // tables before cleanup; no guessed fallback cleanup is allowed.
 var compatiblePermissionTables = map[string]string{

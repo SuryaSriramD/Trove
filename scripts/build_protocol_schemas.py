@@ -24,6 +24,7 @@ def save(name,value): outputs[ROOT/'contracts'/f'{name}.schema.json'] = (json.du
 json_value={'type':['object','array','string','number','integer','boolean','null']}
 error_codes=['INVALID_REQUEST','UNSUPPORTED_VERSION','NOT_FOUND','CONFLICT','SCOPE_DENIED','APPROVAL_REQUIRED','APPROVAL_EXPIRED','IDEMPOTENCY_CONFLICT','CANCELLED','ALREADY_COMMITTED','RESOURCE_EXHAUSTED','WORKSPACE_LOCKED','UNSUPPORTED_SCHEMA','IMPORT_CONFLICT','INTEGRITY_ERROR','WORKER_FAILED','INTERNAL']
 defs={
+'AIGenerationProfile':obj({'schemaVersion':{'const':1},'profileVersion':{'type':'string','minLength':1,'maxLength':96,'pattern':'^[a-z][a-z0-9-]*-v[1-9][0-9]*$'},'trustedGuidanceSHA256':D('Hash'),'systemSHA256':D('Hash'),'grammarSHA256':D('Hash'),'outputTokens':{'type':'integer','minimum':1,'maximum':2048}}),
 'EntityRef':obj({'entityType':enum('page','block','collection','property','record','view','container','file','meeting','transcript_segment','memory','project','import_plan','job'),'entityId':D('Id')}),
 'ExpectedRevision':obj({'target':R('EntityRef'),'revision':{'oneOf':[D('Revision'),{'const':'0'}]}}),
 'Error':obj({'code':enum(*error_codes),'message':S,'retryable':B,'requestId':D('Id'),'details':obj({'path':S,'currentRevisions':arr(R('ExpectedRevision')),'requiredApprovalHash':S,'retryAfterMs':N,'jobId':D('Id')},[])},['code','message','retryable','requestId']),

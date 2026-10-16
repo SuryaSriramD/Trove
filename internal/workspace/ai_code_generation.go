@@ -22,7 +22,7 @@ ws ::= [ \t\n\r]{0,8}
 
 func generateAICodeDraft(ctx context.Context, prepared AIPrepared, generate AIGenerator, onToken func(string)) (AICompletion, error) {
 	// A partial JSON string is not source; publish only after complete validation.
-	raw, err := generate(ctx, prepared.System, prepared.Prompt, prepared.OutputTokens, aiCodeDraftGrammar(), nil)
+	raw, err := generate(ctx, prepared.System, prepared.Prompt, prepared.OutputTokens, prepared.Grammar, nil)
 	if err != nil {
 		return AICompletion{}, err
 	}
