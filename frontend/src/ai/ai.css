@@ -126,3 +126,8 @@
 .ai-memory-card small {
   color: var(--muted, #637080);
 }
+
+.ai-generation-profile dd {
+  margin: 4px 0 12px;
+  overflow-wrap: anywhere;
+}

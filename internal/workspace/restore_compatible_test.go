@@ -164,7 +164,7 @@ func TestRestoreBackupCompatibleRejectsUnreviewedAndUnsupportedFormats(t *testin
 			case "future_version":
 				manifest = rewriteCompatibleBackupDatabase(t, source, manifest, "PRAGMA user_version=4")
 			case "future_generation":
-				manifest = rewriteCompatibleBackupDatabase(t, source, manifest, "UPDATE kernel_meta SET value='2' WHERE key='storageGeneration'")
+				manifest = rewriteCompatibleBackupDatabase(t, source, manifest, "UPDATE kernel_meta SET value='"+strconv.Itoa(CurrentStorageGeneration+1)+"' WHERE key='storageGeneration'")
 			}
 			destination := filepath.Join(t.TempDir(), "refused")
 			if _, err := RestoreBackupCompatible(context.Background(), source, destination, manifest, format); err == nil {

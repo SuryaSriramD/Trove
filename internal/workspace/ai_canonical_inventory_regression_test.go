@@ -104,7 +104,7 @@ func TestAICanonicalInventoryPermitsDraftsButProtectsUnknownTables(t *testing.T)
 	if len(before.Tables["future_canonical_content"].Rows) != 6 {
 		t.Fatal("typed rows missing")
 	}
-	if _, err := k.db.Exec(`INSERT INTO ai_runs VALUES('draft','conversation','actor','completed','{}','generated text','[]','[]','','','now'); INSERT INTO ai_proposals VALUES('proposal','draft','draft','{}','now')`); err != nil {
+	if _, err := k.db.Exec(`INSERT INTO ai_runs(id,conversation_id,actor_id,state,request_json,text,sources_json,citations_json,warning,error,created_at) VALUES('draft','conversation','actor','completed','{}','generated text','[]','[]','','','now'); INSERT INTO ai_proposals VALUES('proposal','draft','draft','{}','now')`); err != nil {
 		t.Fatal(err)
 	}
 	after := requireAICanonicalSnapshot(t, k)

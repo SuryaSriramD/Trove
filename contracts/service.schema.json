@@ -4,6 +4,43 @@
   "title": "service",
   "$ref": "#/$defs/BatchRequest",
   "$defs": {
+    "AIGenerationProfile": {
+      "type": "object",
+      "properties": {
+        "schemaVersion": {
+          "const": 1
+        },
+        "profileVersion": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 96,
+          "pattern": "^[a-z][a-z0-9-]*-v[1-9][0-9]*$"
+        },
+        "trustedGuidanceSHA256": {
+          "$ref": "domain.schema.json#/$defs/Hash"
+        },
+        "systemSHA256": {
+          "$ref": "domain.schema.json#/$defs/Hash"
+        },
+        "grammarSHA256": {
+          "$ref": "domain.schema.json#/$defs/Hash"
+        },
+        "outputTokens": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 2048
+        }
+      },
+      "required": [
+        "schemaVersion",
+        "profileVersion",
+        "trustedGuidanceSHA256",
+        "systemSHA256",
+        "grammarSHA256",
+        "outputTokens"
+      ],
+      "additionalProperties": false
+    },
     "EntityRef": {
       "type": "object",
       "properties": {

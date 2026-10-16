@@ -328,7 +328,7 @@ func TestMigrationFutureFormatRefusedBeforeStartupMutations(t *testing.T) {
 			if future == "version" {
 				_, err = db.Exec("PRAGMA user_version=4")
 			} else {
-				_, err = db.Exec("PRAGMA user_version=3; INSERT INTO kernel_meta(key,value) VALUES('storageGeneration','2')")
+				_, err = db.Exec("PRAGMA user_version=3; INSERT INTO kernel_meta(key,value) VALUES('storageGeneration',?)", CurrentStorageGeneration+1)
 			}
 			if err != nil {
 				t.Fatal(err)

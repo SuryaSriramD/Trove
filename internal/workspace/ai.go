@@ -47,30 +47,36 @@ type AICitation struct {
 	State     string                   `json:"state"`
 }
 type AIRun struct {
-	ID             string       `json:"id"`
-	ConversationID string       `json:"conversationId"`
-	State          string       `json:"state"`
-	Request        AIRequest    `json:"request"`
-	Text           string       `json:"text"`
-	Citations      []AICitation `json:"citations"`
-	Sources        []AIEvidence `json:"sources"`
-	Warning        string       `json:"warning,omitempty"`
-	Error          string       `json:"error,omitempty"`
-	CreatedAt      string       `json:"createdAt"`
+	GenerationProfile *contracts.ServiceAIGenerationProfile `json:"generationProfile,omitempty"`
+	ID                string                                `json:"id"`
+	ConversationID    string                                `json:"conversationId"`
+	State             string                                `json:"state"`
+	Request           AIRequest                             `json:"request"`
+	Text              string                                `json:"text"`
+	Citations         []AICitation                          `json:"citations"`
+	Sources           []AIEvidence                          `json:"sources"`
+	Warning           string                                `json:"warning,omitempty"`
+	Error             string                                `json:"error,omitempty"`
+	CreatedAt         string                                `json:"createdAt"`
 }
 type AIPrepared struct {
-	Run          AIRun  `json:"run"`
-	System       string `json:"-"`
-	Prompt       string `json:"-"`
-	OutputTokens int    `json:"-"`
-	PromptTokens int    `json:"-"`
+	Grammar        string `json:"-"`
+	generationSeal [32]byte
+	Run            AIRun  `json:"run"`
+	System         string `json:"-"`
+	Prompt         string `json:"-"`
+	OutputTokens   int    `json:"-"`
+	PromptTokens   int    `json:"-"`
 }
 
 func init() {
 	RegisterInitializer(func(ctx context.Context, k *Kernel) error {
 		return k.write(ctx, func(tx *sql.Tx) error {
 			_, err := tx.ExecContext(ctx, `CREATE TABLE IF NOT EXISTS ai_runs(id TEXT PRIMARY KEY,conversation_id TEXT NOT NULL,actor_id TEXT NOT NULL,state TEXT NOT NULL,request_json TEXT NOT NULL,text TEXT NOT NULL DEFAULT '',sources_json TEXT NOT NULL,citations_json TEXT NOT NULL DEFAULT '[]',warning TEXT NOT NULL DEFAULT '',error TEXT NOT NULL DEFAULT '',created_at TEXT NOT NULL); CREATE INDEX IF NOT EXISTS ai_runs_conversation ON ai_runs(conversation_id,created_at); CREATE TABLE IF NOT EXISTS ai_proposals(id TEXT PRIMARY KEY,run_id TEXT NOT NULL REFERENCES ai_runs(id),state TEXT NOT NULL,body_json TEXT NOT NULL,created_at TEXT NOT NULL); UPDATE ai_runs SET state='cancelled',error='Application closed during generation; ask again to resume.' WHERE state='running';`)
-			return err
+			if err != nil {
+				return err
+			}
+			return initAIGenerationProfiles(ctx, tx)
 		})
 	})
 	RegisterQuery("ai.runs", func(ctx context.Context, k *Kernel, e contracts.ServiceExecutionContext, r map[string]any) (any, error) {
@@ -217,7 +223,7 @@ func (k *Kernel) PrepareAIWithBudget(ctx context.Context, e contracts.ServiceExe
 				return Fail("CONFLICT", "Reviewed skill sources changed while preparing the run")
 			}
 		}
-		_, err := tx.ExecContext(ctx, "INSERT INTO ai_runs(id,conversation_id,actor_id,state,request_json,sources_json,warning,created_at) VALUES(?,?,?,'running',?,?,?,?)", run.ID, run.ConversationID, e.Actor.ActorId, string(marshal(r)), string(marshal(kept)), run.Warning, run.CreatedAt)
+		_, err := tx.ExecContext(ctx, "INSERT INTO ai_runs(id,conversation_id,actor_id,state,request_json,sources_json,warning,created_at,generation_profile_json) VALUES(?,?,?,'running',?,?,?,?,?)", run.ID, run.ConversationID, e.Actor.ActorId, string(marshal(r)), string(marshal(kept)), run.Warning, run.CreatedAt, string(marshal(run.GenerationProfile)))
 		return err
 	})
 	out.Run = run
@@ -617,10 +623,11 @@ func (k *Kernel) aiEvidenceValid(ctx context.Context, e contracts.ServiceExecuti
 func (k *Kernel) AIRun(ctx context.Context, e contracts.ServiceExecutionContext, id string) (AIRun, error) {
 	var run AIRun
 	var request, sources, citations, actor string
+	var generationProfile sql.NullString
 	if err := k.authorize(e); err != nil {
 		return run, err
 	}
-	if err := k.db.QueryRowContext(ctx, "SELECT id,conversation_id,actor_id,state,request_json,text,sources_json,citations_json,warning,error,created_at FROM ai_runs WHERE id=?", id).Scan(&run.ID, &run.ConversationID, &actor, &run.State, &request, &run.Text, &sources, &citations, &run.Warning, &run.Error, &run.CreatedAt); err != nil {
+	if err := k.db.QueryRowContext(ctx, "SELECT id,conversation_id,actor_id,state,request_json,text,sources_json,citations_json,warning,error,created_at,generation_profile_json FROM ai_runs WHERE id=?", id).Scan(&run.ID, &run.ConversationID, &actor, &run.State, &request, &run.Text, &sources, &citations, &run.Warning, &run.Error, &run.CreatedAt, &generationProfile); err != nil {
 		return run, err
 	}
 	if actor != string(e.Actor.ActorId) {
@@ -628,6 +635,11 @@ func (k *Kernel) AIRun(ctx context.Context, e contracts.ServiceExecutionContext,
 	}
 	if err := json.Unmarshal([]byte(request), &run.Request); err != nil {
 		return run, err
+	}
+	var profileErr error
+	run.GenerationProfile, profileErr = decodeAIGenerationProfile(generationProfile)
+	if profileErr != nil {
+		return AIRun{}, profileErr
 	}
 	json.Unmarshal([]byte(sources), &run.Sources)
 	json.Unmarshal([]byte(citations), &run.Citations)

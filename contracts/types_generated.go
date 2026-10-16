@@ -896,6 +896,14 @@ type DomainImportNormalizedSnapshot struct {
 	PortableIdentity      *string                    `json:"portableIdentity,omitempty"`
 	CollectionSourceScope *string                    `json:"collectionSourceScope,omitempty"`
 }
+type ServiceAIGenerationProfile struct {
+	SchemaVersion         int64      `json:"schemaVersion"`
+	ProfileVersion        string     `json:"profileVersion"`
+	TrustedGuidanceSHA256 DomainHash `json:"trustedGuidanceSHA256"`
+	SystemSHA256          DomainHash `json:"systemSHA256"`
+	GrammarSHA256         DomainHash `json:"grammarSHA256"`
+	OutputTokens          int64      `json:"outputTokens"`
+}
 type ServiceEntityRef struct {
 	EntityType string   `json:"entityType"`
 	EntityId   DomainId `json:"entityId"`

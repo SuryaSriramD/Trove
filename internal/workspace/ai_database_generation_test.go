@@ -10,7 +10,7 @@ import (
 func TestAIDatabaseModesRequireGrammarAndCompleteShape(t *testing.T) {
 	valid := `{"title":"Roadmap","properties":[{"name":"Phase","type":"select","config":{"options":[{"id":"3b88f280-e606-7d20-8dfb-01faab99acb4","label":"Planned"}]}}],"view":"gallery"}`
 	for _, mode := range []string{"database", "schema"} {
-		p := AIPrepared{Run: AIRun{Request: AIRequest{Mode: mode}}}
+		p := preparedGenerationFixture(t, mode)
 		for _, raw := range []string{valid,
 			`{"properties":[],"view":"table"}`,
 			`{"title":"Missing view","properties":[]}`,
