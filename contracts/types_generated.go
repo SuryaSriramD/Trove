@@ -4639,7 +4639,7 @@ func (v *JobsWorkerOutput) UnmarshalJSON(data []byte) error {
 	if err := json.Unmarshal(data, &fields); err != nil {
 		return err
 	}
-	if matchesVariant(fields, []string{"kind", "protocolVersion", "runtime", "runtimeCommit", "architecture", "capabilities"}, map[string]string{"kind": "\"hello\"", "protocolVersion": "1"}, map[string][]string{"runtime": {"\"llama.cpp\"", "\"whisper.cpp\""}, "architecture": {"\"arm64\"", "\"amd64\""}}, []string{"kind", "protocolVersion", "runtime", "runtimeCommit", "architecture", "capabilities"}) {
+	if matchesVariant(fields, []string{"kind", "protocolVersion", "runtime", "runtimeCommit", "architecture", "capabilities"}, map[string]string{"kind": "\"hello\"", "protocolVersion": "1"}, map[string][]string{"runtime": {"\"llama.cpp\"", "\"whisper.cpp\""}, "architecture": {"\"arm64\"", "\"amd64\""}}, []string{"kind", "protocolVersion", "runtime", "runtimeCommit", "architecture", "capabilities", "preprocessingProfileId", "preprocessingProfileHash"}) {
 		var result JobsWorkerOutputVariant1
 		if err := json.Unmarshal(data, &result); err != nil {
 			return err
@@ -4742,7 +4742,7 @@ func (v *JobsWorkerResult) UnmarshalJSON(data []byte) error {
 		v.Value = result
 		return nil
 	}
-	if matchesVariant(fields, []string{"kind", "text", "finishReason", "inputTokens", "outputTokens"}, map[string]string{"kind": "\"image_generation\""}, map[string][]string{"finishReason": {"\"eos\"", "\"length\""}}, []string{"kind", "text", "finishReason", "inputTokens", "outputTokens"}) {
+	if matchesVariant(fields, []string{"kind", "text", "finishReason", "inputTokens", "outputTokens"}, map[string]string{"kind": "\"image_generation\""}, map[string][]string{"finishReason": {"\"eos\"", "\"length\""}}, []string{"kind", "text", "finishReason", "inputTokens", "outputTokens", "preprocessingProfileId", "preprocessingProfileHash"}) {
 		var result JobsWorkerResultVariant5
 		if err := json.Unmarshal(data, &result); err != nil {
 			return err
@@ -5246,12 +5246,14 @@ type JobsJobPayloadVariant10 struct {
 	OccurrenceKey string         `json:"occurrenceKey"`
 }
 type JobsWorkerOutputVariant1 struct {
-	Kind            string   `json:"kind"`
-	ProtocolVersion int64    `json:"protocolVersion"`
-	Runtime         string   `json:"runtime"`
-	RuntimeCommit   string   `json:"runtimeCommit"`
-	Architecture    string   `json:"architecture"`
-	Capabilities    []string `json:"capabilities"`
+	Kind                     string   `json:"kind"`
+	ProtocolVersion          int64    `json:"protocolVersion"`
+	Runtime                  string   `json:"runtime"`
+	RuntimeCommit            string   `json:"runtimeCommit"`
+	Architecture             string   `json:"architecture"`
+	Capabilities             []string `json:"capabilities"`
+	PreprocessingProfileId   *string  `json:"preprocessingProfileId,omitempty"`
+	PreprocessingProfileHash *string  `json:"preprocessingProfileHash,omitempty"`
 }
 type JobsWorkerOutputVariant2 struct {
 	Kind      string       `json:"kind"`
@@ -5314,11 +5316,13 @@ type JobsWorkerResultVariant4 struct {
 	Counts []int64 `json:"counts"`
 }
 type JobsWorkerResultVariant5 struct {
-	Kind         string `json:"kind"`
-	Text         string `json:"text"`
-	FinishReason string `json:"finishReason"`
-	InputTokens  int64  `json:"inputTokens"`
-	OutputTokens int64  `json:"outputTokens"`
+	Kind                     string  `json:"kind"`
+	Text                     string  `json:"text"`
+	FinishReason             string  `json:"finishReason"`
+	InputTokens              int64   `json:"inputTokens"`
+	OutputTokens             int64   `json:"outputTokens"`
+	PreprocessingProfileId   *string `json:"preprocessingProfileId,omitempty"`
+	PreprocessingProfileHash *string `json:"preprocessingProfileHash,omitempty"`
 }
 type JobsJobResponseVariant1 struct {
 	Ok     bool    `json:"ok"`

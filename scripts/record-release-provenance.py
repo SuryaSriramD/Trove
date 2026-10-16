@@ -199,7 +199,8 @@ def main():
               'scripts/build-microphone.py', 'scripts/microphone_bundle.py', 'scripts/build-native.py', 'scripts/build-desktop.py',
               'packaging/microphone-info.plist', 'packaging/microphone.entitlements.plist', 'internal/native/microphone.go',
               'native/audio-decoder.cpp', 'native/audio-decoder.lock.json', 'scripts/build-audio-decoder.py', 'scripts/audio_build.py',
-              'native/vision-worker.cpp', 'scripts/build-vision.py', 'internal/native/vision.go',
+              'native/vision-worker.cpp', 'native/vision-profile.hpp', 'scripts/build-vision.py', 'scripts/vision_profile.py',
+              'internal/native/vision.go', 'internal/native/vision_profile.go', 'internal/native/vision_profile_v1.json',
               'internal/native/vision_packs.go', 'internal/workspace/image_description.go']
     sources = [p for p in (ROOT / 'schemas').glob('*.sql')]
     sources += [p for p in (ROOT / 'internal/workspace').glob('*.go') if not p.name.endswith('_test.go') and not p.name.startswith('._')]

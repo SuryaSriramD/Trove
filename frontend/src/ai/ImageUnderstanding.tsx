@@ -15,6 +15,8 @@ type Run = {
   modelHash?: string;
   projectorHash?: string;
   helperHash?: string;
+  preprocessingProfileId?: string;
+  preprocessingProfileHash?: string;
   inputTokens?: number;
   outputTokens?: number;
   analysisMethod?: string;
@@ -256,6 +258,8 @@ function ImageUnderstandingContent({
             {r.modelHash && <p>Model SHA-256: {r.modelHash}</p>}
             {r.projectorHash && <p>Projector SHA-256: {r.projectorHash}</p>}
             {r.helperHash && <p>Helper SHA-256: {r.helperHash}</p>}
+            {r.preprocessingProfileId && <p>Preprocessing profile: {r.preprocessingProfileId}</p>}
+            {r.preprocessingProfileHash && <p>Preprocessing SHA-256: {r.preprocessingProfileHash}</p>}
           </details>
         </article>
       ))}

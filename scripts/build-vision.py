@@ -2,6 +2,7 @@
 """Build the pinned CPU-only mtmd image worker into an explicit native bundle."""
 import argparse,hashlib,json,pathlib,shutil,subprocess,tarfile
 from devtools import cache_dir,workspace_cache
+from vision_profile import read_profile,profile_header,stage_profile_source
 ROOT=pathlib.Path(__file__).resolve().parents[1]
 p=argparse.ArgumentParser();p.add_argument('--cache',type=pathlib.Path,default=cache_dir());p.add_argument('--output',type=pathlib.Path,required=True);a=p.parse_args();a.cache=cache_dir(a.cache)
 lock=json.loads((ROOT/'baseline/baseline.lock.json').read_text());pin=lock['workers']['llama'];src=a.cache/pin['sourceDirectory'];archive=a.cache/'llama.tar.gz'
@@ -11,12 +12,17 @@ with tarfile.open(archive) as tar:
   if not member.isfile():continue
   target=a.cache/member.name
   if not target.is_file() or target.is_symlink() or hashlib.sha256(target.read_bytes()).digest()!=hashlib.sha256(tar.extractfile(member).read()).digest():raise SystemExit('Native source differs from pin: '+member.name)
-build=workspace_cache(a.cache)/'vision-native-build'
+profile=read_profile(ROOT/'internal/native/vision_profile_v1.json')
+profile_build=workspace_cache(a.cache)/('vision-profile-'+hashlib.sha256((ROOT/'scripts/vision_profile.py').read_bytes()).hexdigest())
+src=stage_profile_source(archive,pin,profile_build/'source')
+build=profile_build/'build'
+headers=profile_build/'headers';headers.mkdir(parents=True,exist_ok=True)
+(headers/'vision-profile-generated.hpp').write_text(profile_header(profile))
 options=['-DCMAKE_BUILD_TYPE=Release','-DCMAKE_OSX_ARCHITECTURES=arm64','-DCMAKE_OSX_DEPLOYMENT_TARGET=27.0','-DBUILD_SHARED_LIBS=OFF','-DGGML_NATIVE=OFF','-DGGML_CPU_ARM_ARCH=armv8.2-a+dotprod','-DGGML_METAL=OFF','-DLLAMA_BUILD_IS_DEV=OFF','-DLLAMA_BUILD_COMMON=OFF','-DLLAMA_BUILD_EXAMPLES=OFF','-DLLAMA_BUILD_TESTS=OFF','-DLLAMA_BUILD_TOOLS=OFF','-DLLAMA_BUILD_SERVER=OFF','-DLLAMA_BUILD_APP=OFF','-DLLAMA_OPENSSL=OFF','-DLLAMA_BUILD_MTMD=ON','-DLLAMA_SUBPROCESS=OFF','-DMTMD_VIDEO=OFF']
 subprocess.run(['cmake','-S',str(src),'-B',str(build)]+options,check=True);subprocess.run(['cmake','--build',str(build),'--target','mtmd','--parallel','4'],check=True)
 a.output.mkdir(parents=True,exist_ok=True);out=a.output/'vision-worker'
 libs=[build/'tools/mtmd/libmtmd.a',build/'src/libllama.a']+sorted((build/'ggml/src').rglob('*.a'))+sorted((build/'vendor').rglob('*.a'))
-cmd=['clang++','-std=c++17','-O2','-arch','arm64','-mmacosx-version-min=27.0','-I',str(src/'include'),'-I',str(src/'ggml/include'),'-I',str(src/'tools/mtmd'),'-I',str(src/'vendor/nlohmann'),str(ROOT/'native/vision-worker.cpp')]+list(map(str,libs))+['-framework','Accelerate','-framework','Foundation','-o',str(out)]
+cmd=['clang++','-std=c++17','-O2','-arch','arm64','-mmacosx-version-min=27.0','-I',str(src/'include'),'-I',str(src/'ggml/include'),'-I',str(src/'tools/mtmd'),'-I',str(src/'vendor/nlohmann'),'-I',str(headers),str(ROOT/'native/vision-worker.cpp')]+list(map(str,libs))+['-framework','Accelerate','-framework','Foundation','-o',str(out)]
 subprocess.run(cmd,check=True);subprocess.run(['codesign','--force','--sign','-',str(out)],check=True);subprocess.run(['codesign','--verify','--strict',str(out)],check=True)
 for line in subprocess.check_output(['otool','-L',str(out)],text=True).splitlines()[1:]:
  if not line.strip().split(' ')[0].startswith(('/usr/lib/','/System/Library/','/Library/Apple/System/')):raise SystemExit('Unbundled vision dependency: '+line)

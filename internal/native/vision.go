@@ -17,26 +17,30 @@ import (
 	"unicode/utf8"
 )
 
-// VisionMetadata v1 is confined to the pinned SmolVLM chat template and one
+// VisionMetadata v1/v2 is confined to the pinned SmolVLM chat template and one
 // normalized image. Workspace paths and source text never cross this boundary.
 type VisionMetadata struct {
-	SchemaVersion int    `json:"schemaVersion"`
-	Question      string `json:"question"`
-	ContextTokens int    `json:"contextTokens"`
-	Width         int    `json:"width"`
-	Height        int    `json:"height"`
+	PreprocessingProfileID   string `json:"preprocessingProfileId,omitempty"`
+	PreprocessingProfileHash string `json:"preprocessingProfileHash,omitempty"`
+	SchemaVersion            int    `json:"schemaVersion"`
+	Question                 string `json:"question"`
+	ContextTokens            int    `json:"contextTokens"`
+	Width                    int    `json:"width"`
+	Height                   int    `json:"height"`
 }
 type VisionResult struct {
-	PeakRSSBytes   int64  `json:"sampledPeakRSSBytes,omitempty"`
-	AnalysisMethod string `json:"analysisMethod"`
-	ModelHash      string `json:"modelHash,omitempty"`
-	ProjectorHash  string `json:"projectorHash,omitempty"`
-	HelperHash     string `json:"helperHash,omitempty"`
-	Kind           string `json:"kind"`
-	Text           string `json:"text"`
-	FinishReason   string `json:"finishReason"`
-	InputTokens    int    `json:"inputTokens"`
-	OutputTokens   int    `json:"outputTokens"`
+	PreprocessingProfileID   string `json:"preprocessingProfileId,omitempty"`
+	PreprocessingProfileHash string `json:"preprocessingProfileHash,omitempty"`
+	PeakRSSBytes             int64  `json:"sampledPeakRSSBytes,omitempty"`
+	AnalysisMethod           string `json:"analysisMethod"`
+	ModelHash                string `json:"modelHash,omitempty"`
+	ProjectorHash            string `json:"projectorHash,omitempty"`
+	HelperHash               string `json:"helperHash,omitempty"`
+	Kind                     string `json:"kind"`
+	Text                     string `json:"text"`
+	FinishReason             string `json:"finishReason"`
+	InputTokens              int    `json:"inputTokens"`
+	OutputTokens             int    `json:"outputTokens"`
 }
 
 func validateVisionInput(p Pack, r Request) (VisionMetadata, error) {
@@ -53,7 +57,10 @@ func validateVisionInput(p Pack, r Request) (VisionMetadata, error) {
 	if d.Decode(&extra) != io.EOF {
 		return v, errors.New("INVALID_INPUT: trailing image metadata")
 	}
-	if v.SchemaVersion != 1 || v.ContextTokens < 512 || v.ContextTokens > p.ContextTokens || v.ContextTokens > 8192 || v.Width < 1 || v.Height < 1 || v.Width > 1024 || v.Height > 1024 || !utf8.ValidString(v.Question) || utf8.RuneCountInString(v.Question) > 2048 || strings.TrimSpace(v.Question) == "" || r.Wire.Limits.MaxTokens < 1 || r.Wire.Limits.MaxTokens > 512 || r.Wire.Limits.TimeoutMs > 300000 || r.Wire.Limits.Threads > 4 || r.Wire.Limits.MaxOutputBytes > 128<<10 {
+	if err := validateVisionProfile(p, v); err != nil {
+		return v, err
+	}
+	if v.ContextTokens < 512 || v.ContextTokens > p.ContextTokens || v.ContextTokens > 8192 || v.Width < 1 || v.Height < 1 || v.Width > 1024 || v.Height > 1024 || !utf8.ValidString(v.Question) || utf8.RuneCountInString(v.Question) > 2048 || strings.TrimSpace(v.Question) == "" || r.Wire.Limits.MaxTokens < 1 || r.Wire.Limits.MaxTokens > 512 || r.Wire.Limits.TimeoutMs > 300000 || r.Wire.Limits.Threads > 4 || r.Wire.Limits.MaxOutputBytes > 128<<10 {
 		return v, errors.New("INVALID_INPUT: image context or resource bounds")
 	}
 	cfg, format, err := image.DecodeConfig(io.NewSectionReader(r.Inputs[1].File, 0, r.Inputs[1].Handle.SizeBytes))
@@ -195,7 +202,8 @@ func (s *Supervisor) generateImage(ctx context.Context, packID, question string,
 	}
 	defer os.Remove(metadata.Name())
 	defer metadata.Close()
-	err = json.NewEncoder(metadata).Encode(VisionMetadata{SchemaVersion: 1, Question: question, ContextTokens: min(p.ContextTokens, 8192), Width: w, Height: h})
+	meta := visionProfileMetadata(p, question, w, h)
+	err = json.NewEncoder(metadata).Encode(meta)
 	if err != nil {
 		return result, err
 	}
@@ -219,6 +227,9 @@ func (s *Supervisor) generateImage(ctx context.Context, packID, question string,
 	}
 	if err = json.NewDecoder(bytes.NewReader(raw)).Decode(&result); err != nil {
 		return result, err
+	}
+	if err = validateVisionProfileResult(meta, result); err != nil {
+		return VisionResult{}, err
 	}
 	if strings.TrimSpace(result.Text) == "" {
 		return result, errors.New("WORKER_FAILED: image model returned no description")
