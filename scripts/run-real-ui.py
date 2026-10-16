@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Run visible Chromium gestures against an unchanged packaged host and SQLite.
+"""Run visible Chromium gestures against a provenance-bound production host and SQLite.
 
 This is UI/service/storage evidence, not native WebView, accessibility, AI-quality,
 physical-device, live-account, performance or release acceptance. Never reuses a
@@ -23,6 +23,8 @@ import time
 import urllib.request
 
 ROOT = Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(ROOT / 'scripts'))
+from native_fixture_environment import native_fixture_environment, validate_native_fixture_environment
 EXPECTED = {stage: [f"real-{workflow}-{stage}" for workflow in ("rich", "task", "due", "record-lifecycle", "layout-review", "p2-data", "p2-action", "conversation-display", "schedule-week", "schedule-dst", "import-merge", "import-resume")] for stage in ("create", "reopen")}
 LIMITATIONS = ["Chromium UI plus production host/services/SQLite; not native Wails WebView acceptance.",
                "No model inference, physical devices, live accounts, performance or release qualification.",
@@ -84,9 +86,22 @@ def assess(report, expected):
             'errors': report.get('errors', []),
             'passed': bool(expected) and all(v == 'passed' for v in outcomes.values()) and set(seen) == set(expected) and not report.get('errors')}
 
+def clean_host_revision(provenance):
+    revisions = [line.split('vcs.revision=', 1)[1].strip() for line in provenance.splitlines() if 'vcs.revision=' in line]
+    if len(revisions) != 1 or 'vcs.modified=false' not in provenance:
+        raise RuntimeError('Host lacks clean-source provenance')
+    return revisions[0]
+
+
+def validate_host_override(executing_revision, harness_revision, status):
+    if executing_revision != harness_revision or status.strip():
+        raise RuntimeError('Explicit host override must match this clean source checkout')
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--app', type=Path, required=True)
+    parser.add_argument('--host', type=Path, help='Explicit clean-source standalone host override; must match current clean checkout')
     parser.add_argument('--assets', type=Path, help='Explicit compiled frontend overlay; never rewrites installed assets')
     parser.add_argument('--evidence', type=Path, required=True, help='New empty output path on local APFS')
     parser.add_argument('--go', type=Path, required=True, help='Existing Go executable, used only to read binary provenance')
@@ -97,11 +112,12 @@ def main():
     if evidence.exists():
         parser.error('Evidence must use an unused path; prior runs are immutable.')
     app = args.app.expanduser().resolve()
-    binary = app / 'Contents/MacOS/trove-host'
+    installed_binary = app / 'Contents/MacOS/trove-host'
+    binary = args.host.expanduser().resolve() if args.host else installed_binary
     assets = args.assets.expanduser().resolve() if args.assets else app / 'Contents/Resources/web'
     native = app / 'Contents/Resources/native'
     playwright = ROOT / 'frontend/node_modules/@playwright/test/cli.js'
-    for required in (binary, assets / 'index.html', native / 'manifest.json', args.go, playwright, args.chrome):
+    for required in (installed_binary, binary, assets / 'index.html', native / 'manifest.json', args.go, playwright, args.chrome):
         if not required.is_file():
             parser.error(f'Missing prerequisite: {required}')
     evidence.mkdir(parents=True, mode=0o700)
@@ -109,41 +125,47 @@ def main():
     workspace = evidence / 'workspace'
     token = evidence / 'owner-token.private'
     manifest_path = evidence / 'manifest.json'
-    manifest = {'schemaVersion': 1, 'kind': 'trove-real-ui-storage', 'startedAt': now(), 'state': 'running', 'passed': False,
-                'app': str(app), 'servedAssets': str(assets), 'frontendOverlay': bool(args.assets), 'workspace': str(workspace), 'expected': EXPECTED, 'stages': [], 'limitations': LIMITATIONS}
+    manifest = {'schemaVersion': 2, 'kind': 'trove-real-ui-storage', 'startedAt': now(), 'state': 'running', 'passed': False,
+                'app': str(app), 'executingHost': str(binary), 'hostOverride': bool(args.host), 'servedAssets': str(assets), 'frontendOverlay': bool(args.assets), 'workspace': str(workspace), 'expected': EXPECTED, 'stages': [], 'limitations': LIMITATIONS}
     save(manifest_path, manifest)
     process = None
     log = None
     inputs = None
     try:
-        env = {k: v for k, v in os.environ.items() if not k.startswith(('DYLD_', 'TROVE_'))}
+        env, environment = native_fixture_environment(evidence / 'private-runtime', workspace)
+        manifest['fixtureEnvironment'] = environment
         env['GOTOOLCHAIN'] = 'local'
-        device = subprocess.check_output(['/bin/df', '-P', str(evidence)], text=True).splitlines()[-1].split()[0]
-        mounts = subprocess.check_output(['/sbin/mount'], text=True).splitlines()
+        device = subprocess.check_output(['/bin/df', '-P', str(evidence)], env=env, text=True).splitlines()[-1].split()[0]
+        mounts = subprocess.check_output(['/sbin/mount'], env=env, text=True).splitlines()
         selected = [line for line in mounts if line.startswith(device + ' on ')]
         flags = selected[0].rsplit(' (', 1)[-1].rstrip(')').split(', ') if len(selected) == 1 else []
         manifest['filesystem'] = {'device': device, 'mountRecord': selected, 'type': flags[0] if flags else None}
         if not flags or flags[0] != 'apfs' or 'local' not in flags:
             raise RuntimeError('Disposable UI workspace requires local APFS')
-        subprocess.run(['/usr/bin/codesign', '--verify', '--deep', '--strict', str(app)], check=True, capture_output=True)
-        source = subprocess.check_output(['git', 'rev-parse', 'HEAD'], cwd=ROOT, text=True).strip()
-        status = subprocess.check_output(['git', 'status', '--porcelain', '--untracked-files=normal'], cwd=ROOT, text=True)
-        provenance = subprocess.check_output([str(args.go), 'version', '-m', str(binary)], env=env, text=True)
+        subprocess.run(['/usr/bin/codesign', '--verify', '--deep', '--strict', str(app)], env=env, check=True, capture_output=True)
+        source = subprocess.check_output(['git', 'rev-parse', 'HEAD'], cwd=ROOT, env=env, text=True).strip()
+        status = subprocess.check_output(['git', 'status', '--porcelain', '--untracked-files=normal'], cwd=ROOT, env=env, text=True)
+        installed_provenance = subprocess.check_output([str(args.go), 'version', '-m', str(installed_binary)], env=env, text=True)
+        provenance = subprocess.check_output([str(args.go), 'version', '-m', str(binary)], env=env, text=True) if args.host else installed_provenance
+        (evidence / 'installed-host-build-info.txt').write_text(installed_provenance)
         (evidence / 'host-build-info.txt').write_text(provenance)
-        revision = [line.split('vcs.revision=', 1)[1].strip() for line in provenance.splitlines() if 'vcs.revision=' in line]
-        if len(revision) != 1 or 'vcs.modified=false' not in provenance:
-            raise RuntimeError('Installed host lacks clean-source provenance')
-        manifest['source'] = {'harnessCommit': source, 'harnessWorkingTreeStatus': status, 'installedHostCommit': revision[0]}
+        installed_revision = clean_host_revision(installed_provenance)
+        executing_revision = clean_host_revision(provenance)
+        if args.host:
+            validate_host_override(executing_revision, source, status)
+        manifest['source'] = {'harnessCommit': source, 'harnessWorkingTreeStatus': status,
+                              'installedHostCommit': installed_revision, 'executingHostCommit': executing_revision}
         manifest['hostBuildInfoSHA256'] = digest(evidence / 'host-build-info.txt')
+        manifest['installedHostBuildInfoSHA256'] = digest(evidence / 'installed-host-build-info.txt')
         app_inventory = inventory(app)
         save(evidence / 'app-inventory.json', app_inventory)
-        harness_paths = ['scripts/run-real-ui.py', 'frontend/playwright.integration.config.ts', 'frontend/tests/real-storage.integration.spec.ts']
+        harness_paths = ['scripts/run-real-ui.py', 'scripts/native_fixture_environment.py', 'scripts/qualification_fixtures.py', 'frontend/playwright.integration.config.ts', 'frontend/tests/real-storage.integration.spec.ts']
         inputs = {'appInventorySHA256': object_digest(app_inventory), 'webAssetsSHA256': object_digest(inventory(assets)),
-                  'nativeHelpersSHA256': object_digest(inventory(native)), 'hostSHA256': digest(binary),
+                  'nativeHelpersSHA256': object_digest(inventory(native)), 'hostSHA256': digest(binary), 'installedHostSHA256': digest(installed_binary),
                   'harnessFiles': {name: digest(ROOT / name) for name in harness_paths},
                   'frontendSourceSHA256': object_digest(inventory(ROOT / 'frontend/src'))}
         manifest['inputs'] = inputs
-        fixture = {'schemaVersion': 1, 'suiteVersion': 5, 'pageTitle': 'Real storage — café తెలుగు',
+        fixture = {'schemaVersion': 1, 'suiteVersion': 6, 'pageTitle': 'Real storage — café తెలుగు',
                    'body': 'A carefully saved idea: café, తెలుగు and 日本語.',
                    'initialTaskTitle': 'Prepare real storage review', 'taskTitle': 'Finish real storage review',
                    'expectedRichMarks': ['bold'], 'expectedTaskStatusGroup': 'done',
@@ -208,7 +230,8 @@ def main():
             }}]
         save(evidence / 'fixture.json', fixture)
         manifest['fixtureSHA256'] = digest(evidence / 'fixture.json')
-        subprocess.run([str(binary), '--init-token', '--token-file', str(token)], env=env, check=True, capture_output=True)
+        validate_native_fixture_environment(env, environment)
+        subprocess.run([str(binary), '--init-token', '--token-file', str(token)], env=env, cwd=environment['temporary'], check=True, capture_output=True)
         with socket.socket() as selected:
             selected.bind(('127.0.0.1', 0))
             port = selected.getsockname()[1]
@@ -220,7 +243,8 @@ def main():
             if stage == 'create':
                 command.append('--create')
             log = (stage_dir / 'host.log').open('w')
-            process = subprocess.Popen(command, env=env, stdout=log, stderr=subprocess.STDOUT)
+            validate_native_fixture_environment(env, environment)
+            process = subprocess.Popen(command, env=env, cwd=environment['temporary'], stdout=log, stderr=subprocess.STDOUT)
             entry = {'stage': stage, 'startedAt': now(), 'hostPID': process.pid, 'hostCommand': command,
                      'outcomes': {name: 'unexecuted' for name in EXPECTED[stage]}, 'passed': False}
             manifest['stages'].append(entry)
@@ -242,6 +266,7 @@ def main():
                             TROVE_REAL_UI_URL=url, TROVE_REAL_UI_TOKEN_FILE=str(token), CHROME_PATH=str(args.chrome))
             test_command = [args.node, str(playwright), 'test', '--config', str(ROOT / 'frontend/playwright.integration.config.ts')]
             entry['testCommand'] = test_command
+            validate_native_fixture_environment(test_env, environment)
             with (stage_dir / 'test.log').open('w') as test_log:
                 result = subprocess.run(test_command, env=test_env, cwd=ROOT / 'frontend', stdout=test_log, stderr=subprocess.STDOUT, timeout=90 * len(EXPECTED[stage]) + 30)
             entry['testExitCode'] = result.returncode
@@ -260,7 +285,7 @@ def main():
             print(f'{stage}: {"passed" if entry["passed"] else "FAILED"}', flush=True)
             if not entry['passed']:
                 break
-        manifest['inputsUnchanged'] = inputs['appInventorySHA256'] == object_digest(inventory(app)) and inputs['webAssetsSHA256'] == object_digest(inventory(assets)) and inputs['frontendSourceSHA256'] == object_digest(inventory(ROOT / 'frontend/src')) and all(digest(ROOT / name) == sha for name, sha in inputs['harnessFiles'].items()) and manifest['fixtureSHA256'] == digest(evidence / 'fixture.json')
+        manifest['inputsUnchanged'] = inputs['hostSHA256'] == digest(binary) and inputs['appInventorySHA256'] == object_digest(inventory(app)) and inputs['webAssetsSHA256'] == object_digest(inventory(assets)) and inputs['frontendSourceSHA256'] == object_digest(inventory(ROOT / 'frontend/src')) and all(digest(ROOT / name) == sha for name, sha in inputs['harnessFiles'].items()) and manifest['fixtureSHA256'] == digest(evidence / 'fixture.json')
         manifest['passed'] = len(manifest['stages']) == 2 and all(stage['passed'] for stage in manifest['stages']) and manifest['inputsUnchanged']
         manifest['state'] = 'completed' if manifest['passed'] else 'failed'
     except (Exception, KeyboardInterrupt) as error:
@@ -285,7 +310,7 @@ def main():
             outcomes.update(stage['outcomes'])
         manifest['outcomes'] = outcomes
         manifest['counts'] = {state: list(outcomes.values()).count(state) for state in sorted(set(outcomes.values()))}
-        manifest['results'] = {str(path.relative_to(evidence)): digest(path) for path in evidence.rglob('*') if path.is_file() and path.suffix in ('.json', '.png') and path != manifest_path and not path.is_relative_to(workspace)}
+        manifest['results'] = {str(path.relative_to(evidence)): digest(path) for path in evidence.rglob('*') if path.is_file() and path.suffix in ('.json', '.png') and path != manifest_path and not path.is_relative_to(workspace) and not path.is_relative_to(evidence / 'private-runtime')}
         manifest['finishedAt'] = now()
         save(manifest_path, manifest)
     print(json.dumps({'state': manifest['state'], 'passed': manifest['passed'], 'counts': manifest['counts'], 'evidence': str(evidence)}))

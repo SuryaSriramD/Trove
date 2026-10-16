@@ -914,6 +914,8 @@ test(`real-import-merge-${stage}`, async ({ page }) => {
     await expect(page.getByRole("status").filter({ hasText: `Identity decision: link existing · ${originalItem.pageId}` })).toBeVisible();
     await expect(page.getByRole("button", { name: "Commit reviewed import", exact: true })).toBeEnabled();
     const retry = await finishImport(page, retriedPreview.planId);
+    expect(retry.rootSkipped).toBe(true);
+    await expect(page.getByRole("button", { name: "Open imported pages", exact: true })).toHaveCount(0);
     const afterRetry = await snapshot(page);
     expect(importedProjection(afterRetry, originalItem.pageId)).toEqual(canonical);
     expect(canonicalIDs(afterRetry)).toEqual(beforeRetryIDs);
@@ -924,6 +926,8 @@ test(`real-import-merge-${stage}`, async ({ page }) => {
   const saved = read("create-import-merge.json");
   await openRecentImport(page, saved.retry);
   expect(await observe(page, "imports.plan", { planId: saved.retry.planId })).toEqual(saved.retry);
+  expect(saved.retry.rootSkipped).toBe(true);
+  await expect(page.getByRole("button", { name: "Open imported pages", exact: true })).toHaveCount(0);
   const current = importedProjection(await snapshot(page), saved.originalItem.pageId);
   expect(current).toEqual(saved.canonical);
   await page.getByRole("button", { name: f.movedFile, exact: true }).click();
