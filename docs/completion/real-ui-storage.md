@@ -2,13 +2,17 @@
 
 `scripts/run-real-ui.py` drives the compiled UI through Chromium against the production `trove-host` packaged inside an existing macOS app. It creates a new local APFS workspace, authenticates through the existing owner-token login, and changes content only through visible controls. Read-only production snapshots independently check exact canonical values and identities. The host is stopped normally and started again before the reopen checks.
 
-Suite version 2 retains the original four rich-page/task case identities and adds six cases. Five independent workflows run before and after a real host restart:
+Suite version 3 retains the earlier ten case identities and adds six cases. Eight independent workflows run before and after a real host restart:
 
 - Unicode rich-page creation with bold formatting.
 - Task creation, rename, completion and Tasks-to-Home consistency.
 - Due-date editing through Tasks, Home and the record page, with explicit timezone and rejected invalid timezone preserving canonical state.
 - Database record promotion with explicit due-property binding, detachment cancellation/application, and grouped undo preserving a later title edit and stable record/page/property identities.
 - Collection layout, record override and reset preserving record values and the existing review event; a subsequent date-value edit makes that same review stale. The automated review event tests persistence, not human acceptance of content.
+
+- Required and typed local form validation, followed by valid submissions and exact large/signed decimal chart aggregates linked to their source records.
+- Reviewed row action cancellation, stale-review invalidation after a date edit, atomic application and grouped undo retaining the later date and title.
+- Branched conversation JSON import through the file picker/upload, exact source-byte retention, stable message/parent/reply identities, and full-width/presentation settings preserving content and the review event.
 
 The reopen cases compare exact canonical values, identities, operation state, layouts and review history with saved pre-restart observations. These are bounded UI/service/storage checks. Native Wails rendering, input methods, accessibility, microphone, reminders, AI quality, live accounts, performance and broader feature workflows require their own checks.
 
@@ -29,3 +33,5 @@ Each evidence path must be unused. `manifest.json` uses schema version 1 and bin
 The private token is created with mode 0600 and removed at cleanup. Browser traces are disabled to keep login input out of trace archives. The runner retains only its disposable workspace, logs, screenshots, canonical observations and manifests; it does not select or modify the user's normal workspace or preferences. It refuses non-local/non-APFS workspace output. Do not reuse or edit a previous result directory to rerun a failed case.
 
 The lane has its own `frontend/playwright.integration.config.ts`, so ordinary mocked component tests do not silently become storage tests. `tests/test_real_ui.py` verifies that missing, skipped, retried, duplicate, unexpected and expected-failure results cannot be counted as passes. A successful fixture remains a bounded automated observation, separate from human acceptance and release qualification.
+
+The host keeps its own admission limit. A visible host-busy error fails the corresponding workflow; the runner does not retry the case or interpret a subsequent unrelated pass as recovery.

@@ -20,10 +20,10 @@ import time
 import urllib.request
 
 ROOT = Path(__file__).resolve().parents[1]
-EXPECTED = {stage: [f"real-{workflow}-{stage}" for workflow in ("rich", "task", "due", "record-lifecycle", "layout-review")] for stage in ("create", "reopen")}
+EXPECTED = {stage: [f"real-{workflow}-{stage}" for workflow in ("rich", "task", "due", "record-lifecycle", "layout-review", "p2-data", "p2-action", "conversation-display")] for stage in ("create", "reopen")}
 LIMITATIONS = ["Chromium UI plus production host/services/SQLite; not native Wails WebView acceptance.",
                "No model inference, physical devices, live accounts, performance or release qualification.",
-               "Bounded rich-page, task due/title/status, record facet/undo and layout/review continuity; imports, scheduling and broader workflows remain pending."]
+               "Bounded rich-page, task/record/undo, layout/review, P2 forms/charts/row actions and conversation/display continuity; scheduling and broader import/recovery workflows remain pending."]
 
 def now():
     return datetime.now(timezone.utc).isoformat()
@@ -140,7 +140,7 @@ def main():
                   'harnessFiles': {name: digest(ROOT / name) for name in harness_paths},
                   'frontendSourceSHA256': object_digest(inventory(ROOT / 'frontend/src'))}
         manifest['inputs'] = inputs
-        fixture = {'schemaVersion': 1, 'suiteVersion': 2, 'pageTitle': 'Real storage — café తెలుగు',
+        fixture = {'schemaVersion': 1, 'suiteVersion': 3, 'pageTitle': 'Real storage — café తెలుగు',
                    'body': 'A carefully saved idea: café, తెలుగు and 日本語.',
                    'initialTaskTitle': 'Prepare real storage review', 'taskTitle': 'Finish real storage review',
                    'expectedRichMarks': ['bold'], 'expectedTaskStatusGroup': 'done',
@@ -150,7 +150,31 @@ def main():
                    'lifecycleRenamed': 'Later title survives facet undo', 'lifecycleDate': '2026-11-10',
                    'layoutDatabase': 'Layout review fixture', 'layoutTitle': 'Reviewed layout fixture',
                    'layoutSection': 'Planning sidebar', 'layoutDates': ['2026-11-12', '2026-11-13'],
+                   'p2Database': 'Exact chart and local form fixture', 'p2SeedTitle': 'Precisely valued seed',
+                   'p2FormTitles': ['Validated local form positive', 'Validated local form negative'],
+                   'p2Amounts': ['9007199254740993.125', '0.875', '-3.5'],
+                   'p2ExpectedSums': {'To do': '9007199254740994', 'Done': '-3.5'},
+                   'actionDatabase': 'Reviewed row action fixture', 'actionTitle': 'Row action original title',
+                   'actionRenamed': 'Later title survives row undo', 'actionLabel': 'Mark reviewed complete',
+                   'actionDates': ['2026-12-01', '2026-12-02'],
+                   'conversationFile': 'real-ui-branched-conversation.json', 'conversationNamespace': 'real-ui-conversations-v3',
+                   'conversationTitle': 'Independent branch and display fixture',
+                   'conversationTexts': ['Which trail has shade?', 'The cedar trail stays shaded.', 'The ridge trail has an open view.'],
                    'expectedCases': EXPECTED}
+        fixture['conversationExport'] = [{'id': 'real-ui-conversation-v3', 'title': fixture['conversationTitle'],
+            'create_time': 1760000000, 'current_node': 'reply-ridge', 'mapping': {
+                'root': {'parent': None, 'children': ['question'], 'message': None},
+                'question': {'parent': 'root', 'children': ['reply-cedar', 'reply-ridge'], 'message': {
+                    'id': 'source-question-v3', 'author': {'role': 'user'}, 'create_time': 1760000001,
+                    'content': {'content_type': 'text', 'parts': [fixture['conversationTexts'][0]]}}},
+                'reply-cedar': {'parent': 'question', 'children': [], 'message': {
+                    'id': 'source-cedar-v3', 'author': {'role': 'assistant'}, 'create_time': 1760000002,
+                    'content': {'parts': [fixture['conversationTexts'][1]]}}},
+                'reply-ridge': {'parent': 'question', 'children': [], 'message': {
+                    'id': 'source-ridge-v3', 'author': {'role': 'assistant'}, 'create_time': 1760000003,
+                    'content': {'parts': [fixture['conversationTexts'][2], {'image_asset_pointer': 'image://retained-only'}]},
+                    'metadata': {'retained_only_marker': 'SOURCE_PAYLOAD_ONLY_V3'}}}
+            }}]
         save(evidence / 'fixture.json', fixture)
         manifest['fixtureSHA256'] = digest(evidence / 'fixture.json')
         subprocess.run([str(binary), '--init-token', '--token-file', str(token)], env=env, check=True, capture_output=True)
@@ -188,7 +212,7 @@ def main():
             test_command = [args.node, str(playwright), 'test', '--config', str(ROOT / 'frontend/playwright.integration.config.ts')]
             entry['testCommand'] = test_command
             with (stage_dir / 'test.log').open('w') as test_log:
-                result = subprocess.run(test_command, env=test_env, cwd=ROOT / 'frontend', stdout=test_log, stderr=subprocess.STDOUT, timeout=480)
+                result = subprocess.run(test_command, env=test_env, cwd=ROOT / 'frontend', stdout=test_log, stderr=subprocess.STDOUT, timeout=90 * len(EXPECTED[stage]) + 30)
             entry['testExitCode'] = result.returncode
             report_path = stage_dir / 'playwright.json'
             report = json.loads(report_path.read_text()) if report_path.exists() else {}

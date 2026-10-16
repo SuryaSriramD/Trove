@@ -1,6 +1,7 @@
 import { test, expect, type Page } from "@playwright/test";
 import fs from "node:fs";
 import path from "node:path";
+import { createHash } from "node:crypto";
 const evidence = process.env.TROVE_REAL_UI_EVIDENCE!;
 const stage = process.env.TROVE_REAL_UI_STAGE!;
 const fixture = JSON.parse(fs.readFileSync(path.join(evidence, "fixture.json"), "utf8"));
@@ -157,7 +158,7 @@ function dateValue(r: ReturnType<typeof recordProjection>, name: string) {
   return r.record.values.find((v: any) => v.propertyId === property(r, name).id)?.value ?? null;
 }
 const date = (start: string, timezone = fixture.timezone) => ({ start, end: null, timezone, hasTime: false });
-async function observe(page: Page, method: "page.freshness" | "recordLayouts.get" | "operations.list", args: Record<string, unknown>) {
+async function observe(page: Page, method: "page.freshness" | "recordLayouts.get" | "operations.list" | "databaseP2" | "databaseChart" | "imports.list" | "imports.plan" | "pageDisplay.get", args: Record<string, unknown>) {
   const s = await snapshot(page);
   return page.evaluate(async ({ method, args, workspaceId }) => {
     const a = crypto.getRandomValues(new Uint8Array(16)), t = BigInt(Date.now());
@@ -170,7 +171,7 @@ async function observe(page: Page, method: "page.freshness" | "recordLayouts.get
     return response.result;
   }, { method, args, workspaceId: s.workspaceId });
 }
-async function surface(page: Page, name: "Tasks" | "Home" | "Pages") {
+async function surface(page: Page, name: "Tasks" | "Home" | "Pages" | "Import") {
   await page.getByRole("navigation", { name: "Workspace", exact: true }).getByRole("button", { name: new RegExp(name) }).click();
 }
 function dateControl(page: Page, label: string) {
@@ -377,4 +378,249 @@ test(`real-layout-review-${stage}`, async ({ page }) => {
   const currentReviewLayout = await reviewAndLayout(page, current);
   expect(currentReviewLayout).toEqual(read("create-layout-review.json").final);
   write(`${stage}-layout-review-result.json`, { passed: true, canonical: current, ...currentReviewLayout });
+});
+
+function collectionProjection(s: any, title: string) {
+  const collections = s.collections.filter((c: any) => c.title === title);
+  expect(collections).toHaveLength(1);
+  const collection = collections[0];
+  const records = s.records.filter((r: any) => r.collectionId === collection.id).sort((a: any, b: any) => a.id.localeCompare(b.id));
+  const ids = new Set([collection.owningPageId, ...records.map((r: any) => r.pageId)]);
+  return { workspaceId: s.workspaceId, collection, records,
+    pages: s.pages.filter((p: any) => ids.has(p.id)).sort((a: any, b: any) => a.id.localeCompare(b.id)),
+    properties: s.properties.filter((p: any) => p.collectionId === collection.id).sort((a: any, b: any) => a.id.localeCompare(b.id)) };
+}
+async function openP2(page: Page) {
+  const panel = page.getByRole("region", { name: "Local database enhancements", exact: true });
+  if ((await panel.locator(":scope > details").getAttribute("open")) === null)
+    await panel.getByText("Charts, local forms and row buttons", { exact: true }).click();
+  return panel;
+}
+async function setStatus(page: Page, title: string, label: string) {
+  await page.getByLabel(`Status for ${title}`, { exact: true }).selectOption({ label });
+  await expect.poll(async () => {
+    const r = recordProjection(await snapshot(page), title), p = property(r, "Status");
+    const value = r.record.values.find((v: any) => v.propertyId === p.id)?.value;
+    return p.config.options.find((o: any) => o.id === value)?.label;
+  }).toBe(label);
+}
+async function p2State(page: Page, collectionId: string) {
+  return { settings: await observe(page, "databaseP2", { collectionId }), chart: await observe(page, "databaseChart", { collectionId }) };
+}
+async function exactChart(page: Page, expected: Record<string, string>) {
+  const chart = page.locator("figure.p2-chart");
+  for (const [label, decimal] of Object.entries(expected)) {
+    const row = chart.getByRole("row").filter({ has: page.getByRole("cell", { name: label, exact: true }) });
+    await expect(row.getByRole("cell").nth(1)).toHaveText(decimal);
+  }
+  await expect(chart.locator("tbody tr")).toHaveCount(Object.keys(expected).length);
+}
+
+test(`real-p2-data-${stage}`, async ({ page }) => {
+  if (stage === "create") {
+    await createRecord(page, fixture.p2Database, fixture.p2SeedTitle);
+    await page.getByRole("button", { name: "＋ Property", exact: true }).click();
+    await page.getByLabel("Property name", { exact: true }).fill("Amount");
+    await page.getByLabel("Property type", { exact: true }).selectOption("number");
+    await page.getByRole("button", { name: "Create property", exact: true }).click();
+    await openRecord(page, fixture.p2SeedTitle);
+    await page.getByLabel("Amount on record page", { exact: true }).fill(fixture.p2Amounts[0]);
+    await page.getByLabel("Amount on record page", { exact: true }).press("Enter");
+    await expect.poll(async () => {
+      const record = recordProjection(await snapshot(page), fixture.p2SeedTitle);
+      return record.record.values.find((v: any) => v.propertyId === property(record, "Amount").id)?.value;
+    }).toEqual({ decimal: fixture.p2Amounts[0], format: "decimal" });
+    await database(page, fixture.p2Database);
+    await setStatus(page, fixture.p2SeedTitle, "To do");
+    const panel = await openP2(page), form = panel.getByRole("region", { name: "Local form configuration", exact: true });
+    await form.getByRole("checkbox", { name: "Enable a local submission form", exact: true }).check();
+    await form.getByRole("checkbox", { name: "Amount", exact: true }).check();
+    await form.getByRole("button", { name: "Save form settings", exact: true }).click();
+    await expect(form.getByRole("button", { name: "Submit local form", exact: true })).toBeDisabled();
+    const beforeInvalid = collectionProjection(await snapshot(page), fixture.p2Database);
+    await form.getByLabel("Form title", { exact: true }).fill(fixture.p2FormTitles[0]);
+    await form.getByRole("button", { name: "Submit local form", exact: true }).click();
+    await expect(page.getByRole("alert").filter({ hasText: "Amount is required." })).toBeVisible();
+    expect(collectionProjection(await snapshot(page), fixture.p2Database)).toEqual(beforeInvalid);
+    await form.getByLabel("Form Amount", { exact: true }).fill("not-a-decimal");
+    await form.getByRole("button", { name: "Submit local form", exact: true }).click();
+    await expect(page.getByRole("alert").filter({ hasText: "Invalid number value" })).toBeVisible();
+    expect(collectionProjection(await snapshot(page), fixture.p2Database)).toEqual(beforeInvalid);
+    for (let index = 0; index < 2; index++) {
+      await form.getByLabel("Form title", { exact: true }).fill(fixture.p2FormTitles[index]);
+      await form.getByLabel("Form Amount", { exact: true }).fill(fixture.p2Amounts[index + 1]);
+      await form.getByLabel("Form Status", { exact: true }).selectOption({ label: index === 0 ? "To do" : "Done" });
+      await form.getByRole("button", { name: "Submit local form", exact: true }).click();
+      await expect(form.getByLabel("Form title", { exact: true })).toHaveValue("");
+      const record = recordProjection(await snapshot(page), fixture.p2FormTitles[index]);
+      expect(record.record.values.find((v: any) => v.propertyId === property(record, "Amount").id)?.value).toEqual({ decimal: fixture.p2Amounts[index + 1], format: "decimal" });
+    }
+    await panel.getByLabel("Chart group", { exact: true }).selectOption({ label: "Status" });
+    await panel.getByLabel("Chart aggregation", { exact: true }).selectOption("sum");
+    await panel.getByLabel("Chart numeric property", { exact: true }).selectOption({ label: "Amount" });
+    await panel.getByRole("button", { name: "Save chart and settings", exact: true }).click();
+    await exactChart(page, fixture.p2ExpectedSums);
+    const canonical = collectionProjection(await snapshot(page), fixture.p2Database);
+    expect(canonical.records).toHaveLength(3);
+    const state = await p2State(page, canonical.collection.id);
+    expect(state.chart.recordCount).toBe(3);
+    for (const [label, decimal] of Object.entries(fixture.p2ExpectedSums)) {
+      const group = state.chart.groups.find((g: any) => g.label === label);
+      expect(group.decimal).toBe(decimal);
+      const titles = label === "To do" ? [fixture.p2SeedTitle, fixture.p2FormTitles[0]] : [fixture.p2FormTitles[1]];
+      expect([...group.recordIds].sort()).toEqual(titles.map((title: string) => canonical.records.find((r: any) => r.pageId === canonical.pages.find((p: any) => p.title === title)?.id)?.id).sort());
+    }
+    write("create-p2-data.json", { canonical, state, requiredAndTypedValidationPreservedCanonicalState: true });
+  } else await database(page, fixture.p2Database);
+  await openP2(page);
+  await exactChart(page, fixture.p2ExpectedSums);
+  await expect(page.getByRole("img", { name: "Bar chart; exact values in table below", exact: true })).toBeVisible();
+  const canonical = collectionProjection(await snapshot(page), fixture.p2Database), state = await p2State(page, canonical.collection.id);
+  expect(canonical).toEqual(read("create-p2-data.json").canonical);
+  expect(state).toEqual(read("create-p2-data.json").state);
+  write(`${stage}-p2-data-result.json`, { passed: true, canonical, state });
+});
+
+test(`real-p2-action-${stage}`, async ({ page }) => {
+  if (stage === "create") {
+    await createRecord(page, fixture.actionDatabase, fixture.actionTitle);
+    await setStatus(page, fixture.actionTitle, "In progress");
+    await setDate(page, `Date for ${fixture.actionTitle}`, fixture.actionDates[0]);
+    await expectDate(page, fixture.actionTitle, "Date", fixture.actionDates[0]);
+    const panel = await openP2(page), config = panel.getByRole("region", { name: "Row button configuration", exact: true });
+    await config.getByLabel("Row button label", { exact: true }).fill(fixture.actionLabel);
+    await config.getByLabel("Row button property", { exact: true }).selectOption({ label: "Status" });
+    await config.getByLabel("Row button value", { exact: true }).selectOption({ label: "Done" });
+    await expect(config.getByRole("checkbox", { name: "Ask for confirmation each time", exact: true })).toBeChecked();
+    await config.getByRole("button", { name: "Add row button", exact: true }).click();
+    const before = recordProjection(await snapshot(page), fixture.actionTitle);
+    await page.getByRole("button", { name: fixture.actionLabel, exact: true }).click();
+    const review = page.getByRole("alertdialog", { name: "Confirm row action", exact: true });
+    await expect(review).toContainText(`Set Status to Done on “${fixture.actionTitle}”?`);
+    await review.getByRole("button", { name: "Cancel", exact: true }).click();
+    expect(recordProjection(await snapshot(page), fixture.actionTitle)).toEqual(before);
+    await page.getByRole("button", { name: fixture.actionLabel, exact: true }).click();
+    await setDate(page, `Date for ${fixture.actionTitle}`, fixture.actionDates[1]);
+    await expectDate(page, fixture.actionTitle, "Date", fixture.actionDates[1]);
+    await expect(review).toHaveCount(0);
+    const staleInvalidated = recordProjection(await snapshot(page), fixture.actionTitle);
+    expect(staleInvalidated.record.values.find((v: any) => v.propertyId === property(before, "Status").id)).toEqual(before.record.values.find((v: any) => v.propertyId === property(before, "Status").id));
+    await page.getByRole("button", { name: fixture.actionLabel, exact: true }).click();
+    await review.getByRole("button", { name: `Confirm ${fixture.actionLabel}`, exact: true }).click();
+    await expect.poll(async () => {
+      const r = recordProjection(await snapshot(page), fixture.actionTitle), p = property(r, "Status");
+      return r.record.values.find((v: any) => v.propertyId === p.id)?.value === p.config.doneOptionId;
+    }).toBe(true);
+    const applied = recordProjection(await snapshot(page), fixture.actionTitle);
+    expect(identity(applied)).toEqual(identity(before));
+    await page.getByLabel(`Title for ${fixture.actionTitle}`, { exact: true }).fill(fixture.actionRenamed);
+    await page.getByLabel(`Title for ${fixture.actionTitle}`, { exact: true }).press("Enter");
+    await expect(page.getByLabel(`Title for ${fixture.actionRenamed}`, { exact: true })).toBeVisible();
+    await openRecord(page, fixture.actionRenamed);
+    await page.getByText("Grouped changes and undo", { exact: true }).click();
+    await page.locator("li").filter({ hasText: `Row action: ${fixture.actionLabel}` }).getByRole("button", { name: "Preview undo", exact: true }).click();
+    await page.getByRole("region", { name: "Review grouped undo", exact: true }).getByRole("button", { name: "Apply reviewed undo", exact: true }).click();
+    await expect.poll(async () => recordProjection(await snapshot(page), fixture.actionRenamed).record.values).toEqual(staleInvalidated.record.values);
+    const canonical = recordProjection(await snapshot(page), fixture.actionRenamed);
+    expect(identity(canonical)).toEqual(identity(before));
+    const operations = await observe(page, "operations.list", { pageId: canonical.page.id });
+    const rowOperations = operations.operations.filter((o: any) => o.label === `Row action: ${fixture.actionLabel}`);
+    expect(rowOperations).toHaveLength(1); expect(rowOperations[0].state).toBe("undone");
+    const state = await p2State(page, canonical.record.collectionId);
+    write("create-p2-action.json", { before, staleInvalidated, applied, canonical, operations, state, cancelledAndStaleReviewsWroteNoStatus: true });
+  }
+  await database(page, fixture.actionDatabase);
+  await expect(page.getByLabel(`Title for ${fixture.actionRenamed}`, { exact: true })).toHaveValue(fixture.actionRenamed);
+  await expect(dateControl(page, `Date for ${fixture.actionRenamed}`).locator("summary")).toContainText(fixture.actionDates[1]);
+  const canonical = recordProjection(await snapshot(page), fixture.actionRenamed), operations = await observe(page, "operations.list", { pageId: canonical.page.id });
+  const state = await p2State(page, canonical.record.collectionId), expected = read("create-p2-action.json");
+  expect(canonical).toEqual(expected.canonical); expect(operations).toEqual(expected.operations); expect(state).toEqual(expected.state);
+  write(`${stage}-p2-action-result.json`, { passed: true, canonical, operations, state });
+});
+
+function conversationProjection(s: any, item: any) {
+  const pages = s.pages.filter((p: any) => p.title === fixture.conversationTitle && !p.deletedAt);
+  expect(pages).toHaveLength(1); expect(pages[0].id).toBe(item.pageId);
+  const blocks = s.blocks.filter((b: any) => b.pageId === item.pageId && !b.deletedAt).sort((a: any, b: any) => a.sortKey.localeCompare(b.sortKey));
+  const texts = blocks.map((b: any) => (b.data.richText ?? []).map((r: any) => r.text).join(""));
+  for (const text of fixture.conversationTexts) expect(texts.filter((t: string) => t === text)).toHaveLength(1);
+  expect(texts.join("\n")).not.toContain("SOURCE_PAYLOAD_ONLY_V3");
+  for (const [node, role] of [["question", "user"], ["reply-cedar", "assistant"], ["reply-ridge", "assistant"]]) {
+    const heading = blocks.find((b: any) => item.blockSources[b.id] === `conversation-node:${node}:heading`);
+    expect(heading?.type).toBe("heading_3");
+    expect(heading.data.richText[0].text).toContain(`${role} · ${node}`);
+    const links = blocks.flatMap((b: any) => b.data.richText ?? []).filter((r: any) => r.link === `trove://page/${item.pageId}/block/${heading.id}`);
+    expect(links.length).toBeGreaterThan(0);
+  }
+  const file = s.files.find((f: any) => f.id === item.retainedFileId);
+  expect(file.contentHash).toBe(createHash("sha256").update(JSON.stringify(fixture.conversationExport)).digest("hex"));
+  return { workspaceId: s.workspaceId, page: pages[0], blocks, file };
+}
+async function openConversationPlan(page: Page, planId?: string) {
+  await surface(page, "Import");
+  if (planId) {
+    await page.getByText("Recent imports and resumable plans", { exact: true }).click();
+    await page.getByRole("button", { name: new RegExp(`^${fixture.conversationFile} · complete`) }).click();
+  }
+}
+test(`real-conversation-display-${stage}`, async ({ page }) => {
+  let plan: any, item: any;
+  if (stage === "create") {
+    await openConversationPlan(page);
+    await page.getByLabel("Source namespace", { exact: true }).fill(fixture.conversationNamespace);
+    const chosen = page.waitForEvent("filechooser");
+    await page.getByRole("button", { name: "Choose import file", exact: true }).click();
+    await (await chosen).setFiles({ name: fixture.conversationFile, mimeType: "application/json", buffer: Buffer.from(JSON.stringify(fixture.conversationExport)) });
+    await expect(page.getByRole("button", { name: "Commit reviewed import", exact: true })).toBeEnabled();
+    const recent = await observe(page, "imports.list", {});
+    expect(recent).toHaveLength(1);
+    const preview = await observe(page, "imports.plan", { planId: recent[0].planId });
+    expect(preview.items.filter((i: any) => i.kind === "conversation")).toHaveLength(1);
+    expect((await snapshot(page)).pages.some((p: any) => p.title === fixture.conversationTitle)).toBe(false);
+    await page.getByRole("button", { name: "Commit reviewed import", exact: true }).click();
+    await expect(page.getByText("Import processing finished. Review all outcomes below.", { exact: true })).toBeVisible();
+    plan = await observe(page, "imports.plan", { planId: recent[0].planId });
+    expect(plan.state).toBe("complete"); expect(plan.cursor).toBe(plan.items.length);
+    item = plan.items.find((i: any) => i.kind === "conversation");
+    const sourceLink = await page.getByRole("link", { name: "Original source", exact: true }).getAttribute("href");
+    expect(sourceLink).toBeTruthy();
+    const bytes = await page.evaluate(async href => {
+      const response = await fetch(href!); if (!response.ok) throw Error(`source read ${response.status}`);
+      return await response.text();
+    }, sourceLink);
+    expect(bytes).toBe(JSON.stringify(fixture.conversationExport));
+    await page.getByRole("button", { name: item.sourceLocator, exact: true }).click();
+    await expect(page.getByLabel("Page title", { exact: true })).toHaveValue(fixture.conversationTitle);
+    for (const text of fixture.conversationTexts) await expect(page.locator(".tiptap .block-text").filter({ hasText: text })).toHaveText(text);
+    const before = conversationProjection(await snapshot(page), item);
+    await page.locator("details.page-review > summary").click();
+    await page.getByRole("button", { name: "I reviewed the current content", exact: true }).click();
+    await expect(page.locator("details.page-review > summary")).toHaveText("Human reviewed");
+    const review = await observe(page, "page.freshness", { pageId: item.pageId });
+    await page.getByRole("button", { name: "Page options", exact: true }).click();
+    const options = page.getByRole("dialog", { name: "Page options", exact: true });
+    await options.getByRole("checkbox", { name: "Full width", exact: true }).click();
+    await expect(options.getByRole("checkbox", { name: "Full width", exact: true })).toBeChecked();
+    await options.getByRole("checkbox", { name: "Presentation layout", exact: true }).click();
+    await expect(page.getByRole("button", { name: "Exit presentation layout", exact: true })).toBeVisible();
+    const canonical = conversationProjection(await snapshot(page), item);
+    expect(canonical.blocks).toEqual(before.blocks); expect(canonical.file).toEqual(before.file); expect(canonical.page.id).toBe(before.page.id);
+    expect(await observe(page, "page.freshness", { pageId: item.pageId })).toEqual(review);
+    const display = await observe(page, "pageDisplay.get", { pageId: item.pageId });
+    expect(display.fullWidth).toBe(true); expect(display.presentation).toBe(true);
+    write("create-conversation-display.json", { preview, plan, before, canonical, review, display, exactOriginalSourceRetained: true });
+  } else {
+    const saved = read("create-conversation-display.json");
+    await openConversationPlan(page, saved.plan.planId);
+    plan = await observe(page, "imports.plan", { planId: saved.plan.planId });
+    expect(plan).toEqual(saved.plan);
+    item = plan.items.find((i: any) => i.kind === "conversation");
+    await page.getByRole("button", { name: item.sourceLocator, exact: true }).click();
+  }
+  await expect(page.locator("article.page-surface")).toHaveClass(/full-width/);
+  await expect(page.getByRole("button", { name: "Exit presentation layout", exact: true })).toBeVisible();
+  const canonical = conversationProjection(await snapshot(page), item), review = await observe(page, "page.freshness", { pageId: item.pageId });
+  const display = await observe(page, "pageDisplay.get", { pageId: item.pageId }), expected = read("create-conversation-display.json");
+  expect(canonical).toEqual(expected.canonical); expect(review).toEqual(expected.review); expect(display).toEqual(expected.display);
+  write(`${stage}-conversation-display-result.json`, { passed: true, canonical, plan, review, display });
 });
