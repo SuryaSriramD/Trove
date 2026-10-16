@@ -285,6 +285,13 @@ func runRealLocalAITransferCases(t *testing.T, load func(*testing.T) ([]aiTransf
 	if pack != "01990000-0000-7000-8000-000000000106" {
 		t.Fatal("fixed pack106 required")
 	}
+	runRealLocalAITransferCasesForPack(t, load, pack)
+}
+
+// This shared execution path does not choose or fall back to a model. The
+// historical and comparison entrypoints enforce their own explicit selection.
+func runRealLocalAITransferCasesForPack(t *testing.T, load func(*testing.T) ([]aiTransferCase, string), pack string) {
+	t.Helper()
 	cases, hash := load(t)
 	manager, err := native.NewManager(os.Getenv("TROVE_MODEL_ROOT"))
 	if err != nil {

@@ -92,6 +92,9 @@ class ModelComparisonGuards(unittest.TestCase):
         for name in runner.COMPARISON_HARNESS:
             current['harness:' + name] = {'sha256': 'new-recorder'}
             changed_source[name] = {'sha256': 'new-recorder'}
+        for name, digest in runner.COMPARISON_TEST_INPUTS.items():
+            current['harness:' + name] = {'sha256': digest}
+            changed_source[name] = {'sha256': digest}
         return prior, current, changed_source
 
     def test_only_selected_artifact_and_recorder_changes_are_allowed(self):
@@ -102,6 +105,9 @@ class ModelComparisonGuards(unittest.TestCase):
             self.assertTrue(runner.model_comparison_binding_errors(prior, mutated, source))
         for key in ('internal/workspace/ai_generation.go', runner.CORPUS, 'internal/workspace/new_prompt.go'):
             mutated = copy.deepcopy(source); mutated[key] = {'sha256': 'changed'}
+            self.assertTrue(runner.model_comparison_binding_errors(prior, current, mutated))
+        for name in runner.COMPARISON_TEST_INPUTS:
+            mutated = copy.deepcopy(source); mutated[name] = {'sha256': 'unreviewed-test-change'}
             self.assertTrue(runner.model_comparison_binding_errors(prior, current, mutated))
         wrong = copy.deepcopy(prior); wrong['sourceCommit'] = 'other'
         self.assertTrue(runner.model_comparison_binding_errors(wrong, current, source))
@@ -134,6 +140,30 @@ class ModelComparisonGuards(unittest.TestCase):
         report = self.report()
         for rss in (None, True, 0, -1, (10 << 30) + 1):
             self.assertTrue(runner.model_comparison_report_errors(report, {**report, 'peakWorkerRSSBytes': rss}, 10 << 30))
+
+
+    def test_comparison_entrypoint_has_separate_complete_accounting(self):
+        rows = [{'Test': runner.COMPARISON_TEST, 'Action': 'fail'}]
+        rows += [{'Test': runner.COMPARISON_TEST+'/'+case, 'Action': 'fail'} for case in runner.IDS]
+        self.assertEqual(runner.native_terminals(rows, runner.COMPARISON_TEST)[1], [])
+        self.assertTrue(runner.native_terminals(rows)[1])
+        self.assertTrue(runner.native_terminals(rows[:-1], runner.COMPARISON_TEST)[1])
+        validator = runner.load_repository_validator(ROOT)
+        events = [{'Test': runner.COMPARISON_TEST+'/'+case, 'Action': 'output',
+                   'Output': 'report: '+json.dumps({'fixture': case})+'\n'} for case in runner.IDS]
+        reports, errors = runner.extract_reports(events, validator, runner.COMPARISON_TEST)
+        self.assertEqual(errors, [])
+        self.assertEqual(set(reports), set(runner.IDS))
+        self.assertTrue(runner.extract_reports(events, validator)[1])
+
+    def test_exact_quality_pack_and_unknown_pack_are_distinct(self):
+        quality = {**runner.COMPARISON_MODELS[runner.COMPARISON_QUALITY_PACK], 'architecture': 'portable'}
+        with mock.patch.object(runner.subprocess, 'check_output', return_value=str(24 << 30)):
+            self.assertEqual(runner.comparison_resources(quality)['declaredModelMemoryBytes'], 39 << 28)
+            with self.assertRaises(ValueError):
+                runner.comparison_resources({**quality, 'sha256': '0'*64})
+            with self.assertRaises(ValueError):
+                runner.comparison_resources({**quality, 'id': runner.PACK})
 
     def test_pack_pinning_and_native_admission_are_required(self):
         model = {**runner.COMPARISON_MODEL, 'architecture': 'arm64'}

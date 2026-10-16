@@ -25,10 +25,16 @@ ORIGINAL_CORPUS = 'internal/workspace/testdata/expanded-evaluation/transfer-2026
 ORIGINAL_SHA256 = '1eb8cb07b0047fde8e4f349be53b17613c33200d6fa44bfdbfe8d4d488f886bd'
 TEST = 'TestRealLocalAnswerabilityTransferCases'
 PACK = '01990000-0000-7000-8000-000000000106'
+COMPARISON_TEST = 'TestRealLocalAnswerabilityModelComparisonCases'
 COMPARISON_PACK = '01990000-0000-7000-8000-000000000105'
+COMPARISON_QUALITY_PACK = '01990000-0000-7000-8000-000000000109'
 COMPARISON_BASE_SOURCE = 'b93f21c646759f77a5f81afd883e88f2199881e5'
 COMPARISON_HARNESS = {'scripts/run-answerability-repair.py', 'scripts/test-answerability-repair.py'}
+COMPARISON_TEST_INPUTS = {'internal/workspace/ai_transfer_evaluation_test.go': 'c8f6cc734d454c4fe2bfa3d4e573578df617ee25d908dded81bce860f8dc3669', 'internal/workspace/ai_answerability_transfer_evaluation_test.go': '0246a99f498e9e07ded25237c335dcb280971676bb6eafc6ac17a473d73840a2'}
+COMPARISON_SOURCE_CHANGES = COMPARISON_HARNESS | set(COMPARISON_TEST_INPUTS)
 COMPARISON_BASE_HARNESS = {
+    'internal/workspace/ai_answerability_transfer_evaluation_test.go': '2375925928564e8ac3e3b6de36fe30d540eafbf3d720bab3c61c4df1312485d8',
+    'internal/workspace/ai_transfer_evaluation_test.go': '27ecb02aff97e85f2baab27ce13e3f3d000a49455f1820e0599655e87bf8fb3d',
     'scripts/run-answerability-repair.py': '8e9934f04cfb2467eb710d5d61766572039c9204ec89a9d041a67086303ca8c7',
     'scripts/test-answerability-repair.py': 'e95eabc81e83c18ab6f86a4fb957f052a88d15068acc913be7e5558130703ec2',
 }
@@ -42,6 +48,7 @@ COMPARISON_MODEL = {
     'sourceRevision': '91cad51170dc346986eccefdc2dd33a9da36ead9',
     'licenseUrl': 'https://huggingface.co/Qwen/Qwen2.5-1.5B-Instruct-GGUF/blob/91cad51170dc346986eccefdc2dd33a9da36ead9/LICENSE',
 }
+COMPARISON_MODELS = {COMPARISON_PACK: COMPARISON_MODEL, COMPARISON_QUALITY_PACK: {'schemaVersion': 1, 'id': '01990000-0000-7000-8000-000000000109', 'kind': 'chat', 'format': 'gguf', 'sha256': '2e998d7e181c8756c5ffc55231b9ee1cdc9d3acec4245d6e27d32bd8e738c474', 'sizeBytes': 5444831936, 'url': 'https://huggingface.co/bartowski/Qwen2.5-7B-Instruct-GGUF/resolve/8911e8a47f92bac19d6f5c64a2e2095bd2f7d031/Qwen2.5-7B-Instruct-Q5_K_M.gguf', 'license': 'Apache-2.0', 'licenseUrl': 'https://huggingface.co/Qwen/Qwen2.5-7B-Instruct/blob/a09a35458c702b33eeacc393d103063234e8bc28/LICENSE', 'sourceRevision': '8911e8a47f92bac19d6f5c64a2e2095bd2f7d031', 'runtimeCommit': 'd2e54583c7452353eb35d40431281f6ee984332f', 'contextTokens': 8192, 'estimatedMemoryBytes': 10468982784}}
 TAGS = 'fts5 sqlite_omit_load_extension'
 NETWORK_POLICY = '(version 1)(allow default)(deny network*)'
 GATES = ('TestAITransferIndependentCorpusAndOracle', 'TestAITransferCanonicalSeedAndScope',
@@ -171,11 +178,11 @@ def gate_errors(events, original_ids):
     return errors
 
 
-def extract_reports(events, validator):
+def extract_reports(events, validator, test=TEST):
     reports, buffers, errors = {}, {}, []
     for event in events:
         name = event.get('Test', '')
-        if not name.startswith(TEST + '/') or event.get('Action') != 'output':
+        if not name.startswith(test + '/') or event.get('Action') != 'output':
             continue
         buffers[name] = buffers.get(name, '') + event.get('Output', '')
         while '\n' in buffers[name]:
@@ -190,7 +197,7 @@ def extract_reports(events, validator):
             if not isinstance(report, dict) or 'fixture' not in report:
                 continue
             case = report['fixture']
-            if not isinstance(case, str) or case in reports or name != TEST + '/' + case:
+            if not isinstance(case, str) or case in reports or name != test + '/' + case:
                 errors.append('duplicate or mismatched native task report')
                 continue
             reports[case] = report
@@ -201,8 +208,8 @@ def extract_reports(events, validator):
     return reports, errors
 
 
-def native_terminals(events):
-    expected = {TEST, *(TEST + '/' + case for case in IDS)}
+def native_terminals(events, test=TEST):
+    expected = {test, *(test + '/' + case for case in IDS)}
     terminals, errors = {}, []
     for event in events:
         name, action = event.get('Test'), event.get('Action')
@@ -317,7 +324,7 @@ def model_comparison_binding_errors(prior, bindings, source_inputs):
     errors = []
     if prior.get('sourceCommit') != COMPARISON_BASE_SOURCE:
         errors.append('model comparison requires the frozen unchanged-production baseline')
-    ignored = {'model', 'modelManifest', 'pilot'} | {'harness:' + name for name in COMPARISON_HARNESS}
+    ignored = {'model', 'modelManifest', 'pilot'} | {'harness:' + name for name in COMPARISON_SOURCE_CHANGES}
     previous = prior.get('stableBindings', {})
     if {k: v for k, v in previous.items() if k not in ignored} != {k: v for k, v in bindings.items() if k not in ignored}:
         errors.append('non-model runtime, helper, corpus or harness bindings changed')
@@ -329,8 +336,11 @@ def model_comparison_binding_errors(prior, bindings, source_inputs):
         errors.append('baseline source inventory missing')
     else:
         changes = {name for name in set(old_source) | set(source_inputs) if old_source.get(name) != source_inputs.get(name)}
-        if changes - COMPARISON_HARNESS:
-            errors.append('model comparison changed production or frozen controls: ' + ', '.join(sorted(changes - COMPARISON_HARNESS)))
+        if changes - COMPARISON_SOURCE_CHANGES:
+            errors.append('model comparison changed production or frozen controls: ' + ', '.join(sorted(changes - COMPARISON_SOURCE_CHANGES)))
+        for name, digest in COMPARISON_TEST_INPUTS.items():
+            if source_inputs.get(name, {}).get('sha256') != digest:
+                errors.append('comparison test differs from exact reviewed delta: ' + name)
     return errors
 
 
@@ -360,7 +370,10 @@ def model_comparison_report_errors(prior, current, memory_budget):
 
 
 def comparison_resources(model):
-    for field, value in COMPARISON_MODEL.items():
+    expected = COMPARISON_MODELS.get(model.get('id'))
+    if expected is None:
+        fail('model is not an explicitly reviewed comparison artifact')
+    for field, value in expected.items():
         if type(model.get(field)) is not type(value) or model[field] != value:
             fail('challenger manifest differs from reviewed artifact: ' + field)
     if model.get('architecture') not in ('portable', 'arm64') or model.get('qualificationOnly', False):
@@ -380,16 +393,17 @@ def main():
     for name in ('root', 'source-commit', 'go', 'go-mod-cache', 'go-build-cache', 'bundle', 'models', 'output'):
         parser.add_argument('--' + name, required=True)
     parser.add_argument('--phase', choices=('before', 'after', 'model-comparison'), required=True)
-    parser.add_argument('--pack', choices=(PACK, COMPARISON_PACK), default=PACK)
+    parser.add_argument('--pack', choices=(PACK, *COMPARISON_MODELS), default=PACK)
     parser.add_argument('--before-manifest')
     args = parser.parse_args()
     if platform.system() != 'Darwin' or not pathlib.Path('/usr/bin/sandbox-exec').is_file():
         parser.error('macOS sandbox-exec network denial is required')
     if (args.phase != 'before') != bool(args.before_manifest):
         parser.error('AFTER/model comparison require --before-manifest; BEFORE must not supply one')
-    if (args.phase == 'model-comparison') != (args.pack == COMPARISON_PACK):
+    if (args.phase == 'model-comparison') != (args.pack in COMPARISON_MODELS):
         parser.error('the reviewed challenger is available only in model-comparison phase')
     pack = args.pack
+    run_test = COMPARISON_TEST if args.phase == 'model-comparison' else TEST
     root, bundle, models, go = [pathlib.Path(value).resolve() for value in (args.root, args.bundle, args.models, args.go)]
     out = pathlib.Path(args.output).resolve()
     if out.is_relative_to(root):
@@ -452,7 +466,7 @@ def main():
     reserve.write_bytes(bytes(1024 * 1024))
     manifest = {'schemaVersion': 1, 'family': 'answerability-transfer-v1', 'phase': args.phase,
                 'sourceCommit': args.source_commit, 'workingTreeStatus': git(root, 'status', '--short'),
-                'test': TEST, 'caseIds': IDS, 'caseCount': 12, 'generationAttemptsPerCase': 1,
+                'test': run_test, 'caseIds': IDS, 'caseCount': 12, 'generationAttemptsPerCase': 1,
                 'corpusSHA256': CORPUS_SHA256, 'modelPackId': pack, 'inputs': before,
                 'stableBindings': bindings, 'sourceInputs': source_inputs, 'beforeComparison': comparison,
                 'networkPolicy': NETWORK_POLICY, 'hardware': platform.platform(), 'initialFreeBytes': free,
@@ -497,15 +511,15 @@ def main():
     if args.phase == 'model-comparison' and comparison_resources(model) != resources:
         fail('resource policy changed before admission')
     env.update(TROVE_NATIVE_INTEGRATION='1', TROVE_CHAT_EVAL_PACK=pack, TROVE_MODEL_ROOT=str(models), TROVE_NATIVE_BUNDLE=str(bundle), TROVE_AI_CANONICAL_EVIDENCE_DIR=manifest['canonicalEvidenceDirectory'])
-    command = [str(go), 'tool', 'test2json', '-t', '-p', 'trove.local/phase0/internal/workspace', str(binary), '-test.run', '^' + TEST + '$', '-test.v', '-test.timeout=45m']
+    command = [str(go), 'tool', 'test2json', '-t', '-p', 'trove.local/phase0/internal/workspace', str(binary), '-test.run', '^' + run_test + '$', '-test.v', '-test.timeout=45m']
     manifest.update(state='native_running', runCommand=command)
     write()
     code, timeout = run_process(sandbox + command, root / 'internal/workspace', env, out / 'results.jsonl', 2730)
     reserve.unlink(missing_ok=True)
     events, malformed = read_events(out / 'results.jsonl')
     requests = {case: {'useMemory': False, 'modelPackId': pack, 'corpusSHA256': CORPUS_SHA256} for case in IDS}
-    summary = validator.summarize(events, IDS, TEST, out / 'canonical', requests)
-    reports, report_errors = extract_reports(events, validator)
+    summary = validator.summarize(events, IDS, run_test, out / 'canonical', requests)
+    reports, report_errors = extract_reports(events, validator, run_test)
     checks = {}
     for case in cases:
         try:
@@ -519,16 +533,16 @@ def main():
     summary['modelComparisonErrors'] = model_errors
     summary['errors'] += malformed + report_errors + model_errors
     summary['errors'] += [case + ': ' + problem for case, problems in checks.items() for problem in problems]
-    terminal, terminal_errors = native_terminals(events)
+    terminal, terminal_errors = native_terminals(events, run_test)
     summary['errors'] += terminal_errors
-    summary['executionComplete'] = not model_errors and not timeout and not malformed and not report_errors and not terminal_errors and set(reports) == set(IDS) and terminal.get(TEST) in ('pass', 'fail') and all(terminal.get(TEST + '/' + case) in ('pass', 'fail') and not comparison_execution_errors(reports[case]) for case in IDS)
+    summary['executionComplete'] = not model_errors and not timeout and not malformed and not report_errors and not terminal_errors and set(reports) == set(IDS) and terminal.get(run_test) in ('pass', 'fail') and all(terminal.get(run_test + '/' + case) in ('pass', 'fail') and not comparison_execution_errors(reports[case]) for case in IDS)
     summary['inputsUnchanged'] = inventory(input_paths(root, bundle, models, go, pack), validator) == before
     try:
         ensure_source(root, args.source_commit)
     except ValueError as error:
         summary['inputsUnchanged'] = False
         summary['errors'].append(str(error))
-    summary['automatedCorpusPassed'] = summary['automatedCorpusPassed'] and terminal.get(TEST) == 'pass' and not code and not timeout and not summary['errors'] and summary['inputsUnchanged'] and summary['executionComplete']
+    summary['automatedCorpusPassed'] = summary['automatedCorpusPassed'] and terminal.get(run_test) == 'pass' and not code and not timeout and not summary['errors'] and summary['inputsUnchanged'] and summary['executionComplete']
     summary['originalDefectEvaluationRequiredSeparately'] = args.phase == 'model-comparison'
     summary['manualSemanticReviewPending'] = IDS
     summary['boundedOracleOnly'] = True
