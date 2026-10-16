@@ -2,7 +2,7 @@
 
 **The single current development and progress tracker for this project.** Read and update this file for every meaningful implementation change, investigation, test result, decision, blocker and handoff. This is not an automatically running monitor.
 
-Last updated: **2026-10-16 19:11 IST**. User-facing dates use **Asia/Kolkata (IST, UTC+05:30)**; source artifacts may retain UTC timestamps.
+Last updated: **2026-10-16 19:12 IST**. User-facing dates use **Asia/Kolkata (IST, UTC+05:30)**; source artifacts may retain UTC timestamps.
 
 This file consolidates the original 51-item backlog, the newly selected desktop scope, current qualification, next actions and development history. Earlier status pages are historical snapshots. Machine-readable contracts, the legacy registry and immutable qualification records remain supporting inputs/evidence; they are not additional human progress dashboards. Their frozen bytes must not be rewritten to make a status look current.
 
@@ -36,7 +36,7 @@ Candidate 7's focused 22-case prompt experiment was rejected and production prom
 
 | Location | Branch / source | Current interpretation |
 | --- | --- | --- |
-| Primary project: `/Volumes/HD-B1/HD-Projects/Trove` | `codex/macos-feature-completion`, `b6f9984` plus active IMPL-002 changes; installed app source `6d017cf` | Repaired P2 app built and independently audited; duplicate bundles archived and removed. Retained mode/review/runtime/query fixes have bounded evidence; answerability, diagram, expansion, relevance and vision quality gaps remain open. Original evidence and rejected experiments are preserved. No release approval. |
+| Primary project: `/Volumes/HD-B1/HD-Projects/Trove` | `codex/macos-feature-completion`, `2e08837` plus active IMPL-002 evidence; installed app source `6d017cf` | Repaired P2 app built and independently audited; duplicate bundles archived and removed. Retained mode/review/runtime/query fixes have bounded evidence; answerability, diagram, expansion, relevance and vision quality gaps remain open. Original evidence and rejected experiments are preserved. No release approval. |
 | Frozen new-candidate execution checkout: `/Users/suryasriramduvvuri/.codex/worktrees/feature-canonical-tasks/Trove` | Detached `9a3948529a1e772b1e5fdb710203e2c1d234d3cc` | Reuses the clean completed worker checkout; original branch `codex/feature-layout-scheduling` remains at `8b739d5`. Completed frozen campaign executed here against the development app helpers; preserve this checkout and its evidence. |
 | Latest development worktree: `/Users/suryasriramduvvuri/.codex/worktrees/macos-p0-title-context/Trove` | `codex/macos-p0-title-context`, `299e43df9b716f771125d939ad320c3cb595f2c7` | Candidate 7 source. One descendant commit containing tests, fixtures, telemetry and execution documentation. |
 
@@ -1336,7 +1336,7 @@ Root fixture follow-ups are complete: the failed rich-layout scenario and clipbo
 
 **Next:** Finish independent mapping review; integrate reviewed source/test changes with their evidence, rerun affected checks and execute the fresh withheld cases only after the candidate is fixed. Live test-resource names/URLs were requested and clarified; none are yet confirmed. Continue independent local workflows without reopening completed app cleanup.
 
-### DEV-064 — 2026-10-16 19:11 IST: complete and independently review full-scope acceptance mappings
+### DEV-064 — 2026-10-16 19:09 IST: complete and independently review full-scope acceptance mappings
 
 **Integrated policy change:** The DEV-063 draft now has 70 new observation groups and 322 procedures covering 302 additional criteria. Cumulative macOS counts remain **411/659/697** with zero invalid/unmapped rows and zero newly passed criteria. All 69 original check definitions, original decompositions and every prior mapping were compared against `75f2aa0` and remain unchanged. Frozen candidates retain their original policy identity.
 
@@ -1345,6 +1345,18 @@ Root fixture follow-ups are complete: the failed rich-layout scenario and clipbo
 **Validation and evidence:** Final affected runs passed **8 addendum tests and 40 qualification tests**. Tests cover source/manifest substitution, omission, resource separation, all-six adapter receipt requirements, historical policies and refusal to accept broad/mock/absent evidence. `git diff --check` passed. Earlier two Python dependency errors are retained alongside the successful repeats. Reproducible inventories, preserved-definition comparisons, code hashes and raw logs are in [acceptance-v2 manifest](/Users/suryasriramduvvuri/.codex/visualizations/2026/10/13/01a1363a-7a42-7700-930e-3083f64ff417/macos-quality-20261016/acceptance-v2/manifest.json). The coordinator also reviewed all 20 sealed control requests/goldens and 40 mode counterexamples without seeing new model outputs; the fixture remains byte-identical. This is oracle preparation, not model acceptance.
 
 **Next:** Commit these mappings, integrate the reviewed real-UI toolbar repair/harness and native v2 regression, then repeat affected integrated checks. The first real UI repair overlay passed four create/restart cases in the worker; its source-bound integration and broader workflow expansion are next. The one answerability experiment remains in progress. Installed app, ordinary workspace and release state are unchanged.
+
+### DEV-065 — 2026-10-16 19:12 IST: integrate proven UI repair, native checks and evaluation evidence
+
+**Integrated source:** Acceptance policy committed as `21230b2`. Reviewed sealed fixtures, capture-v2 regression/docs, answerability telemetry, real UI lane and toolbar fix integrated as `ef21252`, `bdba8d3`, `80495b2`, `af147cd` and `2e08837`. The only new product behavior in this integration is a narrow Tiptap toolbar-state subscription: changing bold/italic/underline/strike or moving the caret updates the visible mark/block controls without treating that selection change as content editing. The rejected answerability experiment is not included.
+
+**Real UI evidence:** Worker `dbfa72a` passes **four of four** declared production-host/UI/storage cases with zero retries/skips: rich Unicode bold page creation/edit/reopen and task creation/rename/completion/Tasks-to-Home consistency, both preserving exact canonical identities and values after a normal host shutdown and new-process restart. Evidence [run-06](/Users/suryasriramduvvuri/.codex/visualizations/2026/10/13/01a1363a-7a42-7700-930e-3083f64ff417/macos-quality-20261016/real-ui/run-06/manifest.json), SHA-256 `bfd955a3a22e3187cc1452e91db0fbcb21e50137c3ad42719f5143eaf0491a4c`, uses installed host `6d017cf` plus an explicitly compiled frontend overlay. It is not an installed native-WebView or release pass. Failed preflight/harness attempts and the confirmed run-05 toolbar failure remain retained. Five affected component-browser scenarios, frontend compilation and source/input checkpoint binding also passed in that worker.
+
+**Integrated validation:** Primary passes **56 focused Go race test/subtest outcomes** across native pre-consent rejection and fixed evaluation golden/poison/scope gates, **56 frontend unit tests**, TypeScript, **six real-UI accounting tests** and **six answerability accounting tests**. The first Python invocations used the frontend directory, selecting zero tests and failing to locate the second script; those are not passes. Correct root invocations and all raw logs are retained under `/private/tmp/trove-integrated-*`. No microphone permission/device access or model execution occurred in these regressions. Broader acceptance remains pending.
+
+**Controlled AI result:** The isolated quote-before-claim v2 experiment `cc48782` regressed the unchanged 12-control corpus from five automated passes/seven failures to three passes/nine failures. Actual claims include newly mismatched supporting quotations, another entity's value attributed to the requested entity, and unsupported negative inference. One bakery case improved, which does not offset regressions. Both phases used one generation per case with unchanged inputs/canonical snapshots. Reject this mechanism; retain production v1 and all experimental bytes. Original review-date-absent also remained failing after the single experiment; final independent all-clause assessment is being recorded. No fresh withheld control is spent on this rejected candidate.
+
+**Next active work:** UI lane expands due dates, task promotion/detachment/undo and freshness/layout workflows. Native lane checks suspected vision geometry against pinned runtime/processor evidence without inference. AI lane audits at most two compatible retained challengers under D-P17–18. Coordinator added telemetry-only exact embedding requests to the existing related-content runner; its 13 deterministic test/subtest outcomes passed before the current-source native baseline; selected chunk IDs/kinds/scores/revisions remain recorded. Native/model execution is serialized. Installed app and ordinary workspace are unchanged; signing/live accounts/independent-Mac checks remain pending.
 
 <a id="commit-history"></a>
 ## Recorded source-development history

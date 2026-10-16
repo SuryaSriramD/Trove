@@ -82,8 +82,10 @@ func runWorkflowRelated(t *testing.T, s *native.Supervisor, pack native.Pack) {
 			scoped := relatedScope(k, owner, source, relevant, irrelevant)
 			defer k.RevokeGrant(string(scoped.ScopeGrantId))
 			calls := 0
+			embeddingRequests := []map[string]any{}
 			k.SetEmbeddingProvider(func(ctx context.Context, model string, texts []string, locations []contracts.DomainLocation) ([][]float32, error) {
 				calls++
+				embeddingRequests = append(embeddingRequests, map[string]any{"modelPackId": model, "texts": append([]string(nil), texts...), "locations": append([]contracts.DomainLocation(nil), locations...)})
 				if model != pack.ID {
 					return nil, fmt.Errorf("unexpected model")
 				}
@@ -166,6 +168,9 @@ func runWorkflowRelated(t *testing.T, s *native.Supervisor, pack native.Pack) {
 				t.Fatal(err)
 			}
 			report["semanticResults"], report["selectedQueryResults"], report["embeddingCalls"] = semantic, keyword, calls
+			// Preserve the actual composed query and source batches; selected results
+			// already bind exact chunk IDs, source kinds, scores and revisions.
+			report["embeddingRequests"] = embeddingRequests
 			inv := audit.finish(t, k)
 			report["canonicalInventory"], report["canonicalUnchanged"], report["mutationHistoryCountUnchanged"] = inv, inv.Unchanged, inv.MutationHistoryCountUnchanged
 			check("canonicalPreserved", inv.Unchanged)
