@@ -804,3 +804,171 @@ test(`real-schedule-dst-${stage}`, async ({ page }) => {
   await expect(dateControl(page, `Date for ${f.title}`).locator("summary")).toContainText(f.after.start);
   write(`${stage}-schedule-dst-result.json`, { passed: true, canonical, operations });
 });
+
+
+async function chooseImport(page: Page, namespace: string, name: string, mimeType: string, bytes: Buffer) {
+  await surface(page, "Import");
+  await page.getByLabel("Source namespace", { exact: true }).fill(namespace);
+  const selected = page.waitForEvent("filechooser");
+  await page.getByRole("button", { name: "Choose import file", exact: true }).click();
+  const response = page.waitForResponse(response => response.url().endsWith("/api") && response.request().postDataJSON()?.method === "imports.preview");
+  await (await selected).setFiles({ name, mimeType, buffer: bytes });
+  const result = await (await response).json(); expect(result.ok).toBe(true);
+  await expect(page.locator(".import-heading h3")).toHaveText(name);
+  return result.result;
+}
+async function finishImport(page: Page, planId: string) {
+  await page.getByRole("button", { name: "Commit reviewed import", exact: true }).click();
+  await expect(page.getByText("Import processing finished. Review all outcomes below.", { exact: true })).toBeVisible();
+  const plan = await observe(page, "imports.plan", { planId });
+  expect(plan.state).toBe("complete"); expect(plan.cursor).toBe(plan.items.length);
+  return plan;
+}
+function importedProjection(s: any, pageId: string) {
+  const pages = s.pages.filter((p: any) => p.id === pageId && !p.deletedAt);
+  expect(pages).toHaveLength(1);
+  return { workspaceId: s.workspaceId, page: pages[0],
+    blocks: s.blocks.filter((b: any) => b.pageId === pageId && !b.deletedAt).sort((a: any, b: any) => a.sortKey.localeCompare(b.sortKey)) };
+}
+const blockText = (b: any) => (b.data.richText ?? []).map((r: any) => r.text).join("");
+async function openRecentImport(page: Page, plan: any) {
+  await surface(page, "Import");
+  const summary = page.getByText("Recent imports and resumable plans", { exact: true });
+  if ((await summary.locator("..").getAttribute("open")) === null) await summary.click();
+  const response = await uiResponse(page, "imports.plan", () => page.getByRole("button", { name: `${plan.sourceName} · ${plan.state} · ${plan.cursor}/${plan.items.length}`, exact: true }).first().click());
+  expect(response.ok).toBe(true); expect(response.result.planId).toBe(plan.planId);
+}
+async function reviewedMovedIdentity(page: Page, plan: any, localId: string) {
+  const f = fixture.importMerge, item = plan.items.find((i: any) => i.sourceLocator === f.movedFile);
+  expect(item.identityReview?.choice).toBeUndefined();
+  await expect(page.getByRole("button", { name: "Commit reviewed import", exact: true })).toBeDisabled();
+  await page.getByLabel(`Existing page for ${f.movedFile}`, { exact: true }).selectOption(localId);
+  const identity = await uiResponse(page, "imports.configure", () => page.getByRole("button", { name: `Link existing page for ${f.movedFile}`, exact: true }).click());
+  expect(identity.ok).toBe(true);
+  const linked = identity.result.items.find((i: any) => i.sourceLocator === f.movedFile);
+  expect(linked.pageId).toBe(localId); expect(linked.merge.baselineStatus).toBe("retained");
+  const title = linked.merge.fields.find((field: any) => field.path === "/title");
+  expect(title).toMatchObject({ outcome: "conflict", base: { present: true, value: f.originalTitle }, incoming: { present: true, value: f.movedTitle } });
+  await expect(page.getByText("Field review · retained source baseline", { exact: true })).toBeVisible();
+  const resolution = await uiResponse(page, "imports.configure", () => page.getByLabel(`Resolution for ${f.movedFile} /title`, { exact: true }).selectOption("keep_local"));
+  expect(resolution.ok).toBe(true);
+  await expect(page.getByRole("button", { name: "Commit reviewed import", exact: true })).toBeEnabled();
+  return resolution.result;
+}
+
+test(`real-import-merge-${stage}`, async ({ page }) => {
+  const f = fixture.importMerge;
+  if (stage === "create") {
+    const preview = await chooseImport(page, f.namespace, f.originalFile, "text/html", Buffer.from(f.originalHTML));
+    expect((await snapshot(page)).pages.some((p: any) => p.title === f.originalTitle)).toBe(false);
+    const initialPlan = await finishImport(page, preview.planId), originalItem = initialPlan.items.find((i: any) => i.kind === "html");
+    await page.getByRole("button", { name: originalItem.sourceLocator, exact: true }).click();
+    await expect(page.getByLabel("Page title", { exact: true })).toHaveValue(f.originalTitle);
+    const original = importedProjection(await snapshot(page), originalItem.pageId);
+    expect(original.blocks.map(blockText)).toEqual(f.originalTexts);
+    await page.getByLabel("Page title", { exact: true }).fill(f.localTitle);
+    const local = page.locator(".tiptap .block-text").filter({ hasText: f.originalTexts[0] });
+    await local.click(); await page.keyboard.press("Meta+ArrowLeft"); await page.keyboard.press("Meta+Shift+ArrowRight");
+    await page.keyboard.insertText(f.localText);
+    await expect(local).toHaveCount(0);
+    await page.getByRole("button", { name: "Save page", exact: true }).click();
+    await expect.poll(async () => importedProjection(await snapshot(page), originalItem.pageId).blocks.map(blockText)).toEqual([f.localText, f.originalTexts[1]]);
+    const localBefore = importedProjection(await snapshot(page), originalItem.pageId);
+    expect(localBefore.page.title).toBe(f.localTitle); expect(localBefore.blocks.map((b: any) => b.id)).toEqual(original.blocks.map((b: any) => b.id));
+    const movedPreview = await chooseImport(page, f.namespace, f.movedFile, "text/html", Buffer.from(f.incomingHTML));
+    const reviewed = await reviewedMovedIdentity(page, movedPreview, originalItem.pageId);
+    const reviewedItem = reviewed.items.find((i: any) => i.kind === "html");
+    expect(reviewedItem.mappingId).toBe(originalItem.mappingId);
+    const byPath = (field: string) => reviewedItem.merge.fields.find((x: any) => x.path === field);
+    expect(byPath(`/blocks/${original.blocks[0].id}/content`).outcome).toBe("keep_local");
+    expect(byPath(`/blocks/${original.blocks[1].id}/content`).outcome).toBe("apply_incoming");
+    // Leaving a reviewed preview without committing must not apply its changes.
+    await surface(page, "Home");
+    expect(importedProjection(await snapshot(page), originalItem.pageId)).toEqual(localBefore);
+    await page.getByRole("navigation", { name: "Page tree", exact: true }).getByRole("button", { name: `▤ ${f.localTitle}`, exact: true }).click();
+    await page.getByLabel("Page title", { exact: true }).fill(f.finalTitle);
+    await page.getByRole("button", { name: "Save page", exact: true }).click();
+    await expect.poll(async () => importedProjection(await snapshot(page), originalItem.pageId).page.title).toBe(f.finalTitle);
+    const beforeStale = importedProjection(await snapshot(page), originalItem.pageId);
+    await openRecentImport(page, reviewed);
+    const rejection = await uiResponse(page, "imports.commit", () => page.getByRole("button", { name: "Commit reviewed import", exact: true }).click());
+    expect(rejection.ok).toBe(false); expect(rejection.error.code).toBe("CONFLICT");
+    await expect(page.getByRole("alert").filter({ hasText: /changed after|changed since|revision/i })).toBeVisible();
+    expect(importedProjection(await snapshot(page), originalItem.pageId)).toEqual(beforeStale);
+    const refreshed = await chooseImport(page, f.namespace, f.movedFile, "text/html", Buffer.from(f.incomingHTML));
+    await reviewedMovedIdentity(page, refreshed, originalItem.pageId);
+    const committed = await finishImport(page, refreshed.planId);
+    const canonical = importedProjection(await snapshot(page), originalItem.pageId);
+    expect(canonical.page.title).toBe(f.finalTitle);
+    expect(canonical.blocks.map(blockText)).toEqual([f.incomingText, f.localText]);
+    expect(canonical.blocks.map((b: any) => b.id)).toEqual([original.blocks[1].id, original.blocks[0].id]);
+    const retriedPreview = await chooseImport(page, f.namespace, f.movedFile, "text/html", Buffer.from(f.incomingHTML));
+    const retryItem = retriedPreview.items.find((i: any) => i.kind === "html");
+    expect(retryItem.pageId).toBe(originalItem.pageId); expect(retryItem.mappingId).toBe(originalItem.mappingId);
+    expect(retryItem.identityReview).toBeUndefined(); expect(retryItem.choice).toBe("keep_local");
+    const retry = await finishImport(page, retriedPreview.planId);
+    expect(importedProjection(await snapshot(page), originalItem.pageId)).toEqual(canonical);
+    const retained = await page.getByRole("link", { name: "Original source", exact: true }).getAttribute("href");
+    expect(await page.evaluate(async href => (await fetch(href!)).text(), retained)).toBe(f.incomingHTML);
+    write("create-import-merge.json", { initialPlan, originalItem, original, localBefore, movedPreview, reviewed, rejection, refreshed, committed, canonical, retry });
+  }
+  const saved = read("create-import-merge.json");
+  await openRecentImport(page, saved.retry);
+  expect(await observe(page, "imports.plan", { planId: saved.retry.planId })).toEqual(saved.retry);
+  const current = importedProjection(await snapshot(page), saved.originalItem.pageId);
+  expect(current).toEqual(saved.canonical);
+  await page.getByRole("button", { name: f.movedFile, exact: true }).click();
+  await expect(page.getByLabel("Page title", { exact: true })).toHaveValue(f.finalTitle);
+  await expect(page.locator(".tiptap .block-text")).toHaveText([f.incomingText, f.localText]);
+  write(`${stage}-import-merge-result.json`, { passed: true, canonical: current, plan: saved.retry });
+});
+
+function pausedImportProjection(s: any, plan: any) {
+  const ids = new Set(plan.items.map((i: any) => i.pageId));
+  return { pages: s.pages.filter((p: any) => ids.has(p.id)).sort((a: any, b: any) => a.id.localeCompare(b.id)),
+    blocks: s.blocks.filter((b: any) => ids.has(b.pageId)).sort((a: any, b: any) => a.id.localeCompare(b.id)) };
+}
+test(`real-import-resume-${stage}`, async ({ page }) => {
+  const f = fixture.importResume;
+  if (stage === "create") {
+    const preview = await chooseImport(page, f.namespace, f.file, "application/zip", Buffer.from(f.zipBase64, "base64"));
+    expect(preview.items).toHaveLength(f.items.length);
+    expect(pausedImportProjection(await snapshot(page), preview)).toEqual({ pages: [], blocks: [] });
+    await page.getByRole("button", { name: "Commit reviewed import", exact: true }).click();
+    await page.getByRole("button", { name: "Pause after current item", exact: true }).click();
+    await expect(page.getByText("Paused after a durable commit. Resume here, including after restarting Trove.", { exact: true })).toBeVisible();
+    const paused = await observe(page, "imports.plan", { planId: preview.planId });
+    expect(paused.initialized).toBe(true); expect(paused.state).toBe("running"); expect(paused.cursor).toBeLessThan(f.items.length);
+    expect(paused.items.filter((i: any) => i.committed)).toHaveLength(paused.cursor);
+    const canonical = pausedImportProjection(await snapshot(page), paused);
+    expect(canonical.pages.map((p: any) => p.id).sort()).toEqual(paused.items.map((i: any) => i.pageId).sort());
+    expect(canonical.blocks).toHaveLength(paused.cursor);
+    for (const item of paused.items.filter((i: any) => i.committed)) {
+      const original = f.items.find((v: any) => v.file === item.sourceLocator);
+      expect(canonical.blocks.find((b: any) => b.pageId === item.pageId)?.data.richText).toEqual([{ text: original.text }]);
+    }
+    write("create-import-resume.json", { preview, paused, canonical });
+    write("create-import-resume-result.json", { passed: true, state: "paused_pending_reopen", canonical, plan: paused });
+  } else {
+    const saved = read("create-import-resume.json");
+    await openRecentImport(page, saved.paused);
+    expect(await observe(page, "imports.plan", { planId: saved.paused.planId })).toEqual(saved.paused);
+    expect(pausedImportProjection(await snapshot(page), saved.paused)).toEqual(saved.canonical);
+    await page.getByRole("button", { name: "Resume import", exact: true }).click();
+    await expect(page.getByText("Import processing finished. Review all outcomes below.", { exact: true })).toBeVisible();
+    const complete = await observe(page, "imports.plan", { planId: saved.paused.planId });
+    expect(complete.state).toBe("complete"); expect(complete.cursor).toBe(f.items.length);
+    const canonical = pausedImportProjection(await snapshot(page), complete);
+    expect(canonical.pages.map((p: any) => p.id)).toEqual(saved.canonical.pages.map((p: any) => p.id));
+    expect(canonical.blocks).toHaveLength(f.items.length);
+    for (const item of complete.items) {
+      const original = f.items.find((v: any) => v.file === item.sourceLocator), blocks = canonical.blocks.filter((b: any) => b.pageId === item.pageId);
+      expect(blocks).toHaveLength(1); expect(blocks[0].id).toBe(item.blocks[0].id); expect(blockText(blocks[0])).toBe(original.text);
+    }
+    for (const b of saved.canonical.blocks) expect(canonical.blocks.find((v: any) => v.id === b.id)).toEqual(b);
+    const last = complete.items[complete.items.length - 1];
+    await page.getByRole("button", { name: last.sourceLocator, exact: true }).click();
+    await expect(page.locator(".tiptap .block-text")).toHaveText(f.items.find((i: any) => i.file === last.sourceLocator).text);
+    write("reopen-import-resume-result.json", { passed: true, canonical, plan: complete });
+  }
+});

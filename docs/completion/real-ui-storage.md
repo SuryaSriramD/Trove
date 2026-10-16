@@ -2,7 +2,7 @@
 
 `scripts/run-real-ui.py` drives the compiled UI through Chromium against the production `trove-host` packaged inside an existing macOS app. It creates a new local APFS workspace, authenticates through the existing owner-token login, and changes content only through visible controls. Read-only production snapshots independently check exact canonical values and identities. The host is stopped normally and started again before the reopen checks.
 
-Suite version 4 retains the earlier sixteen case identities and adds four cases. Ten independent workflows run before and after a real host restart:
+Suite version 5 retains the earlier twenty case identities and adds four cases. Twelve independent workflows run before and after a real host restart:
 
 - Unicode rich-page creation with bold formatting.
 - Task creation, rename, completion and Tasks-to-Home consistency.
@@ -16,6 +16,9 @@ Suite version 4 retains the earlier sixteen case identities and adds four cases.
 
 - Working-week dependency scheduling with a complete branch/slack preview, cancellation, stale-plan rejection, atomic application and grouped undo retaining unrelated status/title edits.
 - Explicit calendar-day versus Sunday-only scheduling across Berlin fall DST, preserving 25 elapsed eligible hours and showing offset effects.
+
+- Moved HTML source identity explicitly linked to its existing page, retained-base field conflicts, local/remote merge, stable reordered block IDs, stale-review rejection and idempotent re-import.
+- A 48-item ZIP import paused by the visible control, with its durable cursor and partial contents preserved across host restart before resuming exactly once.
 
 The reopen cases compare exact canonical values, identities, operation state, layouts and review history with saved pre-restart observations. These are bounded UI/service/storage checks. Native Wails rendering, input methods, accessibility, microphone, reminders, AI quality, live accounts, performance and broader feature workflows require their own checks.
 
