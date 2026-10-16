@@ -55,6 +55,9 @@ func aiDefaultGenerationContract(p AIPrepared, groundedProse bool) aiGenerationC
 		return aiGenerationContract{"local-cited-answer-v1", p.Grammar}
 	}
 	if groundedProse {
+		if p.Run.Request.Mode == "expand" {
+			return aiGenerationContract{aiStructuredExpansionVersion, p.Grammar}
+		}
 		return aiGenerationContract{"local-record-prose-v1", ""}
 	}
 	return aiGenerationContract{"local-free-text-v1", ""}

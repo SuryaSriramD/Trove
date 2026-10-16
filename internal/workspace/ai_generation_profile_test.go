@@ -335,6 +335,14 @@ func TestAIGenerationProfilePreservesGenerationInputs(t *testing.T) {
 		t.Fatal("baseline binding changed", err)
 	}
 	rows := captureGenerationInputs(t)
+	// This versioned experiment intentionally changes only grounded expansion.
+	// Keep the immutable 23-case baseline fixture; all other callback bytes stay
+	// bound to it. Expansion has its own transport/budget/scope regressions.
+	if rows["expand-sources"] == fixture.Cases["expand-sources"] {
+		t.Fatal("structured expansion protocol was not applied")
+	}
+	delete(rows, "expand-sources")
+	delete(fixture.Cases, "expand-sources")
 	if !reflect.DeepEqual(rows, fixture.Cases) {
 		for id, want := range fixture.Cases {
 			if rows[id] != want {

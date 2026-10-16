@@ -53,6 +53,9 @@ func GeneratePreparedAI(ctx context.Context, prepared AIPrepared, generate AIGen
 	if err := validateAIPrepared(prepared); err != nil {
 		return AICompletion{}, err
 	}
+	if prepared.Run.GenerationProfile.ProfileVersion == aiStructuredExpansionVersion {
+		return generateAIStructuredExpansion(ctx, prepared, generate, onToken)
+	}
 	if prepared.Run.Request.Mode == "workspace_agent" {
 		text, err := generate(ctx, prepared.System, prepared.Prompt, prepared.OutputTokens, prepared.Grammar, nil)
 		return AICompletion{Text: text}, err

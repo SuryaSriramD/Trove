@@ -56,7 +56,11 @@ func prepareAIContextWithGeneration(ctx context.Context, r AIRequest, sources []
 		system = trustedSystem
 	}
 	if groundedProse {
-		system += aiProseResponseContract
+		if r.Mode == "expand" {
+			system += aiStructuredExpansionContract
+		} else {
+			system += aiProseResponseContract
+		}
 	}
 	// Capture only trusted instruction components; request/evidence never enter
 	// this digest. The cited response contract is in the USER tail.
@@ -205,6 +209,13 @@ func prepareAIContextWithGeneration(ctx context.Context, r AIRequest, sources []
 		if aiRequiresCitations(r.Mode) && len(kept) > 0 {
 			var err error
 			grammar, err = aiCitedGrammarForSources(kept)
+			if err != nil {
+				continue
+			}
+		}
+		if groundedProse && r.Mode == "expand" && len(kept) > 0 {
+			var err error
+			grammar, err = aiExpansionGrammarForSources(kept)
 			if err != nil {
 				continue
 			}

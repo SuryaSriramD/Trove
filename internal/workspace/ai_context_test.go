@@ -321,6 +321,10 @@ func TestAICitedResponseContractIsMeasuredWithoutInterpretingTheEvidence(t *test
 func TestAISourceGroundedProseContractIsMeasuredWithTheExactFinalRequest(t *testing.T) {
 	for _, mode := range []string{"rewrite", "shorten", "expand", "outline", "generate"} {
 		t.Run(mode, func(t *testing.T) {
+			contract := aiProseResponseContract
+			if mode == "expand" {
+				contract = aiStructuredExpansionContract
+			}
 			request := AIRequest{Mode: mode, Prompt: "Rephrase the supplied account without changing what it establishes.", Selection: "Selected evidence — exact bytes.", UseMemory: true}
 			sources := []AIEvidence{{Title: "Draft record", Text: "The proposal remains optional. No decision has been recorded."}}
 			budget := wordBudget()
@@ -330,7 +334,7 @@ func TestAISourceGroundedProseContractIsMeasuredWithTheExactFinalRequest(t *test
 			budget.CountTokens = func(ctx context.Context, prompts []AIPrompt) ([]int, error) {
 				counts, err := count(ctx, prompts)
 				for i, prompt := range prompts {
-					if strings.Count(prompt.System, aiProseResponseContract) != 1 || strings.Contains(prompt.User, aiProseResponseContract) || strings.Count(prompt.System+prompt.User, aiProseResponseContract) != 1 || strings.Contains(prompt.User, aiCitedResponseContract) || strings.Count(prompt.User, "\nUSER REQUEST\n"+request.Prompt) != 1 || !strings.HasSuffix(prompt.User, "\nUSER REQUEST\n"+request.Prompt) || !strings.Contains(prompt.User, "\nSELECTED TEXT\n"+request.Selection) {
+					if strings.Count(prompt.System, contract) != 1 || strings.Contains(prompt.User, contract) || strings.Count(prompt.System+prompt.User, contract) != 1 || strings.Contains(prompt.User, aiCitedResponseContract) || strings.Count(prompt.User, "\nUSER REQUEST\n"+request.Prompt) != 1 || !strings.HasSuffix(prompt.User, "\nUSER REQUEST\n"+request.Prompt) || !strings.Contains(prompt.User, "\nSELECTED TEXT\n"+request.Selection) {
 						t.Fatal("complete measured prose policy and selection must precede the exact final request")
 					}
 					measured[prompt.System+prompt.User] = counts[i]
@@ -396,6 +400,10 @@ func TestAIProseContractPreservesOtherOutputProtocols(t *testing.T) {
 func TestAISourceGroundedProseJSONKeepsTruncatedEvidenceWithinBudget(t *testing.T) {
 	for _, mode := range []string{"rewrite", "shorten", "expand", "outline", "generate"} {
 		t.Run(mode, func(t *testing.T) {
+			contract := aiProseResponseContract
+			if mode == "expand" {
+				contract = aiStructuredExpansionContract
+			}
 			source := AIEvidence{Title: "Source \"label\"", Text: strings.Repeat("A recorded statement.\n", 1500)}
 			budget := wordBudget()
 			budget.ContextTokens = 700
@@ -412,7 +420,7 @@ func TestAISourceGroundedProseJSONKeepsTruncatedEvidenceWithinBudget(t *testing.
 			if err := json.Unmarshal([]byte(strings.TrimSpace(body)), &encoded); err != nil || len(prepared.Run.Sources) != 1 || encoded.Text != prepared.Run.Sources[0].Text || len(encoded.Text) >= len(source.Text) {
 				t.Fatal("prose truncation broke the evidence JSON/captured-byte boundary", prepared, err)
 			}
-			if !strings.Contains(prepared.Run.Warning, "shortened") || !strings.HasSuffix(prepared.Prompt, "\nUSER REQUEST\n"+request.Prompt) || strings.Count(prepared.System, aiProseResponseContract) != 1 || strings.Contains(prepared.Prompt, aiProseResponseContract) || prepared.PromptTokens+prepared.OutputTokens+16 > budget.ContextTokens {
+			if !strings.Contains(prepared.Run.Warning, "shortened") || !strings.HasSuffix(prepared.Prompt, "\nUSER REQUEST\n"+request.Prompt) || strings.Count(prepared.System, contract) != 1 || strings.Contains(prepared.Prompt, contract) || prepared.PromptTokens+prepared.OutputTokens+16 > budget.ContextTokens {
 				t.Fatal("prose example/JSON bypassed the complete prompt budget", prepared)
 			}
 		})
