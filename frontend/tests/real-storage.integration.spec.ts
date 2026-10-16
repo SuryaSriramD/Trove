@@ -158,7 +158,7 @@ function dateValue(r: ReturnType<typeof recordProjection>, name: string) {
   return r.record.values.find((v: any) => v.propertyId === property(r, name).id)?.value ?? null;
 }
 const date = (start: string, timezone = fixture.timezone) => ({ start, end: null, timezone, hasTime: false });
-async function observe(page: Page, method: "page.freshness" | "recordLayouts.get" | "operations.list" | "databaseP2" | "databaseChart" | "imports.list" | "imports.plan" | "pageDisplay.get" | "databaseDerived", args: Record<string, unknown>) {
+async function observe(page: Page, method: "page.freshness" | "recordLayouts.get" | "operations.list" | "databaseP2" | "databaseChart" | "imports.list" | "imports.plan" | "pageDisplay.get" | "databaseDerived" | "skills.list" | "ai.runs" | "review.list", args: Record<string, unknown>) {
   const s = await snapshot(page);
   return page.evaluate(async ({ method, args, workspaceId }) => {
     const a = crypto.getRandomValues(new Uint8Array(16)), t = BigInt(Date.now());
@@ -171,7 +171,7 @@ async function observe(page: Page, method: "page.freshness" | "recordLayouts.get
     return response.result;
   }, { method, args, workspaceId: s.workspaceId });
 }
-async function surface(page: Page, name: "Tasks" | "Home" | "Pages" | "Import") {
+async function surface(page: Page, name: "Tasks" | "Home" | "Pages" | "Import" | "Skills" | "Intelligence") {
   await page.getByRole("navigation", { name: "Workspace", exact: true }).getByRole("button", { name: new RegExp(name) }).click();
 }
 function dateControl(page: Page, label: string) {
@@ -984,4 +984,343 @@ test(`real-import-resume-${stage}`, async ({ page }) => {
     await expect(page.locator(".tiptap .block-text")).toHaveText(f.items.find((i: any) => i.file === last.sourceLocator).text);
     write("reopen-import-resume-result.json", { passed: true, canonical, plan: complete });
   }
+});
+
+// Suite 7: independently specified, non-generative library/review/graph workflows.
+async function createPlainPage(page: Page, title: string, body: string) {
+  await surface(page, "Pages");
+  await page.getByRole("button", { name: "Create page", exact: true }).click();
+  await page.getByLabel("Page title", { exact: true }).fill(title);
+  await page.getByLabel("Page title", { exact: true }).press("Enter");
+  await expect(page.getByLabel("Page title", { exact: true })).toBeEnabled();
+  await page.locator(".tiptap .block-text").click({ position: { x: 8, y: 8 } });
+  await page.keyboard.insertText(body);
+  await page.getByRole("button", { name: "Save page", exact: true }).click();
+  await expect.poll(async () => {
+    const s = await snapshot(page), p = s.pages.find((p: any) => p.title === title && !p.deletedAt);
+    return p ? s.blocks.filter((b: any) => b.pageId === p.id).map(blockText) : [];
+  }).toEqual([body]);
+  const s = await snapshot(page), p = s.pages.find((p: any) => p.title === title && !p.deletedAt);
+  return importedProjection(s, p.id);
+}
+async function openPlainPage(page: Page, title: string) {
+  await surface(page, "Pages");
+  await page.getByRole("navigation", { name: "Page tree", exact: true }).getByRole("button", { name: `▤ ${title}`, exact: true }).click();
+  await expect(page.getByLabel("Page title", { exact: true })).toHaveValue(title);
+  await expect(page.locator(".tiptap[contenteditable=true]")).toBeVisible();
+}
+function canonicalContent(s: any) {
+  return { pages: s.pages, blocks: s.blocks, collections: s.collections, properties: s.properties, records: s.records, taskFacets: s.taskFacets };
+}
+function unrelatedRecords(s: any) {
+  return { collections: s.collections, properties: s.properties, records: s.records, taskFacets: s.taskFacets };
+}
+const skillsPanel = (page: Page) => page.getByRole("region", { name: "Skills library", exact: true });
+async function saveSkillVersion(page: Page, name: string, version: number) {
+  const panel = skillsPanel(page);
+  const result = await uiResponse(page, "batch", () => panel.getByRole("button", { name: "Save new version", exact: true }).click());
+  expect(result.ok).toBe(true);
+  await expect.poll(async () => (await observe(page, "skills.list", {})).find((v: any) => v.definition.name === name)?.version).toBe(version);
+  const saved = (await observe(page, "skills.list", {})).find((v: any) => v.definition.name === name);
+  await expect(panel.getByLabel("Saved skill", { exact: true })).toHaveValue(saved.id);
+  await expect(panel.getByRole("button", { name: "Save new version", exact: true })).toBeEnabled();
+  return saved;
+}
+async function skillState(page: Page) {
+  const library = (await observe(page, "skills.list", {})).sort((a: any, b: any) => a.id.localeCompare(b.id));
+  const versions: Record<string, any> = {};
+  for (const v of library) versions[v.id] = await observe(page, "skills.list", { skillId: v.id });
+  return { library, versions, aiRuns: await observe(page, "ai.runs", {}) };
+}
+
+test(stage === "create" ? "real-skills-create" : "real-skills-reopen", async ({ page }) => {
+  const f = fixture.skills;
+  if (stage === "create") {
+    const selected = await createPlainPage(page, f.sourceTitle, f.sourceBody);
+    const excluded = await createPlainPage(page, f.excludedTitle, f.excludedBody);
+    await surface(page, "Skills");
+    const panel = skillsPanel(page), beforeInvalid = canonicalContent(await snapshot(page));
+    await panel.getByLabel("Skill instructions", { exact: true }).fill(f.instructions[0]);
+    const rejected = await uiResponse(page, "batch", () => panel.getByRole("button", { name: "Save new version", exact: true }).click());
+    expect(rejected.ok).toBe(false); expect(rejected.error.code).toBe("INVALID_REQUEST");
+    expect(canonicalContent(await snapshot(page))).toEqual(beforeInvalid);
+    expect(await observe(page, "skills.list", {})).toEqual([]);
+    await panel.getByLabel("Skill name", { exact: true }).fill(f.name);
+    await panel.getByLabel("Skill purpose", { exact: true }).fill(f.purpose);
+    await panel.getByLabel("Skill inputDescription", { exact: true }).fill(f.inputDescription);
+    await panel.getByLabel("Skill expectedOutput", { exact: true }).fill(f.expectedOutput);
+    await panel.getByLabel("Skill mode", { exact: true }).selectOption("summarize");
+    await panel.getByRole("group", { name: "Available sources", exact: true }).getByRole("checkbox", { name: f.sourceTitle, exact: true }).check();
+    const permitted = panel.getByRole("group", { name: "Permitted tools", exact: true });
+    await permitted.getByRole("checkbox", { name: "proposeActions", exact: true }).uncheck();
+    await permitted.getByRole("checkbox", { name: "search.query", exact: true }).check();
+    const first = await saveSkillVersion(page, f.name, 1);
+    const expectedDefinition = { name: f.name, purpose: f.purpose, instructions: f.instructions[0], inputDescription: f.inputDescription,
+      expectedOutput: f.expectedOutput, mode: "summarize", sourcePageIds: [selected.page.id], tools: ["readPage", "search.query"] };
+    expect(first.definition).toEqual(expectedDefinition); expect(first.imported).toBe(false); expect(first.archived).toBe(false);
+    await panel.getByLabel("Skill instructions", { exact: true }).fill(f.instructions[1]);
+    const second = await saveSkillVersion(page, f.name, 2);
+    expect(second.id).toBe(first.id); expect(second.pageId).toBe(first.pageId);
+    expect(second.definition).toEqual({ ...expectedDefinition, instructions: f.instructions[1] });
+    await panel.getByRole("button", { name: "Version history", exact: true }).click();
+    await panel.getByRole("button", { name: "Use version 1 as next draft", exact: true }).click();
+    const third = await saveSkillVersion(page, f.name, 3);
+    expect(third.id).toBe(first.id); expect(third.definition).toEqual(expectedDefinition);
+    const history = await observe(page, "skills.list", { skillId: first.id });
+    expect(history).toEqual([third, second, first]);
+    await panel.getByRole("button", { name: "Duplicate", exact: true }).click();
+    const copy = await saveSkillVersion(page, f.name + " copy", 1);
+    expect(copy.id).not.toBe(first.id); expect(copy.pageId).not.toBe(first.pageId);
+    expect(copy.definition).toEqual({ ...expectedDefinition, name: f.name + " copy" });
+    const runsBefore = await observe(page, "ai.runs", {}), canonicalBeforePreview = canonicalContent(await snapshot(page));
+    await panel.getByLabel("Skill input", { exact: true }).fill(f.input);
+    await panel.getByRole("group", { name: "Tools for this run", exact: true }).getByRole("checkbox", { name: "search.query", exact: true }).uncheck();
+    const preview = await uiResponse(page, "skills.preview", () => panel.getByRole("button", { name: "Review skill run", exact: true }).click());
+    expect(preview.ok).toBe(true);
+    expect(preview.result.skill).toEqual(copy); expect(preview.result.provider).toBe("local");
+    expect(preview.result.tools).toEqual(["readPage"]);
+    expect(preview.result.sources).toEqual([{ pageId: selected.page.id, title: f.sourceTitle, revision: selected.page.revision }]);
+    expect(preview.result.prompt).toBe(`Purpose: ${f.purpose}\nInstructions: ${f.instructions[0]}\nExpected output: ${f.expectedOutput}\nInput: ${f.input}`);
+    expect(preview.result.hash).toMatch(/^[a-f0-9]{64}$/);
+    await expect(panel.getByRole("heading", { name: "Review · local · v1", exact: true })).toBeVisible();
+    expect(canonicalContent(await snapshot(page))).toEqual(canonicalBeforePreview);
+    expect(await observe(page, "ai.runs", {})).toEqual(runsBefore);
+    await panel.getByLabel("Saved skill", { exact: true }).selectOption(first.id);
+    await panel.getByRole("checkbox", { name: "Archived (cannot run)", exact: true }).check();
+    const archived = await saveSkillVersion(page, f.name, 4);
+    expect(archived.archived).toBe(true); expect(archived.definition).toEqual(expectedDefinition);
+    await expect(panel.getByRole("region", { name: "Run skill", exact: true })).toHaveCount(0);
+    await panel.getByText("Import or export a skill definition", { exact: true }).click();
+    const beforeImport = canonicalContent(await snapshot(page)), beforeLibrary = await observe(page, "skills.list", {});
+    await panel.getByLabel("Skill JSON", { exact: true }).fill('{"name":"Incomplete imported definition"}');
+    await panel.getByRole("button", { name: "Review imported definition", exact: true }).click();
+    await expect(panel.getByRole("alert")).toContainText("Import a valid skill definition");
+    expect(canonicalContent(await snapshot(page))).toEqual(beforeImport);
+    const importedDefinition = { ...expectedDefinition, name: f.importName, instructions: f.importInstructions,
+      sourcePageIds: [excluded.page.id], tools: ["readPage", "proposeChanges"] };
+    await panel.getByLabel("Skill JSON", { exact: true }).fill(JSON.stringify(importedDefinition));
+    await panel.getByRole("button", { name: "Review imported definition", exact: true }).click();
+    await expect(panel.getByLabel("Skill name", { exact: true })).toHaveValue(f.importName);
+    await expect(panel.getByRole("checkbox", { name: "Archived (cannot run)", exact: true })).toBeChecked();
+    await expect(panel.getByRole("group", { name: "Available sources", exact: true }).getByRole("checkbox", { checked: true })).toHaveCount(0);
+    expect(canonicalContent(await snapshot(page))).toEqual(beforeImport);
+    expect(await observe(page, "skills.list", {})).toEqual(beforeLibrary);
+    const imported = await saveSkillVersion(page, f.importName, 1);
+    expect(imported.definition).toEqual({ ...importedDefinition, sourcePageIds: [] });
+    expect(imported.imported).toBe(true); expect(imported.archived).toBe(true);
+    await expect(panel.getByRole("region", { name: "Run skill", exact: true })).toHaveCount(0);
+    expect(await observe(page, "ai.runs", {})).toEqual(runsBefore);
+    const final = await snapshot(page);
+    expect(importedProjection(final, selected.page.id)).toEqual(selected);
+    expect(importedProjection(final, excluded.page.id)).toEqual(excluded);
+    expect(unrelatedRecords(final)).toEqual(unrelatedRecords(beforeInvalid));
+    write("create-skills.json", { selected, excluded, first, second, third, copy, archived, imported, preview: preview.result, state: await skillState(page) });
+  }
+  const saved = read("create-skills.json");
+  await surface(page, "Skills");
+  const panel = skillsPanel(page);
+  expect(await skillState(page)).toEqual(saved.state);
+  for (const version of [saved.archived, saved.copy, saved.imported]) {
+    await panel.getByLabel("Saved skill", { exact: true }).selectOption(version.id);
+    await expect(panel.getByLabel("Skill instructions", { exact: true })).toHaveValue(version.definition.instructions);
+    await expect(panel.getByRole("checkbox", { name: "Archived (cannot run)", exact: true })).toBeChecked({ checked: version.archived });
+    const selectedSources = await panel.getByRole("group", { name: "Available sources", exact: true }).getByRole("checkbox", { checked: true }).evaluateAll(nodes => nodes.map(n => n.parentElement?.textContent?.trim()));
+    expect(selectedSources).toEqual(version.definition.sourcePageIds.length ? [f.sourceTitle] : []);
+    const selectedTools = await panel.getByRole("group", { name: "Permitted tools", exact: true }).getByRole("checkbox", { checked: true }).evaluateAll(nodes => nodes.map(n => n.parentElement?.textContent?.trim()));
+    expect(selectedTools).toEqual(version.definition.tools);
+    await expect(panel.getByRole("region", { name: "Run skill", exact: true })).toHaveCount(version.archived ? 0 : 1);
+  }
+  const current = await snapshot(page);
+  expect(importedProjection(current, saved.selected.page.id)).toEqual(saved.selected);
+  expect(importedProjection(current, saved.excluded.page.id)).toEqual(saved.excluded);
+  write(`${stage}-skills-result.json`, { passed: true, state: saved.state, previewOnly: true, generationExecuted: false, importedActivation: false });
+});
+
+const intelligencePanel = (page: Page) => page.getByRole("region", { name: "P2 intelligence packages", exact: true });
+async function openIntelligence(page: Page, pageId: string, tab: "Personal review" | "Knowledge graph") {
+  await surface(page, "Intelligence");
+  const panel = intelligencePanel(page);
+  await panel.getByRole("combobox", { name: "Page", exact: true }).selectOption(pageId);
+  await panel.getByRole("navigation", { name: "Intelligence packages", exact: true }).getByRole("button", { name: tab, exact: true }).click();
+  return panel;
+}
+function reviewPlanCard(page: Page, name: string) {
+  return intelligencePanel(page).getByRole("article").filter({ has: page.getByRole("heading", { name, exact: true }) });
+}
+function pendingReviewCard(page: Page) {
+  return intelligencePanel(page).getByRole("article").filter({ has: page.getByRole("button", { name: "Approve and append this digest", exact: true }) });
+}
+async function prepareReview(page: Page, plan: any, sources: any[]) {
+  const before = canonicalContent(await snapshot(page));
+  const response = await uiResponse(page, "review.run", () => reviewPlanCard(page, plan.plan.name).getByRole("button", { name: "Prepare review now", exact: true }).click());
+  expect(response.ok).toBe(true);
+  const run = response.result;
+  expect(run.planBlockId).toBe(plan.blockId); expect(run.pageId).toBe(plan.pageId); expect(run.planHash).toBe(plan.hash);
+  expect(run.status).toBe("pending"); expect(run.generative).toBeUndefined(); expect(run.modelRunId).toBeUndefined();
+  expect(run.sources).toEqual(sources.map(s => ({ pageId: s.page.id, sourceRevision: s.page.revision })));
+  for (const source of sources) { expect(run.text).toContain(source.page.title); expect(run.text).toContain(blockText(source.blocks[0])); }
+  expect(canonicalContent(await snapshot(page))).toEqual(before);
+  await expect(pendingReviewCard(page)).toHaveCount(1);
+  await expect(pendingReviewCard(page).locator("pre")).toHaveText(run.text);
+  return run;
+}
+async function decideReview(page: Page, approve: boolean) {
+  return uiResponse(page, "batch", () => pendingReviewCard(page).getByRole("button", { name: approve ? "Approve and append this digest" : "Dismiss", exact: true }).click());
+}
+
+test(stage === "create" ? "real-personal-review-create" : "real-personal-review-reopen", async ({ page }) => {
+  const f = fixture.personalReview;
+  if (stage === "create") {
+    const source = await createPlainPage(page, f.sourceTitle, f.sourceBody);
+    const additional = await createPlainPage(page, f.additionalTitle, f.additionalBody);
+    const destination = await createPlainPage(page, f.destinationTitle, f.unrelatedBody);
+    const unrelated = unrelatedRecords(await snapshot(page)), aiBefore = await observe(page, "ai.runs", {});
+    let panel = await openIntelligence(page, destination.page.id, "Personal review");
+    await panel.getByLabel("Name", { exact: true }).fill(f.name);
+    await panel.getByLabel("Source page", { exact: true }).selectOption(source.page.id);
+    await panel.getByLabel("Additional source pages", { exact: true }).selectOption([additional.page.id]);
+    await expect(panel.getByRole("checkbox", { name: "Include approved relevant memories", exact: true })).not.toBeChecked();
+    await expect(panel.getByRole("checkbox", { name: "Enable local model analysis for this plan", exact: true })).not.toBeChecked();
+    await panel.getByLabel("Recurrence", { exact: true }).selectOption("weekly");
+    await panel.getByLabel("Review weekday", { exact: true }).selectOption(String(f.weekday));
+    await panel.getByLabel("Local time", { exact: true }).fill(f.time);
+    await panel.getByLabel("Time zone", { exact: true }).fill(f.timezone);
+    await panel.getByLabel("After downtime", { exact: true }).selectOption("skip");
+    const created = await uiResponse(page, "batch", () => panel.getByRole("button", { name: "Save review plan on this page", exact: true }).click());
+    expect(created.ok).toBe(true);
+    await expect(reviewPlanCard(page, f.name)).toContainText("Enabled locally");
+    const plan = (await observe(page, "review.list", {})).plans.find((p: any) => p.plan.name === f.name);
+    expect(plan.pageId).toBe(destination.page.id); expect(plan.activated).toBe(true);
+    expect(plan.plan).toEqual({ type: "trove.personal-review/v1", name: f.name, enabled: true,
+      sourcePageIds: [source.page.id, additional.page.id], query: "", includeMemory: false,
+      schedule: { type: "schedule", timezone: f.timezone, frequency: "weekly", hour: 23, minute: 59, weekday: f.weekday, missedPolicy: "skip", catchUpLimit: 1 } });
+    const dismissed = await prepareReview(page, plan, [source, additional]);
+    expect((await decideReview(page, false)).ok).toBe(true);
+    await expect(pendingReviewCard(page)).toHaveCount(0);
+    expect((await observe(page, "review.list", {})).runs.find((r: any) => r.id === dismissed.id).status).toBe("dismissed");
+    const stale = await prepareReview(page, plan, [source, additional]);
+    await openPlainPage(page, f.sourceTitle);
+    await page.locator(".tiptap .block-text").click({ position: { x: 8, y: 8 } });
+    await page.keyboard.press("Home"); await page.keyboard.press("Shift+End"); await page.keyboard.insertText(f.changedBody);
+    await page.getByRole("button", { name: "Save page", exact: true }).click();
+    await expect.poll(async () => blockText(importedProjection(await snapshot(page), source.page.id).blocks[0])).toBe(f.changedBody);
+    const changedSource = importedProjection(await snapshot(page), source.page.id);
+    expect(changedSource.blocks[0].id).toBe(source.blocks[0].id);
+    panel = await openIntelligence(page, destination.page.id, "Personal review");
+    await expect(pendingReviewCard(page).locator("pre")).toHaveText(stale.text);
+    const beforeStale = canonicalContent(await snapshot(page)), rejection = await decideReview(page, true);
+    expect(rejection.ok).toBe(false); expect(rejection.error.code).toBe("CONFLICT");
+    expect(canonicalContent(await snapshot(page))).toEqual(beforeStale);
+    expect((await observe(page, "review.list", {})).runs.find((r: any) => r.id === stale.id).status).toBe("pending");
+    expect((await decideReview(page, false)).ok).toBe(true);
+    await expect(pendingReviewCard(page)).toHaveCount(0);
+    const fresh = await prepareReview(page, plan, [changedSource, additional]);
+    const beforeApproval = importedProjection(await snapshot(page), destination.page.id);
+    expect((await decideReview(page, true)).ok).toBe(true);
+    await expect(pendingReviewCard(page)).toHaveCount(0);
+    const accepted = importedProjection(await snapshot(page), destination.page.id);
+    const added = accepted.blocks.filter((b: any) => !beforeApproval.blocks.some((v: any) => v.id === b.id));
+    expect(added).toHaveLength(1); expect(added[0].type).toBe("paragraph"); expect(blockText(added[0])).toBe(fresh.text);
+    for (const block of beforeApproval.blocks) expect(accepted.blocks.find((v: any) => v.id === block.id)).toEqual(block);
+    const toggle = async (label: string) => {
+      const response = await uiResponse(page, "batch", () => reviewPlanCard(page, f.name).getByRole("button", { name: label, exact: true }).click());
+      expect(response.ok).toBe(true);
+      await expect(reviewPlanCard(page, f.name).getByRole("button", { name: label === "Pause" ? "Activate locally" : "Pause", exact: true })).toBeEnabled();
+    };
+    await toggle("Pause"); await toggle("Activate locally"); await toggle("Pause");
+    const state = await observe(page, "review.list", {}), final = await snapshot(page);
+    expect(state.plans).toHaveLength(1); expect(state.plans[0].blockId).toBe(plan.blockId);
+    expect(state.plans[0].activated).toBe(false); expect(state.plans[0].plan).toEqual({ ...plan.plan, enabled: false });
+    expect(state.runs.map((r: any) => [r.id, r.status]).sort()).toEqual([[dismissed.id, "dismissed"], [stale.id, "dismissed"], [fresh.id, "accepted"]].sort());
+    expect(importedProjection(final, additional.page.id)).toEqual(additional);
+    expect(importedProjection(final, source.page.id)).toEqual(changedSource);
+    const finalDestination = importedProjection(final, destination.page.id);
+    expect(finalDestination.blocks.find((b: any) => b.id === destination.blocks[0].id)).toEqual(destination.blocks[0]);
+    expect(finalDestination.blocks.find((b: any) => b.id === added[0].id)).toEqual(added[0]);
+    expect(unrelatedRecords(final)).toEqual(unrelated);
+    expect(await observe(page, "ai.runs", {})).toEqual(aiBefore);
+    write("create-personal-review.json", { source: changedSource, additional, destination: finalDestination, plan, dismissed, stale, fresh, rejection, state, unrelated, aiBefore });
+  }
+  const saved = read("create-personal-review.json");
+  const panel = await openIntelligence(page, saved.destination.page.id, "Personal review");
+  const state = await observe(page, "review.list", {});
+  expect(state).toEqual(saved.state);
+  await expect(reviewPlanCard(page, f.name)).toContainText("Paused / activation required");
+  await expect(panel.getByRole("button", { name: "Approve and append this digest", exact: true })).toHaveCount(0);
+  const s = await snapshot(page);
+  for (const projection of [saved.source, saved.additional, saved.destination]) expect(importedProjection(s, projection.page.id)).toEqual(projection);
+  expect(unrelatedRecords(s)).toEqual(saved.unrelated);
+  expect(await observe(page, "ai.runs", {})).toEqual(saved.aiBefore);
+  write(`${stage}-personal-review-result.json`, { passed: true, state, generationExecuted: false, exactAppendBlock: saved.destination.blocks.find((b: any) => blockText(b) === saved.fresh.text) });
+});
+
+async function insertPageLink(page: Page, title: string) {
+  await page.getByRole("button", { name: "＋ Add a thought · type / for blocks", exact: true }).click();
+  await page.getByRole("button", { name: "＋ Insert", exact: true }).click();
+  page.once("dialog", dialog => dialog.accept(title));
+  await page.getByRole("dialog", { name: "Insert a block", exact: true }).getByRole("button", { name: /^Page link/ }).click();
+  await page.getByRole("button", { name: "Save page", exact: true }).click();
+  await expect(page.locator(".tiptap .page-link").filter({ hasText: title })).toBeVisible();
+}
+async function visibleGraph(page: Page, pageId: string) {
+  const panel = await openIntelligence(page, pageId, "Knowledge graph");
+  await expect(panel.getByRole("checkbox", { name: "Include retrieval associations", exact: true })).not.toBeChecked();
+  const response = await uiResponse(page, "graph.query", () => panel.getByRole("button", { name: "Explore connections", exact: true }).click());
+  expect(response.ok).toBe(true); expect(response.result.truncated).toBe(false);
+  await expect(panel.getByRole("img", { name: "Page relationships", exact: true })).toBeVisible();
+  return response.result;
+}
+function expectedGraphEdge(source: any, target: any, blockId: string) {
+  return { source: source.page.id, target: target.page.id, kind: "explicit", evidence: "Canonical link in source block",
+    location: { pageId: source.page.id, sourceRevision: source.page.revision, blockId } };
+}
+
+test(stage === "create" ? "real-graph-create" : "real-graph-reopen", async ({ page }) => {
+  const f = fixture.graph;
+  if (stage === "create") {
+    const target = await createPlainPage(page, f.targetTitle, f.targetBody);
+    const removedTarget = await createPlainPage(page, f.removedTitle, f.removedBody);
+    const source = await createPlainPage(page, f.sourceTitle, f.sourceBody), unrelated = unrelatedRecords(await snapshot(page));
+    await insertPageLink(page, f.targetTitle); await insertPageLink(page, f.removedTitle);
+    await expect.poll(async () => importedProjection(await snapshot(page), source.page.id).blocks.filter((b: any) => b.type === "page_mention").length).toBe(2);
+    const linked = importedProjection(await snapshot(page), source.page.id);
+    const link = linked.blocks.find((b: any) => b.type === "page_mention" && b.data.targetPageId === target.page.id);
+    const removedLink = linked.blocks.find((b: any) => b.type === "page_mention" && b.data.targetPageId === removedTarget.page.id);
+    expect(link).toBeTruthy(); expect(removedLink).toBeTruthy(); expect(link.id).not.toBe(removedLink.id);
+    const graph = await visibleGraph(page, source.page.id);
+    expect(graph.edges).toEqual([expectedGraphEdge(linked, target, link.id), expectedGraphEdge(linked, removedTarget, removedLink.id)].sort((a, b) => a.location.blockId.localeCompare(b.location.blockId)));
+    expect(graph.nodes.map((n: any) => n.id).sort()).toEqual([source.page.id, target.page.id, removedTarget.page.id].sort());
+    const edge = intelligencePanel(page).locator("details").filter({ has: page.getByText(`explicit · ${f.sourceTitle} → ${f.targetTitle}`, { exact: true }) });
+    await edge.locator("summary").click();
+    await expect(edge).toContainText(`Source revision ${linked.page.revision} · block ${link.id}`);
+    await edge.getByRole("button", { name: "Open evidence", exact: true }).click();
+    await expect(page.getByLabel("Page title", { exact: true })).toHaveValue(f.sourceTitle);
+    await page.locator(".tiptap").getByRole("button", { name: `↗ ${f.targetTitle}`, exact: true }).click();
+    await expect(page.getByLabel("Page title", { exact: true })).toHaveValue(f.targetTitle);
+    await page.locator(".backlinks").getByRole("button", { name: `↗ ${f.sourceTitle}`, exact: true }).click();
+    await expect(page.getByLabel("Page title", { exact: true })).toHaveValue(f.sourceTitle);
+    // Existing keyboard block navigation selects canonical atoms; no editor command injection.
+    await page.locator(`.tiptap [data-block-id="${source.blocks[0].id}"] .block-text`).click({ position: { x: 8, y: 8 } });
+    await page.keyboard.press("Alt+ArrowDown"); await page.keyboard.press("Alt+ArrowDown");
+    await expect(page.locator(".tiptap .ProseMirror-selectednode")).toHaveAttribute("data-block-id", removedLink.id);
+    await page.keyboard.press("Backspace");
+    await page.getByRole("button", { name: "Save page", exact: true }).click();
+    await expect.poll(async () => importedProjection(await snapshot(page), source.page.id).blocks.some((b: any) => b.id === removedLink.id)).toBe(false);
+    const final = await snapshot(page), finalSource = importedProjection(final, source.page.id);
+    expect(finalSource.blocks).toEqual(linked.blocks.filter((b: any) => b.id !== removedLink.id));
+    expect(importedProjection(final, target.page.id)).toEqual(target); expect(importedProjection(final, removedTarget.page.id)).toEqual(removedTarget);
+    expect(unrelatedRecords(final)).toEqual(unrelated);
+    const finalGraph = await visibleGraph(page, source.page.id);
+    expect(finalGraph.edges).toEqual([expectedGraphEdge(finalSource, target, link.id)]);
+    expect(finalGraph.nodes.map((n: any) => n.id).sort()).toEqual([source.page.id, target.page.id].sort());
+    write("create-graph.json", { source: finalSource, target, removedTarget, removedLink, link, graph, finalGraph, unrelated });
+  }
+  const saved = read("create-graph.json"), current = await snapshot(page);
+  for (const projection of [saved.source, saved.target, saved.removedTarget]) expect(importedProjection(current, projection.page.id)).toEqual(projection);
+  expect(unrelatedRecords(current)).toEqual(saved.unrelated);
+  expect(await visibleGraph(page, saved.source.page.id)).toEqual(saved.finalGraph);
+  const removed = await visibleGraph(page, saved.removedTarget.page.id);
+  expect(removed.edges).toEqual([]); expect(removed.nodes.map((n: any) => n.id)).toEqual([saved.removedTarget.page.id]);
+  await expect(intelligencePanel(page).getByText("No connections in this neighborhood. Add a page link or include retrieval associations.", { exact: true })).toBeVisible();
+  write(`${stage}-graph-result.json`, { passed: true, graph: saved.finalGraph, removed, semanticAssociations: false });
 });
