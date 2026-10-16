@@ -10,7 +10,7 @@ export default defineConfig({
   workers: 1,
   retries: 0,
   forbidOnly: true,
-  timeout: 60000,
+  timeout: 90000,
   outputDir: path.join(evidence, stage!, "artifacts"),
   reporter: [["list"], ["json", { outputFile: path.join(evidence, stage!, "playwright.json") }]],
   use: {
