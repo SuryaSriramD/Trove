@@ -56,11 +56,12 @@ export function PageFreshness({
   const [error, setError] = useState("");
   useEffect(() => {
     let active = true;
+    const controller = new AbortController();
     setResult(undefined);
     dispatch<S.PageFreshnessResult>("page.freshness", {
       ...envelope(workspace),
       pageId: page.id,
-    })
+    }, { signal: controller.signal })
       .then((r) => {
         if (!r.freshness) throw Error("Review status is unavailable");
         if (active) {
@@ -73,6 +74,7 @@ export function PageFreshness({
       });
     return () => {
       active = false;
+      controller.abort();
     };
   }, [
     workspace.workspaceId,
