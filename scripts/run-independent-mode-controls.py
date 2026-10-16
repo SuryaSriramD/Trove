@@ -76,14 +76,14 @@ def parser_package_inputs(root):
     return sorted(files)
 
 
-def input_paths(root, bundle, models, go, node):
+def input_paths(root, bundle, models, go, node, pack=PACK):
     paths = {root / name for name in HARNESS}
     for directory in SOURCE_ROOTS:
         for suffix in ('*.go', '*.sql', '*.json', '*.c', '*.h', '*.m', '*.mm', '*.metal'):
             paths.update((root / directory).rglob(suffix))
     paths.update((root / 'go.mod', root / 'go.sum', pathlib.Path(__file__).resolve(), go, node,
                   pathlib.Path(sys.executable).resolve(), bundle / 'manifest.json', bundle / 'llama-worker',
-                  models / (PACK + '.json'), models / (PACK + '.model')))
+                  models / (pack + '.json'), models / (pack + '.model')))
     paths.update(parser_package_inputs(root))
     manifest = json.loads((bundle / 'manifest.json').read_text())
     for helper in manifest['helpers']:
@@ -103,11 +103,11 @@ def inventory(paths, validator):
     return result
 
 
-def stable_identity(root, bundle, models, go, node, inputs):
+def stable_identity(root, bundle, models, go, node, inputs, pack=PACK):
     bindings = {'harness:' + name: inputs[str(root / name)] for name in HARNESS}
     for label, path in [('pilot', pathlib.Path(__file__).resolve()), ('go', go), ('node', node), ('python',pathlib.Path(sys.executable).resolve()),
                         ('bundleManifest', bundle / 'manifest.json'), ('llama', bundle / 'llama-worker'),
-                        ('modelManifest', models / (PACK + '.json')), ('model', models / (PACK + '.model'))]:
+                        ('modelManifest', models / (pack + '.json')), ('model', models / (pack + '.model'))]:
         bindings[label] = inputs[str(path)]
     for parser_input in parser_package_inputs(root):
         bindings['parser:' + str(parser_input.relative_to(root / 'frontend/node_modules'))] = inputs[str(parser_input)]
@@ -175,11 +175,11 @@ def gate_errors(events, original_ids):
     return errors
 
 
-def extract_reports(events, validator):
+def extract_reports(events, validator, test=TEST, ids=IDS):
     reports, buffers, errors = {}, {}, []
     for event in events:
         name = event.get('Test', '')
-        if not name.startswith(TEST + '/') or event.get('Action') != 'output':
+        if not name.startswith(test + '/') or event.get('Action') != 'output':
             continue
         buffers[name] = buffers.get(name, '') + event.get('Output', '')
         while '\n' in buffers[name]:
@@ -194,19 +194,19 @@ def extract_reports(events, validator):
             if not isinstance(report, dict) or 'fixture' not in report:
                 continue
             case = report['fixture']
-            if not isinstance(case, str) or case in reports or name != TEST + '/' + case:
+            if not isinstance(case, str) or case in reports or name != test + '/' + case:
                 errors.append('duplicate or mismatched native task report')
                 continue
             reports[case] = report
     if any(value.strip() for value in buffers.values()):
         errors.append('unterminated native report output')
-    if set(reports) != set(IDS):
-        errors.append('native report inventory differs from sealed sixteen cases')
+    if set(reports) != set(ids):
+        errors.append('native report inventory differs from declared cases')
     return reports, errors
 
 
-def native_terminals(events):
-    expected = {TEST, *(TEST + '/' + case for case in IDS)}
+def native_terminals(events, test=TEST, ids=IDS):
+    expected = {test, *(test + '/' + case for case in ids)}
     terminals, errors = {}, []
     for event in events:
         name, action = event.get('Test'), event.get('Action')
@@ -215,7 +215,7 @@ def native_terminals(events):
                 errors.append('duplicate native terminal: ' + name)
             terminals[name] = action
     if set(terminals) != expected:
-        errors.append('native terminal inventory differs from exact parent and sixteen cases')
+        errors.append('native terminal inventory differs from exact parent and declared cases')
     if any(action == 'skip' for action in terminals.values()):
         errors.append('native skipped case cannot qualify as completed execution')
     return terminals, errors
@@ -237,11 +237,11 @@ def comparison_execution_errors(report):
     return errors
 
 
-def validate_mode(report, case, validator):
+def validate_mode(report, case, validator, pack=PACK):
     errors = comparison_execution_errors(report)
     request = report.get('request', {})
     bindings = {'fixture':case['id'], 'mode':case['mode'], 'useMemory':False, 'corpusSHA256':CORPUS_SHA256,
-                'modelPackId':PACK, 'sourceTitle':case['title'], 'source':case['source'], 'prompt':case['prompt'], 'selection':case['selection']}
+                'modelPackId':pack, 'sourceTitle':case['title'], 'source':case['source'], 'prompt':case['prompt'], 'selection':case['selection']}
     for key, expected in bindings.items():
         if type(report.get(key)) is not type(expected) or report[key] != expected: errors.append('report binding differs: '+key)
     if not isinstance(request, dict): return errors+['actual request missing']
@@ -250,7 +250,7 @@ def validate_mode(report, case, validator):
         expected=json.dumps(case['selection'],ensure_ascii=False,separators=(',',':'))
         prepared=report.get('preparedPrompt','')
         if not isinstance(prepared,str) or prepared.count(marker)!=1 or not prepared.split(marker,1)[-1].startswith(expected): errors.append('exact JSON-encoded selected source differs')
-    for key, expected in {'mode':case['mode'], 'prompt':case['prompt'], 'useMemory':False, 'modelPackId':PACK}.items():
+    for key, expected in {'mode':case['mode'], 'prompt':case['prompt'], 'useMemory':False, 'modelPackId':pack}.items():
         if type(request.get(key)) is not type(expected) or request[key] != expected: errors.append('actual request differs: '+key)
     if request.get('selection','') != case['selection'] or any(request.get(k) for k in ('conversationId','projectId','connectedSources','skill')):
         errors.append('request selection/scope differs')
