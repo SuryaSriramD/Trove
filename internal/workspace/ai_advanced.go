@@ -256,6 +256,12 @@ func prepareAdvancedAI(ctx context.Context, k *Kernel, e contracts.ServiceExecut
 
 const relatedEligiblePageSQL = `p.deleted_at IS NULL AND NOT EXISTS(SELECT 1 FROM memory_entries m WHERE m.page_id=p.id AND (m.status<>'active' OR EXISTS(SELECT 1 FROM memory_sources ms LEFT JOIN pages evidence ON evidence.id=ms.page_id WHERE ms.memory_id=m.id AND (evidence.id IS NULL OR evidence.deleted_at IS NOT NULL OR evidence.revision<>ms.source_revision))))`
 
+// Indexed chunks have stable identities across reindexing. Their ID order is
+// reproducible indexed-text order, not the editor's canonical reading order.
+// Exclude only the synthetic title chunk; body/property text may legitimately
+// repeat the title and must remain intact.
+const relatedIndexedBodySQL = `COALESCE((SELECT group_concat(c.body,' ' ORDER BY c.id) FROM search_chunks c WHERE c.page_id=p.id AND c.source_revision=p.revision AND c.id<>p.id||':title'),'')`
+
 func init() { RegisterQuery("ai.suggestions", aiSuggestions) }
 func aiSuggestions(ctx context.Context, k *Kernel, e contracts.ServiceExecutionContext, r map[string]any) (any, error) {
 	page := str(r["pageId"])
@@ -265,7 +271,7 @@ func aiSuggestions(ctx context.Context, k *Kernel, e contracts.ServiceExecutionC
 	if err := k.FlushSearch(ctx); err != nil {
 		return nil, err
 	}
-	query := `SELECT p.id,p.title,p.revision,COALESCE(group_concat(c.body,' '),'') FROM pages p LEFT JOIN search_chunks c ON c.page_id=p.id AND c.source_revision=p.revision WHERE ` + relatedEligiblePageSQL + ` GROUP BY p.id ORDER BY p.id`
+	query := `SELECT p.id,p.title,p.revision,` + relatedIndexedBodySQL + ` FROM pages p WHERE ` + relatedEligiblePageSQL + ` ORDER BY p.id`
 	if _, unrestricted := e.Scope.Value.(contracts.DomainScopeVariant1); unrestricted {
 		query += " LIMIT 1001"
 	}
@@ -290,6 +296,7 @@ func aiSuggestions(ctx context.Context, k *Kernel, e contracts.ServiceExecutionC
 		if k.authorizePage(ctx, k.db, e, d.id) != nil {
 			continue
 		}
+		d.body = strings.TrimSpace(d.title + "\n" + d.body)
 		d.shortened = len(d.body) > 16000
 		d.body = truncateAI(d.body, 16000)
 		docs = append(docs, d)
@@ -306,10 +313,11 @@ func aiSuggestions(ctx context.Context, k *Kernel, e contracts.ServiceExecutionC
 		return nil, err
 	}
 	if source.id == "" {
-		err = k.db.QueryRowContext(ctx, `SELECT p.id,p.title,p.revision,COALESCE(group_concat(c.body,' '),'') FROM pages p LEFT JOIN search_chunks c ON c.page_id=p.id AND c.source_revision=p.revision WHERE p.id=? AND `+relatedEligiblePageSQL+` GROUP BY p.id`, page).Scan(&source.id, &source.title, &source.revision, &source.body)
+		err = k.db.QueryRowContext(ctx, `SELECT p.id,p.title,p.revision,`+relatedIndexedBodySQL+` FROM pages p WHERE p.id=? AND `+relatedEligiblePageSQL, page).Scan(&source.id, &source.title, &source.revision, &source.body)
 		if err != nil {
 			return nil, err
 		}
+		source.body = strings.TrimSpace(source.title + "\n" + source.body)
 		source.shortened = len(source.body) > 16000
 		source.body = truncateAI(source.body, 16000)
 	}
@@ -376,7 +384,7 @@ func aiSuggestions(ctx context.Context, k *Kernel, e contracts.ServiceExecutionC
 	}
 	result := map[string]any{"suggestions": suggestions, "method": "deterministic vocabulary and exact duplicate comparison", "partial": partial, "applied": false, "sourceRevision": source.revision}
 	if r["semantic"] == true {
-		text := strings.TrimSpace(source.title + "\n" + source.body)
+		text := strings.TrimSpace(source.body)
 		if len(text) > 4093 {
 			omissions = append(omissions, "Related-content query uses at most 4,096 UTF-8 bytes of the current title and indexed body.")
 		}
