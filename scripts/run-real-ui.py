@@ -20,10 +20,10 @@ import time
 import urllib.request
 
 ROOT = Path(__file__).resolve().parents[1]
-EXPECTED = {stage: [f"real-{workflow}-{stage}" for workflow in ("rich", "task", "due", "record-lifecycle", "layout-review", "p2-data", "p2-action", "conversation-display")] for stage in ("create", "reopen")}
+EXPECTED = {stage: [f"real-{workflow}-{stage}" for workflow in ("rich", "task", "due", "record-lifecycle", "layout-review", "p2-data", "p2-action", "conversation-display", "schedule-week", "schedule-dst")] for stage in ("create", "reopen")}
 LIMITATIONS = ["Chromium UI plus production host/services/SQLite; not native Wails WebView acceptance.",
                "No model inference, physical devices, live accounts, performance or release qualification.",
-               "Bounded rich-page, task/record/undo, layout/review, P2 forms/charts/row actions and conversation/display continuity; scheduling and broader import/recovery workflows remain pending."]
+               "Bounded rich-page, task/record/undo, layout/review, P2 forms/charts/row actions and conversation/display and working-week/DST scheduling continuity; broader import/recovery workflows remain pending."]
 
 def now():
     return datetime.now(timezone.utc).isoformat()
@@ -140,7 +140,7 @@ def main():
                   'harnessFiles': {name: digest(ROOT / name) for name in harness_paths},
                   'frontendSourceSHA256': object_digest(inventory(ROOT / 'frontend/src'))}
         manifest['inputs'] = inputs
-        fixture = {'schemaVersion': 1, 'suiteVersion': 3, 'pageTitle': 'Real storage — café తెలుగు',
+        fixture = {'schemaVersion': 1, 'suiteVersion': 4, 'pageTitle': 'Real storage — café తెలుగు',
                    'body': 'A carefully saved idea: café, తెలుగు and 日本語.',
                    'initialTaskTitle': 'Prepare real storage review', 'taskTitle': 'Finish real storage review',
                    'expectedRichMarks': ['bold'], 'expectedTaskStatusGroup': 'done',
@@ -161,6 +161,18 @@ def main():
                    'conversationTitle': 'Independent branch and display fixture',
                    'conversationTexts': ['Which trail has shade?', 'The cedar trail stays shaded.', 'The ridge trail has an open view.'],
                    'expectedCases': EXPECTED}
+        date_value = lambda start, end, zone, timed=False: {'start': start, 'end': end, 'timezone': zone, 'hasTime': timed}
+        zone = 'America/New_York'
+        fixture['scheduleWeek'] = {'database': 'Working week dependency fixture', 'timezone': zone,
+            'titles': ['Prepare shipment', 'Dispatch shipment', 'Slack preserved shipment'],
+            'renamed': 'Dispatch title survives schedule undo',
+            'before': [date_value('2026-12-03', '2026-12-04', zone), date_value('2026-12-07', '2026-12-08', zone), date_value('2026-12-17', '2026-12-18', zone)],
+            'after': [date_value('2026-12-10', '2026-12-11', zone), date_value('2026-12-14', '2026-12-15', zone), date_value('2026-12-17', '2026-12-18', zone)]}
+        zone = 'Europe/Berlin'
+        fixture['scheduleDST'] = {'database': 'Explicit Sunday DST fixture', 'title': 'Fall back duration record', 'timezone': zone,
+            'before': date_value('2026-10-25T00:00:00+02:00', '2026-10-26T00:00:00+01:00', zone, True),
+            'calendarAfter': date_value('2026-11-01T00:00:00+01:00', '2026-11-02T01:00:00+01:00', zone, True),
+            'after': date_value('2026-11-01T00:00:00+01:00', '2026-11-08T01:00:00+01:00', zone, True)}
         fixture['conversationExport'] = [{'id': 'real-ui-conversation-v3', 'title': fixture['conversationTitle'],
             'create_time': 1760000000, 'current_node': 'reply-ridge', 'mapping': {
                 'root': {'parent': None, 'children': ['question'], 'message': None},
