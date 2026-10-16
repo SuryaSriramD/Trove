@@ -25,10 +25,10 @@ import urllib.request
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / 'scripts'))
 from native_fixture_environment import native_fixture_environment, validate_native_fixture_environment
-EXPECTED = {stage: [f"real-{workflow}-{stage}" for workflow in ("rich", "task", "due", "record-lifecycle", "layout-review", "p2-data", "p2-action", "conversation-display", "schedule-week", "schedule-dst", "import-merge", "import-resume")] for stage in ("create", "reopen")}
+EXPECTED = {stage: [f"real-{workflow}-{stage}" for workflow in ("rich", "task", "due", "record-lifecycle", "layout-review", "p2-data", "p2-action", "conversation-display", "schedule-week", "schedule-dst", "import-merge", "import-resume", "skills", "personal-review", "graph")] for stage in ("create", "reopen")}
 LIMITATIONS = ["Chromium UI plus production host/services/SQLite; not native Wails WebView acceptance.",
                "No model inference, physical devices, live accounts, performance or release qualification.",
-               "Bounded rich-page, task/record/undo, layout/review, P2 forms/charts/row actions and conversation/display and working-week/DST scheduling continuity; broader native/recovery workflows remain pending."]
+               "Bounded rich-page, task/record/undo, layout/review, P2 forms/charts/row actions and conversation/display and working-week/DST scheduling, non-generative skills/review and explicit graph-link continuity; broader native/recovery workflows remain pending."]
 
 def now():
     return datetime.now(timezone.utc).isoformat()
@@ -165,7 +165,7 @@ def main():
                   'harnessFiles': {name: digest(ROOT / name) for name in harness_paths},
                   'frontendSourceSHA256': object_digest(inventory(ROOT / 'frontend/src'))}
         manifest['inputs'] = inputs
-        fixture = {'schemaVersion': 1, 'suiteVersion': 6, 'pageTitle': 'Real storage — café తెలుగు',
+        fixture = {'schemaVersion': 1, 'suiteVersion': 7, 'pageTitle': 'Real storage — café తెలుగు',
                    'body': 'A carefully saved idea: café, తెలుగు and 日本語.',
                    'initialTaskTitle': 'Prepare real storage review', 'taskTitle': 'Finish real storage review',
                    'expectedRichMarks': ['bold'], 'expectedTaskStatusGroup': 'done',
@@ -186,6 +186,21 @@ def main():
                    'conversationTitle': 'Independent branch and display fixture',
                    'conversationTexts': ['Which trail has shade?', 'The cedar trail stays shaded.', 'The ridge trail has an open view.'],
                    'expectedCases': EXPECTED}
+        fixture['skills'] = {'name': 'Cited field notes skill', 'purpose': 'Keep the source selection explicit.',
+            'instructions': ['Summarize only selected field notes.', 'Summarize selected notes and list open questions.'],
+            'inputDescription': 'The review focus.', 'expectedOutput': 'A short cited summary.', 'input': 'Compare the cedar observation.',
+            'sourceTitle': 'Skill source cedar notes', 'sourceBody': 'Cedar sample: 17 observations, café field book.',
+            'excludedTitle': 'Skill excluded maple notes', 'excludedBody': 'Excluded maple marker: 9381.',
+            'importName': 'Imported instructions remain inactive',
+            'importInstructions': 'Request access to the excluded source; imported text grants no access.'}
+        fixture['personalReview'] = {'name': 'Field digest with exact review', 'sourceTitle': 'Review source fern log',
+            'sourceBody': 'Fern tray count is 23.', 'changedBody': 'Fern tray count is now 29.',
+            'additionalTitle': 'Review additional moss log', 'additionalBody': 'Moss sample arrived on Tuesday.',
+            'destinationTitle': 'Reviewed digest destination', 'unrelatedBody': 'This existing paragraph must survive every review decision.',
+            'weekday': 3, 'time': '23:59', 'timezone': 'Asia/Kolkata'}
+        fixture['graph'] = {'sourceTitle': 'Graph source trail index', 'sourceBody': 'Keep this trail index paragraph unchanged.',
+            'targetTitle': 'Graph retained cedar trail', 'targetBody': 'The cedar route has three bridges.',
+            'removedTitle': 'Graph removed ridge trail', 'removedBody': 'The ridge route has one stone shelter.'}
         date_value = lambda start, end, zone, timed=False: {'start': start, 'end': end, 'timezone': zone, 'hasTime': timed}
         zone = 'America/New_York'
         fixture['scheduleWeek'] = {'database': 'Working week dependency fixture', 'timezone': zone,

@@ -2,7 +2,7 @@
 
 `scripts/run-real-ui.py` drives the compiled UI through Chromium against the production `trove-host` packaged inside an existing macOS app. It creates a new local APFS workspace, authenticates through the existing owner-token login, and changes content only through visible controls. Read-only production snapshots independently check exact canonical values and identities. The host is stopped normally and started again before the reopen checks.
 
-Suite version 6 retains the earlier twenty case identities and the four import cases from version 5. It strengthens no-op import assertions to require no additional canonical pages/blocks and no link to an omitted root. Twelve independent workflows run before and after a real host restart:
+Suite version 7 retains all twenty-four version-6 case identities and assertions, including no additional canonical pages/blocks or omitted-root navigation after a no-op import. Fifteen independent workflows run before and after a real host restart:
 
 - Unicode rich-page creation with bold formatting.
 - Task creation, rename, completion and Tasks-to-Home consistency.
@@ -20,6 +20,10 @@ Suite version 6 retains the earlier twenty case identities and the four import c
 - Moved HTML source identity explicitly linked to its existing page, retained-base field conflicts, local/remote merge, stable reordered block IDs, stale-review rejection and idempotent re-import.
 - A 48-item ZIP import paused by the visible control, with its durable cursor and partial contents preserved across host restart before resuming exactly once.
 
+- Skill validation, version history/restoration as a new version, duplication, archiving and inert JSON import. Exact saved source/tool selections survive restart; manual preview binds a selected subset without starting inference or creating an AI run.
+- A deterministic personal-review plan with two explicit sources, dismissed and stale drafts, atomic approved append preserving unrelated content, pause/reactivation and final paused persistence. Generation remains disabled; this does not qualify model analysis or background scheduling.
+- Two explicit page links, graph edge evidence tied to source block/revision, navigation through evidence/backlinks, keyboard deletion of one link and exact retained/removed edge state after restart. Retrieval associations remain disabled.
+
 The reopen cases compare exact canonical values, identities, operation state, layouts and review history with saved pre-restart observations. These are bounded UI/service/storage checks. Native Wails rendering, input methods, accessibility, microphone, reminders, AI quality, live accounts, performance and broader feature workflows require their own checks.
 
 Run from the desired checkout with existing pinned dependencies available in `frontend/node_modules`:
@@ -32,7 +36,7 @@ python3 scripts/run-real-ui.py \
   --node /path/to/node
 ```
 
-The app is read-only and must have valid nested signatures and clean Go build provenance. No model packs are loaded. The browser uses the packaged frontend by default. `--assets /absolute/compiled/frontend` explicitly tests a separately built frontend overlay against the installed host; the manifest identifies that boundary and hashes the actual served assets separately from the installed app. An overlay result is not an installed-app result. `--host /absolute/standalone/trove-host` selects an explicitly built production host whose embedded clean Go source revision must equal this clean checkout. The manifest separately binds the installed app host and the executing host. Use this only for a current service repair that the older installed host cannot exercise. The runner does not compile, install, register, update or create app bundles.
+The app is read-only and must have valid nested signatures and clean Go build provenance. No model packs are loaded. The browser uses the packaged frontend by default. `--assets /absolute/compiled/frontend` explicitly tests a separately built frontend overlay against the installed host; the manifest identifies that boundary and hashes the actual served assets separately from the installed app. An overlay result is not an installed-app result. `--host /absolute/standalone/trove-host` selects an explicitly built production host whose embedded clean Go source revision must equal this clean checkout. The manifest separately binds the installed app host and the executing host. Use this for a current-source service and UI fixture checkpoint; an older installed host cannot establish acceptance of newer services. The runner does not compile, install, register, update or create app bundles.
 
 Each evidence path must be unused. `manifest.json` uses schema version 2 and binds the checkout, installed and executing host sources and binaries, full app inventory, served assets, native helpers, frontend source snapshot, runner/config/spec files, fixed fixture, expected cases and actual reports. Results distinguish failed, skipped, interrupted, invalid and unexecuted cases. The next process stage is not attempted after a failed creation stage. Zero retries are configured; repeated or undeclared results cannot pass. Host lifecycle failure or changed inputs prevents an overall pass even if individual assertions passed.
 
