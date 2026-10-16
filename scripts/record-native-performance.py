@@ -19,6 +19,7 @@ import sys
 import time
 
 from qualification_fixtures import clone_closed_workspace, inventory, private_directory, retain_closed_workspace, sync_directory
+from native_fixture_environment import OS_GLOBAL_LIMITATION, native_fixture_environment, validate_native_fixture_environment
 
 METRICS = {
     'database_dispatch', 'snapshot_dispatch', 'mutation_dispatch', 'search_dispatch',
@@ -231,35 +232,32 @@ def main():
     # Keep the actual observed bytes with the immutable evidence, rather than
     # relying on a system temporary directory surviving sleep or cleanup.
     scratch = private_directory(output / 'runtime')
-    home, temporary, workspace = scratch / 'home', scratch / 'temporary', scratch / 'workspace'
-    home.mkdir(mode=0o700); temporary.mkdir(mode=0o700)
+    workspace = scratch / 'workspace'
     if args.workspace and args.workspace.is_symlink():
         raise ValueError('fixture_root_is_linked')
     fixture = clone_closed_workspace(args.workspace.resolve(strict=True), workspace) if args.workspace else None
-    empty_models = scratch / 'empty-models'
-    empty_models.mkdir(mode=0o700)
-    models = args.models.resolve(strict=True) if args.models else empty_models
+    env, isolation = native_fixture_environment(scratch / 'environment', workspace, args.models)
+    models = Path(env['TROVE_MODEL_ROOT'])
     before, model_before = inventory(app), inventory(models)
     wrapper = ['/usr/bin/sandbox-exec', '-p', '(version 1)(allow default)(deny network*)']
-    probe = subprocess.run(wrapper + [sys.executable, '-c', 'import socket; socket.socket().connect(("127.0.0.1", 9))'], capture_output=True, text=True)
+    probe = subprocess.run(wrapper + [sys.executable, '-c', 'import socket; socket.socket().connect(("127.0.0.1", 9))'], env=env, cwd=isolation['temporary'], capture_output=True, text=True)
     if probe.returncode == 0 or 'Operation not permitted' not in probe.stderr or 'sandbox_apply' in probe.stderr:
         raise ValueError('network_denial_not_established')
-    env = {'PATH': '/usr/bin:/bin:/usr/sbin:/sbin', 'HOME': str(home), 'TMPDIR': str(temporary),
-           'LANG': 'en_US.UTF-8', 'TROVE_WORKSPACE': str(workspace), 'TROVE_MODEL_ROOT': str(models),
-           'TROVE_PERFORMANCE_REPORT': str(output / 'timings.json'),
+    env.update({'TROVE_PERFORMANCE_REPORT': str(output / 'timings.json'),
            'TROVE_PERFORMANCE_DIAGNOSTICS': str(output / 'renderer-diagnostics.jsonl'),
-           'TROVE_STARTUP_TRACE': str(output / 'startup.trace')}
+           'TROVE_STARTUP_TRACE': str(output / 'startup.trace')})
+    validate_native_fixture_environment(env, isolation)
     private_json(output / 'started.json', {'schemaVersion': 1, 'recordedAt': datetime.now(timezone.utc).isoformat(),
                  'scenario': args.scenario, 'minimumSamplesPerRequiredMetric': args.minimum_samples, 'appInventory': before, 'modelsInventory': model_before,
                  'sourceFixtureInventory': fixture, 'networkDeniedByOS': True,
-                 'scratchDirectory': str(scratch), 'releaseQualified': False})
+                 'scratchDirectory': str(scratch), 'isolation': isolation, 'releaseQualified': False})
     print('Operate the visible disposable app for the selected scenario, then quit normally before the deadline.', flush=True)
     print('Private scratch retained at ' + str(scratch), flush=True)
     samples, timed_out, interrupted = [], False, False
     diagnostics = RendererDiagnostics(output / 'renderer-diagnostics.jsonl')
     diagnostics_error, readiness = None, None
     started = time.monotonic()
-    process = subprocess.Popen(wrapper + [str(binary)], env=env, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+    process = subprocess.Popen(wrapper + [str(binary)], env=env, cwd=isolation['temporary'], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
     try:
         private_json(output / 'process.json', {'schemaVersion': 1, 'ownedProcessId': process.pid,
                      'executable': str(binary), 'launchKind': 'driver-owned-child',
@@ -337,7 +335,7 @@ def main():
               'rendererReadinessObserved': readiness is not None, 'rendererDiagnosticsError': diagnostics_error,
               'rendererDiagnosticsFinal': diagnostics.last,
               'actualForegroundWindowIndependentlyObserved': False,
-              'retainedWorkspace': retained, 'retentionError': retention_error,
+              'retainedWorkspace': retained, 'retentionError': retention_error, 'isolation': isolation,
               'belowMinimumScenarioMetrics': missing, 'minimumSamplesPerRequiredMetric': args.minimum_samples,
               'observationMinimaMet': not missing, 'sampleCoverageCapped': capped, 'workerObserved': workers_seen,
               'memory': {'requestedIntervalMs': 250, 'samples': samples,
@@ -346,7 +344,7 @@ def main():
                          'sampledMaximumOtherDescendantRssBytes': max((s['otherDescendantRssBytes'] for s in available), default=None)},
               'localObservationRecorded': complete, 'collectorFinalized': trace is not None,
               'sampleAccountingComplete': False, 'releaseQualified': False,
-              'limitations': [
+              'limitations': [OS_GLOBAL_LIMITATION,
                   'Instrumented local observation. No latency SLA or product/criterion acceptance is inferred.',
                   'Dispatch includes desktop admission/locking/serialization; bridge includes serialization and transport. Independent aggregate samples are not paired for subtraction.',
                   'Two animation-frame callbacks are scheduling/render opportunities, not confirmed screen paint or input-device latency.',

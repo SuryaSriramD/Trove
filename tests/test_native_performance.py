@@ -101,6 +101,12 @@ class NativePerformanceTests(unittest.TestCase):
 
                     def __init__(self, argv, env, **kwargs):
                         test.assertEqual(argv[-1], str(binary))
+                        test.assertTrue(Path(env['HOME']).is_relative_to(output))
+                        test.assertTrue(Path(env['TMPDIR']).is_relative_to(output))
+                        test.assertEqual(Path(kwargs['cwd']), Path(env['TMPDIR']))
+                        test.assertTrue(Path(env['TROVE_MODEL_ROOT']).is_relative_to(output))
+                        test.assertNotIn('OPENAI_API_KEY', env)
+                        test.assertFalse(any(key.startswith('DYLD_') for key in env))
                         workspace = Path(env['TROVE_WORKSPACE']); workspace.mkdir(mode=0o700)
                         (workspace / '.owner.lock').write_bytes(b'')
                         (workspace / 'workspace.db').write_bytes(b'closed fake workspace')

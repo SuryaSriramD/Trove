@@ -41,9 +41,11 @@ class Qualification(p0.Qualification):
         self.record('p1-offline-required-tests', not missing_offline, requiredTests=OFFLINE_TESTS, missingRequiredTests=missing_offline)
 
         self.command('packaged-p1-restart-offline', [sys.executable, p0.ROOT / 'scripts/verify-packaged.py',
-                     '--p1', '--offline', '--app', self.args.app, '--evidence', self.run_dir], timeout=1500)
-        path = self.run_dir / 'packaged-p1-integration.json'
+                     '--p1', '--offline', '--app', self.args.app, '--evidence', self.run_dir / 'packaged-p1'], timeout=1500)
+        path = self.run_dir / 'packaged-p1/packaged-p1-integration.json'
         if path.is_file():
+            with (self.run_dir / 'packaged-p1-integration.json').open('xb') as copy:
+                copy.write(path.read_bytes())
             report = json.loads(path.read_text())
             steps = report.get('checks', [])
             self.record('packaged-p1-completeness', report.get('passed') is True and report.get('networkDeniedByOS') is True
