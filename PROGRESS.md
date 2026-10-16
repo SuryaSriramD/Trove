@@ -2,7 +2,7 @@
 
 **The single current development and progress tracker for this project.** Read and update this file for every meaningful implementation change, investigation, test result, decision, blocker and handoff. This is not an automatically running monitor.
 
-Last updated: **2026-10-16 02:09 IST**. User-facing dates use **Asia/Kolkata (IST, UTC+05:30)**; source artifacts may retain UTC timestamps.
+Last updated: **2026-10-16 11:39 IST**. User-facing dates use **Asia/Kolkata (IST, UTC+05:30)**; source artifacts may retain UTC timestamps.
 
 This file consolidates the original 51-item backlog, the newly selected desktop scope, current qualification, next actions and development history. Earlier status pages are historical snapshots. Machine-readable contracts, the legacy registry and immutable qualification records remain supporting inputs/evidence; they are not additional human progress dashboards. Their frozen bytes must not be rewritten to make a status look current.
 
@@ -34,7 +34,7 @@ Candidate 7's focused 22-case prompt experiment was rejected and production prom
 
 | Location | Branch / source | Current interpretation |
 | --- | --- | --- |
-| Primary project: `/Volumes/HD-B1/HD-Projects/Trove` | `codex/macos-feature-completion`, `462bbc8` plus DEV-056 controlled mode-guidance candidate; development app `9a39485` | Answerability experiment reverted exactly; Correctness repairs integrated; related-content still 11/12 native passes, personal reviews improve to 12/12. Independent mode BEFORE completed; guidance AFTER is next; quality/release remain open. New source requires its own build/evidence; frozen app results are not transferred. |
+| Primary project: `/Volumes/HD-B1/HD-Projects/Trove` | `codex/macos-feature-completion`, `e4f9621` plus DEV-057 rejection of diagram/expansion guidance; development app `9a39485` | Answerability experiment reverted exactly; Correctness repairs integrated; related-content still 11/12 native passes, personal reviews improve to 12/12. Independent mode comparison completed; regressing diagram/ineffective expansion guidance rejected; database/comment follow-up pending; quality/release remain open. New source requires its own build/evidence; frozen app results are not transferred. |
 | Frozen new-candidate execution checkout: `/Users/suryasriramduvvuri/.codex/worktrees/feature-canonical-tasks/Trove` | Detached `9a3948529a1e772b1e5fdb710203e2c1d234d3cc` | Reuses the clean completed worker checkout; original branch `codex/feature-layout-scheduling` remains at `8b739d5`. Completed frozen campaign executed here against the development app helpers; preserve this checkout and its evidence. |
 | Latest development worktree: `/Users/suryasriramduvvuri/.codex/worktrees/macos-p0-title-context/Trove` | `codex/macos-p0-title-context`, `299e43df9b716f771125d939ad320c3cb595f2c7` | Candidate 7 source. One descendant commit containing tests, fixtures, telemetry and execution documentation. |
 
@@ -1255,6 +1255,18 @@ Root fixture follow-ups are complete: the failed rich-layout scenario and clipbo
 **Independent preparation:** Related-query composition cleanup v3 remains unapplied during the paired mode run. Its deterministic BEFORE has five expected test/subtest failures; worker AFTER has **44 passes, zero failures/skips**, including scope, memory, current revision and query boundaries. Evidence manifest `related-query-composition-v3-evidence/manifest.json` SHA-256 is `ba925ed705bbbe39d352959d1ea0be761aaf4b6fb1f715715632b608e0c33fef`; no native ranking gain is inferred. A separate ordinary-byte build staging copy `repaired-build-native-v1` contains 52 verified files, no links/shared inodes; copy provenance SHA-256 `7b1e32a0efc9e020d5e2d6d8582bd2109996b65764a09bcefa7958399c52752c`. The build script mutates its native input, so subsequent builds must use this staging copy and a fresh app output. No new app has been built.
 
 **Next:** Commit this controlled candidate and run all 16 AFTER cases against the exact BEFORE manifest. Keep source and evaluation inputs fixed until terminal, assess every output/proposal and preserve regressions before deciding which guidance to adopt. Then integrate the independent query cleanup and build the final adopted source separately. Release qualification is unchanged.
+
+### DEV-057 — 2026-10-16 11:39 IST: resume after interruption and reject unsuccessful mode guidance
+
+**Execution reconciliation:** The user confirmed recovered disk space; current read-only checks find HD-B1 mounted and approximately 14 GiB internal free, above the existing 4 GiB harness requirement. The conversation was interrupted while AFTER was running; on resumption its process was already terminal (exit 1, no timeout), source remained clean at `e4f9621fafa20d312b861421bb1060c4f73488ad`, and all 16 native callbacks completed with inputs/canonical inventories unchanged. No silent rerun occurred. Retained manifest: `mode-controls-after-v1/manifest.json`; elapsed execution is not performance qualification.
+
+**Observed comparison:** BEFORE agent assessment accepted 10/16, with six rejected; exact independent review SHA-256 `430fdef347f2be0f891a7757b972300f75d0b5ce8982190f7930d9c581db6247`, separate agent receipt `b4e62c9f8d12506d0586357079061b4f77e086f36b48479b8899d95c55b15250`. AFTER Go task grades improve 13/16 to 14/16 only because one expansion meets the paragraph count; actual Mermaid parser worsens 3/4 to 2/4. A previously valid sequence now contains malformed `Gate -->|>> Sensor`; the already-failing case-distinct graph also changes requested LR to TD. All four expansions still add unsupported facts. Root inspected all 16 AFTER drafts: database schemas preserve all requested titles/properties; code/literals remain unchanged, with comment semantics receiving separate assessment. Pending independent AFTER receipt must not be inferred from these structural grades.
+
+**Disposition:** Rejected the Mermaid and expansion prompt changes, restoring exact prior instructions (`ai_context.go` restored from `462bbc8`). Preserve every experimental output/grade. Retain database-title/comment guidance only as a candidate for the original six affected cases; no aggregate quality improvement or release pass is claimed. The already-proven Go syntax/AST proposal guard is retained independently.
+
+**Verification correction:** DEV-056's 112-test command selected mode/golden/poison/scope checks but its anchored regex did not select the intended context tests. The subsequently explicit context-budget/protocol/draft selector completed **83 tests/subtests, zero failures/skips** before model generation (`mode-context-integration-v2.jsonl`). Keep both actual commands/results; do not reinterpret the first selection.
+
+**Next:** Commit the narrowed candidate, run the original three database and three code-comment controls once, and assess exact outputs. Then integrate the separately reviewed related-query cleanup, verify its twelve native cases with corrected embedding helper, and build the adopted source into a fresh P2 development app. Frozen candidate, required human/live/device checks and release state are unchanged.
 
 <a id="commit-history"></a>
 ## Recorded source-development history

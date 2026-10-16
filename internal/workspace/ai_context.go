@@ -29,7 +29,7 @@ func prepareAIContextWithSystem(ctx context.Context, r AIRequest, sources []AIEv
 		return AIPrepared{}, Fail("INVALID_REQUEST", "Invalid local model context budget")
 	}
 	groundedProse := trustedSystem == "" && aiSourceGroundedProse(r, sources)
-	instructions := map[string]string{"answer": "Answer the question using only the evidence. Say when the evidence does not answer it.", "rewrite": "Rewrite the selected text or page clearly, preserving all facts.", "summarize": "Summarize the selected text or page using the supplied evidence.", "explain": "Explain the selected text or page using the supplied evidence.", "shorten": "Shorten the selected text or page while preserving its meaning.", "expand": aiExpandInstructions, "outline": "Return a concise outline using ATX Markdown headings starting with # or ## and bullet points starting with -. Return Markdown directly, without an enclosing code fence. Preserve source facts and distinguish suggestions from sourced facts.", "generate": "Create a page with a title, Markdown headings and paragraphs. Distinguish suggestions from sourced facts."}
+	instructions := map[string]string{"answer": "Answer the question using only the evidence. Say when the evidence does not answer it.", "rewrite": "Rewrite the selected text or page clearly, preserving all facts.", "summarize": "Summarize the selected text or page using the supplied evidence.", "explain": "Explain the selected text or page using the supplied evidence.", "shorten": "Shorten the selected text or page while preserving its meaning.", "expand": "Expand the selected text or page without inventing facts. Label suggestions explicitly.", "outline": "Return a concise outline using ATX Markdown headings starting with # or ## and bullet points starting with -. Return Markdown directly, without an enclosing code fence. Preserve source facts and distinguish suggestions from sourced facts.", "generate": "Create a page with a title, Markdown headings and paragraphs. Distinguish suggestions from sourced facts."}
 	if instruction, ok := advancedAIInstructions[r.Mode]; ok {
 		instructions[r.Mode] = instruction
 	}
@@ -39,7 +39,7 @@ func prepareAIContextWithSystem(ctx context.Context, r AIRequest, sources []AIEv
 		instructions[r.Mode] = map[string]string{
 			"rewrite":  "Rewrite the supplied record clearly, retaining its meaning and limitations.",
 			"shorten":  "Condense the supplied record, retaining its meaning and limitations.",
-			"expand":   aiExpandInstructions,
+			"expand":   "Develop the wording and organization of the supplied record, retaining its recorded facts and limitations.",
 			"outline":  "Organize the supplied record as a concise Markdown outline using ATX headings starting with # or ## and bullets starting with -. Return Markdown directly, without an enclosing code fence.",
 			"generate": "Present the supplied record as a page with the requested title, Markdown headings and paragraphs, retaining its recorded facts and limitations.",
 		}[r.Mode]

@@ -19,7 +19,7 @@ const aiDatabaseDraftInstructions = `Return only one JSON object, without Markdo
 var advancedAIInstructions = map[string]string{
 	"database":        aiDatabaseDraftInstructions,
 	"schema":          aiDatabaseDraftInstructions,
-	"mermaid":         aiMermaidDraftInstructions,
+	"mermaid":         `Return only Mermaid source, with no Markdown fence. Use flowchart, sequenceDiagram, stateDiagram-v2, classDiagram, erDiagram, gantt, pie, mindmap or timeline. Do not use links, click actions, HTML or init directives.`,
 	"code_explain":    "Explain the selected code and its assumptions. Never execute it. Distinguish observed behavior from suggestions.",
 	"code_refactor":   aiCodeDraftInstructions + " Preserve intended behavior. The user will review a source diff.",
 	"code_comment":    aiCodeDraftInstructions + aiCommentDraftInstructions,
