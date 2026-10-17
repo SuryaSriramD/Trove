@@ -7,24 +7,25 @@ const id = (n: number) =>
 const workspace = (n: number) =>
   ({ workspaceId: id(n), scopeGrantId: id(n + 10), pages: [] }) as any;
 const plan = (name = "Old capture") => ({
-  planId: id(20),
+  planId: id(name === "Old browser draft" ? 22 : 20),
   planHash: "hash",
   state: "preview",
-  rootPageId: id(21),
+  rootPageId: id(name === "Old browser draft" ? 23 : 21),
   initialized: false,
   cursor: 0,
   sourceName: name,
-  items: [
-    {
-      sourceLocator: name,
-      outcome: "supported",
-      reason: "Retained source",
-      committed: false,
-    },
-  ],
+  items: Array.from({ length: w.captureItemCount ?? 2 }, (_, index) => ({
+    sourceLocator: `${name}-${index + 1}`,
+    outcome: "supported",
+    reason: "Retained source",
+    committed: false,
+  })),
   captureDestinationTitle: "Inbox",
 });
 w.commitCalls = 0;
+w.commitScenario = "stalled";
+w.captureItemCount = 2;
+w.captureReturnedPlans = [];
 w.captureChanged = 0;
 w.captureCalls = [];
 w.currentCaptureWorkspace = 1;
@@ -62,19 +63,45 @@ w.go = {
           w.commitCalls++;
           if (w.commitCalls > 100)
             throw Error("fixture exhausted commit budget");
+          const current = plan(
+            request.planId === id(22) ? "Old browser draft" : "Old capture",
+          );
+          const reply = (result: ReturnType<typeof plan>) => {
+            w.captureReturnedPlans.push(result);
+            return ok(result);
+          };
           if (w.delayCaptureCommit)
             return new Promise((resolve) => {
               w.resolveCaptureCommit = () =>
                 resolve(
-                  ok({
-                    ...plan(),
-                    planHash: "hash-2",
-                    state: "committing",
-                    cursor: 1,
+                  reply({
+                    ...current,
+                    state: "running",
+                    initialized: true,
+                    cursor: 0,
                   }),
                 );
             });
-          return ok(plan());
+          if (w.commitScenario === "progress") {
+            if (w.commitCalls > current.items.length + 1)
+              throw Error("fixture received a commit after completion");
+            const cursor = w.commitCalls - 1;
+            return reply({
+              ...current,
+              initialized: true,
+              state: cursor === current.items.length ? "complete" : "running",
+              cursor,
+              items: current.items.map((item, index) => ({
+                ...item,
+                committed: index < cursor,
+              })),
+            });
+          }
+          if (w.commitScenario === "changed-hash")
+            return reply({ ...current, planHash: `changed-${w.commitCalls}` });
+          if (w.commitScenario === "state-only")
+            return reply({ ...current, state: "running" });
+          return reply(current);
         }
         throw Error(`unexpected ${method}`);
       },
