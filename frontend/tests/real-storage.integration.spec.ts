@@ -1444,17 +1444,22 @@ test(`real-table-rich-${stage}`, async ({ page }) => {
     current = await exactPageStep(page, "table-restore-cells", current, current.blocks.map((b: any) => b.id === tableId ? bump(b, { data: restored }) : b), () => table.getByRole("button", { name: "Restore cells", exact: true }).click());
     expect(tableData(blockById(current, tableId).data)).toEqual(tableData(savedTable.data));
     if ((await table.locator("details.table-structure").getAttribute("open")) === null) await table.getByText("Table structure", { exact: true }).click();
-    await table.getByRole("combobox", { name: "Selected table row", exact: true }).selectOption("1");
+    const rowSelection = table.getByRole("combobox", { name: "Selected table row", exact: true });
+    expect(await rowSelection.selectOption({ value: "1" })).toEqual(["1"]);
+    await expect(rowSelection).toHaveValue("1");
     await table.getByRole("button", { name: "Remove row", exact: true }).click();
     const confirmation = table.getByRole("alertdialog", { name: "Remove table row", exact: true });
     await expect(confirmation).toBeVisible();
+    await expect(confirmation.getByText("Remove row 2 and its populated cells? This can be undone.", { exact: true })).toBeVisible();
     expect(importedProjection(await snapshot(page), original.page.id)).toEqual(current);
     await confirmation.getByRole("button", { name: "Keep cells", exact: true }).click();
+    await expect(rowSelection).toHaveValue("1");
     expect(importedProjection(await snapshot(page), original.page.id)).toEqual(current);
     const beforeRemoval = blockById(current, tableId).data;
     const removedRow = { ...beforeRemoval, rowCount: 2, cells: beforeRemoval.cells.filter((c: any) => c.row !== 1).map((c: any) => c.row > 1 ? { ...c, row: c.row - 1 } : c) };
     current = await exactPageStep(page, "table-remove-row", current, current.blocks.map((b: any) => b.id === tableId ? bump(b, { data: removedRow }) : b), async () => {
       await table.getByRole("button", { name: "Remove row", exact: true }).click();
+      await expect(confirmation.getByText("Remove row 2 and its populated cells? This can be undone.", { exact: true })).toBeVisible();
       await confirmation.getByRole("button", { name: "Remove populated row", exact: true }).click();
     });
     current = await exactPageStep(page, "table-remove-row-undo", current, current.blocks.map((b: any) => b.id === tableId ? bump(b, { data: beforeRemoval }) : b), () => page.getByRole("button", { name: "Undo", exact: true }).click());
