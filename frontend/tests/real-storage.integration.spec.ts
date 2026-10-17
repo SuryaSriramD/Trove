@@ -1390,7 +1390,75 @@ async function oneCharacterEdit(page: Page, field: import("@playwright/test").Lo
   await page.keyboard.insertText("!");
 }
 
+
+// Only the two new workflows collect bounded control/network metadata. Do not
+// retain RPC arguments, response bodies, headers, tokens or page text.
+const structuredDiagnostics = new WeakMap<Page, { requests: any[]; droppedRequests: number; stop: () => void }>();
+async function startStructuredDiagnostics(page: Page) {
+  const entries = new Map<import("@playwright/test").Request, any>();
+  const state = { requests: [] as any[], droppedRequests: 0, stop: () => {} };
+  const requested = (request: import("@playwright/test").Request) => {
+    if (!request.url().endsWith("/api")) return;
+    if (state.requests.length >= 256) { state.droppedRequests++; return; }
+    let method = "unreadable";
+    try { const value = request.postDataJSON()?.method; if (typeof value === "string") method = value.slice(0, 80); } catch { /* Never retain payload text. */ }
+    const item = { method, startedAt: new Date().toISOString(), startedMonotonicMs: performance.now(), status: null as number | null, finishedAt: null as string | null, durationMs: null as number | null, failed: false };
+    entries.set(request, item); state.requests.push(item);
+  };
+  const responded = (response: import("@playwright/test").Response) => { const item = entries.get(response.request()); if (item) item.status = response.status(); };
+  const finish = (request: import("@playwright/test").Request, failed: boolean) => {
+    const item = entries.get(request); if (!item) return;
+    item.finishedAt = new Date().toISOString(); item.durationMs = performance.now() - item.startedMonotonicMs; item.failed = failed;
+  };
+  const finished = (request: import("@playwright/test").Request) => finish(request, false);
+  const failed = (request: import("@playwright/test").Request) => finish(request, true);
+  page.on("request", requested); page.on("response", responded); page.on("requestfinished", finished); page.on("requestfailed", failed);
+  state.stop = () => { page.off("request", requested); page.off("response", responded); page.off("requestfinished", finished); page.off("requestfailed", failed); };
+  structuredDiagnostics.set(page, state);
+  await page.evaluate(() => {
+    const ids = new WeakMap<Element, number>(); let nextId = 0;
+    const id = (element: Element | null) => { if (!element) return null; if (!ids.has(element)) ids.set(element, ++nextId); return ids.get(element); };
+    const diagnostic = { events: [] as any[], droppedEvents: 0, capture: (_phase: string, _event?: Event) => {}, stop: () => {} };
+    const capture = (phase: string, event?: Event) => {
+      if (diagnostic.events.length >= 256) { diagnostic.droppedEvents++; return; }
+      const target = event?.target instanceof Element ? event.target : null;
+      if (event && !target?.closest(".block-table, .block-columns, .editor-toolbar")) return;
+      const table = document.querySelector(".block-table"), widget = table?.querySelector(".table-scroll") ?? null;
+      const toolbarControls = Array.from(document.querySelectorAll<HTMLButtonElement>(".editor-toolbar button")).filter(button => ["Save page", "Undo", "Redo"].includes(button.getAttribute("aria-label") ?? button.textContent?.trim() ?? ""));
+      diagnostic.events.push({ phase, at: new Date().toISOString(), monotonicMs: performance.now(), eventType: event?.type ?? null,
+        trusted: event?.isTrusted ?? null, control: target?.closest("button,select,input")?.getAttribute("aria-label") ?? target?.closest("button")?.textContent?.trim().slice(0, 80) ?? null,
+        tableBlockId: table?.getAttribute("data-block-id") ?? null, tableWidgetInstance: id(widget),
+        tableStructureOpen: table?.querySelector("details.table-structure")?.hasAttribute("open") ?? null,
+        selectedRow: (table?.querySelector('[aria-label="Selected table row"]') as HTMLSelectElement | null)?.value ?? null,
+        confirmationText: table?.querySelector('[role="alertdialog"]')?.textContent?.trim().slice(0, 240) ?? null,
+        layoutGroups: Array.from(document.querySelectorAll(".block-columns [data-layout-group]")).map(element => element.getAttribute("data-layout-group")),
+        saveState: document.querySelector(".save-state")?.textContent ?? null,
+        toolbarControls: toolbarControls.map(button => ({ name: button.getAttribute("aria-label") ?? button.textContent?.trim(), disabled: button.disabled })) });
+    };
+    const before = (event: Event) => capture("event-capture", event), after = (event: Event) => capture("event-bubble", event);
+    for (const type of ["click", "change"]) { document.addEventListener(type, before, true); document.addEventListener(type, after); }
+    diagnostic.capture = capture;
+    diagnostic.stop = () => { for (const type of ["click", "change"]) { document.removeEventListener(type, before, true); document.removeEventListener(type, after); } };
+    (window as any).__troveStructuredDiagnostics = diagnostic;
+  });
+}
+async function captureStructuredControls(page: Page, phase: string) {
+  await page.evaluate(phase => (window as any).__troveStructuredDiagnostics?.capture(phase), phase);
+}
+test.afterEach(async ({ page }, info) => {
+  const state = structuredDiagnostics.get(page); if (!state) return;
+  state.stop();
+  const controls = await page.evaluate(() => {
+    const diagnostic = (window as any).__troveStructuredDiagnostics;
+    if (!diagnostic) return { unavailable: true };
+    diagnostic.capture("after-test"); diagnostic.stop();
+    return { events: diagnostic.events, droppedEvents: diagnostic.droppedEvents };
+  }).catch(() => ({ unavailable: true }));
+  write(`${stage}-${info.title}-diagnostics.json`, { schemaVersion: 1, status: info.status, requests: state.requests, droppedRequests: state.droppedRequests, controls });
+});
+
 test(`real-table-rich-${stage}`, async ({ page }) => {
+  await startStructuredDiagnostics(page);
   const f = fixture.richTable;
   if (stage === "create") {
     const original = await createPlainPage(page, f.title, f.sentinel);
@@ -1445,16 +1513,20 @@ test(`real-table-rich-${stage}`, async ({ page }) => {
     expect(tableData(blockById(current, tableId).data)).toEqual(tableData(savedTable.data));
     if ((await table.locator("details.table-structure").getAttribute("open")) === null) await table.getByText("Table structure", { exact: true }).click();
     await table.getByRole("combobox", { name: "Selected table row", exact: true }).selectOption("1");
+    await captureStructuredControls(page, "after-select-row-2");
     await table.getByRole("button", { name: "Remove row", exact: true }).click();
     const confirmation = table.getByRole("alertdialog", { name: "Remove table row", exact: true });
     await expect(confirmation).toBeVisible();
+    await captureStructuredControls(page, "first-row-removal-confirmation");
     expect(importedProjection(await snapshot(page), original.page.id)).toEqual(current);
     await confirmation.getByRole("button", { name: "Keep cells", exact: true }).click();
+    await captureStructuredControls(page, "after-cancel-row-removal");
     expect(importedProjection(await snapshot(page), original.page.id)).toEqual(current);
     const beforeRemoval = blockById(current, tableId).data;
     const removedRow = { ...beforeRemoval, rowCount: 2, cells: beforeRemoval.cells.filter((c: any) => c.row !== 1).map((c: any) => c.row > 1 ? { ...c, row: c.row - 1 } : c) };
     current = await exactPageStep(page, "table-remove-row", current, current.blocks.map((b: any) => b.id === tableId ? bump(b, { data: removedRow }) : b), async () => {
       await table.getByRole("button", { name: "Remove row", exact: true }).click();
+      await captureStructuredControls(page, "second-row-removal-confirmation");
       await confirmation.getByRole("button", { name: "Remove populated row", exact: true }).click();
     });
     current = await exactPageStep(page, "table-remove-row-undo", current, current.blocks.map((b: any) => b.id === tableId ? bump(b, { data: beforeRemoval }) : b), () => page.getByRole("button", { name: "Undo", exact: true }).click());
@@ -1480,6 +1552,7 @@ test(`real-table-rich-${stage}`, async ({ page }) => {
 });
 
 test(`real-layout-rich-${stage}`, async ({ page }) => {
+  await startStructuredDiagnostics(page);
   const f = fixture.richLayout;
   if (stage === "create") {
     const original = await createPlainPage(page, f.title, f.sentinel), unrelated = otherPagesAndRecords(await snapshot(page), original.page.id);
