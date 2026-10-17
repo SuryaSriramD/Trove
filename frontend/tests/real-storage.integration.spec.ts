@@ -1433,8 +1433,8 @@ test(`real-table-rich-${stage}`, async ({ page }) => {
     current = await exactPageStep(page, "table-character-undo", current, current.blocks.map((b: any) => b.id === tableId ? bump(b, { data: savedTable.data }) : b), () => cell.press("ControlOrMeta+z"));
     current = await exactPageStep(page, "table-character-redo", current, current.blocks.map((b: any) => b.id === tableId ? bump(b, { data: edited }) : b), () => cell.press("ControlOrMeta+Shift+z"));
     savedTable = blockById(current, tableId);
-    await table.getByLabel("First cell", { exact: true }).selectOption(first.id);
-    await table.getByLabel("Last cell", { exact: true }).selectOption(second.id);
+    await table.getByRole("combobox", { name: "First cell", exact: true }).selectOption(first.id);
+    await table.getByRole("combobox", { name: "Last cell", exact: true }).selectOption(second.id);
     const originals = [savedTable.data.cells.find((c: any) => c.id === first.id), savedTable.data.cells.find((c: any) => c.id === second.id)];
     const merged = { ...savedTable.data, cells: [...savedTable.data.cells.filter((c: any) => ![first.id, second.id].includes(c.id)),
       { ...originals[0], colSpan: 2, richText: [...richValue(f, f.editedText), { text: "\n" }, { text: f.neighbor }], preMergeCells: originals }] };
