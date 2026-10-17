@@ -298,3 +298,69 @@ test("structural guards include an unchanged parent, moved descendants and desti
     ["existing-child"],
   );
 });
+
+// The service serializes object keys in canonical order; editor projections may
+// construct equal maps in a different insertion order. That is not an edit.
+test("service-ordered rich text roundtrip emits no canonical update", () => {
+  const data = JSON.parse('{"richText":[{"color":"purple","highlight":"yellow","link":"https://example.test/retained","marks":["bold"],"text":"Willow! field notes"}]}');
+  const before = [block("rich", "paragraph", data)];
+  const draft = fromDocument(toDocument(before));
+  assert.deepEqual(draft[0].data, data);
+  assert.notEqual(JSON.stringify(draft[0].data), JSON.stringify(data));
+  assert.deepEqual(mutations("page", before, draft), []);
+});
+
+test("removing an empty layout group updates only the container, preserving rich children", () => {
+  const rich = JSON.parse('{"richText":[{"color":"purple","highlight":"yellow","link":"https://example.test/layout-source","marks":["bold"],"text":"Willow! field notes"}]}');
+  const kept = { childBlockIds: ["plain", "rich"], id: "kept", widthRatio: 1 };
+  const before = [
+    block("layout", "columns", { columns: [
+      { childBlockIds: [], id: "empty", widthRatio: 2 }, kept,
+    ] }),
+    block("plain", "paragraph", { richText: [{ text: "Keep 37 samples" }] }, "layout", "000000000001"),
+    block("rich", "paragraph", rich, "layout", "000000000002"),
+  ];
+  before[2].revision = "6";
+  const draft = fromDocument(toDocument(before));
+  draft.find(b => b.id === "layout")!.data = { columns: [structuredClone(kept)] };
+  const commands = mutations("page", before, draft);
+  assert.deepEqual(commands, [{ kind: "block.update", blockId: "layout", type: "columns", schemaVersion: 1, data: { columns: [kept] } }]);
+  assert.deepEqual(blockMutationGuards(before, commands).map(g => ({ id: g.target.entityId, revision: g.revision })), [{ id: "layout", revision: "1" }]);
+  assert.equal(before[2].revision, "6");
+  assert.deepEqual(draft.find(b => b.id === "rich")!.data, rich);
+});
+
+test("nested map member order is ignored without sorting arrays or changing data", () => {
+  const before = [block("raw", "unsupported_external", {
+    sourceType: "future-widget", sourceVersion: 1, readableText: "Retained evidence", reason: "unknown_type",
+    raw: { first: { count: 3, nullable: null }, second: [{ code: "A", enabled: true }, { code: "B", enabled: false }] },
+  })];
+  const draft = fromDocument(toDocument(before));
+  draft[0].data = {
+    raw: { second: [{ enabled: true, code: "A" }, { enabled: false, code: "B" }], first: { nullable: null, count: 3 } },
+    reason: "unknown_type", readableText: "Retained evidence", sourceVersion: 1, sourceType: "future-widget",
+  };
+  const retained = structuredClone(draft[0].data);
+  assert.deepEqual(mutations("page", before, draft), []);
+  assert.deepEqual(draft[0].data, retained);
+});
+
+test("nested values, array order, types and null versus missing remain edits", async t => {
+  const original = { nullable: null, number: 1, enabled: true, nested: { color: "purple" }, order: ["a", "b"], empty: {} };
+  const variants = [
+    ["nested value", { ...original, nested: { color: "blue" } }],
+    ["array order", { ...original, order: ["b", "a"] }],
+    ["array length", { ...original, order: ["a"] }],
+    ["primitive type", { ...original, number: "1" }],
+    ["boolean", { ...original, enabled: false }],
+    ["missing member", { number: 1, enabled: true, nested: { color: "purple" }, order: ["a", "b"], empty: {} }],
+    ["null versus map", { ...original, empty: null }],
+    ["map versus array", { ...original, empty: [] }],
+  ] as const;
+  for (const [name, raw] of variants) await t.test(name, () => {
+    const before = [block("raw", "unsupported_external", { sourceType: "future-widget", sourceVersion: 1, raw: original, readableText: "Retained", reason: "unknown_type" })];
+    const draft = fromDocument(toDocument(before));
+    draft[0].data.raw = structuredClone(raw);
+    assert.deepEqual(mutations("page", before, draft), [{ kind: "block.update", blockId: "raw", type: "unsupported_external", schemaVersion: 1, data: draft[0].data }]);
+  });
+});
