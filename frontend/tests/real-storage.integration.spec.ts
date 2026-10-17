@@ -1333,3 +1333,224 @@ test(stage === "create" ? "real-graph-create" : "real-graph-reopen", async ({ pa
   await expect(intelligencePanel(page).getByText("No connections in this neighborhood. Add a page link or include retrieval associations.", { exact: true })).toBeVisible();
   write(`${stage}-graph-result.json`, { passed: true, graph: saved.finalGraph, removed, semanticAssociations: false });
 });
+
+// Suite 8: visible rich-table/layout operations, real storage and restart.
+function blockById(projection: any, id: string) {
+  const matches = projection.blocks.filter((b: any) => b.id === id);
+  expect(matches).toHaveLength(1); return matches[0];
+}
+const bump = (block: any, patch: Record<string, unknown> = {}) => ({ ...block, ...patch, revision: String(BigInt(block.revision) + 1n) });
+const sortedBlocks = (blocks: any[]) => [...blocks].sort((a, b) => a.id.localeCompare(b.id));
+const tableData = (data: any) => ({ ...data, cells: [...data.cells].sort((a: any, b: any) => a.row - b.row || a.column - b.column) });
+const richValue = (f: any, text = f.text) => [{ text, marks: ["bold"], link: f.link, color: "purple", highlight: "yellow" }];
+function otherPagesAndRecords(s: any, pageId: string) {
+  return { ...unrelatedRecords(s), pages: s.pages.filter((p: any) => p.id !== pageId), blocks: s.blocks.filter((b: any) => b.pageId !== pageId) };
+}
+async function insertStructuredBlock(page: Page, name: "Table" | "Columns") {
+  await page.getByRole("button", { name: "＋ Add a thought · type / for blocks", exact: true }).click();
+  await page.getByRole("button", { name: "＋ Insert", exact: true }).click();
+  await page.getByRole("dialog", { name: "Insert a block", exact: true }).getByRole("button").filter({ has: page.getByText(name, { exact: true }) }).click();
+  await page.getByRole("button", { name: "Save page", exact: true }).click();
+}
+async function openStructuredPage(page: Page, title: string) {
+  await surface(page, "Pages");
+  await page.getByRole("navigation", { name: "Page tree", exact: true }).getByRole("button", { name: `▤ ${title}`, exact: true }).click();
+  await expect(page.getByLabel("Page title", { exact: true })).toHaveValue(title);
+  await expect(page.getByRole("textbox", { name: "Page body", exact: true })).toBeVisible();
+}
+async function formatInline(page: Page, field: import("@playwright/test").Locator, label: string, f: any) {
+  await field.fill(f.text); await field.press("ControlOrMeta+a");
+  const toolbar = field.locator("xpath=ancestor::*[@data-inline-editor][1]").getByRole("toolbar", { name: `${label} formatting`, exact: true });
+  await toolbar.getByRole("button", { name: `${label} bold`, exact: true }).click();
+  await toolbar.getByRole("combobox", { name: `${label} color`, exact: true }).selectOption("purple");
+  await toolbar.getByRole("combobox", { name: `${label} highlight`, exact: true }).selectOption("yellow");
+  page.once("dialog", dialog => dialog.accept(f.link));
+  await toolbar.getByRole("button", { name: `${label} link`, exact: true }).click();
+  await expect(field.locator("strong")).toHaveText(f.text);
+  await expect(field.locator("a")).toHaveAttribute("href", f.link);
+}
+async function exactPageStep(page: Page, name: string, before: any, expectedBlocks: any[], action: () => Promise<unknown>) {
+  let actual: any;
+  try {
+    await action();
+    await page.getByRole("button", { name: "Save page", exact: true }).click();
+    await expect.poll(async () => sortedBlocks(importedProjection(await snapshot(page), before.page.id).blocks)).toEqual(sortedBlocks(expectedBlocks));
+    actual = importedProjection(await snapshot(page), before.page.id);
+    expect(actual.page).toEqual({ ...before.page, revision: String(BigInt(before.page.revision) + 1n), updatedAt: actual.page.updatedAt });
+    expect(Date.parse(actual.page.updatedAt)).toBeGreaterThanOrEqual(Date.parse(before.page.updatedAt));
+    return actual;
+  } finally {
+    actual ??= importedProjection(await snapshot(page), before.page.id);
+    write(`${stage}-${name}.json`, { before, expectedBlocks, actual });
+  }
+}
+async function oneCharacterEdit(page: Page, field: import("@playwright/test").Locator, count: number) {
+  await field.click(); await field.press("ControlOrMeta+a"); await page.keyboard.press("ArrowLeft");
+  for (let i = 0; i < count; i++) await page.keyboard.press("ArrowRight");
+  await page.keyboard.insertText("!");
+}
+
+test(`real-table-rich-${stage}`, async ({ page }) => {
+  const f = fixture.richTable;
+  if (stage === "create") {
+    const original = await createPlainPage(page, f.title, f.sentinel);
+    const unrelated = otherPagesAndRecords(await snapshot(page), original.page.id);
+    await insertStructuredBlock(page, "Table");
+    const table = page.locator(".tiptap .block-table");
+    await expect(table.getByRole("textbox", { name: "Row 3 column 2", exact: true })).toBeVisible();
+    await expect.poll(async () => importedProjection(await snapshot(page), original.page.id).blocks.filter((b: any) => b.type === "table").length).toBe(1);
+    const initialTable = importedProjection(await snapshot(page), original.page.id).blocks.find((b: any) => b.type === "table");
+    expect(initialTable.parentBlockId).toBeNull();
+    expect(initialTable.data.cells).toHaveLength(6);
+    expect(initialTable.data.cells.every((c: any) => c.richText.length === 0)).toBe(true);
+    const cell = table.getByRole("textbox", { name: "Row 1 column 1", exact: true });
+    await formatInline(page, cell, "Row 1 column 1", f);
+    await table.getByRole("textbox", { name: "Row 1 column 2", exact: true }).fill(f.neighbor);
+    await table.getByRole("textbox", { name: "Row 2 column 1", exact: true }).fill(f.bodyRow);
+    await table.getByText("Table structure", { exact: true }).click();
+    await table.getByRole("spinbutton", { name: "Header columns", exact: true }).fill("1");
+    await table.getByRole("spinbutton", { name: "Column 1 width in pixels", exact: true }).fill(String(f.widths[0]));
+    await table.getByRole("spinbutton", { name: "Column 2 width in pixels", exact: true }).fill(String(f.widths[1]));
+    await page.getByRole("button", { name: "Save page", exact: true }).click();
+    await expect.poll(async () => importedProjection(await snapshot(page), original.page.id).blocks.find((b: any) => b.type === "table")?.data.cells[0].richText).toEqual(richValue(f));
+    let current = importedProjection(await snapshot(page), original.page.id);
+    expect(current.blocks).toHaveLength(2);
+    let savedTable = current.blocks.find((b: any) => b.type === "table");
+    const tableId = savedTable.id, first = savedTable.data.cells.find((c: any) => c.row === 0 && c.column === 0), second = savedTable.data.cells.find((c: any) => c.row === 0 && c.column === 1);
+    expect(savedTable.id).toBe(initialTable.id);
+    expect(savedTable.data.cells.map((c: any) => c.id)).toEqual(initialTable.data.cells.map((c: any) => c.id));
+    expect(new Set(savedTable.data.cells.map((c: any) => c.id)).size).toBe(6);
+    expect(tableData(savedTable.data).cells.map((c: any) => [c.row, c.column])).toEqual([[0, 0], [0, 1], [1, 0], [1, 1], [2, 0], [2, 1]]);
+    expect(tableData(savedTable.data)).toEqual({ rowCount: 3, columnCount: 2, headerRows: 1, headerColumns: 1, columnWidths: f.widths,
+      cells: savedTable.data.cells.map((c: any) => ({ id: c.id, row: c.row, column: c.column, rowSpan: 1, colSpan: 1, preMergeCells: [],
+        richText: c.row === 0 && c.column === 0 ? richValue(f) : c.row === 0 && c.column === 1 ? [{ text: f.neighbor }] : c.row === 1 && c.column === 0 ? [{ text: f.bodyRow }] : [] })).sort((a: any, b: any) => a.row - b.row || a.column - b.column) });
+    const sentinel = blockById(current, original.blocks[0].id);
+    expect(sentinel.data).toEqual(original.blocks[0].data);
+    // A real navigation starts a fresh editor history; no selection command is injected.
+    await surface(page, "Home"); await openStructuredPage(page, f.title);
+    const edited = { ...savedTable.data, cells: savedTable.data.cells.map((c: any) => c.id === first.id ? { ...c, richText: richValue(f, f.editedText) } : c) };
+    current = await exactPageStep(page, "table-character", current, current.blocks.map((b: any) => b.id === tableId ? bump(b, { data: edited }) : b), () => oneCharacterEdit(page, cell, f.editOffset));
+    current = await exactPageStep(page, "table-character-undo", current, current.blocks.map((b: any) => b.id === tableId ? bump(b, { data: savedTable.data }) : b), () => cell.press("ControlOrMeta+z"));
+    current = await exactPageStep(page, "table-character-redo", current, current.blocks.map((b: any) => b.id === tableId ? bump(b, { data: edited }) : b), () => cell.press("ControlOrMeta+Shift+z"));
+    savedTable = blockById(current, tableId);
+    await table.getByLabel("First cell", { exact: true }).selectOption(first.id);
+    await table.getByLabel("Last cell", { exact: true }).selectOption(second.id);
+    const originals = [savedTable.data.cells.find((c: any) => c.id === first.id), savedTable.data.cells.find((c: any) => c.id === second.id)];
+    const merged = { ...savedTable.data, cells: [...savedTable.data.cells.filter((c: any) => ![first.id, second.id].includes(c.id)),
+      { ...originals[0], colSpan: 2, richText: [...richValue(f, f.editedText), { text: "\n" }, { text: f.neighbor }], preMergeCells: originals }] };
+    current = await exactPageStep(page, "table-merge", current, current.blocks.map((b: any) => b.id === tableId ? bump(b, { data: merged }) : b), () => table.getByRole("button", { name: "Merge range", exact: true }).click());
+    await expect(table.getByRole("textbox", { name: "Row 1 column 2", exact: true })).toHaveCount(0);
+    const restored = { ...savedTable.data, cells: [...savedTable.data.cells.filter((c: any) => ![first.id, second.id].includes(c.id)), ...originals] };
+    current = await exactPageStep(page, "table-restore-cells", current, current.blocks.map((b: any) => b.id === tableId ? bump(b, { data: restored }) : b), () => table.getByRole("button", { name: "Restore cells", exact: true }).click());
+    expect(tableData(blockById(current, tableId).data)).toEqual(tableData(savedTable.data));
+    if ((await table.locator("details.table-structure").getAttribute("open")) === null) await table.getByText("Table structure", { exact: true }).click();
+    await table.getByRole("combobox", { name: "Selected table row", exact: true }).selectOption("1");
+    await table.getByRole("button", { name: "Remove row", exact: true }).click();
+    const confirmation = table.getByRole("alertdialog", { name: "Remove table row", exact: true });
+    await expect(confirmation).toBeVisible();
+    expect(importedProjection(await snapshot(page), original.page.id)).toEqual(current);
+    await confirmation.getByRole("button", { name: "Keep cells", exact: true }).click();
+    expect(importedProjection(await snapshot(page), original.page.id)).toEqual(current);
+    const beforeRemoval = blockById(current, tableId).data;
+    const removedRow = { ...beforeRemoval, rowCount: 2, cells: beforeRemoval.cells.filter((c: any) => c.row !== 1).map((c: any) => c.row > 1 ? { ...c, row: c.row - 1 } : c) };
+    current = await exactPageStep(page, "table-remove-row", current, current.blocks.map((b: any) => b.id === tableId ? bump(b, { data: removedRow }) : b), async () => {
+      await table.getByRole("button", { name: "Remove row", exact: true }).click();
+      await confirmation.getByRole("button", { name: "Remove populated row", exact: true }).click();
+    });
+    current = await exactPageStep(page, "table-remove-row-undo", current, current.blocks.map((b: any) => b.id === tableId ? bump(b, { data: beforeRemoval }) : b), () => page.getByRole("button", { name: "Undo", exact: true }).click());
+    expect(blockById(current, sentinel.id)).toEqual(sentinel);
+    expect(otherPagesAndRecords(await snapshot(page), original.page.id)).toEqual(unrelated);
+    write("create-table-rich.json", { canonical: current, tableId, cellIds: savedTable.data.cells.map((c: any) => c.id).sort(), unrelated });
+    await surface(page, "Home");
+  }
+  const saved = read("create-table-rich.json"); await openStructuredPage(page, f.title);
+  const current = importedProjection(await snapshot(page), saved.canonical.page.id);
+  expect(current).toEqual(saved.canonical);
+  const table = page.locator(".tiptap .block-table"), cell = table.getByRole("textbox", { name: "Row 1 column 1", exact: true });
+  await expect(cell).toHaveText(f.editedText); await expect(cell.locator("strong")).toHaveText(f.editedText);
+  await expect(cell.locator("a")).toHaveAttribute("href", f.link);
+  await expect(cell.locator('[data-trove-color="purple"]')).toHaveText(f.editedText);
+  await expect(cell.locator('[data-trove-highlight="yellow"]')).toHaveText(f.editedText);
+  await expect(table.getByRole("textbox", { name: "Row 2 column 1", exact: true })).toHaveText(f.bodyRow);
+  expect(blockById(current, saved.tableId).data.cells.map((c: any) => c.id).sort()).toEqual(saved.cellIds);
+  // Other fixture reopen actions may resume their own imports; record values stay unrelated.
+  expect(unrelatedRecords(await snapshot(page))).toEqual(unrelatedRecords(saved.unrelated));
+  if (stage === "create") expect(otherPagesAndRecords(await snapshot(page), current.page.id)).toEqual(saved.unrelated);
+  write(`${stage}-table-rich-result.json`, { passed: true, canonical: current });
+});
+
+test(`real-layout-rich-${stage}`, async ({ page }) => {
+  const f = fixture.richLayout;
+  if (stage === "create") {
+    const original = await createPlainPage(page, f.title, f.sentinel), unrelated = otherPagesAndRecords(await snapshot(page), original.page.id);
+    await insertStructuredBlock(page, "Columns");
+    await expect.poll(async () => importedProjection(await snapshot(page), original.page.id).blocks.filter((b: any) => b.type === "columns").length).toBe(1);
+    const initial = importedProjection(await snapshot(page), original.page.id), layout = initial.blocks.find((b: any) => b.type === "columns");
+    expect(initial.blocks).toHaveLength(4); expect(layout.data.columns).toHaveLength(2);
+    expect(layout.parentBlockId).toBeNull();
+    const [left, right] = layout.data.columns, [firstId] = left.childBlockIds, [secondId] = right.childBlockIds;
+    expect(left.childBlockIds).toHaveLength(1); expect(right.childBlockIds).toHaveLength(1);
+    expect(new Set([layout.id, left.id, right.id, firstId, secondId]).size).toBe(5);
+    expect(layout.data.columns).toEqual([{ id: left.id, widthRatio: 1, childBlockIds: [firstId] }, { id: right.id, widthRatio: 1, childBlockIds: [secondId] }]);
+    const container = page.locator(`.tiptap [data-block-id="${layout.id}"]`), first = container.locator(`[data-projected-block-id="${firstId}"]`), second = container.locator(`[data-projected-block-id="${secondId}"]`);
+    const field = first.getByRole("textbox", { name: "Column content", exact: true });
+    await formatInline(page, field, "Column content", f);
+    await second.getByRole("textbox", { name: "Column content", exact: true }).fill(f.neighbor);
+    await container.getByRole("spinbutton", { name: "Column 1 width", exact: true }).fill("2");
+    await page.getByRole("button", { name: "Save page", exact: true }).click();
+    await expect.poll(async () => blockById(importedProjection(await snapshot(page), original.page.id), firstId).data.richText).toEqual(richValue(f));
+    let current = importedProjection(await snapshot(page), original.page.id), savedFirst = blockById(current, firstId);
+    expect(savedFirst.parentBlockId).toBe(layout.id); expect(savedFirst.data).toEqual({ richText: richValue(f) });
+    expect(blockById(current, secondId).parentBlockId).toBe(layout.id);
+    expect(blockById(current, secondId).data).toEqual({ richText: [{ text: f.neighbor }] });
+    expect(blockById(current, layout.id).data.columns).toEqual([{ ...left, widthRatio: 2 }, right]);
+    const sentinel = blockById(current, original.blocks[0].id);
+    expect(sentinel.data).toEqual(original.blocks[0].data);
+    await surface(page, "Home"); await openStructuredPage(page, f.title);
+    current = await exactPageStep(page, "layout-character", current, current.blocks.map((b: any) => b.id === firstId ? bump(b, { data: { richText: richValue(f, f.editedText) } }) : b), () => oneCharacterEdit(page, field, f.editOffset));
+    current = await exactPageStep(page, "layout-character-undo", current, current.blocks.map((b: any) => b.id === firstId ? bump(b, { data: savedFirst.data }) : b), () => field.press("ControlOrMeta+z"));
+    current = await exactPageStep(page, "layout-character-redo", current, current.blocks.map((b: any) => b.id === firstId ? bump(b, { data: { richText: richValue(f, f.editedText) } }) : b), () => field.press("ControlOrMeta+Shift+z"));
+    const movedGroups = [{ ...left, widthRatio: 2, childBlockIds: [] }, { ...right, childBlockIds: [secondId, firstId] }];
+    current = await exactPageStep(page, "layout-move", current, current.blocks.map((b: any) => b.id === layout.id ? bump(b, { data: { columns: movedGroups } }) : b.id === firstId ? bump(b, { sortKey: "000000000002" }) : b.id === secondId ? bump(b, { sortKey: "000000000001" }) : b), () => container.getByLabel(`Move layout block ${firstId}`, { exact: true }).selectOption(right.id));
+    current = await exactPageStep(page, "layout-remove-empty-group", current, current.blocks.map((b: any) => b.id === layout.id ? bump(b, { data: { columns: [movedGroups[1]] } }) : b), () => container.locator(`[data-layout-group="${left.id}"]`).getByRole("button", { name: "Remove column and keep content", exact: true }).click());
+    current = await exactPageStep(page, "layout-restore-group", current, current.blocks.map((b: any) => b.id === layout.id ? bump(b, { data: { columns: movedGroups } }) : b), () => page.getByRole("button", { name: "Undo", exact: true }).click());
+    const beforeDuplicate = current;
+    await first.locator("..").getByRole("button", { name: "Duplicate layout block", exact: true }).click();
+    await expect(container.locator("[data-projected-block-id]")).toHaveCount(3);
+    const copies = await container.locator("[data-projected-block-id]").evaluateAll(elements => elements.map(element => element.getAttribute("data-projected-block-id")));
+    const copyId = copies.find(id => id !== firstId && id !== secondId)!;
+    expect(copyId).toBeTruthy(); expect(new Set(copies).size).toBe(3);
+    const copiedGroups = [movedGroups[0], { ...movedGroups[1], childBlockIds: [secondId, firstId, copyId] }];
+    const duplicate = { ...blockById(current, firstId), id: copyId, revision: "1", sortKey: "000000000003" };
+    current = await exactPageStep(page, "layout-duplicate", beforeDuplicate, [...current.blocks.map((b: any) => b.id === layout.id ? bump(b, { data: { columns: copiedGroups } }) : [firstId, secondId].includes(b.id) ? bump(b) : b), duplicate], async () => {});
+    const copy = container.locator(`[data-projected-block-id="${copyId}"]`).locator("..");
+    await copy.getByRole("button", { name: "Remove layout block", exact: true }).click();
+    const confirmation = container.getByRole("alertdialog", { name: "Remove layout content", exact: true });
+    await expect(confirmation).toBeVisible(); expect(importedProjection(await snapshot(page), original.page.id)).toEqual(current);
+    await confirmation.getByRole("button", { name: "Keep layout content", exact: true }).click();
+    expect(importedProjection(await snapshot(page), original.page.id)).toEqual(current);
+    current = await exactPageStep(page, "layout-remove-copy", current, current.blocks.filter((b: any) => b.id !== copyId).map((b: any) => b.id === layout.id ? bump(b, { data: { columns: movedGroups } }) : [firstId, secondId].includes(b.id) ? bump(b) : b), async () => {
+      await copy.getByRole("button", { name: "Remove layout block", exact: true }).click();
+      await confirmation.getByRole("button", { name: "Remove nested content", exact: true }).click();
+    });
+    current = await exactPageStep(page, "layout-recover-copy", current, [...current.blocks.map((b: any) => b.id === layout.id ? bump(b, { data: { columns: copiedGroups } }) : [firstId, secondId].includes(b.id) ? bump(b) : b), duplicate], () => page.getByRole("button", { name: "Undo", exact: true }).click());
+    expect(blockById(current, sentinel.id)).toEqual(sentinel);
+    expect(otherPagesAndRecords(await snapshot(page), original.page.id)).toEqual(unrelated);
+    write("create-layout-rich.json", { canonical: current, containerId: layout.id, firstId, secondId, copyId, groupIds: [left.id, right.id], unrelated });
+    await surface(page, "Home");
+  }
+  const saved = read("create-layout-rich.json"); await openStructuredPage(page, f.title);
+  const current = importedProjection(await snapshot(page), saved.canonical.page.id); expect(current).toEqual(saved.canonical);
+  const container = page.locator(`.tiptap [data-block-id="${saved.containerId}"]`);
+  for (const id of [saved.firstId, saved.copyId]) {
+    const field = container.locator(`[data-projected-block-id="${id}"]`).getByRole("textbox", { name: "Column content", exact: true });
+    await expect(field).toHaveText(f.editedText); await expect(field.locator("strong")).toHaveText(f.editedText);
+    await expect(field.locator("a")).toHaveAttribute("href", f.link);
+    await expect(field.locator('[data-trove-color="purple"]')).toHaveText(f.editedText);
+    await expect(field.locator('[data-trove-highlight="yellow"]')).toHaveText(f.editedText);
+  }
+  expect(blockById(current, saved.containerId).data.columns.map((g: any) => g.id)).toEqual(saved.groupIds);
+  expect(unrelatedRecords(await snapshot(page))).toEqual(unrelatedRecords(saved.unrelated));
+  if (stage === "create") expect(otherPagesAndRecords(await snapshot(page), current.page.id)).toEqual(saved.unrelated);
+  write(`${stage}-layout-rich-result.json`, { passed: true, canonical: current });
+});

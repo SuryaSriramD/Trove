@@ -25,10 +25,10 @@ import urllib.request
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / 'scripts'))
 from native_fixture_environment import native_fixture_environment, validate_native_fixture_environment
-EXPECTED = {stage: [f"real-{workflow}-{stage}" for workflow in ("rich", "task", "due", "record-lifecycle", "layout-review", "p2-data", "p2-action", "conversation-display", "schedule-week", "schedule-dst", "import-merge", "import-resume", "skills", "personal-review", "graph")] for stage in ("create", "reopen")}
+EXPECTED = {stage: [f"real-{workflow}-{stage}" for workflow in ("rich", "task", "due", "record-lifecycle", "layout-review", "p2-data", "p2-action", "conversation-display", "schedule-week", "schedule-dst", "import-merge", "import-resume", "skills", "personal-review", "graph", "table-rich", "layout-rich")] for stage in ("create", "reopen")}
 LIMITATIONS = ["Chromium UI plus production host/services/SQLite; not native Wails WebView acceptance.",
                "No model inference, physical devices, live accounts, performance or release qualification.",
-               "Bounded rich-page, task/record/undo, layout/review, P2 forms/charts/row actions and conversation/display and working-week/DST scheduling, non-generative skills/review and explicit graph-link continuity; broader native/recovery workflows remain pending."]
+               "Bounded rich-page, task/record/undo, layout/review, P2 forms/charts/row actions and conversation/display and working-week/DST scheduling, non-generative skills/review and explicit graph-link continuity; rich table/layout editing, structural recovery and restart; broader native/recovery workflows remain pending."]
 
 def now():
     return datetime.now(timezone.utc).isoformat()
@@ -165,7 +165,7 @@ def main():
                   'harnessFiles': {name: digest(ROOT / name) for name in harness_paths},
                   'frontendSourceSHA256': object_digest(inventory(ROOT / 'frontend/src'))}
         manifest['inputs'] = inputs
-        fixture = {'schemaVersion': 1, 'suiteVersion': 7, 'pageTitle': 'Real storage — café తెలుగు',
+        fixture = {'schemaVersion': 1, 'suiteVersion': 8, 'pageTitle': 'Real storage — café తెలుగు',
                    'body': 'A carefully saved idea: café, తెలుగు and 日本語.',
                    'initialTaskTitle': 'Prepare real storage review', 'taskTitle': 'Finish real storage review',
                    'expectedRichMarks': ['bold'], 'expectedTaskStatusGroup': 'done',
@@ -201,6 +201,15 @@ def main():
         fixture['graph'] = {'sourceTitle': 'Graph source trail index', 'sourceBody': 'Keep this trail index paragraph unchanged.',
             'targetTitle': 'Graph retained cedar trail', 'targetBody': 'The cedar route has three bridges.',
             'removedTitle': 'Graph removed ridge trail', 'removedBody': 'The ridge route has one stone shelter.'}
+        fixture['richTable'] = {'title': 'Rich table storage and recovery',
+            'sentinel': 'This table-page paragraph keeps its identity and text.',
+            'text': 'Copper café inventory', 'editedText': 'Copp!er café inventory', 'editOffset': 4,
+            'link': 'https://example.test/table-source', 'neighbor': 'Retained second header cell',
+            'bodyRow': 'Populated row survives undo: 41 units.', 'widths': [220, 280]}
+        fixture['richLayout'] = {'title': 'Rich column storage and recovery',
+            'sentinel': 'This layout-page paragraph is unrelated to its children.',
+            'text': 'Willow field notes', 'editedText': 'Willow! field notes', 'editOffset': 6,
+            'link': 'https://example.test/layout-source', 'neighbor': 'Second column witness: 37 samples.'}
         date_value = lambda start, end, zone, timed=False: {'start': start, 'end': end, 'timezone': zone, 'hasTime': timed}
         zone = 'America/New_York'
         fixture['scheduleWeek'] = {'database': 'Working week dependency fixture', 'timezone': zone,

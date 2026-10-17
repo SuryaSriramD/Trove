@@ -2,7 +2,7 @@
 
 `scripts/run-real-ui.py` drives the compiled UI through Chromium against the production `trove-host` packaged inside an existing macOS app. It creates a new local APFS workspace, authenticates through the existing owner-token login, and changes content only through visible controls. Read-only production snapshots independently check exact canonical values and identities. The host is stopped normally and started again before the reopen checks.
 
-Suite version 7 retains all twenty-four version-6 case identities and assertions, including no additional canonical pages/blocks or omitted-root navigation after a no-op import. Fifteen independent workflows run before and after a real host restart:
+Suite version 8 retains all thirty version-7 case identities and assertions, including no additional canonical pages/blocks or omitted-root navigation after a no-op import. Seventeen independent workflows run before and after a real host restart:
 
 - Unicode rich-page creation with bold formatting.
 - Task creation, rename, completion and Tasks-to-Home consistency.
@@ -23,6 +23,9 @@ Suite version 7 retains all twenty-four version-6 case identities and assertions
 - Skill validation, version history/restoration as a new version, duplication, archiving and inert JSON import. Exact saved source/tool selections survive restart; manual preview binds a selected subset without starting inference or creating an AI run.
 - A deterministic personal-review plan with two explicit sources, dismissed and stale drafts, atomic approved append preserving unrelated content, pause/reactivation and final paused persistence. Generation remains disabled; this does not qualify model analysis or background scheduling.
 - Two explicit page links, graph edge evidence tied to source block/revision, navigation through evidence/backlinks, keyboard deletion of one link and exact retained/removed edge state after restart. Retrieval associations remain disabled.
+
+- Rich table creation through visible controls, exact bold/link/color/highlight preservation, a genuine caret edit with persisted outer undo/redo, merged-cell source evidence and restoration, populated-row cancellation/removal/undo, stable cell identities and unchanged unrelated content.
+- Rich column creation and editing, stable group/child identities during group moves and removal/undo, duplication and confirmed removal/recovery, navigation and exact restart persistence. Expected mutation revisions and sibling order are checked alongside values; these cases do not inject editor commands or clipboard contents.
 
 The reopen cases compare exact canonical values, identities, operation state, layouts and review history with saved pre-restart observations. These are bounded UI/service/storage checks. Native Wails rendering, input methods, accessibility, microphone, reminders, AI quality, live accounts, performance and broader feature workflows require their own checks.
 
