@@ -1656,15 +1656,22 @@ test(`real-capture-review-${stage}`, async ({ page }) => {
     await expect(panel.getByRole("heading", { name: "Capture review", exact: true })).toBeVisible(); await expect(panel.getByRole("alert")).toHaveCount(0);
     expect(canonicalContent(await snapshot(page))).toEqual(before);
     const response = await uiResponse(page, "imports.commit", () => panel.getByRole("button", { name: "Save reviewed capture", exact: true }).click());
-    expect(response.ok).toBe(true); const plan = response.result;
-    expect(plan.planId).toBe(preview.planId); expect(plan.state).toBe("complete"); expect(plan.cursor).toBe(1); expect(plan.items[0].committed).toBe(true);
+    expect(response.ok).toBe(true); const initialized = response.result;
+    expect(initialized.planId).toBe(preview.planId); expect(initialized.initialized).toBe(true);
+    expect(initialized.state).toBe("running"); expect(initialized.cursor).toBe(0); expect(initialized.items[0].committed).toBe(false);
+    expect(initialized.committedBatchIds).toHaveLength(1);
+    // The visible save action advances initialization and item publication as distinct durable units.
     await expect(panel.getByRole("status").filter({ hasText: "Capture saved as offline workspace content." })).toHaveText("Capture saved as offline workspace content.");
+    const plan = await observe(page, "imports.plan", { planId: preview.planId });
+    expect(plan.planId).toBe(preview.planId); expect(plan.state).toBe("complete"); expect(plan.cursor).toBe(1); expect(plan.items[0].committed).toBe(true);
+    expect(plan.committedBatchIds).toHaveLength(2); expect(plan.committedBatchIds[0]).toBe(initialized.committedBatchIds[0]);
+    expect(plan.planHash).not.toBe(initialized.planHash);
     const s = await snapshot(page), projected = captureProjection(s, plan), added = new Set([plan.rootPageId, plan.items[0].pageId]);
     expect(s.pages.filter((p: any) => !added.has(p.id))).toEqual(before.pages);
     expect(s.blocks.filter((b: any) => !added.has(b.pageId))).toEqual(before.blocks); expect(unrelatedRecords(s)).toEqual(unrelatedRecords(before));
     await panel.getByRole("button", { name: "Open capture", exact: true }).click();
     await expect(page.getByLabel("Page title", { exact: true })).toHaveValue(`Import · ${f.title}`);
-    write("create-capture-review.json", { preview, plan, ...projected, rejection, noCanonicalWritesBeforeReview: true });
+    write("create-capture-review.json", { preview, initialized, plan, ...projected, rejection, noCanonicalWritesBeforeReview: true });
   }
   const saved = read("create-capture-review.json");
   await openRecentImport(page, saved.plan);
