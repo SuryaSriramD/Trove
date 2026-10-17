@@ -1559,3 +1559,223 @@ test(`real-layout-rich-${stage}`, async ({ page }) => {
   if (stage === "create") expect(otherPagesAndRecords(await snapshot(page), current.page.id)).toEqual(saved.unrelated);
   write(`${stage}-layout-rich-result.json`, { passed: true, canonical: current });
 });
+
+// Suite 9: reviewed shared HTML and guarded history recovery; no native capability substitutes.
+async function recoverySurface(page: Page) {
+  await page.getByRole("navigation", { name: "Workspace", exact: true }).getByRole("button", { name: /Settings/ }).click();
+  return page.getByRole("region", { name: "History and recovery", exact: true });
+}
+function pageIncludingTrash(s: any, id: string) {
+  const pages = s.pages.filter((p: any) => p.id === id); expect(pages).toHaveLength(1);
+  return { workspaceId: s.workspaceId, page: pages[0],
+    blocks: s.blocks.filter((b: any) => b.pageId === id).sort((a: any, b: any) => a.sortKey.localeCompare(b.sortKey)) };
+}
+function plainRecoveryGuards(value: any) {
+  return [
+    { target: { entityType: "block", entityId: value.blocks[0].id }, revision: value.blocks[0].revision },
+    { target: { entityType: "page", entityId: value.page.id }, revision: value.page.revision },
+  ];
+}
+function assertRecoveryStep(before: any, after: any, restored: any) {
+  expect(after.workspaceId).toBe(before.workspaceId);
+  expect(after.page).toEqual({ ...restored.page, revision: String(BigInt(before.page.revision) + 1n), updatedAt: after.page.updatedAt });
+  expect(Date.parse(after.page.updatedAt)).toBeGreaterThanOrEqual(Date.parse(before.page.updatedAt));
+  expect(after.blocks).toEqual(restored.blocks.map((block: any) => ({ ...block,
+    revision: String(BigInt(before.blocks.find((b: any) => b.id === block.id).revision) + 1n) })));
+}
+async function replaceHistoryBody(page: Page, before: any, text: string) {
+  await expect(page.locator(".tiptap .block-text")).toHaveText(blockText(before.blocks[0]));
+  await page.locator(".tiptap .block-text").click({ position: { x: 8, y: 8 } });
+  await page.keyboard.press("Home"); await page.keyboard.press("Shift+End"); await page.keyboard.insertText(text);
+  await page.getByRole("button", { name: "Save page", exact: true }).click();
+  await expect.poll(async () => importedProjection(await snapshot(page), before.page.id).blocks.map(blockText)).toEqual([text]);
+  const after = importedProjection(await snapshot(page), before.page.id);
+  assertRecoveryStep(before, after, { ...before, blocks: [{ ...before.blocks[0], data: { richText: [{ text }] } }] });
+  return after;
+}
+async function visibleHistory(page: Page, pageId: string) {
+  const panel = await recoverySurface(page);
+  await panel.getByRole("combobox", { name: "Page history", exact: true }).selectOption({ value: pageId });
+  const response = await uiResponse(page, "history.list", () => panel.getByRole("button", { name: "Load revisions", exact: true }).click());
+  expect(response.ok).toBe(true);
+  return { panel, revisions: response.result.revisions };
+}
+async function previewRevision(page: Page, panel: import("@playwright/test").Locator, revision: string) {
+  const response = await uiResponse(page, "history.previewRestore", () => panel.getByRole("button", { name: new RegExp(`^Preview revision ${revision} ·`) }).click());
+  expect(response.ok).toBe(true); expect(response.result.restoreRevision).toBe(revision); expect(response.result.canRestore).toBe(true);
+  return response.result;
+}
+function captureProjection(s: any, plan: any) {
+  const f = fixture.capture, item = plan.items[0];
+  expect(plan.items).toHaveLength(1); expect(item.title).toBe(f.title);
+  const canonical = importedProjection(s, item.pageId), root = importedProjection(s, plan.rootPageId);
+  expect(root.page.title).toBe(`Import · ${f.title}`); expect(root.page.parentPageId).toBeNull(); expect(root.blocks).toEqual([]);
+  expect(canonical.page.title).toBe(f.title); expect(canonical.page.parentPageId).toBe(root.page.id);
+  expect(canonical.blocks.map((b: any) => ({ type: b.type, schemaVersion: b.schemaVersion, parentBlockId: b.parentBlockId, data: b.data }))).toEqual([
+    { type: "heading_1", schemaVersion: 1, parentBlockId: null, data: { richText: [{ text: f.title }] } },
+    { type: "paragraph", schemaVersion: 1, parentBlockId: null, data: { richText: [{ text: "Original source", link: f.url }] } },
+    { type: "paragraph", schemaVersion: 1, parentBlockId: null, data: { richText: [{ text: f.retainedText, marks: ["bold"] }, { text: " " }, { text: f.referenceText, link: f.referenceURL }] } },
+  ]);
+  expect(canonical.blocks.map((b: any) => b.id)).toEqual(item.blocks.map((b: any) => b.id));
+  expect(canonical.blocks.map((b: any) => b.sortKey)).toEqual(["000000000001", "000000000002", "000000000003"]);
+  expect(item.blockSources[canonical.blocks[2].id]).toBe("html-id:retained");
+  expect(canonical.page.provenance.sourceSystem).toBe("web_clip");
+  expect(canonical.page.provenance.raw).toMatchObject({ sourceNamespace: `web-capture:${f.url}`, sourceLocator: item.sourceLocator,
+    rawFileId: item.retainedFileId, importRunId: plan.planId, supplied: item.provenance });
+  expect(item.provenance).toEqual({ channel: "share-paste", sourceURL: f.url, offline: true, capturedAt: item.provenance.capturedAt });
+  expect(Number.isNaN(Date.parse(item.provenance.capturedAt))).toBe(false);
+  const file = s.files.find((value: any) => value.id === item.retainedFileId); expect(file).toBeTruthy();
+  expect(file.id).toBe(plan.sourceFileId); expect(file.contentHash).toBe(createHash("sha256").update(f.expectedSource).digest("hex"));
+  expect(file.sizeBytes).toBe(String(Buffer.byteLength(f.expectedSource)));
+  return { canonical, root, file };
+}
+test(`real-capture-review-${stage}`, async ({ page }) => {
+  const f = fixture.capture;
+  const mount = await uiResponse(page, "index.roots", () => page.getByRole("navigation", { name: "Workspace", exact: true }).getByRole("button", { name: /Capture/ }).click());
+  // This is an observed host boundary, never a folder-indexing feature pass.
+  write(`${stage}-capture-host-boundary.json`, { schemaVersion: 1, feature: "external-folder-indexing", productAcceptance: false,
+    method: "index.roots", httpStatus: 200, ok: mount.ok, errorCode: mount.error?.code, message: mount.error?.message });
+  expect(mount.ok).toBe(false); expect(mount.error).toMatchObject({ code: "SCOPE_DENIED", message: "This operation requires the desktop adapter" });
+  const panel = page.getByRole("region", { name: "Capture and external indexing", exact: true });
+  await expect(panel.getByRole("alert")).toContainText("This operation requires the desktop adapter");
+  if (stage === "create") {
+    const before = canonicalContent(await snapshot(page)), importsBefore = await observe(page, "imports.list", {});
+    await panel.getByLabel("Title", { exact: true }).fill(f.title);
+    await panel.getByLabel("Source URL", { exact: true }).fill(f.unsafeURL);
+    await panel.getByLabel("Shared selection", { exact: true }).fill(f.html);
+    await panel.getByRole("checkbox", { name: "Selection contains HTML", exact: true }).check();
+    const rejection = await uiResponse(page, "capture.preview", () => panel.getByRole("button", { name: "Preview clip", exact: true }).click());
+    expect(rejection.ok).toBe(false); expect(rejection.error).toMatchObject({ code: "INVALID_REQUEST", message: "Capture source must be an HTTP or HTTPS URL" });
+    await expect(panel.getByRole("alert")).toContainText("Capture source must be an HTTP or HTTPS URL");
+    expect(canonicalContent(await snapshot(page))).toEqual(before); expect(await observe(page, "imports.list", {})).toEqual(importsBefore);
+    await panel.getByLabel("Source URL", { exact: true }).fill(f.url);
+    const previewResponse = await uiResponse(page, "capture.preview", () => panel.getByRole("button", { name: "Preview clip", exact: true }).click());
+    expect(previewResponse.ok).toBe(true); const preview = previewResponse.result;
+    expect(preview.sourceName).toBe(f.title); expect(preview.sourceSystem).toBe("web_clip"); expect(preview.state).toBe("preview");
+    expect(preview.sourceNamespace).toBe(`web-capture:${f.url}`); expect(preview.items).toHaveLength(1);
+    await expect(panel.getByRole("heading", { name: "Capture review", exact: true })).toBeVisible(); await expect(panel.getByRole("alert")).toHaveCount(0);
+    expect(canonicalContent(await snapshot(page))).toEqual(before);
+    const response = await uiResponse(page, "imports.commit", () => panel.getByRole("button", { name: "Save reviewed capture", exact: true }).click());
+    expect(response.ok).toBe(true); const plan = response.result;
+    expect(plan.planId).toBe(preview.planId); expect(plan.state).toBe("complete"); expect(plan.cursor).toBe(1); expect(plan.items[0].committed).toBe(true);
+    await expect(panel.getByRole("status").filter({ hasText: "Capture saved as offline workspace content." })).toHaveText("Capture saved as offline workspace content.");
+    const s = await snapshot(page), projected = captureProjection(s, plan), added = new Set([plan.rootPageId, plan.items[0].pageId]);
+    expect(s.pages.filter((p: any) => !added.has(p.id))).toEqual(before.pages);
+    expect(s.blocks.filter((b: any) => !added.has(b.pageId))).toEqual(before.blocks); expect(unrelatedRecords(s)).toEqual(unrelatedRecords(before));
+    await panel.getByRole("button", { name: "Open capture", exact: true }).click();
+    await expect(page.getByLabel("Page title", { exact: true })).toHaveValue(`Import · ${f.title}`);
+    write("create-capture-review.json", { preview, plan, ...projected, rejection, noCanonicalWritesBeforeReview: true });
+  }
+  const saved = read("create-capture-review.json");
+  await openRecentImport(page, saved.plan);
+  const plan = await observe(page, "imports.plan", { planId: saved.plan.planId }); expect(plan).toEqual(saved.plan);
+  const source = await page.getByRole("link", { name: "Original source", exact: true }).getAttribute("href");
+  expect(source).toBeTruthy();
+  const bytes = await page.evaluate(async href => { const response = await fetch(href!); if (!response.ok) throw Error(`capture source read ${response.status}`); return response.text(); }, source);
+  expect(bytes).toBe(f.expectedSource);
+  await page.getByRole("button", { name: plan.items[0].sourceLocator, exact: true }).click();
+  await expect(page.getByLabel("Page title", { exact: true })).toHaveValue(f.title);
+  await expect(page.locator(".tiptap strong")).toHaveText(f.retainedText);
+  await expect(page.locator(".tiptap a").filter({ hasText: f.referenceText })).toHaveAttribute("href", f.referenceURL);
+  const projected = captureProjection(await snapshot(page), plan);
+  expect(projected).toEqual({ canonical: saved.canonical, root: saved.root, file: saved.file });
+  write(`${stage}-capture-review-result.json`, { passed: true, ...projected, plan, originalSourceSHA256: createHash("sha256").update(bytes).digest("hex"),
+    scope: "Reviewed shared HTML only; index.roots denial is separately recorded and does not qualify folder indexing." });
+});
+
+test(`real-history-recovery-${stage}`, async ({ page, browser }) => {
+  const f = fixture.historyRecovery;
+  if (stage === "create") {
+    const initial = await createPlainPage(page, f.title, f.reviewedBody);
+    await page.locator("details.page-review > summary").click();
+    const reviewResponse = await uiResponse(page, "batch", () => page.getByRole("button", { name: "I reviewed the current content", exact: true }).click());
+    expect(reviewResponse.ok).toBe(true); await expect(page.locator("details.page-review > summary")).toHaveText("Human reviewed");
+    const reviewed = importedProjection(await snapshot(page), initial.page.id), review = await observe(page, "page.freshness", { pageId: initial.page.id });
+    expect(reviewed.page.revision).toBe(String(BigInt(initial.page.revision) + 1n)); expect(reviewed.blocks).toEqual(initial.blocks);
+    expect(review.freshness.state).toBe("reviewed"); expect(review.history).toHaveLength(1); expect(review.freshness.review).toEqual(review.history[0]);
+    expect(review.history[0].contentIdentity).toEqual(review.freshness.contentIdentity);
+    const unrelated = otherPagesAndRecords(await snapshot(page), initial.page.id);
+    const second = await replaceHistoryBody(page, reviewed, f.secondBody);
+    const staleReview = await observe(page, "page.freshness", { pageId: initial.page.id });
+    expect(staleReview.freshness.state).toBe("stale"); expect(staleReview.history).toEqual(review.history);
+    const { panel, revisions: beforePreviewHistory } = await visibleHistory(page, initial.page.id);
+    const beforePreview = canonicalContent(await snapshot(page)), stalePreview = await previewRevision(page, panel, reviewed.page.revision);
+    expect(stalePreview.expectedRevisions).toEqual(plainRecoveryGuards(second));
+    expect(stalePreview.pageId).toBe(initial.page.id); expect(stalePreview.snapshot.page).toEqual(reviewed.page); expect(stalePreview.snapshot.blocks).toEqual(reviewed.blocks);
+    await expect(panel.getByRole("article", { name: "Restoration preview", exact: true })).toContainText(f.reviewedBody);
+    expect(canonicalContent(await snapshot(page))).toEqual(beforePreview);
+    expect(await observe(page, "page.freshness", { pageId: initial.page.id })).toEqual(staleReview);
+    const secondContext = await browser.newContext({ baseURL: process.env.TROVE_REAL_UI_URL, viewport: { width: 1360, height: 950 } });
+    let concurrent: any, concurrentReview: any, concurrentHistory: any, beforeReject: any, rejection: any;
+    try {
+      const secondPage = await secondContext.newPage(); await login(secondPage); await openPlainPage(secondPage, f.title);
+      concurrent = await replaceHistoryBody(secondPage, second, f.thirdBody);
+      concurrentReview = await observe(secondPage, "page.freshness", { pageId: initial.page.id });
+      expect(concurrentReview.freshness.state).toBe("stale"); expect(concurrentReview.history).toEqual(review.history);
+      concurrentHistory = (await visibleHistory(secondPage, initial.page.id)).revisions;
+      expect(concurrentHistory[0].revision).toBe(concurrent.page.revision); expect(concurrentHistory.slice(1)).toEqual(beforePreviewHistory);
+      beforeReject = canonicalContent(await snapshot(page));
+      rejection = await uiResponse(page, "batch", () => panel.getByRole("button", { name: "Restore this revision", exact: true }).click());
+      expect(rejection.ok).toBe(false); expect(rejection.error).toMatchObject({ code: "CONFLICT", message: "Entity revision changed" });
+      expect(rejection.error.details.currentRevisions).toEqual([plainRecoveryGuards(concurrent)[0]]);
+      await expect(page.getByRole("alert").filter({ hasText: "Entity revision changed" })).toBeVisible();
+      expect(canonicalContent(await snapshot(page))).toEqual(beforeReject); expect(importedProjection(await snapshot(page), initial.page.id)).toEqual(concurrent);
+      expect(await observe(page, "page.freshness", { pageId: initial.page.id })).toEqual(concurrentReview);
+      expect((await visibleHistory(secondPage, initial.page.id)).revisions).toEqual(concurrentHistory);
+    } finally { await secondContext.close(); }
+    const freshPreview = await previewRevision(page, panel, reviewed.page.revision);
+    expect(freshPreview.expectedRevisions).toEqual(plainRecoveryGuards(concurrent));
+    expect(freshPreview.previewId).not.toBe(stalePreview.previewId); expect(freshPreview.snapshot.blocks).toEqual(reviewed.blocks);
+    expect(canonicalContent(await snapshot(page))).toEqual(beforeReject);
+    expect(await observe(page, "page.freshness", { pageId: initial.page.id })).toEqual(concurrentReview);
+    const restoredResponse = await uiResponse(page, "batch", () => panel.getByRole("button", { name: "Restore this revision", exact: true }).click());
+    expect(restoredResponse.ok).toBe(true); await expect(panel.getByRole("status").filter({ hasText: "Page restored as a new revision." })).toHaveText("Page restored as a new revision.");
+    const restored = importedProjection(await snapshot(page), initial.page.id); assertRecoveryStep(concurrent, restored, reviewed);
+    expect(await observe(page, "page.freshness", { pageId: initial.page.id })).toEqual(review);
+    expect(otherPagesAndRecords(await snapshot(page), initial.page.id)).toEqual(unrelated);
+    await openPlainPage(page, f.title); await expect(page.locator(".tiptap .block-text")).toHaveText(f.reviewedBody);
+    await page.getByRole("button", { name: "Page options", exact: true }).click();
+    const trashResponse = await uiResponse(page, "batch", () => page.getByRole("dialog", { name: "Page options", exact: true }).getByRole("button", { name: "Move to trash", exact: true }).click());
+    expect(trashResponse.ok).toBe(true);
+    const trashed = pageIncludingTrash(await snapshot(page), initial.page.id);
+    expect(trashed.page.deletedAt).toEqual(expect.any(String)); expect(Number.isNaN(Date.parse(trashed.page.deletedAt))).toBe(false);
+    expect(trashed.page).toEqual({ ...restored.page, revision: String(BigInt(restored.page.revision) + 1n), deletedAt: trashed.page.deletedAt, updatedAt: trashed.page.updatedAt });
+    expect(trashed.blocks).toEqual(restored.blocks);
+    const trashHistory = await visibleHistory(page, initial.page.id), beforeCancel = canonicalContent(await snapshot(page));
+    const previewTrash = async () => {
+      const response = await uiResponse(page, "history.previewSubtree", () => trashHistory.panel.getByRole("button", { name: "Preview trash subtree recovery", exact: true }).click());
+      expect(response.ok).toBe(true); expect(response.result.rootPageId).toBe(initial.page.id); expect(response.result.pages).toHaveLength(1);
+      expect(response.result.expectedRevisions).toEqual(plainRecoveryGuards(trashed));
+      expect(response.result.commands).toEqual([{ kind: "history.restore", pageId: initial.page.id, restoreRevision: restored.page.revision, previewId: response.result.pages[0].previewId }]);
+      expect(response.result.pages[0].snapshot.page).toEqual(restored.page); expect(response.result.pages[0].snapshot.blocks).toEqual(restored.blocks);
+      return response.result;
+    };
+    const cancelledPreview = await previewTrash(); expect(canonicalContent(await snapshot(page))).toEqual(beforeCancel);
+    const subtree = trashHistory.panel.getByRole("article", { name: "Subtree restoration preview", exact: true });
+    await subtree.getByRole("button", { name: "Cancel subtree review", exact: true }).click(); await expect(subtree).toHaveCount(0);
+    expect(canonicalContent(await snapshot(page))).toEqual(beforeCancel);
+    expect(await observe(page, "page.freshness", { pageId: initial.page.id })).toEqual(review);
+    expect((await visibleHistory(page, initial.page.id)).revisions).toEqual(trashHistory.revisions);
+    const appliedPreview = await previewTrash(); expect(appliedPreview.pages[0].previewId).not.toBe(cancelledPreview.pages[0].previewId);
+    const recovery = await uiResponse(page, "batch", () => subtree.getByRole("button", { name: "Restore reviewed subtree", exact: true }).click());
+    expect(recovery.ok).toBe(true); await expect(trashHistory.panel.getByRole("status").filter({ hasText: "Subtree restored as new page revisions." })).toHaveText("Subtree restored as new page revisions.");
+    const canonical = importedProjection(await snapshot(page), initial.page.id); assertRecoveryStep(trashed, canonical, restored);
+    expect(await observe(page, "page.freshness", { pageId: initial.page.id })).toEqual(review);
+    expect(otherPagesAndRecords(await snapshot(page), initial.page.id)).toEqual(unrelated);
+    const history = (await visibleHistory(page, initial.page.id)).revisions;
+    expect(history.map((r: any) => r.revision)).toEqual(Array.from({ length: Number(canonical.page.revision) }, (_, i) => String(BigInt(canonical.page.revision) - BigInt(i))));
+    expect(history.filter((r: any) => r.deleted).map((r: any) => r.revision)).toEqual([trashed.page.revision]);
+    write("create-history-recovery.json", { initial, reviewed, review, second, staleReview, stalePreview, concurrent, concurrentReview, concurrentHistory, rejection, freshPreview,
+      restored, trashed, cancelledPreview, appliedPreview, canonical, history, unrelated, noNewHumanReviewEvent: true });
+  }
+  const saved = read("create-history-recovery.json"), history = (await visibleHistory(page, saved.canonical.page.id)).revisions;
+  expect(history).toEqual(saved.history);
+  await openPlainPage(page, f.title); await expect(page.locator(".tiptap .block-text")).toHaveText(f.reviewedBody);
+  await expect(page.locator("details.page-review > summary")).toHaveText("Human reviewed");
+  const canonical = importedProjection(await snapshot(page), saved.canonical.page.id), review = await observe(page, "page.freshness", { pageId: saved.canonical.page.id });
+  expect(canonical).toEqual(saved.canonical); expect(review).toEqual(saved.review); expect(review.history).toHaveLength(1);
+  expect(unrelatedRecords(await snapshot(page))).toEqual(unrelatedRecords(saved.unrelated));
+  if (stage === "create") expect(otherPagesAndRecords(await snapshot(page), canonical.page.id)).toEqual(saved.unrelated);
+  write(`${stage}-history-recovery-result.json`, { passed: true, canonical, history, review, noNewHumanReviewEvent: true,
+    scope: "Single-page history/trash recovery only; no multi-page subtree, incompatible schema or native backup claim." });
+});

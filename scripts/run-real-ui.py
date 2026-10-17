@@ -25,10 +25,11 @@ import urllib.request
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / 'scripts'))
 from native_fixture_environment import native_fixture_environment, validate_native_fixture_environment
-EXPECTED = {stage: [f"real-{workflow}-{stage}" for workflow in ("rich", "task", "due", "record-lifecycle", "layout-review", "p2-data", "p2-action", "conversation-display", "schedule-week", "schedule-dst", "import-merge", "import-resume", "skills", "personal-review", "graph", "table-rich", "layout-rich")] for stage in ("create", "reopen")}
+EXPECTED = {stage: [f"real-{workflow}-{stage}" for workflow in ("rich", "task", "due", "record-lifecycle", "layout-review", "p2-data", "p2-action", "conversation-display", "schedule-week", "schedule-dst", "import-merge", "import-resume", "skills", "personal-review", "graph", "table-rich", "layout-rich", "capture-review", "history-recovery")] for stage in ("create", "reopen")}
 LIMITATIONS = ["Chromium UI plus production host/services/SQLite; not native Wails WebView acceptance.",
                "No model inference, physical devices, live accounts, performance or release qualification.",
-               "Bounded rich-page, task/record/undo, layout/review, P2 forms/charts/row actions and conversation/display and working-week/DST scheduling, non-generative skills/review and explicit graph-link continuity; rich table/layout editing, structural recovery and restart; broader native/recovery workflows remain pending."]
+               "Capture index.roots is denied by host policy and separately recorded; pasted-HTML success does not qualify folder indexing, screenshots or browser-extension capture.",
+               "Bounded rich-page, task/record/undo, layout/review, P2 forms/charts/row actions and conversation/display and working-week/DST scheduling, non-generative skills/review and explicit graph-link continuity; rich table/layout editing, structural recovery and restart; reviewed shared HTML and guarded single-page history/trash recovery; broader native/recovery workflows remain pending."]
 
 def now():
     return datetime.now(timezone.utc).isoformat()
@@ -85,6 +86,26 @@ def assess(report, expected):
     return {'outcomes': outcomes, 'unexpectedTests': sorted(set(seen) - set(expected)),
             'errors': report.get('errors', []),
             'passed': bool(expected) and all(v == 'passed' for v in outcomes.values()) and set(seen) == set(expected) and not report.get('errors')}
+
+def capture_boundary_evidence(evidence):
+    """Report native-only denial independently; observing it never qualifies indexing."""
+    result = {'feature': 'external-folder-indexing', 'productAcceptance': False, 'method': 'index.roots', 'stages': {}}
+    for stage in ('create', 'reopen'):
+        path = Path(evidence) / f'{stage}-capture-host-boundary.json'
+        observation = {'state': 'unobserved'}
+        if path.is_file():
+            observation.update({'artifact': path.name, 'sha256': digest(path)})
+            try:
+                value = json.loads(path.read_text())
+                expected = {'schemaVersion': 1, 'feature': 'external-folder-indexing', 'productAcceptance': False,
+                            'method': 'index.roots', 'httpStatus': 200, 'ok': False, 'errorCode': 'SCOPE_DENIED',
+                            'message': 'This operation requires the desktop adapter'}
+                observation['state'] = 'observed_host_denial' if value == expected else 'unexpected_boundary_result'
+                observation['result'] = value
+            except (ValueError, OSError) as error:
+                observation.update({'state': 'unreadable', 'error': type(error).__name__})
+        result['stages'][stage] = observation
+    return result
 
 def clean_host_revision(provenance):
     revisions = [line.split('vcs.revision=', 1)[1].strip() for line in provenance.splitlines() if 'vcs.revision=' in line]
@@ -159,13 +180,13 @@ def main():
         manifest['installedHostBuildInfoSHA256'] = digest(evidence / 'installed-host-build-info.txt')
         app_inventory = inventory(app)
         save(evidence / 'app-inventory.json', app_inventory)
-        harness_paths = ['scripts/run-real-ui.py', 'scripts/native_fixture_environment.py', 'scripts/qualification_fixtures.py', 'frontend/playwright.integration.config.ts', 'frontend/tests/real-storage.integration.spec.ts', 'frontend/tests/keyboard-observation.ts']
+        harness_paths = ['scripts/run-real-ui.py', 'scripts/native_fixture_environment.py', 'scripts/qualification_fixtures.py', 'frontend/playwright.integration.config.ts', 'frontend/tests/real-storage.integration.spec.ts', 'frontend/tests/keyboard-observation.ts', 'tests/test_real_ui.py', 'docs/completion/real-ui-storage.md']
         inputs = {'appInventorySHA256': object_digest(app_inventory), 'webAssetsSHA256': object_digest(inventory(assets)),
                   'nativeHelpersSHA256': object_digest(inventory(native)), 'hostSHA256': digest(binary), 'installedHostSHA256': digest(installed_binary),
                   'harnessFiles': {name: digest(ROOT / name) for name in harness_paths},
                   'frontendSourceSHA256': object_digest(inventory(ROOT / 'frontend/src'))}
         manifest['inputs'] = inputs
-        fixture = {'schemaVersion': 1, 'suiteVersion': 8, 'pageTitle': 'Real storage — café తెలుగు',
+        fixture = {'schemaVersion': 1, 'suiteVersion': 9, 'pageTitle': 'Real storage — café తెలుగు',
                    'body': 'A carefully saved idea: café, తెలుగు and 日本語.',
                    'initialTaskTitle': 'Prepare real storage review', 'taskTitle': 'Finish real storage review',
                    'expectedRichMarks': ['bold'], 'expectedTaskStatusGroup': 'done',
@@ -210,6 +231,14 @@ def main():
             'sentinel': 'This layout-page paragraph is unrelated to its children.',
             'text': 'Willow field notes', 'editedText': 'Willow! field notes', 'editOffset': 6,
             'link': 'https://example.test/layout-source', 'neighbor': 'Second column witness: 37 samples.'}
+        fixture['capture'] = {'title': 'Reviewed shared cedar excerpt', 'url': 'https://example.test/field-notes/cedar',
+            'html': '<p id="retained"><strong>Retained cedar count: 47.</strong> <a href="https://example.test/field-notes/reference">Field reference</a></p>',
+            'retainedText': 'Retained cedar count: 47.', 'referenceText': 'Field reference',
+            'referenceURL': 'https://example.test/field-notes/reference', 'unsafeURL': 'javascript:fixtureNeverRuns()',
+            'expectedSource': '<!doctype html><html><head><title>Reviewed shared cedar excerpt</title></head><body><h1>Reviewed shared cedar excerpt</h1><p><a href="https://example.test/field-notes/cedar">Original source</a></p><p id="retained"><strong>Retained cedar count: 47.</strong> <a href="https://example.test/field-notes/reference">Field reference</a></p></body></html>'}
+        fixture['historyRecovery'] = {'title': 'Revision recovery field note',
+            'reviewedBody': 'Reviewed baseline: 53 fern trays.', 'secondBody': 'Edited baseline: 59 fern trays.',
+            'thirdBody': 'Concurrent visible edit: 61 fern trays.'}
         date_value = lambda start, end, zone, timed=False: {'start': start, 'end': end, 'timezone': zone, 'hasTime': timed}
         zone = 'America/New_York'
         fixture['scheduleWeek'] = {'database': 'Working week dependency fixture', 'timezone': zone,
@@ -329,6 +358,7 @@ def main():
         if token.exists():
             token.unlink()
         manifest['credentialRemoved'] = not token.exists()
+        manifest['scopeBoundaries'] = [capture_boundary_evidence(evidence)]
         outcomes = {title: 'unexecuted' for titles in EXPECTED.values() for title in titles}
         for stage in manifest['stages']:
             outcomes.update(stage['outcomes'])
