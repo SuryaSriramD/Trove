@@ -11,6 +11,8 @@ test("native clipper review preserves pairing details and requires a fresh desti
         planHash: "first-hash",
         sourceName: "Browser article",
         state: "preview",
+        initialized: false,
+        cursor: 0,
         rootPageId: id[5],
         captureDestinationTitle: "Approved page",
         sourceOmissions: ["Remote resources not acquired"],
@@ -137,6 +139,8 @@ test("native clipper review preserves pairing details and requires a fresh desti
                       requestId: request.requestId,
                     },
                   });
+                plan.initialized = true;
+                plan.cursor = plan.items.length;
                 plan.state = "complete";
                 plan.items[0].committed = true;
                 return ok(plan);
