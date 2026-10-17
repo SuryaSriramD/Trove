@@ -122,7 +122,33 @@ def review_gate_errors(events, cases):
     return []
 
 
+def retained_evidence_bindings(path, manifest, manifest_binding, reports, family, validator):
+    """Bind the retained bytes actually used for parity, outside source identity."""
+    expected = {path: manifest_binding}
+    for name, sha in manifest['outputs'].items():
+        if pathlib.Path(name).name != name: fail('unsafe retained output name')
+        expected[path.parent / name] = {'sha256': sha}
+    if family == 'reviews-transfer':
+        expected[path.parent / 'oracle-gates.log'] = {'sha256': manifest['sealedOracleScopeGates']['sha256']}
+    for report in reports.values():
+        for phase in ('before', 'after'):
+            item = report['canonicalInventory'][phase]
+            snapshot = pathlib.Path(item['path'])
+            if not snapshot.is_absolute() or not snapshot.is_relative_to(path.parent / 'canonical') or '..' in snapshot.parts:
+                fail('retained canonical input outside baseline evidence')
+            expected[snapshot] = {'sha256': item['sha256'], 'bytes': item['size']}
+    result = {}
+    for name, wanted in expected.items():
+        if not name.is_file() or any(p.is_symlink() for p in (name, *name.parents)):
+            fail('retained baseline input missing or linked')
+        actual = binding(name, validator)
+        if any(actual.get(k) != value for k, value in wanted.items()): fail('retained baseline bytes changed during validation')
+        result[str(name)] = actual
+    return result
+
+
 def retained_reports(path, family, modes, validator, cases):
+    manifest_binding = binding(path, validator)
     manifest = json.loads(path.read_text(), object_pairs_hook=validator._unique_json)
     ids = [c['id'] for c in cases]
     test = modes.TEST if family == 'modes' else 'TestRealLocalReviewTransfersV1'
@@ -155,7 +181,7 @@ def retained_reports(path, family, modes, validator, cases):
         error = validator.validate_canonical_inventory(report, path.parent / 'canonical', test + '/' + case, excluded)
         if error: errors.append(case + ': ' + error)
     if errors: fail('retained baseline accounting invalid: ' + repr(errors))
-    return manifest, reports
+    return manifest, reports, retained_evidence_bindings(path, manifest, manifest_binding, reports, family, validator)
 
 
 MINIMUM_FREE = 4 * 1024**3
@@ -221,6 +247,7 @@ class ControlledRun:
         self.receipt_paths, self.sequence, self.active = [], 0, None
         self.stop_signal, self.finalizing, self.handlers = None, False, {}
         self.paths, self.inputs, self.inputs_complete = [], {}, False
+        self.baseline_paths, self.baseline_inputs, self.baseline_complete = [], {}, False
         self.modes, self.validator, self.ids, self.test = None, None, [], None
         self.last_check, self.minimum_observed = 0.0, {}
         self.monitored = sorted({str(out), str(go_cache), str(module_cache)})
@@ -379,13 +406,22 @@ class ControlledRun:
                 if not path.is_file() or path.is_symlink(): raise ValueError('missing or linked input')
                 final_inputs[str(path)] = {'sha256': self.digest(path), 'bytes': path.stat().st_size}
             except Exception as error: identity_errors.append({'path': str(path), 'error': type(error).__name__ + ': ' + str(error)})
+        final_baseline, baseline_errors = {}, []
+        for path in self.baseline_paths:
+            try:
+                if not path.is_file() or any(p.is_symlink() for p in (path, *path.parents)): raise ValueError('missing or linked baseline input')
+                final_baseline[str(path)] = {'sha256': self.digest(path), 'bytes': path.stat().st_size}
+            except Exception as error: baseline_errors.append({'path': str(path), 'error': type(error).__name__ + ': ' + str(error)})
+        baseline_unchanged = self.baseline_complete and not baseline_errors and final_baseline == self.baseline_inputs
         try: final_head, final_status = self.git('rev-parse', 'HEAD'), self.git('status', '--porcelain', '--untracked-files=all')
         except Exception as error:
             final_head, final_status = None, None; identity_errors.append({'gitError': type(error).__name__ + ': ' + str(error)})
-        unchanged = self.inputs_complete and not identity_errors and final_inputs == self.inputs and final_head == self.source_commit and final_status == ''
+        unchanged = baseline_unchanged and self.inputs_complete and not identity_errors and final_inputs == self.inputs and final_head == self.source_commit and final_status == ''
         final_binding = {'schemaVersion': 1, 'initialBindingsComplete': self.inputs_complete, 'inputsUnchanged': unchanged,
                          'finalSourceCommit': final_head, 'finalSourceStatus': final_status, 'inputs': final_inputs,
-                         'errors': identity_errors, 'minimumObservedFreeBytes': self.minimum_observed,
+                         'errors': identity_errors, 'baselineInputs': final_baseline, 'baselineErrors': baseline_errors,
+                         'baselineInitialBindingsComplete': self.baseline_complete, 'baselineInputsUnchanged': baseline_unchanged,
+                         'minimumObservedFreeBytes': self.minimum_observed,
                          'receivedSignal': self.stop_signal, 'ownedReserveReleasedBytes': released}
         self.write_json(self.out / 'final-input-bindings.json', final_binding)
         terminal = {'schemaVersion': 1, 'test': self.test, 'expectedCases': self.ids, 'executionComplete': False,
@@ -507,8 +543,15 @@ def execute_attempt(args, root, bundle, models, go, node, out, guard, manifest):
         fail('immutable request/oracle corpus changed')
     if [c['id'] for c in mode_cases] != modes.IDS or len(review_cases) != 4 or len({c['id'] for c in review_cases}) != 4: fail('full fixed cohort identity differs')
     guard.ids = [c['id'] for c in (mode_cases if args.family == 'modes' else review_cases)]
-    before_modes, mode_reports = retained_reports(pathlib.Path(args.before_modes).resolve(), 'modes', modes, validator, mode_cases)
-    before_reviews, review_reports = retained_reports(pathlib.Path(args.before_reviews).resolve(), 'reviews-transfer', modes, validator, review_cases)
+    before_modes, mode_reports, mode_baseline_inputs = retained_reports(pathlib.Path(args.before_modes).resolve(), 'modes', modes, validator, mode_cases)
+    guard.baseline_inputs = mode_baseline_inputs
+    guard.baseline_paths = [pathlib.Path(p) for p in sorted(mode_baseline_inputs)]
+    before_reviews, review_reports, review_baseline_inputs = retained_reports(pathlib.Path(args.before_reviews).resolve(), 'reviews-transfer', modes, validator, review_cases)
+    guard.baseline_inputs.update(review_baseline_inputs)
+    guard.baseline_paths = [pathlib.Path(p) for p in sorted(guard.baseline_inputs)]
+    guard.baseline_complete = True
+    manifest['baselineInputs'] = guard.baseline_inputs
+    guard.write_manifest()
     preflight = pathlib.Path(args.preflight_review).resolve()
     preflight_data = json.loads(preflight.read_text(), object_pairs_hook=validator._unique_json)
     if modes.validate_manual_review(preflight_data, modes.manual_template(mode_cases)): fail('independent preflight manual review invalid')
@@ -571,6 +614,7 @@ def execute_attempt(args, root, bundle, models, go, node, out, guard, manifest):
     errors += modes.parser_report_errors(parser_report, mode_cases, 'golden', inputs[str(parser_entry)]['sha256'])
     if code or timeout or errors or parser_report.get('passed') is not True: manifest.update(state='parser_gates_failed', errors=errors, exitCode=code, timedOut=timeout); write(); return 1
     manifest['preAdmissionFreeBytes'] = guard.check(force=True)
+    if modes.inventory(guard.baseline_paths, validator) != guard.baseline_inputs: fail('retained baseline evidence changed before native admission')
     if modes.inventory(paths, validator) != inputs or guard.git('rev-parse', 'HEAD') != args.source_commit or guard.git('status', '--porcelain', '--untracked-files=all'): fail('frozen inputs changed before native admission')
     env.update(TROVE_NATIVE_INTEGRATION='1', TROVE_CHAT_EVAL_PACK=args.pack, TROVE_MODEL_ROOT=str(models), TROVE_NATIVE_BUNDLE=str(bundle), TROVE_AI_CANONICAL_EVIDENCE_DIR=str(out / 'canonical'))
     command = [str(go), 'tool', 'test2json', '-t', '-p', 'trove.local/phase0/internal/workspace', str(binary), '-test.run', '^' + test + '$', '-test.v', '-test.timeout=55m']
@@ -602,7 +646,7 @@ def execute_attempt(args, root, bundle, models, go, node, out, guard, manifest):
     else:
         parser_errors, parser_pass = [], None
         validator.atomic_json(out / 'manual-review-inputs.json', {'cases': cases, 'reports': reports, 'semanticAccepted': None})
-    unchanged = modes.inventory(paths, validator) == inputs and guard.git('rev-parse', 'HEAD') == args.source_commit and not guard.git('status', '--porcelain', '--untracked-files=all')
+    unchanged = modes.inventory(guard.baseline_paths, validator) == guard.baseline_inputs and modes.inventory(paths, validator) == inputs and guard.git('rev-parse', 'HEAD') == args.source_commit and not guard.git('status', '--porcelain', '--untracked-files=all')
     complete = not timeout and not errors and not any(accounting.values()) and unchanged
     summary = {'executionComplete': complete, 'inputsUnchanged': unchanged, 'errors': errors, 'executionErrors': accounting, 'qualityErrors': checks, 'actualMermaidParserPassed': parser_pass, 'parserErrors': parser_errors, 'singleSuccessfulCallbacks': sum(not value for value in accounting.values()), 'expectedCases': len(ids), 'automatedChecksPassed': complete and code == 0 and not any(checks.values()) and (args.family != 'modes' or parser_pass), 'semanticAccepted': None, 'manualSemanticReviewPending': ids, 'performanceQualified': False, 'releaseQualified': False}
     manifest.update(state='finished', exitCode=code, timedOut=timeout, elapsedSeconds=time.monotonic()-started, summary=summary)

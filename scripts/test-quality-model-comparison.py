@@ -160,7 +160,40 @@ class ControlledComparisonProcess(unittest.TestCase):
         self.guard.paths = [path]
         self.guard.inputs = {str(path): dict(sha256=hashlib.sha256(path.read_bytes()).hexdigest(), bytes=path.stat().st_size)}
         self.guard.inputs_complete = True
+        baseline=self.root/'baseline'; baseline.write_text('retained original evidence')
+        self.guard.baseline_paths=[baseline]
+        self.guard.baseline_inputs={str(baseline):dict(sha256=hashlib.sha256(baseline.read_bytes()).hexdigest(),bytes=baseline.stat().st_size)}
+        self.guard.baseline_complete=True
         return path
+
+    def test_baseline_manifests_outputs_oracle_and_canonical_bytes_are_separately_bound(self):
+        base=self.root/'baseline-evidence'; base.mkdir()
+        canonical=base/'canonical'; canonical.mkdir()
+        manifest_path=base/'manifest.json'; manifest_path.write_text('{}')
+        log=base/'results.jsonl'; log.write_text('retained raw output')
+        oracle=base/'oracle-gates.log'; oracle.write_text('retained oracle')
+        before=canonical/'before.json'; before.write_text('before canonical bytes')
+        after=canonical/'after.json'; after.write_text('after canonical bytes')
+        hash_file=lambda p:dict(sha256=hashlib.sha256(p.read_bytes()).hexdigest(),bytes=p.stat().st_size)
+        manifest=dict(outputs={'results.jsonl':hash_file(log)['sha256']},sealedOracleScopeGates={'sha256':hash_file(oracle)['sha256']})
+        report={'canonicalInventory':{phase:dict(path=str(p),sha256=hash_file(p)['sha256'],size=p.stat().st_size) for phase,p in [('before',before),('after',after)]}}
+        expected={str(p) for p in (manifest_path,log,oracle,before,after)}
+        args=(manifest_path,manifest,hash_file(manifest_path),{'one':report},'reviews-transfer',SimpleNamespace(digest=lambda p:hash_file(p)['sha256']))
+        self.assertEqual(set(runner.retained_evidence_bindings(*args)),expected)
+        for path in (manifest_path,log,oracle,before,after):
+            raw=path.read_bytes(); path.write_bytes(raw+b' changed')
+            with self.assertRaises(ValueError): runner.retained_evidence_bindings(*args)
+            path.write_bytes(raw)
+
+    def test_baseline_only_mutation_fails_final_binding_without_changing_source_inventory(self):
+        self.bind_source(); original=copy.deepcopy(self.guard.inputs)
+        self.guard.baseline_paths[0].write_text('changed retained output')
+        with mock.patch.object(self.guard,'git',side_effect=[runner.BASELINE,'']):
+            with self.guard: self.manifest['state']='consumer_failed'
+        final=json.loads((self.out/'final-input-bindings.json').read_text())
+        self.assertEqual(final['inputs'],original)
+        self.assertFalse(final['baselineInputsUnchanged']); self.assertFalse(final['inputsUnchanged'])
+        self.assertFalse(json.loads((self.out/'terminal-accounting.json').read_text())['executionComplete'])
 
     def test_private_allowlist_rejects_ambient_state_and_declares_only_shared_build_caches(self):
         with mock.patch.dict(os.environ, {'HOME':'/ambient-home', 'TMPDIR':'/ambient-tmp', 'PATH':'/ambient-bin',
