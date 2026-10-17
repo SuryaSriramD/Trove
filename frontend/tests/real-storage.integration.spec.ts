@@ -1868,7 +1868,9 @@ test(`real-page-lock-${stage}`, async ({ page }) => {
     expect(locked.response.result).toEqual({ locked: true, revision: "1" });
     expect(await observe(page, "editor.lock", { pageId })).toEqual(locked.response.result);
     await expect(page.locator(".tiptap")).toHaveAttribute("contenteditable", "false");
-    await expect(page.locator("fieldset.editor-editable")).toBeDisabled();
+    await expect(page.locator("fieldset.editor-editable")).toHaveAttribute("disabled", "");
+    await expect(page.locator("fieldset.editor-editable").getByRole("button", { name: "bold", exact: true })).toBeDisabled();
+    await expect(page.locator("fieldset.editor-editable").getByRole("combobox", { name: "Block type", exact: true })).toBeDisabled();
     const beforeRejected = canonicalContent(await snapshot(page)), beforeRejectedHistory = await ownerPageHistory(page, pageId);
     const title = page.getByLabel("Page title", { exact: true }); await expect(title).toBeEnabled();
     await title.fill(f.rejectedTitle);
@@ -1903,7 +1905,9 @@ test(`real-page-lock-${stage}`, async ({ page }) => {
   await showPossiblyLockedPage(page, f.title);
   await expect(page.getByRole("button", { name: "Unlock page", exact: true })).toBeEnabled();
   await expect(page.locator(".tiptap")).toHaveAttribute("contenteditable", "false");
-  await expect(page.locator("fieldset.editor-editable")).toBeDisabled();
+  await expect(page.locator("fieldset.editor-editable")).toHaveAttribute("disabled", "");
+  await expect(page.locator("fieldset.editor-editable").getByRole("button", { name: "bold", exact: true })).toBeDisabled();
+  await expect(page.locator("fieldset.editor-editable").getByRole("combobox", { name: "Block type", exact: true })).toBeDisabled();
   await expect(page.locator(".tiptap .block-text")).toHaveText(f.finalBody);
   expect(importedProjection(await snapshot(page), saved.canonical.page.id)).toEqual(saved.canonical);
   expect(await observe(page, "editor.lock", { pageId: saved.canonical.page.id })).toEqual(saved.lock);
