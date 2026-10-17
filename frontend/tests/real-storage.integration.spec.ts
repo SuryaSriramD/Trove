@@ -159,7 +159,7 @@ function dateValue(r: ReturnType<typeof recordProjection>, name: string) {
   return r.record.values.find((v: any) => v.propertyId === property(r, name).id)?.value ?? null;
 }
 const date = (start: string, timezone = fixture.timezone) => ({ start, end: null, timezone, hasTime: false });
-async function observe(page: Page, method: "page.freshness" | "recordLayouts.get" | "operations.list" | "databaseP2" | "databaseChart" | "imports.list" | "imports.plan" | "pageDisplay.get" | "databaseDerived" | "skills.list" | "ai.runs" | "review.list" | "editor.lock" | "history.list" | "automationHistory", args: Record<string, unknown>) {
+async function observe(page: Page, method: "page.freshness" | "recordLayouts.get" | "operations.list" | "databaseP2" | "databaseChart" | "imports.list" | "imports.plan" | "pageDisplay.get" | "databaseDerived" | "skills.list" | "ai.runs" | "review.list" | "editor.lock" | "history.list" | "automationHistory" | "resolveCitation", args: Record<string, unknown>) {
   const s = await snapshot(page);
   return page.evaluate(async ({ method, args, workspaceId }) => {
     const a = crypto.getRandomValues(new Uint8Array(16)), t = BigInt(Date.now());
@@ -2060,4 +2060,169 @@ test(`real-manual-automation-${stage}`, async ({ page }) => {
   expect(canonicalContent(await snapshot(page))).toEqual(beforeOpen);
   write(`${stage}-manual-automation-result.json`, { passed: true, canonical: saved.canonical, child: saved.child, history: saved.history, revisions: saved.revisions,
     scope: "One owner-reviewed future occurrence, final paused rule; no automatic scheduling, missed-run, external effect or scoped-actor acceptance." });
+});
+
+// Suite 11: real keyword indexing, current block navigation and retained review identity.
+// No model mode, fake clock, mutation bridge, response substitution or stale-click timing injection.
+const keywordPanel = (page: Page) => page.getByRole("region", { name: "Workspace search", exact: true });
+async function openKeywordSearch(page: Page) {
+  await page.getByRole("navigation", { name: "Workspace", exact: true }).getByRole("button", { name: /Search/ }).click();
+  const panel = keywordPanel(page);
+  await expect(panel.getByRole("heading", { name: "Search your workspace", exact: true })).toBeVisible();
+  await panel.getByRole("combobox", { name: "Search mode", exact: true }).selectOption({ value: "keyword" });
+  await panel.getByRole("combobox", { name: "Source type", exact: true }).selectOption({ value: "page" });
+  const settings = panel.locator("details.search-documents").filter({ has: page.locator("summary", { hasText: /^Index settings$/ }) });
+  await expect(settings).toHaveCount(1);
+  const summary = settings.locator(":scope > summary");
+  // The helper is also reused after rebuild, when this disclosure may already be open.
+  if (await settings.getAttribute("open") === null) await summary.click();
+  await expect(settings).toHaveJSProperty("open", true);
+  await expect(settings.getByRole("checkbox", { name: "Keep semantic index updated", exact: true })).not.toBeChecked();
+  await summary.click();
+  await expect(settings).toHaveJSProperty("open", false);
+  return panel;
+}
+function waitForKeywordResponse(page: Page, query: string) {
+  return page.waitForResponse(response => {
+    if (!response.url().endsWith("/api")) return false;
+    const call = response.request().postDataJSON();
+    return call?.method === "search.query" && call.request?.query === query && call.request?.mode === "keyword" &&
+      JSON.stringify(call.request?.kinds) === JSON.stringify(["page"]);
+  });
+}
+async function readKeywordResponse(page: Page, pending: ReturnType<typeof waitForKeywordResponse>) {
+  const response = await pending; expect(response.status()).toBe(200);
+  const exchange = { request: response.request().postDataJSON().request, response: await response.json() };
+  expect(exchange.response.ok).toBe(true);
+  expect(exchange.request).toMatchObject({ mode: "keyword", modelPackId: "", limit: 50, kinds: ["page"] });
+  expect(exchange.response.result.mode).toBe("keyword"); expect(exchange.response.result.partial).toBe(false);
+  expect(exchange.response.result.warning ?? "").toBe("");
+  await expect(keywordPanel(page).getByText("Searching…", { exact: true })).toHaveCount(0);
+  await expect(keywordPanel(page).locator(".search-count")).toHaveText(`${exchange.response.result.hits.length} results · keyword`);
+  return exchange;
+}
+async function keywordQuery(page: Page, query: string) {
+  const pending = waitForKeywordResponse(page, query);
+  await keywordPanel(page).getByRole("searchbox", { name: "Search text", exact: true }).fill(query);
+  return readKeywordResponse(page, pending);
+}
+function keywordHitIdentity(hit: any) {
+  // BM25 score and global index/snapshot generations may change with unrelated fixtures.
+  return { chunkId: hit.chunkId, title: hit.title, kind: hit.kind, excerpt: hit.excerpt, location: hit.location,
+    contentHash: hit.contentHash, sourceState: hit.sourceState, freshness: hit.freshness };
+}
+function assertKeywordHit(exchange: any, canonical: any, review: any, body: string) {
+  const result = exchange.response.result; expect(result.hits).toHaveLength(1);
+  const hit = result.hits[0];
+  expect(keywordHitIdentity(hit)).toEqual({ chunkId: `${canonical.blocks[0].id}:0`, title: canonical.page.title,
+    kind: "page", excerpt: body, location: { pageId: canonical.page.id, blockId: canonical.blocks[0].id, sourceRevision: canonical.page.revision },
+    contentHash: createHash("sha256").update(body).digest("hex"), sourceState: "current", freshness: review.freshness });
+  expect(Number.isFinite(hit.score)).toBe(true); expect(typeof result.indexGeneration).toBe("string"); expect(result.indexGeneration).not.toBe("");
+  return hit;
+}
+async function keywordProtectedState(page: Page, pageId: string) {
+  return { canonical: canonicalContent(await snapshot(page)), history: await ownerPageHistory(page, pageId),
+    review: await observe(page, "page.freshness", { pageId }) };
+}
+async function openKeywordHit(page: Page, canonical: any, review: any, body: string) {
+  const location = { pageId: canonical.page.id, blockId: canonical.blocks[0].id, sourceRevision: canonical.page.revision };
+  const pending: Promise<any>[] = [];
+  const collect = (response: import("@playwright/test").Response) => {
+    if (!response.url().endsWith("/api")) return;
+    const call = response.request().postDataJSON();
+    if (call?.method === "resolveCitation" && call.request?.location?.pageId === canonical.page.id)
+      pending.push(response.json().then(value => ({ status: response.status(), request: call.request, response: value })));
+  };
+  page.on("response", collect);
+  let exchanges: any[];
+  try {
+    await keywordPanel(page).getByRole("button", { name: new RegExp(canonical.page.title) }).click();
+    await expect(page.getByLabel("Page title", { exact: true })).toHaveValue(canonical.page.title);
+    await expect(page.locator(`[data-block-id="${canonical.blocks[0].id}"]`)).toHaveClass(/source-highlight/);
+    await expect(page.locator(".app-footer")).toContainText("Opened cited source.");
+    exchanges = await Promise.all(pending);
+  } finally { page.off("response", collect); }
+  // SearchPanel and App both revalidate; require both and preserve every observed response.
+  expect(exchanges.length).toBeGreaterThanOrEqual(2);
+  for (const exchange of exchanges) {
+    expect(exchange.status).toBe(200); expect(exchange.request.location).toEqual(location); expect(exchange.response.ok).toBe(true);
+    expect(exchange.response.result).toEqual({ location, state: "current", currentRevision: canonical.page.revision, excerpt: body, freshness: review.freshness });
+  }
+  await expect(page.locator(".tiptap .block-text")).toHaveText(body);
+  return exchanges;
+}
+
+test(`real-keyword-source-${stage}`, async ({ page }) => {
+  const f = fixture.keywordSource;
+  if (stage === "create") {
+    const initial = await createPlainPage(page, f.title, f.beforeBody), pageId = initial.page.id;
+    expect(initial.blocks).toHaveLength(1); expect(initial.blocks[0].type).toBe("paragraph");
+    const initialHistory = await ownerPageHistory(page, pageId), unrelated = otherPagesAndRecords(await snapshot(page), pageId);
+    await page.locator("details.page-review > summary").click();
+    const reviewExchange = await uiExchange(page, "batch", () => page.getByRole("button", { name: "I reviewed the current content", exact: true }).click());
+    expect(reviewExchange.response.ok).toBe(true); await expect(page.locator("details.page-review > summary")).toHaveText("Human reviewed");
+    const reviewed = importedProjection(await snapshot(page), pageId), review = await observe(page, "page.freshness", { pageId });
+    assertMetadataRevision(initial, reviewed); assertOneHistoryRevision(initialHistory, await ownerPageHistory(page, pageId), reviewed);
+    expect(review.freshness.state).toBe("reviewed"); expect(review.history).toHaveLength(1);
+    expect(review.freshness.review).toEqual(review.history[0]); expect(review.history[0].contentIdentity).toEqual(review.freshness.contentIdentity);
+    const reviewedState = await keywordProtectedState(page, pageId);
+    await openKeywordSearch(page);
+    const first = await keywordQuery(page, f.beforeQuery), firstHit = assertKeywordHit(first, reviewed, review, f.beforeBody);
+    await expect(keywordPanel(page).locator(".search-result")).toHaveCount(1);
+    await expect(keywordPanel(page).locator(".search-result")).toContainText("Human reviewed");
+    const firstNavigation = await openKeywordHit(page, reviewed, review, f.beforeBody);
+    expect(await keywordProtectedState(page, pageId)).toEqual(reviewedState);
+    // History navigation may clear source highlighting; it must retain the page and never mutate it.
+    await page.getByRole("button", { name: "Go back", exact: true }).click(); await expect(keywordPanel(page)).toBeVisible();
+    await page.getByRole("button", { name: "Go forward", exact: true }).click();
+    await expect(page.getByLabel("Page title", { exact: true })).toHaveValue(f.title);
+    await expect(page.locator(".tiptap .block-text")).toHaveText(f.beforeBody);
+    expect(await keywordProtectedState(page, pageId)).toEqual(reviewedState);
+    const edited = await replaceHistoryBody(page, reviewed, f.afterBody), history = await ownerPageHistory(page, pageId);
+    assertOneHistoryRevision(reviewedState.history, history, edited);
+    const staleReview = await observe(page, "page.freshness", { pageId });
+    expect(staleReview.freshness.state).toBe("stale"); expect(staleReview.history).toEqual(review.history);
+    expect(staleReview.freshness.review).toEqual(review.freshness.review);
+    expect(staleReview.freshness.contentIdentity).not.toEqual(review.freshness.contentIdentity);
+    await expect(page.locator("details.page-review > summary")).toHaveText("Changed since review");
+    const editedState = await keywordProtectedState(page, pageId);
+    // This is a separately labelled service observation, not a synthetic displayed-hit UI race.
+    const oldCitation = await observe(page, "resolveCitation", { location: firstHit.location });
+    expect(oldCitation).toEqual({ location: firstHit.location, state: "stale", currentRevision: edited.page.revision, freshness: staleReview.freshness });
+    await openKeywordSearch(page);
+    const oldQuery = await keywordQuery(page, f.beforeQuery); expect(oldQuery.response.result.hits).toEqual([]);
+    await expect(keywordPanel(page).getByText("No matching sources. Try fewer words or a different source filter.", { exact: true })).toBeVisible();
+    const fresh = await keywordQuery(page, f.afterQuery), freshHit = assertKeywordHit(fresh, edited, staleReview, f.afterBody);
+    expect(freshHit.chunkId).toBe(firstHit.chunkId); expect(freshHit.contentHash).not.toBe(firstHit.contentHash);
+    await expect(keywordPanel(page).locator(".search-result")).toContainText("Changed since review");
+    expect(await keywordProtectedState(page, pageId)).toEqual(editedState);
+    write("create-keyword-source-edit.json", { initial, reviewed, reviewExchange, review, first, firstNavigation, edited, history, staleReview, oldCitation, oldQuery, fresh });
+    // Explicit user recovery of derived search state, not a prerequisite for ordinary saved-text indexing.
+    await keywordPanel(page).getByText("Index settings", { exact: true }).click();
+    const refreshedResponse = waitForKeywordResponse(page, f.afterQuery + " ");
+    const rebuild = await uiExchange(page, "search.rebuild", () => keywordPanel(page).getByRole("button", { name: "Rebuild keyword index", exact: true }).click());
+    expect(rebuild.response.ok).toBe(true); expect(rebuild.response.result.keywordAvailable).toBe(true); expect(rebuild.response.result.pendingPages).toBe(0);
+    await expect(keywordPanel(page).getByText("Keyword index rebuilt from current canonical sources.", { exact: true })).toBeVisible();
+    const rebuilt = await readKeywordResponse(page, refreshedResponse), rebuiltHit = assertKeywordHit(rebuilt, edited, staleReview, f.afterBody);
+    expect(rebuilt.response.result.indexGeneration).not.toBe(fresh.response.result.indexGeneration);
+    expect(keywordHitIdentity(rebuiltHit)).toEqual(keywordHitIdentity(freshHit));
+    expect(await keywordProtectedState(page, pageId)).toEqual(editedState);
+    expect(otherPagesAndRecords(await snapshot(page), pageId)).toEqual(unrelated);
+    write("create-keyword-source.json", { canonical: edited, history, review: staleReview, originalReview: review,
+      oldLocation: firstHit.location, hit: keywordHitIdentity(rebuiltHit), rebuild, rebuilt });
+  }
+  const saved = read("create-keyword-source.json"), pageId = saved.canonical.page.id, protectedState = await keywordProtectedState(page, pageId);
+  expect(importedProjection(await snapshot(page), pageId)).toEqual(saved.canonical);
+  expect(protectedState.history).toEqual(saved.history); expect(protectedState.review).toEqual(saved.review);
+  await openKeywordSearch(page);
+  const oldQuery = await keywordQuery(page, f.beforeQuery); expect(oldQuery.response.result.hits).toEqual([]);
+  const current = await keywordQuery(page, f.afterQuery), hit = assertKeywordHit(current, saved.canonical, saved.review, f.afterBody);
+  expect(keywordHitIdentity(hit)).toEqual(saved.hit);
+  await expect(keywordPanel(page).locator(".search-result")).toContainText("Changed since review");
+  const citations = await openKeywordHit(page, saved.canonical, saved.review, f.afterBody);
+  const oldCitation = await observe(page, "resolveCitation", { location: saved.oldLocation });
+  expect(oldCitation).toEqual({ location: saved.oldLocation, state: "stale", currentRevision: saved.canonical.page.revision, freshness: saved.review.freshness });
+  expect(await keywordProtectedState(page, pageId)).toEqual(protectedState);
+  write(`${stage}-keyword-source-result.json`, { passed: true, canonical: saved.canonical, history: saved.history, review: saved.review, current, oldQuery, citations, oldCitation,
+    scope: "Keyword owner UI/current citation/highlight plus derived rebuild and restart; retained-old-location service check is not displayed-stale-hit race, semantic ranking, native URL/clipboard or release acceptance." });
 });

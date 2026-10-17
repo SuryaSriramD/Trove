@@ -25,11 +25,11 @@ import urllib.request
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / 'scripts'))
 from native_fixture_environment import native_fixture_environment, validate_native_fixture_environment
-EXPECTED = {stage: [f"real-{workflow}-{stage}" for workflow in ("rich", "task", "due", "record-lifecycle", "layout-review", "p2-data", "p2-action", "conversation-display", "schedule-week", "schedule-dst", "import-merge", "import-resume", "skills", "personal-review", "graph", "table-rich", "layout-rich", "capture-review", "history-recovery", "page-lock", "manual-automation")] for stage in ("create", "reopen")}
+EXPECTED = {stage: [f"real-{workflow}-{stage}" for workflow in ("rich", "task", "due", "record-lifecycle", "layout-review", "p2-data", "p2-action", "conversation-display", "schedule-week", "schedule-dst", "import-merge", "import-resume", "skills", "personal-review", "graph", "table-rich", "layout-rich", "capture-review", "history-recovery", "page-lock", "manual-automation", "keyword-source")] for stage in ("create", "reopen")}
 LIMITATIONS = ["Chromium UI plus production host/services/SQLite; not native Wails WebView acceptance.",
                "No model inference, physical devices, live accounts, performance or release qualification.",
                "Capture index.roots is denied by host policy and separately recorded; pasted-HTML success does not qualify folder indexing, screenshots or browser-extension capture.",
-               "Bounded rich-page, task/record/undo, layout/review, P2 forms/charts/row actions and conversation/display and working-week/DST scheduling, non-generative skills/review and explicit graph-link continuity; rich table/layout editing, structural recovery and restart; reviewed shared HTML and guarded single-page history/trash recovery; owner page locks and one future manual automation occurrence paused before restart; broader native/recovery workflows remain pending."]
+               "Bounded rich-page, task/record/undo, layout/review, P2 forms/charts/row actions and conversation/display and working-week/DST scheduling, non-generative skills/review and explicit graph-link continuity; rich table/layout editing, structural recovery and restart; reviewed shared HTML and guarded single-page history/trash recovery; owner page locks and one future manual automation occurrence paused before restart; keyword source invalidation, current citation/navigation and derived rebuild continuity; broader native/recovery workflows remain pending."]
 
 def now():
     return datetime.now(timezone.utc).isoformat()
@@ -186,7 +186,7 @@ def main():
                   'harnessFiles': {name: digest(ROOT / name) for name in harness_paths},
                   'frontendSourceSHA256': object_digest(inventory(ROOT / 'frontend/src'))}
         manifest['inputs'] = inputs
-        fixture = {'schemaVersion': 1, 'suiteVersion': 10, 'pageTitle': 'Real storage — café తెలుగు',
+        fixture = {'schemaVersion': 1, 'suiteVersion': 11, 'pageTitle': 'Real storage — café తెలుగు',
                    'body': 'A carefully saved idea: café, తెలుగు and 日本語.',
                    'initialTaskTitle': 'Prepare real storage review', 'taskTitle': 'Finish real storage review',
                    'expectedRichMarks': ['bold'], 'expectedTaskStatusGroup': 'done',
@@ -252,6 +252,9 @@ def main():
             'cancelledName': 'Cancelled rule-name edit', 'cancelledTitle': 'Cancelled child-title edit',
             'time': '09:17', 'weekday': (occurrence.weekday() + 1) % 7,
             'occurrenceAt': occurrence.isoformat().replace('+00:00', 'Z')}
+        fixture['keywordSource'] = {'title': 'Keyword source continuity note',
+            'beforeBody': 'Amberseam731 is recorded beside 83 fern trays.', 'beforeQuery': 'amberseam731',
+            'afterBody': 'Cobaltseam739 is recorded beside 89 fern trays.', 'afterQuery': 'cobaltseam739'}
         date_value = lambda start, end, zone, timed=False: {'start': start, 'end': end, 'timezone': zone, 'hasTime': timed}
         zone = 'America/New_York'
         fixture['scheduleWeek'] = {'database': 'Working week dependency fixture', 'timezone': zone,
