@@ -10,7 +10,7 @@ import argparse
 import base64
 import io
 import zipfile
-from datetime import datetime, timezone
+from datetime import datetime, timezone, timedelta
 import hashlib
 import json
 import os
@@ -25,11 +25,11 @@ import urllib.request
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / 'scripts'))
 from native_fixture_environment import native_fixture_environment, validate_native_fixture_environment
-EXPECTED = {stage: [f"real-{workflow}-{stage}" for workflow in ("rich", "task", "due", "record-lifecycle", "layout-review", "p2-data", "p2-action", "conversation-display", "schedule-week", "schedule-dst", "import-merge", "import-resume", "skills", "personal-review", "graph", "table-rich", "layout-rich", "capture-review", "history-recovery")] for stage in ("create", "reopen")}
+EXPECTED = {stage: [f"real-{workflow}-{stage}" for workflow in ("rich", "task", "due", "record-lifecycle", "layout-review", "p2-data", "p2-action", "conversation-display", "schedule-week", "schedule-dst", "import-merge", "import-resume", "skills", "personal-review", "graph", "table-rich", "layout-rich", "capture-review", "history-recovery", "page-lock", "manual-automation")] for stage in ("create", "reopen")}
 LIMITATIONS = ["Chromium UI plus production host/services/SQLite; not native Wails WebView acceptance.",
                "No model inference, physical devices, live accounts, performance or release qualification.",
                "Capture index.roots is denied by host policy and separately recorded; pasted-HTML success does not qualify folder indexing, screenshots or browser-extension capture.",
-               "Bounded rich-page, task/record/undo, layout/review, P2 forms/charts/row actions and conversation/display and working-week/DST scheduling, non-generative skills/review and explicit graph-link continuity; rich table/layout editing, structural recovery and restart; reviewed shared HTML and guarded single-page history/trash recovery; broader native/recovery workflows remain pending."]
+               "Bounded rich-page, task/record/undo, layout/review, P2 forms/charts/row actions and conversation/display and working-week/DST scheduling, non-generative skills/review and explicit graph-link continuity; rich table/layout editing, structural recovery and restart; reviewed shared HTML and guarded single-page history/trash recovery; owner page locks and one future manual automation occurrence paused before restart; broader native/recovery workflows remain pending."]
 
 def now():
     return datetime.now(timezone.utc).isoformat()
@@ -186,7 +186,7 @@ def main():
                   'harnessFiles': {name: digest(ROOT / name) for name in harness_paths},
                   'frontendSourceSHA256': object_digest(inventory(ROOT / 'frontend/src'))}
         manifest['inputs'] = inputs
-        fixture = {'schemaVersion': 1, 'suiteVersion': 9, 'pageTitle': 'Real storage — café తెలుగు',
+        fixture = {'schemaVersion': 1, 'suiteVersion': 10, 'pageTitle': 'Real storage — café తెలుగు',
                    'body': 'A carefully saved idea: café, తెలుగు and 日本語.',
                    'initialTaskTitle': 'Prepare real storage review', 'taskTitle': 'Finish real storage review',
                    'expectedRichMarks': ['bold'], 'expectedTaskStatusGroup': 'done',
@@ -239,6 +239,19 @@ def main():
         fixture['historyRecovery'] = {'title': 'Revision recovery field note',
             'reviewedBody': 'Reviewed baseline: 53 fern trays.', 'secondBody': 'Edited baseline: 59 fern trays.',
             'thirdBody': 'Concurrent visible edit: 61 fern trays.'}
+        fixture['pageLock'] = {'title': 'Locked fern field note', 'body': 'Original locked-page witness: 67 trays.',
+            'flushedBody': 'Dirty lock flush retains 71 fern trays.', 'finalBody': 'Unlocked correction retains 73 fern trays.',
+            'rejectedTitle': 'This locked title must never be committed'}
+        # Bind a real future UTC recurrence once, without a fake clock or disabling the host scheduler.
+        # Avoid Sunday (wire field weekday=0 is omitted) so the exact saved trigger has no optional-zero ambiguity.
+        occurrence = (datetime.now(timezone.utc) + timedelta(days=3)).replace(hour=9, minute=17, second=0, microsecond=0)
+        if occurrence.weekday() == 6:
+            occurrence += timedelta(days=1)
+        fixture['manualAutomation'] = {'pageTitle': 'Manual automation owner note', 'body': 'Owner body remains unchanged: 79 samples.',
+            'name': 'Future reviewed fern note', 'childTitle': 'Manual fern occurrence · {{occurrence}}',
+            'cancelledName': 'Cancelled rule-name edit', 'cancelledTitle': 'Cancelled child-title edit',
+            'time': '09:17', 'weekday': (occurrence.weekday() + 1) % 7,
+            'occurrenceAt': occurrence.isoformat().replace('+00:00', 'Z')}
         date_value = lambda start, end, zone, timed=False: {'start': start, 'end': end, 'timezone': zone, 'hasTime': timed}
         zone = 'America/New_York'
         fixture['scheduleWeek'] = {'database': 'Working week dependency fixture', 'timezone': zone,
