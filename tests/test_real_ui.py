@@ -71,11 +71,11 @@ class RealUICaptureHistoryInventoryTests(unittest.TestCase):
             with self.subTest(stage=stage):
                 previous = [f'real-{workflow}-{stage}' for workflow in old]
                 added = [f'real-capture-review-{stage}', f'real-history-recovery-{stage}']
-                self.assertEqual(runner.EXPECTED[stage], previous + added)
-                result = runner.assess(self.case_report(previous), runner.EXPECTED[stage])
+                self.assertEqual(runner.EXPECTED[stage][:-2], previous + added)
+                result = runner.assess(self.case_report(previous), runner.EXPECTED[stage][:-2])
                 self.assertFalse(result['passed'])
                 self.assertEqual({name: result['outcomes'][name] for name in added}, dict.fromkeys(added, 'unexecuted'))
-                complete = runner.assess(self.case_report(previous + added), runner.EXPECTED[stage])
+                complete = runner.assess(self.case_report(previous + added), runner.EXPECTED[stage][:-2])
                 self.assertTrue(complete['passed'])
                 self.assertEqual(len(complete['outcomes']), 19)
 
@@ -117,6 +117,41 @@ class RealUIHostBindingTests(unittest.TestCase):
                       'build vcs.revision=one\nbuild vcs.revision=two\nbuild vcs.modified=false']:
             with self.subTest(value=value), self.assertRaises(RuntimeError):
                 runner.clean_host_revision(value)
+
+
+class RealUILockAutomationInventoryTests(unittest.TestCase):
+    def test_historical_thirty_eight_passes_do_not_cover_locks_and_automation(self):
+        for stage in ('create', 'reopen'):
+            with self.subTest(stage=stage):
+                old = runner.EXPECTED[stage][:-2]
+                added = [f'real-page-lock-{stage}', f'real-manual-automation-{stage}']
+                self.assertEqual(len(old), 19)
+                self.assertEqual(runner.EXPECTED[stage][-2:], added)
+                result = runner.assess(RealUICaptureHistoryInventoryTests.case_report(old), runner.EXPECTED[stage])
+                self.assertFalse(result['passed'])
+                self.assertEqual({name: result['outcomes'][name] for name in added}, dict.fromkeys(added, 'unexecuted'))
+                complete = runner.assess(RealUICaptureHistoryInventoryTests.case_report(old + added), runner.EXPECTED[stage])
+                self.assertTrue(complete['passed'])
+                self.assertEqual(len(complete['outcomes']), 21)
+
+    def test_each_new_case_skip_duplicate_retry_or_expected_failure_cannot_pass(self):
+        for stage in ('create', 'reopen'):
+            for target in runner.EXPECTED[stage][-2:]:
+                for invalid in ('skipped', 'duplicate', 'retry', 'expected_failure'):
+                    with self.subTest(stage=stage, target=target, invalid=invalid):
+                        value = RealUICaptureHistoryInventoryTests.case_report(runner.EXPECTED[stage])
+                        specs = value['suites'][0]['specs']
+                        case = next(item for item in specs if item['title'] == target)
+                        if invalid == 'skipped':
+                            case['tests'][0]['results'][0]['status'] = 'skipped'
+                            case['ok'] = False
+                        elif invalid == 'duplicate':
+                            specs.append(case)
+                        elif invalid == 'retry':
+                            case['tests'][0]['results'][0]['retry'] = 1
+                        else:
+                            case['tests'][0]['expectedStatus'] = 'failed'
+                        self.assertFalse(runner.assess(value, runner.EXPECTED[stage])['passed'])
 
 
 if __name__ == '__main__':

@@ -159,7 +159,7 @@ function dateValue(r: ReturnType<typeof recordProjection>, name: string) {
   return r.record.values.find((v: any) => v.propertyId === property(r, name).id)?.value ?? null;
 }
 const date = (start: string, timezone = fixture.timezone) => ({ start, end: null, timezone, hasTime: false });
-async function observe(page: Page, method: "page.freshness" | "recordLayouts.get" | "operations.list" | "databaseP2" | "databaseChart" | "imports.list" | "imports.plan" | "pageDisplay.get" | "databaseDerived" | "skills.list" | "ai.runs" | "review.list", args: Record<string, unknown>) {
+async function observe(page: Page, method: "page.freshness" | "recordLayouts.get" | "operations.list" | "databaseP2" | "databaseChart" | "imports.list" | "imports.plan" | "pageDisplay.get" | "databaseDerived" | "skills.list" | "ai.runs" | "review.list" | "editor.lock" | "history.list" | "automationHistory", args: Record<string, unknown>) {
   const s = await snapshot(page);
   return page.evaluate(async ({ method, args, workspaceId }) => {
     const a = crypto.getRandomValues(new Uint8Array(16)), t = BigInt(Date.now());
@@ -1785,4 +1785,275 @@ test(`real-history-recovery-${stage}`, async ({ page, browser }) => {
   if (stage === "create") expect(otherPagesAndRecords(await snapshot(page), canonical.page.id)).toEqual(saved.unrelated);
   write(`${stage}-history-recovery-result.json`, { passed: true, canonical, history, review, noNewHumanReviewEvent: true,
     scope: "Single-page history/trash recovery only; no multi-page subtree, incompatible schema or native backup claim." });
+});
+
+// Suite 10: owner UI page locks and one deliberately future manual automation occurrence.
+// These helpers observe production state; every mutation below comes from a visible control.
+async function ownerPageHistory(page: Page, pageId: string) {
+  return (await observe(page, "history.list", { pageId })).revisions;
+}
+async function uiExchange(page: Page, method: string, gesture: () => Promise<unknown>) {
+  const pending = page.waitForResponse(response => response.url().endsWith("/api") && response.request().postDataJSON()?.method === method);
+  await gesture();
+  const response = await pending; expect(response.status()).toBe(200);
+  return { request: response.request().postDataJSON().request, response: await response.json() };
+}
+function ownerPageGuard(value: any) {
+  return [{ target: { entityType: "page", entityId: value.page.id }, revision: value.page.revision }];
+}
+function assertMetadataRevision(before: any, after: any) {
+  expect(after.workspaceId).toBe(before.workspaceId);
+  expect(after.page).toEqual({ ...before.page, revision: String(BigInt(before.page.revision) + 1n), updatedAt: after.page.updatedAt });
+  expect(Date.parse(after.page.updatedAt)).toBeGreaterThanOrEqual(Date.parse(before.page.updatedAt));
+  expect(after.blocks).toEqual(before.blocks);
+}
+function assertOneHistoryRevision(before: any[], after: any[], value: any) {
+  expect(after).toHaveLength(before.length + 1);
+  expect(after[0]).toMatchObject({ revision: value.page.revision, title: value.page.title, deleted: false });
+  expect(after.slice(1)).toEqual(before);
+}
+async function showPossiblyLockedPage(page: Page, title: string) {
+  await surface(page, "Pages");
+  await page.getByRole("navigation", { name: "Page tree", exact: true }).getByRole("button", { name: `▤ ${title}`, exact: true }).click();
+  await expect(page.getByLabel("Page title", { exact: true })).toHaveValue(title);
+  await expect(page.locator(".tiptap")).toBeVisible();
+}
+
+test(`real-page-lock-${stage}`, async ({ page }) => {
+  const f = fixture.pageLock;
+  if (stage === "create") {
+    const initial = await createPlainPage(page, f.title, f.body), pageId = initial.page.id;
+    const initialHistory = await ownerPageHistory(page, pageId), unrelated = otherPagesAndRecords(await snapshot(page), pageId);
+    expect(await observe(page, "editor.lock", { pageId })).toEqual({ locked: false, revision: "0" });
+    // Capture the real pointer gesture's pre-handler state, without changing editor/model state.
+    await page.getByRole("button", { name: "Lock page", exact: true }).evaluate(button => {
+      (window as any).__suite10LockPointer = null;
+      button.addEventListener("pointerdown", event => {
+        (window as any).__suite10LockPointer = { trusted: event.isTrusted,
+          saveState: document.querySelector(".save-state")?.textContent,
+          body: document.querySelector(".tiptap .block-text")?.textContent };
+      }, { capture: true, once: true });
+    });
+    const timeline: { phase: string; method: string }[] = [];
+    const noteRequest = (request: import("@playwright/test").Request) => {
+      if (!request.url().endsWith("/api")) return;
+      const method = request.postDataJSON()?.method;
+      if (method === "batch" || method === "editor.setLock") timeline.push({ phase: "request", method });
+    };
+    const noteResponse = (response: import("@playwright/test").Response) => {
+      if (!response.url().endsWith("/api")) return;
+      const method = response.request().postDataJSON()?.method;
+      if (method === "batch" || method === "editor.setLock") timeline.push({ phase: "response", method });
+    };
+    page.on("request", noteRequest); page.on("response", noteResponse);
+    let locked: any, flushed: any;
+    try {
+      const bodyResponse = page.waitForResponse(response => response.url().endsWith("/api") && response.request().postDataJSON()?.method === "batch");
+      await page.locator(".tiptap .block-text").click({ position: { x: 8, y: 8 } });
+      await page.keyboard.press("Home"); await page.keyboard.press("Shift+End"); await page.keyboard.insertText(f.flushedBody);
+      locked = await uiExchange(page, "editor.setLock", () => page.getByRole("button", { name: "Lock page", exact: true }).click());
+      const response = await bodyResponse; expect(response.status()).toBe(200);
+      flushed = { request: response.request().postDataJSON().request, response: await response.json() };
+    } finally { page.off("request", noteRequest); page.off("response", noteResponse); }
+    const pointer = await page.evaluate(() => (window as any).__suite10LockPointer);
+    const afterFlush = importedProjection(await snapshot(page), pageId), afterFlushHistory = await ownerPageHistory(page, pageId);
+    write("create-page-lock-flush-observation.json", { pointer, timeline, initial, initialHistory, flushed, locked, afterFlush, afterFlushHistory });
+    expect(pointer).toEqual({ trusted: true, saveState: "Unsaved changes", body: f.flushedBody });
+    expect(timeline).toEqual([{ phase: "request", method: "batch" }, { phase: "response", method: "batch" },
+      { phase: "request", method: "editor.setLock" }, { phase: "response", method: "editor.setLock" }]);
+    expect(flushed.response.ok).toBe(true); expect(locked.response.ok).toBe(true);
+    assertRecoveryStep(initial, afterFlush, { ...initial, blocks: [{ ...initial.blocks[0], data: { richText: [{ text: f.flushedBody }] } }] });
+    assertOneHistoryRevision(initialHistory, afterFlushHistory, afterFlush);
+    expect(locked.request).toMatchObject({ pageId, locked: true, expectedRevision: "0", expectedPageRevision: afterFlush.page.revision });
+    expect(locked.response.result).toEqual({ locked: true, revision: "1" });
+    expect(await observe(page, "editor.lock", { pageId })).toEqual(locked.response.result);
+    await expect(page.locator(".tiptap")).toHaveAttribute("contenteditable", "false");
+    await expect(page.locator("fieldset.editor-editable")).toBeDisabled();
+    const beforeRejected = canonicalContent(await snapshot(page)), beforeRejectedHistory = await ownerPageHistory(page, pageId);
+    const title = page.getByLabel("Page title", { exact: true }); await expect(title).toBeEnabled();
+    await title.fill(f.rejectedTitle);
+    const rejected = await uiExchange(page, "batch", () => title.press("Enter"));
+    write("create-page-lock-rejected-title.json", rejected);
+    expect(rejected.request.commands).toEqual([{ kind: "page.update", pageId, title: f.rejectedTitle }]);
+    expect(rejected.request.mutation.expectedRevisions).toEqual(ownerPageGuard(afterFlush));
+    expect(rejected.response.ok).toBe(false);
+    expect(rejected.response.error).toMatchObject({ code: "CONFLICT", message: "Page is locked; unlock it before making changes" });
+    await expect(page.getByRole("alert").filter({ hasText: "Page is locked; unlock it before making changes" })).toBeVisible();
+    expect(canonicalContent(await snapshot(page))).toEqual(beforeRejected);
+    expect(await ownerPageHistory(page, pageId)).toEqual(beforeRejectedHistory);
+    expect(await observe(page, "editor.lock", { pageId })).toEqual({ locked: true, revision: "1" });
+    // Escape explicitly discards the rejected local title draft before another blur/navigation.
+    await expect(title).toBeEnabled(); await title.press("Escape"); await expect(title).toHaveValue(f.title);
+    const unlocked = await uiExchange(page, "editor.setLock", () => page.getByRole("button", { name: "Unlock page", exact: true }).click());
+    expect(unlocked.request).toMatchObject({ pageId, locked: false, expectedRevision: "1", expectedPageRevision: afterFlush.page.revision });
+    expect(unlocked.response.ok).toBe(true); expect(unlocked.response.result).toEqual({ locked: false, revision: "2" });
+    await expect(page.locator(".tiptap")).toHaveAttribute("contenteditable", "true");
+    expect(canonicalContent(await snapshot(page))).toEqual(beforeRejected); expect(await ownerPageHistory(page, pageId)).toEqual(afterFlushHistory);
+    const edited = await replaceHistoryBody(page, afterFlush, f.finalBody), editedHistory = await ownerPageHistory(page, pageId);
+    assertOneHistoryRevision(afterFlushHistory, editedHistory, edited);
+    const beforeRelock = canonicalContent(await snapshot(page));
+    const relocked = await uiExchange(page, "editor.setLock", () => page.getByRole("button", { name: "Lock page", exact: true }).click());
+    expect(relocked.request).toMatchObject({ pageId, locked: true, expectedRevision: "2", expectedPageRevision: edited.page.revision });
+    expect(relocked.response.ok).toBe(true); expect(relocked.response.result).toEqual({ locked: true, revision: "3" });
+    expect(canonicalContent(await snapshot(page))).toEqual(beforeRelock); expect(await ownerPageHistory(page, pageId)).toEqual(editedHistory);
+    expect(otherPagesAndRecords(await snapshot(page), pageId)).toEqual(unrelated);
+    write("create-page-lock.json", { canonical: edited, history: editedHistory, lock: relocked.response.result, rejected, flushed, locked, unlocked, relocked });
+  }
+  const saved = read("create-page-lock.json"), beforeOpen = canonicalContent(await snapshot(page));
+  await showPossiblyLockedPage(page, f.title);
+  await expect(page.getByRole("button", { name: "Unlock page", exact: true })).toBeEnabled();
+  await expect(page.locator(".tiptap")).toHaveAttribute("contenteditable", "false");
+  await expect(page.locator("fieldset.editor-editable")).toBeDisabled();
+  await expect(page.locator(".tiptap .block-text")).toHaveText(f.finalBody);
+  expect(importedProjection(await snapshot(page), saved.canonical.page.id)).toEqual(saved.canonical);
+  expect(await observe(page, "editor.lock", { pageId: saved.canonical.page.id })).toEqual(saved.lock);
+  expect(await ownerPageHistory(page, saved.canonical.page.id)).toEqual(saved.history);
+  expect(canonicalContent(await snapshot(page))).toEqual(beforeOpen);
+  write(`${stage}-page-lock-result.json`, { passed: true, canonical: saved.canonical, history: saved.history, lock: saved.lock,
+    scope: "Owner UI and persistent page lock; no scoped-actor or native WebView claim." });
+});
+
+const automationPanel = (page: Page) => page.locator("section.automation-panel");
+async function openAutomationPage(page: Page, pageId: string) {
+  await page.getByRole("navigation", { name: "Workspace", exact: true }).getByRole("button", { name: /Automations/ }).click();
+  const panel = automationPanel(page); await expect(panel.getByRole("heading", { name: "Local automations", exact: true })).toBeVisible();
+  await panel.getByRole("combobox", { name: "Automation page", exact: true }).selectOption({ value: pageId });
+  return panel;
+}
+const ruleCard = (page: Page, name: string) => automationPanel(page).getByRole("article").filter({ has: page.getByRole("heading", { name, exact: true }) });
+function expectedAutomationChild(ruleId: string, occurrenceKey: string) {
+  const bytes = createHash("sha256").update(`${ruleId}1\0${occurrenceKey}\0page-1`).digest().subarray(0, 16);
+  bytes[6] = (bytes[6] & 15) | 0x70; bytes[8] = (bytes[8] & 63) | 0x80;
+  const hex = bytes.toString("hex"); return `${hex.slice(0, 8)}-${hex.slice(8, 12)}-${hex.slice(12, 16)}-${hex.slice(16, 20)}-${hex.slice(20)}`;
+}
+function outsideAutomation(s: any, pageIds: string[]) {
+  return { ...unrelatedRecords(s), pages: s.pages.filter((p: any) => !pageIds.includes(p.id)), blocks: s.blocks.filter((b: any) => !pageIds.includes(b.pageId)) };
+}
+async function automationPreviewFromUI(page: Page, name: string) {
+  const exchange = await uiExchange(page, "automationPreview", () => ruleCard(page, name).getByRole("button", { name: "Preview", exact: true }).click());
+  expect(exchange.response.ok).toBe(true);
+  await expect(ruleCard(page, name).getByRole("button", { name: "Preview", exact: true })).toBeEnabled();
+  await expect(automationPanel(page).getByRole("region", { name: "Automation preview", exact: true })).toBeVisible();
+  return exchange;
+}
+
+test(`real-manual-automation-${stage}`, async ({ page }) => {
+  const f = fixture.manualAutomation;
+  if (stage === "create") {
+    const initial = await createPlainPage(page, f.pageTitle, f.body), pageId = initial.page.id;
+    const unrelated = outsideAutomation(await snapshot(page), [pageId]), initialHistory = await ownerPageHistory(page, pageId);
+    expect((await observe(page, "automationHistory", { pageId })).rules).toEqual([]);
+    expect((await observe(page, "automationHistory", { pageId })).runs).toEqual([]);
+    const panel = await openAutomationPage(page, pageId), form = panel.getByRole("group", { name: "Create a local rule", exact: true });
+    await form.getByRole("textbox", { name: "Name", exact: true }).fill(f.name);
+    await form.getByRole("combobox", { name: "Frequency", exact: true }).selectOption({ value: "weekly" });
+    await form.getByRole("combobox", { name: "Weekday", exact: true }).selectOption({ value: String(f.weekday) });
+    await form.getByLabel("Local time", { exact: true }).fill(f.time);
+    await form.getByRole("textbox", { name: "Timezone", exact: true }).fill("UTC");
+    await form.getByRole("combobox", { name: "Missed runs", exact: true }).selectOption({ value: "skip" });
+    const action = form.getByRole("group", { name: "Action 1", exact: true });
+    await expect(action.getByRole("combobox", { name: "Action type", exact: true })).toHaveValue("page.create");
+    await action.getByRole("combobox", { name: "Parent page", exact: true }).selectOption({ value: pageId });
+    await action.getByRole("textbox", { name: "Title", exact: true }).fill(f.childTitle);
+    const savedExchange = await uiExchange(page, "batch", () => form.getByRole("button", { name: "Save disabled rule", exact: true }).click());
+    expect(savedExchange.response.ok).toBe(true);
+    await expect(ruleCard(page, f.name).getByRole("button", { name: "Enable", exact: true })).toBeEnabled();
+    let history = await observe(page, "automationHistory", { pageId }); expect(history.rules).toHaveLength(1); expect(history.runs).toEqual([]);
+    const ruleId = history.rules[0].rule.id;
+    const expectedRule = { id: ruleId, name: f.name, enabled: false, paused: false, allowedOrigins: ["user"],
+      trigger: { type: "schedule", frequency: "weekly", timezone: "UTC", hour: 9, minute: 17, weekday: f.weekday, missedPolicy: "skip", catchUpLimit: 3 },
+      actions: [{ kind: "page.create", pageId: "$id:page-1", parentPageId: pageId, title: f.childTitle }] };
+    expect(savedExchange.request.commands).toEqual([{ kind: "automation.save", pageId, rule: expectedRule }]);
+    expect(savedExchange.request.mutation.expectedRevisions).toEqual(ownerPageGuard(initial));
+    expect(history.rules[0]).toEqual({ rule: expectedRule, version: 1, nextAt: f.occurrenceAt, failures: 0 });
+    expect(Date.parse(f.occurrenceAt) - Date.now()).toBeGreaterThan(24 * 60 * 60 * 1000);
+    let current = importedProjection(await snapshot(page), pageId), revisions = await ownerPageHistory(page, pageId);
+    assertMetadataRevision(initial, current); assertOneHistoryRevision(initialHistory, revisions, current);
+    const beforeCancel = canonicalContent(await snapshot(page)), cancelHistory = history, cancelRevisions = revisions;
+    await ruleCard(page, f.name).getByRole("button", { name: "Edit rule", exact: true }).click();
+    const editing = panel.getByRole("group", { name: "Edit saved rule", exact: true });
+    await editing.getByRole("textbox", { name: "Name", exact: true }).fill(f.cancelledName);
+    await editing.getByRole("group", { name: "Action 1", exact: true }).getByRole("textbox", { name: "Title", exact: true }).fill(f.cancelledTitle);
+    await editing.getByRole("button", { name: "Cancel editing", exact: true }).click();
+    await expect(editing).toHaveCount(0);
+    expect(canonicalContent(await snapshot(page))).toEqual(beforeCancel);
+    expect(await observe(page, "automationHistory", { pageId })).toEqual(cancelHistory); expect(await ownerPageHistory(page, pageId)).toEqual(cancelRevisions);
+    const disabledPreview = await automationPreviewFromUI(page, f.name), previewPanel = panel.getByRole("region", { name: "Automation preview", exact: true });
+    expect(disabledPreview.response.result.eligible).toBe(true);
+    await expect(previewPanel.getByRole("button", { name: "Run this occurrence", exact: true })).toBeDisabled();
+    await previewPanel.getByRole("button", { name: "Close preview", exact: true }).click();
+    await expect(previewPanel).toHaveCount(0);
+    expect(canonicalContent(await snapshot(page))).toEqual(beforeCancel);
+    expect(await observe(page, "automationHistory", { pageId })).toEqual(cancelHistory); expect(await ownerPageHistory(page, pageId)).toEqual(cancelRevisions);
+    write("create-manual-automation-cancel.json", { savedExchange, beforeCancel, history: cancelHistory, revisions: cancelRevisions, disabledPreview });
+    const toggles: any[] = [];
+    const changeState = async (label: "Enable" | "Pause" | "Resume", enabled: boolean, paused: boolean) => {
+      // The future time is an admission assertion, not a fake clock or scheduler disable.
+      expect(Date.parse(f.occurrenceAt) - Date.now()).toBeGreaterThan(24 * 60 * 60 * 1000);
+      const previous = current, previousRevisions = revisions, previousHistory = history;
+      const exchange = await uiExchange(page, "batch", () => ruleCard(page, f.name).getByRole("button", { name: label, exact: true }).click());
+      expect(exchange.response.ok).toBe(true);
+      expect(exchange.request.commands).toEqual([{ kind: "automation.state", pageId, ruleId, enabled, paused }]);
+      expect(exchange.request.mutation.expectedRevisions).toEqual(ownerPageGuard(previous));
+      await expect(ruleCard(page, f.name).getByRole("button", { name: paused ? "Resume" : "Pause", exact: true })).toBeEnabled();
+      history = await observe(page, "automationHistory", { pageId });
+      expect(history).toEqual({ ...previousHistory, rules: [{ ...previousHistory.rules[0], rule: { ...previousHistory.rules[0].rule, enabled, paused } }] });
+      current = importedProjection(await snapshot(page), pageId); revisions = await ownerPageHistory(page, pageId);
+      assertMetadataRevision(previous, current); assertOneHistoryRevision(previousRevisions, revisions, current);
+      toggles.push({ label, exchange, history, canonical: current, revisions });
+    };
+    await changeState("Enable", true, false); await changeState("Pause", true, true); await changeState("Resume", true, false);
+    const beforeRun = canonicalContent(await snapshot(page)), beforeRunHistory = history, beforeRunRevisions = revisions, beforeRunPage = current;
+    const prepared = await automationPreviewFromUI(page, f.name), preview = prepared.response.result;
+    const occurrenceKey = `schedule:${f.occurrenceAt}`, childId = expectedAutomationChild(ruleId, occurrenceKey);
+    const childTitle = f.childTitle.replace("{{occurrence}}", f.occurrenceAt);
+    const commands = [{ kind: "page.create", pageId: childId, parentPageId: pageId, title: childTitle }];
+    const guards = [...ownerPageGuard(current), { target: { entityType: "page", entityId: childId }, revision: "0" }]
+      .sort((a, b) => a.target.entityId.localeCompare(b.target.entityId));
+    expect(preview).toEqual({ rule: history.rules[0].rule, version: 1, eligible: true, diagnostic: "", commands, expectedRevisions: guards, occurrenceKey, at: f.occurrenceAt });
+    expect(canonicalContent(await snapshot(page))).toEqual(beforeRun);
+    expect(await observe(page, "automationHistory", { pageId })).toEqual(beforeRunHistory); expect(await ownerPageHistory(page, pageId)).toEqual(beforeRunRevisions);
+    await expect(previewPanel.getByRole("button", { name: "Run this occurrence", exact: true })).toBeEnabled();
+    expect(Date.parse(f.occurrenceAt) - Date.now()).toBeGreaterThan(24 * 60 * 60 * 1000);
+    const executed = await uiExchange(page, "automation.execute", () => previewPanel.getByRole("button", { name: "Run this occurrence", exact: true }).click());
+    expect(executed.response.ok).toBe(true);
+    expect(executed.request).toMatchObject({ pageId, ruleId, occurrenceKey, at: f.occurrenceAt, expectedRevisions: guards });
+    await expect(previewPanel).toHaveCount(0);
+    await expect(ruleCard(page, f.name).getByRole("button", { name: "Preview", exact: true })).toBeEnabled();
+    history = await observe(page, "automationHistory", { pageId }); expect(history.rules).toEqual(beforeRunHistory.rules); expect(history.runs).toHaveLength(1);
+    const run = history.runs[0]; expect(run).toEqual({ id: run.id, ruleId, ruleVersion: 1, occurrenceKey, status: "succeeded", diagnostic: "", at: run.at, commands });
+    expect(run.id).toMatch(/^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/);
+    expect(Number.isNaN(Date.parse(run.at))).toBe(false); expect(Date.parse(preview.at) - Date.parse(run.at)).toBeGreaterThan(24 * 60 * 60 * 1000);
+    const afterRun = await snapshot(page), child = importedProjection(afterRun, childId);
+    expect(child.page).toMatchObject({ id: childId, workspaceId: initial.workspaceId, parentPageId: pageId, title: childTitle, revision: "1", deletedAt: null });
+    expect(child.blocks).toEqual([]);
+    expect(afterRun.pages.filter((p: any) => !beforeRun.pages.some((old: any) => old.id === p.id))).toEqual([child.page]);
+    expect(outsideAutomation(afterRun, [pageId, childId])).toEqual(unrelated);
+    current = importedProjection(afterRun, pageId); revisions = await ownerPageHistory(page, pageId);
+    assertMetadataRevision(beforeRunPage, current); assertOneHistoryRevision(beforeRunRevisions, revisions, current);
+    const beforeDedup = canonicalContent(afterRun), dedupHistory = history, dedupRevisions = revisions;
+    const duplicate = await automationPreviewFromUI(page, f.name);
+    expect(duplicate.response.result).toEqual({ rule: history.rules[0].rule, version: 1, eligible: false,
+      diagnostic: "This occurrence is already succeeded", commands: [], expectedRevisions: [], occurrenceKey, at: f.occurrenceAt });
+    await expect(previewPanel.getByRole("button", { name: "Run this occurrence", exact: true })).toBeDisabled();
+    await previewPanel.getByRole("button", { name: "Close preview", exact: true }).click();
+    expect(canonicalContent(await snapshot(page))).toEqual(beforeDedup);
+    expect(await observe(page, "automationHistory", { pageId })).toEqual(dedupHistory); expect(await ownerPageHistory(page, pageId)).toEqual(dedupRevisions);
+    await changeState("Pause", true, true);
+    expect(importedProjection(await snapshot(page), childId)).toEqual(child);
+    expect(outsideAutomation(await snapshot(page), [pageId, childId])).toEqual(unrelated);
+    write("create-manual-automation.json", { canonical: current, child, history, revisions, prepared, executed, duplicate, toggles });
+  }
+  const saved = read("create-manual-automation.json"), pageId = saved.canonical.page.id, beforeOpen = canonicalContent(await snapshot(page));
+  const panel = await openAutomationPage(page, pageId);
+  await expect(ruleCard(page, f.name)).toContainText("Paused");
+  await expect(ruleCard(page, f.name).getByRole("button", { name: "Resume", exact: true })).toBeEnabled();
+  await expect(panel.getByRole("cell", { name: "succeeded", exact: true })).toHaveCount(1);
+  expect(await observe(page, "automationHistory", { pageId })).toEqual(saved.history);
+  expect(await ownerPageHistory(page, pageId)).toEqual(saved.revisions);
+  expect(importedProjection(await snapshot(page), pageId)).toEqual(saved.canonical);
+  expect(importedProjection(await snapshot(page), saved.child.page.id)).toEqual(saved.child);
+  expect(canonicalContent(await snapshot(page))).toEqual(beforeOpen);
+  write(`${stage}-manual-automation-result.json`, { passed: true, canonical: saved.canonical, child: saved.child, history: saved.history, revisions: saved.revisions,
+    scope: "One owner-reviewed future occurrence, final paused rule; no automatic scheduling, missed-run, external effect or scoped-actor acceptance." });
 });
