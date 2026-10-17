@@ -1,5 +1,6 @@
 import { useEffect, useState, useRef } from "react";
 import { dispatch, envelope, type WorkspaceSnapshot } from "../api";
+import { assertCaptureImportProgress } from "./progress";
 type Pairing = {
   endpoint: string;
   code: string;
@@ -12,6 +13,8 @@ type Plan = {
   planHash: string;
   sourceName: string;
   state: string;
+  initialized: boolean;
+  cursor: number;
   rootPageId: string;
   captureDestinationTitle: string;
   sourceOmissions: string[];
@@ -155,7 +158,7 @@ function ClipperWorkspacePanel({
             );
             return;
           }
-          const previousHash = plan.planHash;
+          const previous = plan;
           plan = await scoped(() =>
             dispatch<Plan>("imports.commit", {
               ...envelope(workspace),
@@ -163,11 +166,8 @@ function ClipperWorkspacePanel({
               planHash: plan.planHash,
             }),
           );
+          assertCaptureImportProgress(previous, plan);
           setSelected(plan);
-          if (plan.state !== "complete" && plan.planHash === previousHash)
-            throw Error(
-              "Capture save made no progress; refresh the draft before retrying.",
-            );
         }
         await scoped(() => Promise.resolve(onChanged()));
         await refresh();

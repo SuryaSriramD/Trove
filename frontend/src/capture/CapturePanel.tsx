@@ -1,5 +1,6 @@
 import { useEffect, useState, useRef } from "react";
 import { dispatch, envelope, type WorkspaceSnapshot } from "../api";
+import { assertCaptureImportProgress } from "./progress";
 import "../imports/imports.css";
 import { ClipperPanel } from "./ClipperPanel";
 
@@ -183,16 +184,13 @@ function CaptureWorkspacePanel({
             );
             return;
           }
-          const previousHash = current.planHash;
+          const previous = current;
           current = await request<CapturePlan>("imports.commit", {
             planId: current.planId,
             planHash: current.planHash,
           });
+          assertCaptureImportProgress(previous, current);
           setPlan(current);
-          if (current.state !== "complete" && current.planHash === previousHash)
-            throw Error(
-              "Capture save made no progress; refresh the draft before retrying.",
-            );
         }
         await scoped(() => Promise.resolve(onChanged()));
         setNotice("Capture saved as offline workspace content.");

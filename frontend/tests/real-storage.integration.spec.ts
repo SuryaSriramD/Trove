@@ -1657,7 +1657,7 @@ test(`real-capture-review-${stage}`, async ({ page }) => {
     expect(canonicalContent(await snapshot(page))).toEqual(before);
     const response = await uiResponse(page, "imports.commit", () => panel.getByRole("button", { name: "Save reviewed capture", exact: true }).click());
     expect(response.ok).toBe(true); const initialized = response.result;
-    expect(initialized.planId).toBe(preview.planId); expect(initialized.initialized).toBe(true);
+    expect(initialized.planId).toBe(preview.planId); expect(initialized.planHash).toBe(preview.planHash); expect(initialized.initialized).toBe(true);
     expect(initialized.state).toBe("running"); expect(initialized.cursor).toBe(0); expect(initialized.items[0].committed).toBe(false);
     expect(initialized.committedBatchIds).toHaveLength(1);
     // The visible save action advances initialization and item publication as distinct durable units.
@@ -1665,7 +1665,7 @@ test(`real-capture-review-${stage}`, async ({ page }) => {
     const plan = await observe(page, "imports.plan", { planId: preview.planId });
     expect(plan.planId).toBe(preview.planId); expect(plan.state).toBe("complete"); expect(plan.cursor).toBe(1); expect(plan.items[0].committed).toBe(true);
     expect(plan.committedBatchIds).toHaveLength(2); expect(plan.committedBatchIds[0]).toBe(initialized.committedBatchIds[0]);
-    expect(plan.planHash).not.toBe(initialized.planHash);
+    expect(plan.planHash).toBe(initialized.planHash);
     const s = await snapshot(page), projected = captureProjection(s, plan), added = new Set([plan.rootPageId, plan.items[0].pageId]);
     expect(s.pages.filter((p: any) => !added.has(p.id))).toEqual(before.pages);
     expect(s.blocks.filter((b: any) => !added.has(b.pageId))).toEqual(before.blocks); expect(unrelatedRecords(s)).toEqual(unrelatedRecords(before));
