@@ -165,6 +165,20 @@ export function assignIDs(
     return { ...b, id };
   });
 }
+// JSON maps carry no member-order semantics; array order, types and missing
+// members remain significant. Compare without rewriting the authored data.
+function sameBlockData(left: unknown, right: unknown): boolean {
+  if (left === right) return true;
+  if (left === null || right === null || typeof left !== "object" || typeof right !== "object") return false;
+  if (Array.isArray(left) || Array.isArray(right)) {
+    return Array.isArray(left) && Array.isArray(right) && left.length === right.length
+      && left.every((value, index) => sameBlockData(value, right[index]));
+  }
+  const a = left as Record<string, unknown>, b = right as Record<string, unknown>;
+  const keys = Object.keys(a);
+  return keys.length === Object.keys(b).length && keys.every(key =>
+    Object.prototype.hasOwnProperty.call(b, key) && sameBlockData(a[key], b[key]));
+}
 export function mutations(
   pageId: string,
   old: Block[],
@@ -211,7 +225,7 @@ export function mutations(
         });
       if (
         prev.type !== b.type ||
-        JSON.stringify(prev.data) !== JSON.stringify(b.data)
+        !sameBlockData(prev.data, b.data)
       )
         commands.push({
           kind: "block.update",
