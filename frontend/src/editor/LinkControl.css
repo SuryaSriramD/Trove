@@ -1,0 +1,33 @@
+.link-control,
+.link-editor {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px;
+}
+.link-editor {
+  max-width: 100%;
+  padding: 5px;
+  border: 1px solid var(--line);
+  border-radius: 4px;
+  background: var(--subtle);
+}
+.link-editor label {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 12px;
+}
+.link-editor input {
+  width: min(220px, 40vw);
+  min-width: 100px;
+  font-size: 12px;
+}
+.link-control .link-editor button {
+  font-size: 12px;
+}
+.link-editor [role="alert"] {
+  flex-basis: 100%;
+  color: #b42318;
+  font-size: 12px;
+}

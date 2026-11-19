@@ -1364,8 +1364,10 @@ async function formatInline(page: Page, field: import("@playwright/test").Locato
   await toolbar.getByRole("button", { name: `${label} bold`, exact: true }).click();
   await toolbar.getByRole("combobox", { name: `${label} color`, exact: true }).selectOption("purple");
   await toolbar.getByRole("combobox", { name: `${label} highlight`, exact: true }).selectOption("yellow");
-  page.once("dialog", dialog => dialog.accept(f.link));
   await toolbar.getByRole("button", { name: `${label} link`, exact: true }).click();
+  const linkEditor = toolbar.getByRole("group", { name: `${label} link editor`, exact: true });
+  await linkEditor.getByRole("textbox", { name: "Link URL", exact: true }).fill(f.link);
+  await linkEditor.getByRole("button", { name: "Apply link", exact: true }).click();
   await expect(field.locator("strong")).toHaveText(f.text);
   await expect(field.locator("a")).toHaveAttribute("href", f.link);
 }

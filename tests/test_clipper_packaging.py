@@ -21,6 +21,8 @@ class ClipperPackagingTests(unittest.TestCase):
             with zipfile.ZipFile(root / 'first.zip') as archive:
                 self.assertEqual(set(archive.namelist()), {'Trove-Web-Clipper/' + name for name in packaging.FILES})
                 manifest = json.loads(archive.read('Trove-Web-Clipper/manifest.json'))
+                for icon in [*manifest['icons'].values(), *manifest['action']['default_icon'].values(), 'logo.png']:
+                    self.assertTrue(archive.read('Trove-Web-Clipper/' + icon).startswith(b'\x89PNG\r\n\x1a\n'))
                 self.assertEqual(manifest['host_permissions'], ['http://127.0.0.1/*'])
                 self.assertEqual(set(manifest['permissions']), {'activeTab', 'storage', 'scripting'})
             with self.assertRaises(FileExistsError):

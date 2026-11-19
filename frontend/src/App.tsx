@@ -1,3 +1,5 @@
+import troveSymbol from "../Trove_Symbol_Transparent.png?url";
+import troveLogo from "../Trove_Logo_Transparent.png?url";
 import { SkillsPanel } from "./ai/SkillsPanel";
 import { RecordLayout } from "./database/RecordLayout";
 import { OperationHistory } from "./OperationHistory";
@@ -940,7 +942,7 @@ export default function App() {
       </a>
       <aside className="sidebar">
         <div className="brand">
-          <span className="brand-logo">✳</span>
+          <img className="brand-logo" src={troveSymbol} alt="" width="36" height="36" />
           <strong>Trove</strong>
           <span className="local-pill">
             {(window as any).troveHost ? "HOST" : "LOCAL"}
@@ -1149,7 +1151,7 @@ export default function App() {
             <div className="empty-state">Opening your workspace…</div>
           ) : !w ? (
             <div className="welcome">
-              <span className="hero-icon">✳</span>
+              <img className="hero-icon" src={troveLogo} alt="Trove" width="216" height="72" />
               <h1>A place for your thinking.</h1>
               <p>
                 Bring your pages, projects, and ideas together in a private
@@ -1376,9 +1378,7 @@ export default function App() {
                         ↓ Bring something in
                       </button>
                     </div>
-                    <span className="hero-drawing" aria-hidden="true">
-                      ✳
-                    </span>
+                    <img className="hero-drawing" src={troveSymbol} alt="" width="96" height="96" />
                   </div>
                   <ReviewQueue workspace={w} onNavigate={navigate} />
                   <div className="section-title">

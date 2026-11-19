@@ -85,7 +85,7 @@ test.beforeEach(async ({page}, info) => {
       state.snapshotCursor=String(Number(state.snapshotCursor)+1);persist();
       return ok({requestId:req.requestId,transactionId:makeID(),eventCursor:state.snapshotCursor,revisions,replayed:false});
     }}}};
-  },{initial: info.title.startsWith("line edge keyboard first paragraph ") ? lineEdgeFirstParagraph : initial});
+  },{initial: info.title.startsWith("native link ") ? { ...initial, blocks: initial.blocks.map(item => item.id === id(40) ? { ...item, data: { richText: rich } } : item) } : info.title.startsWith("saved whole-line paste undo ") ? { ...initial, blocks: [] } : info.title.startsWith("line edge keyboard first paragraph ") ? lineEdgeFirstParagraph : initial});
   await page.route("**/files/019a1234-5678-7000-8000-000000000091", route=>route.fulfill({contentType:"image/png",body:Buffer.from("iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+a2ioAAAAASUVORK5CYII=","base64")}));
   await page.route("**/files/019a1234-5678-7000-8000-000000000092", route=>route.fulfill({contentType:"application/pdf",body:pdfFixture()}));
   await page.goto(process.env.TROVE_TEST_URL??"http://127.0.0.1:4173");
@@ -443,3 +443,224 @@ for (const fixture of [
     }
   });
 }
+
+
+test("saved whole-line paste undo restores prior content and canonical identities", async ({ page, context }, info) => {
+  const original = "Cedar paste marker 731: café and नमस्ते. Count 53.";
+  const replacement = "Cedar paste marker 731: café and नमस्ते. Count 54.";
+  const body = page.getByRole("textbox", { name: "Page body", exact: true });
+  await context.grantPermissions(["clipboard-read", "clipboard-write"]);
+  await page.evaluate(() => {
+    const editor = (document.querySelector(".tiptap") as HTMLElement & { editor?: any }).editor;
+    const events: unknown[] = [];
+    (window as any).undoEvidence = events;
+    editor.on("transaction", ({ transaction }: any) => {
+      events.push({ time: transaction.time, docChanged: transaction.docChanged,
+        addToHistory: transaction.getMeta("addToHistory"), preventUpdate: transaction.getMeta("preventUpdate"),
+        steps: transaction.steps.map((step: any) => step.toJSON()), document: transaction.doc.toJSON() });
+    });
+  });
+  const canonical = () => page.evaluate(() => structuredClone((window as any).integrityState().blocks));
+  const textOf = (blocks: any[]) => blocks.map((block: any) => block.data.richText?.map((run: any) => run.text).join("")).join("\n");
+  const waitSaved = async (text: string) => {
+    await expect(body.locator(".block-text")).toHaveText(text);
+    await expect.poll(async () => textOf(await canonical())).toBe(text);
+    await expect(page.locator(".save-state")).toHaveText("Saved");
+  };
+  const paste = async (text: string) => {
+    await page.evaluate(value => navigator.clipboard.writeText(value), text);
+    await page.keyboard.press("ControlOrMeta+v");
+  };
+  try {
+    await body.click();
+    await paste(original);
+    await waitSaved(original); // Allow real 800ms autosave; do not bypass metadata transactions.
+    const first = await canonical();
+    expect(first).toHaveLength(1);
+    await save(page);
+    expect(await canonical()).toEqual(first);
+    await body.click();
+    await page.keyboard.press("Home");
+    await page.keyboard.press("Shift+End");
+    await paste(replacement);
+    await waitSaved(replacement);
+    const second = await canonical();
+    expect(second).toHaveLength(1);
+    await save(page);
+    expect(await canonical()).toEqual(second);
+    await page.getByRole("button", { name: "Undo", exact: true }).click();
+    await waitSaved(original);
+    const undone = await canonical();
+    expect(undone).toHaveLength(1);
+    expect(undone[0].id).toBe(first[0].id);
+    expect(undone[0].data).toEqual(first[0].data);
+    await save(page);
+    expect(await canonical()).toEqual(undone);
+    await page.getByRole("button", { name: "Redo", exact: true }).click();
+    await waitSaved(replacement);
+    const redone = await canonical();
+    expect(redone).toHaveLength(1);
+    expect(redone[0].id).toBe(second[0].id);
+    expect(redone[0].data).toEqual(second[0].data);
+    await save(page);
+    expect(await canonical()).toEqual(redone);
+  } finally {
+    await info.attach("saved-paste-undo-evidence", {
+      body: JSON.stringify(await page.evaluate(() => ({ state: (window as any).integrityState(), transactions: (window as any).undoEvidence })), null, 2),
+      contentType: "application/json",
+    });
+  }
+});
+
+
+async function selectLinkText(field: Locator, text: string) {
+  await field.evaluate((element, text) => {
+    const host = (element.matches(".tiptap") ? element : element.closest(".tiptap")) as HTMLElement & { editor?: any };
+    const editor = host.editor;
+    if (!editor) throw Error("Real editor is not ready");
+    const walker = document.createTreeWalker(element, NodeFilter.SHOW_TEXT);
+    let node: Node | null;
+    while ((node = walker.nextNode())) {
+      const start = node.textContent!.indexOf(text);
+      if (start >= 0) {
+        const from = editor.view.posAtDOM(node, start);
+        editor.commands.setTextSelection({ from, to: from + text.length });
+        editor.view.focus();
+        return;
+      }
+    }
+    throw Error("Selection text missing");
+  }, text);
+  expect(await field.evaluate(() => window.getSelection()?.toString())).toBe(text);
+}
+function nativeLinkTargets(page: Page, kind: "page" | "inline") {
+  const field = kind === "page" ? page.locator(`[data-block-id="${id(40)}"] .block-text`)
+    : page.getByRole("textbox", { name: "Row 1 column 1", exact: true }).first();
+  const buttonName = kind === "page" ? "Add link" : "Row 1 column 1 link";
+  return { field, button: page.getByRole("button", { name: buttonName, exact: true }).first(),
+    group: page.getByRole("group", { name: `${buttonName} editor`, exact: true }) };
+}
+async function nativeLinkValue(page: Page, kind: "page" | "inline") {
+  return page.evaluate(kind => {
+    const blocks = (window as any).integrityState().blocks;
+    return kind === "page" ? blocks.find((b: any) => b.id.endsWith("000000000040")).data.richText
+      : blocks.find((b: any) => b.type === "table").data.cells[0].richText;
+  }, kind);
+}
+async function nativePromptUnavailable(page: Page) {
+  await page.evaluate(() => {
+    (window as any).nativePromptCalls = 0;
+    window.prompt = () => { (window as any).nativePromptCalls++; return null; };
+  });
+}
+for (const kind of ["page", "inline"] as const) {
+  test(`native link ${kind} applies captured selection without prompt and survives undo redo save reload`, async ({ page }) => {
+    await nativePromptUnavailable(page);
+    const { field, button, group } = nativeLinkTargets(page, kind);
+    await selectLinkText(field, "Keep");
+    await button.click();
+    const url = group.getByRole("textbox", { name: "Link URL", exact: true });
+    await expect(url).toBeVisible();
+    await url.fill("https://example.test/cedar");
+    await test.info().attach(`${kind} link editor`, { body: await page.screenshot(), contentType: "image/png" });
+    // Moving the editor caret while the form is open must not retarget Apply.
+    await field.click();
+    await page.keyboard.press("ArrowRight");
+    await group.getByRole("button", { name: "Apply link", exact: true }).click();
+    await expect(group).toHaveCount(0);
+    await expect(field.locator('a[href="https://example.test/cedar"]')).toHaveText("Keep");
+    await expect(field.locator('a[href="https://example.test/source"]')).toHaveText("linked");
+    expect((await field.locator("strong").allTextContents()).join("")).toBe("Keep ");
+    await save(page);
+    let value = await nativeLinkValue(page, kind);
+    expect(value.map((run: any) => run.text).join("")).toBe("Keep linked tail");
+    expect(value.find((run: any) => run.text === "Keep")).toMatchObject({ link: "https://example.test/cedar", marks: ["bold"], color: "purple", highlight: "yellow" });
+    expect(value.find((run: any) => run.text === "linked")?.link).toBe("https://example.test/source");
+    await page.getByRole("button", { name: "Undo", exact: true }).click();
+    await expect(field.locator('a[href="https://example.test/cedar"]')).toHaveCount(0);
+    await expect(field.locator('a[href="https://example.test/source"]')).toHaveText("linked");
+    await page.getByRole("button", { name: "Redo", exact: true }).click();
+    await expect(field.locator('a[href="https://example.test/cedar"]')).toHaveText("Keep");
+    await save(page);
+    expect(await page.evaluate(() => (window as any).nativePromptCalls)).toBe(0);
+    await page.reload(); await page.getByRole("button", { name: /Editor integrity/ }).first().click();
+    await expect(field.locator('a[href="https://example.test/cedar"]')).toHaveText("Keep");
+    expect(await nativeLinkValue(page, kind)).toEqual(value);
+  });
+  test(`native link ${kind} cancel escape and invalid URL preserve content and marks`, async ({ page }) => {
+    await nativePromptUnavailable(page);
+    const { field, button, group } = nativeLinkTargets(page, kind);
+    const before = await nativeLinkValue(page, kind);
+    await selectLinkText(field, "Keep"); await button.click();
+    const url = group.getByRole("textbox", { name: "Link URL", exact: true });
+    await expect(url).toBeVisible(); await url.fill("javascript:alert(1)");
+    await group.getByRole("button", { name: "Apply link", exact: true }).click();
+    await expect(group.getByRole("alert")).toBeVisible();
+    await expect(field.locator('a[href^="javascript:"]')).toHaveCount(0);
+    await group.getByRole("button", { name: "Cancel link", exact: true }).click();
+    await expect(group).toHaveCount(0);
+    expect(await field.evaluate(() => window.getSelection()?.toString())).toBe("Keep");
+    await button.click(); await url.fill("https://example.test/cancelled"); await url.press("Escape");
+    await expect(group).toHaveCount(0);
+    expect(await field.evaluate(() => window.getSelection()?.toString())).toBe("Keep");
+    await save(page);
+    expect(await nativeLinkValue(page, kind)).toEqual(before);
+    expect(await page.evaluate(() => (window as any).nativePromptCalls)).toBe(0);
+  });
+}
+test("native link inline keeps existing internal URL and empty-removal behavior", async ({ page }) => {
+  await nativePromptUnavailable(page);
+  const { field, button, group } = nativeLinkTargets(page, "inline");
+  await selectLinkText(field, "Keep"); await button.click();
+  const url = group.getByRole("textbox", { name: "Link URL", exact: true });
+  await expect(url).toBeVisible(); await url.fill(`trove://page/${pageId}`);
+  await group.getByRole("button", { name: "Apply link", exact: true }).click();
+  await expect(field.locator(`a[href="trove://page/${pageId}"]`)).toHaveText("Keep");
+  await selectLinkText(field, "linked"); await button.click();
+  await expect(url).toHaveValue("https://example.test/source"); await url.fill("");
+  await group.getByRole("button", { name: "Apply link", exact: true }).click();
+  await expect(field.locator('a[href="https://example.test/source"]')).toHaveCount(0);
+  await save(page); const value = await nativeLinkValue(page, "inline");
+  expect(value.map((run: any) => run.text).join("")).toBe("Keep linked tail");
+  expect(value.find((run: any) => run.text === "Keep")).toMatchObject({ link: `trove://page/${pageId}`, marks: ["bold"], color: "purple", highlight: "yellow" });
+});
+test("native link page keeps mailto support and rejects internal URLs", async ({ page }) => {
+  await nativePromptUnavailable(page);
+  const { field, button, group } = nativeLinkTargets(page, "page");
+  await selectLinkText(field, "Keep"); await button.click();
+  const url = group.getByRole("textbox", { name: "Link URL", exact: true });
+  await expect(url).toBeVisible(); await url.fill(`trove://page/${pageId}`);
+  await group.getByRole("button", { name: "Apply link", exact: true }).click();
+  await expect(group.getByRole("alert")).toBeVisible();
+  await url.fill("mailto:cedar@example.test");
+  await group.getByRole("button", { name: "Apply link", exact: true }).click();
+  await expect(field.locator('a[href="mailto:cedar@example.test"]')).toHaveText("Keep");
+  await save(page);
+  expect((await nativeLinkValue(page, "page")).find((run: any) => run.text === "Keep")?.link).toBe("mailto:cedar@example.test");
+});
+for (const kind of ["page", "inline"] as const) test(`native link ${kind} maps captured selection through a real edit and applies with Enter`, async ({ page }) => {
+  await nativePromptUnavailable(page);
+  const { field, button, group } = nativeLinkTargets(page, kind);
+  await selectLinkText(field, "Keep"); await button.click();
+  const url = group.getByRole("textbox", { name: "Link URL", exact: true });
+  await url.fill("https://example.test/mapped");
+  await field.evaluate(element => {
+    const host = (element.matches(".tiptap") ? element : element.closest(".tiptap")) as HTMLElement & { editor?: any };
+    const editor = host.editor;
+    const node = document.createTreeWalker(element, NodeFilter.SHOW_TEXT).nextNode()!;
+    editor.commands.setTextSelection(editor.view.posAtDOM(node, 0));
+    editor.view.focus();
+  });
+  await page.keyboard.insertText("New ");
+  await expect(field).toContainText("New Keep linked tail");
+  await url.press("Enter");
+  await expect(group).toHaveCount(0);
+  await expect(field.locator('a[href="https://example.test/mapped"]')).toHaveText("Keep");
+  await expect(field.locator('a[href="https://example.test/source"]')).toHaveText("linked");
+  await save(page);
+  const value = await nativeLinkValue(page, kind);
+  expect(value.map((run: any) => run.text).join("")).toBe("New Keep linked tail");
+  expect(value.filter((run: any) => run.link === "https://example.test/mapped").map((run: any) => run.text).join("")).toBe("Keep");
+  expect(value.find((run: any) => run.text === "Keep")).toMatchObject({ marks: ["bold"], color: "purple", highlight: "yellow" });
+  expect(await page.evaluate(() => (window as any).nativePromptCalls)).toBe(0);
+});

@@ -8,6 +8,7 @@ import { getLock, setLock, type PageLock } from "../advanced/service";
 import { replaceDocument, safeWebURL } from "./advanced";
 import "./advanced.css";
 import { TextColor, TextHighlight, ColorControls, preserveStyledPaste } from "./ColorMarks";
+import { LinkControl } from "./LinkControl";
 import { BlockVisibility } from "./visibility";
 import { dispatch, envelope, readBlock } from "../api";
 import { AllSelection, NodeSelection, Selection, TextSelection } from "@tiptap/pm/state";
@@ -572,7 +573,8 @@ export function PageEditor({
       });
       if (missing.length) {
         const allocated = await ids(old.workspace, missing.length);
-        const tr = editor.state.tr;
+        // Saving canonical identity is bookkeeping, not an undoable user edit.
+        const tr = editor.state.tr.setMeta("addToHistory", false);
         missing.forEach((m, i) => {
           editor.state.doc.descendants((n, pos) => {
             if (n.attrs.clientKey === m.key)
@@ -925,16 +927,7 @@ export function PageEditor({
           </button>
         ))}
         {editor && <ColorControls editor={editor}/>}
-        <button
-          aria-label="Add link"
-          onClick={() => {
-            const href = prompt("Link URL");
-            if (href && /^(https?:|mailto:)/i.test(href))
-              editor?.chain().focus().setLink({ href }).run();
-          }}
-        >
-          ↗
-        </button>
+        {editor && <LinkControl editor={editor} label="Add link">↗</LinkControl>}
         <span className="toolbar-divider" />
         <button
           aria-label="Undo"

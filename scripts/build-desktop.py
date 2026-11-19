@@ -93,6 +93,7 @@ shutil.copytree(ROOT / 'native/models', native / 'models', dirs_exist_ok=True)
 contents = args.output / 'Contents'
 (contents / 'MacOS').mkdir(parents=True, exist_ok=True)
 (contents / 'Resources').mkdir(parents=True, exist_ok=True)
+shutil.copyfile(ROOT / 'packaging/Trove.icns', contents / 'Resources/Trove.icns')
 shutil.copytree(ROOT / 'browser-clipper', contents / 'Resources' / 'browser-clipper', dirs_exist_ok=True, ignore=shutil.ignore_patterns('._*', '.DS_Store'))
 run([go, 'build', '-mod=readonly', '-trimpath', '-tags',
      'desktop production fts5 sqlite_omit_load_extension', '-o',
@@ -131,6 +132,7 @@ if set(compatibility) != {'userVersion', 'storageGeneration'} or any(type(value)
 phase = 6 if args.phase6 else 5 if args.phase5 else 4 if args.phase4 else 3
 info = {
     'CFBundleName': 'Trove', 'CFBundleDisplayName': 'Trove',
+    'CFBundleIconFile': 'Trove.icns',
     'CFBundleExecutable': 'Trove', 'CFBundleIdentifier': 'local.trove.desktop',
     'CFBundlePackageType': 'APPL', 'CFBundleShortVersionString': args.version or f'0.{phase}.0',
     'CFBundleVersion': str(args.build_number or phase), 'LSMinimumSystemVersion': '27.0',

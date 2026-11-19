@@ -135,8 +135,12 @@ small,
   padding: 0 12px 28px;
 }
 .brand-logo {
-  font-size: 29px;
-  color: #80679b;
+  display: block;
+  width: 36px;
+  height: 36px;
+  flex-shrink: 0;
+  background: #faf9f6;
+  border-radius: 8px;
 }
 .brand strong {
   font-size: 22px;
@@ -454,12 +458,10 @@ main {
   position: absolute;
   right: 4%;
   top: 2px;
-  font-family: Georgia, serif;
-  font-size: 160px;
-  color: #d6c9df;
-  line-height: 1;
-  transform: rotate(15deg);
-  opacity: 0.8;
+  width: 96px;
+  height: 96px;
+  background: #faf9f6;
+  border-radius: 22px;
 }
 .section-title {
   display: flex;
@@ -1239,8 +1241,10 @@ main {
   text-align: center;
 }
 .welcome .hero-icon {
-  font-size: 85px;
-  color: #b099c0;
+  width: 216px;
+  height: 72px;
+  background: #faf9f6;
+  border-radius: 12px;
 }
 .welcome h1 {
   margin-top: 30px;

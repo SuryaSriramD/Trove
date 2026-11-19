@@ -5,6 +5,7 @@ import StarterKit from "@tiptap/starter-kit";
 import type { RichText } from "../../../contracts/generated/domain";
 import { TextColor, TextHighlight, ColorControls, preserveStyledPaste } from "./ColorMarks";
 import { richNodes, richText, type NodeJSON } from "./codec";
+import { LinkControl } from "./LinkControl";
 
 function inlineDocument(value: RichText) {
   return { type: "doc", content: [{ type: "paragraph", content: richNodes(value) }] };
@@ -88,11 +89,7 @@ export function InlineRichEditor({ value, onChange, label, owner, readOnly = fal
         <button type="button" key={mark} aria-label={`${label} ${mark}`} aria-pressed={editor.isActive(mark)}
           onMouseDown={event => event.preventDefault()}
           onClick={() => editor.chain().focus().toggleMark(mark).run()}>{mark}</button>)}
-      <button type="button" aria-label={`${label} link`} onMouseDown={event => event.preventDefault()} onClick={() => {
-        const href = prompt("Link URL (leave empty to remove)", editor.getAttributes("link").href ?? "");
-        if (href === "") editor.chain().focus().unsetLink().run();
-        else if (href && /^(https?:|mailto:|trove:)/i.test(href)) editor.chain().focus().setLink({ href }).run();
-      }}>Link</button>
+      <LinkControl editor={editor} label={`${label} link`} allowInternal removeOnEmpty>Link</LinkControl>
     </div>}
     <EditorContent editor={editor} />
   </div>;

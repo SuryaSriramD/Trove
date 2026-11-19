@@ -8,7 +8,8 @@ from pathlib import Path
 import zipfile
 
 ROOT = Path(__file__).resolve().parents[1]
-FILES = ('README.md', 'manifest.json', 'popup.html', 'popup.css', 'popup.js', 'extract.js')
+FILES = ('README.md', 'manifest.json', 'popup.html', 'popup.css', 'popup.js', 'extract.js',
+         'logo.png', 'icon-16.png', 'icon-32.png', 'icon-48.png', 'icon-128.png')
 EXPECTED_ID = 'mmdbnaapeedpfjhafldjcacmanhjmjbb'
 
 
