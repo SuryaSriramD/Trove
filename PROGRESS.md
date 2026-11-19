@@ -2025,6 +2025,12 @@ The tracker checkpoint is `47bcec8` (documentation only; installed source remain
 - Documentation audit: 716 relative Markdown links checked across PROGRESS/README/docs; 2 broken, both inside the third-party `docs/phase-3/licenses/bge-small-en-model-card.md` (upstream relative links, not project files). `origin` still has no remote refs (DEV-123–126): nothing is published. No tests, builds or product checks were run.
 - Next: finish hydration, run `git fsck --connectivity-only` and full status, then move the repository (or at least `.git`) to a local APFS path outside Google Drive and complete GIT-001 (commit pending editor/branding changes, push, verify remote SHA). Remove the ~110 root `._*` AppleDouble sidecars only after the user approves.
 
+### DEV-128 — 2026-11-19 IST: relocate to local APFS and publish to GitHub
+
+- GIT-001: after forcing Google Drive downloads, the repository was copied to `/Users/suryasriramduvvuri/Projects/Trove` (excluding AppleDouble sidecars and regenerable `.venv`, `node_modules`, `.cache`, `.tools`, `.phase0-source`, `.firecrawl`). There `git fsck --connectivity-only` reports no missing or broken objects (dangling only) and status completes in under a second. Two tracked `._` files skipped by the copy were restored; evidence files show no diff against HEAD.
+- Committed the pending editor/link, branding, clipper-packaging and tracker changes (14 modified, 12 new files) as `274225d7cc2079f26a44e97a0790dd429fe26357` on `codex/macos-feature-completion` and pushed to `https://github.com/SuryaSriramD/Trove.git`. `git ls-remote --heads origin` returns the same SHA, so GIT-001 publication is verified for that commit. Only this branch is pushed; `main`/`integration` and the other local branches are not.
+- No product tests or builds were run; publication is not acceptance. The local APFS path is now the working checkout. The Google Drive copy is retained pending user approval to delete it. The DEV-127 'Next' step is superseded by this entry, which supersedes the earlier GIT-001 blocker.
+
 <a id="commit-history"></a>
 ## Recorded source-development history
 
