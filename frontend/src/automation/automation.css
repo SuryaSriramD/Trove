@@ -1,10 +1,10 @@
 .automation-panel { max-width: 1100px; margin: 0 auto; }
-.automation-panel form > fieldset, .automation-panel form fieldset > fieldset { display: grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap: 12px 18px; }
+.automation-panel form > fieldset, .automation-panel form fieldset > fieldset { display: grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap: 12px 16px; }
 .automation-panel form label { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; min-width: 0; }
 .automation-panel form label > input:not([type=checkbox]), .automation-panel form label > select { flex: 1 1 150px; min-width: 100px; max-width: 100%; }
 .automation-panel form fieldset > fieldset, .automation-panel form p, .automation-panel form h4 { grid-column: 1 / -1; margin: 4px 0; }
 .automation-panel form fieldset > button { justify-self: start; }
-.automation-panel article { border-bottom: 1px solid var(--line, #e4e3df); padding: 12px 0; }
+.automation-panel article { border-bottom: 1px solid var(--line); padding: 12px 0; }
 .automation-panel article h4 { margin: 4px 0; }
 .automation-panel table { width: 100%; text-align: left; }
 .automation-panel td { vertical-align: top; overflow-wrap: anywhere; padding: 8px 12px 8px 0; }

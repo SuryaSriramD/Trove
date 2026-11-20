@@ -541,7 +541,7 @@ function P2IntelligenceContent({
                       y1={a.y}
                       x2={b.x}
                       y2={b.y}
-                      stroke={edge.kind === "explicit" ? "#64748b" : "#c084fc"}
+                      stroke={edge.kind === "explicit" ? "var(--muted)" : "var(--purple)"}
                       strokeDasharray={
                         edge.kind === "explicit" ? undefined : "5 4"
                       }
@@ -556,7 +556,7 @@ function P2IntelligenceContent({
                         cx={p.x}
                         cy={p.y}
                         r={n.id === focus ? 10 : 7}
-                        fill={n.id === focus ? "#22c55e" : "#818cf8"}
+                        fill={n.id === focus ? "var(--ok)" : "var(--purple-strong)"}
                       />
                       <text
                         x={p.x}

@@ -1,3 +1,4 @@
+import { ArrowDown, ArrowUp } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import {
   batch,
@@ -333,14 +334,14 @@ export function RecordLayout({
                     disabled={i === 0 || busy}
                     onClick={() => moveProperty(section.id, i, -1)}
                   >
-                    ↑
+                    <ArrowUp size={16} strokeWidth={1.5} aria-hidden="true" />
                   </button>
                   <button
                     aria-label={`Move ${properties.find((p) => p.id === id)?.name ?? id} down`}
                     disabled={i === section.propertyIds.length - 1 || busy}
                     onClick={() => moveProperty(section.id, i, 1)}
                   >
-                    ↓
+                    <ArrowDown size={16} strokeWidth={1.5} aria-hidden="true" />
                   </button>
                 </li>
               ))}

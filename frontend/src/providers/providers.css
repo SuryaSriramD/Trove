@@ -2,20 +2,20 @@
   display: flex;
   align-items: center;
   gap: 12px;
-  margin: 24px 0 18px;
+  margin: 24px 0 16px;
 }
 .provider-panel select,
 .provider-panel input:not([type="checkbox"]) {
-  padding: 8px 10px;
-  border: 1px solid var(--border, #e6e1db);
-  border-radius: 7px;
-  background: var(--surface, #fff);
+  padding: 8px 12px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  background: var(--surface);
   color: inherit;
 }
 .provider-panel fieldset {
-  border: 1px solid var(--border, #e6e1db);
-  border-radius: 9px;
-  margin: 14px 0;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  margin: 16px 0;
   padding: 12px 16px;
   max-height: 270px;
   overflow: auto;
@@ -23,29 +23,29 @@
 .provider-panel legend {
   padding: 0 6px;
   font-size: 13px;
-  font-weight: 600;
+  font-weight:var(--weight-medium);
 }
 .provider-panel fieldset label {
-  padding: 5px 0;
+  padding: 4px 0;
   font-size: 14px;
 }
 .provider-panel input[type="checkbox"] {
-  margin-right: 9px;
-  accent-color: #80669c;
+  margin-right: 8px;
+  accent-color: var(--purple);
 }
 .provider-panel > h3 {
   margin-top: 30px;
 }
 .provider-panel article,
 .provider-context {
-  border: 1px solid var(--border, #e6e1db);
-  border-radius: 9px;
-  padding: 18px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: 16px;
   margin: 16px 0;
 }
 .provider-panel article button,
 .provider-panel article input {
-  margin: 5px 8px 5px 0;
+  margin: 4px 8px 4px 0;
 }
 .provider-context ul {
   list-style: none;
@@ -56,19 +56,19 @@
   display: flex;
   flex-wrap: wrap;
   justify-content: space-between;
-  gap: 10px;
+  gap: 12px;
   padding: 8px 0;
-  border-bottom: 1px solid var(--border, #e6e1db);
+  border-bottom: 1px solid var(--border);
 }
 .provider-context li span {
   font-size: 12px;
-  color: var(--muted, #89848e);
+  color: var(--muted);
 }
 .provider-panel pre {
   max-height: 420px;
   overflow: auto;
   font-size: 12px;
-  background: var(--surface-subtle, #f7f6f4);
-  padding: 14px;
-  border-radius: 7px;
+  background: var(--subtle);
+  padding: 16px;
+  border-radius: var(--radius-md);
 }

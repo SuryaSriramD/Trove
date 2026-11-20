@@ -5,8 +5,8 @@
 .connections-panel section {
   margin: 1.5rem 0;
   padding: 1rem;
-  border: 1px solid var(--border, #8885);
-  border-radius: 10px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
 }
 .connection-columns {
   display: grid;
@@ -54,7 +54,7 @@
   overflow: auto;
 }
 .connection-review {
-  border-color: var(--accent, #a88c50) !important;
+  border-color: var(--accent) !important;
 }
 .connection-compose {
   margin-top: 1.5rem;

@@ -832,7 +832,7 @@ export function P2ChartView({
                 y={i * 28 + 3}
                 width={Math.abs(ratio) * 155}
                 height="19"
-                fill="var(--accent, #6589ed)"
+                fill="var(--purple)"
               />
             </g>
           ))}

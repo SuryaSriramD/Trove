@@ -1,3 +1,4 @@
+import { MoveHorizontal } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import { dispatch, envelope, type D, type WorkspaceSnapshot } from "../api";
 import { calendarDay, resizeDateRange } from "./dateRange";
@@ -366,7 +367,7 @@ export function Timeline({
                                 );
                               }}
                             >
-                              ↔
+                              <MoveHorizontal size={16} strokeWidth={1.5} aria-hidden="true" />
                             </button>
                             <span>
                               {range.before ? "‹ " : ""}
@@ -388,7 +389,7 @@ export function Timeline({
                                 );
                               }}
                             >
-                              ↔
+                              <MoveHorizontal size={16} strokeWidth={1.5} aria-hidden="true" />
                             </button>
                           </div>
                         ) : (

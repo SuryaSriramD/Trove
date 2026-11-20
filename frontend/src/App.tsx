@@ -1,3 +1,7 @@
+import {
+  ArrowDownToLine, ArrowUpRight, Bell, CheckSquare, Clock, FileText, Home as HomeIcon, Inbox as InboxIcon,
+  Lightbulb, Link2, Mic, PenLine, PlusCircle, RefreshCw, Repeat, Search as SearchIcon, Settings as SettingsIcon, Sparkles, Star, Sun,
+} from "lucide-react";
 import troveSymbol from "../Trove_Symbol_Transparent.png?url";
 import troveLogo from "../Trove_Logo_Transparent.png?url";
 import { SkillsPanel } from "./ai/SkillsPanel";
@@ -6,7 +10,7 @@ import { OperationHistory } from "./OperationHistory";
 import { PageFreshness, ReviewQueue } from "./PageFreshness";
 import { TaskEditor } from "./tasks/TaskEditor";
 import SupportBundlePanel from "./SupportBundlePanel";
-import { useEffect, useState, useCallback, useMemo, useRef } from "react";
+import { useEffect, useState, useCallback, useMemo, useRef, type ReactNode } from "react";
 import {
   snapshot,
   ids,
@@ -64,24 +68,25 @@ type Surface =
   | "Connections"
   | "Providers"
   | "Settings";
-const nav: [Surface, string][] = [
-  ["Home", "⌂"],
-  ["Inbox", "▣"],
-  ["Pages", "▤"],
-  ["Tasks", "✓"],
-  ["Meetings", "◉"],
-  ["Reminders", "◴"],
-  ["Search", "⌕"],
-  ["Import", "↓"],
-  ["Jobs", "↻"],
-  ["AI", "✧"],
-  ["Skills", "✎"],
-  ["Providers", "⇄"],
-  ["Connections", "↗"],
-  ["Capture", "⊕"],
-  ["Automations", "◷"],
-  ["Intelligence", "◇"],
-  ["Settings", "⚙"],
+const ic = (I: typeof Star) => <I size={16} strokeWidth={1.5} aria-hidden="true" />;
+const nav: [Surface, ReactNode][] = [
+  ["Home", ic(HomeIcon)],
+  ["Inbox", ic(InboxIcon)],
+  ["Pages", ic(FileText)],
+  ["Tasks", ic(CheckSquare)],
+  ["Meetings", ic(Mic)],
+  ["Reminders", ic(Bell)],
+  ["Search", ic(SearchIcon)],
+  ["Import", ic(ArrowDownToLine)],
+  ["Jobs", ic(RefreshCw)],
+  ["AI", ic(Sparkles)],
+  ["Skills", ic(PenLine)],
+  ["Providers", ic(Repeat)],
+  ["Connections", ic(Link2)],
+  ["Capture", ic(PlusCircle)],
+  ["Automations", ic(Clock)],
+  ["Intelligence", ic(Lightbulb)],
+  ["Settings", ic(SettingsIcon)],
 ];
 function stored<T>(key: string, value: T): T {
   try {
@@ -992,7 +997,7 @@ export default function App() {
               key={p!.id}
               onClick={() => navigate(p!.id)}
             >
-              <span>☆</span>
+              <Star size={16} strokeWidth={1.5} aria-hidden="true" />
               <span>{p!.title}</span>
             </button>
           ))}
@@ -1075,7 +1080,7 @@ export default function App() {
                     )
                   }
                 >
-                  {favorites.includes(page.id) ? "★" : "☆"}
+                  <Star size={16} strokeWidth={1.5} aria-hidden="true" fill={favorites.includes(page.id) ? "currentColor" : "none"} />
                 </button>
                 <button
                   aria-label="Page options"
@@ -1245,7 +1250,7 @@ export default function App() {
                       }
                     }}
                   >
-                    ↗ Attach file
+                    <ArrowUpRight size={16} strokeWidth={1.5} aria-hidden="true" /> Attach file
                   </button>
                 </div>
               </div>
@@ -1331,7 +1336,7 @@ export default function App() {
                 />
               )}
               <details className="page-ai">
-                <summary>✧ Ask AI or work with this page</summary>
+                <summary><Sparkles size={16} strokeWidth={1.5} aria-hidden="true" /> Ask AI or work with this page</summary>
                 <AIPanel
                   key={page.id}
                   workspace={w}
@@ -1341,7 +1346,7 @@ export default function App() {
                 />
               </details>
               <div className="backlinks">
-                <span className="eyebrow">LINKED TO THIS PAGE</span>
+                <span className="eyebrow">Linked to this page</span>
                 {backlinks.map((b) => (
                   <button key={b.id} onClick={() => navigate(b.pageId)}>
                     ↗ {pagesById.get(b.pageId)?.title}
@@ -1360,7 +1365,7 @@ export default function App() {
               {surface === "Home" ? (
                 <>
                   <div className="home-intro">
-                    <span className="eyebrow">A LITTLE CLARITY, EVERY DAY</span>
+                    <span className="eyebrow">A little clarity, every day</span>
                     <h1>Make room for your ideas.</h1>
                     <p>
                       Your thoughts, plans, and everything in between.
@@ -1375,7 +1380,7 @@ export default function App() {
                         ＋ New page
                       </button>
                       <button onClick={() => navigate("Import")}>
-                        ↓ Bring something in
+                        <ArrowDownToLine size={16} strokeWidth={1.5} aria-hidden="true" /> Bring something in
                       </button>
                     </div>
                     <img className="hero-drawing" src={troveSymbol} alt="" width="96" height="96" />
@@ -1384,7 +1389,7 @@ export default function App() {
                   <div className="section-title">
                     <h2>Pick up where you left off</h2>
                     <button onClick={() => navigate("Pages")}>
-                      All pages ↗
+                      All pages <ArrowUpRight size={16} strokeWidth={1.5} aria-hidden="true" />
                     </button>
                   </div>
                   <div className="card-grid">
@@ -1408,18 +1413,18 @@ export default function App() {
                   </div>
                   <div className="home-bottom">
                     <div className="soft-card">
-                      <span>☀</span>
+                      <Sun size={16} strokeWidth={1.5} aria-hidden="true" />
                       <h3>A calmer place to work</h3>
                       <p>
                         Capture a loose thought. Shape it into a plan. Give it a
                         home.
                       </p>
                       <button onClick={() => navigate("Inbox")}>
-                        Open your inbox ↗
+                        Open your inbox <ArrowUpRight size={16} strokeWidth={1.5} aria-hidden="true" />
                       </button>
                     </div>
                     <div className="soft-card lavender">
-                      <span>✓</span>
+                      <CheckSquare size={16} strokeWidth={1.5} aria-hidden="true" />
                       <h3>Small steps, real progress</h3>
                       <p>
                         {w.taskFacets.length
@@ -1427,7 +1432,7 @@ export default function App() {
                           : "Keep tasks connected to the work that matters."}
                       </p>
                       <button onClick={() => navigate("Tasks")}>
-                        Go to tasks ↗
+                        Go to tasks <ArrowUpRight size={16} strokeWidth={1.5} aria-hidden="true" />
                       </button>
                     </div>
                   </div>
@@ -1435,7 +1440,7 @@ export default function App() {
                 </>
               ) : surface === "Tasks" ? (
                 <>
-                  <span className="eyebrow">ONE TASK, EVERYWHERE</span>
+                  <span className="eyebrow">One task, everywhere</span>
                   <h1>Tasks</h1>
                   <p className="lede">
                     The next step, with its context close by.
@@ -1470,8 +1475,8 @@ export default function App() {
                     <div>
                       <span className="eyebrow">
                         {surface === "Inbox"
-                          ? "CAPTURE NOW, ORGANIZE LATER"
-                          : "YOUR GROWING COLLECTION"}
+                          ? "Capture now, organize later"
+                          : "Your growing collection"}
                       </span>
                       <h1>{surface}</h1>
                     </div>
@@ -1554,7 +1559,7 @@ export default function App() {
                 <JobsPanel workspace={w} />
               ) : (
                 <>
-                  <span className="eyebrow">YOUR WORKSPACE, YOUR WAY</span>
+                  <span className="eyebrow">Your workspace, your way</span>
                   <h1>Settings</h1>
                   <div className="settings-section">
                     <h2>Appearance</h2>

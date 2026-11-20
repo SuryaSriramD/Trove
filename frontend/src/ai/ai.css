@@ -2,7 +2,7 @@
   max-width: 940px;
   margin: auto;
   padding: 28px;
-  color: var(--text, #28303a);
+  color: var(--text);
 }
 .ai-panel h2 {
   font-size: 26px;
@@ -10,23 +10,23 @@
 }
 .ai-panel > p,
 .ai-memory > p {
-  color: var(--muted, #637080);
+  color: var(--muted);
   line-height: 1.55;
 }
 .ai-controls {
   display: flex;
   flex-wrap: wrap;
-  gap: 10px;
+  gap: 12px;
   align-items: center;
   margin: 12px 0;
 }
 .ai-panel select,
 .ai-panel input:not([type="checkbox"]),
 .ai-panel textarea {
-  padding: 9px 11px;
-  border: 1px solid var(--border, #d3d9df);
-  border-radius: 6px;
-  background: var(--surface, #fff);
+  padding: 8px 12px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--surface);
   color: inherit;
   max-width: 100%;
 }
@@ -37,10 +37,10 @@
   font: inherit;
   line-height: 1.5;
   box-sizing: border-box;
-  margin: 10px 0;
+  margin: 12px 0;
 }
 .ai-panel button {
-  padding: 7px 11px;
+  padding: 8px 12px;
   cursor: pointer;
 }
 .ai-panel button:disabled {
@@ -48,22 +48,21 @@
   opacity: 0.55;
 }
 .ai-panel details {
-  margin: 18px 0;
+  margin: 16px 0;
 }
 .ai-panel summary {
   cursor: pointer;
 }
 .ai-answer,
 .ai-memory-card {
-  border: 1px solid var(--border, #d3d9df);
-  border-radius: 8px;
-  padding: 18px;
-  margin: 18px 0;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: 16px;
+  margin: 16px 0;
 }
 .ai-meta {
   font-size: 12px;
-  text-transform: uppercase;
-  color: var(--muted, #637080);
+  color: var(--muted);
 }
 .ai-prose {
   white-space: pre-wrap;
@@ -74,25 +73,25 @@
   background: transparent;
   border: 0;
   text-decoration: underline;
-  color: #416f9d;
+  color: var(--purple);
   padding: 0 !important;
 }
 .ai-error {
-  color: #b32939;
+  color: var(--danger);
 }
 .ai-note {
   padding: 12px;
-  background: #f8f1d8;
-  color: #5c501d;
+  background: var(--warn-bg);
+  color: var(--warn-ink);
   line-height: 1.5;
 }
 .ai-source p {
   white-space: pre-wrap;
-  color: var(--muted, #637080);
+  color: var(--muted);
   font-size: 13px;
 }
 .ai-source {
-  border-top: 1px solid var(--border, #ddd);
+  border-top: 1px solid var(--border);
   padding-top: 12px;
 }
 .ai-history {
@@ -105,9 +104,9 @@
   min-height: 240px;
 }
 .ai-proposal {
-  padding: 15px;
-  border: 1px solid var(--border, #ccc);
-  margin-top: 15px;
+  padding: 16px;
+  border: 1px solid var(--border);
+  margin-top: 16px;
 }
 .ai-proposal pre {
   max-height: 300px;
@@ -117,14 +116,14 @@
 }
 .ai-memory {
   margin-top: 36px;
-  border-top: 1px solid var(--border, #ddd);
+  border-top: 1px solid var(--border);
   padding-top: 24px;
 }
 .ai-memory-card p {
   white-space: pre-wrap;
 }
 .ai-memory-card small {
-  color: var(--muted, #637080);
+  color: var(--muted);
 }
 
 .ai-generation-profile dd {

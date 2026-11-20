@@ -1,3 +1,4 @@
+import { ArrowUpRight } from "lucide-react";
 import { TaskDetachPanel } from "./TaskDetachPanel";
 import { useState } from "react";
 import { batch, pageGuards, type WorkspaceSnapshot } from "../api";
@@ -29,7 +30,7 @@ export function TaskEditor({ workspace: w, recordId, openPage, onCommitted, onEr
     <input className={`canonical-task-title ${done ? "done" : ""}`} aria-label={`Task title for ${page.title}`} defaultValue={page.title} key={`${page.id}:${page.revision}`} maxLength={512} disabled={busy || readOnly}
       onBlur={e => { const title = e.currentTarget.value.trim(); if (title && title !== page.title) void run(() => batch(w, [{ kind: "page.update", pageId: page.id, title }], pageGuards(w, page))); else e.currentTarget.value = page.title; }}
       onKeyDown={e => { if (e.key === "Enter") e.currentTarget.blur(); if (e.key === "Escape") { e.currentTarget.value = page.title; e.currentTarget.blur(); } }}/>
-    <button type="button" onClick={() => openPage(page.id)} aria-label={`Open ${page.title} task`}>↗</button>
+    <button type="button" onClick={() => openPage(page.id)} aria-label={`Open ${page.title} task`}><ArrowUpRight size={16} strokeWidth={1.5} aria-hidden="true" /></button>
     <select aria-label={`Task status for ${page.title}`} value={value} disabled={busy || readOnly} onChange={e => void run(() => setProperty(w, record, status, e.target.value))}>
       {options.map(option => <option key={option.id} value={option.id}>{option.label}</option>)}
     </select>

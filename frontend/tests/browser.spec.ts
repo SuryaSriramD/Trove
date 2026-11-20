@@ -1314,7 +1314,7 @@ test("Phase 2 AI works without packs and shows reviewed memory controls", async 
   await expect(page.getByRole("button", { name: "Generate locally" })).toBeDisabled();
   await expect(page.getByRole("heading", { name: "Approved memory", exact: true })).toBeVisible();
   await open(page);
-  await page.getByText("✧ Ask AI or work with this page", { exact: true }).click();
+  await page.getByText("Ask AI or work with this page", { exact: true }).click();
   await expect(page.getByLabel("AI source scope")).toHaveValue("page");
   await page.getByLabel("Writing operation").selectOption("shorten");
   await expect(page.getByLabel("Writing operation")).toHaveValue("shorten");
