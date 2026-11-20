@@ -1,4 +1,5 @@
 :root {
+  --logo-plate: #faf9f6; /* wordmark ink is dark, so the plate stays light in both themes */
   --text: var(--ink);
   --border: var(--line);
   --surface: var(--card);
@@ -1278,7 +1279,7 @@ main {
 .welcome .hero-icon {
   width: 216px;
   height: 72px;
-  background: var(--subtle);
+  background: var(--logo-plate);
   border-radius: var(--radius-lg);
 }
 .welcome h1 {
